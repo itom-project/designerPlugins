@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/itomIsoGLFigurePlugin">
+      <file>icons/LightDir.png</file>
+      <file>icons/LightOff.png</file>
+      <file>icons/LightOn.png</file>
+      <file>icons/blkorwht.png</file>
+      <file>icons/info.png</file>
+    </qresource>
+</RCC>

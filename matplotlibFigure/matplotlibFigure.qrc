@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/matplotlibFigure">
+        <file>icons/back.png</file>
+        <file>icons/filesave.png</file>
+        <file>icons/forward.png</file>
+        <file>icons/home.png</file>
+        <file>icons/move.png</file>
+        <file>icons/subplots.png</file>
+        <file>icons/zoom_to_rect.png</file>
+        <file>icons/marker.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/itomDesignerPlugins/itom">
+        <file>icons/q_itoM32.png</file>
+    </qresource>
+    <qresource prefix="/itomDesignerPlugins/complex">
+        <file>icons/ImRe.png</file>
+        <file>icons/ImReAbs.png</file>
+        <file>icons/ImReImag.png</file>
+        <file>icons/ImRePhase.png</file>
+        <file>icons/ImReReal.png</file>
+    </qresource>
+    <qresource prefix="/itomDesignerPlugins/aspect">
+        <file>icons/AspRatio14.png</file>
+        <file>icons/AspRatio12.png</file>
+        <file>icons/AspRatio11.png</file>
+        <file>icons/AspRatio21.png</file>
+        <file>icons/AspRatio41.png</file>
+        <file>icons/off.png</file>
+    </qresource>
+    <qresource prefix="/itomDesignerPlugins/plot">
+        <file>icons/markerPos.png</file>
+    </qresource>
+    <qresource prefix="/itomDesignerPlugins/general">
+        <file>icons/back.png</file>
+        <file>icons/filesave.png</file>
+        <file>icons/forward.png</file>
+        <file>icons/home.png</file>
+        <file>icons/marker.png</file>
+        <file>icons/move.png</file>
+        <file>icons/subplots.png</file>
+        <file>icons/zoom_to_rect.png</file>
+    </qresource>
+</RCC>
