@@ -23,95 +23,106 @@ find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 #find_package(Glut REQUIRED)
 find_package(ITOM_SDK REQUIRED)
-#find_package(Glew REQUIRED)
+find_package(GLEW REQUIRED)
 
-include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
+IF(GLEW_FOUND)
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-IF (BUILD_UNICODE)
-	ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
-ENDIF (BUILD_UNICODE)
-ADD_DEFINITIONS(-DCMAKE)
+    include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 
-# enable some qt stuff
-#SET (QT_USE_QTOPENGL TRUE)
-SET (QT_USE_QTXML TRUE)
+    ADD_DEFINITIONS(${QT_DEFINITIONS})
+    IF (BUILD_UNICODE)
+        ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
+    ENDIF (BUILD_UNICODE)
+    ADD_DEFINITIONS(-DCMAKE)
 
-# default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
-IF (DEFINED CMAKE_BUILD_TYPE)
-	SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-ELSE(CMAKE_BUILD_TYPE)
-	SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-ENDIF (DEFINED CMAKE_BUILD_TYPE)
+    # enable some qt stuff
+    #SET (QT_USE_QTOPENGL TRUE)
+    SET (QT_USE_QTXML TRUE)
 
-message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
+    # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
+    IF (DEFINED CMAKE_BUILD_TYPE)
+        SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+    ELSE(CMAKE_BUILD_TYPE)
+        SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+    ENDIF (DEFINED CMAKE_BUILD_TYPE)
 
-INCLUDE_DIRECTORIES(
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${QT_QTCORE_INCLUDE_DIR}
-    ${OpenCV_DIR}/include
-    ${ITOM_SDK_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/icons
-    ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
-    #${GLEW_INCLUDE_DIR}
-)
+    message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
-LINK_DIRECTORIES(
-	${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${OpenCV_DIR}/lib
-)
+    INCLUDE_DIRECTORIES(
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${QT_QTCORE_INCLUDE_DIR}
+        ${OpenCV_DIR}/include
+        ${ITOM_SDK_INCLUDE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/icons
+        ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
+        ${GLEW_INCLUDE_PATH}
+    )
 
-INCLUDE(${QT_USE_FILE})
+    LINK_DIRECTORIES(
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${OpenCV_DIR}/lib
+    )
 
-set(designer_HEADERS
-    ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsGraphInc.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsInc.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/typeDefs.h
-    ${ITOM_SDK_INCLUDE_DIR}/DataObject/dataObjectFuncs.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/abstractItomDesignerPlugin.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.h
-)
+    INCLUDE(${QT_USE_FILE})
 
-QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
+    set(designer_HEADERS
+        ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsGraphInc.h
+        ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsInc.h
+        ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
+        ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.h
+        ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.h
+        ${ITOM_SDK_INCLUDE_DIR}/common/typeDefs.h
+        ${ITOM_SDK_INCLUDE_DIR}/DataObject/dataObjectFuncs.h
+        ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.h
+        ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
+        ${ITOM_SDK_INCLUDE_DIR}/plot/abstractItomDesignerPlugin.h
+        ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.h
+    )
 
-#set(designer_ui
-#    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
-#)
+    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
 
-QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
+    #set(designer_ui
+    #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
+    #)
 
-set(designer_rcc
-    ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.qrc
-)
+    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
 
-set(designer_SOURCES 
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.cpp
-)
+    set(designer_rcc
+        ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.qrc
+    )
 
-QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
+    set(designer_SOURCES 
+        ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
+        ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
+        ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
+        ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
+        ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
+        ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.cpp
+    )
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY}) # ${GLEW_LIBRARIES}) # glu32 opengl32 qwtsrc)
+    QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+    ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
 
-# COPY SECTION
-set(COPY_SOURCES "")
-set(COPY_DESTINATIONS "")
-ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
-POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY}) # ${GLEW_LIBRARIES}) # glu32 opengl32 qwtsrc)
+
+    # COPY SECTION
+    set(COPY_SOURCES "")
+    set(COPY_DESTINATIONS "")
+    ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+    
+    IF(WIN32)
+        POST_BUILD_COPY_FILE_TO_LIB_FOLDER(${target_name} GLEW_RUNTIME_LIBRARIES)
+    ENDIF(WIN32)
+    
+    POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+
+ELSE(GLEW_FOUND)
+    message(WARNING "glew could not be found. ${target_name} will not be build")
+ENDIF(GLEW_FOUND)
