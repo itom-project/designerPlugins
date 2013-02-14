@@ -24,11 +24,8 @@
 #define plotGLWidget_H
 
 
-#if linux
-    #include "GL/glew.h"
-#else
-    #include "../3rdParty/glew/include/GL/glew.h"
-#endif
+
+#include "GL/glew.h"
 
 #include <QtOpenGL/qgl.h>
 
