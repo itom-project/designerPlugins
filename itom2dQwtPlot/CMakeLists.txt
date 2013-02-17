@@ -14,7 +14,7 @@ ELSE(BUILD_SHARED)
 ENDIF(BUILD_SHARED)
 
 find_package(Qt4 REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS core)
 #find_package(Glew REQUIRED)
 #find_package(Glut REQUIRED)
 #find_package(PCL 1.6 REQUIRED)
