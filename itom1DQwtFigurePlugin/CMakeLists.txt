@@ -5,18 +5,18 @@ project(${target_name})
 cmake_minimum_required(VERSION 2.8)
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
-OPTION(BUILD_SHARED "Build shared library." ON)
+OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
 
-IF(BUILD_SHARED)
+IF(BUILD_SHARED_LIBS)
 	SET(LIBRARY_TYPE SHARED)
-ELSE(BUILD_SHARED)
+ELSE(BUILD_SHARED_LIBS)
 	SET(LIBRARY_TYPE STATIC)
-ENDIF(BUILD_SHARED)
+ENDIF(BUILD_SHARED_LIBS)
 
 find_package(Qt4 REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core)
