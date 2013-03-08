@@ -12,6 +12,12 @@ ItomIsoGLWidgetPlugin::ItomIsoGLWidgetPlugin(QObject *parent)
     m_plotDataTypes = ito::DataObjPlane;
     m_plotFeatures = ito::Static | ito::PlotImage | ito::Cartesian;
 
+    m_description = QObject::tr("ITOM widget for isometric visualisation of 2D DataObjects.");
+    m_detaildescription = QObject::tr("");
+    m_author = "Christian Kohler, ITO";
+    m_version = 0;
+    m_license = QObject::tr("LGPL with ITO itom-exception");
+
     initialized = false;
 }
 
@@ -55,7 +61,7 @@ QString ItomIsoGLWidgetPlugin::toolTip() const
 
 QString ItomIsoGLWidgetPlugin::whatsThis() const
 {
-    return QString("ITOM widget for 2D DataObjects.");
+    return m_description;
 }
 
 bool ItomIsoGLWidgetPlugin::isContainer() const

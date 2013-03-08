@@ -11,6 +11,12 @@ itom1DQwtFigurePlugin::itom1DQwtFigurePlugin(QObject *parent)
     m_plotDataTypes = ito::DataObjLine;
     m_plotFeatures = ito::Live | ito::Static | ito::PlotLine | ito::Cartesian;
 
+    m_description = QObject::tr("ITOM widget for 1D DataObjects based on QWT.");
+    m_detaildescription = QObject::tr("");
+    m_author = "Marc Gronle, ITO";
+    m_version = 0;
+    m_license = QObject::tr("LGPL with ITO itom-exception");
+
     initialized = false;
 }
 
@@ -49,12 +55,12 @@ QIcon itom1DQwtFigurePlugin::icon() const
 
 QString itom1DQwtFigurePlugin::toolTip() const
 {
-    return QString("Use this widget in your UI for 2D plots in this widget's canvas.");
+    return QString("Use this widget in your UI for 1D plots in this widget's canvas.");
 }
 
 QString itom1DQwtFigurePlugin::whatsThis() const
 {
-    return QString("ITOM widget for 2D DataObjects.");
+    return m_description;
 }
 
 bool itom1DQwtFigurePlugin::isContainer() const

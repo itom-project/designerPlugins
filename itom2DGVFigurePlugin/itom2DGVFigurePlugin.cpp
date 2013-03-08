@@ -11,6 +11,12 @@ itom2DGVFigurePlugin::itom2DGVFigurePlugin(QObject *parent)
     m_plotDataTypes = ito::DataObjPlane;
     m_plotFeatures = ito::Live | ito::Static | ito::PlotImage | ito::Cartesian;
 
+    m_description = QObject::tr("ITOM widget for 2D DataObjects.");
+    m_detaildescription = QObject::tr("");
+    m_author = "Marc Gronle, ITO";
+    m_version = 0;
+    m_license = QObject::tr("LGPL with ITO itom-exception");
+
     initialized = false;
 }
 
@@ -54,7 +60,7 @@ QString itom2DGVFigurePlugin::toolTip() const
 
 QString itom2DGVFigurePlugin::whatsThis() const
 {
-    return QString("ITOM widget for 2D DataObjects.");
+    return m_description;
 }
 
 bool itom2DGVFigurePlugin::isContainer() const

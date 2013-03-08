@@ -50,7 +50,7 @@ QString DataObjectTableFactory::toolTip() const
 
 QString DataObjectTableFactory::whatsThis() const
 {
-    return QString();
+    return QObject::tr("ITOM widget to interprete a dataObject as a table.");
 }
 
 bool DataObjectTableFactory::isContainer() const

@@ -7,6 +7,13 @@
 MatplotlibFigureFactory::MatplotlibFigureFactory(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
+
+    m_description = QObject::tr("ITOM widget for matplotlib figures.");
+    m_detaildescription = QObject::tr("");
+    m_author = "Marc Gronle, ITO";
+    m_version = 0;
+    m_license = QObject::tr("LGPL with ITO itom-exception");
+    
     initialized = false;
 }
 
@@ -50,7 +57,7 @@ QString MatplotlibFigureFactory::toolTip() const
 
 QString MatplotlibFigureFactory::whatsThis() const
 {
-    return QString("ITOM widget for matplotlib figures.");
+    return m_description;
 }
 
 bool MatplotlibFigureFactory::isContainer() const
