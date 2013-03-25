@@ -14,4 +14,5 @@ ADD_SUBDIRECTORY(itom2DQwtFigurePlugin)
 #ADD_SUBDIRECTORY(itom2dQwtPlot) # NICHT!
 ADD_SUBDIRECTORY(itomIsoGLFigurePlugin)
 ADD_SUBDIRECTORY(matplotlibFigure)
+ADD_SUBDIRECTORY(motorController)
 ADD_SUBDIRECTORY(dataObjectTable)
