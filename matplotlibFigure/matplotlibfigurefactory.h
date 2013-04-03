@@ -23,14 +23,12 @@
 #ifndef MATPLOTLIBFIGUREFACTORY_H
 #define MATPLOTLIBFIGUREFACTORY_H
 
-#include <QtDesigner/QDesignerCustomWidgetInterface>
 #include "plot/abstractItomDesignerPlugin.h"
 
 //class MatplotlibFigureFactory : public QObject, public QDesignerCustomWidgetInterface
-class MatplotlibFigureFactory : public ito::AbstractItomDesignerPlugin, public QDesignerCustomWidgetInterface
+class MatplotlibFigureFactory : public ito::AbstractItomDesignerPlugin
 {
     Q_OBJECT
-    Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
     MatplotlibFigureFactory(QObject *parent = 0);
@@ -45,6 +43,7 @@ public:
     QString toolTip() const;
     QString whatsThis() const;
     QWidget *createWidget(QWidget *parent);
+    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
     void initialize(QDesignerFormEditorInterface *core);
 
 private:

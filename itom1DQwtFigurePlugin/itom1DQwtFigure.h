@@ -52,7 +52,7 @@ class itom1DQwtFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
 
     public:
-        itom1DQwtFigure(const QString &itomSettingsFile, QWidget *parent = 0);
+        itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         ~itom1DQwtFigure();
 
         //properties

@@ -23,13 +23,11 @@
 #ifndef ITOM_2D_QWT_FIGUREPLUGIN_H
 #define ITOM_2D_QWT_FIGUREPLUGIN_H
 
-#include <QtDesigner/QDesignerCustomWidgetInterface>
 #include "plot/abstractItomDesignerPlugin.h"
 
-class itom2DQwtFigurePlugin : public ito::AbstractItomDesignerPlugin, public QDesignerCustomWidgetInterface
+class itom2DQwtFigurePlugin : public ito::AbstractItomDesignerPlugin //, public QDesignerCustomWidgetInterface
 {
     Q_OBJECT
-    Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
     itom2DQwtFigurePlugin(QObject *parent = 0);
@@ -44,6 +42,7 @@ public:
     QString toolTip() const;
     QString whatsThis() const;
     QWidget *createWidget(QWidget *parent);
+    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
     void initialize(QDesignerFormEditorInterface *core);
 
 private:

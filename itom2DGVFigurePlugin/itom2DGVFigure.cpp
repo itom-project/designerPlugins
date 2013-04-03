@@ -33,8 +33,8 @@
 using namespace ito;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, parent),
+itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actScaleSetting(NULL),
     m_actPan(NULL),

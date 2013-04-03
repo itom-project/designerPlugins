@@ -1,5 +1,7 @@
 #include "itom2DQwtFigurePlugin.h"
 
+#include "plot/AbstractFigure.h"
+
 #include <QtCore/QtPlugin>
 #include "itom2DQwtFigure.h"
 
@@ -35,7 +37,12 @@ bool itom2DQwtFigurePlugin::isInitialized() const
 
 QWidget *itom2DQwtFigurePlugin::createWidget(QWidget *parent)
 {
-    return new itom2DQwtFigure(m_itomSettingsFile, parent);
+    return new itom2DQwtFigure(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
+}
+
+QWidget *itom2DQwtFigurePlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
+{
+    return new itom2DQwtFigure(m_itomSettingsFile, winMode, parent);
 }
 
 QString itom2DQwtFigurePlugin::name() const

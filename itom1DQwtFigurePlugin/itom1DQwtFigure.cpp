@@ -35,8 +35,8 @@
 using namespace ito;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-itom1DQwtFigure::itom1DQwtFigure(const QString &itomSettingsFile, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, parent),
+itom1DQwtFigure::itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actScaleSetting(NULL),
     m_rescaleParent(NULL),

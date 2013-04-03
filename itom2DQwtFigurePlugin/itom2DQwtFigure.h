@@ -51,7 +51,7 @@ class itom2DQwtFigure : public ito::AbstractDObjFigure
     Q_OBJECT
 
     public:
-        itom2DQwtFigure(const QString &itomSettingsFile, QWidget *parent = 0);
+        itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         ~itom2DQwtFigure();
 
         //properties
@@ -85,9 +85,6 @@ class itom2DQwtFigure : public ito::AbstractDObjFigure
         Plot2DWidget *m_pContent;
 
     private:
-
-        
-
         QAction* m_actScaleSetting;
        
         QAction  *m_actPan;

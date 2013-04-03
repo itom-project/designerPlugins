@@ -36,7 +36,12 @@ bool ItomIsoGLWidgetPlugin::isInitialized() const
 
 QWidget *ItomIsoGLWidgetPlugin::createWidget(QWidget *parent)
 {
-    return new ItomIsoGLWidget(m_itomSettingsFile, parent);
+    return new ItomIsoGLWidget(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
+}
+
+QWidget *ItomIsoGLWidgetPlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
+{
+    return new ItomIsoGLWidget(m_itomSettingsFile, winMode, parent);
 }
 
 QString ItomIsoGLWidgetPlugin::name() const

@@ -35,7 +35,12 @@ bool itom1DQwtFigurePlugin::isInitialized() const
 
 QWidget *itom1DQwtFigurePlugin::createWidget(QWidget *parent)
 {
-    return new itom1DQwtFigure(m_itomSettingsFile, parent);
+    return new itom1DQwtFigure(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
+}
+
+QWidget *itom1DQwtFigurePlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
+{
+    return new itom1DQwtFigure(m_itomSettingsFile, winMode, parent);
 }
 
 QString itom1DQwtFigurePlugin::name() const

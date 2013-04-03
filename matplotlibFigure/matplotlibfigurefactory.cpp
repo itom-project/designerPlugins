@@ -35,6 +35,11 @@ QWidget *MatplotlibFigureFactory::createWidget(QWidget *parent)
     return new MatplotlibFigure(parent);
 }
 
+QWidget *MatplotlibFigureFactory::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
+{
+    return new MatplotlibFigure(parent);
+}
+
 QString MatplotlibFigureFactory::name() const
 {
     return "MatplotlibFigure";

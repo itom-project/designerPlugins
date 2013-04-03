@@ -51,7 +51,7 @@ class itom2DGVFigure : public ito::AbstractDObjFigure
     Q_OBJECT
 
     public:
-        itom2DGVFigure(const QString &itomSettingsFile, QWidget *parent = 0);
+        itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         ~itom2DGVFigure();
 
         //properties

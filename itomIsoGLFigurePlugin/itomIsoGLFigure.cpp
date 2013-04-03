@@ -34,8 +34,8 @@ using namespace ito;
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, parent),
+ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actScaleSetting(NULL),
    // m_actPan(NULL),
@@ -230,7 +230,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, QWidget *paren
     test = connect(m_mnuTringModeSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuTringModeSwitch(QAction*)));
 
 	QToolBar *toolbar = new QToolBar(this);
-	addToolBar(toolbar, "mainToolBar");
+	addToolBar(toolbar, "mainToolBar", Qt::TopToolBarArea, 1);
 
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();

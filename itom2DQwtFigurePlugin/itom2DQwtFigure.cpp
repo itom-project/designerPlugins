@@ -32,8 +32,8 @@
 using namespace ito;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, parent),
+itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actScaleSetting(NULL),
     m_actPan(NULL),
@@ -219,6 +219,8 @@ itom2DQwtFigure::~itom2DQwtFigure()
     }
 }
 
+
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal itom2DQwtFigure::applyUpdate()
 {
@@ -276,25 +278,29 @@ ito::RetVal itom2DQwtFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32
 
     retval += apiGetFigure(newUniqueID, "itom1DQwtFigure", &lineCutObj);
 
-    if(uniqueID != newUniqueID)
+    if(!retval.containsError())
     {
-        uniqueID = newUniqueID;
-        ito::AbstractDObjFigure* lineCut = NULL;
-        if (lineCutObj->inherits("ito::AbstractDObjFigure"))
-            lineCut = (ito::AbstractDObjFigure*)lineCutObj;
-        else
-            return ito::retError;
-        retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["bounds"], lineCut->getInputParam("bounds"), Channel::parentToChild, 0, 1);
-        retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["displayed"], lineCut->getInputParam("source"), Channel::parentToChild, 0, 1);
-        paramNames << "bounds"  << "displayed";
-        retval += updateChannels(paramNames);
 
-        lineCut->show();
-    }
-    else
-    {
-        paramNames << "bounds"  << "displayed";
-        retval += updateChannels(paramNames);
+        if(uniqueID != newUniqueID)
+        {
+            uniqueID = newUniqueID;
+            ito::AbstractDObjFigure* lineCut = NULL;
+            if (lineCutObj->inherits("ito::AbstractDObjFigure"))
+                lineCut = (ito::AbstractDObjFigure*)lineCutObj;
+            else
+                return ito::retError;
+            retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["bounds"], lineCut->getInputParam("bounds"), Channel::parentToChild, 0, 1);
+            retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["displayed"], lineCut->getInputParam("source"), Channel::parentToChild, 0, 1);
+            paramNames << "bounds"  << "displayed";
+            retval += updateChannels(paramNames);
+
+            lineCut->show();
+        }
+        else
+        {
+            paramNames << "bounds"  << "displayed";
+            retval += updateChannels(paramNames);
+        }
     }
 
     return retval;

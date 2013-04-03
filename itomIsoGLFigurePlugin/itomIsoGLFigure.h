@@ -82,7 +82,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 
         friend class GL3DEFilter;
 
-        ItomIsoGLWidget(const QString &itomSettingsFile, QWidget *parent = 0);
+        ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         ~ItomIsoGLWidget();
 
         //properties
