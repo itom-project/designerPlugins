@@ -46,54 +46,45 @@
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
 
-class itom1DQwtFigure : public ito::AbstractDObjFigure
+class Itom1DQwtFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
+    Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
+    Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
+    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
 
     public:
-        itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
-        ~itom1DQwtFigure();
+        Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
+        ~Itom1DQwtFigure();
+
+        ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
 
         //properties
-        void setShowContextMenu(bool show); 
         bool showContextMenu() const;
-        ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
-        void setSource(QSharedPointer<ito::DataObject> source);
-        QSharedPointer<ito::DataObject> getSource(void);
-        QSharedPointer<ito::DataObject> getDisplayed(void);
+        void setShowContextMenu(bool show); 
 
-        virtual inline void setBounds(QVector<QPointF> bounds) 
-        { 
-            double *pointArr = new double[2 * bounds.size()];
-            for (int np = 0; np < bounds.size(); np++)
-            {
-                pointArr[np * 2] = bounds[np].x();
-                pointArr[np * 2 + 1] = bounds[np].y();
-            }
-            m_pInput["bounds"]->setVal(pointArr, 2 * bounds.size());
-            delete pointArr;
-        }
-
-        virtual inline QVector<QPointF> getBounds(void) 
-        { 
-            QVector<QPointF> boundsVec;
-            double *ptsDblVec = m_pInput["bounds"]->getVal<double*>();
-            int numPts = m_pInput["bounds"]->getLen();
-
-            boundsVec.reserve(numPts / 2);
-            for (int n = 0; n < numPts / 2; n++)
-            {
-                boundsVec.append(QPointF(ptsDblVec[n * 2], ptsDblVec[n * 2 + 1]));
-            }
-            return boundsVec;
-        }
+        QVector<QPointF> getBounds(void);
+        void setBounds(QVector<QPointF> bounds);
 
         void setMarkerCoordinates(const QVector<QPointF> pts);
         void enableComplexGUI(const bool checked);
+
+        QString getTitle();
+        void setTitle(const QString &title);
+        void resetTitle();
+
+        QString getAxisLabel();
+        void setAxisLabel(const QString &label);
+        void resetAxisLabel();
+
+        QString getValueLabel();
+        void setValueLabel(const QString &label);
+        void resetValueLabel();
     
     protected:
         Plot1DWidget *m_pContent;
+        InternalData m_data;
 
     private:
 
@@ -119,10 +110,6 @@ class itom1DQwtFigure : public ito::AbstractDObjFigure
         QLabel *m_CurCoordDelta;
 		QLabel *m_lblCoordinates;
 
-    signals:
-    
-    private slots:
-
     public slots:
         void mnuMarkerClick(bool checked);
         void mnuPanner(bool checked);
@@ -132,9 +119,13 @@ class itom1DQwtFigure : public ito::AbstractDObjFigure
         void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();
+        
 
         QPointF getYAxisInterval(void);
         void setYAxisInterval(QPointF);
+
+    private slots:
+        void mnuHome();
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

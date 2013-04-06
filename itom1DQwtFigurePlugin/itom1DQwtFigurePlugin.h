@@ -25,12 +25,12 @@
 
 #include "plot/abstractItomDesignerPlugin.h"
 
-class itom1DQwtFigurePlugin : public ito::AbstractItomDesignerPlugin
+class Itom1DQwtFigurePlugin : public ito::AbstractItomDesignerPlugin
 {
     Q_OBJECT
 
 public:
-    itom1DQwtFigurePlugin(QObject *parent = 0);
+    Itom1DQwtFigurePlugin(QObject *parent = 0);
 
     bool isContainer() const;
     bool isInitialized() const;

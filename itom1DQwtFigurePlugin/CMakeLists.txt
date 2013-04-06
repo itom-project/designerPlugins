@@ -104,6 +104,7 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtFigurePlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
 )
 
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})

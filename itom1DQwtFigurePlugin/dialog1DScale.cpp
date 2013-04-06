@@ -46,7 +46,7 @@ Dialog1DScale::Dialog1DScale(const double minX, const double maxX, const double 
     ui.doubleSpinMinY->setValue(minY);
     ui.doubleSpinMaxY->setValue(maxY);
 
-    ui.groupPlane->setVisible(false);
+    //ui.groupPlane->setVisible(false);
 }
 
 void Dialog1DScale::getData(double &minX, double &maxX, double &minY, double &maxY, bool &autoCalcX, bool &autoCalcOnceX, bool &autoCalcY, bool &autoCalcOnceY)

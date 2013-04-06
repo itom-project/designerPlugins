@@ -45,22 +45,35 @@
 #include <qwt_plot_panner.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_grid.h>
 
 #include "valuepicker1d.h"
 
 class itom1DQwtFigure;
 
+struct InternalData
+{
+    QString m_title;
+    QString m_axisLabel;
+    QString m_valueLabel;
+    bool m_autoTitle;
+    bool m_autoAxisLabel;
+    bool m_autoValueLabel;
+};
+
 class Plot1DWidget : public QwtPlot
 {
     Q_OBJECT
     public:
-        Plot1DWidget(QMenu *contextMenu, QWidget * parent = 0);
+        enum MultiLineMode { FirstRow, FirstCol, MultiRows, MultiCols };
+
+        Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
         ~Plot1DWidget();
 
         bool m_showContextMenu;
-        void refreshPlot(QSharedPointer<ito::DataObject> dataObj, QVector<QPointF> pts);
+        void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>() );
 
-        friend class itom1DQwtFigure;
+        friend class Itom1DQwtFigure;
         ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);
 
         void setZoomerEnable(const bool checked);
@@ -71,10 +84,22 @@ class Plot1DWidget : public QwtPlot
         void mouseReleaseEvent ( QMouseEvent * event );
         void contextMenuEvent(QContextMenuEvent * event);
 
+        void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
+
+        
+
     private:
 
         QMenu *m_contextMenu;
-        QwtPlotCurve **m_pContent; //content-element, added to canvas when first valid data object becomes available
+
+        QList<QwtPlotCurve*> m_plotCurveItems;
+
+        QwtPlotGrid *m_pPlotGrid;
+
+        QByteArray m_hash; //hash of recently loaded dataObject
+
+        //QwtPlotCurve **m_pContent; //content-element, added to canvas when first valid data object becomes available
+        InternalData *m_pData;
 
         bool m_startScaledY;
         bool m_startScaledX;
@@ -83,8 +108,7 @@ class Plot1DWidget : public QwtPlot
         bool m_pCurserEnable;
         bool m_cmplxState;
 
-        int m_numElements;
-        int m_multiLine;
+        MultiLineMode m_multiLine;
         char m_autoLineColIndex;
         long m_lineCol;
         int m_lineStyle;
@@ -113,7 +137,7 @@ class Plot1DWidget : public QwtPlot
         void updateChildren(QVector<QPointF>);
 
     public slots:
-        void replot();
+        //void replot();
 
 };
 

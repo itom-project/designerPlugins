@@ -23,34 +23,34 @@
 #ifndef QWTPLOTCURVEDATAOBJECT
 #define QWTPLOTCURVEDATAOBJECT
 
-#include "common/sharedStructures.h"
-
-#include "DataObject/dataobj.h"
-
-#include "dataObjectSeriesData.h"
 #include <qwt_plot_curve.h>
+#include <qpolygon.h>
 
-using namespace ito;
+class QPainter;
 
 class QwtPlotCurveDataObject : public QwtPlotCurve
 {
 public:
 
-    explicit QwtPlotCurveDataObject( const QString &title = QString::null ) : QwtPlotCurve(title) {}
-    explicit QwtPlotCurveDataObject( const QwtText &title ) : QwtPlotCurve(title) {}
+    explicit QwtPlotCurveDataObject( const QString &title = QString::null ) : QwtPlotCurve(title), m_privCurveFitter(NULL) {}
+    explicit QwtPlotCurveDataObject( const QwtText &title ) : QwtPlotCurve(title), m_privCurveFitter(NULL) {}
 
-    virtual void draw( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect ) const
-    {
-        DataObjectSeriesData *myData = NULL;
-        myData = (DataObjectSeriesData *)data();
+    virtual void draw( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect ) const;
 
-        if (myData && myData->isDobjInit())
-        {
-            myData->setRasterObj();
-            drawSeries( painter, xMap, yMap, canvasRect, 0, -1 );
-            myData->releaseRasterObj();
-        }
-    }
+    void setBrush( const QBrush &brush ) { m_privBrush = brush; QwtPlotCurve::setBrush(brush); }
+    void setCurveFitter( QwtCurveFitter *curveFitter ) { m_privCurveFitter = curveFitter; QwtPlotCurve::setCurveFitter(curveFitter); }
+
+protected:
+    void drawSeries( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+    void drawCurve( QPainter *painter, int style, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+    void drawLines( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+
+    void drawPolyline(QPainter *painter, QPolygonF &polyline, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect) const;
+
+private:
+    //this is a hack in order to access PrivateData
+    QBrush m_privBrush;
+    QwtCurveFitter *m_privCurveFitter;
 
 };
 

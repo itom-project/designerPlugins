@@ -4,7 +4,7 @@
 #include "itom1DQwtFigure.h"
 
 
-itom1DQwtFigurePlugin::itom1DQwtFigurePlugin(QObject *parent)
+Itom1DQwtFigurePlugin::Itom1DQwtFigurePlugin(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
     m_plotDataFormats = ito::Format_Gray8 | ito::Format_Gray16 | ito::Format_Gray32 | ito::Format_Float32 | ito::Format_Float64 | ito::Format_Complex;
@@ -20,7 +20,7 @@ itom1DQwtFigurePlugin::itom1DQwtFigurePlugin(QObject *parent)
     initialized = false;
 }
 
-void itom1DQwtFigurePlugin::initialize(QDesignerFormEditorInterface * /*core*/)
+void Itom1DQwtFigurePlugin::initialize(QDesignerFormEditorInterface * /*core*/)
 {
     if (initialized)
         return;
@@ -28,68 +28,68 @@ void itom1DQwtFigurePlugin::initialize(QDesignerFormEditorInterface * /*core*/)
     initialized = true;
 }
 
-bool itom1DQwtFigurePlugin::isInitialized() const
+bool Itom1DQwtFigurePlugin::isInitialized() const
 {
     return initialized;
 }
 
-QWidget *itom1DQwtFigurePlugin::createWidget(QWidget *parent)
+QWidget *Itom1DQwtFigurePlugin::createWidget(QWidget *parent)
 {
-    return new itom1DQwtFigure(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
+    return new Itom1DQwtFigure(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
 }
 
-QWidget *itom1DQwtFigurePlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
+QWidget *Itom1DQwtFigurePlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
 {
-    return new itom1DQwtFigure(m_itomSettingsFile, winMode, parent);
+    return new Itom1DQwtFigure(m_itomSettingsFile, winMode, parent);
 }
 
-QString itom1DQwtFigurePlugin::name() const
+QString Itom1DQwtFigurePlugin::name() const
 {
     return "itom1DQwtFigure";
 }
 
-QString itom1DQwtFigurePlugin::group() const
+QString Itom1DQwtFigurePlugin::group() const
 {
     return "ITOM Plugins";
 }
 
-QIcon itom1DQwtFigurePlugin::icon() const
+QIcon Itom1DQwtFigurePlugin::icon() const
 {
     return QIcon(":/itom/icons/q_itoM32.png");
 }
 
-QString itom1DQwtFigurePlugin::toolTip() const
+QString Itom1DQwtFigurePlugin::toolTip() const
 {
     return QString("Use this widget in your UI for 1D plots in this widget's canvas.");
 }
 
-QString itom1DQwtFigurePlugin::whatsThis() const
+QString Itom1DQwtFigurePlugin::whatsThis() const
 {
     return m_description;
 }
 
-bool itom1DQwtFigurePlugin::isContainer() const
+bool Itom1DQwtFigurePlugin::isContainer() const
 {
     return false;
 }
 
-QString itom1DQwtFigurePlugin::domXml() const
+QString Itom1DQwtFigurePlugin::domXml() const
 {
-    return "<widget class=\"itom1DQwtFigure\" name=\"itom1DQwtFigure\">\n"
+    return "<widget class=\"Itom1DQwtFigure\" name=\"Itom1DQwtFigure\">\n"
         " <property name=\"geometry\">\n"
         "  <rect>\n"
         "   <x>0</x>\n"
         "   <y>0</y>\n"
-        "   <width>100</width>\n"
-        "   <height>100</height>\n"
+        "   <width>250</width>\n"
+        "   <height>150</height>\n"
         "  </rect>\n"
         " </property>\n"
         "</widget>\n";
 }
 
-QString itom1DQwtFigurePlugin::includeFile() const
+QString Itom1DQwtFigurePlugin::includeFile() const
 {
     return "itom1DQwtFigure.h";
 }
 
-Q_EXPORT_PLUGIN2(itom1DQwtFigure, itom1DQwtFigurePlugin)
+Q_EXPORT_PLUGIN2(Itom1DQwtFigure, Itom1DQwtFigurePlugin)
