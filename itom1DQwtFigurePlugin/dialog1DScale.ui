@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>215</width>
+    <width>185</width>
     <height>281</height>
    </rect>
   </property>
@@ -52,19 +52,6 @@
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="1">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>from</string>
@@ -74,8 +61,11 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
+        <item row="0" column="1">
          <widget class="QDoubleSpinBox" name="doubleSpinMinX">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -88,19 +78,6 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="1">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>to</string>
@@ -110,8 +87,11 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
+        <item row="1" column="1">
          <widget class="QDoubleSpinBox" name="doubleSpinMaxX">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -145,6 +125,9 @@
         <property name="text">
          <string>auto</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -153,26 +136,13 @@
          <string>manual adjustment:</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="1">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>from</string>
@@ -182,8 +152,11 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
+        <item row="0" column="1">
          <widget class="QDoubleSpinBox" name="doubleSpinMinY">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -196,19 +169,6 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="1">
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>to</string>
@@ -218,8 +178,11 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
+        <item row="1" column="1">
          <widget class="QDoubleSpinBox" name="doubleSpinMaxY">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -278,7 +241,7 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>205</x>
+     <x>175</x>
      <y>261</y>
     </hint>
     <hint type="destinationlabel">
@@ -294,140 +257,76 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>205</x>
+     <x>175</x>
      <y>261</y>
     </hint>
     <hint type="destinationlabel">
-     <x>214</x>
+     <x>184</x>
      <y>274</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>radioManualX</sender>
-   <signal>clicked(bool)</signal>
+   <sender>radioAutoCalcX</sender>
+   <signal>toggled(bool)</signal>
    <receiver>doubleSpinMinX</receiver>
-   <slot>setEnabled(bool)</slot>
+   <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>54</y>
+     <x>40</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
-     <x>200</x>
-     <y>86</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualX</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>doubleSpinMaxX</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>48</x>
-     <y>55</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>178</x>
-     <y>101</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualY</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>doubleSpinMinY</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
      <x>50</x>
-     <y>168</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>178</x>
-     <y>190</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualY</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>doubleSpinMaxY</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>29</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>176</x>
-     <y>219</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioAutoCalcX</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>doubleSpinMinX</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>31</x>
-     <y>32</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>166</x>
-     <y>81</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioAutoCalcX</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>doubleSpinMaxX</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>109</x>
-     <y>32</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>164</x>
-     <y>107</y>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>radioAutoCalcY</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>doubleSpinMinY</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>75</x>
-     <y>150</y>
+     <x>43</x>
+     <y>151</y>
     </hint>
     <hint type="destinationlabel">
-     <x>165</x>
-     <y>195</y>
+     <x>63</x>
+     <y>188</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>radioAutoCalcY</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>doubleSpinMaxY</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>149</y>
+     <x>106</x>
+     <y>151</y>
     </hint>
     <hint type="destinationlabel">
-     <x>157</x>
-     <y>223</y>
+     <x>102</x>
+     <y>218</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioAutoCalcX</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>doubleSpinMaxX</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>123</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>128</x>
+     <y>108</y>
     </hint>
    </hints>
   </connection>

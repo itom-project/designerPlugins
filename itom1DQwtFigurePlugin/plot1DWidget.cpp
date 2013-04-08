@@ -107,6 +107,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     // This will be point tracker!
     m_pCurser1 = new QwtPlotMarker();
     m_pCurser1->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::red), QPen(QBrush(Qt::red),1),  QSize(6,6) ));
+    //m_pCurser1->setLabel( QwtText("test"));
     m_pCurser1->attach(this);
     m_pCurser1->setVisible(false);
     m_pCurser2 = new QwtPlotMarker();
@@ -239,6 +240,37 @@ void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::updateLabels()
+{
+    if(m_pData->m_autoValueLabel)
+    {
+        setAxisTitle(QwtPlot::yLeft, m_pData->m_valueLabelDObj);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::yLeft, m_pData->m_valueLabel);
+    }
+
+    if(m_pData->m_autoAxisLabel)
+    {
+        setAxisTitle(QwtPlot::xBottom, m_pData->m_axisLabelDObj);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::xBottom, m_pData->m_axisLabel);
+    }
+
+    if(m_pData->m_autoTitle)
+    {
+        setTitle(m_pData->m_titleDObj);
+    }
+    else
+    {
+        setTitle(m_pData->m_title);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds)
 {
     DataObjectSeriesData* seriesData = NULL;
@@ -248,7 +280,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtPlotCurveDataObject *dObjCurve = NULL;
     bool _unused;
 
-    QString valueLabel, axisLabel, title;
+    //QString valueLabel, axisLabel, title;
 
     if (dataObj)
     {
@@ -342,8 +374,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 if(numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                    valueLabel = seriesData->getDObjValueLabel();
-                    axisLabel = seriesData->getDObjAxisLabel();
+                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
+                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
                 }
                 break;
 
@@ -372,8 +404,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 if(numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                    valueLabel = seriesData->getDObjValueLabel();
-                    axisLabel = seriesData->getDObjAxisLabel();
+                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
+                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
                 }
                 break;
             }
@@ -392,8 +424,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 m_plotCurveItems[0]->setData(seriesData);
             }
 
-            valueLabel = seriesData->getDObjValueLabel();
-            axisLabel = seriesData->getDObjAxisLabel();
+            m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
+            m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
         }
         else if(bounds.size() == 1) //point in third dimension
         {
@@ -409,17 +441,17 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 m_plotCurveItems[0]->setData(seriesData);
             }
 
-            valueLabel = seriesData->getDObjValueLabel();
-            axisLabel = seriesData->getDObjAxisLabel();
+            m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
+            m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
         }
 
         bool valid;
         ito::DataObjectTagType tag;
         tag = dataObj->getTag("title", valid);
-        title = valid? QString::fromStdString(tag.getVal_ToString()) : "";
+        m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
     } 
 
-    setLabels(title, valueLabel, axisLabel);
+    updateLabels();
 
     if(seriesData)
     {
@@ -427,252 +459,35 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if(hash != m_hash)
         {
-            m_pZoomer->setZoomBase( true ); //seriesData->boundingRect() );
+            QRectF rect = seriesData->boundingRect();
+            if(m_pData->m_valueScaleAuto)
+            {
+                m_pData->m_valueMin = rect.top();
+                m_pData->m_valueMax = rect.bottom();
+            }
+
+            if(m_pData->m_axisScaleAuto)
+            {
+                m_pData->m_axisMin = rect.left();
+                m_pData->m_axisMax = rect.right();
+            }
+
+            updateScaleValues(); //replot is done here
+
+            m_pZoomer->setZoomBase( true );
+        }
+        else
+        {
+            replot();
         }
 
         m_hash = hash;
     }
-    
-
-    //       {
-    //            int startPoint = 0;
-    //            if (dataObj->getSize(dataObj->getDims() - 1) == 1 && (dataObj->getDims() > 1))
-    //            {
-    //                if (m_numElements != 1)
-    //                {
-    //                    for (int m = 1; m < m_numElements; m++)
-    //                        delete m_pContent[m];
-    //                    m_pContent = static_cast<QwtPlotCurve**>(realloc(m_pContent, sizeof(QwtPlotCurve*)));
-    //                    m_numElements = 1;
-    //                }
-    //                m_pContent[0]->setData(new DataObjectSeriesData(dataObj, startPoint, dataObj->getDims() - 2, dataObj->getSize(dataObj->getDims() - 2), 1));
-
-
-    //                bool test;
-    //                QString qtBuf("");
-    //                std::string tDescription = dataObj->getAxisDescription(dataObj->getDims() - 2, test, true);
-    //                std::string tUnit = dataObj->getAxisUnit(dataObj->getDims() - 2, test, true);
-
-    //                if(!tDescription.empty())
-    //                {
-    //                    qtBuf.append(tDescription.data());
-    //                }
-    //                if (!tUnit.empty())
-    //                {
-    //                    if(qtBuf.size()) qtBuf.append(" in ");
-    //                    qtBuf.append(tUnit.data());
-    //                }
-    //                if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf);
-
-    //            }
-    //            else if (dataObj->getSize(dataObj->getDims() - 2) == 1)
-    //            {
-    //                if (m_numElements != 1)
-    //                {
-    //                    for (int m = 1; m < m_numElements; m++)
-    //                        delete m_pContent[m];
-    //                    m_pContent = static_cast<QwtPlotCurve**>(realloc(m_pContent, sizeof(QwtPlotCurve*)));
-    //                    m_numElements = 1;
-    //                }
-    //                m_pContent[0]->setData(new DataObjectSeriesData(dataObj, startPoint, dataObj->getDims() - 1, dataObj->getSize(dataObj->getDims() - 1), 1));
-
-    //                bool test;
-    //                QString qtBuf("");
-    //                std::string tDescription = dataObj->getAxisDescription(dataObj->getDims() - 1, test, true);
-    //                std::string tUnit = dataObj->getAxisUnit(dataObj->getDims() - 1, test, true);
-
-    //                if(!tDescription.empty())
-    //                {
-    //                    qtBuf.append(tDescription.data());
-    //                }
-    //                if (!tUnit.empty())
-    //                {
-    //                    if(qtBuf.size()) qtBuf.append(" in ");
-    //                    qtBuf.append(tUnit.data());
-    //                }
-    //                if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf);
-    //            }
-    //            else if (pts.size() == 2)
-    //            {
-    //                if (m_numElements != 1)
-    //                {
-    //                    m_pContent = static_cast<QwtPlotCurve**>(realloc(m_pContent, sizeof(QwtPlotCurve*)));
-    //                    m_numElements = 1;
-    //                }
-    //                m_pContent[0]->setData(new DataObjectSeriesData(dataObj, pts, 0));
-
-    //            }
-    //            else if (pts.size() == 1)
-    //            {
-    //                // This is for the depth cut!!!
-    //                if (m_numElements != 1)
-    //                {
-    //                    m_pContent = static_cast<QwtPlotCurve**>(realloc(m_pContent, sizeof(QwtPlotCurve*)));
-    //                    m_numElements = 1;
-    //                }
-    //                m_pContent[0]->setData(new DataObjectSeriesData(dataObj, pts, 0));
-    //            }
-    //        }
-    //        }
-
-    //        if(dataObj)
-    //        {
-    //            bool test;
-
-    //            // Copy Titel and axis scale to widget
-    //            QString qtBuf("");
-    //            std::string tDescription(dataObj->getValueDescription());
-    //            std::string tUnit(dataObj->getValueUnit());
-
-    //            int objDims = dataObj->getDims();
-
-    //            if(!tDescription.empty())
-    //            {
-    //                qtBuf.append(tDescription.data());
-    //            }
-    //            if (!tUnit.empty())
-    //            {
-    //                if(qtBuf.size()) qtBuf.append(" in ");
-    //                qtBuf.append(tUnit.data());
-    //            }
-    //            if(qtBuf.size()) setAxisTitle(QwtPlot::yLeft, qtBuf);
-
-    //            std::string tTitle(dataObj->getTag("title", test).getVal_ToString());
-    //            qtBuf.clear();
-    //            if(test)
-    //            {
-    //                qtBuf.append(tTitle.data());
-    //            }
-    //            setTitle(qtBuf);
-
-
-    //            if (dataObj->getSize(dataObj->getDims() - 1) == 1 && (dataObj->getDims() > 1))
-    //            {
-    //                qtBuf.clear();
-    //                tDescription = dataObj->getAxisDescription(dataObj->getDims() - 2, test, true);
-    //                tUnit = dataObj->getAxisUnit(dataObj->getDims() - 2, test, true);
-
-    //                if(!tDescription.empty())
-    //                {
-    //                    qtBuf.append(tDescription.data());
-    //                }
-    //                if (!tUnit.empty())
-    //                {
-    //                    if(qtBuf.size()) qtBuf.append(" in ");
-    //                    qtBuf.append(tUnit.data());
-    //                }
-    //                if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf);
-
-    //            }
-    //            else if (dataObj->getSize(dataObj->getDims() - 2) == 1)
-    //            {
-    //                qtBuf.clear();
-
-    //                tDescription = dataObj->getAxisDescription(dataObj->getDims() - 1, test, true);
-    //                tUnit = dataObj->getAxisUnit(dataObj->getDims() - 1, test, true);
-
-    //                if(!tDescription.empty())
-    //                {
-    //                    qtBuf.append(tDescription.data());
-    //                }
-    //                if (!tUnit.empty())
-    //                {
-    //                    if(qtBuf.size()) qtBuf.append(" in ");
-    //                    qtBuf.append(tUnit.data());
-    //                }
-    //                if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf);
-    //            }
-    //            else if (pts.size() == 2)
-    //            {
-    //                bool xdirect = false;
-    //                bool ydirect = false;
-
-    //                if(fabs((double)pts[1].x() - (double)pts[0].x()) > std::numeric_limits<double>::epsilon())
-    //                {
-    //                   xdirect = true;
-    //                }
-
-    //                if(fabs((double)pts[1].y() - (double)pts[0].y()) > std::numeric_limits<double>::epsilon())
-    //                {
-    //                   ydirect = true;
-    //                }
-
-    //                if((xdirect != m_xDirect) || (ydirect != m_yDirect))   // Check if the oriantation of the plot has changed (x || y || xy)
-    //                {
-    //                    qtBuf.clear();
-    //                    m_xDirect = xdirect;
-    //                    m_yDirect = ydirect;
-    //                    if(xdirect)
-    //                    {
-    //                       tUnit = dataObj->getAxisUnit(objDims - 1, test, true);
-    //                       tDescription = dataObj->getAxisDescription(objDims - 1, test, true);
-    //                        if(tDescription.size())
-    //                        {
-    //                            qtBuf.append(tDescription.data());
-    //                        }
-    //                        else
-    //                        {
-    //                            qtBuf.append("x-Axis");
-    //                        }
-    //                        if(tUnit.size())
-    //                        {
-    //                            qtBuf.append(" in ");
-    //                            qtBuf.append(tUnit.data());
-    //                        }
-    //                    }
-    //                    if (ydirect)
-    //                    {
-    //                        if(qtBuf.size()) qtBuf.append(" & ");
-    //                        tUnit.clear();
-    //                        tDescription.clear();
-    //                        tUnit = dataObj->getAxisUnit(objDims - 2, test, true);
-    //                        tDescription = dataObj->getAxisDescription(objDims - 1, test, true);
-    //                        if(tDescription.size())
-    //                        {
-    //                            qtBuf.append(tDescription.data());
-    //                        }
-    //                        else
-    //                        {
-    //                            qtBuf.append("y-Axis");
-    //                        }
-    //                        if(tUnit.size())
-    //                        {
-    //                            qtBuf.append(" in ");
-    //                            qtBuf.append(tUnit.data());
-    //                        }
-    //                    }
-    //                    if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf);
-    //                }
-    //            }
-    //            else if (pts.size() == 1 && (objDims > 2))
-    //            {
-
-    //                qtBuf.clear();
-
-    //                tUnit = dataObj->getAxisUnit(objDims - 3, test, true);
-    //                tDescription = dataObj->getAxisDescription(objDims - 3, test, true);
-    //                if(tDescription.size())
-    //                {
-    //                    qtBuf.append(tDescription.data());
-    //                }
-    //                else
-    //                {
-    //                    qtBuf.append("z-Direction");
-    //                }
-    //                if(tUnit.size())
-    //                {
-    //                    qtBuf.append(" in ");
-    //                    qtBuf.append(tUnit.data());
-    //                }
-
-    //                if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf);
-
-    //            }    
-    //        }
-    //    }
-    //}
-
-
+    else
+    {
+        replot();
+    }
+   
     /*if(m_startScaledY && seriesData)
     {
         seriesData->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
@@ -684,7 +499,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         m_startScaledY = false;
     }*/
 
-    replot();
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -868,4 +683,27 @@ void Plot1DWidget::setPickerEnable(const bool checked)
         //m_pValuePicker->setVisible(false);
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::updateScaleValues()
+{
+    if(m_pData->m_valueScaleAuto)
+    {
+        setAxisAutoScale( QwtPlot::yLeft, true );
+    }
+    else
+    {
+        setAxisScale( QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax );
+    }
+
+    if(m_pData->m_axisScaleAuto)
+    {
+        setAxisAutoScale( QwtPlot::xBottom, true );
+    }
+    else
+    {
+        setAxisScale( QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax );
+    }
+
+    replot();
+}

@@ -127,18 +127,17 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
 	m_actCmplxSwitch->setMenu(m_mnuCmplxSwitch);
     m_actCmplxSwitch->setVisible(false);
 
-    bool test;
-    test = connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
-    test = connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
+    connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
+    connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
     
-    test = connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
-    test = connect(m_rescaleParent, SIGNAL(triggered()), this, SLOT(mnuParentScaleSetting()));
+    connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
+    connect(m_rescaleParent, SIGNAL(triggered()), this, SLOT(mnuParentScaleSetting()));
 
-    test = connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
-    test = connect(m_actZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
-    test = connect(m_actPan, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
-    test = connect(m_mnuSetMarker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetMarker(QAction*)));
-	test = connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
+    connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
+    connect(m_actZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
+    connect(m_actPan, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
+    connect(m_mnuSetMarker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetMarker(QAction*)));
+	connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
 	QToolBar *toolbar = new QToolBar("1D Qwt Figure Toolbar", this);
 	addToolBar(toolbar, "mainToolBar");
@@ -190,6 +189,14 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     toolbar->addAction(m_actBack);
     toolbar->addAction(m_actForward);
     toolbar->addAction(m_actCmplxSwitch);
+
+    m_data.m_autoAxisLabel = true;
+    m_data.m_autoValueLabel = true;
+    m_data.m_valueScaleAuto = true;
+    m_data.m_dataType = ito::tFloat64;
+    m_data.m_valueMin = -127.0;
+    m_data.m_valueMax = 128.0;
+    m_data.m_axisScaleAuto = true;
 
     m_pContent = new Plot1DWidget(contextMenu, &m_data, this);
     m_pContent->setObjectName("canvasWidget");
@@ -283,13 +290,15 @@ void Itom1DQwtFigure::setTitle(const QString &title)
         m_data.m_autoTitle = false;
         m_data.m_title = title;
     }
-    if(m_pContent) m_pContent->replot();
+
+    if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::resetTitle()
 {
     m_data.m_autoTitle = true;
+    if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -314,13 +323,14 @@ void Itom1DQwtFigure::setAxisLabel(const QString &label)
         m_data.m_autoAxisLabel = false;
         m_data.m_axisLabel = label;
     }
-    if(m_pContent) m_pContent->replot();
+    if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::resetAxisLabel()
 {
     m_data.m_autoAxisLabel = true;
+    if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -345,28 +355,15 @@ void Itom1DQwtFigure::setValueLabel(const QString &label)
         m_data.m_autoValueLabel = false;
         m_data.m_valueLabel = label;
     }
-    if(m_pContent) m_pContent->replot();
+    if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::resetValueLabel()
 {
     m_data.m_autoValueLabel = true;
+    if(m_pContent) m_pContent->updateLabels();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -412,7 +409,7 @@ void Itom1DQwtFigure::mnuMarkerClick(bool checked)
         m_actZoomToRect->setChecked(false);
     }
     
-    (m_pContent)->setPickerEnable(checked);
+    m_pContent->setPickerEnable(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -472,48 +469,11 @@ void Itom1DQwtFigure::mnuExport()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::mnuScaleSetting()
 {
-    DataObjectSeriesData* seriesData = NULL;
-    
-    if(m_pContent->m_plotCurveItems.size() > 0)
+    Dialog1DScale *dlg = new Dialog1DScale(m_data, this);
+    if(dlg->exec() == QDialog::Accepted)
     {
-        seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
-    }
-
-    double minX = 0.0, maxX = 0.0, minY = 0.0, maxY = 0.0;
-    double minRangeX = 0.0, maxRangeX = 0.0, minRangeY = 0.0, maxRangeY = 0.0;
-
-    bool autoCalcX = true, autoCalcY = true;
-
-    if(seriesData)
-    {
-        QRectF corners =  seriesData->boundingRect();
-        minX = corners.left();
-        maxX = corners.right();
-        maxY = corners.bottom();
-        minY = corners.top();
-
-        //corners = seriesData->boundingRectMax();
-
-        minRangeX = corners.left();
-        maxRangeX = corners.right();
-        maxRangeY = corners.bottom();
-        minRangeY = corners.top();
-
-    }
-    else
-    {
-        QMessageBox::warning(this, tr("no data available"), tr("no data object is currently being displayed in this widget."));
-    }
-
-    Dialog1DScale *dlg = new Dialog1DScale(minX,maxX, minRangeX, maxRangeX, minY,maxY, minRangeY, maxRangeY, autoCalcX, autoCalcY);
-    dlg->exec();
-    if(dlg->result() == QDialog::Accepted)
-    {
-        bool calcX, calcY;
-        dlg->getData(minX, maxX, minY, maxY,autoCalcX, calcX, autoCalcY, calcY);
-
-        (m_pContent)->setInterval(Qt::XAxis, autoCalcX, minX, maxX);
-        (m_pContent)->setInterval(Qt::YAxis, autoCalcY, minY, maxY);
+        dlg->getData(m_data);
+        m_pContent->updateScaleValues();
     }
 
     delete dlg;
@@ -522,8 +482,11 @@ void Itom1DQwtFigure::mnuScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::mnuParentScaleSetting()
 {
-    if(m_pContent && (m_pContent)->m_plotCurveItems.size() > 0)
+    if(m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
+        QwtScaleDiv *scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
+        QPointF bounds = QPointF( scale->lowerBound(), scale->upperBound() );
+/*
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
         int cmlpState = seriesData->getCmplxState();
         ito::uint32  minLoc[3], maxLoc[3];
@@ -532,17 +495,16 @@ void Itom1DQwtFigure::mnuParentScaleSetting()
         ito::DataObject temp = seriesData->getResampledDataObject();
 
         if((temp.getType() != ito::tFloat64) || (temp.getDims() == 0))
-            return;
+            return;*/
 
-        ito::dObjHelper::minMaxValueFunc<ito::float64>(&temp, minVal, minLoc, maxVal, maxLoc, true, cmlpState);
+        //ito::dObjHelper::minMaxValueFunc<ito::float64>(&temp, minVal, minLoc, maxVal, maxLoc, true, cmlpState);
         
-        ito::Channel* dataChanal = getInputChannel("source");
-        if(dataChanal && dataChanal->getParent())
+        ito::Channel* dataChannel = getInputChannel("source");
+        if( dataChannel && dataChannel->getParent() )
         {
-            ((ito::AbstractDObjFigure*)(dataChanal->getParent()))->setZAxisInterval(QPointF(minVal, maxVal));
+            ( (ito::AbstractDObjFigure*)(dataChannel->getParent()) )->setZAxisInterval(bounds);
         }
     }
-    return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::mnuSetMarker(QAction *action)
@@ -554,10 +516,23 @@ void Itom1DQwtFigure::mnuSetMarker(QAction *action)
 		if (action->text() == QString("To Min-Max"))
         {
             DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
-            ito::uint32  minLoc[3], maxLoc[3];
-            ito::float64 minVal, maxVal;
 
-            ito::DataObject temp = seriesData->getResampledDataObject();
+            ito::float64 minVal, maxVal;
+            int minLoc, maxLoc;
+            if(seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
+            {
+                if(minLoc < maxLoc)
+                {
+                    (m_pContent)->m_Curser[0] = minLoc;
+                    (m_pContent)->m_Curser[1] = maxLoc;
+                }
+                else
+                {
+                    (m_pContent)->m_Curser[0] = maxLoc;
+                    (m_pContent)->m_Curser[1] = minLoc;
+                }
+            }
+            /*ito::DataObject temp = seriesData->getResampledDataObject();
 
             if((temp.getType() != ito::tFloat64) || (temp.getDims() == 0))
                 return;
@@ -573,7 +548,7 @@ void Itom1DQwtFigure::mnuSetMarker(QAction *action)
             {
                 (m_pContent)->m_Curser[0] = maxLoc[2];
                 (m_pContent)->m_Curser[1] = minLoc[2];
-            }
+            }*/
             (m_pContent)->replot();
         }
         

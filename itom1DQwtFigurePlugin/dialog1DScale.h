@@ -26,17 +26,22 @@
 #include <QtGui>
 #include <qdialog.h>
 
+#include "plot1DWidget.h"
+
 #include "ui_dialog1DScale.h"
 
 class Dialog1DScale : public QDialog 
 {
 public:
-    Dialog1DScale(const double minX, const double maxX, const double minRangeX, const double maxRangeX,  const double minY, const double maxY, const double minRangeY, const double maxRangeY, const bool autoCalcX, const bool autoCalcY);
+    Dialog1DScale(const InternalData &data, QWidget *parent = NULL);
     ~Dialog1DScale() {};
 
-    void getData(double &minX, double &maxX, double &minY, double &maxY, bool &autoCalcX, bool &autoCalcOnceX, bool &autoCalcY, bool &autoCalcOnceY);
+    void getData(InternalData &data);
 
 private:
+
+    void getDataTypeRange(ito::tDataType type, double &min, double &max);
+
     Ui::Dialog1DScale ui;
 
 private slots:

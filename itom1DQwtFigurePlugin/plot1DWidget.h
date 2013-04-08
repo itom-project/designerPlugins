@@ -53,12 +53,27 @@ class itom1DQwtFigure;
 
 struct InternalData
 {
+    ito::tDataType m_dataType;
+
     QString m_title;
     QString m_axisLabel;
     QString m_valueLabel;
+
+    QString m_titleDObj;
+    QString m_axisLabelDObj;
+    QString m_valueLabelDObj;
+
     bool m_autoTitle;
     bool m_autoAxisLabel;
     bool m_autoValueLabel;
+
+    bool m_valueScaleAuto;
+    double m_valueMin;
+    double m_valueMax;
+
+    bool m_axisScaleAuto;
+    double m_axisMin;
+    double m_axisMax;
 };
 
 class Plot1DWidget : public QwtPlot
@@ -85,6 +100,8 @@ class Plot1DWidget : public QwtPlot
         void contextMenuEvent(QContextMenuEvent * event);
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
+        void updateLabels();
+        void updateScaleValues();
 
         
 

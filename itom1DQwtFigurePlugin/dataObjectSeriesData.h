@@ -80,6 +80,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         QPointF sample(size_t n) const;
         QRectF boundingRect() const;
+        RetVal getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const;
         //QRectF boundingRectMax() const;
 
         size_t size() const;

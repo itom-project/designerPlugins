@@ -271,12 +271,12 @@ ito::RetVal itom2DQwtFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
     ito::uint32 newUniqueID = uniqueID;
-    QObject *lineCutObj = NULL;
+    QWidget *lineCutObj = NULL;
 
     setOutpBounds(bounds);
     setLinePlotCoordinates(bounds);
 
-    retval += apiGetFigure(newUniqueID, "itom1DQwtFigure", &lineCutObj);
+    retval += apiGetFigure("DObjStaticLine","", newUniqueID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
 
     if(!retval.containsError())
     {
