@@ -23,7 +23,7 @@
 #ifndef MC_H
 #define MC_H
 
-#include "common\addInInterface.h"
+#include "common/addInInterface.h"
 
 //#include <QWidget>
 #include <QGroupBox>

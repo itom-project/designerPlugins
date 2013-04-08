@@ -23,7 +23,7 @@
 #ifndef MATPLOTLIBFIGUREFACTORY_H
 #define MATPLOTLIBFIGUREFACTORY_H
 
-#include "plot/abstractItomDesignerPlugin.h"
+#include "plot/AbstractItomDesignerPlugin.h"
 
 //class MatplotlibFigureFactory : public QObject, public QDesignerCustomWidgetInterface
 class MatplotlibFigureFactory : public ito::AbstractItomDesignerPlugin

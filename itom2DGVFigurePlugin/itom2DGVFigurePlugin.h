@@ -23,7 +23,7 @@
 #ifndef ITOMFIGUREPLUGIN_H
 #define ITOMFIGUREPLUGIN_H
 
-#include "plot/abstractItomDesignerPlugin.h"
+#include "plot/AbstractItomDesignerPlugin.h"
 
 class itom2DGVFigurePlugin : public ito::AbstractItomDesignerPlugin
 {

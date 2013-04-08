@@ -308,7 +308,7 @@ QString Itom1DQwtFigure::getAxisLabel()
     {
         return "<auto>";
     }
-    return m_data.m_autoAxisLabel;
+    return m_data.m_axisLabel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -340,7 +340,7 @@ QString Itom1DQwtFigure::getValueLabel()
     {
         return "<auto>";
     }
-    return m_data.m_autoValueLabel;
+    return m_data.m_valueLabel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

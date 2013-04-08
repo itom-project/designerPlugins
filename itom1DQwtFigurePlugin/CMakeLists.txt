@@ -68,7 +68,7 @@ set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/DataObject/dataObjectFuncs.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/abstractItomDesignerPlugin.h
+    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractItomDesignerPlugin.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.h

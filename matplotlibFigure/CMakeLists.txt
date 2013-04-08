@@ -57,7 +57,7 @@ LINK_DIRECTORIES(
 INCLUDE(${QT_USE_FILE})
 
 set(designer_HEADERS
-    ${ITOM_SDK_INCLUDE_DIR}/plot/abstractItomDesignerPlugin.h
+    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractItomDesignerPlugin.h
 	${CMAKE_CURRENT_SOURCE_DIR}/matplotlibfigure.h
 	${CMAKE_CURRENT_SOURCE_DIR}/matplotlibfigurefactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibSubfigConfig.h

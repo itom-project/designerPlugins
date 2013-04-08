@@ -130,7 +130,7 @@ void DataObjectSeriesData::calcHash()
             ba.append( QByteArray().setNum( m->size[0] ));
         }
 
-        ba.append( QByteArray().setNum( m_d.nrPoints ));
+        ba.append( QByteArray().setNum( (uint)(m_d.nrPoints) ));
         ba.append( QByteArray().setNum( m_d.startPx.x() ));
         ba.append( QByteArray().setNum( m_d.startPx.y() ));
         m_hash = QCryptographicHash::hash(ba, QCryptographicHash::Md5);

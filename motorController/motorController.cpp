@@ -56,7 +56,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_posWidgets[i]->setReadOnly(true);
         m_posWidgets[i]->setPrefix(m_axisName[i]);
         m_posWidgets[i]->setSuffix("mm");
-        m_posWidgets[i]->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);
+        m_posWidgets[i]->setButtonSymbols(QAbstractSpinBox::NoButtons);
         m_posWidgets[i]->setMinimum(-10.0);
         m_posWidgets[i]->setMaximum(10.0);
         m_posWidgets[i]->setDecimals(3);

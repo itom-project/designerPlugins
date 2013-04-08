@@ -23,7 +23,7 @@
 #ifndef ITOM_2D_QWT_FIGUREPLUGIN_H
 #define ITOM_2D_QWT_FIGUREPLUGIN_H
 
-#include "plot/abstractItomDesignerPlugin.h"
+#include "plot/AbstractItomDesignerPlugin.h"
 
 class itom2DQwtFigurePlugin : public ito::AbstractItomDesignerPlugin //, public QDesignerCustomWidgetInterface
 {
