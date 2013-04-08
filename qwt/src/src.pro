@@ -12,21 +12,12 @@
 QWT_ROOT = $${PWD}/..
 include( $${QWT_ROOT}/qwtconfig.pri )
 include( $${QWT_ROOT}/qwtbuild.pri )
+include( $${QWT_ROOT}/qwtfunctions.pri )
 
 TEMPLATE          = lib
-TARGET            = $$qtLibraryTarget(qwt)
+TARGET            = $$qwtLibraryTarget(qwt)
 
 DESTDIR           = $${QWT_ROOT}/lib
-#CONFIG(debug,debug|release) {
-##    message("DEBUG")
-##    message($${CONFIG})
-#     DESTDIR    = ./../../../debug/lib
-#}
-#CONFIG(release,debug|release) {
-##    message("RELEASE")
-##    message($${CONFIG})
-#    DESTDIR    = ./../../../release/lib
-#}
 
 contains(QWT_CONFIG, QwtDll) {
 
@@ -35,7 +26,7 @@ contains(QWT_CONFIG, QwtDll) {
 }
 else {
     CONFIG += staticlib
-}
+} 
 
 contains(QWT_CONFIG, QwtFramework) {
 
@@ -104,7 +95,7 @@ SOURCES += \
     qwt_symbol.cpp \
     qwt_system_clock.cpp
 
-
+ 
 contains(QWT_CONFIG, QwtPlot) {
 
     HEADERS += \
@@ -139,7 +130,7 @@ contains(QWT_CONFIG, QwtPlot) {
         qwt_matrix_raster_data.h \
         qwt_sampling_thread.h \
         qwt_series_data.h \
-        qwt_scale_widget.h
+        qwt_scale_widget.h 
 
     SOURCES += \
         qwt_curve_fitter.cpp \
@@ -173,14 +164,14 @@ contains(QWT_CONFIG, QwtPlot) {
         qwt_matrix_raster_data.cpp \
         qwt_sampling_thread.cpp \
         qwt_series_data.cpp \
-        qwt_scale_widget.cpp
+        qwt_scale_widget.cpp 
 }
 
 contains(QWT_CONFIG, QwtSvg) {
 
     QT += svg
     HEADERS += qwt_plot_svgitem.h
-    SOURCES += qwt_plot_svgitem.cpp
+    SOURCES += qwt_plot_svgitem.cpp 
 }
 else {
 
@@ -204,7 +195,7 @@ contains(QWT_CONFIG, QwtWidgets) {
         qwt_slider.h \
         qwt_thermo.h \
         qwt_wheel.h
-
+    
     SOURCES += \
         qwt_abstract_slider.cpp \
         qwt_abstract_scale.cpp \
@@ -222,18 +213,11 @@ contains(QWT_CONFIG, QwtWidgets) {
         qwt_wheel.cpp
 }
 
-CONFIG(debug,debug|release) {
-    QMAKE_POST_LINK += cp $${DESTDIR}/*so* ./../../../debug/lib
-}
-CONFIG(release,debug|release) {
-    QMAKE_POST_LINK += cp $${DESTDIR}/*so* ./../../../release/lib
-}
-
 # Install directives
 
 target.path    = $${QWT_INSTALL_LIBS}
 
-doc.files      = $${QWT_ROOT}/doc/html
+doc.files      = $${QWT_ROOT}/doc/html 
 unix:doc.files += $${QWT_ROOT}/doc/man
 doc.path       = $${QWT_INSTALL_DOCS}
 

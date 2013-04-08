@@ -17,22 +17,15 @@ SUBDIRS = \
     textengines
 
 contains(QWT_CONFIG, QwtDesigner ) {
-    SUBDIRS += designer
+    SUBDIRS += designer 
 }
 
 contains(QWT_CONFIG, QwtExamples ) {
-    SUBDIRS += examples
+    SUBDIRS += examples 
 }
 
-qwtspec.files  = qwtconfig.pri qwt.prf
+qwtspec.files  = qwtconfig.pri qwtfunctions.pri qwt.prf
 qwtspec.path  = $${QWT_INSTALL_FEATURES}
 
 INSTALLS += qwtspec
-
-CONFIG(debug,debug|release) {
-    QMAKE_LFLAGS += ./../../../debug/lib
-}
-CONFIG(release,debug|release) {
-    QMAKE_LFLAGS += ./../../../release/lib
-}
 

@@ -32,13 +32,13 @@ Qwt includes a class documentation, that is available in various formats:
 Building Qwt
 ==========================
 
-The easiest way to build Qwt is from the command line - but you insist on 
-using an IDE don't forget the "make install" step.
+The easiest way to build Qwt is from the command line - but when you
+insist on using an IDE don't forget the "make install" step.
 
 A) Unix 
 --------
 
-qmake
+qmake qwt.pro
 make
 make install
 
@@ -56,7 +56,7 @@ If you didn't enable autobuilding of the examples in qwtconfig.pri
 you have to build the examples this way:
 
 cd examples
-qmake 
+qmake examples.pro
 make
 
 
@@ -127,10 +127,10 @@ In the recent Qt4 releases the default target of qmake is to generate
 XCode project files instead of makefiles. So you might need to do the
 following:
 
-qmake -spec macx-g++
+qmake -spec macx-g++ qwt.pro
 ...
 
-D) Qt Embedded
+E) Qt Embedded
 --------
 
 I only tested Qwt with Qt Embedded in qvfb (Virtual Framebuffer Devivce)
@@ -147,7 +147,7 @@ Using Qwt
 
 For building a Qwt application with qmake use the Qwt configuration features
 file, that has been installed by "make install". When qmake is able to find 
-it ( http://doc.qt.nokia.com/4.7/qmake-advanced-usage.html#adding-new-configuration-features )
+it ( https://qt-project.org/doc/qt-4.8/qmake-advanced-usage.html#adding-new-configuration-features )
 you can simply add "CONFIG += qwt" to your application project file.
 
 If you don't use qmake you have to add the include path to find the Qwt 

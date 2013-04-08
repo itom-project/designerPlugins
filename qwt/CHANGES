@@ -1,3 +1,22 @@
+Release 6.0.2
+===================
+0) qwtfunctions.pri added
+1) QwtPlotDict::detachItems fixed
+2) QwtWeedingCurveFitter::fitCurve performance improvements
+3) QwtDynGridLayout fixed for non widget items
+4) QwtInterval: avoid annoying compiler warning 
+5) Autoscaling of curves without points fixed
+6) QwtPlotDirectPainter::drawSeries bad translation removed
+7) QwtPlotIntervalCurve: drawing of symbols fixed
+8) QwtPlotlayout: minor layout bufs fixed
+9) Usage of QwtPlotRasterItem::pixelHint fixed
+10) QwtPlotRenderer: several minor fixes
+11) QwtRasterData: CONREC algorithm fixed
+12) QwtThermo: layout code fixed
+13) QwtThermo: memory leak fixed
+14) QwtMmlDocument: compiler issues
+15) Logarithmic autoscaler fixed for intervals close below a decade
+
 Release 6.0.1
 ===================
 
@@ -7,6 +26,9 @@ Changes
 2) Reduce warnings with pedantic compiler options
 3) Examples fixed
 4) Legend identifiers of with symbol and line fixed
+5) simpleplot example added
+6) QwtThermo layout code fixed
+7) QwtPickerPolygonMachine modified according to the documented transtions
 
 Release 6.0.0
 ===================

@@ -8,6 +8,7 @@
 ################################################################
 
 include ( ./qwtconfig.pri )
+include ( ./qwtfunctions.pri )
 
 contains(QWT_CONFIG, QwtDll) {
 
@@ -16,11 +17,11 @@ contains(QWT_CONFIG, QwtDll) {
 
 contains(QWT_CONFIG, QwtSvg) {
 
-	QT      *= svg
+    QT      *= svg
 }
 else {
 
-	DEFINES *= QWT_NO_SVG
+    DEFINES *= QWT_NO_SVG
 }
 
 contains(QWT_CONFIG, QwtFramework) {
@@ -34,11 +35,12 @@ else {
     LIBS        *= -L$${QWT_INSTALL_LIBS}
 }   
 
-INCLUDEPATH_QWT = $${INCLUDEPATH}
-qtAddLibrary(qwt)
+qwtAddLibrary(qwt)
 
-# we don't want qtAddLibrary to expand the 
-# include path, with directories, that might
-# conflict with other installations of qwt
+linux-g++ {
 
-INCLUDEPATH      = $${INCLUDEPATH_QWT}
+    # when using the gold linker ( Qt < 4.8 ) - might be 
+    # necessary on non linux systems too
+    QMAKE_LFLAGS += -lrt
+}
+
