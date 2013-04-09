@@ -484,9 +484,9 @@ void itom2DQwtFigure::mnuScaleSetting()
             int dims = dataObj->getDims();
             bool test = false;
             minRangeX = dataObj->getPixToPhys(dims - 1, 0.0, test);
-            maxRangeX = dataObj->getPixToPhys(dims - 1, dataObj->getSize(dims-1, true), test);
+            maxRangeX = dataObj->getPixToPhys(dims - 1, dataObj->getSize(dims-1), test);
             minRangeY = dataObj->getPixToPhys(dims - 2, 0.0, test);
-            maxRangeY = dataObj->getPixToPhys(dims - 2, dataObj->getSize(dims-2, true), test);
+            maxRangeY = dataObj->getPixToPhys(dims - 2, dataObj->getSize(dims-2), test);
 
             dims = dataObj->getDims();
             if(dims > 2)

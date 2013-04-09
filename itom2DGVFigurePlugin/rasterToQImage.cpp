@@ -169,7 +169,7 @@ void RasterToQImageObj::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, dou
                 {
                     m_dataObj->lockRead();
                     m_ROI.setLeft(0);
-                    m_ROI.setWidth(m_dataObj->getSize(m_hDimIndex, true));
+                    m_ROI.setWidth(m_dataObj->getSize(m_hDimIndex));
                     m_dataObj->unlock();
                 }
             }
@@ -326,8 +326,8 @@ void RasterToQImageObj::updateDataObject(QSharedPointer<ito::DataObject> dataObj
             }
         }
         */
-        m_DataObjectWidth = dataObj->getSize(dimX,true); //ly hier bugged was
-        m_DataObjectHeight = dataObj->getSize(dimY,true);//ly hier bugged was
+        m_DataObjectWidth = dataObj->getSize(dimX); //ly hier bugged was
+        m_DataObjectHeight = dataObj->getSize(dimY);//ly hier bugged was
         
         m_ROI.setCoords(0,0, m_DataObjectWidth-1, m_DataObjectHeight-1);
         m_physROI.setCoords(0.0, 1.0, 0.0, 1.0);

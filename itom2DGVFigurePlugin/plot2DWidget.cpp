@@ -248,7 +248,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
 
             if(m_ObjectContainer == NULL)
             {
-                QRect ROI(0, 0, dataObj->getSize(dims - 1, true), dataObj->getSize(dims - 2, true));
+                QRect ROI(0, 0, dataObj->getSize(dims - 1), dataObj->getSize(dims - 2));
                 m_ObjectContainer = new RasterToQImageObj(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), ROI, /*dims -1, dims-2,*/ 1); 
                 newObjectContainer = true;
 
@@ -761,12 +761,12 @@ void plot2DWidget::trackerAppended(const QPointF &pt)
     m_pLineCut->setLine(x0, y0, x1, y1);
 
     int dim = m_ObjectContainer->getDataObject()->getDims()-1;
-    pts[0].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x0, check, false));
-    pts[0].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y0, check, false));
+    pts[0].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x0, check));
+    pts[0].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y0, check));
 
     dim = m_ObjectContainer->getDataObject()->getDims()-2;
-    pts[1].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x1, check, false));
-    pts[1].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y1, check, false));
+    pts[1].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x1, check));
+    pts[1].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y1, check));
 
     repaint();
 
@@ -803,12 +803,12 @@ void plot2DWidget::trackerMoved(const QPointF &pt)
     m_pLineCut->setLine(x0, y0, x1, y1);
 
     int dim = m_ObjectContainer->getDataObject()->getDims()-1;
-    pts[0].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x0, check, false));
-    pts[0].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y0, check, false));
+    pts[0].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x0, check));
+    pts[0].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y0, check));
 
     dim = m_ObjectContainer->getDataObject()->getDims()-2;
-    pts[1].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x1, check, false));
-    pts[1].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y1, check, false));
+    pts[1].setX(m_ObjectContainer->getDataObject()->getPixToPhys(dim, x1, check));
+    pts[1].setY(m_ObjectContainer->getDataObject()->getPixToPhys(dim, y1, check));
 
     repaint();
 

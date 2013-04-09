@@ -282,7 +282,7 @@ void DataObjectRasterData::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, 
                 bool test = false;
                 m_dataObj->lockRead();
                 minValue = m_dataObj->getPixToPhys(m_hDimIndex, 0.0, test);
-                maxValue = m_dataObj->getPixToPhys(m_hDimIndex, m_dataObj->getSize(m_hDimIndex, true), test);
+                maxValue = m_dataObj->getPixToPhys(m_hDimIndex, m_dataObj->getSize(m_hDimIndex), test);
                 m_dataObj->unlock();
             }
         }
@@ -297,7 +297,7 @@ void DataObjectRasterData::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, 
                 bool test = false;
                 m_dataObj->lockRead();
                 minValue = m_dataObj->getPixToPhys(m_wDimIndex, 0.0, test);
-                maxValue = m_dataObj->getPixToPhys(m_wDimIndex, m_dataObj->getSize(m_hDimIndex, true), test);
+                maxValue = m_dataObj->getPixToPhys(m_wDimIndex, m_dataObj->getSize(m_hDimIndex), test);
                 m_dataObj->unlock();
             }
         }
@@ -319,20 +319,20 @@ void DataObjectRasterData::updateDataObject(QSharedPointer<ito::DataObject> data
         int dimX = dataObj->getDims() - 1;
         int dimY = dataObj->getDims() - 2;
 
-        double xscale = dataObj->getAxisScale(dimX, test);
-        double yscale = dataObj->getAxisScale(dimY, test);
+        double xscale = dataObj->getAxisScale(dimX);
+        double yscale = dataObj->getAxisScale(dimY);
 
         setInterval( Qt::XAxis, QwtInterval( dataObj->getPixToPhys(dimX, 0, test), dataObj->getPixToPhys(dimX, m_width, test),  QwtInterval::ExcludeMaximum ) );
         setInterval( Qt::YAxis, QwtInterval( dataObj->getPixToPhys(dimY, 0, test), dataObj->getPixToPhys(dimY, m_height, test), QwtInterval::ExcludeMaximum ) );
 
-        m_DataObjectWidth = dataObj->getSize(dimX,true); //ly hier bugged was
-        m_DataObjectHeight = dataObj->getSize(dimY,true);//ly hier bugged was
+        m_DataObjectWidth = dataObj->getSize(dimX); //ly hier bugged was
+        m_DataObjectHeight = dataObj->getSize(dimY);//ly hier bugged was
 
         m_xScalingFactor = ((double) m_DataObjectWidth)/(m_width * xscale);
         m_yScalingFactor = ((double) m_DataObjectHeight)/(m_height * yscale);
 
-        m_xOffset = dataObj->getAxisOffset(dimX, test);
-        m_yOffset = dataObj->getAxisOffset(dimY, test);
+        m_xOffset = dataObj->getAxisOffset(dimX);
+        m_yOffset = dataObj->getAxisOffset(dimY);
 
         m_dataObj->unlock();
     }

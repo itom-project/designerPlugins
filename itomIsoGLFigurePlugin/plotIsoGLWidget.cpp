@@ -1374,11 +1374,11 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
                 m_axisY.dimIdx = dims - 2;
             }
 
-            m_axisX.phys[0] = m_pContent->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[0], test, false);
-            m_axisX.phys[1] = m_pContent->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[1], test, false);
+            m_axisX.phys[0] = m_pContent->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[0], test);
+            m_axisX.phys[1] = m_pContent->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[1], test);
 
-            m_axisY.phys[0] = m_pContent->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[0], test, false);
-            m_axisY.phys[1] = m_pContent->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[1], test, false);
+            m_axisY.phys[0] = m_pContent->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[0], test);
+            m_axisY.phys[1] = m_pContent->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[1], test);
 
             //m_title = internalObj.getTag("title", test).getVal_ToString();
 
@@ -1400,10 +1400,10 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
             m_protocol.text = m_pContent->getTag("protocol", test).getVal_ToString();
 
-            m_axisX.label = m_pContent->getAxisDescription(dims - 1, test, false);
-            m_axisX.unit  = m_pContent->getAxisUnit(dims - 1, test, false);
-            m_axisY.label = m_pContent->getAxisDescription(dims - 2, test, false);
-            m_axisY.unit  = m_pContent->getAxisUnit(dims - 2, test, false);
+            m_axisX.label = m_pContent->getAxisDescription(dims - 1, test);
+            m_axisX.unit  = m_pContent->getAxisUnit(dims - 1, test);
+            m_axisY.label = m_pContent->getAxisDescription(dims - 2, test);
+            m_axisY.unit  = m_pContent->getAxisUnit(dims - 2, test);
             m_axisZ.label = m_pContent->getValueDescription();
             m_axisZ.unit  = m_pContent->getValueUnit();
 

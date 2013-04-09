@@ -46,13 +46,13 @@ QVariant DataObjectModel::data(const QModelIndex &index, int role) const
             case 0:
                 return (double)0.0; //default case (for designer, adjustment can be done using the defaultRow and defaultCol property)
             case 1:
-                if(index.column() == 0 && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0,true))
+                if(index.column() == 0 && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
                 {
                     return at(index.row(), index.column());
                 }
                 return QVariant();
             case 2:
-                if(index.column() >= 0 && index.column() < (int)m_dataObj.getSize(1,true) && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0,true))
+                if(index.column() >= 0 && index.column() < (int)m_dataObj.getSize(1) && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
                 {
                     return at(index.row(), index.column());
                 }
@@ -83,13 +83,13 @@ bool DataObjectModel::setData(const QModelIndex & index, const QVariant & value,
             /*case 0:
                 return QVariant();*/
             case 1:
-                if(index.column() == 0 && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0,true))
+                if(index.column() == 0 && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
                 {
                     return setValue(index.row(), index.column(), value);
                 }
                 return false;
             case 2:
-                if(index.column() >= 0 && index.column() < (int)m_dataObj.getSize(1,true) && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0,true))
+                if(index.column() >= 0 && index.column() < (int)m_dataObj.getSize(1) && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
                 {
                     return setValue(index.row(), index.column(), value);
                 }
@@ -107,8 +107,8 @@ QVariant DataObjectModel::at(const int row, const int column) const
     Q_ASSERT(row >= 0);
     Q_ASSERT(column >= 0);
     Q_ASSERT(m_dataObj.getDims() == 1 || m_dataObj.getDims() == 2);
-    Q_ASSERT(row < (int)m_dataObj.getSize(0,true));
-    Q_ASSERT(column < (int)m_dataObj.getSize(1,true));
+    Q_ASSERT(row < (int)m_dataObj.getSize(0));
+    Q_ASSERT(column < (int)m_dataObj.getSize(1));
 
     switch(m_dataObj.getType())
     {
@@ -143,8 +143,8 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
     Q_ASSERT(row >= 0);
     Q_ASSERT(column >= 0);
     Q_ASSERT(m_dataObj.getDims() == 1 || m_dataObj.getDims() == 2);
-    Q_ASSERT(row < (int)m_dataObj.getSize(0,true));
-    Q_ASSERT(column < (int)m_dataObj.getSize(1,true));
+    Q_ASSERT(row < (int)m_dataObj.getSize(0));
+    Q_ASSERT(column < (int)m_dataObj.getSize(1));
 
     QModelIndex i = createIndex(row, column);
     bool ok = false;
@@ -243,7 +243,7 @@ int DataObjectModel::rowCount(const QModelIndex &parent) const
 {
     if(parent.isValid() == false && m_dataObj.getDims() > 0)
     {
-        return m_dataObj.getSize(0, true);
+        return m_dataObj.getSize(0);
     }
     else if(parent.isValid() == false) //default case
     {
@@ -258,7 +258,7 @@ int DataObjectModel::columnCount(const QModelIndex &parent) const
     {
         if(m_dataObj.getDims() > 1)
         {
-            return m_dataObj.getSize(1, true);
+            return m_dataObj.getSize(1);
         }
         else if(m_dataObj.getDims() == 0) //default case
         {
@@ -291,7 +291,7 @@ QVariant DataObjectModel::headerData(int section, Qt::Orientation orientation, i
                 return 0;
             default:
                 {
-                    if(section >= 0 && section < (int)m_dataObj.getSize(1,true))
+                    if(section >= 0 && section < (int)m_dataObj.getSize(1))
                     {
                         if(m_horizontalHeader.count() > section)
                         {
@@ -323,7 +323,7 @@ QVariant DataObjectModel::headerData(int section, Qt::Orientation orientation, i
                 return 1;
             default:
                 {
-                    if(section >= 0 && section < (int)m_dataObj.getSize(0,true))
+                    if(section >= 0 && section < (int)m_dataObj.getSize(0))
                     {
                         if(m_verticalHeader.count() > section)
                         {

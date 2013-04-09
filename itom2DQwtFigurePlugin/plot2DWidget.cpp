@@ -193,8 +193,8 @@ void Plot2DWidget::refreshPlot(ito::ParamBase *param)
             }
 
 			bool test = true;
-			int width = dataObj->getSize(dims - 1, true);
-			int height = dataObj->getSize(dims - 2, true);
+			int width = dataObj->getSize(dims - 1);
+			int height = dataObj->getSize(dims - 2);
 
             double x0 = dataObj->getPixToPhys(dims - 1, 0, test);
             double y0 = dataObj->getPixToPhys(dims - 2, 0, test);
@@ -214,11 +214,11 @@ void Plot2DWidget::refreshPlot(ito::ParamBase *param)
 
             if(rasterData)
             {
-                rasterData->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), startPoint, dims - 1, dataObj->getSize(dims - 1, true), dims - 2, dataObj->getSize(dims - 2, true));
+                rasterData->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), startPoint, dims - 1, dataObj->getSize(dims - 1), dims - 2, dataObj->getSize(dims - 2));
             }
             else
             {
-                m_pContent->setData(new DataObjectRasterData(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), startPoint, dims - 1, dataObj->getSize(dims - 1, true), dims - 2, dataObj->getSize(dims - 2, true), 1));
+                m_pContent->setData(new DataObjectRasterData(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), startPoint, dims - 1, dataObj->getSize(dims - 1), dims - 2, dataObj->getSize(dims - 2), 1));
                 newRasterDataCreated = true;
                 if(dataObj)
                 {
@@ -244,8 +244,8 @@ void Plot2DWidget::refreshPlot(ito::ParamBase *param)
                     if(qtBuf.size()) setAxisTitle(QwtPlot::yRight, qtBuf);
                     qtBuf.clear();
 
-                    tDescription = dataObj->getAxisDescription(dims - 1, test, true);
-                    tUnit = dataObj->getAxisUnit(dims - 1, test, true);
+                    tDescription = dataObj->getAxisDescription(dims - 1, test);
+                    tUnit = dataObj->getAxisUnit(dims - 1, test);
                     if(!tDescription.empty())
                     {
                         qtBuf.append(tDescription.data());
@@ -258,8 +258,8 @@ void Plot2DWidget::refreshPlot(ito::ParamBase *param)
                     if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf); 
                     qtBuf.clear();
 
-                    tDescription = dataObj->getAxisDescription(dims- 2, test, true);
-                    tUnit = dataObj->getAxisUnit(dims - 2, test, true);
+                    tDescription = dataObj->getAxisDescription(dims- 2, test);
+                    tUnit = dataObj->getAxisUnit(dims - 2, test);
                     if(!tDescription.empty())
                     {
                         qtBuf.append(tDescription.data());
