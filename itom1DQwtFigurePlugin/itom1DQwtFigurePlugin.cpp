@@ -45,7 +45,7 @@ QWidget *Itom1DQwtFigurePlugin::createWidgetWithMode(ito::AbstractFigure::Window
 
 QString Itom1DQwtFigurePlugin::name() const
 {
-    return "itom1DQwtFigure";
+    return "Itom1DQwtFigure";
 }
 
 QString Itom1DQwtFigurePlugin::group() const

@@ -25,10 +25,12 @@
 #include "dataObjectSeriesData.h"
 
 #include "DataObject/dataObjectFuncs.h"
+#include "DataObject/dataobj.h"
 
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qimagewriter.h>
+#include <qsharedpointer.h>
 
 #include <qwt_plot_renderer.h>
 
@@ -54,9 +56,9 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     m_CurCoordDelta(NULL),
 	m_lblCoordinates(NULL)
 {
-    qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
-
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
+    
+    //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
 	//m_actHome
     m_actHome = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/home.png"),tr("Home"), this);
@@ -346,7 +348,7 @@ QString Itom1DQwtFigure::getValueLabel()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::setValueLabel(const QString &label)
 {
-    if(label == "<auto>")
+    /*if(label == "<auto>")
     {
         m_data.m_autoValueLabel = true;
     }
@@ -355,14 +357,14 @@ void Itom1DQwtFigure::setValueLabel(const QString &label)
         m_data.m_autoValueLabel = false;
         m_data.m_valueLabel = label;
     }
-    if(m_pContent) m_pContent->updateLabels();
+    if(m_pContent) m_pContent->updateLabels();*/
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::resetValueLabel()
 {
-    m_data.m_autoValueLabel = true;
-    if(m_pContent) m_pContent->updateLabels();
+    /*m_data.m_autoValueLabel = true;
+    if(m_pContent) m_pContent->updateLabels();*/
 }
 
 
@@ -486,7 +488,7 @@ void Itom1DQwtFigure::mnuParentScaleSetting()
     {
         QwtScaleDiv *scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
         QPointF bounds = QPointF( scale->lowerBound(), scale->upperBound() );
-/*
+        /*
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
         int cmlpState = seriesData->getCmplxState();
         ito::uint32  minLoc[3], maxLoc[3];
