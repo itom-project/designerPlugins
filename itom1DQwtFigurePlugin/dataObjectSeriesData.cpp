@@ -160,15 +160,26 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
     else
     {
         int dims = dataObj->getDims();
+
+        int prependedOneDims = 0;
+        for(int i = 0; i < dims-2; i++)
+        {
+            if(dataObj->getSize(i) != 1)
+            {
+                break;
+            }
+            prependedOneDims++;
+        }
+
         
         switch( bounds.size() )
         {
         case 2: //dirX, dirY or dirXY
 
-            if(dims != 2)
+            if( (dims-prependedOneDims) != 2)
             {
                 m_d.valid = false;
-                retval += RetVal(retError,0,"line plot requires a 2-dim dataObject");
+                retval += RetVal(retError,0,"line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
             }
             else
             {
@@ -201,7 +212,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setHeight(1);
 
                         m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[dims-2] ; //step in y-direction (in bytes)
+                        m_d.matStepSize= mat->step[0] ; //step in y-direction (in bytes)
                     }
                     else
                     {
@@ -216,7 +227,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setHeight(1);
 
                         m_d.matOffset = mat->step[0] * pxY2 + mat->step[1] * pxX1; //(&mat->at<char>(pxY2,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[dims-2] ; //step in y-direction (in bytes)
+                        m_d.matStepSize= mat->step[0] ; //step in y-direction (in bytes)
                     }
 
                     description = dataObj->getAxisDescription(dims-2,_unused);
@@ -259,7 +270,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setHeight(0);
 
                         m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[dims-1] ; //step in x-direction (in bytes)
+                        m_d.matStepSize= mat->step[1] ; //step in x-direction (in bytes)
                     }
                     else
                     {
@@ -274,7 +285,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setHeight(0);
 
                         m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX2; //(&mat->at<char>(pxY1,pxX2) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[dims-1] ; //step in x-direction (in bytes)
+                        m_d.matStepSize= mat->step[1] ; //step in x-direction (in bytes)
                     }
 
                     description = dataObj->getAxisDescription(dims-1,_unused);
