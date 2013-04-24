@@ -24,6 +24,8 @@ public:
     bool toolbarVisible() const;
     void setShowContextMenu(bool show); 
     bool showContextMenu() const;
+
+    void resizeCanvas(int width, int height);
    
 
 private:

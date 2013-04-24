@@ -103,6 +103,25 @@ MatplotlibFigure::~MatplotlibFigure()
     }
 }
 
+void MatplotlibFigure::resizeCanvas(int width, int height)
+{
+    if(m_toolbar->isVisible() && m_toolbar->isFloating() == false)
+    {
+        if(m_toolbar->orientation() == Qt::Horizontal)
+        {
+            resize(width,height+m_toolbar->height());
+        }
+        else
+        {
+            resize(width + m_toolbar->width(),height);
+        }
+    }
+    else
+    {
+        resize(width,height);
+    }
+}
+
 void MatplotlibFigure::setToolbarVisible(bool visible)
 {
     if(m_toolbar) m_toolbar->setVisible(visible);

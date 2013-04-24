@@ -25,6 +25,7 @@
 #include <qimage.h>
 #include <qpixmap.h>
 #include <qdebug.h>
+#include "matplotlibfigure.h"
 
 
 MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
@@ -34,7 +35,8 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
         m_scene(NULL),
         m_rectItem(NULL),
         m_pixmapItem(NULL),
-        m_contextMenu(contextMenu)
+        m_contextMenu(contextMenu)/*,
+        m_externalSizeHint(0,0)*/
 {
     //setBackgroundBrush(QBrush(Qt::red));
     m_scene = new QGraphicsScene(this);
@@ -66,10 +68,37 @@ MatplotlibWidget::~MatplotlibWidget()
 {
 }
 
+//QSize MatplotlibWidget::sizeHint() const
+//{
+//    /*if(!m_externalSizeHint.isNull())
+//    {
+//        return m_externalSizeHint;
+//    }*/
+//    return QGraphicsView::sizeHint();
+//}
+
 void MatplotlibWidget::externalResize(int width, int height)
 {
-    m_internalResize = true;
-    resize(width,height);
+    
+
+    //QSize oldSize = this->size();
+    //m_externalSizeHint = QSize(width,height);
+
+    //QSizePolicy::Policy hPol = QSizePolicy::Fixed; //oldSize.width() < sizeHint().width() ? QSizePolicy::Minimum : QSizePolicy::Maximum;
+    //QSizePolicy::Policy vPol = QSizePolicy::Fixed; //oldSize.height() < sizeHint().height() ? QSizePolicy::Minimum : QSizePolicy::Maximum;
+
+    //setSizePolicy(hPol, vPol);    
+    //updateGeometry();
+
+    MatplotlibFigure *parent = qobject_cast<MatplotlibFigure*>(this->parent());
+    if(parent)
+    {
+        m_internalResize = true;
+        parent->resizeCanvas(width,height);
+        m_internalResize = false;
+    }
+
+    //resize(width,height);
 }
 
 void MatplotlibWidget::paintResult(QByteArray imageString, int x, int y, int w, int h, bool blit )
@@ -115,7 +144,19 @@ void MatplotlibWidget::paintResult(QByteArray imageString, int x, int y, int w, 
     //this->setTransform(unityTransform);
     ////this->scale(1.0,1.0);
     ////fitInView(m_pixmapItem, Qt::KeepAspectRatio);
-    fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
+    
+    QSize s = size();
+    //qDebug() << "size: " << s << ", pixmap:" << m_pixmap.size();
+
+    if(abs(m_pixmap.width()-s.width())<6 && abs(m_pixmap.height()-s.height())<6)
+    {
+        setTransform( QTransform(1,0,0,1,0,0), false );
+        centerOn( m_pixmapItem->boundingRect().center() );
+    }
+    else
+    {
+        fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
+    }
     
     //handle possible further update requests
     paintTimeout();
@@ -155,6 +196,7 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
         {
             //scale(1.0,1.0);
             //fitInView(m_pixmapItem, Qt::KeepAspectRatio);
+            
             fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
         }
 
