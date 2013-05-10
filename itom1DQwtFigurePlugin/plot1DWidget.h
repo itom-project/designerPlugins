@@ -81,9 +81,12 @@ class Plot1DWidget : public QwtPlot
     Q_OBJECT
     public:
         enum MultiLineMode { FirstRow, FirstCol, MultiRows, MultiCols };
+        enum State { stateIdle, statePanner, stateZoomer, statePicker };
 
         Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
         ~Plot1DWidget();
+
+        ito::RetVal init();
 
         bool m_showContextMenu;
         void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>() );
@@ -93,6 +96,7 @@ class Plot1DWidget : public QwtPlot
 
         void setZoomerEnable(const bool checked);
         void setPickerEnable(const bool checked);
+        void setPannerEnable(const bool checked);
 
     protected:
         void keyPressEvent ( QKeyEvent * event );
@@ -106,6 +110,17 @@ class Plot1DWidget : public QwtPlot
         
 
     private:
+
+        struct Marker
+        {
+            QwtPlotMarker *item;
+            bool active;
+            int curveIdx;
+        };
+
+        void stickMarkerToXPx(Marker *m, double xScaleStart, int dir);
+        void updateMarkerPosition(bool updatePositions, bool clear = false);
+
 
         QMenu *m_contextMenu;
 
@@ -122,7 +137,6 @@ class Plot1DWidget : public QwtPlot
         bool m_startScaledX;
         bool m_xDirect;
         bool m_yDirect;
-        bool m_pCurserEnable;
         bool m_cmplxState;
 
         MultiLineMode m_multiLine;
@@ -132,7 +146,7 @@ class Plot1DWidget : public QwtPlot
         int m_linePlotID;
 
         int m_Curser[2];
-        bool m_curserFirstActive;
+        int m_actPickerIdx;
 
         QStringList m_colorList;
         QPointF m_startRangeY;
@@ -144,14 +158,17 @@ class Plot1DWidget : public QwtPlot
 
         ValuePicker1D *m_pValuePicker;
 
-        QwtPlotMarker * m_pCurser1;
-        QwtPlotMarker * m_pCurser2;
+        QList<Marker> m_markers;
 
 		QMenu *m_pCmplxMenu;
+
+        State m_state;
 
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
+
+        void setMarkerText(const QString &coords, const QString &offsets);
 
     public slots:
         //void replot();

@@ -56,7 +56,7 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
 
     public:
         Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
-        ~Itom1DQwtFigure();
+        virtual ~Itom1DQwtFigure();
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
 
@@ -67,7 +67,7 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
         QVector<QPointF> getBounds(void);
         void setBounds(QVector<QPointF> bounds);
 
-        void setMarkerCoordinates(const QVector<QPointF> pts);
+        
         void enableComplexGUI(const bool checked);
 
         QString getTitle();
@@ -83,6 +83,8 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
         void resetValueLabel();
     
     protected:
+        ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
+
         Plot1DWidget *m_pContent;
         InternalData m_data;
 
@@ -107,8 +109,8 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
 	    QAction* m_actCmplxSwitch;
 	    QMenu *m_mnuCmplxSwitch;
 
-        QLabel *m_CurCoordDelta;
-		QLabel *m_lblCoordinates;
+        QLabel *m_lblMarkerOffsets;
+		QLabel *m_lblMarkerCoords;
 
     public slots:
         void mnuMarkerClick(bool checked);
@@ -126,6 +128,7 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
 
     private slots:
         void mnuHome();
+        void setMarkerText(const QString &coords, const QString &offsets);
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

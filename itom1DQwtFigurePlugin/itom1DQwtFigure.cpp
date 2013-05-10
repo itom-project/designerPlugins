@@ -53,8 +53,8 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     m_actSetMarker(NULL),
 	m_actCmplxSwitch(NULL),
 	m_mnuCmplxSwitch(NULL),
-    m_CurCoordDelta(NULL),
-	m_lblCoordinates(NULL)
+    m_lblMarkerOffsets(NULL),
+	m_lblMarkerCoords(NULL)
 {
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
     
@@ -73,11 +73,13 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     //m_actScaleSetting
     m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"),tr("Scale Settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
-    m_actScaleSetting->setToolTip("Set the ranges and offsets oif this view");
+    m_actScaleSetting->setToolTip("Set the ranges and offsets of this view");
 
+    //m_rescaleParent
     m_rescaleParent = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"),tr("Parent Scale Settings"), this);
     m_rescaleParent->setObjectName("rescaleParent");
-    m_rescaleParent->setToolTip("Set the z-Range of the parent view according to this view");
+    m_rescaleParent->setToolTip("Set the value-range of the parent view according to this plot");
+    m_rescaleParent->setVisible(false);
 
     //m_actForward
     m_actForward = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/forward.png"), tr("forward"), this);
@@ -170,20 +172,20 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     toolbar->addAction(m_actMarker);
     toolbar->addAction(m_actSetMarker);
     
-    m_lblCoordinates = new QLabel(" [0.0; 0.0]\n [0.0; 0.0]", this);
-    m_lblCoordinates->setAlignment( Qt::AlignRight | Qt::AlignTop);
-    m_lblCoordinates->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
-    m_lblCoordinates->setObjectName("Marker Positions");
+    m_lblMarkerCoords = new QLabel("    \n    ", this);
+    m_lblMarkerCoords->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_lblMarkerCoords->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
+    m_lblMarkerCoords->setObjectName("Marker Positions");
 
-    m_CurCoordDelta = new QLabel(" dx = 0.0\n dy = 0.0", this);
-    m_CurCoordDelta->setAlignment( Qt::AlignRight | Qt::AlignTop);
-    m_CurCoordDelta->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
-    m_CurCoordDelta->setObjectName("Marker Difference");
+    m_lblMarkerOffsets = new QLabel("    \n    ", this);
+    m_lblMarkerOffsets->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_lblMarkerOffsets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
+    m_lblMarkerOffsets->setObjectName("Marker Offsets");
 
-    QAction *lblAction = toolbar->addWidget(m_lblCoordinates);
+    QAction *lblAction = toolbar->addWidget(m_lblMarkerCoords);
     lblAction->setVisible(true);
 
-    QAction *lblAction2 = toolbar->addWidget(m_CurCoordDelta);
+    QAction *lblAction2 = toolbar->addWidget(m_lblMarkerOffsets);
     lblAction->setVisible(true);
 
     // next block is for complex and stacks
@@ -202,6 +204,9 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
 
     m_pContent = new Plot1DWidget(contextMenu, &m_data, this);
     m_pContent->setObjectName("canvasWidget");
+
+    connect(m_pContent, SIGNAL(setMarkerText(const QString &, const QString &)), this, SLOT(setMarkerText(const QString &, const QString &)));
+
     setFocus();
     setCentralWidget(m_pContent);
     m_pContent->setFocus();
@@ -221,6 +226,9 @@ ito::RetVal Itom1DQwtFigure::applyUpdate()
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
         m_pContent->refreshPlot( (ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+
+        ito::Channel* dataChannel = getInputChannel("source");
+        m_rescaleParent->setVisible( dataChannel && dataChannel->getParent() );
     }
 
     return ito::retOk;
@@ -376,11 +384,11 @@ void Itom1DQwtFigure::mnuPanner(bool checked)
         m_actZoomToRect->setChecked(false);
         m_actMarker->setChecked(false);
         //(m_pContent)->setMouseTracking(true);
-        m_pContent->m_pPanner->setEnabled(true);
+        m_pContent->setPannerEnable(true);
     }
     else
     {
-        m_pContent->m_pPanner->setEnabled(false);
+        m_pContent->setPannerEnable(false);
         //(m_pContent)->setMouseTracking(false);
     }
 }
@@ -481,6 +489,7 @@ void Itom1DQwtFigure::mnuScaleSetting()
     delete dlg;
     dlg = NULL;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::mnuParentScaleSetting()
 {
@@ -508,6 +517,7 @@ void Itom1DQwtFigure::mnuParentScaleSetting()
         }
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::mnuSetMarker(QAction *action)
 {
@@ -609,24 +619,15 @@ void Itom1DQwtFigure::setYAxisInterval(QPointF interval)
 { 
     (m_pContent)->setInterval(Qt::YAxis, 0, interval.x(), interval.y());
     return; 
-}        
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::setMarkerCoordinates(const QVector<QPointF> pts)
+}   
+
+//----------------------------------------------------------------------------------------------------------------------------------   
+void Itom1DQwtFigure::setMarkerText(const QString &coords, const QString &offsets)
 {
-    char buf[60] = {0};
-    if(pts.size() > 1)
-    {
-        sprintf(buf, " [%.4g; %.4g]\n [%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-    }
-
-    m_lblCoordinates->setText(buf);
-
-    if(pts.size() > 2)
-    {
-        sprintf(buf, " dx = %.4g\n dy = %.4g", pts[2].x(), pts[2].y());
-    }
-    m_CurCoordDelta->setText(buf);
+    m_lblMarkerCoords->setText(coords);
+    m_lblMarkerOffsets->setText(offsets);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::enableComplexGUI(const bool checked)
 { 
@@ -634,7 +635,7 @@ void Itom1DQwtFigure::enableComplexGUI(const bool checked)
     m_actCmplxSwitch->setVisible(checked);
 }
 
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::mnuHome()
 {
     m_pContent->m_pZoomer->zoom(0);

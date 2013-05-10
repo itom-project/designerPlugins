@@ -25,7 +25,7 @@
 #include "dataObjectSeriesData.h"
 #include "qwtPlotCurveDataObject.h"
 #include "common/sharedStructuresGraphics.h"
-//#include "common/apiFunctionsGraphInc.h"
+#include "common/apiFunctionsGraphInc.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -44,6 +44,7 @@
 #include <qpixmap.h>
 #include <qdebug.h>
 #include <qmessagebox.h>
+#include <qnumeric.h>
 
 //namespace ito {
 //    extern void **ITOM_API_FUNCS_GRAPH;
@@ -63,13 +64,12 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_lineCol(0),
         m_lineStyle(1),
         m_pParent(parent),
-        m_pCurser1(NULL),
-        m_pCurser2(NULL),
-        m_pCurserEnable(false),
+        m_actPickerIdx(-1),
         m_cmplxState(false),
-        m_pData(data)
+        m_pData(data),
+        m_state(stateIdle)
 {
-    this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
+    this->setMouseTracking(false);
 
     //this is the border between the canvas and the axes and the overall mainwindow
 	setContentsMargins(5,5,5,5);
@@ -77,6 +77,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 	//canvas() is the real plotting area, where the plot is printed (without axes...)
 	canvas()->setFrameShadow(QFrame::Plain);
 	canvas()->setFrameShape(QFrame::NoFrame);
+    canvas()->setCursor( Qt::ArrowCursor );
 
     m_colorList.reserve(12);
     m_colorList.append("blue");
@@ -94,53 +95,19 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 
     m_pZoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
-    m_pZoomer->setRubberBandPen(QPen(QBrush(Qt::red),3,Qt::DashLine));
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
-    m_pZoomer->setTrackerFont(QFont("Verdana",10));
-    m_pZoomer->setTrackerPen(QPen(QBrush(Qt::green),2));
+    //all others settings for zoomer are set in init (since they need access to the settings via api)
 
     m_pPanner = new QwtPlotPanner(canvas());
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false);
     m_pPanner->setCursor(Qt::SizeAllCursor);
-    m_pPanner->setEnabled(false);
+    m_pPanner->setEnabled(false);;
 
-    // This will be point tracker!
-    m_pCurser1 = new QwtPlotMarker();
-    m_pCurser1->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::red), QPen(QBrush(Qt::red),1),  QSize(6,6) ));
-    //m_pCurser1->setLabel( QwtText("test"));
-    m_pCurser1->attach(this);
-    m_pCurser1->setVisible(false);
-    m_pCurser2 = new QwtPlotMarker();
-    m_pCurser2->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::darkGreen), QPen(QBrush(Qt::darkGreen),1),  QSize(6,6) ));
-    m_pCurser2->attach(this);
-    m_pCurser2->setVisible(false);
-
-
+    //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
-    m_pValuePicker->setTrackerFont(QFont("Verdana",10));
-    m_pValuePicker->setTrackerPen(QPen(QBrush(Qt::red),2));
-    m_pValuePicker->setBackgroundFillBrush( QBrush(QColor(255,255,255,155), Qt::SolidPattern) );
-
-
-    QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
-    rightAxis->setColorBarEnabled(true);
-    rightAxis->setColorBarWidth(30);
-
-    rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(Qt::black, Qt::white));
-    rightAxis->setFont(QFont("Comic Sans",8,1,true));
-
-    rightAxis->setMargin(20); //margin to right border of window
-    rightAxis->scaleDraw()->setLength(20);
-    rightAxis->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,false);
-
-    setAxisScale(QwtPlot::yRight, 0, 1.0 );
-    enableAxis(QwtPlot::yRight,false);
-
-    m_Curser[0] = 0;
-    m_Curser[1] = 0;
-    m_curserFirstActive = false;
+    //all others settings for tracker are set in init (since they need access to the settings via api)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -153,12 +120,38 @@ Plot1DWidget::~Plot1DWidget()
     }
     m_plotCurveItems.clear();
 
+    foreach(Marker m, m_markers)
+    {
+        m.item->detach();
+        delete m.item;
+    }
+    m_markers.clear();
+
     if(m_pPlotGrid)
     {
         m_pPlotGrid->detach();
         delete m_pPlotGrid;
         m_pPlotGrid = NULL;
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Plot1DWidget::init()
+{
+    QPen rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red),2,Qt::DashLine),NULL).value<QPen>();
+    QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
+    QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
+    QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
+    
+    m_pZoomer->setRubberBandPen(rubberBandPen);
+    m_pZoomer->setTrackerFont(trackerFont);
+    m_pZoomer->setTrackerPen(trackerPen);
+
+    m_pValuePicker->setTrackerFont(trackerFont);
+    m_pValuePicker->setTrackerPen(trackerPen);
+    m_pValuePicker->setBackgroundFillBrush(trackerBg);
+
+    return ito::retOk;
 }
 
 ////----------------------------------------------------------------------------------------------------------------------------------
@@ -459,6 +452,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if(hash != m_hash)
         {
+            updateMarkerPosition(true);
+
             QRectF rect = seriesData->boundingRect();
             if(m_pData->m_valueScaleAuto)
             {
@@ -478,6 +473,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else
         {
+            updateMarkerPosition(true,false);
+
             replot();
         }
 
@@ -505,15 +502,82 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
 {
-   // if (!hasFocus())
-   //     return;
+    Marker *m;
+    int curves = m_plotCurveItems.size();
 
-    if(!m_pCurserEnable && m_plotCurveItems.size() > 0)
+    if(m_state == statePicker)
     {
-        return;      
+        switch(event->key())
+        {
+        case Qt::Key_Left:
+            for(int i = 0 ; i < m_markers.size() ; i++)
+            {
+                m = &(m_markers[i]);
+                if(m->active)
+                {
+                    stickMarkerToXPx(m, m->item->xValue(), -1);
+                }
+            }
+            break;
+        case Qt::Key_Right:
+            for(int i = 0 ; i < m_markers.size() ; i++)
+            {
+                m = &(m_markers[i]);
+                if(m->active)
+                {
+                     stickMarkerToXPx(m, m->item->xValue(), 1);
+                }
+            }
+            break;
+        case Qt::Key_Up:
+            for(int i = 0 ; i < m_markers.size() ; i++)
+            {
+                m = &(m_markers[i]);
+                if(m->active)
+                {
+                    m->curveIdx++;
+                    if(m->curveIdx >= curves) m->curveIdx = 0;
+                    stickMarkerToXPx(m, m->item->xValue(), 0);
+                }
+            }
+            break;
+        case Qt::Key_Down:
+            for(int i = 0 ; i < m_markers.size() ; i++)
+            {
+                m = &(m_markers[i]);
+                if(m->active)
+                {
+                    m->curveIdx--;
+                    if(m->curveIdx <= 0) m->curveIdx = curves-1;
+                    stickMarkerToXPx(m, m->item->xValue(), 0);
+                }
+            }
+            break;
+        case Qt::Key_Delete:
+        {
+            QList<Marker>::iterator it = m_markers.begin();
+
+            while(it != m_markers.end())
+            {
+                if(it->active)
+                {
+                    it->item->detach();
+                    delete it->item;
+                    it = m_markers.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            break;
+        }
+        }
+
+        updateMarkerPosition(false,false);
     }
 
-    int x1 = ((DataObjectSeriesData*)(m_plotCurveItems[0]->data()))->size()-1;
+    /*int x1 = ((DataObjectSeriesData*)(m_plotCurveItems[0]->data()))->size()-1;
 
      switch(event->key())
     {
@@ -541,7 +605,7 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
         m_Curser[0] = m_Curser[1];
         m_Curser[1] = temp;
         m_curserFirstActive = !m_curserFirstActive;
-    }
+    }*/
 
     event->accept();
     replot();
@@ -551,52 +615,154 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
 {
-    Qt::MouseButton btn = event->button();
-    Qt::MouseButtons btns = event->buttons();
-    int button = 0;
-
-    QPointF scenePos;
-    
-    switch(btn)
+    if(m_state == statePicker)
     {
-        case Qt::LeftButton: button = 1; 
-            if(m_pCurserEnable && m_plotCurveItems.size() > 0)
-            {
-                int xpos = m_pValuePicker->trackerPosition().x();
-                double d_xpos = invTransform(m_plotCurveItems[0]->xAxis(), xpos);
-                xpos = ((DataObjectSeriesData*)(m_plotCurveItems[0]->data()))->getPosToPix(d_xpos);
+        int xPx = m_pValuePicker->trackerPosition().x();
+        int yPx = m_pValuePicker->trackerPosition().y();
+        double xScale = invTransform( xBottom, xPx );
+        double yScale = invTransform( yLeft, yPx );
 
-                if(m_curserFirstActive && xpos > m_Curser[1])
+        bool closeToMarker = false;
+
+        if(event->button() == Qt::LeftButton)
+        {
+            for(int i = 0 ; i < m_markers.size() ; i++)
+            {
+                if( abs( transform(xBottom, m_markers[i].item->xValue()) - xPx) < 20 && abs(transform(yLeft, m_markers[i].item->yValue()) - yPx) < 20 )
                 {
-                    m_Curser[0] = m_Curser[1];
-                    m_Curser[1] = xpos;
+                    closeToMarker = true;
+                    m_markers[i].active = true;
+                    
                 }
-                else if(!m_curserFirstActive && xpos < m_Curser[0])
+                else if( (event->modifiers() & Qt::ControlModifier) == false && m_markers[i].active)
                 {
-                    m_Curser[1] = m_Curser[0];
-                    m_Curser[0] = xpos;                        
+                    m_markers[i].active = false;
+                    //m_markers[i].item->setSymbol( new QwtSymbol(QwtSymbol::Diamond, m_markers[i].color, QPen(m_markers[i].color,1), QSize(6,6) ));
                 }
-                else if(m_curserFirstActive)
-                {
-                    m_Curser[0] = xpos;
-                }
-                else
-                {
-                    m_Curser[1] = xpos;
-                }
-                replot();
             }
+
+            if(!closeToMarker && m_plotCurveItems.size() > 0)
+            {
+                Marker marker;
+                marker.item = new QwtPlotMarker();
+                marker.item->attach(this);
+                marker.active = true;
+                //marker.color = Qt::darkGreen;
+                //marker.item->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::white), QPen(marker.color,1),  QSize(8,8) ));
                 
-            break;
-        case Qt::RightButton: button = 3; break;
-        case Qt::MiddleButton: button = 2; break;
+                marker.curveIdx = 0;
+                stickMarkerToXPx(&marker, xScale, 0);
+
+                marker.item->setVisible(true);
+                
+                m_markers.append(marker);
+
+            }
+
+            updateMarkerPosition(false,false);
+
+            replot();
+
+        }
+
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //dir: 0: this point, -1: next valid to the left or this if not possible, 1: next valid to the right or this if not possible
+{
+    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
+
+    if(!qIsFinite(xScaleStart)) xScaleStart = m->item->xValue();
+
+    int thisIdx = data->getPosToPix(xScaleStart);
+    int s = data->size();
+    QPointF p;
+    bool found = false;
+    bool d = true;
+
+    if(dir == 0)
+    {
+        while(!found)
+        {
+            if(thisIdx >= 0 && thisIdx < s)
+            {
+                p = data->sample(thisIdx);
+                if(qIsFinite(p.ry()))
+                {
+                    m->item->setXValue(p.rx());
+                    m->item->setYValue(p.ry());
+                    found = true;
+                }
+            }
+            else
+            {
+                break;
+            }
+
+            if(d)
+            {
+                thisIdx = -thisIdx + 1;
+                d = !d;
+            }
+            else
+            {
+                thisIdx = -thisIdx;
+                d = !d;
+            }
+        }
+    }
+    if(dir == -1)
+    {
+        while(!found)
+        {
+            thisIdx -= 1;
+            if( thisIdx >= 0)
+            {
+                p = data->sample(thisIdx);
+                if(qIsFinite(p.ry()))
+                {
+                    m->item->setXValue(p.rx());
+                    m->item->setYValue(p.ry());
+                    found = true;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    else //dir > 0
+    {
+        while(!found)
+        {
+            thisIdx += 1;
+            if( (thisIdx) < s)
+            {
+                p = data->sample(thisIdx);
+                if(qIsFinite(p.ry()))
+                {
+                    m->item->setXValue(p.rx());
+                    m->item->setYValue(p.ry());
+                    found = true;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::contextMenuEvent(QContextMenuEvent * event)
 {
-    if(m_showContextMenu)
+    if(m_showContextMenu && m_pPanner->isEnabled() == false)
     {
         event->accept();
         m_contextMenu->exec(event->globalPos());
@@ -640,6 +806,11 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
 {
     if(checked)
     {
+        setPickerEnable(false);
+        setPannerEnable(false);
+
+        m_state = stateZoomer;
+
         m_pPanner->setEnabled(false);
 
         DataObjectSeriesData *data = NULL;
@@ -651,10 +822,14 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
         }
 
         m_pZoomer->setEnabled(true);
+        canvas()->setCursor( Qt::CrossCursor );
     }
     else
     {
+        m_state = stateIdle;
+
         m_pZoomer->setEnabled(false);
+        canvas()->setCursor( Qt::ArrowCursor );
 
         foreach( QwtPlotCurve *curve, m_plotCurveItems)
         {
@@ -667,21 +842,45 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
 void Plot1DWidget::setPickerEnable(const bool checked)
 {
     if(checked)
-    {      
+    {   
+        setZoomerEnable(false);
+        setPannerEnable(false);
+
+        m_state = statePicker;
         m_pValuePicker->setEnabled(true);
-        m_pCurser1->setVisible(true);
-        m_pCurser2->setVisible(true);
-        m_pCurserEnable = true;
-        //m_pValuePicker->setVisible(true);
+        canvas()->setCursor( Qt::CrossCursor );
     }
     else
     {
+        m_state = stateIdle;
         m_pValuePicker->setEnabled(false);
-        m_pCurser1->setVisible(false);
-        m_pCurser2->setVisible(false);
-        m_pCurserEnable = false;
-        //m_pValuePicker->setVisible(false);
+        canvas()->setCursor( Qt::ArrowCursor );
+
+        /*foreach(Marker m, m_markers)
+        {
+            m.item->detach();
+            delete m.item;
+        }
+        m_markers.clear();*/
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setPannerEnable(const bool checked)
+{
+    if(checked)
+    {
+        setZoomerEnable(false);
+        setPickerEnable(false);
+        m_state = statePanner;
+        canvas()->setCursor( Qt::OpenHandCursor);
+    }
+    else
+    {
+        m_state = stateIdle;
+        canvas()->setCursor( Qt::ArrowCursor );
+    }
+    m_pPanner->setEnabled(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -707,3 +906,73 @@ void Plot1DWidget::updateScaleValues()
 
     replot();
 }
+
+void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = false*/)
+{
+    if(clear)
+    {
+        foreach(Marker m, m_markers)
+        {
+            m.item->detach();
+            delete m.item;
+        }
+        m_markers.clear();
+    }
+
+    QColor colors[3] = { Qt::red, Qt::darkGreen, Qt::darkGray };
+    int cur = 0;
+    Marker *m;
+    QVector<QPointF> points;
+
+    for(int i = 0 ; i < m_markers.size() ; i++)
+    {
+        m = &(m_markers[i]);
+        if(updatePositions)
+        {
+            stickMarkerToXPx(m, std::numeric_limits<double>::signaling_NaN() ,0);
+        }
+
+        if(m->active)
+        {
+            m_markers[i].item->setSymbol( new QwtSymbol(QwtSymbol::Diamond, Qt::white, QPen(colors[cur],2), QSize(8,8) ));
+        }
+        else
+        {
+            m_markers[i].item->setSymbol( new QwtSymbol(QwtSymbol::Diamond, colors[cur], QPen(colors[cur],2), QSize(6,6) ));
+        }
+
+        if(cur < 2) cur++;
+        points << QPointF(m_markers[i].item->xValue(), m_markers[i].item->yValue());
+            
+    }
+
+    QString coords, offsets;
+    if(points.size() > 1)
+    {
+        coords = QString("[%1; %2]\n [%3; %4]").arg( points[0].rx(),0,'g',4 ).arg( points[0].ry(),0,'g',4  ).arg( points[1].rx(),0,'g',4  ).arg( points[1].ry(),0,'g',4  );
+        offsets = QString("dx = %1\n dy = %2").arg( points[1].rx() - points[0].rx(),0,'g',4).arg( points[1].ry() - points[0].ry(), 0, 'g', 4 );
+    }
+    else if(points.size() == 1)
+    {
+        coords = QString("[%1; %2]\n      ").arg( points[0].rx(),0,'g',4 ).arg( points[0].ry(),0,'g',4  );
+    }
+
+    emit setMarkerText(coords,offsets);
+}
+////----------------------------------------------------------------------------------------------------------------------------------
+//void Itom1DQwtFigure::setMarkerCoordinates(const QVector<QPointF> pts)
+//{
+//    char buf[60] = {0};
+//    if(pts.size() > 1)
+//    {
+//        sprintf(buf, " [%.4g; %.4g]\n [%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+//    }
+//
+//    m_lblCoordinates->setText(buf);
+//
+//    if(pts.size() > 2)
+//    {
+//        sprintf(buf, " dx = %.4g\n dy = %.4g", pts[2].x(), pts[2].y());
+//    }
+//    m_CurCoordDelta->setText(buf);
+//}
