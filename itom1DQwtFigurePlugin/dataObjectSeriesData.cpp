@@ -137,7 +137,6 @@ void DataObjectSeriesData::calcHash()
     }
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------------------
 RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds)
 {
@@ -606,13 +605,6 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
     return retval;
 
-
-
-
-
-
-
-
     //if((bounds.size() == 1) && (dataObjectDims > 2))
     //{
     //    m_zDirect = true;
@@ -806,16 +798,9 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
         //        m_plotPts[n].weights[3] = xsub * (1 - ysub);
         //    }
         //}
-        
     //}
-
     //m_pDataObj = dataObj;
 }
-
-
-
-
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF DataObjectSeriesData::sample(size_t n) const
@@ -931,11 +916,6 @@ QPointF DataObjectSeriesData::sample(size_t n) const
     }
 
     return QPointF();
-
-
-
-
-
 
     //if(m_pDataObj)
     //{
@@ -1473,7 +1453,6 @@ QPointF DataObjectSeriesData::sample(size_t n) const
     //return QPointF();
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectSeriesData::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue)
 {
@@ -1504,7 +1483,6 @@ void DataObjectSeriesData::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, 
         }
     }
 }
-
 
 //------------------------------------------------------------------------------------------------------------
 ito::DataObject DataObjectSeriesData::getResampledDataObject()
@@ -1721,12 +1699,7 @@ ito::DataObject DataObjectSeriesData::getResampledDataObject()
 //    else return QRectF(m_startPos + m_physLength, minY, abs(m_physLength), maxY - minY);
 //}
 
-
-
-
-
-
-
+//----------------------------------------------------------------------------------------------------------------------------------
 template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState = DataObjectSeriesData::cmplxAbs)
 {
     const cv::Mat *mat;
@@ -1781,6 +1754,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
 {
     const cv::Mat *mat;
@@ -1849,6 +1823,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
 {
     const cv::Mat *mat;
@@ -1918,6 +1893,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
 {
     const cv::Mat *mat;
@@ -2034,6 +2010,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
 {
     const cv::Mat *mat;
@@ -2149,25 +2126,6 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
     }
 }
 
-
-
-
-
-
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 ////----------------------------------------------------------------------------------------------------------------------------------
 //template<typename _Tp> void findMinMaxInZ(const ito::DataObject *obj, const QPointF &xyPos, double &min, double &max, DataObjectSeriesData::ComplexType cmplxState = DataObjectSeriesData::cmplxAbs)
 //{

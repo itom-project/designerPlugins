@@ -55,7 +55,7 @@ class itom2DQwtFigure : public ito::AbstractDObjFigure
         ~itom2DQwtFigure();
 
         //properties
-        ito::RetVal displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID);
+        ito::RetVal displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, const ito::uint8 direction);
         void setShowContextMenu(bool show); 
         bool showContextMenu() const;
         ito::RetVal applyUpdate();  //!> does the real update work
@@ -121,13 +121,11 @@ class itom2DQwtFigure : public ito::AbstractDObjFigure
 		void mnuCmplxSwitch(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();
+        void mnuForward();
+        void mnuBack();
 
 	private slots:
 		void mnuHome();
-        
-
-        
-
         QString getColorPalette(void);
         void setColorPalette(QString);
 };

@@ -225,6 +225,7 @@ ito::RetVal Itom1DQwtFigure::applyUpdate()
     if ((ito::DataObject*)m_pInput["source"]->getVal<void*>())
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
+        // why "source" is used here and not "displayed" .... ck 05/15/2013
         m_pContent->refreshPlot( (ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
 
         ito::Channel* dataChannel = getInputChannel("source");
@@ -640,3 +641,5 @@ void Itom1DQwtFigure::mnuHome()
 {
     m_pContent->m_pZoomer->zoom(0);
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------

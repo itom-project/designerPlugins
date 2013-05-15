@@ -334,8 +334,6 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             m_plotCurveItems.append(dObjCurve);
         }
 
-        
-
         if( bounds.size() == 0)
         {
             QVector<QPointF> pts(2);
@@ -611,7 +609,6 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
     replot();
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
 {
@@ -773,7 +770,6 @@ void Plot1DWidget::contextMenuEvent(QContextMenuEvent * event)
     }
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
 {
@@ -801,6 +797,7 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
     }
     return retError;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setZoomerEnable(const bool checked)
 {
@@ -838,6 +835,7 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
         }
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setPickerEnable(const bool checked)
 {
@@ -907,6 +905,7 @@ void Plot1DWidget::updateScaleValues()
     replot();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = false*/)
 {
     if(clear)

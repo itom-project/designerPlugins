@@ -104,12 +104,10 @@ class Plot2DWidget : public QwtPlot
         bool m_stateMoveAligned;
 
     signals:
-
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
     public slots:
-
         void trackerAScanMoved(const QPoint &pt);
         void trackerAScanAppended(const QPoint &pt);
         void trackerMoved(const QPoint &pt);
@@ -136,6 +134,9 @@ class Plot2DWidget : public QwtPlot
                 break;
             }
         };
+
+        void stackForward();
+        void stackBack();
 };
 
 

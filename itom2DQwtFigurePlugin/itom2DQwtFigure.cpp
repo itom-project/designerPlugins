@@ -50,6 +50,7 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
 	m_lblCoordinates(NULL)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy pass through of input source object").toAscii().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
@@ -149,7 +150,8 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     connect(m_actAScan, SIGNAL(toggled(bool)), this, SLOT(mnuAScanPicker(bool)));
 	connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
-    
+    connect(m_actForward, SIGNAL(triggered()), this, SLOT(mnuForward()));
+    connect(m_actBack, SIGNAL(triggered()), this, SLOT(mnuBack()));
 
     //this->menuBar()->addAction(m_actPan);
 	QToolBar *toolbar = new QToolBar(this);
@@ -219,12 +221,31 @@ itom2DQwtFigure::~itom2DQwtFigure()
     }
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal itom2DQwtFigure::applyUpdate()
 {
-    m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
+
+    // inserted shallow a shallow copy for the source -> displayed transision and an additional sourceout for the z-stack linecut
+    // maybe Mark will do some changes here?? ck 05/15/2013
+    // anyway z-stack linecut is working currently ;-)
+
+//    m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
+
+    DataObject *tmpDObj = NULL;
+    if ((tmpDObj = (ito::DataObject*)m_pOutput["displayed"]->getVal<void*>()))
+    {
+        delete tmpDObj;
+    }
+    tmpDObj = new DataObject(*(ito::DataObject*)m_pInput["source"]->getVal<void*>());
+    m_pOutput["displayed"]->setVal<void*>(tmpDObj);
+
+    if ((tmpDObj = (ito::DataObject*)m_pOutput["sourceout"]->getVal<void*>()))
+    {
+        delete tmpDObj;
+    }
+    tmpDObj = new DataObject(*(ito::DataObject*)m_pInput["source"]->getVal<void*>());
+    m_pOutput["sourceout"]->setVal<void*>(tmpDObj);
+
     m_pContent->refreshPlot(m_pOutput["displayed"]); //push the displayed DataObj into the actual plot widget for displaying
 
     return ito::retOk;
@@ -266,7 +287,7 @@ bool itom2DQwtFigure::showContextMenu() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal itom2DQwtFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID)
+ito::RetVal itom2DQwtFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, const ito::uint8 direction)
 {
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
@@ -280,7 +301,6 @@ ito::RetVal itom2DQwtFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32
 
     if(!retval.containsError())
     {
-
         if(uniqueID != newUniqueID)
         {
             uniqueID = newUniqueID;
@@ -290,15 +310,41 @@ ito::RetVal itom2DQwtFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32
             else
                 return ito::retError;
             retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["bounds"], lineCut->getInputParam("bounds"), Channel::parentToChild, 0, 1);
-            retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["displayed"], lineCut->getInputParam("source"), Channel::parentToChild, 0, 1);
-            paramNames << "bounds"  << "displayed";
+            switch (direction)
+            {
+                // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
+                // with one plane and cannot display the points in z-direction
+                case 2:
+                    retval += addChannel((ito::AbstractNode*)lineCut,  m_pOutput["sourceout"], lineCut->getInputParam("source"), Channel::parentToChild, 0, 1);
+                    paramNames << "bounds"  << "sourceout";
+                break;
+
+                // otherwise simply pass on the displayed plane
+                case 0:
+                case 1:
+                default:
+                    retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["displayed"], lineCut->getInputParam("source"), Channel::parentToChild, 0, 1);
+                    paramNames << "bounds"  << "displayed";
+                break;
+            }
             retval += updateChannels(paramNames);
 
             lineCut->show();
         }
         else
         {
-            paramNames << "bounds"  << "displayed";
+            switch (direction)
+            {
+                case 2:
+                    paramNames << "bounds"  << "sourceout";
+                break;
+
+                case 0:
+                case 1:
+                default:
+                    paramNames << "bounds"  << "displayed";
+                break;
+            }
             retval += updateChannels(paramNames);
         }
     }
@@ -644,4 +690,16 @@ void itom2DQwtFigure::setLinePlotCoordinates(const QVector<QPointF> pts)
     m_lblCoordinates->setText(buf);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void itom2DQwtFigure::mnuForward()
+{
+    m_pContent->stackForward();
+}
 
+//----------------------------------------------------------------------------------------------------------------------------------
+
+void itom2DQwtFigure::mnuBack()
+{
+    m_pContent->stackBack();
+}
+//----------------------------------------------------------------------------------------------------------------------------------

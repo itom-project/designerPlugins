@@ -153,7 +153,7 @@ void Plot2DWidget::refreshPlot(ito::ParamBase *param)
         //check dataObj
         ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
         int dims = dataObj->getDims();
-        if( dims > 1 )
+        if(dims > 1)
         {
             QList<unsigned int> startPoint;
             startPoint.append(0);
@@ -161,15 +161,15 @@ void Plot2DWidget::refreshPlot(ito::ParamBase *param)
             
             if(dataObj->calcNumMats() > 1)
             { 
-                int* limits = new int[2*dims];
+                int* limits = new int[2 * dims];
+                memset(limits, 0, sizeof(int) * 2 * dims);
 
-                memset(limits, 0, sizeof(int) * 2*dims);
-
-                for(int i = 0; i < (dims -2); i++)
+                // set roi to first matrix
+                for(int i = 0; i < (dims - 2); i++)
                 {
                     limits[2 * i + 1] = -1 * dataObj->getSize(i) + 1;
                 }
-                dataObj->adjustROI(dims,limits);
+                dataObj->adjustROI(dims, limits);
                 delete limits;
                 
                 if(!m_stackState) ((itom2DQwtFigure*)m_pParent)->enableZStackGUI(true);
@@ -361,7 +361,6 @@ void Plot2DWidget::refreshColorMap(QString palette)
     {
         return;
     }
-    
 
     if(newPalette.getPos(newPalette.getSize() - 1) == newPalette.getPos(newPalette.getSize() - 2))  // BuxFix - For Gray-Marked
     {
@@ -427,7 +426,7 @@ void Plot2DWidget::trackerAppended(const QPoint &pt)
     m_lineCut.setSamples(pts);
     replot();
 
-    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -459,7 +458,7 @@ void Plot2DWidget::trackerMoved(const QPoint &pt)
 
     replot();
 
-    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -484,7 +483,7 @@ void Plot2DWidget::trackerAScanAppended(const QPoint &pt)
     m_lineCut.setSamples(pts);
 
     replot();
-    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, 2);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -515,7 +514,7 @@ void Plot2DWidget::trackerAScanMoved(const QPoint &pt)
     m_lineCut.setSamples(pts);
 
     replot();
-    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+    ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, 2);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -549,10 +548,11 @@ ito::RetVal Plot2DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
     }
     return ito::retError;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot2DWidget::keyPressEvent ( QKeyEvent * event ) 
 {
-
+    char dir = 0;
     if(!m_pContent || !m_pContent->data())
         return;
 
@@ -582,6 +582,9 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
                 pts.resize(1);
                 pts[0] = m_lineCut.sample(0);
                 if (pts[0].y() < upperBorder) pts[0].setY(pts[0].y() + diff);
+
+                // setting linecut direction to z
+                dir = 2;
             }
             else
             {
@@ -594,11 +597,14 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
 
                 if (pts[0].y() < upperBorder) pts[0].setY(pts[0].y() + diff);
                 if (pts[1].y() < upperBorder) pts[1].setY(pts[1].y() + diff);
+
+                // setting linecut direction to x / y
+                dir = 0;
             }
 
             m_lineCut.setSamples(pts);
             replot();
-            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, dir);
         }
         return;
 
@@ -625,6 +631,9 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
                 pts.resize(1);
                 pts[0] = m_lineCut.sample(0);
                 if (pts[0].y() > lowerBorder) pts[0].setY(pts[0].y() - diff);
+
+                // setting linecut direction to z
+                dir = 2;
             }
             else
             {
@@ -632,12 +641,15 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
                 pts[0] = m_lineCut.sample(0);
                 pts[1] = m_lineCut.sample(1);
                 if (pts[0].y() > lowerBorder) pts[0].setY(pts[0].y() - diff);
-                if (pts[1].y() > lowerBorder) pts[1].setY(pts[1].y() - diff);                    
+                if (pts[1].y() > lowerBorder) pts[1].setY(pts[1].y() - diff);
+
+                // setting linecut direction to x / y
+                dir = 0;
             }
 
             m_lineCut.setSamples(pts);
             replot();
-            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, dir);
         }
         return;
 
@@ -666,6 +678,9 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
                 pts.resize(1);
                 pts[0] = m_lineCut.sample(0);
                 if (pts[0].x() < rightBorder) pts[0].setX(pts[0].x() + diff);
+
+                // setting linecut direction to z
+                dir = 2;
             }
             else
             {
@@ -674,12 +689,15 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
                 pts[1] = m_lineCut.sample(1);
 
                 if (pts[0].x() < rightBorder) pts[0].setX(pts[0].x() + diff);
-                if (pts[1].x() < rightBorder) pts[1].setX(pts[1].x() + diff);                    
+                if (pts[1].x() < rightBorder) pts[1].setX(pts[1].x() + diff);
+
+                // setting linecut direction to x / y
+                dir = 0;
             }
 
             m_lineCut.setSamples(pts);
             replot();
-            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, dir);
         }
         return;
 
@@ -705,6 +723,9 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
                 pts.resize(1);
                 pts[0] = m_lineCut.sample(0);
                 if (pts[0].x() > leftBorder) pts[0].setX(pts[0].x() - diff);
+
+                // setting linecut direction to z
+                dir = 2;
             }
             else
             {
@@ -717,10 +738,13 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
 
                 if (pts[0].x() > leftBorder) pts[0].setX(pts[0].x() - diff);
                 if (pts[1].x() > leftBorder) pts[1].setX(pts[1].x() - diff);
+
+                // setting linecut direction to x / y
+                dir = 0;
             }
             m_lineCut.setSamples(pts);
             replot();
-            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, dir);
         }
         return;
 
@@ -755,7 +779,7 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
 
             m_lineCut.setSamples(pts);
             replot();
-            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, 0);
         }
         break;
 
@@ -788,19 +812,20 @@ void Plot2DWidget::keyPressEvent ( QKeyEvent * event )
 
             m_lineCut.setSamples(pts);
             replot();
-            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+            ((itom2DQwtFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID, 0);
         }
         break;
 
         case Qt::Key_Control:
             m_stateMoveAligned = true;
-            break;
+        break;
 
         default:
         break;
     }
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot2DWidget::keyReleaseEvent ( QKeyEvent * event )
 {
@@ -809,11 +834,106 @@ void Plot2DWidget::keyReleaseEvent ( QKeyEvent * event )
     {
         case Qt::Key_Control:
             m_stateMoveAligned = false;
-            break;
+        break;
 
         default:
         break;
     }
     return;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot2DWidget::stackForward()
+{
+    // TODO: this implementation doesn't respect the originally set roi of the source, neither is the displayed object updated. 
+    // This must be fixed soon
+    DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(m_pContent->data());
+
+    if(rasterData)
+    {
+        QSharedPointer<ito::DataObject> dObj = rasterData->getDataObject();
+        QList<unsigned int> startPoint;
+        startPoint.append(0);
+        startPoint.append(0);
+
+        int dims, *wholeSizes = NULL, *offsets = NULL;
+
+        dims = dObj->getDims();
+        wholeSizes = new int[2 * dims];
+        memset(wholeSizes, 0, sizeof(int) * dims);
+        offsets = new int[2 * dims];
+        memset(offsets, 0, sizeof(int) * dims);
+        dObj->locateROI(wholeSizes, offsets);
+
+        int* limits = new int[2 * dims];
+        memset(limits, 0, sizeof(int) * 2 * dims);
+
+        if (offsets[dims - 3] < wholeSizes[dims - 3] - 1)
+        {
+            limits[(dims - 3) * 2] = -1;
+            limits[(dims - 3) * 2 + 1] = 1;
+        }
+        else
+        {
+            limits[(dims - 3) * 2] = wholeSizes[(dims - 3)] - 1;
+            limits[(dims - 3) * 2 + 1] = -wholeSizes[(dims - 3)] + 1;
+        }
+
+        dObj->adjustROI(dims, limits);
+        delete offsets;
+        delete wholeSizes;
+        delete limits;
+
+        rasterData->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dObj)), startPoint, dims - 1, dObj->getSize(dims - 1), dims - 2, dObj->getSize(dims - 2));
+        replot();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot2DWidget::stackBack()
+{
+    // TODO: this implementation doesn't respect the originally set roi of the source, neither is the displayed object updated. 
+    // This must be fixed soon
+    DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(m_pContent->data());
+
+    if(rasterData)
+    {
+        QSharedPointer<ito::DataObject> dObj = rasterData->getDataObject();
+        QList<unsigned int> startPoint;
+        startPoint.append(0);
+        startPoint.append(0);
+
+        int dims, *wholeSizes = NULL, *offsets = NULL;
+
+        dims = dObj->getDims();
+        wholeSizes = new int[2 * dims];
+        memset(wholeSizes, 0, sizeof(int) * dims);
+        offsets = new int[2 * dims];
+        memset(offsets, 0, sizeof(int) * dims);
+        dObj->locateROI(wholeSizes, offsets);
+
+        int* limits = new int[2 * dims];
+        memset(limits, 0, sizeof(int) * 2 * dims);
+
+        if (offsets[dims - 3] > 0)
+        {
+            limits[(dims - 3) * 2] = 1;
+            limits[(dims - 3) * 2 + 1] = -1;
+        }
+        else
+        {
+            limits[(dims - 3) * 2] = -(wholeSizes[(dims - 3)] - 1);
+            limits[(dims - 3) * 2 + 1] = wholeSizes[(dims - 3)] - 1;
+        }
+
+        dObj->adjustROI(dims, limits);
+        delete offsets;
+        delete wholeSizes;
+        delete limits;
+
+        rasterData->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dObj)), startPoint, dims - 1, dObj->getSize(dims - 1), dims - 2, dObj->getSize(dims - 2));
+        replot();
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
