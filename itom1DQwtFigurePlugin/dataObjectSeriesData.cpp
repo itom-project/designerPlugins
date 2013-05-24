@@ -533,7 +533,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
             break;
         case 1:
-            if(dims != 3)
+            if((dims - prependedOneDims) != 3)
             {
                 retval += RetVal(retError,0,"line plot in z-direction requires a 3-dim dataObject");
                 return retval;
@@ -541,19 +541,19 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
             else
             {
                 m_d.valid = true;
-                pxX1 = dataObj->getPhysToPix(dims-1, bounds[0].x(), _unused);
-                pxY1 = dataObj->getPhysToPix(dims-2, bounds[0].y(), _unused);
+                pxX1 = dataObj->getPhysToPix(dims - 1, bounds[0].x(), _unused);
+                pxY1 = dataObj->getPhysToPix(dims - 2, bounds[0].y(), _unused);
 
-                saturation( pxX1, 0, dataObj->getSize(dims-1)-1 );
-                saturation( pxX2, 0, dataObj->getSize(dims-1)-1 );
+                saturation( pxX1, 0, dataObj->getSize(dims - 1) - 1 );
+                saturation( pxX2, 0, dataObj->getSize(dims - 1) - 1 );
 
                 m_d.dir = dirZ;
-                m_d.nrPoints = dataObj->getSize(dims-3);
-                m_d.startPhys = dataObj->getPixToPhys(dims-3,0,_unused);
+                m_d.nrPoints = dataObj->getSize(dims - 3);
+                m_d.startPhys = dataObj->getPixToPhys(dims - 3,0,_unused);
                 if(m_d.nrPoints > 1)
                 {
-                    right = dataObj->getPixToPhys(dims-3,m_d.nrPoints-1,_unused);
-                    m_d.stepSizePhys = (right-m_d.startPhys) / (float)(m_d.nrPoints - 1);
+                    right = dataObj->getPixToPhys(dims - 3, m_d.nrPoints - 1, _unused);
+                    m_d.stepSizePhys = (right - m_d.startPhys) / (float)(m_d.nrPoints - 1);
                 }
                 else
                 {
@@ -569,8 +569,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                 m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
                 m_d.matStepSize= 0 ; //step in x-direction (in bytes)
 
-                description = dataObj->getAxisDescription(dims-3,_unused);
-                unit = dataObj->getAxisUnit(dims-3,_unused);
+                description = dataObj->getAxisDescription(dims - 3, _unused);
+                unit = dataObj->getAxisUnit(dims - 3, _unused);
                 if(description == "") description = "z-axis";
                 if(unit == "")
                 {
