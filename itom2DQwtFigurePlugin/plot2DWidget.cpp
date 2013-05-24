@@ -885,6 +885,7 @@ void Plot2DWidget::stackForward()
         delete limits;
 
         rasterData->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dObj)), startPoint, dims - 1, dObj->getSize(dims - 1), dims - 2, dObj->getSize(dims - 2));
+        rasterData->setIntervalRange(Qt::ZAxis, false, 0,255);
         replot();
     }
 }
@@ -932,6 +933,7 @@ void Plot2DWidget::stackBack()
         delete limits;
 
         rasterData->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dObj)), startPoint, dims - 1, dObj->getSize(dims - 1), dims - 2, dObj->getSize(dims - 2));
+        rasterData->setIntervalRange(Qt::ZAxis, false, 0,255);
         replot();
     }
 }

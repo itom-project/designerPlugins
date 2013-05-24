@@ -816,54 +816,53 @@ QPointF DataObjectSeriesData::sample(size_t n) const
         {
             switch (m_d.dir)
             {
-            case dirX:
-            case dirY:
-                mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(0) ]);
-                ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
-                fPos = m_d.startPhys + m_d.stepSizePhys * n;
-            break;
+                case dirX:
+                case dirY:
+                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(0) ]);
+                    ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
+                    fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
 
-            case dirZ:
-                
-                mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(n) ]);
-                ptr[0] = (mat->data + m_d.matOffset);
-                fPos = m_d.startPhys + m_d.stepSizePhys * n;
-            break;
+                case dirZ:
+                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(n) ]);
+                    ptr[0] = (mat->data + m_d.matOffset);
+                    fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
 
-            case dirXY:
-                mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(0) ]);
-                ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[n]);
-                fPos = m_d.startPhys + m_d.stepSizePhys * n;
-            break;
+                case dirXY:
+                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(0) ]);
+                    ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[n]);
+                    fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
             }
 
             switch(m_pDataObj->getType())
             {
-            case ito::tInt8:
-                return QPointF(fPos, *(reinterpret_cast<const ito::int8*>(ptr[0])) );
-            break;
-            case ito::tUInt8:
-                return QPointF(fPos, *(reinterpret_cast<const ito::uint8*>(ptr[0])) );
-            break;
-            case ito::tInt16:
-                return QPointF(fPos, *(reinterpret_cast<const ito::int16*>(ptr[0])) );
-            break;
-            case ito::tUInt16:
-                return QPointF(fPos, *(reinterpret_cast<const ito::uint16*>(ptr[0])) );
-            break;
-            case ito::tInt32:
-                return QPointF(fPos, *(reinterpret_cast<const ito::int32*>(ptr[0])) );
-            break;
-            case ito::tUInt32:
-                return QPointF(fPos, *(reinterpret_cast<const ito::uint32*>(ptr[0])) );
-            break;
-            case ito::tFloat32:
-                return QPointF(fPos, *(reinterpret_cast<const ito::float32*>(ptr[0])) );
-            break;
-            case ito::tFloat64:
-                return QPointF(fPos, *(reinterpret_cast<const ito::float64*>(ptr[0])) );
-            break;
-            case ito::tComplex64:
+                case ito::tInt8:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::int8*>(ptr[0])) );
+                break;
+                case ito::tUInt8:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::uint8*>(ptr[0])) );
+                break;
+                case ito::tInt16:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::int16*>(ptr[0])) );
+                break;
+                case ito::tUInt16:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::uint16*>(ptr[0])) );
+                break;
+                case ito::tInt32:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::int32*>(ptr[0])) );
+                break;
+                case ito::tUInt32:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::uint32*>(ptr[0])) );
+                break;
+                case ito::tFloat32:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::float32*>(ptr[0])) );
+                break;
+                case ito::tFloat64:
+                    return QPointF(fPos, *(reinterpret_cast<const ito::float64*>(ptr[0])) );
+                break;
+                case ito::tComplex64:
 				{
                     ito::complex64 val = *(reinterpret_cast<const ito::complex64*>(ptr[0]));
 					switch (m_cmplxState)
@@ -885,25 +884,25 @@ QPointF DataObjectSeriesData::sample(size_t n) const
 				}
             break;
             case ito::tComplex128:
+			{
+				ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
+				switch (m_cmplxState)
 				{
-					ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
-					switch (m_cmplxState)
-					{
-						default:
-                        case cmplxAbs:
-							return QPointF(fPos, abs(val));
-						break;
-						case cmplxReal:
-							return QPointF(fPos, val.real());
-						break;
-						case cmplxImag:
-							return QPointF(fPos, val.imag());
-						break;
-						case cmplxArg:
-							return QPointF(fPos, arg(val));
-						break;
-					}
+					default:
+                    case cmplxAbs:
+						return QPointF(fPos, abs(val));
+					break;
+					case cmplxReal:
+						return QPointF(fPos, val.real());
+					break;
+					case cmplxImag:
+						return QPointF(fPos, val.imag());
+					break;
+					case cmplxArg:
+						return QPointF(fPos, arg(val));
+					break;
 				}
+			}
             break;
             }
         }
