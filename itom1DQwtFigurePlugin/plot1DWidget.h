@@ -140,7 +140,7 @@ class Plot1DWidget : public QwtPlot
         bool m_cmplxState;
 
         MultiLineMode m_multiLine;
-        char m_autoLineColIndex;
+        unsigned char m_autoLineColIndex;
         long m_lineCol;
         int m_lineStyle;
         int m_linePlotID;
