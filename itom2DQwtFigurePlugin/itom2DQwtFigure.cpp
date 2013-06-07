@@ -214,10 +214,86 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
 //----------------------------------------------------------------------------------------------------------------------------------
 itom2DQwtFigure::~itom2DQwtFigure()
 {
-    if(m_pContent)
+    if (m_pContent)
     {
+        m_pContent->close();
         delete m_pContent;
-        m_pContent = NULL;
+    }
+
+    if (m_actScaleSetting)
+    {
+        delete m_actScaleSetting;
+    }
+
+    if (m_actPan)
+    {
+        delete m_actPan;
+    }
+
+    if (m_actZoomToRect)
+    {
+        delete m_actZoomToRect;
+    }
+
+    if (m_actMarker)
+    {
+        delete m_actMarker;
+    }
+
+    if (m_actLineCut)
+    {
+        delete m_actLineCut;
+    }
+
+    if (m_actPalette)
+    {
+        delete m_actPalette;
+    }
+
+    if (m_actToggleColorBar)
+    {
+        delete m_actToggleColorBar;
+    }
+
+    if (m_actAScan)
+    {
+        delete m_actAScan;
+    }
+
+    if (m_actForward)
+    {
+        delete m_actForward;
+    }
+
+    if (m_actBack)
+    {
+        delete m_actBack;
+    }
+
+    if (m_actCmplxSwitch)
+    {
+        delete m_actCmplxSwitch;
+    }
+
+    if (m_mnuCmplxSwitch)
+    {
+        m_mnuCmplxSwitch->clear();
+        delete m_mnuCmplxSwitch;
+    }
+
+    if (m_lblCoordinates)
+    {
+        delete m_lblCoordinates;
+    }
+
+    DataObject *tmpDObj = NULL;
+    if ((tmpDObj = (ito::DataObject*)m_pOutput["displayed"]->getVal<void*>()))
+    {
+        delete tmpDObj;
+    }
+    if ((tmpDObj = (ito::DataObject*)m_pOutput["sourceout"]->getVal<void*>()))
+    {
+        delete tmpDObj;
     }
 }
 

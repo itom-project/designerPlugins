@@ -140,6 +140,39 @@ Plot2DWidget::Plot2DWidget(QMenu *contextMenu, QWidget * parent) :
 //----------------------------------------------------------------------------------------------------------------------------------
 Plot2DWidget::~Plot2DWidget()
 {
+    if (m_pZoomer)
+    {
+        delete m_pZoomer;
+    }
+    if (m_pPanner)
+    {
+        delete m_pPanner;
+    }
+    if (m_pLinePicker)
+    {
+        delete m_pLinePicker;
+    }
+    if (m_pAScanPicker)
+    {
+        delete m_pAScanPicker;
+    }
+    if (m_pAScanMarker)
+    {
+        delete m_pAScanMarker;
+    }
+    if (m_pValuePicker)
+    {
+        delete m_pValuePicker;
+    }
+    if (m_pCmplxMenu)
+    {
+        m_pCmplxMenu->clear();
+        delete m_pCmplxMenu;
+    }
+    if (m_pContent)
+    {
+        delete m_pContent;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
