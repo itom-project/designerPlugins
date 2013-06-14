@@ -78,6 +78,7 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2DGVFigurePlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plot2DWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/rasterToQImage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
@@ -105,6 +106,11 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/plot2DWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rasterToQImage.cpp
 )
+
+#If you want to use automatical metadata for dlls under windows use the following if-case.
+if(MSVC)
+    list(APPEND designer_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/version.rc)
+endif(MSVC)
 
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})

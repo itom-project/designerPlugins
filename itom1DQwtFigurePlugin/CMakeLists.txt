@@ -51,7 +51,8 @@ INCLUDE_DIRECTORIES(
     ${ITOM_SDK_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/icons
 	${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
- )
+    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+)
 
 LINK_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -106,6 +107,11 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
 )
+
+#If you want to use automatical metadata for dlls under windows use the following if-case.
+if(MSVC)
+    list(APPEND designer_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/version.rc)
+endif(MSVC)
 
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 

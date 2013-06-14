@@ -102,6 +102,7 @@ set(designer_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
@@ -135,6 +136,11 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.cpp
 )
+
+#If you want to use automatical metadata for dlls under windows use the following if-case.
+if(MSVC)
+    list(APPEND designer_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/version.rc)
+endif(MSVC)
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../designer)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ../../designer)

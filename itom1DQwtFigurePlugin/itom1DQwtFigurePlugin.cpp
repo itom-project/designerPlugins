@@ -1,4 +1,5 @@
 #include "itom1DQwtFigurePlugin.h"
+#include "pluginVersion.h"
 
 #include <QtCore/QtPlugin>
 #include "itom1DQwtFigure.h"
@@ -14,7 +15,7 @@ Itom1DQwtFigurePlugin::Itom1DQwtFigurePlugin(QObject *parent)
     m_description = QObject::tr("ITOM widget for 1D DataObjects based on QWT.");
     m_detaildescription = QObject::tr("");
     m_author = "Marc Gronle, ITO";
-    m_version = 0;
+    m_version = PLUGIN_VERSION_MAJOR << 16 + PLUGIN_VERSION_MINOR << 8 + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL with ITO itom-exception");
 
     initialized = false;
