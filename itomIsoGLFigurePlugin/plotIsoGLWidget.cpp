@@ -418,12 +418,12 @@ void plotGLWidget::paintTimeout()
 void plotGLWidget::paintGL()
 {
     static int drawScene = 0;
-    bool test;
+    //bool test;
     double winSizeX = (double)this->width();
     double winSizeY = (double)this->height();
     ito::RetVal retval = ito::retOk;
     ito::float64 Sqrt2Div2 = sqrt(2.0) / 2.0;
-    ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0, tempVal;
+    ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0; //, tempVal;
     ito::float64 nDims = 0;
 
     if (m_isInit != 3)
@@ -574,7 +574,7 @@ void plotGLWidget::paintGL()
     if (m_drawTitle)
     {	/* noobjinfo */
 //		setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
-        int yused;
+        //int yused;
         int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
     }
@@ -1317,7 +1317,7 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
     int height = this->height();
     ito::RetVal retval = ito::retOk;
     ito::float64 Sqrt2Div2 = sqrt(2.0) / 2.0;
-    ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0, tempVal;
+    ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0; //, tempVal;
     int dims = 0;
 
     if (!(m_isInit & IS_INIT))
@@ -1759,7 +1759,7 @@ void plotGLWidget::threeDAxis(void)
 {
     ito::float64 Sqrt2div2 = sqrt(2.0) / 2.0;
     ito::float64 xb, yb;
-    ito::float64 dt;
+    //ito::float64 dt;
     ito::float64 xmin, xmax, ymin, ymax, zmin, zmax, xsizep, ysizep;
     ito::float64 ax, ay, az, xe[6], ye[6], ze[6];
     ito::float64 signedY=1, signedX=1, signedXAx, signedXAy, signedYAx, signedYAy, signedZAx, signedZAy, signedZA;
@@ -1988,13 +1988,13 @@ void plotGLWidget::threeDAxis(void)
         switch(m_colorBarMode)
         {
             case COLORBAR_LEFT:
-                DrawColorBar(-1, 0, 0.02, 0.6, m_axisZ.phys[0], m_axisZ.phys[1]);
+                DrawColorBar(-1, 0, 0.02f, 0.6f, m_axisZ.phys[0], m_axisZ.phys[1]);
                 break;
             case COLORBAR_RIGHT:
-                DrawColorBar(1, 0, 0.02, 0.6, m_axisZ.phys[0], m_axisZ.phys[1]);
+                DrawColorBar(1, 0, 0.02f, 0.6f, m_axisZ.phys[0], m_axisZ.phys[1]);
                 break;
             case COLORBAR_UPPER_RIGHT:
-                DrawColorBar(1, 1, 0.02, 0.6, m_axisZ.phys[0], m_axisZ.phys[1]);
+                DrawColorBar(1, 1, 0.02f, 0.6f, m_axisZ.phys[0], m_axisZ.phys[1]);
                 break;
         }
     }
@@ -2068,7 +2068,7 @@ void plotGLWidget::paintLightArrow()
     position1[0] /= norm1;
     position1[1] /= norm1;
     position1[2] /= norm1;
-    position1[2] *= 0.8;
+    position1[2] *= 0.8f;
 
     //Paint the axis itsself
     glBegin(GL_LINES);
@@ -2367,9 +2367,10 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 *\ingroup 3DOGLFuncsGroup
 */
 void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const double y, const double v)
-{char buffer[300];
- char decimal;
- char *p;
+{
+ char buffer[300];
+ //char decimal;
+ //char *p;
  struct achslabel *al = (struct achslabel *)vd;
  long l;
  int ret;
@@ -2545,22 +2546,22 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
     glPushMatrix();
     glLoadIdentity();
 
-    GLfloat x0 = -0.98;
-    GLfloat y0 = -1.0 * dY / 2.0;
+    GLfloat x0 = -0.98f;
+    GLfloat y0 = -1.0f * dY / 2.0f;
 
     if(xPos > 0)
     {
-        x0 = 1.0 - dX - 7.0 / (double)width() - 12.0 * m_fontsize / (double)width();
+        x0 = 1.0f - dX - 7.0f / (double)width() - 12.0f * m_fontsize / (double)width();
     }
     if(yPos != 0)
     {
         if(yPos > 0)
         {
-            y0 = 1.0 - 0.02 - m_fontsize / (double)height() - dY;
+            y0 = 1.0f - 0.02f - m_fontsize / (double)height() - dY;
         }
         else
         {
-            y0 = -1.0 + 0.02 + m_fontsize / (double)height();
+            y0 = -1.0f + 0.02f + m_fontsize / (double)height();
         }
     }
 
