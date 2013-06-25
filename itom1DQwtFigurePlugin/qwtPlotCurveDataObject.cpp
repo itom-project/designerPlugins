@@ -161,6 +161,20 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
                     polyline.clear();
                 }
             }
+            else
+            {
+                if(qIsFinite(y))
+                {
+                    sample.rx() = x;
+                    sample.ry() = y;
+                    polyline << sample;
+                }
+                else
+                {
+                    drawPolyline(painter,polyline,xMap,yMap,canvasRect);
+                    polyline.clear();
+                }
+            }
         }
 
         if(polyline.size() > 0)
@@ -183,10 +197,10 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
             if ( doAlign )
             {
                 x = qRound( x );
-                if(qIsFinite(y))
-                {
+                //if(qIsFinite(y))
+                //{
                 y = qRound( y );
-                }
+                //}
             }
 
             points[i - from].rx() = x;
