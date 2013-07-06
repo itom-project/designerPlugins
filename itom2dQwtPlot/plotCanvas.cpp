@@ -21,9 +21,9 @@
 *********************************************************************** */
 
 #include "plotCanvas.h"
-#include "../../common/sharedStructuresGraphics.h"
-#include "../../DataObject/dataObjectFuncs.h"
-#include "../../common/apiFunctionsGraphInc.h"
+#include "common/sharedStructuresGraphics.h"
+#include "DataObject/dataObjectFuncs.h"
+#include "common/apiFunctionsGraphInc.h"
 
 #include "itom2dqwtplot.h"
 
@@ -49,16 +49,18 @@ using namespace ito;
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-PlotCanvas::PlotCanvas(Itom2dQwtPlotActions *actions, QWidget * parent) :
+PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         QwtPlot(parent),
         m_pZoomer(NULL),
         m_pPanner(NULL),
-        m_pLinePicker(NULL),
-        m_pAScanPicker(NULL),
-        m_pAScanMarker(NULL),
+        m_pLineCutPicker(NULL),
+        m_pStackCutPicker(NULL),
+        m_pStackCutMarker(NULL),
 		m_dObjItem(NULL),
-        m_data(NULL),
-		m_pActions(actions)
+        m_rasterData(NULL),
+		m_pData(m_pData),
+        m_state(tIdle),
+        m_curColorMapIndex(0)
 {
     setMouseTracking(false);
 
@@ -68,27 +70,14 @@ PlotCanvas::PlotCanvas(Itom2dQwtPlotActions *actions, QWidget * parent) :
 	//canvas() is the real plotting area, where the plot is printed (without axes...)
 	canvas()->setFrameShadow(QFrame::Plain);
 	canvas()->setFrameShape(QFrame::NoFrame);
-
-	//prepare actions (no data available yet)
-	m_pActions->m_actSave->setEnabled(false);
-    m_pActions->m_actHome->setEnabled(false);
-    m_pActions->m_actPan->setEnabled(false);
-    m_pActions->m_actZoom->setEnabled(false);
-    m_pActions->m_actScaleSettings->setEnabled(false);
-    m_pActions->m_actColorPalette->setEnabled(false);
-    m_pActions->m_actToggleColorBar->setEnabled(false);
-    m_pActions->m_actTracker->setEnabled(false);
-    m_pActions->m_actLineCut->setEnabled(false);
-    m_pActions->m_actStackCut->setEnabled(false);
-	m_pActions->m_actPlaneSelector->setEnabled(false);
 	
 	//main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
     m_dObjItem->setRenderThreadCount(0);
     m_dObjItem->setColorMap( new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
 
-    m_data = new DataObjRasterData();
-    m_dObjItem->setData(m_data);
+    m_rasterData = new DataObjRasterData();
+    m_dObjItem->setData(m_rasterData);
 	m_dObjItem->attach(this);
 
 	//zoom tool
@@ -119,42 +108,7 @@ PlotCanvas::PlotCanvas(Itom2dQwtPlotActions *actions, QWidget * parent) :
     rightAxis->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,false);
 
     setAxisScale(QwtPlot::yRight, 0, 1.0 );
-    enableAxis(QwtPlot::yRight, m_pActions->m_actToggleColorBar->isChecked() );
-
- //   m_pValuePicker = new ValuePicker2D(m_pContent, QwtPlot::xBottom, QwtPlot::yLeft, canvas());
- //   m_pValuePicker->setEnabled(false);
- //   m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
- //   m_pValuePicker->setTrackerFont(QFont("Verdana",10));
- //   m_pValuePicker->setTrackerPen(QPen(QBrush(Qt::red),2));
- //   m_pValuePicker->setBackgroundFillBrush( QBrush(QColor(255,255,255,155), Qt::SolidPattern) );
-
- //   m_pAScanPicker = new QwtPicker(QwtPicker::CrossRubberBand , QwtPicker::AlwaysOn, canvas());
- //   m_pAScanPicker->setEnabled(false);
- //   m_pAScanPicker->setStateMachine(new QwtPickerDragPointMachine);
- //   m_pAScanPicker->setRubberBandPen(QPen(QBrush(Qt::red),1));
- //   m_pAScanPicker->setTrackerPen(QPen(QBrush(Qt::red),1));
- //   connect(m_pAScanPicker, SIGNAL(moved(const QPoint&)), SLOT(trackerAScanMoved(const QPoint&)));
- //   connect(m_pAScanPicker, SIGNAL(appended(const QPoint&)), SLOT(trackerAScanAppended(const QPoint&)));
-
- //   m_pAScanMarker = new QwtPlotMarker();
- //   m_pAScanMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
- //   m_pAScanMarker->attach(this);
- //   m_pAScanMarker->setVisible(false);
- //   
- //   m_pLinePicker = new QwtPicker(QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, canvas());
- //   m_pLinePicker->setEnabled(false);
- //   m_pLinePicker->setStateMachine(new QwtPickerDragPointMachine);
- //   m_pLinePicker->setRubberBandPen(QPen(Qt::green));
- //   m_pLinePicker->setTrackerPen(QPen(Qt::green));
- //   connect(m_pLinePicker, SIGNAL(moved(const QPoint&)), SLOT(trackerMoved(const QPoint&)));
- //   connect(m_pLinePicker, SIGNAL(appended(const QPoint&)), SLOT(trackerAppended(const QPoint&)));
-
- //   m_lineCut.attach(this);
-
- //   m_pContent->attach(this);
-
-//    m_pEventFilter = new Plot2DEFilter(this, m_pthisNode, m_pContent);
-//    installEventFilter( m_pEventFilter );
+    enableAxis(QwtPlot::yRight, m_pData->m_colorBarVisible );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -165,10 +119,10 @@ PlotCanvas::~PlotCanvas()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshPlot(ito::ParamBase *param)
 {
-    if(m_data)
+    if(m_rasterData)
     {
         ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
-        m_data->updateDataObject(dataObj);
+        m_rasterData->updateDataObject(dataObj);
     }
 
     replot();
@@ -355,7 +309,7 @@ void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshColorMap(QString palette)
+void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 {
     QwtLinearColorMap *colorMap = NULL;
     QwtLinearColorMap *colorBarMap = NULL;
@@ -363,27 +317,29 @@ void PlotCanvas::refreshColorMap(QString palette)
     ito::RetVal retval(ito::retOk);
     int numPalettes = 1;
 
-
-    if (palette.isEmpty())
+    if (colormap == "__next__")
     {
         retval = apiPaletteGetNumberOfColorBars(numPalettes);
-        m_curColorPaletteIndex %= numPalettes;
-        if (m_curColorPaletteIndex == 0)
-            return;
 
-        retval += apiPaletteGetColorBarIdx(m_curColorPaletteIndex, newPalette);
+        if (numPalettes == 0 || retval.containsError())
+        {
+            return;
+        }
+
+        m_curColorMapIndex++;
+        m_curColorMapIndex %= numPalettes; //map index to [0,numPalettes)
+        retval += apiPaletteGetColorBarIdx(m_curColorMapIndex, newPalette);
     }
     else
     {
-        retval += apiPaletteGetColorBarName(palette, newPalette);
-        retval += apiPaletteGetColorBarIdxFromName(palette, m_curColorPaletteIndex);
+        retval += apiPaletteGetColorBarName(colormap, newPalette);
     }
 
-    if(newPalette.getSize() < 2)
+    if (retval.containsError() || newPalette.getSize() < 2)
     {
         return;
     }
-    
+   
 
     if(newPalette.getPos(newPalette.getSize() - 1) == newPalette.getPos(newPalette.getSize() - 2))  // BuxFix - For Gray-Marked
     {
@@ -416,18 +372,16 @@ void PlotCanvas::refreshColorMap(QString palette)
 
     if(colorMap != NULL)
     {
-        /*m_pContent->setColorMap(colorMap);
-        DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(m_pContent->data());
-        if(rasterData)
+        if(m_rasterData)
         {
-            QwtInterval interval = rasterData->interval(Qt::ZAxis);
+            QwtInterval interval = m_rasterData->interval(Qt::ZAxis);
             setAxisScale(QwtPlot::yRight, interval.minValue(), interval.maxValue());
             axisWidget(QwtPlot::yRight)->setColorMap(interval, colorBarMap);
         }
         else
         {
             axisWidget(QwtPlot::yRight)->setColorMap(QwtInterval(0,1.0), colorBarMap);
-        }*/
+        }
     }
 
     replot();
@@ -840,14 +794,136 @@ void PlotCanvas::keyReleaseEvent ( QKeyEvent * event )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mnuSwitchColorPalette()
+void PlotCanvas::setColorBarVisible(bool visible)
 {
-	m_curColorPaletteIndex++;
-	refreshColorMap();
+    m_pData->m_colorBarVisible = visible;
+	enableAxis(QwtPlot::yRight, visible );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mnuToggleColorBar(bool checked)
+void PlotCanvas::setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel)
 {
-	enableAxis(QwtPlot::yRight, checked );
+    if(m_pData->m_autoValueLabel)
+    {
+        setAxisTitle(QwtPlot::yRight, valueLabel);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::yRight, m_pData->m_valueLabel);
+    }
+
+    if(m_pData->m_autoxAxisLabel)
+    {
+        setAxisTitle(QwtPlot::xBottom, xAxisLabel);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::xBottom, m_pData->m_xaxisLabel);
+    }
+
+    if(m_pData->m_autoyAxisLabel)
+    {
+        setAxisTitle(QwtPlot::yLeft, yAxisLabel);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::yLeft, m_pData->m_yaxisLabel);
+    }
+
+    if(m_pData->m_autoTitle)
+    {
+        setTitle(title);
+    }
+    else
+    {
+        setTitle(m_pData->m_title);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::updateLabels()
+{
+    if(m_pData->m_autoValueLabel)
+    {
+        setAxisTitle(QwtPlot::yRight, m_pData->m_valueLabelDObj);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::yRight, m_pData->m_valueLabel);
+    }
+
+    if(m_pData->m_autoxAxisLabel)
+    {
+        setAxisTitle(QwtPlot::xBottom, m_pData->m_xaxisLabelDObj);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::xBottom, m_pData->m_xaxisLabel);
+    }
+
+    if(m_pData->m_autoyAxisLabel)
+    {
+        setAxisTitle(QwtPlot::yLeft, m_pData->m_yaxisLabelDObj);
+    }
+    else
+    {
+        setAxisTitle(QwtPlot::yLeft, m_pData->m_yaxisLabel);
+    }
+
+    if(m_pData->m_autoTitle)
+    {
+        setTitle(m_pData->m_titleDObj);
+    }
+    else
+    {
+        setTitle(m_pData->m_title);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::updateScaleValues()
+{
+    if(m_pData->m_valueScaleAuto)
+    {
+        setAxisAutoScale( QwtPlot::yRight, true );
+    }
+    else
+    {
+        setAxisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax );
+    }
+
+    if(m_pData->m_xaxisScaleAuto)
+    {
+        setAxisAutoScale( QwtPlot::xBottom, true );
+    }
+    else
+    {
+        setAxisScale( QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax );
+    }
+
+    if(m_pData->m_yaxisScaleAuto)
+    {
+        setAxisAutoScale( QwtPlot::yLeft, true );
+    }
+    else
+    {
+        setAxisScale( QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax );
+    }
+
+    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setState( tState state)
+{
+    if (m_state != state)
+    {
+        if (m_pZoomer) m_pZoomer->setEnabled( state == tZoom );
+        if (m_pPanner) m_pPanner->setEnabled( state == tPan );
+        if (m_pLineCutPicker) m_pLineCutPicker->setEnabled( state == tLineCut );
+        if (m_pStackCutPicker) m_pStackCutPicker->setEnabled( state == tStackCut );
+        if (m_pStackCutMarker) m_pStackCutMarker->setVisible( state == tStackCut );
+
+        m_state = state;
+    }
 }

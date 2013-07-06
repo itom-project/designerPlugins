@@ -26,10 +26,9 @@
 #include <QtDesigner/QDesignerCustomWidgetInterface>
 #include "plot/abstractItomDesignerPlugin.h"
 
-class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin, public QDesignerCustomWidgetInterface
+class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
 {
 	Q_OBJECT
-	Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
 	Itom2dQwtPlotPlugin(QObject *parent = 0);
@@ -43,7 +42,8 @@ public:
 	QString name() const;
 	QString toolTip() const;
 	QString whatsThis() const;
-	QWidget *createWidget(QWidget *parent);
+    QWidget *createWidget(QWidget *parent);
+    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
 	void initialize(QDesignerFormEditorInterface *core);
 
 private:

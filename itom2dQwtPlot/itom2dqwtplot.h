@@ -36,28 +36,73 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
 {
 	Q_OBJECT
 
-	Q_PROPERTY(bool showColorBar READ showColorBar WRITE setShowColorBar DESIGNABLE true)
+	Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
+    Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
+    Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel RESET resetxAxisLabel)
+    Q_PROPERTY(QString yAxisLabel READ getyAxisLabel WRITE setyAxisLabel RESET resetyAxisLabel)
+    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
 
 public:
-	Itom2dQwtPlot(const QString &itomSettingsFile, QWidget *parent = 0);
+    Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
 	~Itom2dQwtPlot();
+
+    ito::RetVal applyUpdate();  //!> does the real update work
 
 	//properties (setter/getter)
 	void setShowContextMenu(bool show) {}; 
 	bool showContextMenu() const { return false; };
 
-	ito::RetVal applyUpdate();  //!> does the real update work
+	bool colorBarVisible() const;
+	void setColorBarVisible(bool value);
 
-	bool showColorBar() const;
-	void setShowColorBar(bool value);
+    QString getTitle() const;
+    void setTitle(const QString &title);
+    void resetTitle();
+
+    QString getxAxisLabel() const;
+    void setxAxisLabel(const QString &label);
+    void resetxAxisLabel();
+
+    QString getyAxisLabel() const;
+    void setyAxisLabel(const QString &label);
+    void resetyAxisLabel();
+
+    QString getValueLabel() const;
+    void setValueLabel(const QString &label);
+    void resetValueLabel();
 
 protected:
 	void createActions();
 
 private:
 
-	Itom2dQwtPlotActions *m_pActions;
-	PlotCanvas *m_pCanvas;	
+	PlotCanvas *m_pContent;	
+    InternalData m_data;
+
+    QAction *m_pActSave;
+    QAction *m_pActHome;
+    QAction *m_pActPan;
+    QAction *m_pActZoom;
+    QAction *m_pActScaleSettings;
+    QAction *m_pActColorPalette;
+    QAction *m_pActToggleColorBar;
+    QAction *m_pActValuePicker;
+    QAction *m_pActLineCut;
+    QAction *m_pActStackCut;
+    QAction *m_pActPlaneSelector;
+
+private slots:
+    void mnuActSave();
+    void mnuActHome();
+    void mnuActPan(bool checked);
+    void mnuActZoom(bool checked);
+    void mnuActScaleSettings();
+    void mnuActColorPalette();
+    void mnuActToggleColorBar(bool checked);
+    void mnuActValuePicker(bool checked);
+    void mnuActLineCut(bool checked);
+    void mnuActStackCut(bool checked);
+    void mnuActPlaneSelector(int plane);
 
 };
 

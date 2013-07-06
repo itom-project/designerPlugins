@@ -51,7 +51,12 @@ bool Itom2dQwtPlotPlugin::isInitialized() const
 
 QWidget *Itom2dQwtPlotPlugin::createWidget(QWidget *parent)
 {
-	return new Itom2dQwtPlot(m_itomSettingsFile, parent);
+	return new Itom2dQwtPlot(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
+}
+
+QWidget *Itom2dQwtPlotPlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
+{
+    return new Itom2dQwtPlot(m_itomSettingsFile, winMode, parent);
 }
 
 QString Itom2dQwtPlotPlugin::name() const
@@ -76,7 +81,7 @@ QString Itom2dQwtPlotPlugin::toolTip() const
 
 QString Itom2dQwtPlotPlugin::whatsThis() const
 {
-	return QString("ITOM widget for 2D DataObjects.");
+	return QString("itom widget for 2D DataObjects.");
 }
 
 bool Itom2dQwtPlotPlugin::isContainer() const

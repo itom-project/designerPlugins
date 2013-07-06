@@ -23,9 +23,8 @@
 #ifndef DATAOBJRASTERDATA_H
 #define DATAOBJRASTERDATA_H
 
-//#include "../../Qitom/global.h"
-#include "../../common/sharedStructures.h"
-#include "../../DataObject/dataobj.h"
+#include "common/sharedStructures.h"
+#include "DataObject/dataobj.h"
 
 #include <qwt_raster_data.h>
 #include <qlist.h>

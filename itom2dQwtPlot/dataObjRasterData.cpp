@@ -21,9 +21,9 @@
 *********************************************************************** */
 
 #include "dataObjRasterData.h"
-#include "../../common/typeDefs.h"
+#include "common/typeDefs.h"
 
-#include "../../DataObject/dataObjectFuncs.h"
+#include "DataObject/dataObjectFuncs.h"
 
 #include <qdebug.h>
 
