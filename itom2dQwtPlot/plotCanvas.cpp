@@ -26,6 +26,7 @@
 #include "common/apiFunctionsGraphInc.h"
 
 #include "itom2dqwtplot.h"
+#include "valuePicker2d.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -60,7 +61,9 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_rasterData(NULL),
 		m_pData(m_pData),
         m_state(tIdle),
-        m_curColorMapIndex(0)
+        m_curColorMapIndex(0),
+        m_pValuePicker(NULL),
+        m_dObjPtr(NULL)
 {
     setMouseTracking(false);
 
@@ -83,17 +86,18 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 	//zoom tool
     m_pZoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
-    m_pZoomer->setRubberBandPen(QPen(QBrush(Qt::red),3,Qt::DashLine));
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
-    m_pZoomer->setTrackerFont(QFont("Verdana",10));
-    m_pZoomer->setTrackerPen(QPen(QBrush(Qt::green),2));
-	m_orgImageSize = m_pZoomer->zoomBase();
 
 	//pan tool
     m_pPanner = new QwtPlotPanner(canvas());
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
+
+    //value picker
+    m_pValuePicker = new ValuePicker2D(QwtPlot::xBottom, QwtPlot::yLeft, canvas(), m_rasterData);
+    m_pValuePicker->setEnabled(false);
+    m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
 
 	//prepare color bar
 	QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
@@ -117,181 +121,114 @@ PlotCanvas::~PlotCanvas()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshPlot(ito::ParamBase *param)
+ito::RetVal PlotCanvas::init()
 {
-    if(m_rasterData)
+    QPen rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red),2,Qt::DashLine),NULL).value<QPen>();
+    QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
+    QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
+    QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
+    
+    m_pZoomer->setRubberBandPen(rubberBandPen);
+    m_pZoomer->setTrackerFont(trackerFont);
+    m_pZoomer->setTrackerPen(trackerPen);
+
+    m_pValuePicker->setTrackerFont(trackerFont);
+    m_pValuePicker->setTrackerPen(trackerPen);
+    m_pValuePicker->setBackgroundFillBrush(trackerBg);
+
+    return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::refreshPlot(ito::DataObject *dObj, int plane /*= -1*/)
+{
+    int colorIndex;
+    bool needToUpdate = false;
+
+    m_dObjPtr = dObj;
+
+    //QString valueLabel, axisLabel, title;
+
+    if (dObj)
     {
-        ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
-        m_rasterData->updateDataObject(dataObj);
+        int dims = dObj->getDims();
+        int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
+        int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
+
+        /*if(dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
+        {
+            if(!m_cmplxState) ((Itom1DQwtFigure*)m_pParent)->enableComplexGUI(true);
+            m_cmplxState = true;                
+        }
+        else
+        {
+            if(m_cmplxState) ((Itom1DQwtFigure*)m_pParent)->enableComplexGUI(false);
+            m_cmplxState = false;                
+        }*/
+        needToUpdate = m_rasterData->updateDataObject( dObj, plane );
+
+        bool valid;
+        ito::DataObjectTagType tag;
+        tag = dObj->getTag("title", valid);
+        m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
+    } 
+
+    updateLabels();
+
+    if(needToUpdate)
+    {
+        Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+        if (p)
+        {
+            int maxPlane = 0;
+            if (dObj->getDims() > 2)
+            {
+                maxPlane = dObj->calcNumMats() - 1;
+            }
+            p->setPlaneRange(0, maxPlane);
+        }
+
+
+        //updateMarkerPosition(true);
+        QwtInterval ival;
+        if(m_pData->m_valueScaleAuto)
+        {
+            ival = m_rasterData->interval(Qt::ZAxis);
+            m_pData->m_valueMin = ival.minValue();
+            m_pData->m_valueMax = ival.maxValue();
+        }
+
+        if(m_pData->m_xaxisScaleAuto)
+        {
+            ival = m_rasterData->interval(Qt::XAxis);
+            m_pData->m_xaxisMin = ival.minValue();
+            m_pData->m_xaxisMax = ival.maxValue();
+        }
+
+        if(m_pData->m_yaxisScaleAuto)
+        {
+            ival = m_rasterData->interval(Qt::YAxis);
+            m_pData->m_yaxisMin = ival.minValue();
+            m_pData->m_yaxisMax = ival.maxValue();
+        }
+
+        
+        updateScaleValues(); //replot is done here
+
+        m_pZoomer->setZoomBase( true );
     }
+    else
+    {
+        //updateMarkerPosition(true,false);
 
-    replot();
-   // DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(m_pContent->data());
-   // bool newRasterDataCreated = false;
+        replot();
+    }
+}
 
-   // if ((param != NULL) && (param->getType() == (ito::Param::DObjPtr & ito::paramTypeMask)))
-   // {
-   //     //check dataObj
-   //     ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
-   //     int dims = dataObj->getDims();
-   //     if( dims > 1 )
-   //     {
-   //         QList<unsigned int> startPoint;
-   //         startPoint.append(0);
-   //         startPoint.append(0);
-   //         
-   //         if(dataObj->calcNumMats() > 1)
-   //         { 
-   //             int* limits = new int[2*dims];
-
-   //             memset(limits, 0, sizeof(int) * 2*dims);
-
-   //             for(int i = 0; i < (dims -2); i++)
-   //             {
-   //                 limits[2 * i + 1] = -1 * dataObj->getSize(i) + 1;
-   //             }
-   //             dataObj->adjustROI(dims,limits);
-   //             delete limits;
-   //             
-   //             if(!m_stackState) ((itom2DQwtFigure*)m_pParent)->enableZStackGUI(true);
-   //             m_stackState = true;
-   //         }
-   //         else
-   //         {
-   //             if(m_stackState) ((itom2DQwtFigure*)m_pParent)->enableZStackGUI(false);
-   //             m_stackState = false;
-   //         }
-
-   //         if(dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
-   //         {
-   //             if(!m_cmplxState) ((itom2DQwtFigure*)m_pParent)->enableComplexGUI(true);
-   //             m_cmplxState = true;                
-   //         }
-   //         else
-   //         {
-   //             if(!m_cmplxState) ((itom2DQwtFigure*)m_pParent)->enableComplexGUI(false);
-   //             m_cmplxState = false;                
-   //         }
-
-			//bool test = true;
-			//int width = dataObj->getSize(dims - 1, true);
-			//int height = dataObj->getSize(dims - 2, true);
-
-			//QRectF newImageSize = QRectF(dataObj->getPixToPhys(dims - 1, 0, test), dataObj->getPixToPhys(dims - 2, 0, test), dataObj->getPixToPhys(dims - 1, width, test), dataObj->getPixToPhys(dims - 2, height, test));
-			//if(newImageSize != m_orgImageSize)
-			//{
-			//	m_orgImageSize = newImageSize;
-
-			//	setAxisScale( QwtPlot::xBottom, newImageSize.left(), newImageSize.width() );
-			//	setAxisScale( QwtPlot::yLeft, newImageSize.top(), newImageSize.height() );
-			//	m_pZoomer->setZoomBase(m_orgImageSize);
-			//	m_pZoomer->zoom(0);
-			//}
-
-   //         if(rasterData)
-   //         {
-   //             rasterData->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), startPoint, dims - 1, dataObj->getSize(dims - 1, true), dims - 2, dataObj->getSize(dims - 2, true));
-   //         }
-   //         else
-   //         {
-   //             m_pContent->setData(new DataObjectRasterData(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), startPoint, dims - 1, dataObj->getSize(dims - 1, true), dims - 2, dataObj->getSize(dims - 2, true), 1));
-   //             newRasterDataCreated = true;
-   //             if(dataObj)
-   //             {
-   //                 bool test;
-   //                 // Copy Object scales to rastobject
-   //                 //DataObjectRasterData * rastaData = static_cast<DataObjectRasterData*>(m_pContent->data());
-   //                 //rastaData->setObjOffsetsAndScales(dataObj->getAxisScales(dataObj->getDims() - 1, true), dataObj->getAxisOffset(dataObj->getDims() - 1, true),dataObj->getAxisScales(dataObj->getDims() - 2, true), dataObj->getAxisOffset(dataObj->getDims() - 2, true));
-
-   //                 // Copy Titel and axis scale to widget
-   //                 QString qtBuf("");
-
-   //                 std::string tDescription(dataObj->getValueDescription());
-   //                 std::string tUnit(dataObj->getValueUnit());
-   //                 if(!tDescription.empty())
-   //                 {
-   //                     qtBuf.append(tDescription.data());
-   //                 }
-   //                 if (!tUnit.empty())
-   //                 {
-   //                     if(qtBuf.size()) qtBuf.append(" in ");
-   //                     qtBuf.append(tUnit.data()); 
-   //                 }
-   //                 if(qtBuf.size()) setAxisTitle(QwtPlot::yRight, qtBuf);
-   //                 qtBuf.clear();
-
-   //                 tDescription = dataObj->getAxisDescription(dims - 1, test, true);
-   //                 tUnit = dataObj->getAxisUnit(dims - 1, test, true);
-   //                 if(!tDescription.empty())
-   //                 {
-   //                     qtBuf.append(tDescription.data());
-   //                 }
-   //                 if (!tUnit.empty())
-   //                 {
-   //                     if(qtBuf.size()) qtBuf.append(" in ");
-   //                     qtBuf.append(tUnit.data()); 
-   //                 }
-   //                 if(qtBuf.size()) setAxisTitle(QwtPlot::xBottom, qtBuf); 
-   //                 qtBuf.clear();
-
-   //                 tDescription = dataObj->getAxisDescription(dims- 2, test, true);
-   //                 tUnit = dataObj->getAxisUnit(dims - 2, test, true);
-   //                 if(!tDescription.empty())
-   //                 {
-   //                     qtBuf.append(tDescription.data());
-   //                 }
-   //                 if (!tUnit.empty())
-   //                 {
-   //                     if(qtBuf.size()) qtBuf.append(" in ");
-   //                     qtBuf.append(tUnit.data()); 
-   //                 }
-   //                 if(qtBuf.size()) setAxisTitle(QwtPlot::yLeft, qtBuf); 
-   //                 qtBuf.clear();
-
-   //                 std::string tTitle(dataObj->getTag("title", test).getVal_ToString());
-   //                 qtBuf.clear();
-   //                 if(test)
-   //                 {
-   //                     qtBuf.append(tTitle.data());   
-   //                 }
-   //                 setTitle(qtBuf);
-
-   //                 rasterData = static_cast<DataObjectRasterData*>(m_pContent->data());
-   //                 QwtInterval interval = rasterData->interval(Qt::ZAxis);
-   //                 setAxisScale(QwtPlot::yRight, interval.minValue(), interval.maxValue());
-   //                 axisWidget(QwtPlot::yRight)->setColorMap(interval, new QwtLinearColorMap(Qt::black, Qt::white));
-
-   //                 if(m_startScaledZ)
-   //                 {
-   //                     rasterData->setIntervalRange(Qt::ZAxis, false, m_startRangeZ.x(), m_startRangeZ.y());
-   //                 }
-   //                 if(m_startScaledY)
-   //                 {
-   //                     rasterData->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
-   //                 }
-   //                 if(m_startScaledX)
-   //                 {
-   //                     rasterData->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
-   //                 }
-   //             }
-   //         }
-   //     }
-   //     else
-   //     {
-   //         //error
-   //     }
-   // }
-   // else if(rasterData)
-   // {
-   //     rasterData->updateDataObject(QSharedPointer<ito::DataObject>());
-   //     //if(m_pReplotPending) *m_pReplotPending = false;
-   // }
-   // else
-   // {
-   //     //if(m_pReplotPending) *m_pReplotPending = false;
-   // }
-
-   // replot();
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::changePlane(int plane)
+{
+    refreshPlot(m_dObjPtr, plane);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -382,6 +319,8 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
         {
             axisWidget(QwtPlot::yRight)->setColorMap(QwtInterval(0,1.0), colorBarMap);
         }
+
+        m_dObjItem->setColorMap(colorMap);
     }
 
     replot();
@@ -920,9 +859,23 @@ void PlotCanvas::setState( tState state)
     {
         if (m_pZoomer) m_pZoomer->setEnabled( state == tZoom );
         if (m_pPanner) m_pPanner->setEnabled( state == tPan );
+        if (m_pValuePicker) m_pValuePicker->setEnabled( state == tValuePicker );
         if (m_pLineCutPicker) m_pLineCutPicker->setEnabled( state == tLineCut );
         if (m_pStackCutPicker) m_pStackCutPicker->setEnabled( state == tStackCut );
         if (m_pStackCutMarker) m_pStackCutMarker->setVisible( state == tStackCut );
+
+        switch (state)
+        {
+        case tIdle:
+            canvas()->setCursor( Qt::ArrowCursor );
+            break;
+        case tValuePicker:
+            canvas()->setCursor( Qt::CrossCursor );
+            break;
+        default:
+            canvas()->setCursor( Qt::ArrowCursor );
+            break;
+        }
 
         m_state = state;
     }

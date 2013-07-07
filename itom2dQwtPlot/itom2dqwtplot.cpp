@@ -163,11 +163,15 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActStackCut(bool)));
 
 	QSpinBox *planeSelector = new QSpinBox(this);
+    planeSelector->setMinimum(0);
+    planeSelector->setMaximum(0);
+    planeSelector->setValue(0);
 	planeSelector->setToolTip("Select image plane");
 	QWidgetAction *wa = new QWidgetAction(this);
 	wa->setDefaultWidget(planeSelector);
-	m_pActPlaneSelector = a = wa;
-	a->setObjectName("planeSelector");
+	m_pActPlaneSelector = wa;
+	wa->setObjectName("planeSelector");
+    wa->setVisible(false);
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
 	
 }
@@ -175,9 +179,11 @@ void Itom2dQwtPlot::createActions()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
-    m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
-    m_pContent->refreshPlot( m_pOutput["displayed"] );
-    //m_pContent->refreshPlot(m_pOutput["displayed"]); //push the displayed DataObj into the actual plot widget for displaying
+    if (m_pInput["source"]->getVal<ito::DataObject*>())
+    {
+        m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
+        m_pContent->refreshPlot( m_pInput["source"]->getVal<ito::DataObject*>() );
+    }
 
     return ito::retOk;
 }
@@ -421,6 +427,7 @@ void Itom2dQwtPlot::mnuActZoom(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActScaleSettings()
 {
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -462,4 +469,24 @@ void Itom2dQwtPlot::mnuActStackCut(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActPlaneSelector(int plane)
 {
+    if (m_pContent) m_pContent->changePlane(plane);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setPlaneRange(int min, int max)
+{
+    if (m_pActPlaneSelector)
+    {
+        QSpinBox *spinBox = qobject_cast<QSpinBox*>(m_pActPlaneSelector->defaultWidget());
+        if (spinBox)
+        {
+            int value = spinBox->value();
+            value = std::max(min, value);
+            value = std::min(max, value);
+            spinBox->setMinimum(min);
+            spinBox->setMaximum(max);
+            spinBox->setValue(value);
+        }
+        m_pActPlaneSelector->setVisible( std::abs(max-min) > 0 );
+    }
 }

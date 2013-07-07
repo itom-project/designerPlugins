@@ -47,8 +47,9 @@ class DataObjRasterData : public QwtRasterData
 
         inline QSize getSize() const { return QSize(m_D.m_xSize, m_D.m_ySize); }
 
+        void calcHash();
 
-        void updateDataObject(ito::DataObject *dataObj, size_t planeIdx = 0);
+        bool updateDataObject(ito::DataObject *dataObj, int planeIdx = -1);
 
         /*void updateDataObject(QSharedPointer<ito::DataObject> dataObj);
         void updateDataObject(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height);
@@ -58,6 +59,9 @@ class DataObjRasterData : public QwtRasterData
         inline int getDataObjWidth() { return m_DataObjectWidth; }
         inline int getDataObjHeight() { return m_DataObjectHeight; }
         inline void setCmplxState(const int state) { m_cmplxState = state; }*/
+
+        QPointF valueLimits() const { return m_zBounds; };
+        QRectF boundingRectPlane() const { return m_xyBounds; };
        
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
@@ -68,6 +72,8 @@ class DataObjRasterData : public QwtRasterData
 
         void deleteCache();
 
+        QByteArray m_hash;
+
         ito::DataObject *m_dataObj; //is pointer only
 
         bool m_validData;
@@ -75,6 +81,9 @@ class DataObjRasterData : public QwtRasterData
         QCryptographicHash m_hashGenerator;
         QRectF m_lastRasteredArea;
         QSize m_lastRasteredRaster;
+
+        QRectF m_xyBounds;
+        QPointF m_zBounds;
 
         struct DataParam {
             int** m_dataPtr; //only for comparison
@@ -92,19 +101,6 @@ class DataObjRasterData : public QwtRasterData
         cv::Mat *m_plane;
         uchar **m_rasteredLinePtr;
         int *m_xIndizes;
-
-        /*QList<unsigned int>m_startPoint;
-        unsigned int m_wDimIndex;
-        unsigned int m_hDimIndex;
-        unsigned int m_width;
-        unsigned int m_height;
-        int m_DataObjectWidth;
-        int m_DataObjectHeight;
-        double m_xScalingFactor;
-        double m_yScalingFactor;
-        double m_xOffset;
-        double m_yOffset;
-		int m_cmplxState;*/
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -28,6 +28,7 @@
 #include "plotCanvas.h"
 
 #include <qaction.h>
+#include <qwidgetaction.h>
 #include <qspinbox.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
@@ -71,7 +72,11 @@ public:
     void setValueLabel(const QString &label);
     void resetValueLabel();
 
+    void setPlaneRange(int min, int max);
+
 protected:
+    ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
+
 	void createActions();
 
 private:
@@ -89,7 +94,7 @@ private:
     QAction *m_pActValuePicker;
     QAction *m_pActLineCut;
     QAction *m_pActStackCut;
-    QAction *m_pActPlaneSelector;
+    QWidgetAction *m_pActPlaneSelector;
 
 private slots:
     void mnuActSave();

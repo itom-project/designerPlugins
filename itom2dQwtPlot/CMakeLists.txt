@@ -100,6 +100,7 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.h
+	${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
@@ -127,6 +128,7 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.cpp
 )
 

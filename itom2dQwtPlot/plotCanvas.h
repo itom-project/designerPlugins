@@ -45,6 +45,7 @@
 #include <qwt_plot_marker.h>
 
 class Itom2dQwtPlot; //forward declaration
+class ValuePicker2D;
 
 struct InternalData
 {
@@ -89,7 +90,10 @@ class PlotCanvas : public QwtPlot
         PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
 
-        void refreshPlot(ito::ParamBase *dataObj);
+        ito::RetVal init();
+        void refreshPlot(ito::DataObject *dObj, int plane = -1);
+
+        void changePlane(int plane);
 
         void setState( tState state);
 
@@ -112,15 +116,16 @@ class PlotCanvas : public QwtPlot
         QwtPicker *m_pLineCutPicker;
         QwtPicker *m_pStackCutPicker;
         QwtPlotMarker *m_pStackCutMarker;
+        ValuePicker2D *m_pValuePicker;
 
 		int m_curColorMapIndex;
-		QRectF m_orgImageSize;
 		DataObjItem *m_dObjItem;
         DataObjRasterData *m_rasterData;
 
         tState m_state;
 
 		InternalData *m_pData;
+        ito::DataObject *m_dObjPtr;
 
     signals:
         void spawnNewChild(QVector<QPointF>);

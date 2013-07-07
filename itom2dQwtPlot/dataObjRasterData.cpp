@@ -35,7 +35,8 @@ DataObjRasterData::DataObjRasterData() :
     m_rasteredLinePtr(NULL),
     m_xIndizes(NULL),
     m_plane(NULL),
-    m_hashGenerator(QCryptographicHash::Md5)
+    m_hashGenerator(QCryptographicHash::Md5),
+    m_dataObj(NULL)
 {
     m_D.m_planeIdx = 0;
     m_D.m_yScaling = 1.0;
@@ -52,8 +53,37 @@ DataObjRasterData::~DataObjRasterData()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void DataObjRasterData::calcHash()
+{
+    if(m_dataObj == NULL)
+    {
+        m_hash = m_hashGenerator.hash("", QCryptographicHash::Md5);
+    }
+    else
+    {
+        QByteArray ba;
+
+        int dims = m_dataObj->getDims();
+        ba.append( QByteArray().setNum( dims ) );
+
+        if( dims > 0 )
+        {
+            cv::Mat *m = (cv::Mat*)m_dataObj->get_mdata()[ m_dataObj->seekMat(0) ];
+            uchar* d = m->data;
+            ba.append( QByteArray( (const char*)&d, (sizeof(int)/sizeof(char)))); //address to data of first plane
+
+            ba.append( QByteArray().setNum( m->size[0] ));
+        }
+
+        m_hash = m_hashGenerator.hash(ba, QCryptographicHash::Md5);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::deleteCache()
 {
+    m_validData = false;
+
     if(m_rasteredLinePtr)
     {
         delete[] m_rasteredLinePtr;
@@ -69,13 +99,13 @@ void DataObjRasterData::deleteCache()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DataObjRasterData::updateDataObject(ito::DataObject *dataObj, size_t planeIdx /*= 0*/)
+bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx /*= -1*/) //true if hash has changed
 {
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
     // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is 
     // responsible that no dataObject is deleted when it is still in use by any object of this entire plot plugin.
     
-    m_validData = (dataObj != NULL);
+    bool newHash = false;
     
     if(dataObj)
     {
@@ -87,28 +117,46 @@ void DataObjRasterData::updateDataObject(ito::DataObject *dataObj, size_t planeI
         m_D.m_ySize = dataObj->getSize(d-2);
         m_D.m_xSize = dataObj->getSize(d-1);
         m_D.m_dataPtr = NULL; //dataObj->get_mdata();
-        m_D.m_planeIdx = planeIdx;
-
-        //check hash
-        m_hashGenerator.reset();
-        m_hashGenerator.addData( (const char*)&m_D, sizeof(m_D) );
-        QByteArray hash = m_hashGenerator.result();
-
-        if(hash != m_dataHash)
+        if (planeIdx >= 0 && m_D.m_planeIdx != planeIdx)
         {
-            m_dataHash = hash;
+            deleteCache();
+            m_D.m_planeIdx = planeIdx;
+        }
+
+        QByteArray oldHash = m_hash;
+        calcHash();
+
+        if (m_hash != oldHash)
+        {
+            if (planeIdx == -1)
+            {
+                m_D.m_planeIdx = 0;
+            }
+
+            newHash = true;
 
             deleteCache();
 
             //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
-            setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize,m_D.m_xOffset,m_D.m_xScaling)) );
-            setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize,m_D.m_yOffset,m_D.m_yScaling)) );
+            setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
+            setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling)) );
         }
 
         ito::float64 min, max;
         ito::uint32 firstMin[3];
         ito::uint32 firstMax[3];
-        ito::dObjHelper::minMaxValue(dataObj, min, firstMin, max, firstMax, true);
+
+        if (dataObj->getDims() > 2)
+        {
+            cv::Mat plane = *(cv::Mat*)(dataObj->get_mdata()[ dataObj->seekMat( m_D.m_planeIdx ) ]);
+            size_t sizes[2] = { m_D.m_ySize, m_D.m_xSize };
+            ito::DataObject limited( 2, sizes, dataObj->getType(), &plane, 1);
+            ito::dObjHelper::minMaxValue(&limited, min, firstMin, max, firstMax, true);
+        }
+        else
+        {
+            ito::dObjHelper::minMaxValue(dataObj, min, firstMin, max, firstMax, true);
+        }
         setInterval(Qt::ZAxis, QwtInterval(min,max));
     }
     else
@@ -122,10 +170,9 @@ void DataObjRasterData::updateDataObject(ito::DataObject *dataObj, size_t planeI
         m_D.m_xSize = 0;
         m_D.m_planeIdx = 0;
 
-        m_dataHash = "";
-        m_hashGenerator.reset();
-
         deleteCache();
+        m_hash = QByteArray();
+        newHash = true;
 
         setInterval(Qt::XAxis, QwtInterval() );
         setInterval(Qt::YAxis, QwtInterval() );
@@ -133,11 +180,28 @@ void DataObjRasterData::updateDataObject(ito::DataObject *dataObj, size_t planeI
     }
     
     m_dataObj = dataObj;
+    return newHash;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 double DataObjRasterData::value(double x, double y) const
 {
+    bool inside1, inside2;
+    if (m_dataObj)
+    {
+        int d = m_dataObj->getDims();
+
+        if ( d>1 )
+        {
+            int n = m_dataObj->getPhysToPix(d-1, x, inside1);
+            int m = m_dataObj->getPhysToPix(d-2, y, inside2);
+
+            if (inside1 && inside2)
+            {
+                return value2(m,n);
+            }
+        }
+    }
     return std::numeric_limits<double>::signaling_NaN();
 }
 
@@ -269,6 +333,8 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
             }
 
         }
+
+        m_validData = true;
     }
 }
 
@@ -475,3 +541,4 @@ void DataObjRasterData::discardRaster()
 //
 //    updateDataObject(dataObj);
 //}
+
