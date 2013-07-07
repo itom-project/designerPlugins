@@ -20,46 +20,41 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#include "valuepicker1d.h"
+#ifndef VALUEPICKER2D_H
+#define VALUEPICKER2D_H
 
-#include <qpainter.h>
-#include <qbrush.h>
+#include <qwt_plot_picker.h>
+#include <qwt_plot_canvas.h>
 
-ValuePicker1D::ValuePicker1D(int xAxis, int yAxis, QwtPlotCanvas* parent) : QwtPlotPicker(xAxis, yAxis, parent)
+#include <qpoint.h>
+#include <qwt_raster_data.h>
+
+class ValuePicker2D : public QwtPlotPicker
 {
-}
+    Q_OBJECT
 
-ValuePicker1D::~ValuePicker1D()
-{
-}
+public:
+    explicit ValuePicker2D(int xAxis, int yAxis, QwtPlotCanvas* parent, const QwtRasterData* valueData);
+    virtual ~ValuePicker2D();
 
-QwtText ValuePicker1D::trackerTextF( const QPointF &pos ) const
-{
-    QString text;
-    text.sprintf("[%.2f, %.2f]", pos.x(), pos.y());
+    virtual QwtText trackerTextF( const QPointF &pos ) const;
 
-    return text;
-}
+    void drawTracker( QPainter *painter ) const;
+    void setBackgroundFillBrush( const QBrush &brush );
 
-void ValuePicker1D::drawTracker( QPainter *painter ) const
-{
-    const QRect textRect = trackerRect( painter->font() );
-    if ( !textRect.isEmpty() )
-    {
-        const QwtText label = trackerText( trackerPosition() );
-        if ( !label.isEmpty() )
-        {
-            painter->fillRect(textRect, m_rectFillBrush);
-            label.draw( painter, textRect );
-        }
-    }
-}
 
-void ValuePicker1D::setBackgroundFillBrush( const QBrush &brush )
-{
-    if(brush != this->m_rectFillBrush)
-    {
-        m_rectFillBrush = brush;
-        updateDisplay();
-    }
-}
+protected:
+
+private:
+    const QwtRasterData *m_valueData;
+    QBrush m_rectFillBrush;
+
+signals:
+
+public slots:
+
+private slots:
+
+};
+
+#endif
