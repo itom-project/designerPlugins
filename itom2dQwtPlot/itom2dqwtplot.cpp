@@ -21,10 +21,12 @@
 *********************************************************************** */
 
 #include "itom2dqwtplot.h"
+
 #include <qwidgetaction.h>
 #include <qfiledialog.h>
 #include <qimagewriter.h>
-#include "qwt_plot_renderer.h"
+#include <qwt_plot_renderer.h>
+#include <qmenu.h>
 
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
@@ -39,7 +41,9 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActValuePicker(NULL),
     m_pActLineCut(NULL),
     m_pActStackCut(NULL),
-    m_pActPlaneSelector(NULL)
+    m_pActPlaneSelector(NULL),
+    m_pActCmplxSwitch(NULL),
+	m_mnuCmplxSwitch(NULL)
 {
 	//init actions
 	createActions();
@@ -56,6 +60,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_xaxisScaleAuto = true;
     m_data.m_yaxisScaleAuto = true;
     m_data.m_colorBarVisible = false;
+    m_data.m_cmplxType = PlotCanvas::Real;
 
 	//initialize canvas
 	m_pContent = new PlotCanvas(&m_data, this);
@@ -80,6 +85,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 	mainTb->addAction(m_pActStackCut);
 	mainTb->addSeparator();
 	mainTb->addAction(m_pActPlaneSelector);
+    mainTb->addAction(m_pActCmplxSwitch);
 }
 
 Itom2dQwtPlot::~Itom2dQwtPlot()
@@ -173,6 +179,36 @@ void Itom2dQwtPlot::createActions()
 	wa->setObjectName("planeSelector");
     wa->setVisible(false);
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
+
+    //m_actCmplxSwitch
+    m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"),tr("Switch Imag, Real, Abs, Pha"), this);
+	m_mnuCmplxSwitch = new QMenu("Complex Switch");
+
+    QActionGroup *m_pCmplxActGroup = new QActionGroup(this);
+    a = m_pCmplxActGroup->addAction(tr("Real"));
+    a->setData( PlotCanvas::Real );
+    m_mnuCmplxSwitch->addAction(a);
+    a->setCheckable(true);
+
+	a = m_pCmplxActGroup->addAction(tr("Imag"));
+    a->setData( PlotCanvas::Imag );
+    m_mnuCmplxSwitch->addAction(a);
+    a->setCheckable(true);
+
+	a = m_pCmplxActGroup->addAction(tr("Abs"));
+    a->setData( PlotCanvas::Abs );
+    m_mnuCmplxSwitch->addAction(a);
+    a->setCheckable(true);
+    a->setChecked(true);
+
+	a = m_pCmplxActGroup->addAction(tr("Pha"));
+    a->setData( PlotCanvas::Phase );
+    m_mnuCmplxSwitch->addAction(a);
+    a->setCheckable(true);
+
+	m_pActCmplxSwitch->setMenu(m_mnuCmplxSwitch);
+    m_pActCmplxSwitch->setVisible(false);
+    connect(m_pCmplxActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 	
 }
 
@@ -488,5 +524,59 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
             spinBox->setValue(value);
         }
         m_pActPlaneSelector->setVisible( std::abs(max-min) > 0 );
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuCmplxSwitch(QAction *action)
+{
+	if (action->text() == QString("Imag"))
+    {
+        setCmplxSwitch(PlotCanvas::Imag, true);
+    }
+	else if (action->text() == QString("Real"))
+    {
+        setCmplxSwitch(PlotCanvas::Real, true);
+    }
+	else if (action->text() == QString("Pha"))
+    {
+        setCmplxSwitch(PlotCanvas::Phase, true);
+    }
+	else
+    {
+        setCmplxSwitch(PlotCanvas::Abs, true);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setCmplxSwitch(PlotCanvas::ComplexType type, bool visible)
+{
+    m_pActCmplxSwitch->setVisible(visible);
+
+    if (m_data.m_cmplxType != type)
+    {
+
+        if (visible)
+        {
+            m_data.m_cmplxType = type;
+
+            switch (type)
+            {
+            case PlotCanvas::Imag:
+                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
+                break;
+            case PlotCanvas::Real:
+                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
+                break;
+            case PlotCanvas::Phase:
+                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
+                break;
+            case PlotCanvas::Abs:
+                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
+                break;
+            }
+        }
+
+        if (m_pContent) m_pContent->internalDataUpdated();
     }
 }

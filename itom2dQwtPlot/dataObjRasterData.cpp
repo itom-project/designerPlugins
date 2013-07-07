@@ -66,6 +66,8 @@ void DataObjRasterData::calcHash()
         int dims = m_dataObj->getDims();
         ba.append( QByteArray().setNum( dims ) );
 
+        ba.append( m_D.m_cmplxType );
+
         if( dims > 0 )
         {
             cv::Mat *m = (cv::Mat*)m_dataObj->get_mdata()[ m_dataObj->seekMat(0) ];
@@ -99,7 +101,7 @@ void DataObjRasterData::deleteCache()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx /*= -1*/) //true if hash has changed
+bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx /*= -1*/, PlotCanvas::ComplexType cmplxType /*= PlotCanvas::Abs*/) //true if hash has changed
 {
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
     // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is 
@@ -117,6 +119,16 @@ bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx 
         m_D.m_ySize = dataObj->getSize(d-2);
         m_D.m_xSize = dataObj->getSize(d-1);
         m_D.m_dataPtr = NULL; //dataObj->get_mdata();
+        
+        if (dataObj->getType() & (ito::tComplex64 | ito::tComplex128))
+        {
+            m_D.m_cmplxType = cmplxType;
+        }
+        else
+        {
+            m_D.m_cmplxType = PlotCanvas::Abs;
+        }
+
         if (planeIdx >= 0 && m_D.m_planeIdx != planeIdx)
         {
             deleteCache();
@@ -151,11 +163,11 @@ bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx 
             cv::Mat plane = *(cv::Mat*)(dataObj->get_mdata()[ dataObj->seekMat( m_D.m_planeIdx ) ]);
             size_t sizes[2] = { m_D.m_ySize, m_D.m_xSize };
             ito::DataObject limited( 2, sizes, dataObj->getType(), &plane, 1);
-            ito::dObjHelper::minMaxValue(&limited, min, firstMin, max, firstMax, true);
+            ito::dObjHelper::minMaxValue(&limited, min, firstMin, max, firstMax, true, m_D.m_cmplxType);
         }
         else
         {
-            ito::dObjHelper::minMaxValue(dataObj, min, firstMin, max, firstMax, true);
+            ito::dObjHelper::minMaxValue(dataObj, min, firstMin, max, firstMax, true, m_D.m_cmplxType);
         }
         setInterval(Qt::ZAxis, QwtInterval(min,max));
     }
@@ -169,6 +181,7 @@ bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx 
         m_D.m_ySize = 0;
         m_D.m_xSize = 0;
         m_D.m_planeIdx = 0;
+        m_D.m_cmplxType = PlotCanvas::Abs;
 
         deleteCache();
         m_hash = QByteArray();
@@ -259,6 +272,52 @@ double DataObjRasterData::value2(int m, int n) const
                 ito::float64 *line = (ito::float64*)m_rasteredLinePtr[m];
                 if(!line) return std::numeric_limits<double>::signaling_NaN();
                 return line[ m_xIndizes[n] ];
+            }
+        case ito::tComplex64:
+            {
+                ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                ito::complex64 i = line[ m_xIndizes[n] ];
+
+                if (m_D.m_cmplxType == PlotCanvas::Real)
+                {
+                    return line[ m_xIndizes[n] ].real();
+                }
+                if (m_D.m_cmplxType == PlotCanvas::Imag)
+                {
+                    return line[ m_xIndizes[n] ].imag();
+                }
+                if (m_D.m_cmplxType == PlotCanvas::Phase)
+                {
+                    return std::arg( line[ m_xIndizes[n] ] );
+                }
+                else //if (m_D.m_cmplxType == PlotCanvas::Abs)
+                {
+                    return std::abs( line[ m_xIndizes[n] ] );
+                }
+            }
+        case ito::tComplex128:
+            {
+                ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                ito::complex128 i = line[ m_xIndizes[n] ];
+                
+                if (m_D.m_cmplxType == PlotCanvas::Real)
+                {
+                    return line[ m_xIndizes[n] ].real();
+                }
+                if (m_D.m_cmplxType == PlotCanvas::Imag)
+                {
+                    return line[ m_xIndizes[n] ].imag();
+                }
+                if (m_D.m_cmplxType == PlotCanvas::Phase)
+                {
+                    return std::arg( line[ m_xIndizes[n] ] );
+                }
+                else //if (m_D.m_cmplxType == PlotCanvas::Abs)
+                {
+                    return std::abs( line[ m_xIndizes[n] ] );
+                }
             }
         default:
             return std::numeric_limits<double>::signaling_NaN();

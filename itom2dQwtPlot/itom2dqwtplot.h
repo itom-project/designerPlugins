@@ -47,6 +47,8 @@ public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
 	~Itom2dQwtPlot();
 
+    
+
     ito::RetVal applyUpdate();  //!> does the real update work
 
 	//properties (setter/getter)
@@ -73,6 +75,7 @@ public:
     void resetValueLabel();
 
     void setPlaneRange(int min, int max);
+    void setCmplxSwitch(PlotCanvas::ComplexType type, bool visible);
 
 protected:
     ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
@@ -96,6 +99,9 @@ private:
     QAction *m_pActStackCut;
     QWidgetAction *m_pActPlaneSelector;
 
+    QAction* m_pActCmplxSwitch;
+	QMenu *m_mnuCmplxSwitch;
+
 private slots:
     void mnuActSave();
     void mnuActHome();
@@ -108,6 +114,7 @@ private slots:
     void mnuActLineCut(bool checked);
     void mnuActStackCut(bool checked);
     void mnuActPlaneSelector(int plane);
+    void mnuCmplxSwitch(QAction *action);
 
 };
 

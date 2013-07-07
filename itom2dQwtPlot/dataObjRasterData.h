@@ -25,6 +25,7 @@
 
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
+#include "plotCanvas.h"
 
 #include <qwt_raster_data.h>
 #include <qlist.h>
@@ -49,7 +50,7 @@ class DataObjRasterData : public QwtRasterData
 
         void calcHash();
 
-        bool updateDataObject(ito::DataObject *dataObj, int planeIdx = -1);
+        bool updateDataObject(ito::DataObject *dataObj, int planeIdx = -1, PlotCanvas::ComplexType cmplxType = PlotCanvas::Abs);
 
         /*void updateDataObject(QSharedPointer<ito::DataObject> dataObj);
         void updateDataObject(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height);
@@ -94,6 +95,7 @@ class DataObjRasterData : public QwtRasterData
             double m_xOffset;
             int m_ySize;
             int m_xSize;
+            PlotCanvas::ComplexType m_cmplxType;
         };
 
         DataParam m_D;

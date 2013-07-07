@@ -24,9 +24,10 @@
 #define PLOTCANVAS_H
 
 #include "common/sharedStructures.h"
+#include "DataObject/dataobj.h"
 
 #include "dataObjItem.h"
-#include "dataObjRasterData.h"
+
 
 #include <qwidget.h>
 #include <qstring.h>
@@ -46,46 +47,16 @@
 
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
+struct InternalData;
+class DataObjRasterData;
 
-struct InternalData
-{
-    ito::tDataType m_dataType;
-
-    QString m_title;
-    QString m_yaxisLabel;
-    QString m_xaxisLabel;
-    QString m_valueLabel;
-
-    QString m_titleDObj;
-    QString m_xaxisLabelDObj;
-    QString m_yaxisLabelDObj;
-    QString m_valueLabelDObj;
-
-    bool m_autoTitle;
-    bool m_autoxAxisLabel;
-    bool m_autoyAxisLabel;
-    bool m_autoValueLabel;
-
-    bool m_valueScaleAuto;
-    double m_valueMin;
-    double m_valueMax;
-
-    bool m_xaxisScaleAuto;
-    double m_xaxisMin;
-    double m_xaxisMax;
-
-    bool m_yaxisScaleAuto;
-    double m_yaxisMin;
-    double m_yaxisMax;
-
-    bool m_colorBarVisible;
-};
 
 class PlotCanvas : public QwtPlot
 {
     Q_OBJECT
     public:
         enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut };
+        enum ComplexType { Real = 2, Imag = 1, Abs = 0, Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
 
         PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
@@ -94,6 +65,7 @@ class PlotCanvas : public QwtPlot
         void refreshPlot(ito::DataObject *dObj, int plane = -1);
 
         void changePlane(int plane);
+        void internalDataUpdated();
 
         void setState( tState state);
 
@@ -136,6 +108,42 @@ class PlotCanvas : public QwtPlot
         void trackerAScanAppended(const QPoint &pt);
         void trackerMoved(const QPoint &pt);
         void trackerAppended(const QPoint &pt);
+};
+
+struct InternalData
+{
+    ito::tDataType m_dataType;
+
+    QString m_title;
+    QString m_yaxisLabel;
+    QString m_xaxisLabel;
+    QString m_valueLabel;
+
+    QString m_titleDObj;
+    QString m_xaxisLabelDObj;
+    QString m_yaxisLabelDObj;
+    QString m_valueLabelDObj;
+
+    bool m_autoTitle;
+    bool m_autoxAxisLabel;
+    bool m_autoyAxisLabel;
+    bool m_autoValueLabel;
+
+    bool m_valueScaleAuto;
+    double m_valueMin;
+    double m_valueMax;
+
+    bool m_xaxisScaleAuto;
+    double m_xaxisMin;
+    double m_xaxisMax;
+
+    bool m_yaxisScaleAuto;
+    double m_yaxisMin;
+    double m_yaxisMax;
+
+    bool m_colorBarVisible;
+
+    PlotCanvas::ComplexType m_cmplxType;
 };
 
 

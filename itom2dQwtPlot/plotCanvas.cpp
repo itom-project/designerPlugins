@@ -25,6 +25,7 @@
 #include "DataObject/dataObjectFuncs.h"
 #include "common/apiFunctionsGraphInc.h"
 
+#include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
 #include "valuePicker2d.h"
 
@@ -45,8 +46,6 @@
 #include <qpixmap.h>
 #include <qdebug.h>
 #include <qmessagebox.h>
-
-using namespace ito;
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -155,17 +154,9 @@ void PlotCanvas::refreshPlot(ito::DataObject *dObj, int plane /*= -1*/)
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
 
-        /*if(dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
-        {
-            if(!m_cmplxState) ((Itom1DQwtFigure*)m_pParent)->enableComplexGUI(true);
-            m_cmplxState = true;                
-        }
-        else
-        {
-            if(m_cmplxState) ((Itom1DQwtFigure*)m_pParent)->enableComplexGUI(false);
-            m_cmplxState = false;                
-        }*/
-        needToUpdate = m_rasterData->updateDataObject( dObj, plane );
+        
+
+        needToUpdate = m_rasterData->updateDataObject( dObj, plane, m_pData->m_cmplxType );
 
         bool valid;
         ito::DataObjectTagType tag;
@@ -180,6 +171,15 @@ void PlotCanvas::refreshPlot(ito::DataObject *dObj, int plane /*= -1*/)
         Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
         if (p)
         {
+            if(dObj->getType() == ito::tComplex128 || dObj->getType() == ito::tComplex64)
+            {
+                p->setCmplxSwitch(m_pData->m_cmplxType, true);                
+            }
+            else
+            {
+                p->setCmplxSwitch(m_pData->m_cmplxType, false);                  
+            }
+
             int maxPlane = 0;
             if (dObj->getDims() > 2)
             {
@@ -229,6 +229,12 @@ void PlotCanvas::refreshPlot(ito::DataObject *dObj, int plane /*= -1*/)
 void PlotCanvas::changePlane(int plane)
 {
     refreshPlot(m_dObjPtr, plane);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::internalDataUpdated()
+{
+    refreshPlot(m_dObjPtr, -1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
