@@ -24,6 +24,7 @@
 #define ITOM2DQWTPLOT_H
 
 #include "plot/AbstractDObjFigure.h"
+#include "plot/AbstractNode.h"
 
 #include "plotCanvas.h"
 
@@ -50,7 +51,7 @@ public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
 	~Itom2dQwtPlot();
 
-    
+    ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, const ito::uint8 direction);
 
     ito::RetVal applyUpdate();  //!> does the real update work
 
@@ -93,6 +94,8 @@ protected:
     ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
 	void createActions();
+
+	//void setLinePlotCoordinates(const QVector<QPointF> pts);
 
 private:
 

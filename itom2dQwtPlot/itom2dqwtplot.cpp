@@ -46,6 +46,11 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActCmplxSwitch(NULL),
 	m_mnuCmplxSwitch(NULL)
 {
+	m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy pass through of input source object").toAscii().data()));
+
+	int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
+
 	//init actions
 	createActions();
 
@@ -130,19 +135,19 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActZoom(bool)));
 
     //m_actScaleSetting
-    m_pActScaleSettings = a = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"),tr("Scale Settings"), this);
+    m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"),tr("Scale Settings"), this);
     a->setObjectName("actScaleSetting");
     a->setToolTip("Set the ranges and offsets of this view");
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActScaleSettings()));
 
     //m_actPalette
-    m_pActColorPalette = a = new QAction(QIcon(":/plots/icons/itom_icons/color.png"),tr("Palette"),this);
+    m_pActColorPalette = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"),tr("Palette"),this);
     a->setObjectName("actColorPalette");
     a->setToolTip("Switch between color palettes");
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActColorPalette()));
 
     //m_actToggleColorBar
-    m_pActToggleColorBar = a = new QAction(QIcon(":/plots/icons/itom_icons/colorbar.png"),tr("Show Colorbar"), this);
+    m_pActToggleColorBar = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"),tr("Show Colorbar"), this);
     a->setCheckable(true);
     a->setObjectName("actShowColorBar");
     a->setToolTip("Toggle visibility of the color bar on right canvas side");
@@ -156,14 +161,14 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActValuePicker(bool)));
 
     //m_actLineCut
-    m_pActLineCut = a = new QAction(QIcon(":/plots/icons/itom_icons/pntline.png"),tr("Linecut"),this);
+    m_pActLineCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"),tr("Linecut"),this);
     a->setCheckable(true);
     a->setObjectName("actLineCut");
     a->setToolTip("Show a in plane line cut");
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActLineCut(bool)));
 
     //m_actStackCut
-    m_pActStackCut = a = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"),tr("Slice in z-direction"),this);
+    m_pActStackCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"),tr("Slice in z-direction"),this);
     a->setObjectName("actStackCut");
     a->setToolTip("Show a slice through z-Stack");
     a->setCheckable(true);
@@ -217,10 +222,14 @@ void Itom2dQwtPlot::createActions()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
+	m_pOutput["sourceout"]->setVal<ito::DataObject*>(NULL);
+
     if (m_pInput["source"]->getVal<ito::DataObject*>())
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
         m_pContent->refreshPlot( m_pInput["source"]->getVal<ito::DataObject*>() );
+		
+		m_pOutput["sourceout"]->setVal<void*>( (void*)m_pContent->getDataObject() ); //source data object is stored as shallow copy in m_pContent
     }
 
     return ito::retOk;
@@ -515,6 +524,7 @@ void Itom2dQwtPlot::mnuActScaleSettings()
     if(dlg->exec() == QDialog::Accepted)
     {
         dlg->getData(m_data);
+
         m_pContent->updateScaleValues();
     }
 
@@ -551,11 +561,29 @@ void Itom2dQwtPlot::mnuActValuePicker(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActLineCut(bool checked)
 {
+	if(checked)
+    {
+        m_pActZoom->setChecked(false);
+        m_pActPan->setChecked(false);
+        m_pActStackCut->setChecked(false);
+        m_pActValuePicker->setChecked(false);
+    }
+    
+    m_pContent->setState( checked ? PlotCanvas::tLineCut : PlotCanvas::tIdle );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActStackCut(bool checked)
 {
+	if(checked)
+    {
+        m_pActZoom->setChecked(false);
+        m_pActPan->setChecked(false);
+        m_pActLineCut->setChecked(false);
+        m_pActValuePicker->setChecked(false);
+    }
+    
+    m_pContent->setState( checked ? PlotCanvas::tStackCut : PlotCanvas::tIdle );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -580,28 +608,14 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
             spinBox->setValue(value);
         }
         m_pActPlaneSelector->setVisible( std::abs(max-min) > 0 );
+		m_pActStackCut->setVisible( std::abs(max-min) > 0 );
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuCmplxSwitch(QAction *action)
 {
-	if (action->text() == QString("Imag"))
-    {
-        setCmplxSwitch(PlotCanvas::Imag, true);
-    }
-	else if (action->text() == QString("Real"))
-    {
-        setCmplxSwitch(PlotCanvas::Real, true);
-    }
-	else if (action->text() == QString("Pha"))
-    {
-        setCmplxSwitch(PlotCanvas::Phase, true);
-    }
-	else
-    {
-        setCmplxSwitch(PlotCanvas::Abs, true);
-    }
+	setCmplxSwitch( (PlotCanvas::ComplexType)(action->data().toInt()), true );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -636,3 +650,101 @@ void Itom2dQwtPlot::setCmplxSwitch(PlotCanvas::ComplexType type, bool visible)
         if (m_pContent) m_pContent->internalDataUpdated();
     }
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, const ito::uint8 direction)
+{
+    ito::RetVal retval = ito::retOk;
+    QList<QString> paramNames;
+    ito::uint32 newUniqueID = uniqueID;
+    QWidget *lineCutObj = NULL;
+
+	double *pointArr = new double[2 * bounds.size()];
+    for (int np = 0; np < bounds.size(); np++)
+    {
+        pointArr[np * 2] = bounds[np].x();
+        pointArr[np * 2 + 1] = bounds[np].y();
+    }
+    m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    delete pointArr;
+    //setOutpBounds(bounds);
+    //setLinePlotCoordinates(bounds);
+
+    retval += apiGetFigure("DObjStaticLine","", newUniqueID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
+
+    if(!retval.containsError())
+    {
+        if(uniqueID != newUniqueID)
+        {
+            uniqueID = newUniqueID;
+            ito::AbstractDObjFigure* figure = NULL;
+            if (lineCutObj->inherits("ito::AbstractDObjFigure"))
+			{
+                figure = (ito::AbstractDObjFigure*)lineCutObj;
+			}
+            else
+			{
+                return ito::RetVal(ito::retError,0,"the opened figure is not inherited from ito::AbstractDObjFigure");
+			}
+
+            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+            switch (direction)
+            {
+                // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
+                // with one plane and cannot display the points in z-direction
+                case 2:
+                    retval += addChannel((ito::AbstractNode*)figure,  m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                    paramNames << "bounds"  << "sourceout";
+                break;
+
+                // otherwise simply pass on the displayed plane
+                case 0:
+                case 1:
+                default:
+                    retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                    paramNames << "bounds"  << "displayed";
+                break;
+            }
+            retval += updateChannels(paramNames);
+
+            figure->show();
+        }
+        else
+        {
+            switch (direction)
+            {
+                case 2:
+                    paramNames << "bounds"  << "sourceout";
+                break;
+
+                case 0:
+                case 1:
+                default:
+                    paramNames << "bounds"  << "displayed";
+                break;
+            }
+            retval += updateChannels(paramNames);
+        }
+    }
+
+    return retval;
+}
+
+////----------------------------------------------------------------------------------------------------------------------------------
+//void Itom2dQwtPlot::setLinePlotCoordinates(const QVector<QPointF> pts)
+//{
+//    char buf[60] = {0};
+//    if(pts.size() > 1)
+//    {
+//        sprintf(buf, "[%.4g; %.4g]\n[%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+//    }
+//    else if(pts.size() == 1)
+//    {
+//        sprintf(buf, "[%.4g; %.4g]\n[ - ; - ]", pts[0].x(), pts[0].y());
+//    }
+//    else
+//    {
+//        sprintf(buf, "[ - ; - ]\n[ - ; - ]");
+//    }
+//    m_lblCoordinates->setText(buf);
+//}

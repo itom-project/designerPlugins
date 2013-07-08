@@ -42,6 +42,7 @@
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_scale_engine.h>
+#include <qwt_picker_machine.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -63,7 +64,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_state(tIdle),
         m_curColorMapIndex(0),
         m_pValuePicker(NULL),
-        m_dObjPtr(NULL)
+        m_dObjPtr(NULL),
+		m_pPointPicker(NULL)
 {
     setMouseTracking(false);
 
@@ -73,6 +75,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 	//canvas() is the real plotting area, where the plot is printed (without axes...)
 	canvas()->setFrameShadow(QFrame::Plain);
 	canvas()->setFrameShape(QFrame::NoFrame);
+	canvas()->setCursor( Qt::ArrowCursor );
 	
 	//main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
@@ -98,6 +101,14 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pValuePicker = new ValuePicker2D(QwtPlot::xBottom, QwtPlot::yLeft, canvas(), m_rasterData);
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
+
+	//any point picker
+	m_pPointPicker = new QwtPlotPicker(canvas());
+	m_pPointPicker->setStateMachine(new QwtPickerClickPointMachine());
+	m_pPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+	m_pPointPicker->setRubberBand(QwtPicker::CrossRubberBand); 
+	m_pPointPicker->setEnabled(false);
+	connect(m_pPointPicker, SIGNAL(appended(QPoint)), this, SLOT(pointTrackerAppended(QPoint)));
 
 	//prepare color bar
 	QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
@@ -191,29 +202,7 @@ void PlotCanvas::refreshPlot(ito::DataObject *dObj, int plane /*= -1*/)
 
 
         //updateMarkerPosition(true);
-        QwtInterval ival;
-        if(m_pData->m_valueScaleAuto)
-        {
-            ival = m_rasterData->interval(Qt::ZAxis);
-            m_pData->m_valueMin = ival.minValue();
-            m_pData->m_valueMax = ival.maxValue();
-        }
-
-        if(m_pData->m_xaxisScaleAuto)
-        {
-            ival = m_rasterData->interval(Qt::XAxis);
-            m_pData->m_xaxisMin = ival.minValue();
-            m_pData->m_xaxisMax = ival.maxValue();
-        }
-
-        if(m_pData->m_yaxisScaleAuto)
-        {
-            ival = m_rasterData->interval(Qt::YAxis);
-            m_pData->m_yaxisMin = ival.minValue();
-            m_pData->m_yaxisMax = ival.maxValue();
-        }
-
-        
+                
         updateScaleValues(); //replot is done here
 
         m_pZoomer->setZoomBase( true );
@@ -829,6 +818,28 @@ void PlotCanvas::updateLabels()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateScaleValues()
 {
+	QwtInterval ival;
+    if(m_pData->m_valueScaleAuto)
+    {
+        ival = m_rasterData->interval(Qt::ZAxis);
+        m_pData->m_valueMin = ival.minValue();
+        m_pData->m_valueMax = ival.maxValue();
+    }
+
+    if(m_pData->m_xaxisScaleAuto)
+    {
+        ival = m_rasterData->interval(Qt::XAxis);
+        m_pData->m_xaxisMin = ival.minValue();
+        m_pData->m_xaxisMax = ival.maxValue();
+    }
+
+    if(m_pData->m_yaxisScaleAuto)
+    {
+        ival = m_rasterData->interval(Qt::YAxis);
+        m_pData->m_yaxisMin = ival.minValue();
+        m_pData->m_yaxisMax = ival.maxValue();
+    }
+
     setAxisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
     
     setAxisScale( QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
@@ -858,7 +869,7 @@ void PlotCanvas::setState( tState state)
         if (m_pPanner) m_pPanner->setEnabled( state == tPan );
         if (m_pValuePicker) m_pValuePicker->setEnabled( state == tValuePicker );
         if (m_pLineCutPicker) m_pLineCutPicker->setEnabled( state == tLineCut );
-        if (m_pStackCutPicker) m_pStackCutPicker->setEnabled( state == tStackCut );
+        if (m_pPointPicker) m_pPointPicker->setEnabled( state == tStackCut );
         if (m_pStackCutMarker) m_pStackCutMarker->setVisible( state == tStackCut );
 
         switch (state)
@@ -866,9 +877,18 @@ void PlotCanvas::setState( tState state)
         case tIdle:
             canvas()->setCursor( Qt::ArrowCursor );
             break;
+		case tZoom:
+			canvas()->setCursor( Qt::CrossCursor );
+			break;
+		case tPan:
+			canvas()->setCursor( Qt::OpenHandCursor );
+			break;
         case tValuePicker:
             canvas()->setCursor( Qt::CrossCursor );
             break;
+		case tStackCut:
+			canvas()->setCursor( Qt::CrossCursor );
+			break;
         default:
             canvas()->setCursor( Qt::ArrowCursor );
             break;
@@ -876,4 +896,10 @@ void PlotCanvas::setState( tState state)
 
         m_state = state;
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::pointTrackerAppended(const QPoint &pt)
+{
+	qDebug() << pt;
 }

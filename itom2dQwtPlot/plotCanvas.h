@@ -71,6 +71,8 @@ class PlotCanvas : public QwtPlot
 
         friend class Itom2dQwtPlot;
 
+		const ito::DataObject* getDataObject() const { return m_dObjPtr; }
+
     protected:
         void contextMenuEvent(QContextMenuEvent * event);
         void keyPressEvent ( QKeyEvent * event );
@@ -90,6 +92,8 @@ class PlotCanvas : public QwtPlot
         QwtPlotMarker *m_pStackCutMarker;
         ValuePicker2D *m_pValuePicker;
 
+		QwtPlotPicker *m_pPointPicker;
+
 		int m_curColorMapIndex;
 		DataObjItem *m_dObjItem;
         DataObjRasterData *m_rasterData;
@@ -102,6 +106,9 @@ class PlotCanvas : public QwtPlot
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
+
+	private slots:
+		void pointTrackerAppended(const QPoint &pt);
 
     public slots:
         void trackerAScanMoved(const QPoint &pt);
