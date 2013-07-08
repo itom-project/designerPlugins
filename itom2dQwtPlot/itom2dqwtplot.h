@@ -37,11 +37,14 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
 {
 	Q_OBJECT
 
-	Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
     Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel RESET resetxAxisLabel)
+    Q_PROPERTY(bool xAxisVisible READ getxAxisVisible WRITE setxAxisVisible)
     Q_PROPERTY(QString yAxisLabel READ getyAxisLabel WRITE setyAxisLabel RESET resetyAxisLabel)
+    Q_PROPERTY(bool yAxisVisible READ getyAxisVisible WRITE setyAxisVisible)
+    Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
+    Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -73,6 +76,15 @@ public:
     QString getValueLabel() const;
     void setValueLabel(const QString &label);
     void resetValueLabel();
+
+    bool getyAxisFlipped() const;
+    void setyAxisFlipped(const bool &value);
+
+    bool getxAxisVisible() const;
+    void setxAxisVisible(const bool &value);
+    
+    bool getyAxisVisible() const;
+    void setyAxisVisible(const bool &value);
 
     void setPlaneRange(int min, int max);
     void setCmplxSwitch(PlotCanvas::ComplexType type, bool visible);

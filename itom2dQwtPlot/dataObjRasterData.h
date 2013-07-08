@@ -33,15 +33,18 @@
 #include <qsharedpointer.h>
 #include <qcryptographichash.h>
 
+struct InternalData;
+
 //----------------------------------------------------------------------------------------------------------------------------------
 class DataObjRasterData : public QwtRasterData
 {
     public:
-        explicit DataObjRasterData();
+        explicit DataObjRasterData(const InternalData *m_internalData);
         explicit DataObjRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending);
         ~DataObjRasterData();
 
         double value2(int m, int n) const;
+        double value2_yinv(int m, int n) const;
         double value(double x, double y) const;
         void initRaster( const QRectF& area, const QSize& raster );
         void discardRaster();
@@ -50,7 +53,7 @@ class DataObjRasterData : public QwtRasterData
 
         void calcHash();
 
-        bool updateDataObject(ito::DataObject *dataObj, int planeIdx = -1, PlotCanvas::ComplexType cmplxType = PlotCanvas::Abs);
+        bool updateDataObject(ito::DataObject *dataObj, int planeIdx = -1);
 
         /*void updateDataObject(QSharedPointer<ito::DataObject> dataObj);
         void updateDataObject(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height);
@@ -74,6 +77,7 @@ class DataObjRasterData : public QwtRasterData
         void deleteCache();
 
         QByteArray m_hash;
+        bool m_validHash;
 
         ito::DataObject *m_dataObj; //is pointer only
 
@@ -95,14 +99,17 @@ class DataObjRasterData : public QwtRasterData
             double m_xOffset;
             int m_ySize;
             int m_xSize;
-            PlotCanvas::ComplexType m_cmplxType;
+            bool m_yaxisFlipped;
         };
 
         DataParam m_D;
 
         cv::Mat *m_plane;
         uchar **m_rasteredLinePtr;
+        int m_rasteredLines;
         int *m_xIndizes;
+
+        const InternalData *m_pInternalData;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

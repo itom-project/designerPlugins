@@ -101,15 +101,16 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.h
 	${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.h
+	${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
 
-#set(designer_ui
-#    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
-#)
+set(designer_ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
+)
 
 QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
 
@@ -129,6 +130,7 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.cpp
 )
 

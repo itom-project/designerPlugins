@@ -41,6 +41,7 @@
 #include <qwt_symbol.h>
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
+#include <qwt_scale_engine.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -78,7 +79,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_dObjItem->setRenderThreadCount(0);
     m_dObjItem->setColorMap( new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
 
-    m_rasterData = new DataObjRasterData();
+    m_rasterData = new DataObjRasterData(m_pData);
     m_dObjItem->setData(m_rasterData);
 	m_dObjItem->attach(this);
 
@@ -156,7 +157,7 @@ void PlotCanvas::refreshPlot(ito::DataObject *dObj, int plane /*= -1*/)
 
         
 
-        needToUpdate = m_rasterData->updateDataObject( dObj, plane, m_pData->m_cmplxType );
+        needToUpdate = m_rasterData->updateDataObject( dObj, plane);
 
         bool valid;
         ito::DataObjectTagType tag;
@@ -828,31 +829,21 @@ void PlotCanvas::updateLabels()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateScaleValues()
 {
-    if(m_pData->m_valueScaleAuto)
-    {
-        setAxisAutoScale( QwtPlot::yRight, true );
-    }
-    else
-    {
-        setAxisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax );
-    }
+    setAxisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
+    
+    setAxisScale( QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
+    
+    QwtScaleEngine *scaleEngine = axisScaleEngine(QwtPlot::yLeft);
 
-    if(m_pData->m_xaxisScaleAuto)
+    if (m_pData->m_yaxisFlipped)
     {
-        setAxisAutoScale( QwtPlot::xBottom, true );
+        scaleEngine->setAttribute( QwtScaleEngine::Inverted, true);
+        setAxisScale( QwtPlot::yLeft, m_pData->m_yaxisMax, m_pData->m_yaxisMin);
     }
     else
     {
-        setAxisScale( QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax );
-    }
-
-    if(m_pData->m_yaxisScaleAuto)
-    {
-        setAxisAutoScale( QwtPlot::yLeft, true );
-    }
-    else
-    {
-        setAxisScale( QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax );
+        scaleEngine->setAttribute( QwtScaleEngine::Inverted, false);
+        setAxisScale( QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
     }
 
     replot();

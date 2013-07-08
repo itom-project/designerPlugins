@@ -136,10 +136,13 @@ struct InternalData
     bool m_xaxisScaleAuto;
     double m_xaxisMin;
     double m_xaxisMax;
+    bool m_xaxisVisible;
 
     bool m_yaxisScaleAuto;
     double m_yaxisMin;
     double m_yaxisMax;
+    bool m_yaxisFlipped;
+    bool m_yaxisVisible;
 
     bool m_colorBarVisible;
 

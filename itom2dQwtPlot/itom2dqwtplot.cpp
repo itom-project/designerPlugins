@@ -27,6 +27,7 @@
 #include <qimagewriter.h>
 #include <qwt_plot_renderer.h>
 #include <qmenu.h>
+#include "dialog2DScale.h"
 
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
@@ -61,6 +62,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_yaxisScaleAuto = true;
     m_data.m_colorBarVisible = false;
     m_data.m_cmplxType = PlotCanvas::Real;
+    m_data.m_yaxisFlipped = false;
 
 	//initialize canvas
 	m_pContent = new PlotCanvas(&m_data, this);
@@ -367,6 +369,52 @@ void Itom2dQwtPlot::resetValueLabel()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+bool Itom2dQwtPlot::getyAxisFlipped() const
+{
+    return m_data.m_yaxisFlipped;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setyAxisFlipped(const bool &value)
+{
+    m_data.m_yaxisFlipped = value;
+
+    if(m_pContent) 
+    {
+        m_pContent->updateScaleValues();
+        m_pContent->internalDataUpdated();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom2dQwtPlot::getxAxisVisible() const
+{
+    return m_data.m_xaxisVisible;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setxAxisVisible(const bool &value)
+{
+    m_data.m_xaxisVisible = value;
+
+    if(m_pContent) m_pContent->enableAxis(QwtPlot::xBottom, value);
+}
+    
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom2dQwtPlot::getyAxisVisible() const
+{
+    return m_data.m_yaxisVisible;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setyAxisVisible(const bool &value)
+{
+    m_data.m_yaxisVisible = value;
+
+    if(m_pContent) m_pContent->enableAxis(QwtPlot::yLeft, value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActSave()
 {
     #ifndef QT_NO_PRINTER
@@ -463,7 +511,15 @@ void Itom2dQwtPlot::mnuActZoom(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActScaleSettings()
 {
+    Dialog2DScale *dlg = new Dialog2DScale(m_data, this);
+    if(dlg->exec() == QDialog::Accepted)
+    {
+        dlg->getData(m_data);
+        m_pContent->updateScaleValues();
+    }
 
+    delete dlg;
+    dlg = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
