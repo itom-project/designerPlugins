@@ -884,7 +884,26 @@ void Plot1DWidget::setPannerEnable(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updateScaleValues()
 {
+    /*QRectF rect = seriesData->boundingRect();
     if(m_pData->m_valueScaleAuto)
+    {
+        m_pData->m_valueMin = rect.top();
+        m_pData->m_valueMax = rect.bottom();
+    }
+
+    if(m_pData->m_axisScaleAuto)
+    {
+        m_pData->m_axisMin = rect.left();
+        m_pData->m_axisMax = rect.right();
+    }*/
+
+    setAxisScale( QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax );
+    
+    setAxisScale( QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax );
+
+
+
+    /*if(m_pData->m_valueScaleAuto)
     {
         setAxisAutoScale( QwtPlot::yLeft, true );
     }
@@ -900,7 +919,7 @@ void Plot1DWidget::updateScaleValues()
     else
     {
         setAxisScale( QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax );
-    }
+    }*/
 
     replot();
 }

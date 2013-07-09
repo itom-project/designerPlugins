@@ -51,7 +51,7 @@ public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
 	~Itom2dQwtPlot();
 
-    ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, const ito::uint8 direction);
+    ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack = false);
 
     ito::RetVal applyUpdate();  //!> does the real update work
 
@@ -90,6 +90,15 @@ public:
     void setPlaneRange(int min, int max);
     void setCmplxSwitch(PlotCanvas::ComplexType type, bool visible);
 
+    virtual QPointF getXAxisInterval(void);
+    virtual void setXAxisInterval(QPointF point);
+        
+    virtual QPointF getYAxisInterval(void);
+    virtual void setYAxisInterval(QPointF point);
+        
+    virtual QPointF getZAxisInterval(void);
+    virtual void setZAxisInterval(QPointF point);
+
 protected:
     ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
@@ -117,6 +126,8 @@ private:
     QAction* m_pActCmplxSwitch;
 	QMenu *m_mnuCmplxSwitch;
 
+    QHash<QObject*,ito::uint32> m_childFigures;
+
 private slots:
     void mnuActSave();
     void mnuActHome();
@@ -130,6 +141,9 @@ private slots:
     void mnuActStackCut(bool checked);
     void mnuActPlaneSelector(int plane);
     void mnuCmplxSwitch(QAction *action);
+
+public slots:
+    void childFigureDestroyed(QObject *obj);
 
 };
 

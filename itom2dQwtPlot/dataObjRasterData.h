@@ -53,19 +53,9 @@ class DataObjRasterData : public QwtRasterData
 
         void calcHash();
 
-        bool updateDataObject(ito::DataObject *dataObj, int planeIdx = -1);
+        bool updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
 
-        /*void updateDataObject(QSharedPointer<ito::DataObject> dataObj);
-        void updateDataObject(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height);
-        inline QSharedPointer<ito::DataObject> getDataObject(void) { return m_dataObj; }
-
-        void setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue);
-        inline int getDataObjWidth() { return m_DataObjectWidth; }
-        inline int getDataObjHeight() { return m_DataObjectHeight; }
-        inline void setCmplxState(const int state) { m_cmplxState = state; }*/
-
-        QPointF valueLimits() const { return m_zBounds; };
-        QRectF boundingRectPlane() const { return m_xyBounds; };
+        bool pointValid(const QPointF &point) const;
        
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
@@ -79,7 +69,8 @@ class DataObjRasterData : public QwtRasterData
         QByteArray m_hash;
         bool m_validHash;
 
-        ito::DataObject *m_dataObj; //is pointer only
+        const ito::DataObject *m_dataObj; //pointer to the source data object (unchanged)
+        const ito::DataObject *m_dataObjPlane; //pointer to the source data object (<=2D) or a shallow copy to the depicted plane (>=3D)
 
         bool m_validData;
         QByteArray m_dataHash;

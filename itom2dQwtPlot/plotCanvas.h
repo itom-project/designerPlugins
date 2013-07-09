@@ -62,16 +62,18 @@ class PlotCanvas : public QwtPlot
         ~PlotCanvas();
 
         ito::RetVal init();
-        void refreshPlot(ito::DataObject *dObj, int plane = -1);
+        void refreshPlot(const ito::DataObject *dObj, int plane = -1);
 
         void changePlane(int plane);
         void internalDataUpdated();
 
         void setState( tState state);
+        void childFigureDestroyed(QObject* obj, ito::uint32 UID);
+
+        QPointF getInterval(Qt::Axis axis) const;
+        void setInterval(Qt::Axis axis, const QPointF &interval);
 
         friend class Itom2dQwtPlot;
-
-		const ito::DataObject* getDataObject() const { return m_dObjPtr; }
 
     protected:
         void contextMenuEvent(QContextMenuEvent * event);
@@ -87,34 +89,39 @@ class PlotCanvas : public QwtPlot
 	private:
         QwtPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
-        QwtPicker *m_pLineCutPicker;
-        QwtPicker *m_pStackCutPicker;
-        QwtPlotMarker *m_pStackCutMarker;
+        
+        QwtPlotPicker *m_pLineCutPicker;
+        QwtPlotCurve *m_pLineCutLine;
+        
         ValuePicker2D *m_pValuePicker;
 
-		QwtPlotPicker *m_pPointPicker;
+		QwtPlotPicker *m_pStackPicker;
+        QwtPlotMarker *m_pStackCutMarker;
 
 		int m_curColorMapIndex;
 		DataObjItem *m_dObjItem;
         DataObjRasterData *m_rasterData;
 
+        ito::uint32 m_zstackCutUID;
+        ito::uint32 m_lineCutUID;
+
         tState m_state;
 
 		InternalData *m_pData;
-        ito::DataObject *m_dObjPtr;
+        const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
+
+        Qt::KeyboardModifiers m_activeModifiers;
 
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
 	private slots:
-		void pointTrackerAppended(const QPoint &pt);
-
-    public slots:
-        void trackerAScanMoved(const QPoint &pt);
-        void trackerAScanAppended(const QPoint &pt);
-        void trackerMoved(const QPoint &pt);
-        void trackerAppended(const QPoint &pt);
+        void zStackCutTrackerMoved(const QPoint &pt);
+		void zStackCutTrackerAppended(const QPoint &pt);
+        void lineCutMoved(const QPoint &pt);
+        void lineCutAppended(const QPoint &pt);
+        
 };
 
 struct InternalData
@@ -154,6 +161,8 @@ struct InternalData
     bool m_colorBarVisible;
 
     PlotCanvas::ComplexType m_cmplxType;
+
+    const QHash<QString, ito::Param*> *m_pConstOutput;
 };
 
 

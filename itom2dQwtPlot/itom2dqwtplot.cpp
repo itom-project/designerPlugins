@@ -68,6 +68,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_colorBarVisible = false;
     m_data.m_cmplxType = PlotCanvas::Real;
     m_data.m_yaxisFlipped = false;
+    m_data.m_pConstOutput = &m_pOutput;
 
 	//initialize canvas
 	m_pContent = new PlotCanvas(&m_data, this);
@@ -179,6 +180,7 @@ void Itom2dQwtPlot::createActions()
     planeSelector->setMinimum(0);
     planeSelector->setMaximum(0);
     planeSelector->setValue(0);
+    planeSelector->setKeyboardTracking(false);
 	planeSelector->setToolTip("Select image plane");
 	QWidgetAction *wa = new QWidgetAction(this);
 	wa->setDefaultWidget(planeSelector);
@@ -222,15 +224,8 @@ void Itom2dQwtPlot::createActions()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
-	m_pOutput["sourceout"]->setVal<ito::DataObject*>(NULL);
-
-    if (m_pInput["source"]->getVal<ito::DataObject*>())
-    {
-        m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
-        m_pContent->refreshPlot( m_pInput["source"]->getVal<ito::DataObject*>() );
-		
-		m_pOutput["sourceout"]->setVal<void*>( (void*)m_pContent->getDataObject() ); //source data object is stored as shallow copy in m_pContent
-    }
+    //displayed and sourceout is set by dataObjRasterData, since the data is analyzed there
+    m_pContent->refreshPlot( m_pInput["source"]->getVal<ito::DataObject*>() );
 
     return ito::retOk;
 }
@@ -421,6 +416,63 @@ void Itom2dQwtPlot::setyAxisVisible(const bool &value)
     m_data.m_yaxisVisible = value;
 
     if(m_pContent) m_pContent->enableAxis(QwtPlot::yLeft, value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QPointF Itom2dQwtPlot::getXAxisInterval(void)
+{
+    if (m_pContent)
+    {
+        return m_pContent->getInterval( Qt::XAxis );
+    }
+    return QPointF();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setXAxisInterval(QPointF point)
+{
+    if (m_pContent)
+    {
+        m_pContent->setInterval( Qt::XAxis, point );
+    }
+}
+        
+//----------------------------------------------------------------------------------------------------------------------------------
+QPointF Itom2dQwtPlot::getYAxisInterval(void)
+{
+    if (m_pContent)
+    {
+        return m_pContent->getInterval( Qt::YAxis );
+    }
+    return QPointF();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setYAxisInterval(QPointF point)
+{
+    if (m_pContent)
+    {
+        m_pContent->setInterval( Qt::YAxis, point );
+    }
+}
+   
+//----------------------------------------------------------------------------------------------------------------------------------
+QPointF Itom2dQwtPlot::getZAxisInterval(void)
+{
+    if (m_pContent)
+    {
+        return m_pContent->getInterval( Qt::ZAxis );
+    }
+    return QPointF();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setZAxisInterval(QPointF point)
+{
+    if (m_pContent)
+    {
+        m_pContent->setInterval( Qt::ZAxis, point );
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -652,7 +704,7 @@ void Itom2dQwtPlot::setCmplxSwitch(PlotCanvas::ComplexType type, bool visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, const ito::uint8 direction)
+ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack /*= false*/)
 {
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
@@ -674,6 +726,8 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
     if(!retval.containsError())
     {
+        
+
         if(uniqueID != newUniqueID)
         {
             uniqueID = newUniqueID;
@@ -681,6 +735,8 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             if (lineCutObj->inherits("ito::AbstractDObjFigure"))
 			{
                 figure = (ito::AbstractDObjFigure*)lineCutObj;
+                m_childFigures[lineCutObj] = newUniqueID;
+                connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
 			}
             else
 			{
@@ -688,46 +744,58 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 			}
 
             retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-            switch (direction)
+            
+            if (zStack)
             {
                 // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
                 // with one plane and cannot display the points in z-direction
-                case 2:
-                    retval += addChannel((ito::AbstractNode*)figure,  m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                    paramNames << "bounds"  << "sourceout";
-                break;
 
-                // otherwise simply pass on the displayed plane
-                case 0:
-                case 1:
-                default:
-                    retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                    paramNames << "bounds"  << "displayed";
-                break;
+                retval += addChannel((ito::AbstractNode*)figure,  m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                paramNames << "bounds"  << "sourceout";
             }
+            else
+            {
+                // otherwise simply pass on the displayed plane
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                paramNames << "bounds"  << "displayed";
+            }
+
             retval += updateChannels(paramNames);
 
             figure->show();
         }
         else
         {
-            switch (direction)
+            if (zStack)
             {
-                case 2:
-                    paramNames << "bounds"  << "sourceout";
-                break;
-
-                case 0:
-                case 1:
-                default:
-                    paramNames << "bounds"  << "displayed";
-                break;
+                paramNames << "bounds"  << "sourceout";
+            }
+            else
+            {
+                paramNames << "bounds"  << "displayed";
             }
             retval += updateChannels(paramNames);
         }
     }
 
     return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
+{
+    QHash<QObject*,ito::uint32>::iterator it = m_childFigures.find(obj);
+
+    if (it != m_childFigures.end())
+    {
+        m_pContent->childFigureDestroyed(obj, m_childFigures[obj]);
+    }
+    else
+    {
+        m_pContent->childFigureDestroyed(obj, 0);
+    }
+
+    m_childFigures.erase(it);
 }
 
 ////----------------------------------------------------------------------------------------------------------------------------------

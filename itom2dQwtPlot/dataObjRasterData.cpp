@@ -37,6 +37,7 @@ DataObjRasterData::DataObjRasterData(const InternalData *m_internalData) :
     m_plane(NULL),
     m_hashGenerator(QCryptographicHash::Md5),
     m_dataObj(NULL),
+    m_dataObjPlane(NULL),
     m_pInternalData(m_internalData)
 {
     m_D.m_planeIdx = 0;
@@ -65,10 +66,10 @@ void DataObjRasterData::calcHash()
         QByteArray ba;
 
         int dims = m_dataObj->getDims();
-        ba.append( QByteArray().setNum( dims ) );
-
+        ba.append( dims );
         ba.append( m_pInternalData->m_cmplxType );
         ba.append( m_pInternalData->m_yaxisFlipped );
+        ba.append( m_D.m_planeIdx );
 
         if( dims > 0 )
         {
@@ -102,17 +103,19 @@ void DataObjRasterData::deleteCache()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx /*= -1*/) //true if hash has changed
+bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int planeIdx /*= -1*/) //true if hash has changed
 {
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
     // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is 
     // responsible that no dataObject is deleted when it is still in use by any object of this entire plot plugin.
     
     bool newHash = false;
-    m_dataObj = dataObj;
-    
+    bool dataObjPlaneWasShallow = (m_dataObj != m_dataObjPlane);
+
     if(dataObj)
     {
+        m_dataObj = dataObj;
+
         int d = dataObj->getDims();
         m_D.m_yScaling = dataObj->getAxisScale(d-2);
         m_D.m_xScaling = dataObj->getAxisScale(d-1);
@@ -142,6 +145,27 @@ bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx 
 
             deleteCache();
 
+            m_plane = (cv::Mat*)(dataObj->get_mdata()[ dataObj->seekMat( m_D.m_planeIdx )]);
+
+            if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
+            {
+                delete m_dataObjPlane;
+                m_dataObjPlane = NULL;
+            }
+
+            if (dataObj->getDims() > 2)
+            {
+                size_t sizes[2] = { m_D.m_ySize, m_D.m_xSize };
+                m_dataObjPlane = new ito::DataObject( 2, sizes, dataObj->getType(), m_plane, 1);
+            }
+            else
+            {
+                m_dataObjPlane = dataObj;
+            }
+
+            m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>((void*)m_dataObj);
+            m_pInternalData->m_pConstOutput->operator[]("displayed")->setVal<void*>((void*)m_dataObjPlane);
+
             //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
             setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
             setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling)) );
@@ -151,23 +175,22 @@ bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx 
         ito::uint32 firstMin[3];
         ito::uint32 firstMax[3];
 
-        m_plane = (cv::Mat*)(dataObj->get_mdata()[ dataObj->seekMat( m_D.m_planeIdx )]);
+        ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
 
-        if (dataObj->getDims() > 2)
-        {
-            cv::Mat plane = *m_plane; //shallow copy
-            size_t sizes[2] = { m_D.m_ySize, m_D.m_xSize };
-            ito::DataObject limited( 2, sizes, dataObj->getType(), &plane, 1);
-            ito::dObjHelper::minMaxValue(&limited, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
-        }
-        else
-        {
-            ito::dObjHelper::minMaxValue(dataObj, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
-        }
         setInterval(Qt::ZAxis, QwtInterval(min,max));
     }
     else
     {
+        if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
+        {
+            delete m_dataObjPlane;
+        }
+
+        m_dataObjPlane = NULL;
+        m_dataObj = NULL;
+        m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>(NULL);
+        m_pInternalData->m_pConstOutput->operator[]("output")->setVal<void*>(NULL);
+
         m_plane = NULL;
 
         m_D.m_dataPtr = NULL;
@@ -190,6 +213,11 @@ bool DataObjRasterData::updateDataObject(ito::DataObject *dataObj, int planeIdx 
     
     
     return newHash;
+}
+
+bool DataObjRasterData::pointValid(const QPointF &point) const
+{
+    return interval(Qt::XAxis).contains( point.x() ) && interval(Qt::YAxis).contains( point.y() );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

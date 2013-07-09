@@ -39,13 +39,11 @@ DataObjItem::DataObjItem( const QString &title ):
     QwtPlotSpectrogram( title )
 {
     m_counter = 0;
-    timer.start();
 }
 
 //! Destructor
 DataObjItem::~DataObjItem()
 {
-    qDebug() << "itom2dQwtPlot: " << m_counter << timer.elapsed();
 }
 
 /*!
