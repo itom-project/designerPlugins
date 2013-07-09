@@ -147,7 +147,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     rightAxis->setColorBarEnabled(true);
     rightAxis->setColorBarWidth(30);
 
-    rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(Qt::black, Qt::white));
+    rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     rightAxis->setFont(QFont("Verdana",8,1,true));
 
     rightAxis->setMargin(20); //margin to right border of window
@@ -335,12 +335,16 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
         }
     }
 
-    if(colorMap != NULL)
+    if(colorMap && colorBarMap)
     {
         if(m_rasterData)
         {
             QwtInterval interval = m_rasterData->interval(Qt::ZAxis);
-            setAxisScale(QwtPlot::yRight, interval.minValue(), interval.maxValue());
+            /*setAxisScale(QwtPlot::yRight, interval.minValue(), interval.maxValue());
+
+            
+            axisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
+*/
             axisWidget(QwtPlot::yRight)->setColorMap(interval, colorBarMap);
         }
         else
@@ -349,6 +353,11 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
         }
 
         m_dObjItem->setColorMap(colorMap);
+    }
+    else
+    {
+        delete colorMap;
+        delete colorBarMap;
     }
 
     replot();
@@ -545,9 +554,14 @@ void PlotCanvas::updateScaleValues()
 	QwtInterval ival;
     if(m_pData->m_valueScaleAuto)
     {
+        internalDataUpdated();
         ival = m_rasterData->interval(Qt::ZAxis);
         m_pData->m_valueMin = ival.minValue();
         m_pData->m_valueMax = ival.maxValue();
+    }
+    else
+    {
+        m_rasterData->setInterval(Qt::ZAxis, QwtInterval(m_pData->m_valueMin, m_pData->m_valueMax));
     }
 
     if(m_pData->m_xaxisScaleAuto)
@@ -565,6 +579,12 @@ void PlotCanvas::updateScaleValues()
     }
 
     setAxisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
+    QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
+    if (widget)
+    {
+        QwtInterval ival(m_pData->m_valueMin, m_pData->m_valueMax);
+        axisWidget(QwtPlot::yRight)->setColorMap( ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
+    }
     
     setAxisScale( QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
     
@@ -619,7 +639,18 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
         m_pData->m_valueScaleAuto = false;
         m_pData->m_valueMin = interval.x();
         m_pData->m_valueMax = interval.y();
+
+        QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
+        
+        if (widget)
+        {
+            QwtInterval ival(interval.x(), interval.y());
+            widget->setColorMap( ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
+        }
+
         setAxisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
+        
+        m_rasterData->setInterval(Qt::ZAxis, QwtInterval(m_pData->m_valueMin, m_pData->m_valueMax));
     }
 
     replot();

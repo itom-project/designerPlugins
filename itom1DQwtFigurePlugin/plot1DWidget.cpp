@@ -735,7 +735,7 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
         while(!found)
         {
             thisIdx += 1;
-            if( (thisIdx) < s)
+            if(thisIdx >= 0 && thisIdx < s)
             {
                 p = data->sample(thisIdx);
                 if(qIsFinite(p.ry()))
