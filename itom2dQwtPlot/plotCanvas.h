@@ -55,7 +55,7 @@ class PlotCanvas : public QwtPlot
 {
     Q_OBJECT
     public:
-        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut };
+        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut, tMultiPointPick };
         enum ComplexType { Real = 2, Imag = 1, Abs = 0, Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
 
         PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
@@ -72,6 +72,8 @@ class PlotCanvas : public QwtPlot
 
         QPointF getInterval(Qt::Axis axis) const;
         void setInterval(Qt::Axis axis, const QPointF &interval);
+
+        ito::RetVal pickPoints(ito::DataObject *coordsOut, int maxNrOfPoints);
 
         friend class Itom2dQwtPlot;
 
@@ -98,6 +100,8 @@ class PlotCanvas : public QwtPlot
 		QwtPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
 
+        QwtPlotPicker *m_pMultiPointPicker;
+
 		int m_curColorMapIndex;
 		DataObjItem *m_dObjItem;
         DataObjRasterData *m_rasterData;
@@ -121,6 +125,13 @@ class PlotCanvas : public QwtPlot
 		void zStackCutTrackerAppended(const QPoint &pt);
         void lineCutMoved(const QPoint &pt);
         void lineCutAppended(const QPoint &pt);
+
+        void multiPointActivated (bool on) { qDebug() << "pointActivated:" << on; };
+        void multiPointSelected (const QPolygon &polygon) { qDebug() << "pointSelected:" << polygon; };
+        void multiPointAppended (const QPoint &pos) { qDebug() << "pointAppended:" << pos; };
+        void multiPointMoved (const QPoint &pos) { qDebug() << "pointMoved:" << pos; };
+        void multiPointRemoved (const QPoint &pos) { qDebug() << "pointRemoved:" << pos; };
+        void multiPointChanged (const QPolygon &selection) { qDebug() << "pointChanged:" << selection; };
         
 };
 

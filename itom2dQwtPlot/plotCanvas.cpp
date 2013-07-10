@@ -66,7 +66,9 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_dObjPtr(NULL),
 		m_pStackPicker(NULL),
         m_zstackCutUID(0),
-        m_lineCutUID(0)
+        m_lineCutUID(0),
+        m_pLineCutLine(NULL),
+        m_pMultiPointPicker(NULL)
 {
     setMouseTracking(false);
 
@@ -142,6 +144,13 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pLineCutLine->attach(this);
     m_pLineCutLine->setVisible(false);
 
+    //multi point picker for pick-point action (equivalent to matlabs ginput)
+    m_pMultiPointPicker = new QwtPlotPicker(QwtPicker::CrossRubberBand, QwtPicker::ActiveOnly, canvas());
+    m_pMultiPointPicker->setEnabled(true);
+    //m_pMultiPointPicker->setStateMachine(new QwtPickerClickPointMachine); 
+    m_pMultiPointPicker->setStateMachine(new QwtPickerPolygonMachine);
+    m_pMultiPointPicker->setTrackerPen( QPen(Qt::blue) );
+
 	//prepare color bar
 	QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
     rightAxis->setColorBarEnabled(true);
@@ -161,6 +170,12 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::~PlotCanvas()
 {
+    m_pLineCutLine->detach();
+    delete m_pLineCutLine;
+
+    m_pStackCutMarker->detach();
+    delete m_pStackCutMarker;
+	
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -673,6 +688,7 @@ void PlotCanvas::setState( tState state)
         if (m_pValuePicker) m_pValuePicker->setEnabled( state == tValuePicker );
         if (m_pLineCutPicker) m_pLineCutPicker->setEnabled( state == tLineCut );
         if (m_pStackPicker) m_pStackPicker->setEnabled( state == tStackCut );
+        //if (m_pMultiPointPicker) m_pMultiPointPicker->setEnabled( state == tMultiPointPick );
 
         switch (state)
         {
@@ -691,6 +707,9 @@ void PlotCanvas::setState( tState state)
 		case tStackCut:
 			canvas()->setCursor( Qt::CrossCursor );
 			break;
+        case tMultiPointPick:
+            canvas()->setCursor( Qt::CrossCursor );
+            break;
         default:
             canvas()->setCursor( Qt::ArrowCursor );
             break;
@@ -831,4 +850,22 @@ void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
     }
 
     replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::pickPoints(ito::DataObject *coordsOut, int maxNrOfPoints)
+{
+    setState(tMultiPointPick);
+
+    connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
+    connect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon) ));
+    connect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint) ));
+    connect(m_pMultiPointPicker, SIGNAL(moved(QPoint)), this, SLOT(multiPointMoved (QPoint) ));
+    connect(m_pMultiPointPicker, SIGNAL(removed(QPoint)), this, SLOT(multiPointRemoved (QPoint)) );
+    connect(m_pMultiPointPicker, SIGNAL(changed(QPolygon)), this, SLOT(multiPointChanged (QPolygon)) );
+
+    m_pMultiPointPicker->setEnabled(true);
+    m_pMultiPointPicker->stateMachine()->setState( QwtPickerMachine::Begin );
+
+    return ito::retOk;
 }

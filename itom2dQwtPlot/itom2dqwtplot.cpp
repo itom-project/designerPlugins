@@ -816,3 +816,20 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 //    }
 //    m_lblCoordinates->setText(buf);
 //}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::pickPoints(QSharedPointer<ito::DataObject> coordsOut, int maxNrOfPoints /*= -1*/)
+{
+    ito::RetVal retval;
+
+    if (coordsOut.data() == NULL)
+    {
+        retval += ito::RetVal(ito::retError,0,"The given data object for the resulting coordinates is empty");
+    }
+    else
+    {
+        m_pContent->pickPoints(coordsOut.data(), maxNrOfPoints);
+    }
+
+    return retval;
+}

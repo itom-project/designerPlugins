@@ -141,9 +141,10 @@ private slots:
     void mnuActStackCut(bool checked);
     void mnuActPlaneSelector(int plane);
     void mnuCmplxSwitch(QAction *action);
+    void childFigureDestroyed(QObject *obj);
 
 public slots:
-    void childFigureDestroyed(QObject *obj);
+    ito::RetVal pickPoints(QSharedPointer<ito::DataObject> coordsOut, int maxNrOfPoints = -1);
 
 };
 
