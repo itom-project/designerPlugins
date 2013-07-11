@@ -70,15 +70,15 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
         
         void enableComplexGUI(const bool checked);
 
-        QString getTitle();
+        QString getTitle() const;
         void setTitle(const QString &title);
         void resetTitle();
 
-        QString getAxisLabel();
+        QString getAxisLabel() const;
         void setAxisLabel(const QString &label);
         void resetAxisLabel();
 
-        QString getValueLabel();
+        QString getValueLabel() const;
         void setValueLabel(const QString &label);
         void resetValueLabel();
     

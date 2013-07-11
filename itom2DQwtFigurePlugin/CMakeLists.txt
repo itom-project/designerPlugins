@@ -42,8 +42,6 @@ ELSE(CMAKE_BUILD_TYPE)
 	SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 ENDIF (DEFINED CMAKE_BUILD_TYPE)
 
-message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
-
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -101,11 +99,11 @@ set(designer_SOURCES
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/dataObjectRasterData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectRasterData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2DQwtFigure.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2DQwtFigurePlugin.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/itoPlotSpectrogram.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/itoPlotSpectrogram.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plot2DWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker2d.cpp
 )

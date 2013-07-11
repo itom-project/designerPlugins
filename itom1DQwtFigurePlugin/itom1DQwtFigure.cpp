@@ -280,7 +280,7 @@ QVector<QPointF> Itom1DQwtFigure::getBounds(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString Itom1DQwtFigure::getTitle()
+QString Itom1DQwtFigure::getTitle() const
 {
     if(m_data.m_autoTitle)
     {
@@ -313,7 +313,7 @@ void Itom1DQwtFigure::resetTitle()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString Itom1DQwtFigure::getAxisLabel()
+QString Itom1DQwtFigure::getAxisLabel() const
 {
     if(m_data.m_autoAxisLabel)
     {
@@ -345,7 +345,7 @@ void Itom1DQwtFigure::resetAxisLabel()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString Itom1DQwtFigure::getValueLabel()
+QString Itom1DQwtFigure::getValueLabel() const
 {
     if(m_data.m_autoValueLabel)
     {
@@ -357,7 +357,7 @@ QString Itom1DQwtFigure::getValueLabel()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::setValueLabel(const QString &label)
 {
-    /*if(label == "<auto>")
+    if(label == "<auto>")
     {
         m_data.m_autoValueLabel = true;
     }
@@ -366,14 +366,14 @@ void Itom1DQwtFigure::setValueLabel(const QString &label)
         m_data.m_autoValueLabel = false;
         m_data.m_valueLabel = label;
     }
-    if(m_pContent) m_pContent->updateLabels();*/
+    if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::resetValueLabel()
 {
-    /*m_data.m_autoValueLabel = true;
-    if(m_pContent) m_pContent->updateLabels();*/
+    m_data.m_autoValueLabel = true;
+    if(m_pContent) m_pContent->updateLabels();
 }
 
 

@@ -20,34 +20,32 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef ITOM2DQWTPLOTPLUGIN_H
-#define ITOM2DQWTPLOTPLUGIN_H
+#ifndef DIALOG2DSCALE
+#define DIALOG2DSCALE
 
-#include <QtDesigner/QDesignerCustomWidgetInterface>
-#include "plot/abstractItomDesignerPlugin.h"
+#include <QtGui>
+#include <qdialog.h>
 
-class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
+#include "plotCanvas.h"
+
+#include "ui_dialog2DScale.h"
+
+class Dialog2DScale : public QDialog 
 {
-	Q_OBJECT
-
 public:
-	Itom2dQwtPlotPlugin(QObject *parent = 0);
+    Dialog2DScale(const InternalData &data, QWidget *parent = NULL);
+    ~Dialog2DScale() {};
 
-	bool isContainer() const;
-	bool isInitialized() const;
-	QIcon icon() const;
-	QString domXml() const;
-	QString group() const;
-	QString includeFile() const;
-	QString name() const;
-	QString toolTip() const;
-	QString whatsThis() const;
-    QWidget *createWidget(QWidget *parent);
-    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
-	void initialize(QDesignerFormEditorInterface *core);
+    void getData(InternalData &data);
 
 private:
-	bool initialized;
+
+    void getDataTypeRange(ito::tDataType type, double &min, double &max);
+
+    Ui::Dialog2DScale ui;
+
+private slots:
+
 };
 
-#endif // ITOM2DQWTPLOTPLUGIN_H
+#endif

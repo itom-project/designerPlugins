@@ -11,7 +11,7 @@ ADD_SUBDIRECTORY(qwt)
 ADD_SUBDIRECTORY(itom1DQwtFigurePlugin)
 ADD_SUBDIRECTORY(itom2DGVFigurePlugin)
 ADD_SUBDIRECTORY(itom2DQwtFigurePlugin)
-#ADD_SUBDIRECTORY(itom2dQwtPlot) # NICHT!
+ADD_SUBDIRECTORY(itom2dQwtPlot)
 ADD_SUBDIRECTORY(itomIsoGLFigurePlugin)
 ADD_SUBDIRECTORY(matplotlibFigure)
 ADD_SUBDIRECTORY(motorController)

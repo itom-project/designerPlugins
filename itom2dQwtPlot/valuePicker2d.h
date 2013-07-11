@@ -20,34 +20,41 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef ITOM2DQWTPLOTPLUGIN_H
-#define ITOM2DQWTPLOTPLUGIN_H
+#ifndef VALUEPICKER2D_H
+#define VALUEPICKER2D_H
 
-#include <QtDesigner/QDesignerCustomWidgetInterface>
-#include "plot/abstractItomDesignerPlugin.h"
+#include <qwt_plot_picker.h>
+#include <qwt_plot_canvas.h>
 
-class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
+#include <qpoint.h>
+#include <qwt_raster_data.h>
+
+class ValuePicker2D : public QwtPlotPicker
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Itom2dQwtPlotPlugin(QObject *parent = 0);
+    explicit ValuePicker2D(int xAxis, int yAxis, QwtPlotCanvas* parent, const QwtRasterData* valueData);
+    virtual ~ValuePicker2D();
 
-	bool isContainer() const;
-	bool isInitialized() const;
-	QIcon icon() const;
-	QString domXml() const;
-	QString group() const;
-	QString includeFile() const;
-	QString name() const;
-	QString toolTip() const;
-	QString whatsThis() const;
-    QWidget *createWidget(QWidget *parent);
-    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
-	void initialize(QDesignerFormEditorInterface *core);
+    virtual QwtText trackerTextF( const QPointF &pos ) const;
+
+    void drawTracker( QPainter *painter ) const;
+    void setBackgroundFillBrush( const QBrush &brush );
+
+
+protected:
 
 private:
-	bool initialized;
+    const QwtRasterData *m_valueData;
+    QBrush m_rectFillBrush;
+
+signals:
+
+public slots:
+
+private slots:
+
 };
 
-#endif // ITOM2DQWTPLOTPLUGIN_H
+#endif

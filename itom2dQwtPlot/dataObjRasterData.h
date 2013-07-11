@@ -23,9 +23,9 @@
 #ifndef DATAOBJRASTERDATA_H
 #define DATAOBJRASTERDATA_H
 
-//#include "../../Qitom/global.h"
-#include "../../common/sharedStructures.h"
-#include "../../DataObject/dataobj.h"
+#include "common/sharedStructures.h"
+#include "DataObject/dataobj.h"
+#include "plotCanvas.h"
 
 #include <qwt_raster_data.h>
 #include <qlist.h>
@@ -33,32 +33,29 @@
 #include <qsharedpointer.h>
 #include <qcryptographichash.h>
 
+struct InternalData;
+
 //----------------------------------------------------------------------------------------------------------------------------------
 class DataObjRasterData : public QwtRasterData
 {
     public:
-        explicit DataObjRasterData();
+        explicit DataObjRasterData(const InternalData *m_internalData);
         explicit DataObjRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending);
         ~DataObjRasterData();
 
         double value2(int m, int n) const;
+        double value2_yinv(int m, int n) const;
         double value(double x, double y) const;
         void initRaster( const QRectF& area, const QSize& raster );
         void discardRaster();
 
         inline QSize getSize() const { return QSize(m_D.m_xSize, m_D.m_ySize); }
 
+        QByteArray calcHash(const ito::DataObject *dObj = NULL);
 
-        void updateDataObject(ito::DataObject *dataObj, size_t planeIdx = 0);
+        bool updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
 
-        /*void updateDataObject(QSharedPointer<ito::DataObject> dataObj);
-        void updateDataObject(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height);
-        inline QSharedPointer<ito::DataObject> getDataObject(void) { return m_dataObj; }
-
-        void setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue);
-        inline int getDataObjWidth() { return m_DataObjectWidth; }
-        inline int getDataObjHeight() { return m_DataObjectHeight; }
-        inline void setCmplxState(const int state) { m_cmplxState = state; }*/
+        bool pointValid(const QPointF &point) const;
        
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
@@ -69,13 +66,20 @@ class DataObjRasterData : public QwtRasterData
 
         void deleteCache();
 
-        ito::DataObject *m_dataObj; //is pointer only
+        QByteArray m_hash;
+        bool m_validHash;
+
+        ito::DataObject m_dataObj; //the source data object (unchanged)
+        const ito::DataObject *m_dataObjPlane; //pointer to the source data object (<=2D) or a shallow copy to the depicted plane (>=3D)
 
         bool m_validData;
         QByteArray m_dataHash;
         QCryptographicHash m_hashGenerator;
         QRectF m_lastRasteredArea;
         QSize m_lastRasteredRaster;
+
+        QRectF m_xyBounds;
+        QPointF m_zBounds;
 
         struct DataParam {
             int** m_dataPtr; //only for comparison
@@ -86,26 +90,17 @@ class DataObjRasterData : public QwtRasterData
             double m_xOffset;
             int m_ySize;
             int m_xSize;
+            bool m_yaxisFlipped;
         };
 
         DataParam m_D;
 
         cv::Mat *m_plane;
         uchar **m_rasteredLinePtr;
+        int m_rasteredLines;
         int *m_xIndizes;
 
-        /*QList<unsigned int>m_startPoint;
-        unsigned int m_wDimIndex;
-        unsigned int m_hDimIndex;
-        unsigned int m_width;
-        unsigned int m_height;
-        int m_DataObjectWidth;
-        int m_DataObjectHeight;
-        double m_xScalingFactor;
-        double m_yScalingFactor;
-        double m_xOffset;
-        double m_yOffset;
-		int m_cmplxState;*/
+        const InternalData *m_pInternalData;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

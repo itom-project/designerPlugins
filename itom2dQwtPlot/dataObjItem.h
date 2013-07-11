@@ -44,7 +44,6 @@ protected:
     void renderTile(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRect &tile, QImage *image ) const;
 
     int m_counter;
-    QElapsedTimer timer;
 
 };
 

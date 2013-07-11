@@ -19,6 +19,11 @@
     </qresource>
     <qresource prefix="/itomDesignerPlugins/plot">
         <file>icons/markerPos.png</file>
+        <file>icons/zStack.png</file>
+        <file>icons/pntline.png</file>
+        <file>icons/autoscal.png</file>
+        <file>icons/colorbar.png</file>
+        <file>icons/colorPalette.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>

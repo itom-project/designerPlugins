@@ -17,7 +17,7 @@ itom2DQwtFigurePlugin::itom2DQwtFigurePlugin(QObject *parent)
     m_description = QObject::tr("ITOM widget for 2D-visualisation of 2D/3D DataObjects based on QWT.");
     m_detaildescription = QObject::tr("");
     m_author = "Marc Gronle, ITO";
-    m_version = PLUGIN_VERSION_MAJOR << 16 + PLUGIN_VERSION_MINOR << 8 + PLUGIN_VERSION_PATCH;
+    m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL with ITO itom-exception");
 
     initialized = false;

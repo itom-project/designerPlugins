@@ -20,28 +20,39 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#include "valuepicker1d.h"
+#include "valuePicker2d.h"
 
 #include <qpainter.h>
 #include <qbrush.h>
+#include <qwt_plot_canvas.h>
 
-ValuePicker1D::ValuePicker1D(int xAxis, int yAxis, QwtPlotCanvas* parent) : QwtPlotPicker(xAxis, yAxis, parent)
+ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QwtPlotCanvas* parent, const QwtRasterData* valueData) : 
+    QwtPlotPicker(xAxis, yAxis, parent),
+    m_valueData(valueData)
 {
 }
 
-ValuePicker1D::~ValuePicker1D()
+ValuePicker2D::~ValuePicker2D()
 {
 }
 
-QwtText ValuePicker1D::trackerTextF( const QPointF &pos ) const
+QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
 {
     QString text;
-    text.sprintf("[%.2f, %.2f]", pos.x(), pos.y());
+    if (m_valueData)
+    {
+        double value = m_valueData->value(pos.x(), pos.y());
+        text.sprintf("[%.2f, %.2f]\n%.4f", pos.x(), pos.y(), value);
+    }
+    else
+    {
+        text.sprintf("[%.2f, %.2f]", pos.x(), pos.y());
+    }
 
     return text;
 }
 
-void ValuePicker1D::drawTracker( QPainter *painter ) const
+void ValuePicker2D::drawTracker( QPainter *painter ) const
 {
     const QRect textRect = trackerRect( painter->font() );
     if ( !textRect.isEmpty() )
@@ -55,7 +66,7 @@ void ValuePicker1D::drawTracker( QPainter *painter ) const
     }
 }
 
-void ValuePicker1D::setBackgroundFillBrush( const QBrush &brush )
+void ValuePicker2D::setBackgroundFillBrush( const QBrush &brush )
 {
     if(brush != this->m_rectFillBrush)
     {

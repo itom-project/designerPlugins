@@ -21,21 +21,23 @@
 *********************************************************************** */
 
 #include "dataObjRasterData.h"
-#include "../../common/typeDefs.h"
+#include "common/typeDefs.h"
 
-#include "../../DataObject/dataObjectFuncs.h"
+#include "DataObject/dataObjectFuncs.h"
 
 #include <qdebug.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DataObjRasterData::DataObjRasterData() :
+DataObjRasterData::DataObjRasterData(const InternalData *m_internalData) :
     QwtRasterData(),
     m_validData(false),
     m_dataHash(),
     m_rasteredLinePtr(NULL),
     m_xIndizes(NULL),
     m_plane(NULL),
-    m_hashGenerator(QCryptographicHash::Md5)
+    m_hashGenerator(QCryptographicHash::Md5),
+    m_dataObjPlane(NULL),
+    m_pInternalData(m_internalData)
 {
     m_D.m_planeIdx = 0;
     m_D.m_yScaling = 1.0;
@@ -49,11 +51,52 @@ DataObjRasterData::DataObjRasterData() :
 DataObjRasterData::~DataObjRasterData()
 {
     deleteCache();
+
+    bool dataObjPlaneWasShallow = (&m_dataObj != m_dataObjPlane);
+    if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
+    {
+        delete m_dataObjPlane;
+        m_dataObjPlane = NULL;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QByteArray DataObjRasterData::calcHash(const ito::DataObject *dObj)
+{
+    if (dObj == NULL) dObj = &m_dataObj;
+
+    if(dObj->getDims() < 2)
+    {
+        return m_hashGenerator.hash("", QCryptographicHash::Md5);
+    }
+    else
+    {
+        QByteArray ba;
+
+        int dims = dObj->getDims();
+        ba.append( dims );
+        ba.append( m_pInternalData->m_cmplxType );
+        ba.append( m_pInternalData->m_yaxisFlipped );
+        ba.append( m_D.m_planeIdx );
+
+        if( dims > 0 )
+        {
+            cv::Mat *m = (cv::Mat*)dObj->get_mdata()[ dObj->seekMat(0) ];
+            uchar* d = m->data;
+            ba.append( QByteArray( (const char*)&d, (sizeof(int)/sizeof(char)))); //address to data of first plane
+
+            ba.append( QByteArray().setNum( m->size[0] ));
+        }
+
+        return m_hashGenerator.hash(ba, QCryptographicHash::Md5);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::deleteCache()
 {
+    m_validData = false;
+
     if(m_rasteredLinePtr)
     {
         delete[] m_rasteredLinePtr;
@@ -65,18 +108,18 @@ void DataObjRasterData::deleteCache()
         delete[] m_xIndizes;
     }
     m_xIndizes = NULL;
-    m_plane = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DataObjRasterData::updateDataObject(ito::DataObject *dataObj, size_t planeIdx /*= 0*/)
+bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int planeIdx /*= -1*/) //true if hash has changed
 {
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
     // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is 
     // responsible that no dataObject is deleted when it is still in use by any object of this entire plot plugin.
     
-    m_validData = (dataObj != NULL);
-    
+    bool newHash = false;
+    bool dataObjPlaneWasShallow = (&m_dataObj != m_dataObjPlane);
+
     if(dataObj)
     {
         int d = dataObj->getDims();
@@ -87,32 +130,84 @@ void DataObjRasterData::updateDataObject(ito::DataObject *dataObj, size_t planeI
         m_D.m_ySize = dataObj->getSize(d-2);
         m_D.m_xSize = dataObj->getSize(d-1);
         m_D.m_dataPtr = NULL; //dataObj->get_mdata();
-        m_D.m_planeIdx = planeIdx;
 
-        //check hash
-        m_hashGenerator.reset();
-        m_hashGenerator.addData( (const char*)&m_D, sizeof(m_D) );
-        QByteArray hash = m_hashGenerator.result();
-
-        if(hash != m_dataHash)
+        if (planeIdx >= 0 && m_D.m_planeIdx != planeIdx)
         {
-            m_dataHash = hash;
+            deleteCache();
+            m_D.m_planeIdx = planeIdx;
+        }
+
+        QByteArray hash = calcHash(dataObj);
+
+        if (m_hash != hash)
+        {
+            m_hash = hash;
+
+            if (planeIdx == -1)
+            {
+                m_D.m_planeIdx = 0;
+            }
+
+            newHash = true;
 
             deleteCache();
 
+            m_dataObj = *dataObj;
+            m_plane = (cv::Mat*)(m_dataObj.get_mdata()[ m_dataObj.seekMat( m_D.m_planeIdx )]);
+
+            if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
+            {
+                delete m_dataObjPlane;
+                m_dataObjPlane = NULL;
+            }
+
+            if (m_dataObj.getDims() > 2)
+            {
+                size_t sizes[2] = { m_D.m_ySize, m_D.m_xSize };
+                m_dataObjPlane = new ito::DataObject( 2, sizes, m_dataObj.getType(), m_plane, 1);
+            }
+            else
+            {
+                m_dataObjPlane = &m_dataObj;
+            }
+
+            m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>((void*)&m_dataObj);
+            m_pInternalData->m_pConstOutput->operator[]("displayed")->setVal<void*>((void*)m_dataObjPlane);
+
             //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
-            setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize,m_D.m_xOffset,m_D.m_xScaling)) );
-            setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize,m_D.m_yOffset,m_D.m_yScaling)) );
+            setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
+            setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling)) );
         }
 
         ito::float64 min, max;
         ito::uint32 firstMin[3];
         ito::uint32 firstMax[3];
-        ito::dObjHelper::minMaxValue(dataObj, min, firstMin, max, firstMax, true);
-        setInterval(Qt::ZAxis, QwtInterval(min,max));
+
+        
+        if (m_pInternalData->m_valueScaleAuto)
+        {
+            ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
+            setInterval(Qt::ZAxis, QwtInterval(min,max));
+        }
+        else
+        {
+            setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_valueMin, m_pInternalData->m_valueMax));
+        }
     }
     else
     {
+        if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
+        {
+            delete m_dataObjPlane;
+        }
+
+        m_dataObjPlane = NULL;
+        m_dataObj = ito::DataObject();
+        m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>(NULL);
+        m_pInternalData->m_pConstOutput->operator[]("output")->setVal<void*>(NULL);
+
+        m_plane = NULL;
+
         m_D.m_dataPtr = NULL;
         m_D.m_yScaling = (1.0);
         m_D.m_xScaling = (1.0);
@@ -122,22 +217,121 @@ void DataObjRasterData::updateDataObject(ito::DataObject *dataObj, size_t planeI
         m_D.m_xSize = 0;
         m_D.m_planeIdx = 0;
 
-        m_dataHash = "";
-        m_hashGenerator.reset();
-
         deleteCache();
+        m_hash = QByteArray();
+        newHash = true;
 
         setInterval(Qt::XAxis, QwtInterval() );
         setInterval(Qt::YAxis, QwtInterval() );
         setInterval(Qt::ZAxis, QwtInterval() );
     }
     
-    m_dataObj = dataObj;
+    
+    return newHash;
+}
+
+bool DataObjRasterData::pointValid(const QPointF &point) const
+{
+    return interval(Qt::XAxis).contains( point.x() ) && interval(Qt::YAxis).contains( point.y() );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 double DataObjRasterData::value(double x, double y) const
 {
+    bool inside1, inside2;
+    if (m_dataObj.getDims() > 0 && m_plane)
+    {
+        int d = m_dataObj.getDims();
+
+        if ( d>1 )
+        {
+            int n = qRound(m_dataObj.getPhysToPix(d-1, x, inside1));
+            int m = qRound(m_dataObj.getPhysToPix(d-2, y, inside2));
+
+            if (inside1 && inside2)
+            {
+                switch(m_dataObj.getType())
+                {
+                case ito::tInt8:
+                    {
+                        return m_plane->at<ito::int8>(m,n);
+                    }
+                case ito::tUInt8:
+                    {
+                        return m_plane->at<ito::uint8>(m,n);
+                    }
+                case ito::tInt16:
+                    {
+                        return m_plane->at<ito::int16>(m,n);
+                    }
+                case ito::tUInt16:
+                    {
+                        return m_plane->at<ito::uint16>(m,n);
+                    }
+                case ito::tInt32:
+                    {
+                        return m_plane->at<ito::int32>(m,n);
+                    }
+                case ito::tUInt32:
+                    {
+                        return m_plane->at<ito::uint32>(m,n);
+                    }
+                case ito::tFloat32:
+                    {
+                        return m_plane->at<ito::float32>(m,n);
+                    }
+                case ito::tFloat64:
+                    {
+                        return m_plane->at<ito::float64>(m,n);
+                    }
+                case ito::tComplex64:
+                    {
+                        if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
+                        {
+                            return m_plane->at<ito::complex64>(m,n).real();
+                        }
+                        if (m_pInternalData->m_cmplxType == PlotCanvas::Imag)
+                        {
+                            return m_plane->at<ito::complex64>(m,n).imag();
+                        }
+                        if (m_pInternalData->m_cmplxType == PlotCanvas::Phase)
+                        {
+                            return std::arg( m_plane->at<ito::complex64>(m,n) );
+                        }
+                        else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                        {
+                            return std::abs( m_plane->at<ito::complex64>(m,n) );
+                        }
+                    }
+                case ito::tComplex128:
+                    {
+                        ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
+                        if(!line) return std::numeric_limits<double>::signaling_NaN();
+                        ito::complex128 i = line[ m_xIndizes[n] ];
+                
+                        if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
+                        {
+                            return m_plane->at<ito::complex128>(m,n).real();
+                        }
+                        if (m_pInternalData->m_cmplxType == PlotCanvas::Imag)
+                        {
+                            return m_plane->at<ito::complex128>(m,n).imag();
+                        }
+                        if (m_pInternalData->m_cmplxType == PlotCanvas::Phase)
+                        {
+                            return std::arg( m_plane->at<ito::complex128>(m,n) );
+                        }
+                        else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                        {
+                            return std::abs( m_plane->at<ito::complex128>(m,n) );
+                        }
+                    }
+                default:
+                    return std::numeric_limits<double>::signaling_NaN();
+                }
+            }
+        }
+    }
     return std::numeric_limits<double>::signaling_NaN();
 }
 
@@ -146,7 +340,7 @@ double DataObjRasterData::value2(int m, int n) const
 {
     if(m_validData)
     {
-        switch(m_dataObj->getType())
+        switch(m_dataObj.getType())
         {
         case ito::tInt8:
             {
@@ -196,6 +390,165 @@ double DataObjRasterData::value2(int m, int n) const
                 if(!line) return std::numeric_limits<double>::signaling_NaN();
                 return line[ m_xIndizes[n] ];
             }
+        case ito::tComplex64:
+            {
+                ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                ito::complex64 i = line[ m_xIndizes[n] ];
+
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
+                {
+                    return line[ m_xIndizes[n] ].real();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Imag)
+                {
+                    return line[ m_xIndizes[n] ].imag();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Phase)
+                {
+                    return std::arg( line[ m_xIndizes[n] ] );
+                }
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                {
+                    return std::abs( line[ m_xIndizes[n] ] );
+                }
+            }
+        case ito::tComplex128:
+            {
+                ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                ito::complex128 i = line[ m_xIndizes[n] ];
+                
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
+                {
+                    return line[ m_xIndizes[n] ].real();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Imag)
+                {
+                    return line[ m_xIndizes[n] ].imag();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Phase)
+                {
+                    return std::arg( line[ m_xIndizes[n] ] );
+                }
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                {
+                    return std::abs( line[ m_xIndizes[n] ] );
+                }
+            }
+        default:
+            return std::numeric_limits<double>::signaling_NaN();
+        }
+    }
+    else
+    {
+        return std::numeric_limits<double>::signaling_NaN();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+double DataObjRasterData::value2_yinv(int m, int n) const
+{
+    if(m_validData)
+    {
+        m = m_rasteredLines - m - 1; //invert y-coordinate
+
+        switch(m_dataObj.getType())
+        {
+        case ito::tInt8:
+            {
+                ito::int8 *line = (ito::int8*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tUInt8:
+            {
+                ito::uint8 *line = (ito::uint8*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tInt16:
+            {
+                ito::int16 *line = (ito::int16*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tUInt16:
+            {
+                ito::uint16 *line = (ito::uint16*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tInt32:
+            {
+                ito::int32 *line = (ito::int32*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tUInt32:
+            {
+                ito::uint32 *line = (ito::uint32*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tFloat32:
+            {
+                ito::float32 *line = (ito::float32*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tFloat64:
+            {
+                ito::float64 *line = (ito::float64*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                return line[ m_xIndizes[n] ];
+            }
+        case ito::tComplex64:
+            {
+                ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                ito::complex64 i = line[ m_xIndizes[n] ];
+
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
+                {
+                    return line[ m_xIndizes[n] ].real();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Imag)
+                {
+                    return line[ m_xIndizes[n] ].imag();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Phase)
+                {
+                    return std::arg( line[ m_xIndizes[n] ] );
+                }
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                {
+                    return std::abs( line[ m_xIndizes[n] ] );
+                }
+            }
+        case ito::tComplex128:
+            {
+                ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
+                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                ito::complex128 i = line[ m_xIndizes[n] ];
+                
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
+                {
+                    return line[ m_xIndizes[n] ].real();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Imag)
+                {
+                    return line[ m_xIndizes[n] ].imag();
+                }
+                if (m_pInternalData->m_cmplxType == PlotCanvas::Phase)
+                {
+                    return std::arg( line[ m_xIndizes[n] ] );
+                }
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                {
+                    return std::abs( line[ m_xIndizes[n] ] );
+                }
+            }
         default:
             return std::numeric_limits<double>::signaling_NaN();
         }
@@ -230,16 +583,22 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
         qreal ySteps = raster.height() > 0 ? (bottom-top) / raster.height() : 0.0;
         qreal xSteps = raster.width() > 0 ? (right-left) / raster.width() : 0.0;
 
+        /*if (m_pInternalData->m_yaxisFlipped)
+        {
+            std::swap(top,bottom);
+            ySteps *= -1;
+        }*/
+
         int j;
 
-        if(m_dataObj)
+        if(m_dataObj.getDims() > 1)
         {
-            m_plane = (cv::Mat*)m_dataObj->get_mdata()[ m_dataObj->seekMat( m_D.m_planeIdx ) ];
-            int nrOfLines = raster.height();
+            //m_plane = (cv::Mat*)m_dataObj->get_mdata()[ m_dataObj->seekMat( m_D.m_planeIdx ) ];
+            m_rasteredLines = raster.height();
             int nrOfCols = raster.width();
         
-            m_rasteredLinePtr = new uchar*[nrOfLines];
-            for(int i = 0 ; i < nrOfLines ; i++)
+            m_rasteredLinePtr = new uchar*[m_rasteredLines];
+            for(int i = 0 ; i < m_rasteredLines ; i++)
             {
                 j = qRound( top + ySteps * i );
 
@@ -269,6 +628,8 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
             }
 
         }
+
+        m_validData = true;
     }
 }
 
@@ -277,201 +638,3 @@ void DataObjRasterData::discardRaster()
 {
     
 }
-
-////----------------------------------------------------------------------------------------------------------------------------------
-//DataObjectRasterData::DataObjectRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending) :
-//m_wDimIndex(0), m_hDimIndex(0), m_width(0), m_height(0), m_DataObjectWidth(0), m_DataObjectHeight(0), m_xScalingFactor(1), m_yScalingFactor(1),
-//		m_xOffset(0), m_yOffset(0), m_cmplxState(0), m_replotPending(replotPending)
-//{
-//    updateDataObject(dataObj, startPoint, wDimIndex, width, hDimIndex, height);
-//
-//    if(dataObj.data() != NULL)
-//    {
-//        setIntervalRange(Qt::ZAxis, true, 0,0);
-//    }
-//    else
-//    {
-//        setIntervalRange(Qt::ZAxis, false, 0,255);
-//    }
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//DataObjectRasterData::~DataObjectRasterData()
-//{
-//    m_dataObjWhileRastering.clear();
-//    m_dataObj.clear();
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//double DataObjectRasterData::value(double x, double y) const
-//{
-//    if(m_dataObj)
-//    {
-//        cv::Mat* curPlane = (cv::Mat*)m_dataObj->get_mdata()[m_dataObj->seekMat(0)];
-//        switch(m_dataObj->getType())
-//        {
-//            case ito::tInt8:
-//                //return bilinearInterpolation<int8>(m_dataObj.data(), x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                return bilinearInterpolation<int8>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                break;
-//            case ito::tUInt8:
-//                return bilinearInterpolation<uint8>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                break;
-//            case ito::tInt16:
-//                return bilinearInterpolation<int16>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                break;
-//            case ito::tUInt16:
-//                return bilinearInterpolation<uint16>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                break;
-//            case ito::tInt32:
-//                return bilinearInterpolation<int32>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                break;
-//            case ito::tUInt32:
-//                return bilinearInterpolation<uint32>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                break;
-//            case ito::tFloat32:
-//				return bilinearInterpolation<float>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//            break;
-//            case ito::tFloat64:
-//                return bilinearInterpolation<double>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset);
-//                break;
-//			case ito::tComplex64:
-//				return bilinearInterpolation<ito::complex64>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset, m_cmplxState);
-//                break;
-//            case ito::tComplex128:
-//				return bilinearInterpolation<ito::complex128>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset, m_cmplxState);
-//                break;
-//            default:
-//                return 0;
-//        }
-//    }
-//
-//    return 0;
-//    //if(m_dataObj)
-//    //{
-//    //	//double test = m_dataObj->at<uint8>(0,0);
-//    //	return m_dataObj->at<uint8>(0,0);
-//    //}
-//
-//        //return x*y;
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//void DataObjectRasterData::initRaster( const QRectF &, const QSize& /*raster*/ )
-//{
-//    if(m_dataObj)
-//    {
-//        //qDebug("raster data: init");
-//        m_dataObjWhileRastering = m_dataObj;
-//        m_dataObjWhileRastering->lockRead();
-//    }
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//void DataObjectRasterData::discardRaster()
-//{
-//    if(m_dataObjWhileRastering)
-//    {
-//        m_dataObjWhileRastering->unlock();
-//        m_dataObjWhileRastering.clear();
-//        //qDebug("raster data: end");
-//        //if(m_pReplotPending) *m_pReplotPending = false;
-//    }
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//void DataObjectRasterData::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue)
-//{
-//    QwtInterval tempInterval;
-//    if(axis == Qt::ZAxis)
-//    {
-//        if(autoCalcLimits)
-//        {
-//            if(m_dataObj)
-//            {
-//                m_dataObj->lockRead();
-//                uint32 minPos[3] = {0, 0, 0};
-//                uint32 maxPos[3] = {0, 0, 0};
-//                ito::dObjHelper::minMaxValue(m_dataObj.data(), minValue, minPos, maxValue, maxPos, true, m_cmplxState);
-//				//m_dataObj->getMinMaxValue(minValue, maxValue, true, m_cmplxState);
-//                m_dataObj->unlock();
-//            }
-//        }
-//        setInterval(Qt::ZAxis, QwtInterval(minValue, maxValue));
-//    }
-//    else if(axis == Qt::XAxis)
-//    {
-//        if(autoCalcLimits)
-//        {
-//            if(m_dataObj)
-//            {
-//                bool test = false;
-//                m_dataObj->lockRead();
-//                minValue = m_dataObj->getPixToPhys(m_hDimIndex, 0.0, test);
-//                maxValue = m_dataObj->getPixToPhys(m_hDimIndex, m_dataObj->getSize(m_hDimIndex, true), test);
-//                m_dataObj->unlock();
-//            }
-//        }
-//        setInterval(Qt::XAxis, QwtInterval(minValue, maxValue, QwtInterval::IncludeBorders));
-//    }
-//    else if(axis == Qt::YAxis)
-//    {
-//        if(autoCalcLimits)
-//        {
-//            if(m_dataObj)
-//            {
-//                bool test = false;
-//                m_dataObj->lockRead();
-//                minValue = m_dataObj->getPixToPhys(m_wDimIndex, 0.0, test);
-//                maxValue = m_dataObj->getPixToPhys(m_wDimIndex, m_dataObj->getSize(m_hDimIndex, true), test);
-//                m_dataObj->unlock();
-//            }
-//        }
-//        setInterval(Qt::YAxis, QwtInterval(minValue, maxValue, QwtInterval::IncludeBorders));
-//    }
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//void DataObjectRasterData::updateDataObject(QSharedPointer<ito::DataObject> dataObj)
-//{
-//    m_dataObj = dataObj;
-//
-//    if(m_dataObj)
-//    {
-//        m_dataObj->lockRead();
-//
-//        bool test = true;
-//
-//        int dimX = dataObj->getDims() - 1;
-//        int dimY = dataObj->getDims() - 2;
-//
-//        double xscale = dataObj->getAxisScale(dimX, test);
-//        double yscale = dataObj->getAxisScale(dimY, test);
-//
-//        setInterval( Qt::XAxis, QwtInterval( dataObj->getPixToPhys(dimX, 0, test), dataObj->getPixToPhys(dimX, m_width, test),  QwtInterval::ExcludeMaximum ) );
-//        setInterval( Qt::YAxis, QwtInterval( dataObj->getPixToPhys(dimY, 0, test), dataObj->getPixToPhys(dimY, m_height, test), QwtInterval::ExcludeMaximum ) );
-//
-//        m_DataObjectWidth = dataObj->getSize(dimX,true); //ly hier bugged was
-//        m_DataObjectHeight = dataObj->getSize(dimY,true);//ly hier bugged was
-//
-//        m_xScalingFactor = ((double) m_DataObjectWidth)/(m_width * xscale);
-//        m_yScalingFactor = ((double) m_DataObjectHeight)/(m_height * yscale);
-//
-//        m_xOffset = dataObj->getAxisOffset(dimX, test);
-//        m_yOffset = dataObj->getAxisOffset(dimY, test);
-//
-//        m_dataObj->unlock();
-//    }
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//void DataObjectRasterData::updateDataObject(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height)
-//{
-//    m_startPoint = startPoint;
-//    m_wDimIndex = wDimIndex;
-//    m_width = width;
-//    m_hDimIndex = hDimIndex;
-//    m_height = height;
-//
-//    updateDataObject(dataObj);
-//}

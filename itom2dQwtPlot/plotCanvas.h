@@ -23,10 +23,11 @@
 #ifndef PLOTCANVAS_H
 #define PLOTCANVAS_H
 
-#include "../../common/sharedStructures.h"
+#include "common/sharedStructures.h"
+#include "DataObject/dataobj.h"
 
 #include "dataObjItem.h"
-#include "dataObjRasterData.h"
+
 
 #include <qwidget.h>
 #include <qstring.h>
@@ -45,67 +46,134 @@
 #include <qwt_plot_marker.h>
 
 class Itom2dQwtPlot; //forward declaration
+class ValuePicker2D;
+struct InternalData;
+class DataObjRasterData;
 
-struct Itom2dQwtPlotActions
-{
-public:
-	QAction *m_actSave;
-	QAction *m_actHome;
-	QAction *m_actPan;
-	QAction *m_actZoom;
-	QAction *m_actTracker;
-	QAction *m_actScaleSettings;
-	QAction *m_actColorPalette;
-	QAction *m_actToggleColorBar;
-	QAction *m_actLineCut;
-	QAction *m_actStackCut;
-	QAction *m_actPlaneSelector;
-	QSpinBox *m_planeSelector;
-};
 
 class PlotCanvas : public QwtPlot
 {
     Q_OBJECT
     public:
-        PlotCanvas(Itom2dQwtPlotActions *actions, QWidget * parent = NULL);
+        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut, tMultiPointPick };
+        enum ComplexType { Real = 2, Imag = 1, Abs = 0, Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
+
+        PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
 
-        void refreshPlot(ito::ParamBase *dataObj);
+        ito::RetVal init();
+        void refreshPlot(const ito::DataObject *dObj, int plane = -1);
+
+        void changePlane(int plane);
+        void internalDataUpdated();
+
+        void setState( tState state);
+        void childFigureDestroyed(QObject* obj, ito::uint32 UID);
+
+        QPointF getInterval(Qt::Axis axis) const;
+        void setInterval(Qt::Axis axis, const QPointF &interval);
+
+        ito::RetVal pickPoints(ito::DataObject *coordsOut, int maxNrOfPoints);
+
+        friend class Itom2dQwtPlot;
 
     protected:
         void contextMenuEvent(QContextMenuEvent * event);
         void keyPressEvent ( QKeyEvent * event );
         void keyReleaseEvent ( QKeyEvent * event );
+
+        void setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel);
+        void updateLabels();
+        void updateScaleValues();
+        void setColorBarVisible(bool visible);
+        void setColorMap(QString colormap = "__next__");
     
 	private:
         QwtPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
-        QwtPicker *m_pLinePicker;
-        QwtPicker *m_pAScanPicker;
-        QwtPlotMarker *m_pAScanMarker;
+        
+        QwtPlotPicker *m_pLineCutPicker;
+        QwtPlotCurve *m_pLineCutLine;
+        
+        ValuePicker2D *m_pValuePicker;
 
-		QSpinBox *m_planeSelector; //borrowed reference, taken by corresponding action in m_actions
-		int m_curColorPaletteIndex;
-		QRectF m_orgImageSize;
+		QwtPlotPicker *m_pStackPicker;
+        QwtPlotMarker *m_pStackCutMarker;
+
+        QwtPlotPicker *m_pMultiPointPicker;
+
+		int m_curColorMapIndex;
 		DataObjItem *m_dObjItem;
-        DataObjRasterData *m_data;
+        DataObjRasterData *m_rasterData;
 
-		Itom2dQwtPlotActions *m_pActions;
+        ito::uint32 m_zstackCutUID;
+        ito::uint32 m_lineCutUID;
+
+        tState m_state;
+
+		InternalData *m_pData;
+        const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
+
+        Qt::KeyboardModifiers m_activeModifiers;
 
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
-    public slots:
-        void trackerAScanMoved(const QPoint &pt);
-        void trackerAScanAppended(const QPoint &pt);
-        void trackerMoved(const QPoint &pt);
-        void trackerAppended(const QPoint &pt);
+	private slots:
+        void zStackCutTrackerMoved(const QPoint &pt);
+		void zStackCutTrackerAppended(const QPoint &pt);
+        void lineCutMoved(const QPoint &pt);
+        void lineCutAppended(const QPoint &pt);
 
-        void refreshColorMap(QString colormap = QString());
+        void multiPointActivated (bool on) { qDebug() << "pointActivated:" << on; };
+        void multiPointSelected (const QPolygon &polygon) { qDebug() << "pointSelected:" << polygon; };
+        void multiPointAppended (const QPoint &pos) { qDebug() << "pointAppended:" << pos; };
+        void multiPointMoved (const QPoint &pos) { qDebug() << "pointMoved:" << pos; };
+        void multiPointRemoved (const QPoint &pos) { qDebug() << "pointRemoved:" << pos; };
+        void multiPointChanged (const QPolygon &selection) { qDebug() << "pointChanged:" << selection; };
+        
+};
 
-		void mnuSwitchColorPalette();
-		void mnuToggleColorBar(bool checked);
+struct InternalData
+{
+    ito::tDataType m_dataType;
+
+    QString m_title;
+    QString m_yaxisLabel;
+    QString m_xaxisLabel;
+    QString m_valueLabel;
+
+    QString m_titleDObj;
+    QString m_xaxisLabelDObj;
+    QString m_yaxisLabelDObj;
+    QString m_valueLabelDObj;
+
+    bool m_autoTitle;
+    bool m_autoxAxisLabel;
+    bool m_autoyAxisLabel;
+    bool m_autoValueLabel;
+
+    bool m_valueScaleAuto;
+    double m_valueMin;
+    double m_valueMax;
+
+    bool m_xaxisScaleAuto;
+    double m_xaxisMin;
+    double m_xaxisMax;
+    bool m_xaxisVisible;
+
+    bool m_yaxisScaleAuto;
+    double m_yaxisMin;
+    double m_yaxisMax;
+    bool m_yaxisFlipped;
+    bool m_yaxisVisible;
+
+    bool m_colorBarVisible;
+
+    PlotCanvas::ComplexType m_cmplxType;
+
+    const QHash<QString, ito::Param*> *m_pConstOutput;
 };
 
 
