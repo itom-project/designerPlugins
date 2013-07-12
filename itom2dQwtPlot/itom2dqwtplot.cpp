@@ -73,7 +73,12 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 
 	//initialize canvas
 	m_pContent = new PlotCanvas(&m_data, this);
-	setCentralWidget(m_pContent);
+    connect(m_pContent, SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString)), statusBar(), SLOT(showMessage(QString)));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+    setCentralWidget(m_pContent);
+
+
 
 	//initialize actions
 	QToolBar *mainTb = new QToolBar("plotting tools",this);

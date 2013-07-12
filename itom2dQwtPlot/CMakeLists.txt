@@ -104,6 +104,7 @@ set(designer_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.h
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
@@ -132,6 +133,7 @@ set(designer_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.

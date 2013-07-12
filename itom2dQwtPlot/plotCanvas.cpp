@@ -28,6 +28,7 @@
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
 #include "valuePicker2d.h"
+#include "multiPointPickerMachine.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -147,7 +148,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pMultiPointPicker = new QwtPlotPicker(QwtPicker::CrossRubberBand, QwtPicker::ActiveOnly, canvas());
     m_pMultiPointPicker->setEnabled(true);
     //m_pMultiPointPicker->setStateMachine(new QwtPickerClickPointMachine); 
-    m_pMultiPointPicker->setStateMachine(new QwtPickerPolygonMachine);
+    m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine);
     m_pMultiPointPicker->setTrackerPen( QPen(Qt::blue) );
 
 	//prepare color bar
@@ -175,7 +176,9 @@ PlotCanvas::~PlotCanvas()
 
     m_pStackCutMarker->detach();
     delete m_pStackCutMarker;
-	m_pStackCutMarker = NULL;
+    m_pStackCutMarker = NULL;
+
+    m_pMultiPointPicker = NULL;
 	
 }
 
@@ -856,17 +859,70 @@ void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotCanvas::pickPoints(ito::DataObject *coordsOut, int maxNrOfPoints)
 {
+    ito::RetVal retval;
+
     setState(tMultiPointPick);
 
     connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
     connect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon) ));
     connect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint) ));
-    connect(m_pMultiPointPicker, SIGNAL(moved(QPoint)), this, SLOT(multiPointMoved (QPoint) ));
-    connect(m_pMultiPointPicker, SIGNAL(removed(QPoint)), this, SLOT(multiPointRemoved (QPoint)) );
-    connect(m_pMultiPointPicker, SIGNAL(changed(QPolygon)), this, SLOT(multiPointChanged (QPolygon)) );
 
-    m_pMultiPointPicker->setEnabled(true);
-    m_pMultiPointPicker->stateMachine()->setState( QwtPickerMachine::Begin );
+    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 
-    return ito::retOk;
+    if (m)
+    {
+        m->setMaxNrItems( maxNrOfPoints );
+        m_pMultiPointPicker->setEnabled(true);
+
+        if (maxNrOfPoints > 0)
+        {
+            emit statusBarMessage( tr("Please select %1 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+        }
+        else
+        {
+            emit statusBarMessage( tr("Please select points and press Space to end the selection. Esc aborts the selection.") );
+        }
+
+        QKeyEvent evt(QEvent::KeyPress, Qt::Key_M, Qt::NoModifier);
+        
+        m_pMultiPointPicker->eventFilter( m_pMultiPointPicker->parent(), &evt); //starts the process
+
+        while (m_pMultiPointPicker && m_pMultiPointPicker->isActive())
+        {
+            QCoreApplication::processEvents();
+        }
+
+        QPolygon polygon = m_pMultiPointPicker->selection();
+        int dims = 2; //m_dObjPtr ? m_dObjPtr->getDims() : 2;
+        ito::DataObject output(dims, polygon.size(), ito::tFloat64);
+
+        if (polygon.size() == 0)
+        {
+            emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+            retval += ito::RetVal(ito::retError,0,"selection aborted");
+        }
+        else
+        {
+            ito::float64 *ptr = (ito::float64*)output.rowPtr(0,0);
+            int stride = polygon.size();
+
+            for (int i = 0; i < polygon.size(); ++i)
+            {
+                ptr[i] = invTransform(QwtPlot::xBottom, polygon[i].rx());
+                ptr[i + stride] = invTransform(QwtPlot::yLeft, polygon[i].ry());
+            }
+
+            emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()), 2000 );
+        }
+
+        *coordsOut = output;
+    }
+
+    disconnect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
+    disconnect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon) ));
+    disconnect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint) ));
+
+    setState(tIdle);
+
+    return retval;
 }

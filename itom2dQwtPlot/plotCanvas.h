@@ -118,6 +118,9 @@ class PlotCanvas : public QwtPlot
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
+        void statusBarClear();
+        void statusBarMessage(const QString &message, int timeout = 0);
+
 	private slots:
         void zStackCutTrackerMoved(const QPoint &pt);
 		void zStackCutTrackerAppended(const QPoint &pt);
@@ -127,9 +130,6 @@ class PlotCanvas : public QwtPlot
         void multiPointActivated (bool on) { qDebug() << "pointActivated:" << on; };
         void multiPointSelected (const QPolygon &polygon) { qDebug() << "pointSelected:" << polygon; };
         void multiPointAppended (const QPoint &pos) { qDebug() << "pointAppended:" << pos; };
-        void multiPointMoved (const QPoint &pos) { qDebug() << "pointMoved:" << pos; };
-        void multiPointRemoved (const QPoint &pos) { qDebug() << "pointRemoved:" << pos; };
-        void multiPointChanged (const QPolygon &selection) { qDebug() << "pointChanged:" << selection; };
         
 };
 
