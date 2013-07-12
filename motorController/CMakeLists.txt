@@ -58,6 +58,7 @@ LINK_DIRECTORIES(
 INCLUDE(${QT_USE_FILE})
 
 set(designer_HEADERS
+    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
     ${CMAKE_CURRENT_SOURCE_DIR}/motorController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/motorControllerfactory.h
 )
@@ -75,6 +76,7 @@ set(designer_rcc
 )
 
 set(designer_SOURCES 
+    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/motorController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/motorControllerfactory.cpp
 )

@@ -29,6 +29,8 @@
 #include <QGroupBox>
 #include <QPointer>
 #include <QDoubleSpinBox>
+#include <QAction>
+#include <QMenu>
 
 class MotorController : public QGroupBox
 {
@@ -36,21 +38,26 @@ class MotorController : public QGroupBox
 
     Q_PROPERTY(QPointer<ito::AddInActuator> actuator READ getActuator WRITE setActuator DESIGNABLE false);
     Q_PROPERTY(int numberOfAxis READ getNumAxis WRITE setNumAxis DESIGNABLE true);
-    //Q_PROPERTY(bool readOnly READ getReadOnly WRITE setReadOnly DESIGNABLE true);
+    Q_PROPERTY(QString unit READ getUnit WRITE setUnit DESIGNABLE true);
+    Q_PROPERTY(bool readOnly READ getReadOnly WRITE setReadOnly DESIGNABLE true);
     //Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
 
 
 public:
     MotorController(QWidget *parent = 0);
     ~MotorController();
-
+    
     void setActuator(QPointer<ito::AddInActuator> actuator);
     QPointer<ito::AddInActuator> getActuator() const;
 
+    void setUnit(const QString unit);
+    QString getUnit();
+
     void setNumAxis(const int numAxis);
     int getNumAxis() const {return m_numVisAxis;};
-    //bool getReadOnly() const;
-    //void setReadOnly(bool value);
+
+    bool getReadOnly() const;
+    void setReadOnly(bool value);
 
     //double getMin() const;
     //void setMin(double value);
@@ -69,9 +76,24 @@ private:
     QList<QString> m_axisName;
     int m_numAxis;
     int m_numVisAxis;
-public slots:
-    void actuatorStatusChanged(QVector<int> status, QVector<double> actPosition);
+    double m_baseScale;
+    bool m_updateBySignal;
+    bool m_readOnly;
 
+    QString m_unit;
+
+    QAction  *m_actSetUnit;
+    QAction  *m_actUpdatePos;
+    QMenu    *m_mnuSetUnit;
+
+public slots:
+
+    void actuatorStatusChanged(QVector<int> status, QVector<double> actPosition);
+    void triggerUpdatePosition(void);
+    void mnuSetUnit(QAction* inputAction);
+
+signals:
+    void RequestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
 };
 
 #endif //MC_H

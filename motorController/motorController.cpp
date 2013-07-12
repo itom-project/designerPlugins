@@ -27,7 +27,14 @@
 //-----------------------------------------------------------------------------------------------
 MotorController::MotorController(QWidget *parent /*= 0*/)
     : QGroupBox(parent),
-    m_pActuator(NULL)
+    m_pActuator(NULL),
+    m_updateBySignal(false),
+    m_baseScale(1.0),
+    m_readOnly(false),
+    m_actSetUnit(NULL),
+    m_actUpdatePos(NULL),
+    m_mnuSetUnit(NULL),
+    m_unit("mm")
 {
     setTitle("MotorMonitor");
     m_axisName.clear();
@@ -48,6 +55,29 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_posWidgets.append(new QDoubleSpinBox(this));
     m_posWidgets.append(new QDoubleSpinBox(this));
     
+    QString micron(2, 181);
+    micron[1] = 'm';
+
+    //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
+    m_actSetUnit = new QAction(tr("Set Unit"), this);
+    m_mnuSetUnit = new QMenu("Unit Switch");
+	m_mnuSetUnit->addAction("nm");
+	m_mnuSetUnit->addAction(micron);
+	m_mnuSetUnit->addAction("mm");
+	m_mnuSetUnit->addAction("m");
+    m_actSetUnit->setMenu(m_mnuSetUnit);
+    
+    m_actUpdatePos = new QAction(tr("Update"), this);
+
+    connect(m_mnuSetUnit, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetUnit(QAction*)));
+    connect(m_actUpdatePos, SIGNAL(triggered()), this, SLOT(triggerUpdatePosition()));
+    
+    //contextMenu->addAction(m_actSetUnit);
+
+    setContextMenuPolicy( Qt::ActionsContextMenu );
+    addAction( m_actSetUnit );
+    addAction( m_actUpdatePos );
+
     m_numAxis = m_posWidgets.length();
     m_numVisAxis = m_posWidgets.length();
 
@@ -55,10 +85,10 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     {
         m_posWidgets[i]->setReadOnly(true);
         m_posWidgets[i]->setPrefix(m_axisName[i]);
-        m_posWidgets[i]->setSuffix("mm");
+        m_posWidgets[i]->setSuffix(m_unit);
         m_posWidgets[i]->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        m_posWidgets[i]->setMinimum(-20.0);
-        m_posWidgets[i]->setMaximum(20.0);
+        m_posWidgets[i]->setMinimum(-99.999);
+        m_posWidgets[i]->setMaximum(99.999);
         m_posWidgets[i]->setDecimals(3);
         
     }
@@ -85,6 +115,19 @@ void MotorController::resizeEvent(QResizeEvent * event )
 
 MotorController::~MotorController()
 {
+    if(m_actSetUnit)
+    {
+        delete m_actSetUnit;
+    }
+    if(m_actUpdatePos)
+    {
+        delete m_actUpdatePos;
+    }
+    if(m_mnuSetUnit)
+    {
+        delete m_mnuSetUnit;
+    }
+
     m_pActuator = NULL;
 }
 
@@ -98,32 +141,92 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
     else
     {
         m_pActuator = actuator;
-        /*
-        ItomSharedSemaphore* mySemaphoreLocker = new ItomSharedSemaphore();
 
-        QSharedPointer<ito::Param> qsParam(new ito::Param("numaxis", ito::ParamBase::Int));
-        QMetaObject::invokeMethod(m_pActuator, "getParam", Q_ARG(QSharedPointer<ito::Param>, qsParam), Q_ARG(ItomSharedSemaphore *, pMySemaphoreLocker.getSemaphore()));
+        connect( m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>) ), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>) ) );
 
-        while (!pMySemaphoreLocker.getSemaphore()->wait(PLUGINWAIT))
+        m_updateBySignal = connect( this, SIGNAL(RequestStatusAndPosition( bool, bool) ), m_pActuator, SLOT(RequestStatusAndPosition( bool, bool) ) );
+
+        triggerUpdatePosition();
+    }
+
+    return;  
+}
+
+void MotorController::triggerUpdatePosition(void)
+{
+    if(m_pActuator.isNull())
+    {
+        return;
+    }
+
+    if(m_updateBySignal)
+    {
+        emit RequestStatusAndPosition(true, false);
+    }
+    else
+    {
+        ito::RetVal retval;
+        int axisNumbers = 0;
+        ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
+
+        QSharedPointer<ito::Param> qsParam(new ito::Param("numaxis"));
+        QMetaObject::invokeMethod(m_pActuator, "getParam", Q_ARG(QSharedPointer<ito::Param>, qsParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore()));
+
+        while (!locker.getSemaphore()->wait(500))
         {
             retval += ito::RetVal(ito::retError, 0, "timeout while getting numaxis parameter");
             break;
         }
 
-        retval += pMySemaphoreLocker.getSemaphore()->returnValue;
-
-        if(retval.containsWarningOrError())
+        if(!retval.containsError())
         {
-            pMyMotor = NULL;
-            return;
+            retval += locker.getSemaphore()->returnValue;
         }
 
-        axisNumbers = (*qsParam).getVal<int>();
-        */
-        connect( m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>) ), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>) ) );
+        if(!retval.containsError())
+        {
+            axisNumbers = (*qsParam).getVal<int>();
+        }
+
+        if(axisNumbers != 0)
+        {
+            if(m_numVisAxis == 0)
+            {
+                setNumAxis(axisNumbers);
+            }
+            axisNumbers = axisNumbers > 6 ? 6 : axisNumbers;
+
+            QVector<int> status(axisNumbers);
+            status.fill(0);
+
+            QVector<int> axisNo(axisNumbers);
+            for(int i = 0; i < axisNumbers; i++)
+            {
+                axisNo[i] = i;
+            }
+
+            ItomSharedSemaphoreLocker posLocker(new ItomSharedSemaphore());
+            QSharedPointer<QVector<double>> qsVector(new QVector<double>(axisNumbers, 0.0));
+            QMetaObject::invokeMethod(m_pActuator, "getPos", Q_ARG(const QVector<int>, axisNo), Q_ARG(QSharedPointer<QVector<double>>, qsVector), Q_ARG(ItomSharedSemaphore*, posLocker.getSemaphore()));
+
+            while (!posLocker.getSemaphore()->wait(5000))
+            {
+                retval += ito::RetVal(ito::retError, 0, "timeout while getting numaxis parameter");
+                break;
+            }
+
+            if(!retval.containsError())
+            {
+                retval += posLocker.getSemaphore()->returnValue;
+            }
+
+            if(!retval.containsError())
+            {
+                actuatorStatusChanged(status, *qsVector);
+            }
+        }
     }
     return;
-   
 }
 
 void MotorController::setNumAxis(const int numAxis)
@@ -192,8 +295,70 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
         }
 
         m_posWidgets[i]->setStyleSheet(style);
-        m_posWidgets[i]->setValue( positions[i] );
+        m_posWidgets[i]->setValue( positions[i] * m_baseScale );
     }
 
     return;
+}
+
+void MotorController::setUnit(const QString unit)
+{
+    double oldScale = m_baseScale;
+    QString micron(2, 181);
+    micron[1] = 'm';
+    if(unit == "mm")
+    {
+        m_baseScale = 1.0;
+    }
+    else if(unit == micron)
+    {
+        m_baseScale = 1000.0;
+    }
+    else if(unit == "m")
+    {
+        m_baseScale = 0.001;
+    }
+    else if(unit == "km")
+    {
+        m_baseScale = 0.000001;
+    }
+    else if(unit == "nm")
+    {
+        m_baseScale = 1000000.0;
+    }
+    else
+        return;
+
+    m_unit = unit;
+
+    for(int i = 0; i < m_numVisAxis; i++)
+    {
+        if(m_posWidgets[i]->suffix() != unit)
+        {
+            m_posWidgets[i]->setValue(m_posWidgets[i]->value() * m_baseScale / oldScale);
+            m_posWidgets[i]->setSuffix(unit);
+        }
+    }
+
+    return;
+}
+
+QString MotorController::getUnit()
+{
+    return m_unit;
+}
+
+bool MotorController::getReadOnly() const
+{
+    return m_readOnly;
+}
+void MotorController::setReadOnly(bool value)
+{
+    m_readOnly = value;
+    return;
+}
+
+void MotorController::mnuSetUnit(QAction* inputAction)
+{
+    setUnit(inputAction->text());
 }
