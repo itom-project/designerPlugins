@@ -29,6 +29,7 @@
 #include <QGroupBox>
 #include <QPointer>
 #include <QDoubleSpinBox>
+#include <QPushButton>
 #include <QAction>
 #include <QMenu>
 
@@ -40,6 +41,8 @@ class MotorController : public QGroupBox
     Q_PROPERTY(int numberOfAxis READ getNumAxis WRITE setNumAxis DESIGNABLE true);
     Q_PROPERTY(QString unit READ getUnit WRITE setUnit DESIGNABLE true);
     Q_PROPERTY(bool readOnly READ getReadOnly WRITE setReadOnly DESIGNABLE true);
+    Q_PROPERTY(bool smallStep READ getSmallStep WRITE setSmallStep DESIGNABLE true);
+    Q_PROPERTY(bool bigStep READ getBigStep WRITE setBigStep DESIGNABLE true);
     //Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
 
 
@@ -57,7 +60,13 @@ public:
     int getNumAxis() const {return m_numVisAxis;};
 
     bool getReadOnly() const;
-    void setReadOnly(bool value);
+    void setReadOnly(const bool value);
+
+    double getSmallStep() const;
+    void setSmallStep(const double value);
+
+    double getBigStep() const;
+    void setBigStep(const double value);
 
     //double getMin() const;
     //void setMin(double value);
@@ -72,13 +81,18 @@ protected:
     void resizeEvent(QResizeEvent * event );
     
 private:
-    QList<QDoubleSpinBox*> m_posWidgets;
-    QList<QString> m_axisName;
+    QList<QDoubleSpinBox* > m_posWidgets;
+    QList<QList<QPushButton *> > m_changePosButtons;
+    QList<QString > m_axisName;
     int m_numAxis;
     int m_numVisAxis;
     double m_baseScale;
     bool m_updateBySignal;
     bool m_readOnly;
+    bool m_needStepAdaption;
+
+    double m_smallStep;
+    double m_bigStep;
 
     QString m_unit;
 
@@ -88,10 +102,42 @@ private:
 
 public slots:
 
+    void triggerActuatorStep(const int axisNo, const bool smallBig, const bool forward);
     void actuatorStatusChanged(QVector<int> status, QVector<double> actPosition);
     void triggerUpdatePosition(void);
     void mnuSetUnit(QAction* inputAction);
 
+    void axis0BigStepMinus(void){triggerActuatorStep(0, true, false);};
+    void axis0BigStepPlus(void){triggerActuatorStep(0, true, true);};
+    void axis0SmallStepMinus(void){triggerActuatorStep(0, false, false);};
+    void axis0SmallStepPlus(void){triggerActuatorStep(0, false, true);};
+
+    void axis1BigStepMinus(void){triggerActuatorStep(1, true, false);};
+    void axis1BigStepPlus(void){triggerActuatorStep(1, true, true);};
+    void axis1SmallStepMinus(void){triggerActuatorStep(1, false, false);};
+    void axis1SmallStepPlus(void){triggerActuatorStep(1, false, true);};
+
+    void axis2BigStepMinus(void){triggerActuatorStep(2, true, false);};
+    void axis2BigStepPlus(void){triggerActuatorStep(2, true, true);};
+    void axis2SmallStepMinus(void){triggerActuatorStep(2, false, false);};
+    void axis2SmallStepPlus(void){triggerActuatorStep(2, false, true);};
+
+    void axis3BigStepMinus(void){triggerActuatorStep(3, true, false);};
+    void axis3BigStepPlus(void){triggerActuatorStep(3, true, true);};
+    void axis3SmallStepMinus(void){triggerActuatorStep(3, false, false);};
+    void axis3SmallStepPlus(void){triggerActuatorStep(3, false, true);};
+
+    void axis4BigStepMinus(void){triggerActuatorStep(4, true, false);};
+    void axis4BigStepPlus(void){triggerActuatorStep(4, true, true);};
+    void axis4SmallStepMinus(void){triggerActuatorStep(4, false, false);};
+    void axis4SmallStepPlus(void){triggerActuatorStep(4, false, true);};
+
+    void axis5BigStepMinus(void){triggerActuatorStep(5, true, false);};
+    void axis5BigStepPlus(void){triggerActuatorStep(5, true, true);};
+    void axis5SmallStepMinus(void){triggerActuatorStep(5, false, false);};
+    void axis5SmallStepPlus(void){triggerActuatorStep(5, false, true);};
+
+    
 signals:
     void RequestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
 };

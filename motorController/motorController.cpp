@@ -30,7 +30,10 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_pActuator(NULL),
     m_updateBySignal(false),
     m_baseScale(1.0),
-    m_readOnly(false),
+    m_readOnly(true),
+    m_needStepAdaption(false),
+    m_smallStep(0.001),
+    m_bigStep(0.010),
     m_actSetUnit(NULL),
     m_actUpdatePos(NULL),
     m_mnuSetUnit(NULL),
@@ -55,6 +58,64 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_posWidgets.append(new QDoubleSpinBox(this));
     m_posWidgets.append(new QDoubleSpinBox(this));
     
+    m_changePosButtons.clear();
+    m_changePosButtons.reserve(6);
+
+    for(int i = 0; i < 6; i++)
+    {
+        QList<QPushButton* > buttons;
+        buttons.reserve(4);
+        QString bname(10);
+        
+        buttons.append(new QPushButton("--", this));
+        bname.sprintf("%c--", m_axisName[i][0]);
+        buttons[0]->setToolTip(bname);
+        
+        buttons.append(new QPushButton("-", this));
+        bname.sprintf("%c-", m_axisName[i][0]);
+        buttons[1]->setToolTip(bname);
+
+        buttons.append(new QPushButton("+", this));
+        bname.sprintf("%c+", m_axisName[i][0]);
+        buttons[2]->setToolTip(bname);
+
+        buttons.append(new QPushButton("++", this));
+        bname.sprintf("%c++", m_axisName[i][0]);
+        buttons[3]->setToolTip(bname);
+
+        m_changePosButtons.append(buttons); 
+    }
+
+    connect(m_changePosButtons[0][0], SIGNAL(pressed()), this, SLOT(axis0BigStepMinus()));
+    connect(m_changePosButtons[0][1], SIGNAL(pressed()), this, SLOT(axis0SmallStepMinus()));
+    connect(m_changePosButtons[0][2], SIGNAL(pressed()), this, SLOT(axis0SmallStepPlus()));
+    connect(m_changePosButtons[0][3], SIGNAL(pressed()), this, SLOT(axis0BigStepPlus()));
+
+    connect(m_changePosButtons[1][0], SIGNAL(pressed()), this, SLOT(axis1BigStepMinus()));
+    connect(m_changePosButtons[1][1], SIGNAL(pressed()), this, SLOT(axis1SmallStepMinus()));
+    connect(m_changePosButtons[1][2], SIGNAL(pressed()), this, SLOT(axis1SmallStepPlus()));
+    connect(m_changePosButtons[1][3], SIGNAL(pressed()), this, SLOT(axis1BigStepPlus()));
+
+    connect(m_changePosButtons[2][0], SIGNAL(pressed()), this, SLOT(axis2BigStepMinus()));
+    connect(m_changePosButtons[2][1], SIGNAL(pressed()), this, SLOT(axis2SmallStepMinus()));
+    connect(m_changePosButtons[2][2], SIGNAL(pressed()), this, SLOT(axis2SmallStepPlus()));
+    connect(m_changePosButtons[2][3], SIGNAL(pressed()), this, SLOT(axis2BigStepPlus()));
+
+    connect(m_changePosButtons[3][0], SIGNAL(pressed()), this, SLOT(axis3BigStepMinus()));
+    connect(m_changePosButtons[3][1], SIGNAL(pressed()), this, SLOT(axis3SmallStepMinus()));
+    connect(m_changePosButtons[3][2], SIGNAL(pressed()), this, SLOT(axis3SmallStepPlus()));
+    connect(m_changePosButtons[3][3], SIGNAL(pressed()), this, SLOT(axis3BigStepPlus()));
+
+    connect(m_changePosButtons[4][0], SIGNAL(pressed()), this, SLOT(axis4BigStepMinus()));
+    connect(m_changePosButtons[4][1], SIGNAL(pressed()), this, SLOT(axis4SmallStepMinus()));
+    connect(m_changePosButtons[4][2], SIGNAL(pressed()), this, SLOT(axis4SmallStepPlus()));
+    connect(m_changePosButtons[4][3], SIGNAL(pressed()), this, SLOT(axis4BigStepPlus()));
+
+    connect(m_changePosButtons[5][0], SIGNAL(pressed()), this, SLOT(axis5BigStepMinus()));
+    connect(m_changePosButtons[5][1], SIGNAL(pressed()), this, SLOT(axis5SmallStepMinus()));
+    connect(m_changePosButtons[5][2], SIGNAL(pressed()), this, SLOT(axis5SmallStepPlus()));
+    connect(m_changePosButtons[5][3], SIGNAL(pressed()), this, SLOT(axis5BigStepPlus()));
+
     QString micron(2, 181);
     micron[1] = 'm';
 
@@ -92,6 +153,18 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_posWidgets[i]->setDecimals(3);
         
     }
+
+    if(m_readOnly)
+    {
+        for(int i = 0; i < m_numVisAxis; i++)
+        {
+            m_changePosButtons[i][0]->setVisible(false);
+            m_changePosButtons[i][1]->setVisible(false);
+            m_changePosButtons[i][2]->setVisible(false);
+            m_changePosButtons[i][3]->setVisible(false);
+        }   
+    }
+
     resizeEvent(NULL);
     return;
 }
@@ -101,15 +174,38 @@ void MotorController::resizeEvent(QResizeEvent * event )
     int y = 0;
     int border = isFlat() ? 1 : 5;
     int upper = title().length() > 0 ? 10:1;
-    for(int i = 0; i < m_numVisAxis; i++)
+    if(m_readOnly)
     {
-        m_posWidgets[i]->setGeometry(75 * x + border, 25 * y + border + upper, 70, 20);
-        x++;
-        if(x * 75 + 70 > size().width())
+        for(int i = 0; i < m_numVisAxis; i++)
         {
-            y++;
-            x = 0;
+            m_posWidgets[i]->setGeometry(75 * x + border, 25 * y + border + upper, 70, 20);
+            x++;
+            if(x * 75 + 70 > size().width())
+            {
+                y++;
+                x = 0;
+            }
         }
+    }
+    else
+    {
+        int curpX = 0, curpY = 0;
+        for(int i = 0; i < m_numVisAxis; i++)
+        {
+            curpX = 75 * x + border;
+            curpY = 45 * y + border + upper;
+            m_posWidgets[i]->setGeometry(curpX, curpY, 70, 20);
+            for(int n = 0; n < 4; n++)
+            {
+                m_changePosButtons[i][n]->setGeometry(curpX + n * 17, curpY + 21, 17, 15);
+            }
+            x++;
+            if(x * 75 + 70 > size().width())
+            {
+                y++;
+                x = 0;
+            }
+        }    
     }
 }
 
@@ -147,6 +243,9 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
         m_updateBySignal = connect( this, SIGNAL(RequestStatusAndPosition( bool, bool) ), m_pActuator, SLOT(RequestStatusAndPosition( bool, bool) ) );
 
         triggerUpdatePosition();
+
+
+
     }
 
     return;  
@@ -247,6 +346,28 @@ void MotorController::setNumAxis(const int numAxis)
         {
             m_posWidgets[i]->setVisible(false);
         }
+
+        i = 0;
+
+
+        if(!m_readOnly)
+        {
+            for(; i < m_numVisAxis; i++)
+            {
+                m_changePosButtons[i][0]->setVisible(true);
+                m_changePosButtons[i][1]->setVisible(true);
+                m_changePosButtons[i][2]->setVisible(true);
+                m_changePosButtons[i][3]->setVisible(true);
+            }
+            for(; i < m_posWidgets.length(); i++)
+            {
+                m_changePosButtons[i][0]->setVisible(false);
+                m_changePosButtons[i][1]->setVisible(false);
+                m_changePosButtons[i][2]->setVisible(false);
+                m_changePosButtons[i][3]->setVisible(false);
+            }
+        }
+
         resizeEvent(NULL);
     }
     return;
@@ -352,13 +473,73 @@ bool MotorController::getReadOnly() const
 {
     return m_readOnly;
 }
-void MotorController::setReadOnly(bool value)
+void MotorController::setReadOnly(const bool value)
 {
+    bool changed = m_readOnly != value;
     m_readOnly = value;
+
+    if(changed)
+    {
+        for(int i = 0; i < m_numVisAxis; i++)
+        {
+            m_changePosButtons[i][0]->setVisible(!m_readOnly);
+            m_changePosButtons[i][1]->setVisible(!m_readOnly);
+            m_changePosButtons[i][2]->setVisible(!m_readOnly);
+            m_changePosButtons[i][3]->setVisible(!m_readOnly);
+        }
+
+        resizeEvent(NULL);
+    }
     return;
 }
 
 void MotorController::mnuSetUnit(QAction* inputAction)
 {
     setUnit(inputAction->text());
+}
+
+double MotorController::getSmallStep() const
+{
+    return m_smallStep;
+}
+void MotorController::setSmallStep(const double value)
+{
+    if(value > 0.0 && value < 1.0)
+    {
+        m_smallStep = value;
+    }
+    return;
+}
+
+double MotorController::getBigStep() const
+{
+    return m_bigStep;
+}
+
+void MotorController::setBigStep(const double value)
+{
+    if(value > 0.0 && value < 1000.0)
+    {
+        m_bigStep = value;
+    }
+    return;
+}
+
+void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig, const bool forward)
+{
+    if(m_pActuator.isNull())
+        return;
+
+    double step = smallBig ? m_bigStep : m_smallStep;
+    step = forward ? step : -1 * step;
+
+    if(m_needStepAdaption)
+    {
+    
+    
+    }
+
+    QMetaObject::invokeMethod(m_pActuator, "setPosRel", Q_ARG(const int, axisNo), Q_ARG(const double, step), Q_ARG(ItomSharedSemaphore*, NULL));
+
+    return;
 }
