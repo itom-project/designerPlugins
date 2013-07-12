@@ -244,7 +244,11 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
 
         triggerUpdatePosition();
 
-
+        // Use invoke or do it directly?
+        // directly 
+        QMap<QString, ito::Param> *paramList = NULL;
+        m_pActuator->getParamList(&paramList);
+        m_needStepAdaption = paramList->contains("myFunnyParameter");
 
     }
 
@@ -533,13 +537,30 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
     double step = smallBig ? m_bigStep : m_smallStep;
     step = forward ? step : -1 * step;
 
+    bool ready = true;
+
     if(m_needStepAdaption)
     {
-    
-    
+        ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
+
+        QSharedPointer<ito::ParamBase> qsParam(new ito::ParamBase("myFunnyParamater", ito::ParamBase::Double, step));
+        QMetaObject::invokeMethod(m_pActuator, "setParam", Q_ARG(QSharedPointer<ito::ParamBase>, qsParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore()));
+
+        while (!locker.getSemaphore()->wait(500))
+        {
+            ready = false;
+            break;
+        }
+
+        if(locker.getSemaphore()->returnValue.containsError())
+        {
+            ready = false;
+        }   
     }
 
-    QMetaObject::invokeMethod(m_pActuator, "setPosRel", Q_ARG(const int, axisNo), Q_ARG(const double, step), Q_ARG(ItomSharedSemaphore*, NULL));
-
+    if(ready)
+    {
+        QMetaObject::invokeMethod(m_pActuator, "setPosRel", Q_ARG(const int, axisNo), Q_ARG(const double, step), Q_ARG(ItomSharedSemaphore*, NULL));
+    }
     return;
 }
