@@ -41,8 +41,8 @@ class MotorController : public QGroupBox
     Q_PROPERTY(int numberOfAxis READ getNumAxis WRITE setNumAxis DESIGNABLE true);
     Q_PROPERTY(QString unit READ getUnit WRITE setUnit DESIGNABLE true);
     Q_PROPERTY(bool readOnly READ getReadOnly WRITE setReadOnly DESIGNABLE true);
-    Q_PROPERTY(bool smallStep READ getSmallStep WRITE setSmallStep DESIGNABLE true);
-    Q_PROPERTY(bool bigStep READ getBigStep WRITE setBigStep DESIGNABLE true);
+    Q_PROPERTY(double smallStep READ getSmallStep WRITE setSmallStep DESIGNABLE true);
+    Q_PROPERTY(double bigStep READ getBigStep WRITE setBigStep DESIGNABLE true);
     //Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
 
 
