@@ -109,8 +109,6 @@ class PlotCanvas : public QwtPlot
         ito::uint32 m_zstackCutUID;
         ito::uint32 m_lineCutUID;
 
-        tState m_state;
-
 		InternalData *m_pData;
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
 
@@ -172,6 +170,8 @@ struct InternalData
     bool m_colorBarVisible;
 
     PlotCanvas::ComplexType m_cmplxType;
+
+	PlotCanvas::tState m_state;
 
     const QHash<QString, ito::Param*> *m_pConstOutput;
 };

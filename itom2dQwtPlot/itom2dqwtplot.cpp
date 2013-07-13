@@ -69,6 +69,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_cmplxType = PlotCanvas::Real;
     m_data.m_yaxisFlipped = false;
     m_data.m_pConstOutput = &m_pOutput;
+	m_data.m_state = PlotCanvas::tIdle;
 
 	//initialize canvas
 	m_pContent = new PlotCanvas(&m_data, this);
@@ -96,11 +97,21 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActCmplxSwitch);
 }
 
+//---------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::~Itom2dQwtPlot()
 {
-	delete m_pContent;
+	m_pContent->deleteLater();
 	m_pContent = NULL;
 }
+
+//---------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::closeEvent(QCloseEvent *event)
+ {
+	event->accept();
+    /* } else {
+         event->ignore();
+     }*/
+ }
 
 //---------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::createActions()

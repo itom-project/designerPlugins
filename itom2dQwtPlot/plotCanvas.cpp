@@ -60,7 +60,6 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 		m_dObjItem(NULL),
         m_rasterData(NULL),
 		m_pData(m_pData),
-        m_state(tIdle),
         m_curColorMapIndex(0),
         m_pValuePicker(NULL),
         m_dObjPtr(NULL),
@@ -172,9 +171,11 @@ PlotCanvas::~PlotCanvas()
 {
     m_pLineCutLine->detach();
     delete m_pLineCutLine;
+	m_pLineCutLine = NULL;
 
     m_pStackCutMarker->detach();
     delete m_pStackCutMarker;
+	m_pStackCutMarker = NULL;
 	
 }
 
@@ -387,7 +388,7 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
     incr.setX( transform(QwtPlot::xBottom, 1) - transform(QwtPlot::xBottom, 0) );
     incr.setY( transform(QwtPlot::yLeft, 1) - transform(QwtPlot::yLeft, 0) );
 
-    if (m_state == tStackCut)
+    if (m_pData->m_state == tStackCut)
     {
         QPointF markerPosScaleCoords = m_pStackCutMarker->value();
         
@@ -418,7 +419,7 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
             replot();
         }
     }
-    else if (m_state == tLineCut)
+    else if (m_pData->m_state == tLineCut)
     {
         QVector<QPointF> pts;
 
@@ -681,7 +682,7 @@ QPointF PlotCanvas::getInterval(Qt::Axis axis) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setState( tState state)
 {
-    if (m_state != state)
+    if (m_pData->m_state != state)
     {
         if (m_pZoomer) m_pZoomer->setEnabled( state == tZoom );
         if (m_pPanner) m_pPanner->setEnabled( state == tPan );
@@ -715,7 +716,7 @@ void PlotCanvas::setState( tState state)
             break;
         }
 
-        m_state = state;
+        m_pData->m_state = state;
     }
 }
 
@@ -724,7 +725,7 @@ void PlotCanvas::zStackCutTrackerAppended(const QPoint &pt)
 {
     QVector<QPointF> pts;
 
-    if (m_state == tStackCut)
+    if (m_pData->m_state == tStackCut)
     {
         QPointF ptScale;
         ptScale.setY(invTransform(QwtPlot::yLeft, pt.y()));
@@ -745,7 +746,7 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
 {
     QVector<QPointF> pts;
 
-    if (m_state == tStackCut)
+    if (m_pData->m_state == tStackCut)
     {
         QPointF ptScale;
         ptScale.setY(invTransform(QwtPlot::yLeft, pt.y()));
@@ -779,7 +780,7 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
     QVector<QPointF> pts;
     pts.resize(2);
 
-    if (m_state == tLineCut)
+    if (m_pData->m_state == tLineCut)
     {
         pts[0] = m_pLineCutLine->sample(0);
         pts[1].setY(invTransform(QwtPlot::yLeft, pt.y()));
@@ -811,7 +812,7 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
     QVector<QPointF> pts;
     pts.resize(2);
 
-    if (m_state == tLineCut)
+    if (m_pData->m_state == tLineCut)
     {
         pts[0].setY(invTransform(QwtPlot::yLeft, pt.y()));
         pts[0].setX(invTransform(QwtPlot::xBottom, pt.x()));
