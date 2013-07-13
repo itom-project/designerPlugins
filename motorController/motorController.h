@@ -43,6 +43,7 @@ class MotorController : public QGroupBox
     Q_PROPERTY(bool readOnly READ getReadOnly WRITE setReadOnly DESIGNABLE true);
     Q_PROPERTY(double smallStep READ getSmallStep WRITE setSmallStep DESIGNABLE true);
     Q_PROPERTY(double bigStep READ getBigStep WRITE setBigStep DESIGNABLE true);
+    Q_PROPERTY(bool absRel READ getAbsRel WRITE setAbsRel DESIGNABLE true);
     //Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
 
 
@@ -54,19 +55,22 @@ public:
     QPointer<ito::AddInActuator> getActuator() const;
 
     void setUnit(const QString unit);
-    QString getUnit();
+    QString getUnit() const {return m_unit;};
 
     void setNumAxis(const int numAxis);
     int getNumAxis() const {return m_numVisAxis;};
 
-    bool getReadOnly() const;
+    bool getReadOnly() const {return m_readOnly;};
     void setReadOnly(const bool value);
 
-    double getSmallStep() const;
+    double getSmallStep() const {return m_smallStep;};
     void setSmallStep(const double value);
 
-    double getBigStep() const;
+    double getBigStep() const {return m_bigStep;};
     void setBigStep(const double value);
+
+    bool getAbsRel() const {return m_numVisAxis;};;
+    void setAbsRel(const bool absRel);
 
     //double getMin() const;
     //void setMin(double value);
@@ -90,6 +94,10 @@ private:
     bool m_updateBySignal;
     bool m_readOnly;
     bool m_needStepAdaption;
+    bool m_absRelPosition;
+
+    QVector<double> m_relPosNull;
+    QVector<double> m_curAbsPos;
 
     double m_smallStep;
     double m_bigStep;
@@ -98,7 +106,11 @@ private:
 
     QAction  *m_actSetUnit;
     QAction  *m_actUpdatePos;
+    QAction  *m_actSetAbsRel;
+
     QMenu    *m_mnuSetUnit;
+    QMenu    *m_mnuSetAbsRel;
+    
 
 public slots:
 
@@ -106,6 +118,7 @@ public slots:
     void actuatorStatusChanged(QVector<int> status, QVector<double> actPosition);
     void triggerUpdatePosition(void);
     void mnuSetUnit(QAction* inputAction);
+    void mnuSetAbsRel(QAction* inputAction);
 
     void axis0BigStepMinus(void){triggerActuatorStep(0, true, false);};
     void axis0BigStepPlus(void){triggerActuatorStep(0, true, true);};

@@ -32,11 +32,14 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_baseScale(1.0),
     m_readOnly(true),
     m_needStepAdaption(false),
+    m_absRelPosition(false),
     m_smallStep(0.001),
     m_bigStep(0.010),
     m_actSetUnit(NULL),
     m_actUpdatePos(NULL),
     m_mnuSetUnit(NULL),
+    m_mnuSetAbsRel(NULL),
+    m_actSetAbsRel(NULL),
     m_unit("mm")
 {
     setTitle("MotorMonitor");
@@ -48,6 +51,13 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_axisName.append("a ");
     m_axisName.append("b ");
     m_axisName.append("c ");
+
+
+    m_relPosNull.resize(6);
+    m_relPosNull.fill(0.0, 6);
+
+    m_curAbsPos.resize(6);
+    m_curAbsPos.fill(0.0, 6);
 
     m_posWidgets.clear();
     m_posWidgets.reserve(6);
@@ -120,7 +130,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     micron[1] = 'm';
 
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
-    m_actSetUnit = new QAction(tr("Set Unit"), this);
+    m_actSetUnit = new QAction(tr("Toogle Unit"), this);
     m_mnuSetUnit = new QMenu("Unit Switch");
 	m_mnuSetUnit->addAction("nm");
 	m_mnuSetUnit->addAction(micron);
@@ -129,15 +139,25 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_actSetUnit->setMenu(m_mnuSetUnit);
     
     m_actUpdatePos = new QAction(tr("Update"), this);
+    
+    m_actSetAbsRel = new QAction(tr("Toogle Abs/Rel"), this);
+    m_mnuSetAbsRel = new QMenu("AbsRel-Switch");
+	m_mnuSetAbsRel->addAction("abs");
+	m_mnuSetAbsRel->addAction("rel");
+	m_mnuSetAbsRel->addSeparator();
+	m_mnuSetAbsRel->addAction("origin");
+    m_actSetAbsRel->setMenu(m_mnuSetAbsRel);
 
+    connect(m_mnuSetAbsRel, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAbsRel(QAction*)));
+    
     connect(m_mnuSetUnit, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetUnit(QAction*)));
     connect(m_actUpdatePos, SIGNAL(triggered()), this, SLOT(triggerUpdatePosition()));
     
-    //contextMenu->addAction(m_actSetUnit);
-
     setContextMenuPolicy( Qt::ActionsContextMenu );
-    addAction( m_actSetUnit );
     addAction( m_actUpdatePos );
+    m_mnuSetAbsRel->addSeparator();
+    addAction( m_actSetUnit );
+    addAction( m_actSetAbsRel );
 
     m_numAxis = m_posWidgets.length();
     m_numVisAxis = m_posWidgets.length();
@@ -214,14 +234,29 @@ MotorController::~MotorController()
     if(m_actSetUnit)
     {
         delete m_actSetUnit;
+        m_actSetUnit = NULL;
     }
     if(m_actUpdatePos)
     {
         delete m_actUpdatePos;
+        m_actUpdatePos = NULL;
     }
     if(m_mnuSetUnit)
     {
         delete m_mnuSetUnit;
+        m_mnuSetUnit = NULL;
+    }
+
+    if(m_actSetAbsRel)
+    {
+        delete m_actSetAbsRel;
+        m_actSetAbsRel = NULL;
+    }
+
+    if(m_mnuSetAbsRel)
+    {
+        delete m_mnuSetAbsRel;
+        m_mnuSetAbsRel = NULL;
     }
 
     m_pActuator = NULL;
@@ -420,7 +455,15 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
         }
 
         m_posWidgets[i]->setStyleSheet(style);
-        m_posWidgets[i]->setValue( positions[i] * m_baseScale );
+        m_curAbsPos[i] = positions[i] * m_baseScale;
+        if(m_absRelPosition)
+        {
+            m_posWidgets[i]->setValue( m_curAbsPos[i] - m_relPosNull[i]);
+        }
+        else
+        {
+            m_posWidgets[i]->setValue( m_curAbsPos[i]);
+        }
     }
 
     return;
@@ -458,25 +501,24 @@ void MotorController::setUnit(const QString unit)
 
     for(int i = 0; i < m_numVisAxis; i++)
     {
-        if(m_posWidgets[i]->suffix() != unit)
+        m_curAbsPos[i] *= m_baseScale / oldScale;
+        m_relPosNull[i] *= m_baseScale / oldScale;
+
+        if(m_absRelPosition)
         {
-            m_posWidgets[i]->setValue(m_posWidgets[i]->value() * m_baseScale / oldScale);
+            m_posWidgets[i]->setValue(m_curAbsPos[i] - m_relPosNull[i]);
             m_posWidgets[i]->setSuffix(unit);
+        }
+        else
+        {
+            m_posWidgets[i]->setValue(m_curAbsPos[i]);
+            m_posWidgets[i]->setSuffix(unit);     
         }
     }
 
     return;
 }
 
-QString MotorController::getUnit()
-{
-    return m_unit;
-}
-
-bool MotorController::getReadOnly() const
-{
-    return m_readOnly;
-}
 void MotorController::setReadOnly(const bool value)
 {
     bool changed = m_readOnly != value;
@@ -502,10 +544,24 @@ void MotorController::mnuSetUnit(QAction* inputAction)
     setUnit(inputAction->text());
 }
 
-double MotorController::getSmallStep() const
+void MotorController::mnuSetAbsRel(QAction* inputAction)
 {
-    return m_smallStep;
+    if(inputAction->text() == QString("abs"))
+    {
+        setAbsRel(false);
+    }
+    else if(inputAction->text() == QString("rel"))
+    {
+        setAbsRel(true);
+    }
+    else if(inputAction->text() == QString("origin")) 
+    {
+        m_relPosNull = m_curAbsPos;
+        setAbsRel(m_absRelPosition);
+    }
+    return;
 }
+
 void MotorController::setSmallStep(const double value)
 {
     if(value > 0.0 && value < 1.0)
@@ -515,10 +571,6 @@ void MotorController::setSmallStep(const double value)
     return;
 }
 
-double MotorController::getBigStep() const
-{
-    return m_bigStep;
-}
 
 void MotorController::setBigStep(const double value)
 {
@@ -527,6 +579,26 @@ void MotorController::setBigStep(const double value)
         m_bigStep = value;
     }
     return;
+}
+
+void MotorController::setAbsRel(const bool absRel)
+{
+    m_absRelPosition = absRel;
+    QChar axisName;
+    
+    char text[4] = {'%','c', ' ', 0};
+    if(m_absRelPosition)
+    {
+        text[2] = '*';
+    }
+    for(int i = 0; i < m_posWidgets.size(); i ++)
+    {
+        axisName = m_axisName[i][0];
+        m_axisName[i].sprintf(text, axisName);
+
+        m_posWidgets[i]->setPrefix(m_axisName[i]);
+    }
+    triggerUpdatePosition();
 }
 
 void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig, const bool forward)
