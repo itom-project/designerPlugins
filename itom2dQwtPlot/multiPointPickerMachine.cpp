@@ -47,7 +47,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
         case QEvent::MouseButtonPress:
         {
             if ( eventPattern.mouseMatch(
-                QwtEventPattern::MouseSelect1, ( const QMouseEvent * )event ) )
+                QwtEventPattern::MouseSelect1, static_cast<const QMouseEvent *>( event ) ) )
             {
                 if ( state() == 0 )
                 {
@@ -69,7 +69,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                 }
             }
             if ( eventPattern.mouseMatch(
-                QwtEventPattern::MouseSelect2, ( const QMouseEvent * )event ) )
+                QwtEventPattern::MouseSelect2, static_cast<const QMouseEvent *>( event ) ) )
             {
                 if ( state() == 1 )
                 {
@@ -89,7 +89,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
         case QEvent::KeyPress:
         {
             if ( eventPattern.keyMatch(
-                QwtEventPattern::KeySelect1, ( const QKeyEvent * )event ) )
+                QwtEventPattern::KeySelect1, static_cast<const QKeyEvent *> ( event ) ) )
             {
                 if ( state() == 0 )
                 {
@@ -111,7 +111,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                 }
             }
             else if ( eventPattern.keyMatch(
-                QwtEventPattern::KeySelect2, ( const QKeyEvent * )event ) )
+                QwtEventPattern::KeySelect2, static_cast<const QKeyEvent *> ( event ) ) )
             {
                 if ( state() == 1 )
                 {
@@ -119,7 +119,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                     setState( 0 );
                 }
             }
-            else if ( ((const QKeyEvent*)event)->key() == Qt::Key_M)
+            else if ( (static_cast<const QKeyEvent *>( event ))->key() == Qt::Key_M)
             {
                 if ( state() == 0 )
                 {

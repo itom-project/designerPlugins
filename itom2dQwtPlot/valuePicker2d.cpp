@@ -26,7 +26,7 @@
 #include <qbrush.h>
 #include <qwt_plot_canvas.h>
 
-ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QwtPlotCanvas* parent, const QwtRasterData* valueData) : 
+ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData) : 
     QwtPlotPicker(xAxis, yAxis, parent),
     m_valueData(valueData)
 {

@@ -76,8 +76,10 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 	setContentsMargins(5,5,5,5);
 	
 	//canvas() is the real plotting area, where the plot is printed (without axes...)
-	canvas()->setFrameShadow(QFrame::Plain);
-	canvas()->setFrameShape(QFrame::NoFrame);
+	//canvas()->setFrameShadow(QFrame::Plain);
+	//canvas()->setFrameShape(QFrame::NoFrame);
+
+	canvas()->setStyleSheet("border: 0px;");
 	canvas()->setCursor( Qt::ArrowCursor );
 	
 	//main item on canvas -> the data object

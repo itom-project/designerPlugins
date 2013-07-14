@@ -110,15 +110,6 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
 }
 
 //---------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::closeEvent(QCloseEvent *event)
- {
-	event->accept();
-    /* } else {
-         event->ignore();
-     }*/
- }
-
-//---------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::createActions()
 {
 	QAction *a = NULL;
@@ -539,7 +530,7 @@ void Itom2dQwtPlot::mnuActSave()
 
         // flags to make the document look like the widget
         renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-        renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
+        //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
         renderer.renderDocument((m_pContent), fileName, QSizeF(300, 200), 85);
     }

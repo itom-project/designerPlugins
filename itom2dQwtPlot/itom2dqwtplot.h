@@ -105,7 +105,6 @@ protected:
 	void createActions();
 
 	//void setLinePlotCoordinates(const QVector<QPointF> pts);
-	void closeEvent(QCloseEvent *event);
 
 private:
 
