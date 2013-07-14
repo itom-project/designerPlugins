@@ -131,7 +131,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
 
     const bool doAlign = QwtPainter::roundingAlignment( painter );
 
-    DataObjectSeriesData *d_objseries = static_cast<DataObjectSeriesData*>(d_series);
+    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
 
     if(d_objseries->floatingPointValues())
     {

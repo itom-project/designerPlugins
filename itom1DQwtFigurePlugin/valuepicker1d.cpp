@@ -25,7 +25,7 @@
 #include <qpainter.h>
 #include <qbrush.h>
 
-ValuePicker1D::ValuePicker1D(int xAxis, int yAxis, QwtPlotCanvas* parent) : QwtPlotPicker(xAxis, yAxis, parent)
+ValuePicker1D::ValuePicker1D(int xAxis, int yAxis, QWidget* parent) : QwtPlotPicker(xAxis, yAxis, parent)
 {
 }
 

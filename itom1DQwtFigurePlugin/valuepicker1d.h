@@ -33,7 +33,7 @@ class ValuePicker1D : public QwtPlotPicker
     Q_OBJECT
 
 public:
-    explicit ValuePicker1D(int xAxis, int yAxis, QwtPlotCanvas* parent);
+    explicit ValuePicker1D(int xAxis, int yAxis, QWidget* parent);
     virtual ~ValuePicker1D();
 
     virtual QwtText trackerTextF( const QPointF &pos ) const;

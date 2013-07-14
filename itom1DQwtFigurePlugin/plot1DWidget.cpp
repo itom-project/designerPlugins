@@ -75,8 +75,9 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 	setContentsMargins(5,5,5,5);
 	
 	//canvas() is the real plotting area, where the plot is printed (without axes...)
-	canvas()->setFrameShadow(QFrame::Plain);
-	canvas()->setFrameShape(QFrame::NoFrame);
+	//canvas()->setFrameShadow(QFrame::Plain); //deprecated in qwt 6.1.0
+	//canvas()->setFrameShape(QFrame::NoFrame); //deprecated in qwt 6.1.0
+	canvas()->setStyleSheet("border: 0px;");
     canvas()->setCursor( Qt::ArrowCursor );
 
     m_colorList.reserve(12);

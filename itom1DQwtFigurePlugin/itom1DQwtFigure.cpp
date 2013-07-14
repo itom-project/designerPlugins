@@ -471,7 +471,7 @@ void Itom1DQwtFigure::mnuExport()
 
         // flags to make the document look like the widget
         renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-        renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
+        //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
         renderer.renderDocument((m_pContent), fileName, QSizeF(300, 200), 85);
     }
@@ -496,8 +496,8 @@ void Itom1DQwtFigure::mnuParentScaleSetting()
 {
     if(m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
-        QwtScaleDiv *scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
-        QPointF bounds = QPointF( scale->lowerBound(), scale->upperBound() );
+        const QwtScaleDiv scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
+        QPointF bounds = QPointF( scale.lowerBound(), scale.upperBound() );
         /*
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
         int cmlpState = seriesData->getCmplxState();
