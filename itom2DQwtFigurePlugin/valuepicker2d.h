@@ -34,7 +34,7 @@ class ValuePicker2D : public QwtPlotPicker
     Q_OBJECT
 
 public:
-    explicit ValuePicker2D(ItoPlotSpectrogram* trackablePlotRasterItem, int xAxis, int yAxis, QwtPlotCanvas* parent);
+    explicit ValuePicker2D(ItoPlotSpectrogram* trackablePlotRasterItem, int xAxis, int yAxis, QWidget* parent);
     virtual ~ValuePicker2D();
 
     virtual QwtText trackerTextF( const QPointF &pos ) const;

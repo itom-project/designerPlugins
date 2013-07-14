@@ -571,7 +571,7 @@ void itom2DQwtFigure::mnuExport()
 
         // flags to make the document look like the widget
         renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-        renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
+        //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
         renderer.renderDocument(m_pContent, fileName, QSizeF(300, 200), 85);
     }

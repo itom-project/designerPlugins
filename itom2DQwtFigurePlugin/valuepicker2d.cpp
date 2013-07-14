@@ -25,7 +25,7 @@
 #include <qpainter.h>
 #include <qbrush.h>
 
-ValuePicker2D::ValuePicker2D(ItoPlotSpectrogram* trackablePlotRasterItem, int xAxis, int yAxis, QwtPlotCanvas* parent) : QwtPlotPicker(xAxis, yAxis, parent), m_trackablePlotRasterItem(trackablePlotRasterItem)
+ValuePicker2D::ValuePicker2D(ItoPlotSpectrogram* trackablePlotRasterItem, int xAxis, int yAxis, QWidget* parent) : QwtPlotPicker(xAxis, yAxis, parent), m_trackablePlotRasterItem(trackablePlotRasterItem)
 {
 }
 
