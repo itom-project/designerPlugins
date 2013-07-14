@@ -16,7 +16,7 @@ ItomIsoGLWidgetPlugin::ItomIsoGLWidgetPlugin(QObject *parent)
     m_description = QObject::tr("ITOM widget for isometric visualisation of 2D DataObjects.");
     m_detaildescription = QObject::tr("");
     m_author = "Christian Kohler, ITO";
-    m_version = PLUGIN_VERSION_MAJOR << 16 + PLUGIN_VERSION_MINOR << 8 + PLUGIN_VERSION_PATCH;
+    m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL with ITO itom-exception");
 
     initialized = false;

@@ -1360,14 +1360,14 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             int y1 = m_pContent->getSize(dims - 2) - 1;
             bool test;
 
-            if(m_axisX.autoScale || m_axisX.idx[1] > x1 || m_axisX.dimIdx != dims - 1)
+            if((m_axisX.autoScale) || (m_axisX.idx[1] > x1) || (m_axisX.dimIdx != dims - 1))
             {
                 m_axisX.idx[0] = 0;
                 m_axisX.idx[1] = x1;
                 m_axisX.dimIdx = dims - 1;
             }
 
-            if(m_axisY.autoScale || m_axisY.idx[1] > y1 || m_axisY.dimIdx != dims - 2)
+            if((m_axisY.autoScale) || (m_axisY.idx[1] > y1) || (m_axisY.dimIdx != dims - 2))
             {
                 m_axisY.idx[0] = 0;
                 m_axisY.idx[1] = y1;
