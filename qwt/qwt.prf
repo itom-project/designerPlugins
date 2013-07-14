@@ -17,11 +17,11 @@ contains(QWT_CONFIG, QwtDll) {
 
 contains(QWT_CONFIG, QwtSvg) {
 
-    QT      *= svg
+	QT      *= svg
 }
 else {
 
-    DEFINES *= QWT_NO_SVG
+	DEFINES *= QWT_NO_SVG
 }
 
 contains(QWT_CONFIG, QwtFramework) {
@@ -36,11 +36,3 @@ else {
 }   
 
 qwtAddLibrary(qwt)
-
-linux-g++ {
-
-    # when using the gold linker ( Qt < 4.8 ) - might be 
-    # necessary on non linux systems too
-    QMAKE_LFLAGS += -lrt
-}
-

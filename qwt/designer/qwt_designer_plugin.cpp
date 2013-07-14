@@ -25,6 +25,7 @@
 #ifndef NO_QWT_PLOT
 #include "qwt_designer_plotdialog.h"
 #include "qwt_plot.h"
+#include "qwt_plot_canvas.h"
 #include "qwt_scale_widget.h"
 #endif
 
@@ -34,6 +35,8 @@
 #include "qwt_thermo.h"
 #include "qwt_knob.h"
 #include "qwt_slider.h"
+#include "qwt_dial.h"
+#include "qwt_dial_needle.h"
 #include "qwt_analog_clock.h"
 #include "qwt_compass.h"
 #endif
@@ -140,6 +143,31 @@ QWidget *PlotInterface::createWidget( QWidget *parent )
     return new QwtPlot( parent );
 }
 
+
+PlotCanvasInterface::PlotCanvasInterface( QObject *parent ):
+    CustomWidgetInterface( parent )
+{
+    d_name = "QwtPlotCanvas";
+    d_include = "qwt_plot_canvas.h";
+    d_icon = QPixmap( ":/pixmaps/qwtplot.png" );
+    d_domXml =
+        "<widget class=\"QwtPlotCanvas\" name=\"qwtPlotCanvas\">\n"
+        " <property name=\"geometry\">\n"
+        "  <rect>\n"
+        "   <x>0</x>\n"
+        "   <y>0</y>\n"
+        "   <width>400</width>\n"
+        "   <height>200</height>\n"
+        "  </rect>\n"
+        " </property>\n"
+        "</widget>\n";
+}
+
+QWidget *PlotCanvasInterface::createWidget( QWidget *parent )
+{
+    return new QwtPlotCanvas( qobject_cast<QwtPlot *>( parent ) );
+}
+
 #endif
 
 #ifndef NO_QWT_WIDGETS
@@ -199,7 +227,13 @@ CompassInterface::CompassInterface( QObject *parent ):
 
 QWidget *CompassInterface::createWidget( QWidget *parent )
 {
-    return new QwtCompass( parent );
+    QwtCompass *compass = new QwtCompass( parent );
+    compass->setNeedle( new QwtCompassMagnetNeedle(
+        QwtCompassMagnetNeedle::TriangleStyle, 
+        compass->palette().color( QPalette::Mid ),
+        compass->palette().color( QPalette::Dark ) ) );
+
+    return compass;
 }
 
 #endif
@@ -250,7 +284,13 @@ DialInterface::DialInterface( QObject *parent ):
 
 QWidget *DialInterface::createWidget( QWidget *parent )
 {
-    return new QwtDial( parent );
+    QwtDial *dial = new QwtDial( parent );
+    dial->setNeedle( new QwtDialSimpleNeedle(
+        QwtDialSimpleNeedle::Arrow, true, 
+        dial->palette().color( QPalette::Dark ),
+        dial->palette().color( QPalette::Mid ) ) );
+
+    return dial;
 }
 
 #endif
@@ -269,8 +309,8 @@ KnobInterface::KnobInterface( QObject *parent ):
         "  <rect>\n"
         "   <x>0</x>\n"
         "   <y>0</y>\n"
-        "   <width>100</width>\n"
-        "   <height>100</height>\n"
+        "   <width>150</width>\n"
+        "   <height>150</height>\n"
         "  </rect>\n"
         " </property>\n"
         "</widget>\n";
@@ -293,6 +333,14 @@ ScaleWidgetInterface::ScaleWidgetInterface( QObject *parent ):
     d_icon = QPixmap( ":/pixmaps/qwtscale.png" );
     d_domXml =
         "<widget class=\"QwtScaleWidget\" name=\"ScaleWidget\">\n"
+        " <property name=\"geometry\">\n"
+        "  <rect>\n"
+        "   <x>0</x>\n"
+        "   <y>0</y>\n"
+        "   <width>60</width>\n"
+        "   <height>250</height>\n"
+        "  </rect>\n"
+        " </property>\n"
         "</widget>\n";
 }
 
@@ -317,8 +365,8 @@ SliderInterface::SliderInterface( QObject *parent ):
         "  <rect>\n"
         "   <x>0</x>\n"
         "   <y>0</y>\n"
-        "   <width>200</width>\n"
-        "   <height>60</height>\n"
+        "   <width>60</width>\n"
+        "   <height>250</height>\n"
         "  </rect>\n"
         " </property>\n"
         "</widget>\n";
@@ -326,13 +374,7 @@ SliderInterface::SliderInterface( QObject *parent ):
 
 QWidget *SliderInterface::createWidget( QWidget *parent )
 {
-    QwtSlider *slider = new QwtSlider( parent );
-#if 0
-    slider->setScalePosition( QwtSlider::Bottom );
-    slider->setRange( 0.0, 10.0, 1.0, 0 );
-    slider->setValue( 3.0 );
-#endif
-    return slider;
+    return new QwtSlider( parent );
 }
 
 #endif
@@ -359,7 +401,7 @@ TextLabelInterface::TextLabelInterface( QObject *parent ):
 
 QWidget *TextLabelInterface::createWidget( QWidget *parent )
 {
-    return new QwtTextLabel( parent );
+    return new QwtTextLabel( QwtText( "Label" ), parent );
 }
 
 #ifndef NO_QWT_WIDGETS
@@ -372,6 +414,14 @@ ThermoInterface::ThermoInterface( QObject *parent ):
     d_icon = QPixmap( ":/pixmaps/qwtthermo.png" );
     d_domXml =
         "<widget class=\"QwtThermo\" name=\"Thermo\">\n"
+        " <property name=\"geometry\">\n"
+        "  <rect>\n"
+        "   <x>0</x>\n"
+        "   <y>0</y>\n"
+        "   <width>60</width>\n"
+        "   <height>250</height>\n"
+        "  </rect>\n"
+        " </property>\n"
         "</widget>\n";
 }
 
@@ -403,11 +453,17 @@ QWidget *WheelInterface::createWidget( QWidget *parent )
 #endif
 
 CustomWidgetCollectionInterface::CustomWidgetCollectionInterface(
-    QObject *parent ):
+        QObject *parent ):
     QObject( parent )
 {
 #ifndef NO_QWT_PLOT
     d_plugins.append( new PlotInterface( this ) );
+
+#if 0
+    // better not: the designer crashes TODO ..
+    d_plugins.append( new PlotCanvasInterface( this ) );
+#endif
+
     d_plugins.append( new ScaleWidgetInterface( this ) );
 #endif
 
@@ -509,4 +565,6 @@ void TaskMenuExtension::applyProperties( const QString &properties )
         formWindow->cursor()->setProperty( "propertiesDocument", properties );
 }
 
+#if QT_VERSION < 0x050000
 Q_EXPORT_PLUGIN2( QwtDesignerPlugin, CustomWidgetCollectionInterface )
+#endif

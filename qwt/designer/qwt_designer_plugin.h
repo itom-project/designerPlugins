@@ -16,7 +16,6 @@
 
 namespace QwtDesignerPlugin
 {
-
     class CustomWidgetInterface: public QObject,
         public QDesignerCustomWidgetInterface
     {
@@ -57,6 +56,11 @@ namespace QwtDesignerPlugin
         Q_OBJECT
         Q_INTERFACES( QDesignerCustomWidgetCollectionInterface )
 
+#if QT_VERSION >= 0x050000
+        Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetCollectionInterface" )
+#endif
+
+
     public:
         CustomWidgetCollectionInterface( QObject *parent = NULL );
 
@@ -74,6 +78,16 @@ namespace QwtDesignerPlugin
 
     public:
         PlotInterface( QObject *parent );
+        virtual QWidget *createWidget( QWidget *parent );
+    };
+
+    class PlotCanvasInterface: public CustomWidgetInterface
+    {
+        Q_OBJECT
+        Q_INTERFACES( QDesignerCustomWidgetInterface )
+
+    public:
+        PlotCanvasInterface( QObject *parent );
         virtual QWidget *createWidget( QWidget *parent );
     };
 #endif

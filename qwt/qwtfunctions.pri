@@ -11,23 +11,26 @@
 
 defineReplace(qwtLibraryTarget) {
 
-   unset(LIBRARY_NAME)
-   LIBRARY_NAME = $$1
+    unset(LIBRARY_NAME)
+    LIBRARY_NAME = $$1
 
-   mac:!static:contains(QT_CONFIG, qt_framework) {
-      QMAKE_FRAMEWORK_BUNDLE_NAME = $$LIBRARY_NAME
-      export(QMAKE_FRAMEWORK_BUNDLE_NAME)
-   }
+    mac:contains(QWT_CONFIG, QwtFramework) {
 
-   contains(TEMPLATE, .*lib):CONFIG(debug, debug|release) {
-      !debug_and_release|build_pass {
-          mac:RET = $$member(LIBRARY_NAME, 0)_debug
-          else:win32:RET = $$member(LIBRARY_NAME, 0)d
-      }
-   }
+        QMAKE_FRAMEWORK_BUNDLE_NAME = $$LIBRARY_NAME
+        export(QMAKE_FRAMEWORK_BUNDLE_NAME)
+    }
 
-   isEmpty(RET):RET = $$LIBRARY_NAME
-   return($$RET)
+    contains(TEMPLATE, .*lib):CONFIG(debug, debug|release) {
+
+        !debug_and_release|build_pass {
+
+            mac:RET = $$member(LIBRARY_NAME, 0)_debug
+            win32:RET = $$member(LIBRARY_NAME, 0)d
+        }
+    }
+
+    isEmpty(RET):RET = $$LIBRARY_NAME
+    return($$RET)
 }
 
 defineTest(qwtAddLibrary) {
@@ -36,14 +39,27 @@ defineTest(qwtAddLibrary) {
 
     unset(LINKAGE)
 
-    if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
-       win32:LINKAGE = -l$${LIB_NAME}$${QT_LIBINFIX}d
-       mac:LINKAGE = -l$${LIB_NAME}$${QT_LIBINFIX}_debug
+    mac:contains(QWT_CONFIG, QwtFramework) {
+
+        LINKAGE = -framework $${LIB_NAME}$${QT_LIBINFIX}
     }
 
-    isEmpty(LINKAGE):LINKAGE = -l$${LIB_NAME}$${QT_LIBINFIX}
+    isEmpty(LINKAGE) {
+
+        if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
+
+            mac:LINKAGE = -l$${LIB_NAME}$${QT_LIBINFIX}_debug
+            win32:LINKAGE = -l$${LIB_NAME}$${QT_LIBINFIX}d
+        }
+    }
+
+    isEmpty(LINKAGE) {
+
+        LINKAGE = -l$${LIB_NAME}$${QT_LIBINFIX}
+    }
 
     !isEmpty(QMAKE_LSB) {
+
         QMAKE_LFLAGS *= --lsb-shared-libs=$${LIB_NAME}$${QT_LIBINFIX}
     }
 

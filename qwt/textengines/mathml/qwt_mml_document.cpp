@@ -3084,7 +3084,7 @@ QwtMmlDocument::QwtMmlDocument()
 
     // Some defaults which happen to work on my computer,
     // but probably won't work on other's
-#if defined(Q_WS_WIN)
+#if defined(Q_OS_WIN)
     m_normal_font_name = "Times New Roman";
 #else
     m_normal_font_name = "Century Schoolbook L";
@@ -3362,7 +3362,7 @@ QwtMmlNode *QwtMmlDocument::domToMml( const QDomNode &dom_node, bool *ok, QStrin
 
     QDomNamedNodeMap dom_attr = dom_node.attributes();
     QwtMmlAttributeMap mml_attr;
-    for ( unsigned i = 0; i < dom_attr.length(); ++i )
+    for ( int i = 0; i < dom_attr.length(); ++i )
     {
         QDomNode attr_node = dom_attr.item( i );
         Q_ASSERT( !attr_node.nodeName().isNull() );
@@ -4017,7 +4017,7 @@ void QwtMmlNode::paint( QPainter *p )
     if ( bg.isValid() )
         p->fillRect( myRect(), bg );
     if ( fg.isValid() )
-        p->setPen( color() );
+        p->setPen( QPen( color(), 0 ) );
 
     QwtMmlNode *child = firstChild();
     for ( ; child != 0; child = child->nextSibling() )
@@ -4033,7 +4033,7 @@ void QwtMmlNode::paintSymbol( QPainter *p ) const
     if ( g_draw_frames && myRect().isValid() )
     {
         p->save();
-        p->setPen( Qt::red );
+        p->setPen( QPen( Qt::red, 0 ) );
         p->drawRect( m_my_rect );
         QPen pen = p->pen();
         pen.setStyle( Qt::DotLine );
