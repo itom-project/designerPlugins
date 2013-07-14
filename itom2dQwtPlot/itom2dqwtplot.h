@@ -145,6 +145,8 @@ private slots:
 
 public slots:
     ito::RetVal pickPoints(QSharedPointer<ito::DataObject> coordsOut, int maxNrOfPoints = -1);
+	ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
+	ito::RetVal deleteMarkers(QString id);
 
 };
 

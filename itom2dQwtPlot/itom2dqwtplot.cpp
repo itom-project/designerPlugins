@@ -78,8 +78,6 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
     setCentralWidget(m_pContent);
 
-
-
 	//initialize actions
 	QToolBar *mainTb = new QToolBar("plotting tools",this);
 	addToolBar(mainTb, "mainToolBar");
@@ -839,4 +837,16 @@ ito::RetVal Itom2dQwtPlot::pickPoints(QSharedPointer<ito::DataObject> coordsOut,
     }
 
     return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
+{
+	return m_pContent->plotMarkers(&coords, style, id, plane);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::deleteMarkers(QString id)
+{
+	return m_pContent->deleteMarkers(id);
 }

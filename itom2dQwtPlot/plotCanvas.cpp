@@ -24,6 +24,7 @@
 #include "common/sharedStructuresGraphics.h"
 #include "DataObject/dataObjectFuncs.h"
 #include "common/apiFunctionsGraphInc.h"
+#include "common/apiFunctionsInc.h"
 
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
@@ -206,7 +207,7 @@ ito::RetVal PlotCanvas::init()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 {
-    int colorIndex;
+
     bool needToUpdate = false;
 
     m_dObjPtr = dObj;
@@ -390,8 +391,8 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
     m_activeModifiers = event->modifiers();
 
     QPointF incr;
-    incr.setX( transform(QwtPlot::xBottom, 1) - transform(QwtPlot::xBottom, 0) );
-    incr.setY( transform(QwtPlot::yLeft, 1) - transform(QwtPlot::yLeft, 0) );
+    incr.setX( invTransform(QwtPlot::xBottom, 1) - invTransform(QwtPlot::xBottom, 0) );
+    incr.setY( invTransform(QwtPlot::yLeft, 1) - invTransform(QwtPlot::yLeft, 0) );
 
     if (m_pData->m_state == tStackCut)
     {
@@ -925,6 +926,121 @@ ito::RetVal PlotCanvas::pickPoints(ito::DataObject *coordsOut, int maxNrOfPoints
     disconnect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint) ));
 
     setState(tIdle);
+
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
+{
+	ito::RetVal retval;
+	size_t limits[] = {2,2,0,99999};
+	ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
+
+	QwtSymbol::Style symStyle = QwtSymbol::XCross;
+	QSize symSize(5,5);
+	QBrush symBrush(Qt::NoBrush);
+	QPen symPen(Qt::red);
+
+
+	QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
+	if (rgexp.indexIn(style) != -1)
+	{
+		QString s = rgexp.cap(1);
+
+		if (s == "b") symPen.setColor( Qt::blue );
+		else if (s == "g") symPen.setColor( Qt::green );
+		else if (s == "r") symPen.setColor( Qt::red );
+		else if (s == "c") symPen.setColor( Qt::cyan );
+		else if (s == "m") symPen.setColor( Qt::magenta );
+		else if (s == "y") symPen.setColor( Qt::yellow );
+		else if (s == "k") symPen.setColor( Qt::black );
+		else if (s == "w") symPen.setColor( Qt::white );
+
+		s = rgexp.cap(2);
+		bool ok;
+
+		if (s == ".") symStyle = QwtSymbol::Ellipse;
+		else if (s == "o") symStyle = QwtSymbol::Ellipse;
+		else if (s == "s") symStyle = QwtSymbol::Rect;
+		else if (s == "d") symStyle = QwtSymbol::Diamond;
+		else if (s == ">") symStyle = QwtSymbol::RTriangle;
+		else if (s == "v") symStyle = QwtSymbol::DTriangle;
+		else if (s == "^") symStyle = QwtSymbol::UTriangle;
+		else if (s == "<") symStyle = QwtSymbol::LTriangle;
+		else if (s == "x") symStyle = QwtSymbol::XCross;
+ 		else if (s == "*") symStyle = QwtSymbol::Star1;
+		else if (s == "+") symStyle = QwtSymbol::Cross;
+		else if (s == "h") symStyle = QwtSymbol::Hexagon;
+
+		s = rgexp.cap(3);
+		int size = s.toInt(&ok);
+		if (ok)
+		{
+			symSize = QSize(size,size);
+		}
+	}
+	else
+	{
+		retval += ito::RetVal(ito::retError,0,"The style tag does not correspond to the required format");
+	}
+
+
+	if (!retval.containsError())
+	{
+		//QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
+		QwtPlotMarker *marker = NULL;
+		int nrOfMarkers = dObj->getSize(1);
+
+		if (id == "") id = "unknown";
+		
+		ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0,0);
+		ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0,1);
+
+		for (int i = 0; i < nrOfMarkers; ++i)
+		{
+			marker = new QwtPlotMarker();
+			marker->setSymbol(new QwtSymbol(symStyle,symBrush,symPen,symSize) );
+			marker->setValue(xCoords[i], yCoords[i]);
+			marker->attach(this);
+
+			m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
+		}
+
+		replot();
+	}
+
+	if (dObj) delete dObj;
+
+	return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::deleteMarkers(const QString &id)
+{
+	ito::RetVal retval;
+	bool found = false;
+	QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
+	while ( i.hasNext() )
+	{
+		i.next();
+		if (i.key() == id || id == "")
+		{
+			i.value().second->detach();
+			delete i.value().second;
+			found = true;
+			i.remove();
+		}
+	}
+
+	if (!found && id != "")
+	{
+		retval += ito::RetVal::format(ito::retError,0,"No marker with id '%s' found.", id.toAscii().data());
+	}
+	else
+	{
+		replot();
+	}
 
     return retval;
 }

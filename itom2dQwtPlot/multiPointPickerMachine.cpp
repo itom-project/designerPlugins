@@ -83,7 +83,9 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
         case QEvent::Wheel:
         {
             if ( state() != 0 )
-                cmdList += Move;
+			{
+                //cmdList += Move; //don't use move-event, since this continuously changes the last entry of the polygon-vector
+			}
             break;
         }
         case QEvent::KeyPress:

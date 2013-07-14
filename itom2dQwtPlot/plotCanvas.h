@@ -38,6 +38,7 @@
 #include <qcoreapplication.h>
 #include <qapplication.h>
 #include <qspinbox.h>
+#include <qhash.h>
 
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
@@ -75,6 +76,9 @@ class PlotCanvas : public QwtPlot
 
         ito::RetVal pickPoints(ito::DataObject *coordsOut, int maxNrOfPoints);
 
+		ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
+		ito::RetVal deleteMarkers(const QString &id);
+
         friend class Itom2dQwtPlot;
 
     protected:
@@ -101,6 +105,8 @@ class PlotCanvas : public QwtPlot
         QwtPlotMarker *m_pStackCutMarker;
 
         QwtPlotPicker *m_pMultiPointPicker;
+
+		QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
 
 		int m_curColorMapIndex;
 		DataObjItem *m_dObjItem;
