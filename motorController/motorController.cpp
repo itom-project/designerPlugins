@@ -283,7 +283,7 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
         // directly 
         QMap<QString, ito::Param> *paramList = NULL;
         m_pActuator->getParamList(&paramList);
-        m_needStepAdaption = paramList->contains("myFunnyParameter");
+        m_needStepAdaption = paramList->contains("stepwidth");
 
     }
 
@@ -615,10 +615,10 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
     {
         ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
 
-        QSharedPointer<ito::ParamBase> qsParam(new ito::ParamBase("myFunnyParamater", ito::ParamBase::Double, step));
+        QSharedPointer<ito::ParamBase> qsParam(new ito::ParamBase("stepwidth", ito::ParamBase::Double, step));
         QMetaObject::invokeMethod(m_pActuator, "setParam", Q_ARG(QSharedPointer<ito::ParamBase>, qsParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore()));
 
-        while (!locker.getSemaphore()->wait(500))
+        while (!locker.getSemaphore()->wait(5000))
         {
             ready = false;
             break;
