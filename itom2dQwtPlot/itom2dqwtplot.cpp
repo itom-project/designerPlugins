@@ -823,23 +823,6 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 //}
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom2dQwtPlot::pickPoints(QSharedPointer<ito::DataObject> coordsOut, int maxNrOfPoints /*= -1*/)
-{
-    ito::RetVal retval;
-
-    if (coordsOut.data() == NULL)
-    {
-        retval += ito::RetVal(ito::retError,0,"The given data object for the resulting coordinates is empty");
-    }
-    else
-    {
-        m_pContent->pickPoints(coordsOut.data(), maxNrOfPoints);
-    }
-
-    return retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
 	return m_pContent->plotMarkers(&coords, style, id, plane);
@@ -849,4 +832,15 @@ ito::RetVal Itom2dQwtPlot::plotMarkers(const ito::DataObject &coords, QString st
 ito::RetVal Itom2dQwtPlot::deleteMarkers(QString id)
 {
 	return m_pContent->deleteMarkers(id);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints /*= -1*/)
+{
+    m_pContent->userInteractionStart(type, start, maxNrOfPoints);
+
+    //m_pContent->setWindowState( (m_pContent->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    //m_pContent->raise(); //for MacOS
+    //m_pContent->activateWindow(); //for Windows
+    //m_pContent->setFocus();
 }

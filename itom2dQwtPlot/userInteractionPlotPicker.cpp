@@ -20,26 +20,39 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef MULTIPOINTPICKERMACHINE_H
-#define MULTIPOINTPICKERMACHINE_H
+#include "userInteractionPlotPicker.h"
 
-#include <qwt_picker_machine.h>
-#include <qwt_plot_picker.h>
-
-class MultiPointPickerMachine: public QwtPickerPolygonMachine
+void UserInteractionPlotPicker::reset()
 {
-public:
-    MultiPointPickerMachine();
+    //at the beginning no point is clicked, nevertheless the Abort-Key should abort the selection and
+    // send activated(false) such that itom is able to continue
+    if (isEnabled() && !isActive())
+    {
+        emit activated(false);
+    }
 
-    int maxNrItems() const { return m_maxNrItems; }
-    void setMaxNrItems(int value = -1);
+    QwtPlotPicker::reset();
+}
 
-    virtual QList<Command> transition(
-        const QwtEventPattern &, const QEvent * );
+void UserInteractionPlotPicker::setBackgroundFillBrush( const QBrush &brush )
+{
+    if(brush != this->m_rectFillBrush)
+    {
+        m_rectFillBrush = brush;
+        updateDisplay();
+    }
+}
 
-protected:
-    int m_maxNrItems;
-    int m_currentNrItems;
-};
-
-#endif
+void UserInteractionPlotPicker::drawTracker( QPainter *painter ) const
+{
+    const QRect textRect = trackerRect( painter->font() );
+    if ( !textRect.isEmpty() )
+    {
+        const QwtText label = trackerText( trackerPosition() );
+        if ( !label.isEmpty() )
+        {
+            painter->fillRect(textRect, m_rectFillBrush);
+            label.draw( painter, textRect );
+        }
+    }
+}

@@ -99,6 +99,8 @@ public:
     virtual QPointF getZAxisInterval(void);
     virtual void setZAxisInterval(QPointF point);
 
+    friend class PlotCanvas;
+
 protected:
     ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
@@ -144,9 +146,13 @@ private slots:
     void childFigureDestroyed(QObject *obj);
 
 public slots:
-    ito::RetVal pickPoints(QSharedPointer<ito::DataObject> coordsOut, int maxNrOfPoints = -1);
 	ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
 	ito::RetVal deleteMarkers(QString id);
+    
+    void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
+
+signals:
+    void userInteractionDone(int type, bool aborted, QPolygonF points);
 
 };
 

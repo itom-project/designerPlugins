@@ -62,7 +62,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                     m_currentNrItems++;
                 }
 
-                if (m_currentNrItems >= m_maxNrItems && m_maxNrItems >= 0)
+                if (m_currentNrItems > m_maxNrItems && m_maxNrItems >= 0) // "> m_maxNrItems" since the last item is always the currently "moved" point (not clicked yet)
                 {
                     cmdList += End;
                     setState( 0 );
@@ -84,7 +84,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
         {
             if ( state() != 0 )
 			{
-                //cmdList += Move; //don't use move-event, since this continuously changes the last entry of the polygon-vector
+                cmdList += Move;
 			}
             break;
         }
@@ -106,7 +106,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                     m_currentNrItems++;
                 }
 
-                if (m_currentNrItems >= m_maxNrItems && m_maxNrItems >= 0)
+                if (m_currentNrItems > m_maxNrItems && m_maxNrItems >= 0) // "> m_maxNrItems" since the last item is always the currently "moved" point (not clicked yet)
                 {
                     cmdList += End;
                     setState( 0 );

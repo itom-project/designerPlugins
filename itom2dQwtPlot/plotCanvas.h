@@ -50,6 +50,7 @@ class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
 struct InternalData;
 class DataObjRasterData;
+class UserInteractionPlotPicker;
 
 
 class PlotCanvas : public QwtPlot
@@ -74,8 +75,6 @@ class PlotCanvas : public QwtPlot
         QPointF getInterval(Qt::Axis axis) const;
         void setInterval(Qt::Axis axis, const QPointF &interval);
 
-        ito::RetVal pickPoints(ito::DataObject *coordsOut, int maxNrOfPoints);
-
 		ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
 		ito::RetVal deleteMarkers(const QString &id);
 
@@ -91,6 +90,8 @@ class PlotCanvas : public QwtPlot
         void updateScaleValues();
         void setColorBarVisible(bool visible);
         void setColorMap(QString colormap = "__next__");
+
+        ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
     
 	private:
         QwtPlotZoomer *m_pZoomer;
@@ -104,7 +105,7 @@ class PlotCanvas : public QwtPlot
 		QwtPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
 
-        QwtPlotPicker *m_pMultiPointPicker;
+        UserInteractionPlotPicker *m_pMultiPointPicker;
 
 		QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
 
@@ -133,9 +134,9 @@ class PlotCanvas : public QwtPlot
         void lineCutMoved(const QPoint &pt);
         void lineCutAppended(const QPoint &pt);
 
-        void multiPointActivated (bool on) { qDebug() << "pointActivated:" << on; };
-        void multiPointSelected (const QPolygon &polygon) { qDebug() << "pointSelected:" << polygon; };
-        void multiPointAppended (const QPoint &pos) { qDebug() << "pointAppended:" << pos; };
+        void multiPointActivated (bool on);
+        //void multiPointSelected (const QPolygon &polygon);
+        //void multiPointAppended (const QPoint &pos);
         
 };
 
