@@ -50,6 +50,7 @@ protected:
     void reset();
 
     void drawTracker( QPainter *painter ) const;
+    void drawRubberBand( QPainter *painter ) const;
 
 private:
     QBrush m_rectFillBrush;

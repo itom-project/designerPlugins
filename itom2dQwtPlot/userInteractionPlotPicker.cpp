@@ -22,6 +22,9 @@
 
 #include "userInteractionPlotPicker.h"
 
+#include <qwt_picker_machine.h>
+#include <qwt_painter.h>
+
 void UserInteractionPlotPicker::reset()
 {
     //at the beginning no point is clicked, nevertheless the Abort-Key should abort the selection and
@@ -54,5 +57,111 @@ void UserInteractionPlotPicker::drawTracker( QPainter *painter ) const
             painter->fillRect(textRect, m_rectFillBrush);
             label.draw( painter, textRect );
         }
+    }
+}
+
+
+void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
+{
+    if ( !isActive() || rubberBand() == NoRubberBand ||
+        rubberBandPen().style() == Qt::NoPen )
+    {
+        return;
+    }
+
+    const QPolygon pa = adjustedPoints( pickedPoints() );
+
+    QwtPickerMachine::SelectionType selectionType =
+        QwtPickerMachine::NoSelection;
+
+    if ( stateMachine() )
+        selectionType = stateMachine()->selectionType();
+
+    switch ( selectionType )
+    {
+        case QwtPickerMachine::NoSelection:
+        case QwtPickerMachine::PointSelection:
+        {
+            if ( pa.count() < 1 )
+                return;
+
+            const QPoint pos = pa[0];
+
+            const QRect pRect = pickArea().boundingRect().toRect();
+            switch ( rubberBand() )
+            {
+                case VLineRubberBand:
+                {
+                    QwtPainter::drawLine( painter, pos.x(),
+                        pRect.top(), pos.x(), pRect.bottom() );
+                    break;
+                }
+                case HLineRubberBand:
+                {
+                    QwtPainter::drawLine( painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y() );
+                    break;
+                }
+                case CrossRubberBand:
+                {
+                    QwtPainter::drawLine( painter, pos.x(),
+                        pRect.top(), pos.x(), pRect.bottom() );
+                    QwtPainter::drawLine( painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y() );
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case QwtPickerMachine::RectSelection:
+        {
+            if ( pa.count() < 2 )
+                return;
+
+            const QRect rect = QRect( pa.first(), pa.last() ).normalized();
+            switch ( rubberBand() )
+            {
+                case EllipseRubberBand:
+                {
+                    QwtPainter::drawEllipse( painter, rect );
+                    break;
+                }
+                case RectRubberBand:
+                {
+                    QwtPainter::drawRect( painter, rect );
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case QwtPickerMachine::PolygonSelection:
+        {
+            if ( rubberBand() == PolygonRubberBand )
+            {
+                painter->drawPolyline( pa );
+            }
+            else if ( rubberBand() == QwtPicker::UserRubberBand )
+            {
+                if (pa.size() > 0)
+                {
+                    const QPoint pos = pa.last();
+
+                    const QRect pRect = pickArea().boundingRect().toRect();
+
+                    QwtPainter::drawLine( painter, pos.x(),
+                            pRect.top(), pos.x(), pRect.bottom() );
+                    QwtPainter::drawLine( painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y() );
+                }
+                break;
+            }
+            break;
+        }
+        default:
+            break;
     }
 }

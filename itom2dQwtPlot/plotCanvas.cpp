@@ -151,9 +151,10 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
     m_pMultiPointPicker->setEnabled(false);
+    m_pMultiPointPicker->setRubberBand( QwtPicker::UserRubberBand ); //user is cross here
     //m_pMultiPointPicker->setStateMachine(new QwtPickerClickPointMachine); 
     m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine);
-    m_pMultiPointPicker->setRubberBandPen( QPen(QBrush(Qt::blue, Qt::SolidPattern),3) );
+    m_pMultiPointPicker->setRubberBandPen( QPen(QBrush(Qt::green, Qt::SolidPattern),2) );
     connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
     //connect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon) ));
     //connect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint) ));
@@ -698,12 +699,30 @@ void PlotCanvas::setState( tState state)
 {
     if (m_pData->m_state != state)
     {
+        if (m_pData->m_state == tMultiPointPick && state != tIdle)
+        {
+            return; //multiPointPick needs to go back to idle
+        }
+
         if (m_pZoomer) m_pZoomer->setEnabled( state == tZoom );
         if (m_pPanner) m_pPanner->setEnabled( state == tPan );
         if (m_pValuePicker) m_pValuePicker->setEnabled( state == tValuePicker );
         if (m_pLineCutPicker) m_pLineCutPicker->setEnabled( state == tLineCut );
         if (m_pStackPicker) m_pStackPicker->setEnabled( state == tStackCut );
         //if (m_pMultiPointPicker) m_pMultiPointPicker->setEnabled( state == tMultiPointPick );
+
+        if (state == tMultiPointPick || state == tIdle)
+        {
+            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+            if (p)
+            {
+                p->m_pActZoom->setEnabled(state == tIdle);
+                p->m_pActPan->setEnabled(state == tIdle);
+                p->m_pActLineCut->setEnabled(state == tIdle);
+                p->m_pActStackCut->setEnabled(state == tIdle);
+                p->m_pActValuePicker->setEnabled(state == tIdle);
+            }
+        }
 
         switch (state)
         {

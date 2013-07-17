@@ -837,6 +837,12 @@ ito::RetVal Itom2dQwtPlot::deleteMarkers(QString id)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints /*= -1*/)
 {
+    m_pActValuePicker->setChecked(false);
+    m_pActZoom->setChecked(false);
+    m_pActPan->setChecked(false);
+    m_pActLineCut->setChecked(false);
+    m_pActStackCut->setChecked(false);
+
     m_pContent->userInteractionStart(type, start, maxNrOfPoints);
 
     //m_pContent->setWindowState( (m_pContent->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
