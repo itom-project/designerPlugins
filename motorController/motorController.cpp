@@ -20,9 +20,20 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/**
+* \file motorController.cpp
+* \brief In this file the functions of the MotorController-Class are defined
+*
+*	The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
+*   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
+*
+*\sa MotorController, MotorControllerFactory, MotorControllerFactory.h
+*\author ITO
+*\date	2013
+*/
+
 #include "motorController.h"
 #include <qspinbox.h>
-
 
 //-----------------------------------------------------------------------------------------------
 MotorController::MotorController(QWidget *parent /*= 0*/)
@@ -188,6 +199,8 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     resizeEvent(NULL);
     return;
 }
+
+//-----------------------------------------------------------------------------------------------
 void MotorController::resizeEvent(QResizeEvent * event )
 {
     int x = 0;
@@ -228,7 +241,7 @@ void MotorController::resizeEvent(QResizeEvent * event )
         }    
     }
 }
-
+//-----------------------------------------------------------------------------------------------
 MotorController::~MotorController()
 {
     if(m_actSetUnit)
@@ -261,7 +274,7 @@ MotorController::~MotorController()
 
     m_pActuator = NULL;
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
 {
     if(actuator.isNull())
@@ -289,7 +302,7 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
 
     return;  
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::triggerUpdatePosition(void)
 {
     if(m_pActuator.isNull())
@@ -366,7 +379,7 @@ void MotorController::triggerUpdatePosition(void)
     }
     return;
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::setNumAxis(const int numAxis)
 {
     bool change = m_numVisAxis != numAxis ? true : false;
@@ -411,19 +424,19 @@ void MotorController::setNumAxis(const int numAxis)
     }
     return;
 }
-
+//-----------------------------------------------------------------------------------------------
 QPointer<ito::AddInActuator> MotorController::getActuator() const
 {
     return QPointer<ito::AddInActuator>(NULL);
 }
-
+//-----------------------------------------------------------------------------------------------
 QSize MotorController::sizeHint() const
 {
     
     return QSize(10,10);
     
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double> positions)
 {
     if(status.size() != positions.size())
@@ -468,7 +481,7 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
 
     return;
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::setUnit(const QString unit)
 {
     double oldScale = m_baseScale;
@@ -518,7 +531,7 @@ void MotorController::setUnit(const QString unit)
 
     return;
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::setReadOnly(const bool value)
 {
     bool changed = m_readOnly != value;
@@ -538,12 +551,12 @@ void MotorController::setReadOnly(const bool value)
     }
     return;
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::mnuSetUnit(QAction* inputAction)
 {
     setUnit(inputAction->text());
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::mnuSetAbsRel(QAction* inputAction)
 {
     if(inputAction->text() == QString("abs"))
@@ -561,7 +574,7 @@ void MotorController::mnuSetAbsRel(QAction* inputAction)
     }
     return;
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::setSmallStep(const double value)
 {
     if(value > 0.0 && value < 1.0)
@@ -570,8 +583,7 @@ void MotorController::setSmallStep(const double value)
     }
     return;
 }
-
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::setBigStep(const double value)
 {
     if(value > 0.0 && value < 1000.0)
@@ -580,7 +592,7 @@ void MotorController::setBigStep(const double value)
     }
     return;
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::setAbsRel(const bool absRel)
 {
     m_absRelPosition = absRel;
@@ -600,7 +612,7 @@ void MotorController::setAbsRel(const bool absRel)
     }
     triggerUpdatePosition();
 }
-
+//-----------------------------------------------------------------------------------------------
 void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig, const bool forward)
 {
     if(m_pActuator.isNull())
@@ -636,3 +648,4 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
     }
     return;
 }
+//-----------------------------------------------------------------------------------------------

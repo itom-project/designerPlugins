@@ -20,6 +20,18 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/**
+* \file motorController.h
+* \brief In this file the MotorController-Class is declared
+*
+*	The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
+*   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
+*
+*\sa MotorController, MotorControllerFactory, MotorControllerFactory.h
+*\author ITO
+*\date	2013
+*/
+
 #ifndef MC_H
 #define MC_H
 
@@ -32,6 +44,8 @@
 #include <QPushButton>
 #include <QAction>
 #include <QMenu>
+
+
 
 class MotorController : public QGroupBox
 {
@@ -48,28 +62,52 @@ class MotorController : public QGroupBox
 
 
 public:
+    //! Constructor for the class
     MotorController(QWidget *parent = 0);
+
+    //! Destructor for the class
     ~MotorController();
     
+    //! Set the actuator-handle
     void setActuator(QPointer<ito::AddInActuator> actuator);
+
+    //! Retrive the current actuator-handle
     QPointer<ito::AddInActuator> getActuator() const;
 
+    //! Set the metrical unit of the display
     void setUnit(const QString unit);
+
+    //! Read out the metrical unit of the display
     QString getUnit() const {return m_unit;};
 
+    //! Set the number of axis to be displayed
     void setNumAxis(const int numAxis);
+
+    //! Retrive the number of axis currently displayed
     int getNumAxis() const {return m_numVisAxis;};
 
+    //! Retrive readOnly status
     bool getReadOnly() const {return m_readOnly;};
+
+    //! Toggle between display-only and additional controll functions
     void setReadOnly(const bool value);
 
+    //! Get the small step-distance of the widget
     double getSmallStep() const {return m_smallStep;};
+
+    //! Set the small step-distance of the widget in writeMode
     void setSmallStep(const double value);
 
+    //! Get the large step-distance of the widget
     double getBigStep() const {return m_bigStep;};
+
+    //! Set the large step-distance of the widget in writeMode
     void setBigStep(const double value);
 
-    bool getAbsRel() const {return m_numVisAxis;};;
+    //! Retrive absolute or relative display status
+    bool getAbsRel() const {return m_numVisAxis;};
+
+    //! Toggle between absolute display and relative to a virtual coordinate display mode
     void setAbsRel(const bool absRel);
 
     //double getMin() const;
@@ -81,27 +119,56 @@ public:
     virtual QSize sizeHint() const;
 
 protected:
+    //! Handle to the motor secured by QPointer
     QPointer<ito::AddInActuator> m_pActuator;
+
     void resizeEvent(QResizeEvent * event );
     
 private:
+
+    //! QList with all position-display
     QList<QDoubleSpinBox* > m_posWidgets;
+
+    //! QList with the handles to the steps
     QList<QList<QPushButton *> > m_changePosButtons;
+
+    //! QList with the identifiers each the axis
     QList<QString > m_axisName;
+
+    //! Number of axis currently availeble
     int m_numAxis;
+
+    //! Number of axis currently visible
     int m_numVisAxis;
+
+    //! The current scaling to mm according to m_unit
     double m_baseScale;
+
+    //! Becomes true of the position can be requested by a signal
     bool m_updateBySignal;
+
+    //! If true, no step-Buttons are visible
     bool m_readOnly;
+
+    //! If true, the "stepwidth" paramter is set to corresponding step width before step is triggered
     bool m_needStepAdaption;
+
+    //! If true, position are shown relative to correspondig position
     bool m_absRelPosition;
 
+    //! QVector with the virtual origin position
     QVector<double> m_relPosNull;
+
+    //! QVector with last retrieved absolute position
     QVector<double> m_curAbsPos;
 
+    //! Small step distance
     double m_smallStep;
+
+    //! Large step distance
     double m_bigStep;
 
+    //! Current display unit
     QString m_unit;
 
     QAction  *m_actSetUnit;
