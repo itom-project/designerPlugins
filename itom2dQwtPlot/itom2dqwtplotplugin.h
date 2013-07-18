@@ -24,7 +24,7 @@
 #define ITOM2DQWTPLOTPLUGIN_H
 
 #include <QtDesigner/QDesignerCustomWidgetInterface>
-#include "plot/abstractItomDesignerPlugin.h"
+#include "plot/AbstractItomDesignerPlugin.h"
 
 class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
 {

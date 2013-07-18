@@ -357,8 +357,8 @@ void MotorController::triggerUpdatePosition(void)
             }
 
             ItomSharedSemaphoreLocker posLocker(new ItomSharedSemaphore());
-            QSharedPointer<QVector<double>> qsVector(new QVector<double>(axisNumbers, 0.0));
-            QMetaObject::invokeMethod(m_pActuator, "getPos", Q_ARG(const QVector<int>, axisNo), Q_ARG(QSharedPointer<QVector<double>>, qsVector), Q_ARG(ItomSharedSemaphore*, posLocker.getSemaphore()));
+            QSharedPointer<QVector<double> > qsVector(new QVector<double>(axisNumbers, 0.0));
+            QMetaObject::invokeMethod(m_pActuator, "getPos", Q_ARG(const QVector<int>, axisNo), Q_ARG(QSharedPointer<QVector<double> >, qsVector), Q_ARG(ItomSharedSemaphore*, posLocker.getSemaphore()));
 
             while (!posLocker.getSemaphore()->wait(5000))
             {
