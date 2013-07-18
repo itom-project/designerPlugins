@@ -123,12 +123,12 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
     if(dataObj)
     {
         int d = dataObj->getDims();
-        m_D.m_yScaling = dataObj->getAxisScale(d-2);
-        m_D.m_xScaling = dataObj->getAxisScale(d-1);
-        m_D.m_yOffset = dataObj->getAxisOffset(d-2);
-        m_D.m_xOffset = dataObj->getAxisOffset(d-1);
-        m_D.m_ySize = dataObj->getSize(d-2);
-        m_D.m_xSize = dataObj->getSize(d-1);
+        m_D.m_yScaling = d > 1 ? dataObj->getAxisScale(d-2) : 1.0;
+        m_D.m_xScaling = d > 1 ? dataObj->getAxisScale(d-1) : 1.0;
+        m_D.m_yOffset = d > 1 ? dataObj->getAxisOffset(d-2) : 0.0;
+        m_D.m_xOffset = d > 1 ? dataObj->getAxisOffset(d-1) : 0.0;
+        m_D.m_ySize = d > 1 ? dataObj->getSize(d-2) : 0;
+        m_D.m_xSize = d > 1 ? dataObj->getSize(d-1) : 0;
         m_D.m_dataPtr = NULL; //dataObj->get_mdata();
 
         if (planeIdx >= 0 && m_D.m_planeIdx != planeIdx)
@@ -153,7 +153,7 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
             deleteCache();
 
             m_dataObj = *dataObj;
-            m_plane = (cv::Mat*)(m_dataObj.get_mdata()[ m_dataObj.seekMat( m_D.m_planeIdx )]);
+            m_plane = m_dataObj.getDims() > 1 ? (cv::Mat*)(m_dataObj.get_mdata()[ m_dataObj.seekMat( m_D.m_planeIdx )]) : NULL;
 
             if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
             {
@@ -187,6 +187,9 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
         if (m_pInternalData->m_valueScaleAuto)
         {
             ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
+
+			if (min == std::numeric_limits<ito::float64>::max()) min = -10.0;
+			if (max == -std::numeric_limits<ito::float64>::max()) max = 10.0;
             setInterval(Qt::ZAxis, QwtInterval(min,max));
         }
         else
