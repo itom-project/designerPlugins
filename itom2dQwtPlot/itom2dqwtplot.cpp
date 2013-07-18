@@ -44,7 +44,9 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActStackCut(NULL),
     m_pActPlaneSelector(NULL),
     m_pActCmplxSwitch(NULL),
-	m_mnuCmplxSwitch(NULL)
+	m_mnuCmplxSwitch(NULL),
+    m_pActCoordinates(NULL),
+    m_pCoordinates(NULL)
 {
 	m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy pass through of input source object").toAscii().data()));
@@ -98,6 +100,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 	mainTb->addSeparator();
 	mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
+    mainTb->addAction(m_pActCoordinates);
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -223,7 +226,15 @@ void Itom2dQwtPlot::createActions()
 	m_pActCmplxSwitch->setMenu(m_mnuCmplxSwitch);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pCmplxActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
-	
+
+    m_pCoordinates = new QLabel("[0.0; 0.0]\n[0.0; 0.0]", this);
+    m_pCoordinates->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_pCoordinates->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+    m_pCoordinates->setObjectName("lblCoordinates");
+
+    m_pActCoordinates = new QWidgetAction(this);
+	m_pActCoordinates->setDefaultWidget(m_pCoordinates);
+    m_pActCoordinates->setVisible(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -477,6 +488,25 @@ void Itom2dQwtPlot::setZAxisInterval(QPointF point)
     if (m_pContent)
     {
         m_pContent->setInterval( Qt::ZAxis, point );
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QString Itom2dQwtPlot::getColorMap() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->colorMapName();
+    }
+    return "";
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setColorMap(const QString &name)
+{
+    if (name != "" && m_pContent)
+    {
+        m_pContent->setColorMap(name);
     }
 }
 
@@ -849,4 +879,28 @@ void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     //m_pContent->raise(); //for MacOS
     //m_pContent->activateWindow(); //for Windows
     //m_pContent->setFocus();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setCoordinates(const QVector<QPointF> &pts, bool visible)
+{
+    m_pActCoordinates->setVisible(visible);
+
+    if (visible)
+    {
+        char buf[60] = {0};
+        if(pts.size() > 1)
+        {
+            sprintf(buf, "[%.4g; %.4g]\n[%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+        }
+        else if(pts.size() == 1)
+        {
+            sprintf(buf, "[%.4g; %.4g]\n[ - ; - ]", pts[0].x(), pts[0].y());
+        }
+        else
+        {
+            sprintf(buf, "[ - ; - ]\n[ - ; - ]");
+        }
+        m_pCoordinates->setText(buf);
+    }
 }

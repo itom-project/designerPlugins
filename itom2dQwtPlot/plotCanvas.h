@@ -45,6 +45,7 @@
 #include <qwt_plot_panner.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_magnifier.h>
 
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
@@ -90,12 +91,14 @@ class PlotCanvas : public QwtPlot
         void updateScaleValues();
         void setColorBarVisible(bool visible);
         void setColorMap(QString colormap = "__next__");
+        inline QString colorMapName() const { return m_colorMapName; };
 
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
     
 	private:
         QwtPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
+        QwtPlotMagnifier *m_pMagnifier;
         
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
@@ -106,6 +109,8 @@ class PlotCanvas : public QwtPlot
         QwtPlotMarker *m_pStackCutMarker;
 
         UserInteractionPlotPicker *m_pMultiPointPicker;
+
+        QString m_colorMapName;
 
 		QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
 

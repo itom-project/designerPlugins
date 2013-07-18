@@ -46,6 +46,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
     Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
+    Q_PROPERTY(QString colorMap READ getColorMap WRITE setColorMap)
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -87,6 +88,9 @@ public:
     bool getyAxisVisible() const;
     void setyAxisVisible(const bool &value);
 
+    QString getColorMap() const;
+    void setColorMap(const QString &name);
+
     void setPlaneRange(int min, int max);
     void setCmplxSwitch(PlotCanvas::ComplexType type, bool visible);
 
@@ -125,6 +129,9 @@ private:
     QAction *m_pActStackCut;
     QWidgetAction *m_pActPlaneSelector;
 
+    QLabel *m_pCoordinates;
+    QWidgetAction *m_pActCoordinates;
+
     QAction* m_pActCmplxSwitch;
 	QMenu *m_mnuCmplxSwitch;
 
@@ -144,6 +151,9 @@ private slots:
     void mnuActPlaneSelector(int plane);
     void mnuCmplxSwitch(QAction *action);
     void childFigureDestroyed(QObject *obj);
+
+private slots:
+    void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
 
 public slots:
 	ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);

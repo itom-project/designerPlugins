@@ -87,7 +87,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 	//main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
     m_dObjItem->setRenderThreadCount(0);
-    m_dObjItem->setColorMap( new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
+    //m_dObjItem->setColorMap( new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
 
     m_rasterData = new DataObjRasterData(m_pData);
     m_dObjItem->setData(m_rasterData);
@@ -103,6 +103,13 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
+
+    m_pMagnifier = new QwtPlotMagnifier(canvas());
+    m_pMagnifier->setEnabled(true);
+    m_pMagnifier->setWheelModifiers( Qt::ControlModifier );
+    m_pMagnifier->setAxisEnabled(QwtPlot::yLeft,true);
+    m_pMagnifier->setAxisEnabled(QwtPlot::xBottom,true);
+    m_pMagnifier->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis (color bar)
 
     //value picker
     m_pValuePicker = new ValuePicker2D(QwtPlot::xBottom, QwtPlot::yLeft, canvas(), m_rasterData);
@@ -164,7 +171,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     rightAxis->setColorBarEnabled(true);
     rightAxis->setColorBarWidth(30);
 
-    rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
+    //rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     rightAxis->setFont(QFont("Verdana",8,1,true));
 
     rightAxis->setMargin(20); //margin to right border of window
@@ -209,6 +216,8 @@ ito::RetVal PlotCanvas::init()
     m_pMultiPointPicker->setTrackerFont(trackerFont);
     m_pMultiPointPicker->setTrackerPen(trackerPen);
     m_pMultiPointPicker->setBackgroundFillBrush(trackerBg);
+
+    setColorMap("__first__");
 
     return ito::retOk;
 }
@@ -313,17 +322,23 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     ito::RetVal retval(ito::retOk);
     int numPalettes = 1;
 
+    retval += apiPaletteGetNumberOfColorBars(numPalettes);
+
+    if (numPalettes == 0 || retval.containsError())
+    {
+        emit statusBarMessage( tr("No color maps defined."), 4000 );
+        return;
+    }
+
     if (colormap == "__next__")
     {
-        retval = apiPaletteGetNumberOfColorBars(numPalettes);
-
-        if (numPalettes == 0 || retval.containsError())
-        {
-            return;
-        }
-
         m_curColorMapIndex++;
         m_curColorMapIndex %= numPalettes; //map index to [0,numPalettes)
+        retval += apiPaletteGetColorBarIdx(m_curColorMapIndex, newPalette);
+    }
+    else if (colormap == "__first__")
+    {
+        m_curColorMapIndex = 0;
         retval += apiPaletteGetColorBarIdx(m_curColorMapIndex, newPalette);
     }
     else
@@ -331,10 +346,24 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
         retval += apiPaletteGetColorBarName(colormap, newPalette);
     }
 
-    if (retval.containsError() || newPalette.getSize() < 2)
+    if (retval.containsError() && retval.errorMessage() != NULL)
     {
+        emit statusBarMessage( QString("%1").arg( retval.errorMessage() ), 4000 );
         return;
     }
+    else if (retval.containsError())
+    {
+        emit statusBarMessage( "error when loading color map", 4000 );
+        return;
+    }
+
+    if (newPalette.getSize() < 2)
+    {
+        emit statusBarMessage( tr("Selected color map has less than two points."), 4000 );
+        return;
+    }
+
+    m_colorMapName = newPalette.getName();
    
 
     if(newPalette.getPos(newPalette.getSize() - 1) == newPalette.getPos(newPalette.getSize() - 2))  // BuxFix - For Gray-Marked
@@ -697,6 +726,8 @@ QPointF PlotCanvas::getInterval(Qt::Axis axis) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setState( tState state)
 {
+    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+
     if (m_pData->m_state != state)
     {
         if (m_pData->m_state == tMultiPointPick && state != tIdle)
@@ -713,7 +744,6 @@ void PlotCanvas::setState( tState state)
 
         if (state == tMultiPointPick || state == tIdle)
         {
-            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
             if (p)
             {
                 p->m_pActZoom->setEnabled(state == tIdle);
@@ -721,6 +751,14 @@ void PlotCanvas::setState( tState state)
                 p->m_pActLineCut->setEnabled(state == tIdle);
                 p->m_pActStackCut->setEnabled(state == tIdle);
                 p->m_pActValuePicker->setEnabled(state == tIdle);
+            }
+        }
+
+        if (state == tZoom || state == tPan || state == tMultiPointPick ||state == tValuePicker ||state == tIdle)
+        {
+            if (p)
+            {
+                p->setCoordinates(QVector<QPointF>(),false);
             }
         }
 
@@ -768,6 +806,7 @@ void PlotCanvas::zStackCutTrackerAppended(const QPoint &pt)
         m_pStackCutMarker->setVisible(true);
 
         pts.append(ptScale);
+        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
     }
 
@@ -801,6 +840,7 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
         m_pStackCutMarker->setVisible(true);
 
         pts.append(ptScale);
+        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
     }
 
@@ -833,6 +873,7 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
 
         m_pLineCutLine->setSamples(pts);
 
+        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
     }
 
@@ -855,6 +896,7 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
         m_pLineCutLine->setVisible(true);
         m_pLineCutLine->setSamples(pts);
 
+        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
     }
 
