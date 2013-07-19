@@ -356,6 +356,9 @@ void RasterToQImageObj::updateDataObject(QSharedPointer<ito::DataObject> dataObj
 //----------------------------------------------------------------------------------------------------------------------------------
 QImage RasterToQImageObj::getRastersImage()
 {
+    //qDebug() << "framerate: " << (1000.0) / ((float)timer2.elapsed());
+    //timer2.restart();
+
     if(m_dataObj)
     {
         //qDebug("raster data: init");

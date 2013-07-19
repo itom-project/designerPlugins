@@ -31,6 +31,7 @@
 #include <qlist.h>
 #include <qrect.h>
 #include <qsharedpointer.h>
+#include <qelapsedtimer.h>
 
 //using namespace ito;
 
@@ -87,6 +88,8 @@ class RasterToQImageObj : QObject
 
         QRect m_ROI;
         QRect m_physROI;
+
+        QElapsedTimer timer2;
 
         unsigned int m_wDimIndex;
         unsigned int m_hDimIndex;

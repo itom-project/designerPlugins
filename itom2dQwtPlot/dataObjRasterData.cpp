@@ -565,6 +565,10 @@ double DataObjRasterData::value2_yinv(int m, int n) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
 {
+    //timer1.restart();    
+    //qDebug() << "framerate: " << (1000.0) / ((float)timer2.elapsed());
+    //timer2.restart();
+
     if(m_rasteredLinePtr)
     {
         if(m_lastRasteredArea != area || m_lastRasteredRaster != raster)
@@ -639,5 +643,5 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::discardRaster()
 {
-    
+    //qDebug() << "rendering time" << timer1.elapsed();
 }

@@ -100,6 +100,9 @@ class DataObjRasterData : public QwtRasterData
         int m_rasteredLines;
         int *m_xIndizes;
 
+        QElapsedTimer timer1, timer2;
+        unsigned int nrOfRendering;
+
         const InternalData *m_pInternalData;
 };
 
