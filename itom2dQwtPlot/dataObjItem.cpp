@@ -97,10 +97,18 @@ QImage DataObjItem::renderImage(
     uint numThreads = renderThreadCount();
 
     if ( numThreads <= 0 )
+    {
         numThreads = QThread::idealThreadCount();
+        if (numThreads > 1)
+        {
+            numThreads = std::max((uint)1, numThreads - 2); //reduce the maximum number of threads by 2 in order to provide free threads for other jobs
+        }
+    }
 
     if ( numThreads <= 0 )
         numThreads = 1;
+
+    
 
     const int numRows = imageSize.height() / numThreads;
 
