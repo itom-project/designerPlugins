@@ -543,29 +543,8 @@ void Itom1DQwtFigure::mnuSetMarker(QAction *action)
                     m_pContent->setMainMarkersToIndex( maxLoc, minLoc, 0 );
                 }
             }
-            /*ito::DataObject temp = seriesData->getResampledDataObject();
-
-            if((temp.getType() != ito::tFloat64) || (temp.getDims() == 0))
-                return;
-
-            ito::dObjHelper::minMaxValueFunc<ito::float64>(&temp, minVal, minLoc, maxVal, maxLoc, true, cmlpState);
-			
-            if(minLoc[2] < maxLoc[2])
-            {
-                (m_pContent)->m_Curser[0] = minLoc[2];
-                (m_pContent)->m_Curser[1] = maxLoc[2];
-            }
-            else
-            {
-                (m_pContent)->m_Curser[0] = maxLoc[2];
-                (m_pContent)->m_Curser[1] = minLoc[2];
-            }*/
-            (m_pContent)->replot();
         }
-        
-        
     }
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
