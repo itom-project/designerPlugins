@@ -98,6 +98,8 @@ class Plot1DWidget : public QwtPlot
         void setPickerEnable(const bool checked);
         void setPannerEnable(const bool checked);
 
+        void setMainMarkersToIndex(int idx1, int idx2, int curveIdx);
+
     protected:
         void keyPressEvent ( QKeyEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
@@ -119,6 +121,7 @@ class Plot1DWidget : public QwtPlot
         };
 
         void stickMarkerToXPx(Marker *m, double xScaleStart, int dir);
+        void stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int dir);
         void updateMarkerPosition(bool updatePositions, bool clear = false);
 
 

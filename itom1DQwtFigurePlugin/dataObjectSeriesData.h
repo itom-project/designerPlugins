@@ -58,7 +58,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
             size_t matOffset; //in bytes
             size_t matStepSize; //in bytes
             QVector<PtsWeighted> points; //only for dirXY, else size=0
-            QVector<size_t> matSteps; //only for dirXY, else size=0 (fast mode)
+            QVector<int> matSteps; //only for dirXY, else size=0 (fast mode)
             bool valid;
         };
 

@@ -667,6 +667,47 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setMainMarkersToIndex(int idx1, int idx2, int curveIdx)
+{
+    while (m_markers.size() < 2)
+    {
+        //prepend
+        Marker marker;
+        marker.item = new QwtPlotMarker();
+        marker.item->attach(this);
+        marker.active = false;
+                
+        marker.curveIdx = curveIdx;
+        marker.item->setVisible(true);
+                
+        m_markers.prepend(marker);
+    }
+
+    for (int i = 0; i < m_markers.size() ; ++i)
+    {
+        if (i == 0)
+        {
+            m_markers[0].active = true;
+            stickMarkerToSampleIdx( &(m_markers[0]), idx1, curveIdx, 0 );
+        }
+        else if (i == 1)
+        {
+            m_markers[1].active = false;
+            stickMarkerToSampleIdx( &(m_markers[1]), idx2, curveIdx, 0 );
+        }
+        else
+        {
+            m_markers[i].active = false;
+        }
+    }
+
+
+    updateMarkerPosition(false,false);
+
+    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //dir: 0: this point, -1: next valid to the left or this if not possible, 1: next valid to the right or this if not possible
 {
     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
@@ -752,9 +793,92 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
             }
         }
     }
+}
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int dir)
+{
+    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[curveIdx]->data());
 
+    int thisIdx = idx;
+    int s = data->size();
+    QPointF p;
+    bool found = false;
+    bool d = true;
 
+    if(dir == 0)
+    {
+        while(!found)
+        {
+            if(thisIdx >= 0 && thisIdx < s)
+            {
+                p = data->sample(thisIdx);
+                if(qIsFinite(p.ry()))
+                {
+                    m->item->setXValue(p.rx());
+                    m->item->setYValue(p.ry());
+                    found = true;
+                }
+            }
+            else
+            {
+                break;
+            }
+
+            if(d)
+            {
+                thisIdx = -thisIdx + 1;
+                d = !d;
+            }
+            else
+            {
+                thisIdx = -thisIdx;
+                d = !d;
+            }
+        }
+    }
+    if(dir == -1)
+    {
+        while(!found)
+        {
+            thisIdx -= 1;
+            if( thisIdx >= 0)
+            {
+                p = data->sample(thisIdx);
+                if(qIsFinite(p.ry()))
+                {
+                    m->item->setXValue(p.rx());
+                    m->item->setYValue(p.ry());
+                    found = true;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    else //dir > 0
+    {
+        while(!found)
+        {
+            thisIdx += 1;
+            if(thisIdx >= 0 && thisIdx < s)
+            {
+                p = data->sample(thisIdx);
+                if(qIsFinite(p.ry()))
+                {
+                    m->item->setXValue(p.rx());
+                    m->item->setYValue(p.ry());
+                    found = true;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

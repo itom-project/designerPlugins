@@ -522,7 +522,7 @@ void Itom1DQwtFigure::mnuParentScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtFigure::mnuSetMarker(QAction *action)
 {
-    if(m_pContent && m_pContent->m_plotCurveItems.size() > 0 && m_pContent->m_pValuePicker->isEnabled())
+    if(m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
 
@@ -536,13 +536,11 @@ void Itom1DQwtFigure::mnuSetMarker(QAction *action)
             {
                 if(minLoc < maxLoc)
                 {
-                    (m_pContent)->m_Curser[0] = minLoc;
-                    (m_pContent)->m_Curser[1] = maxLoc;
+                    m_pContent->setMainMarkersToIndex( minLoc, maxLoc, 0 );
                 }
                 else
                 {
-                    (m_pContent)->m_Curser[0] = maxLoc;
-                    (m_pContent)->m_Curser[1] = minLoc;
+                    m_pContent->setMainMarkersToIndex( maxLoc, minLoc, 0 );
                 }
             }
             /*ito::DataObject temp = seriesData->getResampledDataObject();
