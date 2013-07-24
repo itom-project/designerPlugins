@@ -97,6 +97,8 @@ void DataObjRasterData::deleteCache()
 {
     m_validData = false;
 
+    m_rasteredLines = 0;
+
     if(m_rasteredLinePtr)
     {
         delete[] m_rasteredLinePtr;
@@ -634,6 +636,10 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
                 }
             }
             //m_validData = true; // moved here by Wolfram Lyda
+        }
+        else
+        {
+            m_rasteredLines = 0;
         }
 
         m_validData = true;
