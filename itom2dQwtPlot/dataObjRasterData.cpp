@@ -633,10 +633,10 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
                     m_xIndizes[i] = -1;
                 }
             }
-
+            m_validData = true; // moved here by Wolfram Lyda
         }
 
-        m_validData = true;
+        //m_validData = true;
     }
 }
 
