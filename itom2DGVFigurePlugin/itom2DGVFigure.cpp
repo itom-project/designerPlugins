@@ -243,8 +243,7 @@ itom2DGVFigure::~itom2DGVFigure()
 {
     if (m_pContent)
     {
-        m_pContent->close();
-        delete m_pContent;
+        m_pContent->deleteLater();
     }
 
     if (m_actScaleSetting)
