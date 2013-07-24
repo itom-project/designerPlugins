@@ -81,6 +81,10 @@ QImage DataObjItem::renderImage(
     if ( !intensityRange.isValid() )
         return QImage();
 
+    const QwtInterval xRange = dObjRasterData->interval( Qt::XAxis );
+    if ( !xRange.isValid() )
+        return QImage();
+
     QImage::Format format = ( colorMap()->format() == QwtColorMap::RGB )
         ? QImage::Format_ARGB32 : QImage::Format_Indexed8;
 
