@@ -55,8 +55,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         QwtPlot(parent),
         m_contextMenu(contextMenu),
         m_pPlotGrid(NULL),
-        m_startScaledX(false),
-        m_startScaledY(false),
+//        m_startScaledX(false),
+//        m_startScaledY(false),
         m_xDirect(false),
         m_yDirect(false),
         m_multiLine(MultiRows),
@@ -445,8 +445,24 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
     updateLabels();
 
+
+
     if(seriesData)
     {
+        /*
+        if(m_startScaledY)
+        {
+            seriesData->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
+            m_startScaledY = false;
+            m_pData->m_valueScaleAuto = false;
+        }
+        if(m_startScaledX)
+        {
+            seriesData->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
+            m_startScaledY = false;
+        }
+        */
+
         QByteArray hash = seriesData->getHash();
 
         if(hash != m_hash)
@@ -483,19 +499,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     {
         replot();
     }
-   
-    /*if(m_startScaledY && seriesData)
-    {
-        seriesData->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
-        m_startScaledY = false;
-    }
-    if(m_startScaledX && seriesData)
-    {
-        seriesData->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
-        m_startScaledY = false;
-    }*/
-
-    
+       
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -898,6 +902,29 @@ void Plot1DWidget::contextMenuEvent(QContextMenuEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
 {
+    switch(axis)
+    {
+        case Qt::YAxis:
+            if(autoCalcLimits) m_pData->m_valueScaleAuto = true;
+            else
+            {
+                m_pData->m_valueScaleAuto = false;
+                m_pData->m_valueMin = minValue;
+                m_pData->m_valueMax = maxValue;
+            }
+        break;
+        case Qt::XAxis:
+            if(autoCalcLimits) m_pData->m_axisScaleAuto = true;
+            else
+            {
+                m_pData->m_axisScaleAuto = false;
+                m_pData->m_axisMin = minValue;
+                m_pData->m_axisMax = maxValue;                        
+            }
+        break;
+    }
+
+    /*
     DataObjectSeriesData* seriesData = m_plotCurveItems.size() > 0 ? static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data()) : NULL;
     if(seriesData)
     {
@@ -920,7 +947,8 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
             break;
         }
     }
-    return retError;
+    */
+    return retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

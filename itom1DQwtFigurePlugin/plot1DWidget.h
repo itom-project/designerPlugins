@@ -136,8 +136,8 @@ class Plot1DWidget : public QwtPlot
         //QwtPlotCurve **m_pContent; //content-element, added to canvas when first valid data object becomes available
         InternalData *m_pData;
 
-        bool m_startScaledY;
-        bool m_startScaledX;
+        //bool m_startScaledY;
+        //bool m_startScaledX;
         bool m_xDirect;
         bool m_yDirect;
         bool m_cmplxState;
