@@ -69,12 +69,12 @@ QString MotorControllerFactory::name() const
 //-----------------------------------------------------------------------------------------------
 QString MotorControllerFactory::group() const
 {
-    return "ITOM Plugins";
+    return "itom Plugins";
 }
 //-----------------------------------------------------------------------------------------------
 QIcon MotorControllerFactory::icon() const
 {
-    return QIcon(":/itom/icons/q_itoM32.png");
+    return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
 //-----------------------------------------------------------------------------------------------
 QString MotorControllerFactory::toolTip() const

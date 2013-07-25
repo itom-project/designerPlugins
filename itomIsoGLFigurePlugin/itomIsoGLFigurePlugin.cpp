@@ -52,7 +52,7 @@ QString ItomIsoGLWidgetPlugin::name() const
 
 QString ItomIsoGLWidgetPlugin::group() const
 {
-    return "ITOM Plugins";
+    return "itom Plugins";
 }
 
 QIcon ItomIsoGLWidgetPlugin::icon() const

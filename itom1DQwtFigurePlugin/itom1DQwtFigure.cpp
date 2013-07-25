@@ -61,12 +61,12 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
 	//m_actHome
-    m_actHome = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/home.png"),tr("Home"), this);
+    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"),tr("Home"), this);
     m_actHome->setObjectName("actHome");
     m_actHome->setToolTip("Reset original view");
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/filesave.png"),tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"),tr("Save"), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip("Export current view");
 
@@ -82,33 +82,33 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     m_rescaleParent->setVisible(false);
 
     //m_actForward
-    m_actForward = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/forward.png"), tr("forward"), this);
+    m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
     m_actForward->setObjectName("actionForward");
     m_actForward->setEnabled(false);
     m_actForward->setToolTip("Forward to next line");
 
     //m_actBack
-    m_actBack = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/back.png"), tr("back"), this);
+    m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
     m_actBack->setObjectName("actionBack");
     m_actBack->setEnabled(false);
     m_actBack->setToolTip("Back to previous line");
 
     //m_actPan
-    m_actPan = new QAction(QIcon(":/matplotlibFigure/icons/move.png"), QObject::tr("move"), this);
+    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), QObject::tr("move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
     m_actPan->setToolTip("Pan axes with left mouse, zoom with right");
 
     //m_actZoomToRect
-    m_actZoomToRect = new QAction(QIcon(":/matplotlibFigure/icons/zoom_to_rect.png"), QObject::tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), QObject::tr("zoom to rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
     m_actZoomToRect->setToolTip("Zoom to rectangle");
 
     //m_actMarker
-    m_actMarker = new QAction(QIcon(":/matplotlibFigure/icons/marker.png"), QObject::tr("marker"), this);
+    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), QObject::tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);

@@ -90,6 +90,7 @@ QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
 
 set(designer_rcc
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtFigurePlugin.qrc
+	${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
 
 set(designer_SOURCES 

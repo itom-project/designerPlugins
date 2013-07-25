@@ -51,12 +51,12 @@ QString Itom1DQwtFigurePlugin::name() const
 
 QString Itom1DQwtFigurePlugin::group() const
 {
-    return "ITOM Plugins";
+    return "itom Plugins";
 }
 
 QIcon Itom1DQwtFigurePlugin::icon() const
 {
-    return QIcon(":/itom/icons/q_itoM32.png");
+    return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
 
 QString Itom1DQwtFigurePlugin::toolTip() const

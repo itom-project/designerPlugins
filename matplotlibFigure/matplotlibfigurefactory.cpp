@@ -48,12 +48,12 @@ QString MatplotlibFigureFactory::name() const
 
 QString MatplotlibFigureFactory::group() const
 {
-    return "ITOM Plugins";
+    return "itom Plugins";
 }
 
 QIcon MatplotlibFigureFactory::icon() const
 {
-    return QIcon(":/itom/icons/q_itoM32.png");
+    return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
 
 QString MatplotlibFigureFactory::toolTip() const

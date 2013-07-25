@@ -35,12 +35,12 @@ QString DataObjectTableFactory::name() const
 
 QString DataObjectTableFactory::group() const
 {
-    return "ITOM Plugins";
+    return "itom Plugins";
 }
 
 QIcon DataObjectTableFactory::icon() const
 {
-    return QIcon(":/itom/icons/q_itoM32.png");
+    return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
 
 QString DataObjectTableFactory::toolTip() const
@@ -50,7 +50,7 @@ QString DataObjectTableFactory::toolTip() const
 
 QString DataObjectTableFactory::whatsThis() const
 {
-    return QObject::tr("ITOM widget to interprete a dataObject as a table.");
+    return QObject::tr("itom widget to interprete a dataObject as a table.");
 }
 
 bool DataObjectTableFactory::isContainer() const

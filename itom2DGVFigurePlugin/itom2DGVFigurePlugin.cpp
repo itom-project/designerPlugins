@@ -51,7 +51,7 @@ QString itom2DGVFigurePlugin::name() const
 
 QString itom2DGVFigurePlugin::group() const
 {
-    return "ITOM Plugins";
+    return "itom Plugins";
 }
 
 QIcon itom2DGVFigurePlugin::icon() const

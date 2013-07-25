@@ -66,7 +66,7 @@ QString Itom2dQwtPlotPlugin::name() const
 
 QString Itom2dQwtPlotPlugin::group() const
 {
-	return "ITOM Plugins";
+	return "itom Plugins";
 }
 
 QIcon Itom2dQwtPlotPlugin::icon() const

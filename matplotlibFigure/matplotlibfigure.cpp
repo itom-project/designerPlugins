@@ -16,41 +16,41 @@ MatplotlibFigure::MatplotlibFigure(QWidget *parent)
 {
     setWindowFlags(Qt::Widget); //this is important such that this main window reacts as widget
 
-    m_actHome = new QAction(QIcon(":/matplotlibFigure/icons/home.png"), tr("home"), this);
+    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("home"), this);
     m_actHome->setObjectName("actionHome");
     m_actHome->setToolTip("Reset original view");
 
-    m_actForward = new QAction(QIcon(":/matplotlibFigure/icons/forward.png"), tr("forward"), this);
+    m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
     m_actForward->setObjectName("actionForward");
     m_actForward->setToolTip("Forward to next view");
 
-    m_actBack = new QAction(QIcon(":/matplotlibFigure/icons/back.png"), tr("back"), this);
+    m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
     m_actBack->setObjectName("actionBack");
     m_actBack->setToolTip("Back to previous view");
 
-    m_actPan = new QAction(QIcon(":/matplotlibFigure/icons/move.png"), tr("move"), this);
+    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
     m_actPan->setToolTip("Pan axes with left mouse, zoom with right");
 
-    m_actZoomToRect = new QAction(QIcon(":/matplotlibFigure/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
     m_actZoomToRect->setToolTip("Zoom to rectangle");
 
-    m_actMarker = new QAction(QIcon(":/matplotlibFigure/icons/marker.png"), tr("marker"), this);
+    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
     m_actMarker->connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
 
-    m_actSubplotConfig = new QAction(QIcon(":/matplotlibFigure/icons/subplots.png"), tr("subplot configuration"), this);
+    m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("subplot configuration"), this);
     m_actSubplotConfig->setObjectName("actionSubplotConfig");
     m_actSubplotConfig->setToolTip("Configure subplots");
 
-    m_actSave = new QAction(QIcon(":/matplotlibFigure/icons/filesave.png"), tr("save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save"), this);
     m_actSave->setObjectName("actionSave");
     m_actSave->setToolTip("Save the figure");
 

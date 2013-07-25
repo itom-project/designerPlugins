@@ -53,7 +53,7 @@ QString itom2DQwtFigurePlugin::name() const
 
 QString itom2DQwtFigurePlugin::group() const
 {
-    return "ITOM Plugins";
+    return "itom Plugins";
 }
 
 QIcon itom2DQwtFigurePlugin::icon() const
