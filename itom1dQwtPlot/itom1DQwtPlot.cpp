@@ -20,7 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#include "itom1DQwtFigure.h"
+#include "itom1DQwtPlot.h"
 #include "dialog1DScale.h"
 #include "dataObjectSeriesData.h"
 
@@ -37,7 +37,7 @@
 using namespace ito;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actScaleSetting(NULL),
@@ -213,12 +213,12 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-Itom1DQwtFigure::~Itom1DQwtFigure()
+Itom1DQwtPlot::~Itom1DQwtPlot()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtFigure::applyUpdate()
+ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
@@ -236,20 +236,20 @@ ito::RetVal Itom1DQwtFigure::applyUpdate()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool Itom1DQwtFigure::getContextMenuEnabled() const
+bool Itom1DQwtPlot::getContextMenuEnabled() const
 {
     if(m_pContent) return (m_pContent)->m_showContextMenu;
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::setContextMenuEnabled(bool show)
+void Itom1DQwtPlot::setContextMenuEnabled(bool show)
 {
     if (m_pContent) (m_pContent)->m_showContextMenu = show;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::setBounds(QVector<QPointF> bounds) 
+void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds) 
 { 
     double *pointArr = new double[2 * bounds.size()];
     for (int np = 0; np < bounds.size(); np++)
@@ -262,7 +262,7 @@ void Itom1DQwtFigure::setBounds(QVector<QPointF> bounds)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QVector<QPointF> Itom1DQwtFigure::getBounds(void) 
+QVector<QPointF> Itom1DQwtPlot::getBounds(void) 
 { 
     int numPts = m_pInput["bounds"]->getLen();
     QVector<QPointF> boundsVec;
@@ -280,7 +280,7 @@ QVector<QPointF> Itom1DQwtFigure::getBounds(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString Itom1DQwtFigure::getTitle() const
+QString Itom1DQwtPlot::getTitle() const
 {
     if(m_data.m_autoTitle)
     {
@@ -290,7 +290,7 @@ QString Itom1DQwtFigure::getTitle() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::setTitle(const QString &title)
+void Itom1DQwtPlot::setTitle(const QString &title)
 {
     if(title == "<auto>")
     {
@@ -306,14 +306,14 @@ void Itom1DQwtFigure::setTitle(const QString &title)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::resetTitle()
+void Itom1DQwtPlot::resetTitle()
 {
     m_data.m_autoTitle = true;
     if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString Itom1DQwtFigure::getAxisLabel() const
+QString Itom1DQwtPlot::getAxisLabel() const
 {
     if(m_data.m_autoAxisLabel)
     {
@@ -323,7 +323,7 @@ QString Itom1DQwtFigure::getAxisLabel() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::setAxisLabel(const QString &label)
+void Itom1DQwtPlot::setAxisLabel(const QString &label)
 {
     if(label == "<auto>")
     {
@@ -338,14 +338,14 @@ void Itom1DQwtFigure::setAxisLabel(const QString &label)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::resetAxisLabel()
+void Itom1DQwtPlot::resetAxisLabel()
 {
     m_data.m_autoAxisLabel = true;
     if(m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString Itom1DQwtFigure::getValueLabel() const
+QString Itom1DQwtPlot::getValueLabel() const
 {
     if(m_data.m_autoValueLabel)
     {
@@ -355,7 +355,7 @@ QString Itom1DQwtFigure::getValueLabel() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::setValueLabel(const QString &label)
+void Itom1DQwtPlot::setValueLabel(const QString &label)
 {
     if(label == "<auto>")
     {
@@ -370,7 +370,7 @@ void Itom1DQwtFigure::setValueLabel(const QString &label)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::resetValueLabel()
+void Itom1DQwtPlot::resetValueLabel()
 {
     m_data.m_autoValueLabel = true;
     if(m_pContent) m_pContent->updateLabels();
@@ -378,7 +378,7 @@ void Itom1DQwtFigure::resetValueLabel()
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuPanner(bool checked)
+void Itom1DQwtPlot::mnuPanner(bool checked)
 {
     if(checked)
     {
@@ -395,7 +395,7 @@ void Itom1DQwtFigure::mnuPanner(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuZoomer(bool checked)
+void Itom1DQwtPlot::mnuZoomer(bool checked)
 {
     if(checked)
     {
@@ -412,7 +412,7 @@ void Itom1DQwtFigure::mnuZoomer(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuMarkerClick(bool checked)
+void Itom1DQwtPlot::mnuMarkerClick(bool checked)
 {
     if(checked)
     {
@@ -424,7 +424,7 @@ void Itom1DQwtFigure::mnuMarkerClick(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuExport()
+void Itom1DQwtPlot::mnuExport()
 {
 #ifndef QT_NO_PRINTER
     QString fileName = "plot1D.pdf";
@@ -478,7 +478,7 @@ void Itom1DQwtFigure::mnuExport()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuScaleSetting()
+void Itom1DQwtPlot::mnuScaleSetting()
 {
     Dialog1DScale *dlg = new Dialog1DScale(m_data, this);
     if(dlg->exec() == QDialog::Accepted)
@@ -492,7 +492,7 @@ void Itom1DQwtFigure::mnuScaleSetting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuParentScaleSetting()
+void Itom1DQwtPlot::mnuParentScaleSetting()
 {
     if(m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
@@ -520,7 +520,7 @@ void Itom1DQwtFigure::mnuParentScaleSetting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuSetMarker(QAction *action)
+void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 {
     if(m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
@@ -548,7 +548,7 @@ void Itom1DQwtFigure::mnuSetMarker(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuCmplxSwitch(QAction *action)
+void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
 {
     DataObjectSeriesData *seriesData;
 	if (m_pContent)
@@ -587,34 +587,34 @@ void Itom1DQwtFigure::mnuCmplxSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom1DQwtFigure::getYAxisInterval(void) 
+QPointF Itom1DQwtPlot::getYAxisInterval(void) 
 { 
     return (m_pContent)->m_startRangeY;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-void Itom1DQwtFigure::setYAxisInterval(QPointF interval) 
+void Itom1DQwtPlot::setYAxisInterval(QPointF interval) 
 { 
     (m_pContent)->setInterval(Qt::YAxis, 0, interval.x(), interval.y());
     return; 
 }   
 
 //----------------------------------------------------------------------------------------------------------------------------------   
-void Itom1DQwtFigure::setMarkerText(const QString &coords, const QString &offsets)
+void Itom1DQwtPlot::setMarkerText(const QString &coords, const QString &offsets)
 {
     m_lblMarkerCoords->setText(coords);
     m_lblMarkerOffsets->setText(offsets);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::enableComplexGUI(const bool checked)
+void Itom1DQwtPlot::enableComplexGUI(const bool checked)
 { 
     m_actCmplxSwitch->setEnabled(checked);
     m_actCmplxSwitch->setVisible(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtFigure::mnuHome()
+void Itom1DQwtPlot::mnuHome()
 {
     m_pContent->m_pZoomer->zoom(0);
 }

@@ -1,6 +1,6 @@
-#include "matplotlibfigure.h"
+#include "matplotlibplot.h"
 
-MatplotlibFigure::MatplotlibFigure(QWidget *parent)
+MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     : QMainWindow(parent),
     m_actHome(NULL),
     m_actForward(NULL),
@@ -94,7 +94,7 @@ MatplotlibFigure::MatplotlibFigure(QWidget *parent)
     setCentralWidget(m_pContent);
 }
 
-MatplotlibFigure::~MatplotlibFigure()
+MatplotlibPlot::~MatplotlibPlot()
 {
     if(m_pMatplotlibSubfigConfig)
     {
@@ -103,7 +103,7 @@ MatplotlibFigure::~MatplotlibFigure()
     }
 }
 
-void MatplotlibFigure::resizeCanvas(int width, int height)
+void MatplotlibPlot::resizeCanvas(int width, int height)
 {
     if(m_toolbar->isVisible() && m_toolbar->isFloating() == false)
     {
@@ -122,18 +122,18 @@ void MatplotlibFigure::resizeCanvas(int width, int height)
     }
 }
 
-void MatplotlibFigure::setToolbarVisible(bool visible)
+void MatplotlibPlot::setToolbarVisible(bool visible)
 {
     if(m_toolbar) m_toolbar->setVisible(visible);
 }
 
-bool MatplotlibFigure::getToolbarVisible() const 
+bool MatplotlibPlot::getToolbarVisible() const 
 { 
     if(m_toolbar) return m_toolbar->isVisible();
     return false; 
 }
 
-void MatplotlibFigure::mnuMarkerClick(bool checked)
+void MatplotlibPlot::mnuMarkerClick(bool checked)
 {
     if(m_pContent)
     {
@@ -142,7 +142,7 @@ void MatplotlibFigure::mnuMarkerClick(bool checked)
     }
 }
 
-void MatplotlibFigure::setContextMenuEnabled(bool show)
+void MatplotlibPlot::setContextMenuEnabled(bool show)
 {
     if(m_pContent) 
     {
@@ -150,13 +150,13 @@ void MatplotlibFigure::setContextMenuEnabled(bool show)
     }
 }
 
-bool MatplotlibFigure::getContextMenuEnabled() const
+bool MatplotlibPlot::getContextMenuEnabled() const
 {
     if(m_pContent) return m_pContent->m_showContextMenu;
     return false;
 }
 
-void MatplotlibFigure::showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace)
+void MatplotlibPlot::showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace)
 {
     if(m_pMatplotlibSubfigConfig == NULL)
     {

@@ -1,5 +1,5 @@
-#ifndef MATPLOTLIBFIGURE_H
-#define MATPLOTLIBFIGURE_H
+#ifndef MATPLOTLIBPLOT_H
+#define MATPLOTLIBPLOT_H
 
 #include <qmainwindow.h>
 #include <qaction.h>
@@ -9,13 +9,18 @@
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
 
-class MatplotlibFigure : public QMainWindow
+class MatplotlibPlot : public QMainWindow
 {
     Q_OBJECT
+    Q_PROPERTY(bool toolbarVisible READ getToolbarVisible WRITE setToolbarVisible DESIGNABLE true)
+    Q_PROPERTY(bool contextMenuEnabled READ getContextMenuEnabled WRITE setContextMenuEnabled DESIGNABLE true)
+
+    Q_CLASSINFO("info://toolbarVisible", "Toggles the visibility of the toolbar of the plot.")
+    Q_CLASSINFO("info://contextMenuEnabled", "Defines whether the context menu of the plot should be enabled or not.")
 
 public:
-    MatplotlibFigure(QWidget *parent = 0);
-    ~MatplotlibFigure();
+    MatplotlibPlot(QWidget *parent = 0);
+    ~MatplotlibPlot();
 
     //properties
     void setToolbarVisible(bool visible);
@@ -61,4 +66,4 @@ public slots:
 
 };
 
-#endif // MATPLOTLIBFIGURE_H
+#endif // MATPLOTLIBPLOT_H

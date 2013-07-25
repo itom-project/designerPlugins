@@ -87,8 +87,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 
         //properties
         ito::RetVal displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID);
-        void setShowContextMenu(bool show); 
-        bool showContextMenu() const;
+        
         ito::RetVal applyUpdate();  //!> does the real update work
         QSharedPointer<ito::DataObject> getSource(void);
         QSharedPointer<ito::DataObject> getDisplayed(void);
@@ -111,6 +110,15 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         void setLinePlotCoordinates(const QVector<QPointF> pts);
 
         GL3DEFilter *m_pEventFilter;
+
+        QPointF getZAxisInterval(void);
+        void setZAxisInterval(QPointF);
+
+        QString getColorMap(void);
+        void setColorMap(QString);
+
+        void setContextMenuEnabled(bool show); 
+        bool getContextMenuEnabled() const;
 
     protected:
         plotGLWidget* m_pContent;
@@ -179,10 +187,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         void mnuExport();
         //void mnuSwitchColorMode(QAction *action);
 
-        QPointF getZAxisInterval(void);
-        void setZAxisInterval(QPointF);
-        QString getColorPalette(void);
-        void setColorPalette(QString);
+        
         void triggerReplot();
 };
 

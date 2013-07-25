@@ -46,7 +46,6 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
     Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
-    Q_PROPERTY(QString colorMap READ getColorMap WRITE setColorMap)
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -57,8 +56,8 @@ public:
     ito::RetVal applyUpdate();  //!> does the real update work
 
 	//properties (setter/getter)
-	void setShowContextMenu(bool show) {}; 
-	bool showContextMenu() const { return false; };
+	void setContextMenuEnabled(bool show) {}; 
+	bool getContextMenuEnabled() const { return false; };
 
 	bool colorBarVisible() const;
 	void setColorBarVisible(bool value);

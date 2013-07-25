@@ -300,13 +300,13 @@ QSharedPointer<ito::DataObject> ItomIsoGLWidget::getSource(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomIsoGLWidget::setShowContextMenu(bool show)
+void ItomIsoGLWidget::setContextMenuEnabled(bool show)
 {
     if(m_pContent) ((plotGLWidget*)m_pContent)->m_showContextMenu = show;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool ItomIsoGLWidget::showContextMenu() const
+bool ItomIsoGLWidget::getContextMenuEnabled() const
 {
     if(m_pContent) return ((plotGLWidget*)m_pContent)->m_showContextMenu;
     return false;
@@ -577,13 +577,13 @@ void ItomIsoGLWidget::setZAxisInterval(QPointF interval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString ItomIsoGLWidget::getColorPalette(void)
+QString ItomIsoGLWidget::getColorMap(void)
 {
     return QString();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomIsoGLWidget::setColorPalette(QString palette)
+void ItomIsoGLWidget::setColorMap(QString palette)
 {
     ((plotGLWidget*)m_pContent)->setColorMap(palette);
 }

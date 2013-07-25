@@ -56,8 +56,8 @@ class itom2DGVFigure : public ito::AbstractDObjFigure
 
         //properties
         ito::RetVal displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID);
-        void setShowContextMenu(bool show); 
-        bool showContextMenu() const;
+        void setContextMenuEnabled(bool show); 
+        bool getContextMenuEnabled() const;
         ito::RetVal applyUpdate();  //!> does the real update work
         QSharedPointer<ito::DataObject> getSource(void);
         QSharedPointer<ito::DataObject> getDisplayed(void);
@@ -87,6 +87,12 @@ class itom2DGVFigure : public ito::AbstractDObjFigure
         {
             m_pPaletteRep->setText(newPalette);
         }
+
+        QPointF getZAxisInterval(void);
+        void setZAxisInterval(QPointF);
+
+        QString getColorMap(void);
+        void setColorMap(QString);
 
     protected:
         plot2DWidget *m_pContent;
@@ -142,10 +148,7 @@ class itom2DGVFigure : public ito::AbstractDObjFigure
         void mnuExport();
         void mnuSwitchColorMode(QAction *action);
 
-        QPointF getZAxisInterval(void);
-        void setZAxisInterval(QPointF);
-        QString getColorPalette(void);
-        void setColorPalette(QString);
+        
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

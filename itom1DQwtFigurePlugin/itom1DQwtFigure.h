@@ -54,6 +54,10 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
 
+    Q_CLASSINFO("info://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
+    Q_CLASSINFO("info://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
+    Q_CLASSINFO("info://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
+
     public:
         Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         virtual ~Itom1DQwtFigure();
@@ -61,8 +65,8 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
 
         //properties
-        bool showContextMenu() const;
-        void setShowContextMenu(bool show); 
+        bool getContextMenuEnabled() const;
+        void setContextMenuEnabled(bool show); 
 
         QVector<QPointF> getBounds(void);
         void setBounds(QVector<QPointF> bounds);

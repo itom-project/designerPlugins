@@ -366,13 +366,13 @@ QSharedPointer<ito::DataObject> itom2DGVFigure::getSource(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void itom2DGVFigure::setShowContextMenu(bool show)
+void itom2DGVFigure::setContextMenuEnabled(bool show)
 {
     if(m_pContent) ((plot2DWidget*)m_pContent)->m_showContextMenu = show;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool itom2DGVFigure::showContextMenu() const
+bool itom2DGVFigure::getContextMenuEnabled() const
 {
     if(m_pContent) return ((plot2DWidget*)m_pContent)->m_showContextMenu;
     return false;
@@ -805,13 +805,13 @@ void itom2DGVFigure::setZAxisInterval(QPointF interval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-QString itom2DGVFigure::getColorPalette(void) 
+QString itom2DGVFigure::getColorMap(void) 
 { 
     return QString(); 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-void itom2DGVFigure::setColorPalette(QString palette) 
+void itom2DGVFigure::setColorMap(QString palette) 
 { 
     ((plot2DWidget*)m_pContent)->refreshColorMap(palette);
 }

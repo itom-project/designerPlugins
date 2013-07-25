@@ -350,13 +350,13 @@ QSharedPointer<ito::DataObject> itom2DQwtFigure::getSource(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void itom2DQwtFigure::setShowContextMenu(bool show)
+void itom2DQwtFigure::setContextMenuEnabled(bool show)
 {
     if(m_pContent) m_pContent->m_showContextMenu = show;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool itom2DQwtFigure::showContextMenu() const
+bool itom2DQwtFigure::getContextMenuEnabled() const
 {
     if(m_pContent) return m_pContent->m_showContextMenu;
     return false;

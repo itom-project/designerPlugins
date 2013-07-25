@@ -20,14 +20,12 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef ITOM2D_QWT_FIGURE_H
-#define ITOM2D_QWT_FIGURE_H
+#ifndef ITOMPLOT_H
+#define ITOMPLOT_H
 
 #include "plot/AbstractDObjFigure.h"
 
-#include "plot2DWidget.h"
-
-#include "valuepicker2d.h"
+#include "plot1DWidget.h"
 
 #include <qwt_plot.h>
 #include <qgridlayout.h>
@@ -39,6 +37,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 
+
 #include <qaction.h>
 
 #include <qsharedpointer.h>
@@ -46,88 +45,94 @@
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
-class itom2DQwtFigure : public ito::AbstractDObjFigure
+
+class Itom1DQwtPlot : public ito::AbstractDObjFigure
 {
     Q_OBJECT
+    Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
+    Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
+    Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
+    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
+
+    Q_CLASSINFO("info://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
+    Q_CLASSINFO("info://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
+    Q_CLASSINFO("info://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
 
     public:
-        itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
-        ~itom2DQwtFigure();
+        Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
+        virtual ~Itom1DQwtPlot();
+
+        ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
 
         //properties
-        ito::RetVal displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, const ito::uint8 direction);
-        void setContextMenuEnabled(bool show); 
         bool getContextMenuEnabled() const;
-        ito::RetVal applyUpdate();  //!> does the real update work
-        QSharedPointer<ito::DataObject> getSource(void);
-        QSharedPointer<ito::DataObject> getDisplayed(void);
+        void setContextMenuEnabled(bool show); 
 
-        virtual inline void setOutpBounds(QVector<QPointF> bounds) 
-        { 
-            double *pointArr = new double[2 * bounds.size()];
-            for (int np = 0; np < bounds.size(); np++)
-            {
-                pointArr[np * 2] = bounds[np].x();
-                pointArr[np * 2 + 1] = bounds[np].y();
-            }
-            m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
-            delete pointArr;
-        }
+        QVector<QPointF> getBounds(void);
+        void setBounds(QVector<QPointF> bounds);
 
+        
         void enableComplexGUI(const bool checked);
-        void enableZStackGUI(const bool checked);
-        void setLinePlotCoordinates(const QVector<QPointF> pts);
 
-        QPointF getZAxisInterval(void);
-        void setZAxisInterval(QPointF);
+        QString getTitle() const;
+        void setTitle(const QString &title);
+        void resetTitle();
 
+        QString getAxisLabel() const;
+        void setAxisLabel(const QString &label);
+        void resetAxisLabel();
+
+        QString getValueLabel() const;
+        void setValueLabel(const QString &label);
+        void resetValueLabel();
+    
     protected:
-        Plot2DWidget *m_pContent;
+        ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
+
+        Plot1DWidget *m_pContent;
+        InternalData m_data;
 
     private:
+
         QAction* m_actScaleSetting;
-       
+        QAction* m_rescaleParent;
+
         QAction  *m_actPan;
         QAction  *m_actZoomToRect;
         QAction  *m_actMarker;
-        QAction  *m_actLineCut;
 
-		QAction  *m_actHome;
-		QAction  *m_actSave;
+		QAction *m_actSave;
+		QAction *m_actHome;
 
-        QAction  *m_actPalette;
-        QAction  *m_actToggleColorBar;
+        QMenu    *m_mnuSetMarker;
+        QAction  *m_actSetMarker;
 
-        QAction  *m_actAScan;
-        QAction  *m_actForward;
-        QAction  *m_actBack;
-	    QAction  *m_actCmplxSwitch;
-	    QMenu    *m_mnuCmplxSwitch;
+        QAction *m_actForward;
+        QAction *m_actBack;
+        
+	    QAction* m_actCmplxSwitch;
+	    QMenu *m_mnuCmplxSwitch;
 
-		QLabel *m_lblCoordinates;
-
-    signals:
-    
-    private slots:
+        QLabel *m_lblMarkerOffsets;
+		QLabel *m_lblMarkerCoords;
 
     public slots:
+        void mnuMarkerClick(bool checked);
         void mnuPanner(bool checked);
-        void mnuPalette();
-        void mnuValuePicker(bool checked);
-        void mnuAScanPicker(bool checked);
-        void mnuLinePicker(bool checked);
         void mnuScaleSetting();
-        void mnuColorBar(bool checked);
+        void mnuParentScaleSetting();
 		void mnuCmplxSwitch(QAction *action);
+        void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();
-        void mnuForward();
-        void mnuBack();
+        
 
-	private slots:
-		void mnuHome();
-        QString getColorPalette(void);
-        void setColorPalette(QString);
+        QPointF getYAxisInterval(void);
+        void setYAxisInterval(QPointF);
+
+    private slots:
+        void mnuHome();
+        void setMarkerText(const QString &coords, const QString &offsets);
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -158,4 +163,4 @@ class Plot2DEFilter : public QObject
 */
 //----------------------------------------------------------------------------------------------------------------------------------
 
-#endif // ITOM2D_QWT_FIGURE_H
+#endif // ITOMPLOT_H
