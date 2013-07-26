@@ -14,6 +14,8 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     m_pContent(NULL),
     m_pMatplotlibSubfigConfig(NULL)
 {
+    statusBar()->showMessage("This plot is deprecated. Please replace it by MatplotlibPlot.");
+
     setWindowFlags(Qt::Widget); //this is important such that this main window reacts as widget
 
     m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("home"), this);

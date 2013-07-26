@@ -102,13 +102,13 @@ public:
     void setPlaneRange(int min, int max);
     void setCmplxSwitch(PlotCanvas::ComplexType type, bool visible);
 
-    virtual QPointF getXAxisInterval(void);
+    virtual QPointF getXAxisInterval(void) const;
     virtual void setXAxisInterval(QPointF point);
         
-    virtual QPointF getYAxisInterval(void);
+    virtual QPointF getYAxisInterval(void) const;
     virtual void setYAxisInterval(QPointF point);
         
-    virtual QPointF getZAxisInterval(void);
+    virtual QPointF getZAxisInterval(void) const;
     virtual void setZAxisInterval(QPointF point);
 
     friend class PlotCanvas;

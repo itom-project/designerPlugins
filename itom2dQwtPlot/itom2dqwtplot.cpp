@@ -437,7 +437,7 @@ void Itom2dQwtPlot::setyAxisVisible(const bool &value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom2dQwtPlot::getXAxisInterval(void)
+QPointF Itom2dQwtPlot::getXAxisInterval(void) const
 {
     if (m_pContent)
     {
@@ -456,7 +456,7 @@ void Itom2dQwtPlot::setXAxisInterval(QPointF point)
 }
         
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom2dQwtPlot::getYAxisInterval(void)
+QPointF Itom2dQwtPlot::getYAxisInterval(void) const
 {
     if (m_pContent)
     {
@@ -475,7 +475,7 @@ void Itom2dQwtPlot::setYAxisInterval(QPointF point)
 }
    
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom2dQwtPlot::getZAxisInterval(void)
+QPointF Itom2dQwtPlot::getZAxisInterval(void) const
 {
     if (m_pContent)
     {

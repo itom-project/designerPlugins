@@ -56,6 +56,8 @@ Itom1DQwtFigure::Itom1DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     m_lblMarkerOffsets(NULL),
 	m_lblMarkerCoords(NULL)
 {
+    statusBar()->showMessage("This plot is deprecated. Please replace it by itom1DQwtPlot");
+
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
     
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
@@ -587,7 +589,7 @@ void Itom1DQwtFigure::mnuCmplxSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom1DQwtFigure::getYAxisInterval(void) 
+QPointF Itom1DQwtFigure::getYAxisInterval(void) const
 { 
     return (m_pContent)->m_startRangeY;
 }

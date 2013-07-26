@@ -89,7 +89,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         ito::RetVal displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID);
         
         ito::RetVal applyUpdate();  //!> does the real update work
-        QSharedPointer<ito::DataObject> getSource(void);
+        QSharedPointer<ito::DataObject> getSource(void) const;
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
         virtual inline void setOutpBounds(QVector<QPointF> bounds) 
@@ -111,10 +111,10 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 
         GL3DEFilter *m_pEventFilter;
 
-        QPointF getZAxisInterval(void);
+        QPointF getZAxisInterval(void) const;
         void setZAxisInterval(QPointF);
 
-        QString getColorMap(void);
+        QString getColorMap(void) const;
         void setColorMap(QString);
 
         void setContextMenuEnabled(bool show); 

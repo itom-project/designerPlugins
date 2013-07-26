@@ -59,7 +59,7 @@ class itom2DGVFigure : public ito::AbstractDObjFigure
         void setContextMenuEnabled(bool show); 
         bool getContextMenuEnabled() const;
         ito::RetVal applyUpdate();  //!> does the real update work
-        QSharedPointer<ito::DataObject> getSource(void);
+        QSharedPointer<ito::DataObject> getSource(void) const;
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
         virtual inline void setOutpBounds(QVector<QPointF> bounds) 
@@ -88,10 +88,10 @@ class itom2DGVFigure : public ito::AbstractDObjFigure
             m_pPaletteRep->setText(newPalette);
         }
 
-        QPointF getZAxisInterval(void);
+        QPointF getZAxisInterval(void) const;
         void setZAxisInterval(QPointF);
 
-        QString getColorMap(void);
+        QString getColorMap(void) const;
         void setColorMap(QString);
 
     protected:

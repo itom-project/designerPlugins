@@ -49,6 +49,8 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
 	m_mnuCmplxSwitch(NULL),
 	m_lblCoordinates(NULL)
 {
+    statusBar()->showMessage("This plot is deprecated. Please replace it by itom2DQwtPlot");
+
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy pass through of input source object").toAscii().data()));
 
@@ -339,7 +341,7 @@ QSharedPointer<ito::DataObject> itom2DQwtFigure::getDisplayed(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> itom2DQwtFigure::getSource(void)
+QSharedPointer<ito::DataObject> itom2DQwtFigure::getSource(void) const
 {
 	ito::DataObject *dObj = m_pInput["source"]->getVal<ito::DataObject*>();
 	if(dObj)
@@ -707,7 +709,7 @@ void itom2DQwtFigure::mnuHome()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-QPointF itom2DQwtFigure::getZAxisInterval(void) 
+QPointF itom2DQwtFigure::getZAxisInterval(void) const
 { 
     return ((Plot2DWidget*)m_pContent)->m_startRangeZ;
 }
@@ -720,13 +722,13 @@ void itom2DQwtFigure::setZAxisInterval(QPointF interval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-QString itom2DQwtFigure::getColorPalette(void) 
+QString itom2DQwtFigure::getColorMap(void) const
 { 
     return QString(); 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-void itom2DQwtFigure::setColorPalette(QString palette) 
+void itom2DQwtFigure::setColorMap(QString palette) 
 { 
     m_pContent->refreshColorMap(palette);
 }

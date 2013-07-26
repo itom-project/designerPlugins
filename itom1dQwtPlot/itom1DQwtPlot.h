@@ -71,7 +71,6 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
         QVector<QPointF> getBounds(void);
         void setBounds(QVector<QPointF> bounds);
 
-        
         void enableComplexGUI(const bool checked);
 
         QString getTitle() const;
@@ -85,6 +84,11 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
         QString getValueLabel() const;
         void setValueLabel(const QString &label);
         void resetValueLabel();
+
+        QPointF getYAxisInterval(void) const;
+        void setYAxisInterval(QPointF);
+
+        void setSource(QSharedPointer<ito::DataObject> source);
     
     protected:
         ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
@@ -126,10 +130,6 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuZoomer(bool checked);
         void mnuExport();
         
-
-        QPointF getYAxisInterval(void);
-        void setYAxisInterval(QPointF);
-
     private slots:
         void mnuHome();
         void setMarkerText(const QString &coords, const QString &offsets);

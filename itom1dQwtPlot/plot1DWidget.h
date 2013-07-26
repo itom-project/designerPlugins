@@ -74,6 +74,12 @@ struct InternalData
     bool m_axisScaleAuto;
     double m_axisMin;
     double m_axisMax;
+
+    //true for one replot if setSource-Property has been set 
+    //(even if the same data object is given one more time, 
+    //the hash might be the same, but we want to recalcuate 
+    //boundaries if values of dataObject changed.
+    bool m_forceValueParsing; 
 };
 
 class Plot1DWidget : public QwtPlot
@@ -107,7 +113,7 @@ class Plot1DWidget : public QwtPlot
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
-        void updateScaleValues();
+        void updateScaleValues(bool recalculateBoundaries = false);
 
         
 

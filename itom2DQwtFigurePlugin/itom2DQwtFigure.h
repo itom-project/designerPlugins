@@ -59,7 +59,7 @@ class itom2DQwtFigure : public ito::AbstractDObjFigure
         void setContextMenuEnabled(bool show); 
         bool getContextMenuEnabled() const;
         ito::RetVal applyUpdate();  //!> does the real update work
-        QSharedPointer<ito::DataObject> getSource(void);
+        QSharedPointer<ito::DataObject> getSource(void) const;
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
         virtual inline void setOutpBounds(QVector<QPointF> bounds) 
@@ -78,8 +78,11 @@ class itom2DQwtFigure : public ito::AbstractDObjFigure
         void enableZStackGUI(const bool checked);
         void setLinePlotCoordinates(const QVector<QPointF> pts);
 
-        QPointF getZAxisInterval(void);
+        QPointF getZAxisInterval(void) const;
         void setZAxisInterval(QPointF);
+
+        QString getColorMap(void) const;
+        void setColorMap(QString);
 
     protected:
         Plot2DWidget *m_pContent;
@@ -126,8 +129,7 @@ class itom2DQwtFigure : public ito::AbstractDObjFigure
 
 	private slots:
 		void mnuHome();
-        QString getColorPalette(void);
-        void setColorPalette(QString);
+        
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

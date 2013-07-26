@@ -127,7 +127,7 @@ class Itom1DQwtFigure : public ito::AbstractDObjFigure
         void mnuExport();
         
 
-        QPointF getYAxisInterval(void);
+        QPointF getYAxisInterval(void) const;
         void setYAxisInterval(QPointF);
 
     private slots:

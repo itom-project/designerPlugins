@@ -294,7 +294,7 @@ QSharedPointer<ito::DataObject> ItomIsoGLWidget::getDisplayed(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> ItomIsoGLWidget::getSource(void)
+QSharedPointer<ito::DataObject> ItomIsoGLWidget::getSource(void) const
 {
     return QSharedPointer<ito::DataObject>(m_pInput["source"]->getVal<ito::DataObject*>());
 }
@@ -563,7 +563,7 @@ void ItomIsoGLWidget::mnuTringModeSwitch(QAction *action)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF ItomIsoGLWidget::getZAxisInterval(void)
+QPointF ItomIsoGLWidget::getZAxisInterval(void) const
 {
     //return ((plotGLWidget*)m_pContent)->m_startRangeZ;
     return QPointF(0.0, 1.0);
@@ -577,7 +577,7 @@ void ItomIsoGLWidget::setZAxisInterval(QPointF interval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString ItomIsoGLWidget::getColorMap(void)
+QString ItomIsoGLWidget::getColorMap(void) const
 {
     return QString();
 }

@@ -486,6 +486,28 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
             m_pZoomer->setZoomBase( true );
         }
+        else if( m_pData->m_forceValueParsing)
+        {
+            updateMarkerPosition(true);
+
+
+            QRectF rect = seriesData->boundingRect();
+            if(m_pData->m_valueScaleAuto)
+            {
+                m_pData->m_valueMin = rect.top();
+                m_pData->m_valueMax = rect.bottom();
+            }
+
+            if(m_pData->m_axisScaleAuto)
+            {
+                m_pData->m_axisMin = rect.left();
+                m_pData->m_axisMax = rect.right();
+            }
+
+            updateScaleValues(); //replot is done here
+
+            m_pData->m_forceValueParsing = false;
+        }
         else
         {
             updateMarkerPosition(true,false);
@@ -1035,20 +1057,29 @@ void Plot1DWidget::setPannerEnable(const bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::updateScaleValues()
+void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
 {
-    /*QRectF rect = seriesData->boundingRect();
-    if(m_pData->m_valueScaleAuto)
+    if (recalculateBoundaries)
     {
-        m_pData->m_valueMin = rect.top();
-        m_pData->m_valueMax = rect.bottom();
-    }
+        QRectF rect;
 
-    if(m_pData->m_axisScaleAuto)
-    {
-        m_pData->m_axisMin = rect.left();
-        m_pData->m_axisMax = rect.right();
-    }*/
+        foreach( QwtPlotCurve *curve, m_plotCurveItems)
+        {
+            rect = rect.unite( ((DataObjectSeriesData *)curve->data())->boundingRect() );
+        }
+
+        if(m_pData->m_valueScaleAuto)
+        {
+            m_pData->m_valueMin = rect.top();
+            m_pData->m_valueMax = rect.bottom();
+        }
+
+        if(m_pData->m_axisScaleAuto)
+        {
+            m_pData->m_axisMin = rect.left();
+            m_pData->m_axisMax = rect.right();
+        }
+    }
 
     setAxisScale( QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax );
     

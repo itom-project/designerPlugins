@@ -201,6 +201,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_valueMin = -127.0;
     m_data.m_valueMax = 128.0;
     m_data.m_axisScaleAuto = true;
+    m_data.m_forceValueParsing = false;
 
     m_pContent = new Plot1DWidget(contextMenu, &m_data, this);
     m_pContent->setObjectName("canvasWidget");
@@ -233,6 +234,13 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
     }
 
     return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
+{
+    m_data.m_forceValueParsing = true; //recalculate boundaries since content of data object may have changed
+    AbstractDObjFigure::setSource(source);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -484,7 +492,15 @@ void Itom1DQwtPlot::mnuScaleSetting()
     if(dlg->exec() == QDialog::Accepted)
     {
         dlg->getData(m_data);
-        m_pContent->updateScaleValues();
+
+         bool recalculateBoundaries = false;
+
+        if (m_data.m_valueScaleAuto == true || m_data.m_axisScaleAuto == true)
+        {
+            recalculateBoundaries = true;
+        }
+
+        m_pContent->updateScaleValues(recalculateBoundaries);
     }
 
     delete dlg;
@@ -587,7 +603,7 @@ void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom1DQwtPlot::getYAxisInterval(void) 
+QPointF Itom1DQwtPlot::getYAxisInterval(void) const
 { 
     return (m_pContent)->m_startRangeY;
 }

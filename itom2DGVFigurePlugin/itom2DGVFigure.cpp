@@ -360,7 +360,7 @@ QSharedPointer<ito::DataObject> itom2DGVFigure::getDisplayed(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> itom2DGVFigure::getSource(void)
+QSharedPointer<ito::DataObject> itom2DGVFigure::getSource(void) const
 {
     return QSharedPointer<ito::DataObject>(m_pInput["source"]->getVal<ito::DataObject*>());
 }
@@ -792,7 +792,7 @@ void itom2DGVFigure::mnuSwitchColorMode(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-QPointF itom2DGVFigure::getZAxisInterval(void) 
+QPointF itom2DGVFigure::getZAxisInterval(void) const
 { 
     return ((plot2DWidget*)m_pContent)->m_startRangeZ;
 }
@@ -805,7 +805,7 @@ void itom2DGVFigure::setZAxisInterval(QPointF interval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-QString itom2DGVFigure::getColorMap(void) 
+QString itom2DGVFigure::getColorMap(void) const
 { 
     return QString(); 
 }
