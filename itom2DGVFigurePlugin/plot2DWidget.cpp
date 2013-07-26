@@ -216,7 +216,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
                 ito::ItomPalette newPalette;
 
                 apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
-                m_ObjectContainer->setColorTable(newPalette.get256Colors());
+                m_ObjectContainer->setColorTable(newPalette.colorVector256);
                 //refreshColorMap();
             }
             else
@@ -241,6 +241,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
                 m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
                 m_pLineCut->setVisible(false);
                 m_lineIsSampling = false;
+                m_pLineCut->setPen(QPen(QColor(Qt::darkGreen)));
             }
 
             if(!m_pointMarker)
@@ -574,7 +575,8 @@ void plot2DWidget::refreshColorMap(QString palette)
         //    return;
 
         retval += apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
-        ((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.getName());
+        //((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.getName());
+        ((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.name);
     }
     else if(!palette.compare("RGB24", Qt::CaseInsensitive))
     {
@@ -600,33 +602,30 @@ void plot2DWidget::refreshColorMap(QString palette)
     {
         retval += apiPaletteGetColorBarName(palette, newPalette);
         retval += apiPaletteGetColorBarIdxFromName(palette, m_paletteNum);
-        ((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.getName());
+        //((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.getName());
+        ((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.name);
     }
 
-    if(newPalette.getSize() < 2)
+    
+    if(newPalette.colorVector256.isEmpty())
     {
         return;
     }
-
+    if(newPalette.inverseColorOne.isValid() && m_pLineCut)
+    {
+        m_pLineCut->setPen(QPen(newPalette.inverseColorOne));
+        //m_pLineCut->set
+    }
     if(isFalseColor)
     {
-        QVector<ito::uint32> colors(newPalette.get256Colors());
-        /*
-        QImage colorBar(128, 8, QImage::Format_ARGB32);
+
         
 
-        for(int y = 0; y < 8; y++)
-        {
-            for(int x = 1; y < 127; y++)
-            {
-                colorBar.setPixel(x, y, colors[x] + 0xFF000000);
-            }       
-        }
-        ((itom2DGVFigure*)m_pParent)->setPaletteColor(colorBar);
-        */
+        //QVector<ito::uint32> colors(newPalette.get256Colors());
         if(m_ObjectContainer != NULL)
         {
-            m_ObjectContainer->setColorTable(colors);
+            //m_ObjectContainer->setColorTable(colors);
+            m_ObjectContainer->setColorTable(newPalette.colorVector256);
         }
     }
     ito::ParamBase temp("newPalette", ito::ParamBase::Int, 1);

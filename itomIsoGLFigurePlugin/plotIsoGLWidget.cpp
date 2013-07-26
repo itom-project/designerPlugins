@@ -250,19 +250,27 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
         apiPaletteGetNumberOfColorBars(numColBars);
         apiPaletteGetColorBarIdx((m_currentColor + 1) % numColBars, newPalette);
 
-        m_currentPalette = newPalette.get256Colors();
+        m_currentPalette = newPalette.colorVector256;
 
     }
     else
     {
         // Only false Colors
+        /*
         ito::ItomPalette newPalette("falseColorIR", ito::ItomPalette::FCPalette | ito::ItomPalette::LinearPalette, QColor::fromRgb(165, 30, 165), Qt::white);
         newPalette.insertColorStop(0.15, Qt::blue);
         newPalette.insertColorStop(0.35, Qt::cyan);
         newPalette.insertColorStop(0.55, Qt::green);
         newPalette.insertColorStop(0.75, Qt::yellow);
         newPalette.insertColorStop(0.97, Qt::red);
-        m_currentPalette = newPalette.get256Colors();
+        */
+        m_currentPalette = QVector<ito::uint32>(256);
+
+        for(int i = 0; i < 256; i++)
+        {
+            m_currentPalette[i] = i + i << 8 + i << 16;
+        }
+
     }
 
 
@@ -2786,12 +2794,12 @@ void plotGLWidget::setColorMap(QString palette)
         retval += apiPaletteGetColorBarIdxFromName(palette, m_paletteNum);
     }
 
-    if(newPalette.getSize() < 2)
+    if(newPalette.colorVector256.size() < 255)
     {
         return;
     }
 
-    m_currentPalette = newPalette.get256Colors();
+    m_currentPalette = newPalette.colorVector256;
 
     makeCurrent();
 

@@ -357,15 +357,17 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
         return;
     }
 
-    if (newPalette.getSize() < 2)
+    int totalStops = newPalette.colorStops.size();
+
+    if (totalStops < 2)
     {
         emit statusBarMessage( tr("Selected color map has less than two points."), 4000 );
         return;
     }
 
-    m_colorMapName = newPalette.getName();
-   
+    m_colorMapName = newPalette.name;
 
+/*
     if(newPalette.getPos(newPalette.getSize() - 1) == newPalette.getPos(newPalette.getSize() - 2))  // BuxFix - For Gray-Marked
     {
         colorMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColor(newPalette.getSize() - 2), QwtColorMap::Indexed);
@@ -391,6 +393,50 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
             {
                 colorMap->addColorStop(newPalette.getPos(i), newPalette.getColor(i));
                 colorBarMap->addColorStop(newPalette.getPos(i), newPalette.getColor(i));
+            }
+        }
+    }
+*/
+
+    if(newPalette.inverseColorOne.isValid() /* && newPalette.inverseColorTwo.isValid() */)
+    {
+        m_pLineCutPicker->setRubberBandPen(QPen(newPalette.inverseColorOne));
+        m_pLineCutPicker->setTrackerPen(QPen(newPalette.inverseColorOne));
+        m_pLineCutLine->setPen(newPalette.inverseColorOne);
+    }
+    else
+    {
+        m_pLineCutPicker->setRubberBandPen(QPen(Qt::gray));
+        m_pLineCutPicker->setTrackerPen(QPen(Qt::gray));
+        m_pLineCutLine->setPen(Qt::gray);
+    }
+
+
+    if(newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first )  // BuxFix - For Gray-Marked
+    {
+        colorMap    = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
+        colorBarMap = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);   
+        if(totalStops > 2)
+        {
+            for(int i = 1; i < totalStops - 2; i++)
+            {
+                colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+                colorBarMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+            }
+            colorMap->addColorStop(newPalette.colorStops[totalStops-1].first, newPalette.colorStops[totalStops-1].second);
+            colorBarMap->addColorStop(newPalette.colorStops[totalStops-1].first, newPalette.colorStops[totalStops-1].second);
+        }    
+    }
+    else
+    {
+        colorMap    = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
+        colorBarMap = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);   
+        if(totalStops > 2)
+        {
+            for(int i = 1; i < totalStops - 1; i++)
+            {
+                colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+                colorBarMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
             }
         }
     }
