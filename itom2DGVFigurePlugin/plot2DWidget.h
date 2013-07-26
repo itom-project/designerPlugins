@@ -72,10 +72,6 @@ class plot2DWidget :  public QGraphicsView
         void resizeEvent (QResizeEvent * event);
         void keyPressEvent ( QKeyEvent * event );
         void keyReleaseEvent ( QKeyEvent * event );
-        void leaveEvent ( QEvent * event );
-        void enterEvent ( QEvent * event );
-        void wheelEvent( QWheelEvent * event );
-        void mouseDoubleClickEvent ( QMouseEvent * event );
         void mouseMoveEvent ( QMouseEvent * event );
         void mousePressEvent ( QMouseEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
@@ -86,29 +82,9 @@ class plot2DWidget :  public QGraphicsView
         void trackerMoved(const QPointF &pt);
         void trackerAppended(const QPointF &pt);
 
-        struct PendingEvent
-        {
-            public:
-                PendingEvent() : m_valid(false) {}
-                PendingEvent(int x, int y, int button) : m_type(typeMouseMove), m_x(x), m_y(y), m_button(button), m_valid(true) {}
-                PendingEvent(const PendingEvent &cpy) : m_type(cpy.m_type), m_x(cpy.m_x), m_y(cpy.m_y), m_button(cpy.m_button), m_h(cpy.m_h), m_w(cpy.m_w), m_valid(cpy.m_valid) {}
-                bool isValid() { return m_valid; }
-                void clear() { m_valid = false; }
-                enum tPendingEventType { typeResize, typeMouseMove };
-
-                tPendingEventType m_type;
-                int m_x;
-                int m_y;
-                int m_button;
-                int m_h;
-                int m_w;
-                bool m_valid;
-        };
         void handleMouseEvent( int type, QMouseEvent *event);
 
-        QTimer m_timer;
         ito::uint32 m_lineplotUID;
-        PendingEvent m_pendingEvent;
         QMenu *m_contextMenu;
 
         RasterToQImageObj *m_ObjectContainer;
@@ -165,22 +141,10 @@ class plot2DWidget :  public QGraphicsView
         bool m_stackState;
 
     signals:
-        void eventLeaveEnter(bool enter);
-        void eventMouse(int type, int x, int y, int button);
-        void eventWheel(int x, int y, int delta, int orientation);
-        void eventKey(int type, int keyId, QString keyString, bool autoRepeat);
-        void eventPaintRequest();
-        void eventIdle();
-
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
     public slots:
-        void paintTimeout();
-        void stopTimer()
-        {
-            m_timer.stop();
-        }
 
         void updatePointTracker();
 

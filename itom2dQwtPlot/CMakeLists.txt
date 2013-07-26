@@ -36,25 +36,6 @@ ADD_DEFINITIONS(-DCMAKE)
 #SET (QT_USE_QTOPENGL TRUE)
 SET (QT_USE_QTXML TRUE)
 
-# using custom macro for qtCreator compability, i.e. put ui files into GeneratedFiles/ folder
-MACRO (QT4_WRAP_UI outfiles )
-  QT4_EXTRACT_OPTIONS(ui_files ui_options ${ARGN})
-
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../GeneratedFiles)
-
-  FOREACH (it ${ui_files})
-    GET_FILENAME_COMPONENT(outfile ${it} NAME_WE)
-    GET_FILENAME_COMPONENT(infile ${it} ABSOLUTE)
-    SET(outfile ${CMAKE_CURRENT_SOURCE_DIR}/../GeneratedFiles/ui_${outfile}.h) # Here we set output
-    ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
-      COMMAND ${QT_UIC_EXECUTABLE}
-      ARGS ${ui_options} -o ${outfile} ${infile}
-      MAIN_DEPENDENCY ${infile})
-    SET(${outfiles} ${${outfiles}} ${outfile})
-  ENDFOREACH (it)
-
-ENDMACRO (QT4_WRAP_UI)
-
 # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
 IF (DEFINED CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")

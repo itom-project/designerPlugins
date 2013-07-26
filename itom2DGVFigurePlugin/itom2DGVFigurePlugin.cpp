@@ -56,7 +56,7 @@ QString itom2DGVFigurePlugin::group() const
 
 QIcon itom2DGVFigurePlugin::icon() const
 {
-    return QIcon(":/itom/icons/q_itoM32.png");
+    return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
 
 QString itom2DGVFigurePlugin::toolTip() const

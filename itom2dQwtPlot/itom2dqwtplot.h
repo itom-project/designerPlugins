@@ -47,14 +47,14 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
     Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
 
-    Q_CLASSINFO("info://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
-    Q_CLASSINFO("info://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
-    Q_CLASSINFO("info://xAxisVisible", "Sets visibility of the x-axis.")
-    Q_CLASSINFO("info://yAxisLabel", "Label of the y-axis or '<auto>' if the description from the data object should be used.")
-    Q_CLASSINFO("info://yAxisVisible", "Sets visibility of the y-axis.")
-    Q_CLASSINFO("info://yAxisFlipped", "Sets whether y-axis should be flipped (default: false, zero is at the bottom).")
-    Q_CLASSINFO("info://valueLabel", "Label of the value axis or '<auto>' if the description should be used from data object.")
-    Q_CLASSINFO("info://colorBarVisible", "Defines whether the color bar should be visible.")
+    Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
+    Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
+    Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
+    Q_CLASSINFO("prop://yAxisLabel", "Label of the y-axis or '<auto>' if the description from the data object should be used.")
+    Q_CLASSINFO("prop://yAxisVisible", "Sets visibility of the y-axis.")
+    Q_CLASSINFO("prop://yAxisFlipped", "Sets whether y-axis should be flipped (default: false, zero is at the bottom).")
+    Q_CLASSINFO("prop://valueLabel", "Label of the value axis or '<auto>' if the description should be used from data object.")
+    Q_CLASSINFO("prop://colorBarVisible", "Defines whether the color bar should be visible.")
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);

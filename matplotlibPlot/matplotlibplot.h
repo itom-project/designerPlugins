@@ -15,8 +15,8 @@ class MatplotlibPlot : public QMainWindow
     Q_PROPERTY(bool toolbarVisible READ getToolbarVisible WRITE setToolbarVisible DESIGNABLE true)
     Q_PROPERTY(bool contextMenuEnabled READ getContextMenuEnabled WRITE setContextMenuEnabled DESIGNABLE true)
 
-    Q_CLASSINFO("info://toolbarVisible", "Toggles the visibility of the toolbar of the plot.")
-    Q_CLASSINFO("info://contextMenuEnabled", "Defines whether the context menu of the plot should be enabled or not.")
+    Q_CLASSINFO("prop://toolbarVisible", "Toggles the visibility of the toolbar of the plot.")
+    Q_CLASSINFO("prop://contextMenuEnabled", "Defines whether the context menu of the plot should be enabled or not.")
 
 public:
     MatplotlibPlot(QWidget *parent = 0);

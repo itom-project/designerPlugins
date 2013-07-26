@@ -25,21 +25,6 @@
 
 #include "DataObject/dataObjectFuncs.h"
 
-/*
-#include <qwt_color_map.h>
-#include <qwt_plot_layout.h>
-#include <qwt_matrix_raster_data.h>
-#include <qwt_scale_widget.h>
-#include <qwt_plot_magnifier.h>
-#include <qwt_plot_panner.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_canvas.h>
-#include <qwt_symbol.h>
-#include <qwt_picker.h>
-#include <qwt_picker_machine.h>
-*/
-
 #include <qimage.h>
 
 #include <qpixmap.h>
@@ -77,9 +62,6 @@ plot2DWidget::plot2DWidget(QMenu *contextMenu, QWidget * parent) :
 
     this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
 
-    m_timer.setSingleShot(true);
-    QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(paintTimeout()));
-
     m_pContent = new QGraphicsScene(this);
     setScene(m_pContent);
     //refreshColorMap();
@@ -90,25 +72,6 @@ plot2DWidget::~plot2DWidget()
 {
     delete m_ObjectContainer;
     m_ObjectContainer = NULL;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::paintTimeout()
-{
-    if(m_pendingEvent.isValid())
-    {
-        
-        switch(m_pendingEvent.m_type)
-        {
-            case PendingEvent::typeMouseMove:
-                //qDebug() << "timer active?" << m_timer.isActive();
-                m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
-                //qDebug() << "mouseMoveEvent" << m_pendingEvent.m_x << m_pendingEvent.m_y << m_pendingEvent.m_button;
-                emit eventMouse(2, m_pendingEvent.m_x,m_pendingEvent.m_y, m_pendingEvent.m_button);
-                m_pendingEvent.clear();
-            break;
-        }
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -208,14 +171,6 @@ void plot2DWidget::handleMouseEvent( int type, QMouseEvent *event)
             }
 
         break;
-        default:
-            switch(btn)
-            {
-                case Qt::LeftButton: button = 1; break;
-                case Qt::RightButton: button = 3; break;
-                case Qt::MiddleButton: button = 2; break;
-            }
-            emit eventMouse(type, qRound(scenePos.x()), qRound(scenePos.y()), button);
     }
 }
 
@@ -535,60 +490,7 @@ void plot2DWidget::keyPressEvent ( QKeyEvent * event )
     return;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::leaveEvent ( QEvent * /*event*/ )
-{
-    if (!hasFocus())
-        return;
-    QApplication::restoreOverrideCursor();
-    emit eventLeaveEnter(0);
-}
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::enterEvent ( QEvent * /*event*/ )
-{
-    if (!hasFocus())
-        return;
-    emit eventLeaveEnter(1);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::wheelEvent( QWheelEvent * event )
-{
-    if (!hasFocus())
-        return;
-    QPointF scenePos;
-
-    if(event->orientation() == Qt::Vertical)
-    {
-        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 1);
-    }
-    else
-    {
-        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 0);
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::mouseDoubleClickEvent ( QMouseEvent * event )
-{
-    if (!hasFocus())
-        return;
-
-    Qt::MouseButton btn = event->button();
-    int button;
-
-    switch(btn)
-    {
-        case Qt::LeftButton: button = 1; break;
-        case Qt::RightButton: button = 3; break;
-        case Qt::MiddleButton: button = 2; break;
-    }
-    QPointF scenePos;
-
-    emit eventMouse(1, qRound(scenePos.x()), qRound(scenePos.y()), button);
-    event->accept();
-}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::mouseMoveEvent ( QMouseEvent * event )
@@ -604,7 +506,6 @@ void plot2DWidget::mousePressEvent ( QMouseEvent * event )
 {
     if (!hasFocus())
         return;
-    m_pendingEvent.clear(); //clear possible move events which are still in queue
     handleMouseEvent(0, event);
     event->accept();
 }
@@ -615,7 +516,6 @@ void plot2DWidget::mouseReleaseEvent ( QMouseEvent * event )
     if (!hasFocus())
         return;
     QApplication::restoreOverrideCursor();
-    m_pendingEvent.clear(); //clear possible move events which are still in queue
     handleMouseEvent(3, event);
     event->accept();
 }
