@@ -207,11 +207,14 @@ void MotorController::resizeEvent(QResizeEvent * event )
     int y = 0;
     int border = isFlat() ? 1 : 5;
     int upper = title().length() > 0 ? 10:1;
+    int curpX = 0, curpY = 0;
     if(m_readOnly)
     {
         for(int i = 0; i < m_numVisAxis; i++)
         {
-            m_posWidgets[i]->setGeometry(75 * x + border, 25 * y + border + upper, 70, 20);
+            curpX = 75 * x + border;
+            curpY = 25 * y + border + upper;
+            m_posWidgets[i]->setGeometry(curpX,  curpY, 70, 20);
             x++;
             if(x * 75 + 70 > size().width())
             {
@@ -219,10 +222,11 @@ void MotorController::resizeEvent(QResizeEvent * event )
                 x = 0;
             }
         }
+        this->setMinimumHeight(curpY + 22 + border);
     }
     else
     {
-        int curpX = 0, curpY = 0;
+        
         for(int i = 0; i < m_numVisAxis; i++)
         {
             curpX = 75 * x + border;
@@ -238,8 +242,10 @@ void MotorController::resizeEvent(QResizeEvent * event )
                 y++;
                 x = 0;
             }
-        }    
+        }
+        this->setMinimumHeight(curpY + 42 + border);
     }
+
 }
 //-----------------------------------------------------------------------------------------------
 MotorController::~MotorController()
