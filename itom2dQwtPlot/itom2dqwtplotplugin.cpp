@@ -24,7 +24,7 @@
 
 #include <QtCore/QtPlugin>
 #include "itom2dqwtplotplugin.h"
-
+#include "pluginVersion.h"
 
 Itom2dQwtPlotPlugin::Itom2dQwtPlotPlugin(QObject *parent)
 	: ito::AbstractItomDesignerPlugin(parent)
