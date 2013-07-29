@@ -61,6 +61,7 @@ set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
     ${CMAKE_CURRENT_SOURCE_DIR}/motorController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/motorControllerfactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
@@ -80,6 +81,11 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/motorController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/motorControllerfactory.cpp
 )
+
+#If you want to use automatical metadata for dlls under windows use the following if-case.
+if(MSVC)
+    list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
+endif(MSVC)
 
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})

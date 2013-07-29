@@ -82,7 +82,7 @@ set(designer_SOURCES
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
 if(MSVC)
-    list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../pluginLibraryVersion.rc)
+    list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif(MSVC)
 
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
