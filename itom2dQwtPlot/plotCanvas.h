@@ -46,6 +46,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_magnifier.h>
+#include <qcolor.h>
 
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
@@ -90,8 +91,10 @@ class PlotCanvas : public QwtPlot
         void updateLabels();
         void updateScaleValues();
         void setColorBarVisible(bool visible);
-        void setColorMap(QString colormap = "__next__");
+        bool setColorMap(QString colormap = "__next__");
         inline QString colorMapName() const { return m_colorMapName; };
+
+        void refreshStyles();
 
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
     
@@ -125,6 +128,8 @@ class PlotCanvas : public QwtPlot
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
 
         Qt::KeyboardModifiers m_activeModifiers;
+        
+        QColor m_inverseColor0, m_inverseColor1;
 
     signals:
         void spawnNewChild(QVector<QPointF>);

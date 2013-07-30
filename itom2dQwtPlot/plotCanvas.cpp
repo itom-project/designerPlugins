@@ -200,10 +200,37 @@ PlotCanvas::~PlotCanvas()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotCanvas::init()
 {
-    QPen rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red),2,Qt::DashLine),NULL).value<QPen>();
+    if (!setColorMap("__first__"))
+    {
+        refreshStyles();
+    }
+    else
+    {
+        //refreshStyles is implicitely called by setColorMap
+    }
+
+    return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::refreshStyles()
+{
+    QPen rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red),1,Qt::DashLine),NULL).value<QPen>();
     QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
     QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
     QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
+    QPen selectionPen = apiGetFigureSetting(parent(), "selectionPen", QPen(QBrush(Qt::gray),2,Qt::SolidLine),NULL).value<QPen>();
+
+    if (m_inverseColor1.isValid())
+    {
+        rubberBandPen.setColor(m_inverseColor1);
+    }
+
+    if (m_inverseColor0.isValid())
+    {
+        selectionPen.setColor(m_inverseColor0);
+        trackerPen.setColor(m_inverseColor0);
+    }
     
     m_pZoomer->setRubberBandPen(rubberBandPen);
     m_pZoomer->setTrackerFont(trackerFont);
@@ -217,9 +244,15 @@ ito::RetVal PlotCanvas::init()
     m_pMultiPointPicker->setTrackerPen(trackerPen);
     m_pMultiPointPicker->setBackgroundFillBrush(trackerBg);
 
-    setColorMap("__first__");
-
-    return ito::retOk;
+    m_pLineCutPicker->setRubberBandPen(rubberBandPen);
+    m_pLineCutPicker->setTrackerPen(trackerPen);
+    m_pLineCutLine->setPen(selectionPen);
+    //}
+    //else
+    //{
+    //    m_pLineCutPicker->setRubberBandPen(QPen(Qt::gray));
+    //    m_pLineCutPicker->setTrackerPen(QPen(Qt::gray));
+    //    m_pLineCutLine->setPen(Qt::gray);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -314,7 +347,7 @@ void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
+bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 {
     QwtLinearColorMap *colorMap = NULL;
     QwtLinearColorMap *colorBarMap = NULL;
@@ -327,7 +360,7 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     if (numPalettes == 0 || retval.containsError())
     {
         emit statusBarMessage( tr("No color maps defined."), 4000 );
-        return;
+        return false;
     }
 
     if (colormap == "__next__")
@@ -349,12 +382,12 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     if (retval.containsError() && retval.errorMessage() != NULL)
     {
         emit statusBarMessage( QString("%1").arg( retval.errorMessage() ), 4000 );
-        return;
+        return false;
     }
     else if (retval.containsError())
     {
         emit statusBarMessage( "error when loading color map", 4000 );
-        return;
+        return false;
     }
 
     int totalStops = newPalette.colorStops.size();
@@ -362,7 +395,7 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     if (totalStops < 2)
     {
         emit statusBarMessage( tr("Selected color map has less than two points."), 4000 );
-        return;
+        return false;
     }
 
     m_colorMapName = newPalette.name;
@@ -398,18 +431,21 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     }
 */
 
-    if(newPalette.inverseColorOne.isValid() /* && newPalette.inverseColorTwo.isValid() */)
-    {
-        m_pLineCutPicker->setRubberBandPen(QPen(newPalette.inverseColorOne));
-        m_pLineCutPicker->setTrackerPen(QPen(newPalette.inverseColorOne));
-        m_pLineCutLine->setPen(newPalette.inverseColorOne);
-    }
-    else
-    {
-        m_pLineCutPicker->setRubberBandPen(QPen(Qt::gray));
-        m_pLineCutPicker->setTrackerPen(QPen(Qt::gray));
-        m_pLineCutLine->setPen(Qt::gray);
-    }
+    //if(newPalette.inverseColorOne.isValid() /* && newPalette.inverseColorTwo.isValid() */)
+    //{
+    //    m_pLineCutPicker->setRubberBandPen(QPen(newPalette.inverseColorOne));
+    //    m_pLineCutPicker->setTrackerPen(QPen(newPalette.inverseColorOne));
+    //    m_pLineCutLine->setPen(newPalette.inverseColorOne);
+    //}
+    //else
+    //{
+    //    m_pLineCutPicker->setRubberBandPen(QPen(Qt::gray));
+    //    m_pLineCutPicker->setTrackerPen(QPen(Qt::gray));
+    //    m_pLineCutLine->setPen(Qt::gray);
+    //}
+    m_inverseColor0 = newPalette.inverseColorOne;
+    m_inverseColor1 = newPalette.inverseColorTwo;
+    refreshStyles();
 
 
     if(newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first )  // BuxFix - For Gray-Marked
@@ -467,6 +503,7 @@ void PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     }
 
     replot();
+    return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
