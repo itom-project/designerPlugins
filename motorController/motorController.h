@@ -44,8 +44,7 @@
 #include <QPushButton>
 #include <QAction>
 #include <QMenu>
-
-
+#include <QLineEdit>
 
 class MotorController : public QGroupBox
 {
@@ -126,8 +125,20 @@ protected:
     
 private:
 
+    //! QList with all vertical layout, one for each axis
+    QList<QGroupBox* > m_axisGroups;
+
+    //! QList with all axis labels
+    QList<QLineEdit* > m_posLabels;
+
     //! QList with all position-display
     QList<QDoubleSpinBox* > m_posWidgets;
+
+    //! QList with all small step value display
+    QList<QDoubleSpinBox* > m_smallStepWidgets;
+
+    //! QList with all large step value display
+    QList<QDoubleSpinBox* > m_largeStepWidgets;
 
     //! QList with the handles to the steps
     QList<QList<QPushButton *> > m_changePosButtons;
@@ -155,6 +166,9 @@ private:
 
     //! If true, position are shown relative to correspondig position
     bool m_absRelPosition;
+
+    //! If true, ignore several signals within the gui
+    bool m_isUpdating;
 
     //! QVector with the virtual origin position
     QVector<double> m_relPosNull;
@@ -217,7 +231,9 @@ public slots:
     void axis5SmallStepMinus(void){triggerActuatorStep(5, false, false);};
     void axis5SmallStepPlus(void){triggerActuatorStep(5, false, true);};
 
-    
+    void guiChangedSmallStep(double value);
+    void guiChangedLargeStep(double value);
+
 signals:
     void RequestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
 };

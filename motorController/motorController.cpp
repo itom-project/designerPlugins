@@ -33,7 +33,8 @@
 */
 
 #include "motorController.h"
-#include <qspinbox.h>
+#include <QSpinbox>
+#include <QLayout>
 
 //-----------------------------------------------------------------------------------------------
 MotorController::MotorController(QWidget *parent /*= 0*/)
@@ -44,6 +45,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_readOnly(true),
     m_needStepAdaption(false),
     m_absRelPosition(false),
+    m_isUpdating(true),
     m_smallStep(0.001),
     m_bigStep(0.010),
     m_actSetUnit(NULL),
@@ -53,6 +55,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_actSetAbsRel(NULL),
     m_unit("mm")
 {
+    unsigned int numAxisToUse = 6;
     setTitle("MotorMonitor");
     m_axisName.clear();
     m_axisName.reserve(6);
@@ -64,14 +67,24 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_axisName.append("c ");
 
 
-    m_relPosNull.resize(6);
-    m_relPosNull.fill(0.0, 6);
+    m_relPosNull.resize(numAxisToUse);
+    m_relPosNull.fill(0.0, numAxisToUse);
 
-    m_curAbsPos.resize(6);
-    m_curAbsPos.fill(0.0, 6);
+    m_curAbsPos.resize(numAxisToUse);
+    m_curAbsPos.fill(0.0, numAxisToUse);
+
+    m_posLabels.clear();
+    m_posLabels.reserve(numAxisToUse);
+    m_posLabels.append(new QLineEdit(this));
+    m_posLabels.append(new QLineEdit(this));
+    m_posLabels.append(new QLineEdit(this));
+    m_posLabels.append(new QLineEdit(this));
+    m_posLabels.append(new QLineEdit(this));
+    m_posLabels.append(new QLineEdit(this));
+
 
     m_posWidgets.clear();
-    m_posWidgets.reserve(6);
+    m_posWidgets.reserve(numAxisToUse);
     m_posWidgets.append(new QDoubleSpinBox(this));
     m_posWidgets.append(new QDoubleSpinBox(this));
     m_posWidgets.append(new QDoubleSpinBox(this));
@@ -79,10 +92,29 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_posWidgets.append(new QDoubleSpinBox(this));
     m_posWidgets.append(new QDoubleSpinBox(this));
     
-    m_changePosButtons.clear();
-    m_changePosButtons.reserve(6);
+    
+    m_smallStepWidgets.clear();
+    m_smallStepWidgets.reserve(numAxisToUse);
+    m_smallStepWidgets.append(new QDoubleSpinBox(this));
+    m_smallStepWidgets.append(new QDoubleSpinBox(this));
+    m_smallStepWidgets.append(new QDoubleSpinBox(this));
+    m_smallStepWidgets.append(new QDoubleSpinBox(this));
+    m_smallStepWidgets.append(new QDoubleSpinBox(this));
+    m_smallStepWidgets.append(new QDoubleSpinBox(this));
+    
+    m_largeStepWidgets.clear();
+    m_largeStepWidgets.reserve(numAxisToUse);
+    m_largeStepWidgets.append(new QDoubleSpinBox(this));
+    m_largeStepWidgets.append(new QDoubleSpinBox(this));
+    m_largeStepWidgets.append(new QDoubleSpinBox(this));
+    m_largeStepWidgets.append(new QDoubleSpinBox(this));
+    m_largeStepWidgets.append(new QDoubleSpinBox(this));
+    m_largeStepWidgets.append(new QDoubleSpinBox(this));
 
-    for(int i = 0; i < 6; i++)
+    m_changePosButtons.clear();
+    m_changePosButtons.reserve(numAxisToUse);
+
+    for(int i = 0; i < numAxisToUse; i++)
     {
         QList<QPushButton* > buttons;
         buttons.reserve(4);
@@ -91,18 +123,26 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         buttons.append(new QPushButton("--", this));
         bname.sprintf("%c--", m_axisName[i][0]);
         buttons[0]->setToolTip(bname);
-        
+        buttons[0]->setMinimumSize(24, 24);
+        buttons[0]->setMaximumSize(24, 24);
+
         buttons.append(new QPushButton("-", this));
         bname.sprintf("%c-", m_axisName[i][0]);
         buttons[1]->setToolTip(bname);
+        buttons[1]->setMinimumSize(24, 24);
+        buttons[1]->setMaximumSize(24, 24);
 
         buttons.append(new QPushButton("+", this));
         bname.sprintf("%c+", m_axisName[i][0]);
         buttons[2]->setToolTip(bname);
+        buttons[2]->setMinimumSize(24, 24);
+        buttons[2]->setMaximumSize(24, 24);
 
         buttons.append(new QPushButton("++", this));
         bname.sprintf("%c++", m_axisName[i][0]);
         buttons[3]->setToolTip(bname);
+        buttons[3]->setMinimumSize(24, 24);
+        buttons[3]->setMaximumSize(24, 24);
 
         m_changePosButtons.append(buttons); 
     }
@@ -176,14 +216,92 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     for(int i = 0; i < m_numVisAxis; i++)
     {
         m_posWidgets[i]->setReadOnly(true);
-        m_posWidgets[i]->setPrefix(m_axisName[i]);
         m_posWidgets[i]->setSuffix(m_unit);
         m_posWidgets[i]->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        m_posWidgets[i]->setMinimum(-99.999);
-        m_posWidgets[i]->setMaximum(99.999);
+        m_posWidgets[i]->setMinimum(-9999.999);
+        m_posWidgets[i]->setMaximum(9999.999);
         m_posWidgets[i]->setDecimals(3);
         
+        m_posLabels[i]->setText(m_axisName[i]);
+        m_posLabels[i]->setReadOnly(true);
+        m_posLabels[i]->setMaximumWidth(30);
+
+        m_smallStepWidgets[i]->setSuffix(m_unit);
+        m_smallStepWidgets[i]->setButtonSymbols(QAbstractSpinBox::PlusMinus);
+        m_smallStepWidgets[i]->setMinimum(0.00);
+        m_smallStepWidgets[i]->setMaximum(999.999);
+        m_smallStepWidgets[i]->setDecimals(3);
+        m_smallStepWidgets[i]->setKeyboardTracking(false);
+
+        m_largeStepWidgets[i]->setSuffix(m_unit);
+        m_largeStepWidgets[i]->setButtonSymbols(QAbstractSpinBox::PlusMinus);
+        m_largeStepWidgets[i]->setMinimum(0.00);
+        m_largeStepWidgets[i]->setMaximum(999.999);
+        m_largeStepWidgets[i]->setDecimals(3);
+        m_largeStepWidgets[i]->setKeyboardTracking(false);
+
+        connect(m_smallStepWidgets[i], SIGNAL(valueChanged(double)), this, SLOT(guiChangedSmallStep(double)));
+        connect(m_largeStepWidgets[i], SIGNAL(valueChanged(double)), this, SLOT(guiChangedLargeStep(double)));
+
     }
+
+    m_axisGroups.clear();
+    m_axisGroups.reserve(numAxisToUse);
+    m_axisGroups.append(new QGroupBox(this));
+    m_axisGroups.append(new QGroupBox(this));
+    m_axisGroups.append(new QGroupBox(this));
+    m_axisGroups.append(new QGroupBox(this));
+    m_axisGroups.append(new QGroupBox(this));
+    m_axisGroups.append(new QGroupBox(this));
+
+    QHBoxLayout* mainLayout = new QHBoxLayout(this);
+
+    mainLayout->setContentsMargins(2,2,2,2);
+
+    for(int i = 0; i < numAxisToUse; i++)
+    {
+        QHBoxLayout* line1 = new QHBoxLayout(this);
+        QHBoxLayout* line2 = new QHBoxLayout(this);
+        QHBoxLayout* line3 = new QHBoxLayout(this);
+
+        QVBoxLayout* colLayOut = new QVBoxLayout(this);
+
+        line1->addWidget(m_posLabels[i]);
+        line1->addWidget(m_posWidgets[i]);
+
+        line1->setContentsMargins(0,0,0,0);
+        line1->setSpacing(0);
+
+        line2->addWidget(m_changePosButtons[i][0]);
+        line2->addWidget(m_largeStepWidgets[i]);
+        line2->addWidget(m_changePosButtons[i][3]);
+
+        line2->setContentsMargins(0,0,0,0);
+        line2->setSpacing(2);
+
+        line3->addWidget(m_changePosButtons[i][1]);
+        line3->addWidget(m_smallStepWidgets[i]);
+        line3->addWidget(m_changePosButtons[i][2]);
+
+        line3->setContentsMargins(0,0,0,0);
+        line3->setSpacing(2);
+
+        colLayOut->addLayout(line1);
+        colLayOut->addLayout(line2);
+        colLayOut->addLayout(line3);
+
+        colLayOut->setContentsMargins(0,0,0,0);
+        colLayOut->setSpacing(2);
+
+        m_axisGroups[i]->setLayout(colLayOut);
+        m_axisGroups[i]->setContentsMargins(1,1,1,1);
+
+        m_axisGroups[i]->setTitle("");
+
+        mainLayout->addWidget(m_axisGroups[i]);
+    }
+
+    this->setLayout(mainLayout);
 
     if(m_readOnly)
     {
@@ -193,16 +311,21 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
             m_changePosButtons[i][1]->setVisible(false);
             m_changePosButtons[i][2]->setVisible(false);
             m_changePosButtons[i][3]->setVisible(false);
+
+            m_smallStepWidgets[i]->setVisible(false);
+            m_largeStepWidgets[i]->setVisible(false);
         }   
     }
 
     resizeEvent(NULL);
+    m_isUpdating = false;
     return;
 }
 
 //-----------------------------------------------------------------------------------------------
 void MotorController::resizeEvent(QResizeEvent * event )
 {
+    /*
     int x = 0;
     int y = 0;
     int border = isFlat() ? 1 : 5;
@@ -244,6 +367,16 @@ void MotorController::resizeEvent(QResizeEvent * event )
             }
         }
         this->setMinimumHeight(curpY + 42 + border);
+    }
+    */
+    for(int i = 0; i < m_numVisAxis; i++)
+    {
+        m_axisGroups[i]->setVisible(true);
+    }
+
+    for(int i = m_numVisAxis; i < m_axisGroups.size(); i++)
+    {
+        m_axisGroups[i]->setVisible(false);
     }
 
 }
@@ -395,14 +528,23 @@ void MotorController::setNumAxis(const int numAxis)
     }
     if(change)
     {
+        if(m_numVisAxis == 1)
+        {
+            m_axisGroups[0]->setFlat(true);
+        }
+        else
+        {
+            m_axisGroups[0]->setFlat(false);
+        }
+
         int i = 0;
         for(; i < m_numVisAxis; i++)
         {
-            m_posWidgets[i]->setVisible(true);
+            m_axisGroups[i]->setVisible(true);
         }
-        for(; i < m_posWidgets.length(); i++)
+        for(; i < m_axisGroups.length(); i++)
         {
-            m_posWidgets[i]->setVisible(false);
+            m_axisGroups[i]->setVisible(false);
         }
 
         i = 0;
@@ -412,6 +554,8 @@ void MotorController::setNumAxis(const int numAxis)
         {
             for(; i < m_numVisAxis; i++)
             {
+                m_largeStepWidgets[i]->setVisible(true);
+                m_smallStepWidgets[i]->setVisible(true);
                 m_changePosButtons[i][0]->setVisible(true);
                 m_changePosButtons[i][1]->setVisible(true);
                 m_changePosButtons[i][2]->setVisible(true);
@@ -419,6 +563,8 @@ void MotorController::setNumAxis(const int numAxis)
             }
             for(; i < m_posWidgets.length(); i++)
             {
+                m_largeStepWidgets[i]->setVisible(false);
+                m_smallStepWidgets[i]->setVisible(false);
                 m_changePosButtons[i][0]->setVisible(false);
                 m_changePosButtons[i][1]->setVisible(false);
                 m_changePosButtons[i][2]->setVisible(false);
@@ -525,14 +671,17 @@ void MotorController::setUnit(const QString unit)
 
         if(m_absRelPosition)
         {
-            m_posWidgets[i]->setValue(m_curAbsPos[i] - m_relPosNull[i]);
-            m_posWidgets[i]->setSuffix(unit);
+            m_posWidgets[i]->setValue(m_curAbsPos[i] - m_relPosNull[i]);            
         }
         else
         {
-            m_posWidgets[i]->setValue(m_curAbsPos[i]);
-            m_posWidgets[i]->setSuffix(unit);     
+            m_posWidgets[i]->setValue(m_curAbsPos[i]);    
         }
+        m_posWidgets[i]->setSuffix(unit);
+        m_smallStepWidgets[i]->setSuffix(unit);
+        m_smallStepWidgets[i]->setValue(m_smallStep * m_baseScale);
+        m_largeStepWidgets[i]->setSuffix(unit);
+        m_largeStepWidgets[i]->setValue(m_bigStep * m_baseScale);
     }
 
     return;
@@ -547,6 +696,8 @@ void MotorController::setReadOnly(const bool value)
     {
         for(int i = 0; i < m_numVisAxis; i++)
         {
+            m_largeStepWidgets[i]->setVisible(!m_readOnly);
+            m_smallStepWidgets[i]->setVisible(!m_readOnly);
             m_changePosButtons[i][0]->setVisible(!m_readOnly);
             m_changePosButtons[i][1]->setVisible(!m_readOnly);
             m_changePosButtons[i][2]->setVisible(!m_readOnly);
@@ -583,19 +734,35 @@ void MotorController::mnuSetAbsRel(QAction* inputAction)
 //-----------------------------------------------------------------------------------------------
 void MotorController::setSmallStep(const double value)
 {
+    m_isUpdating = true;
     if(value > 0.0 && value < 1.0)
     {
         m_smallStep = value;
     }
+
+    for(int i = 0; i < m_smallStepWidgets.size(); i++) 
+    {
+        m_smallStepWidgets[i]->setValue(m_smallStep * m_baseScale);    
+    }
+
+
+    m_isUpdating = false;
     return;
 }
 //-----------------------------------------------------------------------------------------------
 void MotorController::setBigStep(const double value)
 {
+    m_isUpdating = true;
     if(value > 0.0 && value < 1000.0)
     {
         m_bigStep = value;
     }
+
+    for(int i = 0; i < m_smallStepWidgets.size(); i++) 
+    {
+        m_largeStepWidgets[i]->setValue(m_bigStep * m_baseScale);    
+    }
+    m_isUpdating = false;
     return;
 }
 //-----------------------------------------------------------------------------------------------
@@ -607,14 +774,14 @@ void MotorController::setAbsRel(const bool absRel)
     char text[4] = {'%','c', ' ', 0};
     if(m_absRelPosition)
     {
-        text[2] = '*';
+        text[2] = '\'';
     }
     for(int i = 0; i < m_posWidgets.size(); i ++)
     {
         axisName = m_axisName[i][0];
         m_axisName[i].sprintf(text, axisName);
 
-        m_posWidgets[i]->setPrefix(m_axisName[i]);
+        m_posLabels[i]->setText(m_axisName[i]);
     }
     triggerUpdatePosition();
 }
@@ -652,6 +819,22 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
     {
         QMetaObject::invokeMethod(m_pActuator, "setPosRel", Q_ARG(const int, axisNo), Q_ARG(const double, step), Q_ARG(ItomSharedSemaphore*, NULL));
     }
+    return;
+}
+//-----------------------------------------------------------------------------------------------
+void MotorController::guiChangedSmallStep(double value)
+{
+    if(m_isUpdating) return;
+
+    setSmallStep(value / m_baseScale);
+    return;
+}
+//-----------------------------------------------------------------------------------------------
+void MotorController::guiChangedLargeStep(double value)
+{
+    if(m_isUpdating) return;
+
+    setBigStep(value / m_baseScale);
     return;
 }
 //-----------------------------------------------------------------------------------------------
