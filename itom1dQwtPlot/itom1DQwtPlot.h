@@ -53,6 +53,9 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
+    Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
+    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
+    Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -87,6 +90,15 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QPointF getYAxisInterval(void) const;
         void setYAxisInterval(QPointF);
+
+        QFont getTitleFont(void) const;
+        void setTitleFont(const QFont &font);
+
+        QFont getLabelFont(void) const;
+        void setLabelFont(const QFont &font);
+
+        QFont getAxisFont(void) const;
+        void setAxisFont(const QFont &font);
 
         void setSource(QSharedPointer<ito::DataObject> source);
     

@@ -39,6 +39,7 @@
 #include <qwt_symbol.h>
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
+#include <qwt_scale_widget.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -143,6 +144,10 @@ ito::RetVal Plot1DWidget::init()
     QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
     QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
     QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
+
+    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",10),NULL).value<QFont>();
+    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",10),NULL).value<QFont>();
+    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",8),NULL).value<QFont>();
     
     m_pZoomer->setRubberBandPen(rubberBandPen);
     m_pZoomer->setTrackerFont(trackerFont);
@@ -151,6 +156,19 @@ ito::RetVal Plot1DWidget::init()
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
     m_pValuePicker->setBackgroundFillBrush(trackerBg);
+
+    title().setFont(titleFont);
+
+    axisTitle(QwtPlot::xBottom).setFont(axisFont);
+    axisTitle(QwtPlot::yLeft).setFont(axisFont);
+
+    QwtText t = axisWidget(QwtPlot::xBottom)->title();
+    t.setFont(labelFont);
+    axisWidget(QwtPlot::xBottom)->setTitle(t);
+
+    t = axisWidget(QwtPlot::yLeft)->title();
+    t.setFont(labelFont);
+    axisWidget(QwtPlot::yLeft)->setTitle(t);
 
     return ito::retOk;
 }
@@ -205,23 +223,30 @@ ito::RetVal Plot1DWidget::init()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel)
 {
+    QwtText t;
+    t = axisTitle(QwtPlot::yLeft);
     if(m_pData->m_autoValueLabel)
     {
-        setAxisTitle(QwtPlot::yLeft, valueLabel);
+        t.setText(valueLabel);
     }
     else
     {
-        setAxisTitle(QwtPlot::yLeft, m_pData->m_valueLabel);
+        t.setText(m_pData->m_valueLabel);
     }
+    setAxisTitle(QwtPlot::yLeft, t);
 
+    t = axisTitle(QwtPlot::xBottom);
     if(m_pData->m_autoAxisLabel)
     {
-        setAxisTitle(QwtPlot::xBottom, axisLabel);
+        t.setText(axisLabel);
     }
     else
     {
-        setAxisTitle(QwtPlot::xBottom, m_pData->m_axisLabel);
+        t.setText(m_pData->m_axisLabel);
     }
+    setAxisTitle(QwtPlot::xBottom, t);
+
+
 
     if(m_pData->m_autoTitle)
     {
@@ -236,23 +261,28 @@ void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, co
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updateLabels()
 {
+    QwtText t;
+    t = axisTitle(QwtPlot::yLeft);
     if(m_pData->m_autoValueLabel)
     {
-        setAxisTitle(QwtPlot::yLeft, m_pData->m_valueLabelDObj);
+        t.setText(m_pData->m_valueLabelDObj);
     }
     else
     {
-        setAxisTitle(QwtPlot::yLeft, m_pData->m_valueLabel);
+        t.setText(m_pData->m_valueLabel);
     }
+    setAxisTitle(QwtPlot::yLeft, t);
 
+    t = axisTitle(QwtPlot::xBottom);
     if(m_pData->m_autoAxisLabel)
     {
-        setAxisTitle(QwtPlot::xBottom, m_pData->m_axisLabelDObj);
+        t.setText(m_pData->m_axisLabelDObj);
     }
     else
     {
-        setAxisTitle(QwtPlot::xBottom, m_pData->m_axisLabel);
+        t.setText(m_pData->m_axisLabel);
     }
+    setAxisTitle(QwtPlot::xBottom, t);
 
     if(m_pData->m_autoTitle)
     {
