@@ -33,7 +33,7 @@
 */
 
 #include "motorController.h"
-#include <QSpinbox>
+#include <QSpinBox>
 #include <QLayout>
 
 //-----------------------------------------------------------------------------------------------
