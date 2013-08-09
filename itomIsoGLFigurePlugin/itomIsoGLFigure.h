@@ -26,6 +26,16 @@
 #include "plot/AbstractDObjFigure.h"
 #include "plotIsoGLWidget.h"
 
+#ifdef CONNEXION_FOUND
+    #define CONNEXION_ENABLE 1
+    //#include "spwmacro.h"
+    #include "si.h"
+    //#include "spwmath.h"
+    #include "siapp.h"
+#else
+    #define CONNEXION_ENABLE 0
+#endif
+
 #include <qsharedpointer.h>
 #include <qgridlayout.h>
 #include <qstyle.h>
@@ -81,6 +91,10 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
     public:
 
         friend class GL3DEFilter;
+
+
+        SiHdl m_SpwDeviceHandle;
+        SiOpenData m_SpwData;
 
         ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         ~ItomIsoGLWidget();

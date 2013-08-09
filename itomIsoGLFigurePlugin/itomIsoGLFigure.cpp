@@ -57,7 +57,8 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actTringModeSwitch(NULL),
     m_mnuTringModeSwitch(NULL),
     m_toggleInfoText(NULL),
-	m_lblCoordinates(NULL)
+	m_lblCoordinates(NULL),
+    m_SpwDeviceHandle(SI_NO_HANDLE)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
 
@@ -266,6 +267,23 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
 //    m_toolbar->addAction(m_actForward);
     toolbar->addAction(m_actCmplxSwitch);
 
+#if(CONNEXION_ENABLE)
+    /*
+    *  Initialize the 3D mouse
+    */
+    SiInitialize ();
+    SiOpenWinInit (&m_SpwData, this->effectiveWinId());
+    m_SpwDeviceHandle = SiOpen ("isoWidget", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &m_SpwData);
+
+    if (m_SpwDeviceHandle == SI_NO_HANDLE)
+    {
+        SiTerminate ();
+        m_SpwDeviceHandle = NULL;
+    }
+
+    SiSetUiMode (m_SpwDeviceHandle, SI_UI_NO_CONTROLS);
+#endif
+
     m_pEventFilter = NULL;
 
     m_pEventFilter = new GL3DEFilter(this);
@@ -275,7 +293,13 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomIsoGLWidget::~ItomIsoGLWidget()
 {
-
+#if(CONNEXION_ENABLE)
+    if(m_SpwDeviceHandle)
+    {
+        SiClose (m_SpwDeviceHandle);
+    }
+    SiTerminate ();
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

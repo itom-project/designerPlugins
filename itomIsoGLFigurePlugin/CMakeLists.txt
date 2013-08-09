@@ -24,6 +24,7 @@ find_package(OpenGL REQUIRED)
 #find_package(Glut REQUIRED)
 find_package(ITOM_SDK REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(3DCONNEXION)
 
 IF(GLEW_FOUND)
 
@@ -57,11 +58,14 @@ IF(GLEW_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/icons
         ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
         ${GLEW_INCLUDE_PATH}
+        ${3DCONNEXION_INCLUDE_PATH}
     )
+
 
     LINK_DIRECTORIES(
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${OpenCV_DIR}/lib
+        ${3DCONNEXION_LIBRARIES}
     )
 
     INCLUDE(${QT_USE_FILE})
@@ -84,18 +88,6 @@ IF(GLEW_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
-    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
-
-    #set(designer_ui
-    #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
-    #)
-
-    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
-
-    set(designer_rcc
-        ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.qrc
-    )
-
     set(designer_SOURCES 
         ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
         ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
@@ -108,16 +100,41 @@ IF(GLEW_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.cpp
     )
 
+    IF(3DCONNEXION_FOUND)
+        ADD_DEFINITIONS(-DCONNEXION_FOUND)
+        #list(APPEND  ${LINK_DIRECTORIES} ${3DCONNEXION_LIBRARIES})
+        #list(APPEND  ${INCLUDE_DIRECTORIES} ${3DCONNEXION_INCLUDE_PATH})
+        #list(APPEND designer_HEADERS ${3DCONNEXION_LIBRARIES}/designerPluginLibraryVersion.rc)
+    ENDIF(3DCONNEXION_FOUND)
+    
     #If you want to use automatical metadata for dlls under windows use the following if-case.
     if(MSVC)
         list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
     endif(MSVC) 
     
-    QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
+
+    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
+    
+    
+    set(designer_rcc
+        ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.qrc
+    )
+    
+    QT4_ADD_RESOURCES(designer_HEADERS ${designer_rcc})
+    
+    
     ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
 
-    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY}) # ${GLEW_LIBRARIES}) # glu32 opengl32 qwtsrc)
-
+    IF(3DCONNEXION_FOUND)
+        Message(STATUS "3DCONNEXION was found ${3DCONNEXION_SIAPP}.")
+        
+        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${3DCONNEXION_SIAPP} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY}) # ${GLEW_LIBRARIES}) # glu32 opengl32 qwtsrc)
+    ELSE(3DCONNEXION_FOUND)
+        Message(STATUS "WARNING: 3DCONNEXION was not found.")
+        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY}) # ${GLEW_LIBRARIES}) # glu32 opengl32 qwtsrc)
+    ENDIF(3DCONNEXION_FOUND)
+    
     # COPY SECTION
     set(COPY_SOURCES "")
     set(COPY_DESTINATIONS "")
