@@ -7,15 +7,17 @@ cmake_minimum_required(VERSION 2.8)
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
+OPTION(BUILD_ISOGL_3DCONNEXION "If 3DConnexion is installed, support is build into the ISOGL-Widget." OFF)
+
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
 
 IF(BUILD_SHARED_LIBS)
-	SET(LIBRARY_TYPE SHARED)
+    SET(LIBRARY_TYPE SHARED)
 ELSE(BUILD_SHARED_LIBS)
-	SET(LIBRARY_TYPE STATIC)
+    SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
 find_package(Qt4 REQUIRED)
@@ -24,7 +26,14 @@ find_package(OpenGL REQUIRED)
 #find_package(Glut REQUIRED)
 find_package(ITOM_SDK REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(3DCONNEXION)
+
+IF(BUILD_ISOGL_3DCONNEXION)
+    find_package(3DCONNEXION)
+    message(STATUS "3DConnexion enabled by user")
+ELSE(BUILD_ISOGL_3DCONNEXION)
+    set(3DCONNEXION_FOUND false)
+    message(STATUS "3DConnexion disabled by user")
+ENDIF(BUILD_ISOGL_3DCONNEXION)
 
 IF(GLEW_FOUND)
 
@@ -86,7 +95,7 @@ IF(GLEW_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.h
         ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
-)
+    )
 
     set(designer_SOURCES 
         ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
