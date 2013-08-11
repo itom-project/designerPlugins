@@ -23,12 +23,13 @@
 #ifndef ITOMFIGUREPLUGIN_H
 #define ITOMFIGUREPLUGIN_H
 
+#include <QtDesigner/QDesignerCustomWidgetInterface>
 #include "plot/AbstractItomDesignerPlugin.h"
 
 class ItomIsoGLWidgetPlugin : public ito::AbstractItomDesignerPlugin
 {
     Q_OBJECT
-    Q_INTERFACES(QDesignerCustomWidgetInterface)
+    //Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
     ItomIsoGLWidgetPlugin(QObject *parent = 0);

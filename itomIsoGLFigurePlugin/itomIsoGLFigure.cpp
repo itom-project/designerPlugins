@@ -57,8 +57,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actTringModeSwitch(NULL),
     m_mnuTringModeSwitch(NULL),
     m_toggleInfoText(NULL),
-	m_lblCoordinates(NULL),
-    m_SpwDeviceHandle(SI_NO_HANDLE)
+	m_lblCoordinates(NULL)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
 
@@ -271,6 +270,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     /*
     *  Initialize the 3D mouse
     */
+    m_SpwDeviceHandle = SI_NO_HANDLE;
     SiInitialize ();
     SiOpenWinInit (&m_SpwData, this->effectiveWinId());
     m_SpwDeviceHandle = SiOpen ("isoWidget", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &m_SpwData);
@@ -281,7 +281,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
         m_SpwDeviceHandle = NULL;
     }
 
-    SiSetUiMode (m_SpwDeviceHandle, SI_UI_NO_CONTROLS);
+    SiSetUiMode (m_SpwDeviceHandle, SI_UI_ALL_CONTROLS);
 #endif
 
     m_pEventFilter = NULL;
@@ -298,7 +298,7 @@ ItomIsoGLWidget::~ItomIsoGLWidget()
     {
         SiClose (m_SpwDeviceHandle);
     }
-    SiTerminate ();
+    SiTerminate();
 #endif
 }
 
@@ -683,7 +683,6 @@ bool GL3DEFilter::event(QEvent *e)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
 {
-
     if(e->type() == QEvent::Destroy)
         return false;
 
@@ -768,32 +767,33 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 case Qt::Key_Up:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(-0.05, 0.0, 0.0);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
                 }
-                ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                
                 return true;
 
                 case Qt::Key_Down:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.05, 0.0, 0.0);
-
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
                 }
-                ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                
                 return true;
 
                 case Qt::Key_Right:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, 0.0, 0.05);
-
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
                 }
-                ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                
                 return true;
 
                 case Qt::Key_Left:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0, 0, -0.05);
-
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
                 }
-                ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                
                 return true;
 
                 // The following keys represent a direction, they are
@@ -810,8 +810,79 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
             }
         }
         default:
+            
             break;
     }
 
     return QObject::eventFilter(object, e);
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
+{
+    //std::cout << "Got event\n";
+#if CONNEXION_ENABLE
+    int            num;      /* number of button returned */
+    SiSpwEvent     pEvent;    /* SpaceWare Event */ 
+    SiGetEventData EData;    /* SpaceWare Event Data */
+   
+    /* init Window platform specific data for a call to SiGetEvent */
+    SiGetEventWinInit(&EData, message->message, message->wParam, message->lParam);
+  
+    /* check whether msg was a 3D mouse event and process it */
+    if (SiGetEvent (m_SpwDeviceHandle, 0, &EData, &pEvent) == SI_IS_EVENT)
+    {
+        switch (pEvent.type)
+        {
+            case SI_MOTION_EVENT:
+            {
+                //pEvent.u.spwData.mData[SI_TX];
+                //pEvent.u.spwData.mData[SI_TY];
+                //pEvent.u.spwData.mData[SI_TZ];
+                //pEvent.u.spwData.mData[SI_RX];
+                //pEvent.u.spwData.mData[SI_RY];
+                //pEvent.u.spwData.mData[SI_RZ];
+                if(abs(pEvent.u.spwData.mData[SI_TY]) > 2)
+                {
+                    double value = 1.0 - pEvent.u.spwData.mData[SI_TY] * 0.02;
+                    if(pEvent.u.spwData.mData[SI_TY] > 0)
+                    {
+                        riseZAmplifierer(value);
+                    }
+                    else
+                    {
+                        reduceZAmplifierer(value);
+                    }
+                }
+                if(abs(pEvent.u.spwData.mData[SI_TX]) > 2 ||
+                abs(pEvent.u.spwData.mData[SI_TZ]) > 2 ||
+                abs(pEvent.u.spwData.mData[SI_RY]) > 2 )
+                {
+                    m_pContent->rotateView(0.001* pEvent.u.spwData.mData[SI_TX], 0.001*pEvent.u.spwData.mData[SI_TZ], 0.001 * pEvent.u.spwData.mData[SI_RY]);
+                    m_pContent->paintEvent(NULL);
+                }
+            }
+            break;
+           
+            case SI_ZERO_EVENT:
+                //SbZeroEvent();          /* process 3D mouse zero event */     
+            break;
+           
+            case  SI_BUTTON_EVENT:
+            /*
+            if ((num = SiButtonPressed (&Event)) != SI_NO_BUTTON)	
+            {
+            SbButtonPressEvent(num);     // process 3D mouse button event
+            }
+            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)	
+            {
+            SbButtonReleaseEvent(num);   // process 3D mouse button event
+            }
+            */
+            break;
+        
+        } // end switch
+    } /* end SiGetEvent */
+#endif
+    return true;
+}
+//----------------------------------------------------------------------------------------------------------------------------------

@@ -26,11 +26,11 @@
 #include "plot/AbstractDObjFigure.h"
 #include "plotIsoGLWidget.h"
 
-#ifdef CONNEXION_FOUND
+#if defined(CONNEXION_FOUND) && !_DEBUG
     #define CONNEXION_ENABLE 1
-    //#include "spwmacro.h"
+    #include "spwmacro.h"
     #include "si.h"
-    //#include "spwmath.h"
+    #include "spwmath.h"
     #include "siapp.h"
 #else
     #define CONNEXION_ENABLE 0
@@ -92,10 +92,10 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 
         friend class GL3DEFilter;
 
-
+#if(CONNEXION_ENABLE)
         SiHdl m_SpwDeviceHandle;
         SiOpenData m_SpwData;
-
+#endif
         ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         ~ItomIsoGLWidget();
 
@@ -133,6 +133,8 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 
         void setContextMenuEnabled(bool show); 
         bool getContextMenuEnabled() const;
+
+        bool winEvent(MSG * message, long * result);
 
     protected:
         plotGLWidget* m_pContent;

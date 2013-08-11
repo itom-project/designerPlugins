@@ -378,6 +378,12 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
 
     doneCurrent();
+
+    m_pContent = QSharedPointer<ito::DataObject>(new ito::DataObject());
+    m_pContent->ones(3,3,ito::tFloat32);
+    
+    refreshPlot(NULL);
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -456,6 +462,7 @@ void plotGLWidget::paintGL()
 
     if ( ( ((m_pTriangles == NULL) && (m_elementMode == PAINT_TRIANG)) && ((m_pPoints == NULL) && (m_elementMode == PAINT_POINTS)) ) || (m_pColTriangles == NULL) || (m_NumElements == 0))
     {
+        doneCurrent();
         m_isInit &= ~IS_RENDERING;
         return;
     }
@@ -2694,7 +2701,7 @@ void plotGLWidget::riseZAmplifierer(const double value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::togglePaletteMode()
 {
-    m_colorBarMode = (m_colorBarMode + 1) % 4;
+    //m_colorBarMode = (m_colorBarMode + 1) % 4;
 
     switch(m_colorBarMode)
     {
