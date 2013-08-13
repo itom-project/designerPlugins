@@ -696,8 +696,8 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
             spinBox->setMaximum(max);
             spinBox->setValue(value);
         }
-        m_pActPlaneSelector->setVisible( std::abs(max-min) > 0 );
-		m_pActStackCut->setVisible( std::abs(max-min) > 0 );
+        m_pActPlaneSelector->setVisible((max-min) > 0);
+		m_pActStackCut->setVisible((max-min) > 0);
     }
 }
 

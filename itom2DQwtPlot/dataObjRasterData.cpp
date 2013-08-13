@@ -167,6 +167,20 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
             {
                 size_t sizes[2] = { m_D.m_ySize, m_D.m_xSize };
                 m_dataObjPlane = new ito::DataObject( 2, sizes, m_dataObj.getType(), m_plane, 1);
+                m_dataObj.copyTagMapTo( *m_dataObjPlane );
+
+                bool v;
+                for (int i = 0; i < 2; ++i)
+                {
+                    m_dataObjPlane->setAxisDescription(i, m_dataObj.getAxisDescription( d - (2 - i), v ));
+                    m_dataObjPlane->setAxisScale(i, m_dataObj.getAxisScale( d - (2 - i) ));
+                    m_dataObjPlane->setAxisOffset(i, m_dataObj.getAxisOffset( d - (2 - i) ));
+                }
+
+                m_dataObjPlane->setValueDescription( m_dataObj.getValueDescription() );
+                m_dataObjPlane->setValueUnit( m_dataObj.getValueUnit() );
+
+                m_dataObj.copyAxisTagsTo( *m_dataObjPlane );
             }
             else
             {

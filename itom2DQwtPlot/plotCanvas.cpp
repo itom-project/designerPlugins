@@ -302,7 +302,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             {
                 maxPlane = dObj->calcNumMats() - 1;
             }
+
             p->setPlaneRange(0, maxPlane);
+            
         }
 
 
