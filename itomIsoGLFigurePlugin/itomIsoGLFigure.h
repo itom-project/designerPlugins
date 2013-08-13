@@ -26,12 +26,25 @@
 #include "plot/AbstractDObjFigure.h"
 #include "plotIsoGLWidget.h"
 
-#if defined(CONNEXION_FOUND) && !_DEBUG
-    #define CONNEXION_ENABLE 1
-    #include "spwmacro.h"
-    #include "si.h"
-    #include "spwmath.h"
-    #include "siapp.h"
+#if defined(CONNEXION_FOUND) //&& !_DEBUG
+    #ifdef _DEBUG
+        #undef _DEBUG
+        #define CONNEXION_ENABLE 1
+        #include <windows.h>
+        #include "spwmacro.h"
+        #include "si.h"
+        #include "spwmath.h"
+        #include "siapp.h"
+        #define _DEBUG
+    #else
+        #undef _DEBUG
+        #define CONNEXION_ENABLE 1
+        #include <windows.h>
+        #include "spwmacro.h"
+        #include "si.h"
+        #include "spwmath.h"
+        #include "siapp.h"
+    #endif
 #else
     #define CONNEXION_ENABLE 0
 #endif
@@ -134,8 +147,9 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         void setContextMenuEnabled(bool show); 
         bool getContextMenuEnabled() const;
 
+#if CONNEXION_ENABLE
         bool winEvent(MSG * message, long * result);
-
+#endif //CONNEXION_ENABLE
     protected:
         plotGLWidget* m_pContent;
 

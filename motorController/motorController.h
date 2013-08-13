@@ -46,6 +46,29 @@
 #include <QMenu>
 #include <QLineEdit>
 
+#if defined(CONNEXION_FOUND) //&& !_DEBUG
+    #ifdef _DEBUG
+        #undef _DEBUG
+        #define CONNEXION_ENABLE 1
+        #include <windows.h>
+        #include "spwmacro.h"
+        #include "si.h"
+        #include "spwmath.h"
+        #include "siapp.h"
+        #define _DEBUG
+    #else
+        #undef _DEBUG
+        #define CONNEXION_ENABLE 1
+        #include <windows.h>
+        #include "spwmacro.h"
+        #include "si.h"
+        #include "spwmath.h"
+        #include "siapp.h"
+    #endif
+#else
+    #define CONNEXION_ENABLE 0
+#endif
+
 class MotorController : public QGroupBox
 {
     Q_OBJECT
@@ -57,6 +80,7 @@ class MotorController : public QGroupBox
     Q_PROPERTY(double smallStep READ getSmallStep WRITE setSmallStep DESIGNABLE true);
     Q_PROPERTY(double bigStep READ getBigStep WRITE setBigStep DESIGNABLE true);
     Q_PROPERTY(bool absRel READ getAbsRel WRITE setAbsRel DESIGNABLE true);
+    Q_PROPERTY(bool allowJoyStick READ getAllowJoyStick WRITE setAllowJoyStick DESIGNABLE true);
     //Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
 
 
@@ -71,7 +95,7 @@ public:
     void setActuator(QPointer<ito::AddInActuator> actuator);
 
     //! Retrive the current actuator-handle
-    QPointer<ito::AddInActuator> getActuator() const;
+    QPointer<ito::AddInActuator> getActuator() const {return QPointer<ito::AddInActuator>(NULL);};
 
     //! Set the metrical unit of the display
     void setUnit(const QString unit);
@@ -87,6 +111,9 @@ public:
 
     //! Retrive readOnly status
     bool getReadOnly() const {return m_readOnly;};
+
+    bool getAllowJoyStick() const {return m_allowJoyStick;};
+    void setAllowJoyStick(const bool newState){m_allowJoyStick = newState;};
 
     //! Toggle between display-only and additional controll functions
     void setReadOnly(const bool value);
@@ -117,6 +144,10 @@ public:
 
     virtual QSize sizeHint() const;
 
+#if CONNEXION_ENABLE
+        bool winEvent(MSG * message, long * result);
+#endif //CONNEXION_ENABLE
+
 protected:
     //! Handle to the motor secured by QPointer
     QPointer<ito::AddInActuator> m_pActuator;
@@ -124,6 +155,18 @@ protected:
     void resizeEvent(QResizeEvent * event );
     
 private:
+
+#if(CONNEXION_ENABLE)
+    //! Handle from the 3DConnexion device
+    SiHdl m_SpwDeviceHandle;
+    //! Handle from the 3DConnexion device
+    SiOpenData m_SpwData;
+
+    bool m_conNeedsTermination;
+   
+#endif
+
+    void initializeJouStick();
 
     //! QList with all vertical layout, one for each axis
     QList<QGroupBox* > m_axisGroups;
@@ -169,6 +212,18 @@ private:
 
     //! If true, ignore several signals within the gui
     bool m_isUpdating;
+
+    //! If true, the corresponding actuator has a joystick-slot
+    bool m_hasJoyStick;
+
+    //! If true, the joystick is enabled external
+    bool m_allowJoyStick;
+
+    //! If true, the joystick is enabled by this gui element
+    bool m_enableJoyStick;
+
+    //! If true, the joystick moves fast else slow
+    bool m_joyModeFast;
 
     //! QVector with the virtual origin position
     QVector<double> m_relPosNull;
@@ -236,6 +291,7 @@ public slots:
 
 signals:
     void RequestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
+    void TriggerSoftJoyStickMovement(QVector<int> axis, QVector<double> vel);
 };
 
 #endif //MC_H

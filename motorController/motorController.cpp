@@ -35,7 +35,8 @@
 #include "motorController.h"
 #include <QSpinBox>
 #include <QLayout>
-
+#include <iostream>
+//#include <qdebug.h>
 //-----------------------------------------------------------------------------------------------
 MotorController::MotorController(QWidget *parent /*= 0*/)
     : QGroupBox(parent),
@@ -53,7 +54,11 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_mnuSetUnit(NULL),
     m_mnuSetAbsRel(NULL),
     m_actSetAbsRel(NULL),
-    m_unit("mm")
+    m_unit("mm"),
+    m_hasJoyStick(false),
+    m_enableJoyStick(true),
+    m_allowJoyStick(true),
+    m_joyModeFast(true)
 {
     unsigned int numAxisToUse = 6;
     setTitle("MotorMonitor");
@@ -260,11 +265,11 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     for(int i = 0; i < numAxisToUse; i++)
     {
-        QHBoxLayout* line1 = new QHBoxLayout(this);
-        QHBoxLayout* line2 = new QHBoxLayout(this);
-        QHBoxLayout* line3 = new QHBoxLayout(this);
+        QHBoxLayout* line1 = new QHBoxLayout();
+        QHBoxLayout* line2 = new QHBoxLayout();
+        QHBoxLayout* line3 = new QHBoxLayout();
 
-        QVBoxLayout* colLayOut = new QVBoxLayout(this);
+        QVBoxLayout* colLayOut = new QVBoxLayout();
 
         line1->addWidget(m_posLabels[i]);
         line1->addWidget(m_posWidgets[i]);
@@ -316,6 +321,14 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
             m_largeStepWidgets[i]->setVisible(false);
         }   
     }
+
+#if(CONNEXION_ENABLE)
+    /*
+    *  Initialize the 3D mouse
+    */
+    m_SpwDeviceHandle = SI_NO_HANDLE;
+    m_conNeedsTermination = false;
+#endif
 
     resizeEvent(NULL);
     m_isUpdating = false;
@@ -381,6 +394,34 @@ void MotorController::resizeEvent(QResizeEvent * event )
 
 }
 //-----------------------------------------------------------------------------------------------
+void MotorController::initializeJouStick()
+{
+#if(CONNEXION_ENABLE)
+    SiInitialize ();
+    SiOpenWinInit (&m_SpwData, this->effectiveWinId());
+    m_SpwDeviceHandle = SiOpen ("isoWidget", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &m_SpwData);
+
+    if (m_SpwDeviceHandle == SI_NO_HANDLE)
+    {
+        SiTerminate ();
+        m_SpwDeviceHandle = NULL;
+    }
+    else
+    {
+        m_conNeedsTermination = true;
+    }
+
+    SiSetUiMode (m_SpwDeviceHandle, SI_UI_ALL_CONTROLS);
+
+    if(m_SpwDeviceHandle != SI_NO_HANDLE)
+    {
+        m_hasJoyStick = connect( this, SIGNAL(TriggerSoftJoyStickMovement(QVector<int>, QVector<double>) ), m_pActuator, SLOT(startJoyStickMovement(QVector<int>, QVector<double>) ));
+        std::cout << "Connected to \"Spass-Stecken\"" << (m_hasJoyStick? "true" : "false") << "\n";
+    }
+    #endif
+}
+
+//-----------------------------------------------------------------------------------------------
 MotorController::~MotorController()
 {
     if(m_actSetUnit)
@@ -412,6 +453,17 @@ MotorController::~MotorController()
     }
 
     m_pActuator = NULL;
+
+#if(CONNEXION_ENABLE)
+    if(m_conNeedsTermination)
+    {
+        if(m_SpwDeviceHandle)
+        {
+            SiClose (m_SpwDeviceHandle);
+        }
+        SiTerminate();
+    }
+#endif
 }
 //-----------------------------------------------------------------------------------------------
 void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
@@ -426,6 +478,11 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
         m_pActuator = actuator;
 
         connect( m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>) ), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>) ) );
+        
+        if(m_allowJoyStick)
+        {
+            initializeJouStick();
+        }
 
         m_updateBySignal = connect( this, SIGNAL(RequestStatusAndPosition( bool, bool) ), m_pActuator, SLOT(RequestStatusAndPosition( bool, bool) ) );
 
@@ -575,11 +632,6 @@ void MotorController::setNumAxis(const int numAxis)
         resizeEvent(NULL);
     }
     return;
-}
-//-----------------------------------------------------------------------------------------------
-QPointer<ito::AddInActuator> MotorController::getActuator() const
-{
-    return QPointer<ito::AddInActuator>(NULL);
 }
 //-----------------------------------------------------------------------------------------------
 QSize MotorController::sizeHint() const
@@ -838,3 +890,76 @@ void MotorController::guiChangedLargeStep(double value)
     return;
 }
 //-----------------------------------------------------------------------------------------------
+#if CONNEXION_ENABLE // Only of CONNEXION is enabled
+bool MotorController::winEvent(MSG * message, long * result)
+{
+    std::cout << "Try to match event\n";
+    if(!(m_hasJoyStick && m_enableJoyStick && m_allowJoyStick))
+        return false;
+
+    std::cout << "Got event\n";
+
+    int            num;      /* number of button returned */
+    SiSpwEvent     pEvent;    /* SpaceWare Event */ 
+    SiGetEventData EData;    /* SpaceWare Event Data */
+   
+    /* init Window platform specific data for a call to SiGetEvent */
+    SiGetEventWinInit(&EData, message->message, message->wParam, message->lParam);
+  
+    /* check whether msg was a 3D mouse event and process it */
+    if (SiGetEvent (m_SpwDeviceHandle, 0, &EData, &pEvent) == SI_IS_EVENT)
+    {
+        QVector<int> axis(1);
+        axis[0] = 0;
+        QVector<double> vel(1);
+        switch (pEvent.type)
+        {
+            case SI_MOTION_EVENT:
+            {
+                //pEvent.u.spwData.mData[SI_TX];
+                //pEvent.u.spwData.mData[SI_TY];
+                //pEvent.u.spwData.mData[SI_TZ];
+                //pEvent.u.spwData.mData[SI_RX];
+                //pEvent.u.spwData.mData[SI_RY];
+                //pEvent.u.spwData.mData[SI_RZ];
+                if(abs(pEvent.u.spwData.mData[SI_RY]) > 2)
+                {
+                    vel[0] = (m_joyModeFast ? m_bigStep : m_smallStep) *  pEvent.u.spwData.mData[SI_RY];
+                    std::cout << "Gotcha\n";
+                }
+                else
+                {
+                    vel[0] = 0.0;
+                }
+                emit TriggerSoftJoyStickMovement(axis, vel);
+                this->setEnabled(false);
+            }
+            break;
+           
+            case SI_ZERO_EVENT:
+            {
+                vel[0] = 0.0;
+                emit TriggerSoftJoyStickMovement(axis, vel);
+                this->setEnabled(false);
+            }
+            break;
+           
+            case  SI_BUTTON_EVENT:
+            
+            if ((num = SiButtonPressed (&pEvent)) != SI_NO_BUTTON)	
+            {
+                m_joyModeFast = m_joyModeFast ? false : true; 
+            }
+            /*
+            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)	
+            {
+            SbButtonReleaseEvent(num);   // process 3D mouse button event
+            }
+            */
+            break;
+        
+        } // end switch
+    } /* end SiGetEvent */
+    return true;
+}
+#endif

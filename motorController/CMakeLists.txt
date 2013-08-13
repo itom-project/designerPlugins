@@ -7,6 +7,8 @@ cmake_minimum_required(VERSION 2.8)
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
+OPTION(BUILD_MOTORCTRL_3DCONNEXION "If 3DConnexion is installed, support is build into the MotorCtrl-Widget." OFF)
+
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 
@@ -21,6 +23,14 @@ ENDIF(BUILD_SHARED_LIBS)
 find_package(Qt4 REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core)
 find_package(ITOM_SDK REQUIRED)
+
+IF(BUILD_MOTORCTRL_3DCONNEXION)
+    find_package(3DCONNEXION)
+    message(STATUS "3DConnexion enabled by user")
+ELSE(BUILD_MOTORCTRL_3DCONNEXION)
+    set(3DCONNEXION_FOUND false)
+    message(STATUS "3DConnexion disabled by user")
+ENDIF(BUILD_MOTORCTRL_3DCONNEXION)
 
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 
@@ -48,11 +58,13 @@ INCLUDE_DIRECTORIES(
     ${OpenCV_DIR}/include
     ${ITOM_SDK_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
+    ${3DCONNEXION_INCLUDE_PATH}
 )
 
 LINK_DIRECTORIES(
-	${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${OpenCV_DIR}/lib
+    ${3DCONNEXION_LIBRARIES}
 )
 
 INCLUDE(${QT_USE_FILE})
@@ -82,6 +94,13 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/motorControllerfactory.cpp
 )
 
+IF(3DCONNEXION_FOUND)
+    ADD_DEFINITIONS(-DCONNEXION_FOUND)
+    #list(APPEND  ${LINK_DIRECTORIES} ${3DCONNEXION_LIBRARIES})
+    #list(APPEND  ${INCLUDE_DIRECTORIES} ${3DCONNEXION_INCLUDE_PATH})
+    #list(APPEND designer_HEADERS ${3DCONNEXION_LIBRARIES}/designerPluginLibraryVersion.rc)
+ENDIF(3DCONNEXION_FOUND)
+
 #If you want to use automatical metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
@@ -90,7 +109,15 @@ endif(MSVC)
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY}) # glu32 opengl32 qwtsrc)
+IF(3DCONNEXION_FOUND)
+    Message(STATUS "3DCONNEXION was found ${3DCONNEXION_SIAPP}.")
+    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH})
+ELSE(3DCONNEXION_FOUND)
+    Message(STATUS "WARNING: 3DCONNEXION was not found.")
+    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY})
+ENDIF(3DCONNEXION_FOUND)
+
+
 
 # COPY SECTION
 set(COPY_SOURCES "")

@@ -272,7 +272,8 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     */
     m_SpwDeviceHandle = SI_NO_HANDLE;
     SiInitialize ();
-    SiOpenWinInit (&m_SpwData, this->effectiveWinId());
+    //SiOpenWinInit (&m_SpwData, this->effectiveWinId());
+    SiOpenWinInit (&m_SpwData, this->winId());
     m_SpwDeviceHandle = SiOpen ("isoWidget", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &m_SpwData);
 
     if (m_SpwDeviceHandle == SI_NO_HANDLE)
@@ -817,10 +818,11 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
     return QObject::eventFilter(object, e);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+#if CONNEXION_ENABLE // Only of CONNEXION is enabled
 bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
 {
     //std::cout << "Got event\n";
-#if CONNEXION_ENABLE
+
     int            num;      /* number of button returned */
     SiSpwEvent     pEvent;    /* SpaceWare Event */ 
     SiGetEventData EData;    /* SpaceWare Event Data */
@@ -882,7 +884,7 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
         
         } // end switch
     } /* end SiGetEvent */
-#endif
     return true;
 }
+#endif
 //----------------------------------------------------------------------------------------------------------------------------------

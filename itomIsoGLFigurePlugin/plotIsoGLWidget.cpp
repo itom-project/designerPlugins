@@ -2681,21 +2681,24 @@ void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &y
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::setZAmplifierer(double value)
 {
-    m_zAmpl = value;
+    if(value < 5.0 && value > 0.001)
+        m_zAmpl = value;
     refreshPlot(NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::reduceZAmplifierer(double value)
 {
-    m_zAmpl *= value;
+    if(m_zAmpl > 0.001)
+        m_zAmpl *= value;
     refreshPlot(NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::riseZAmplifierer(const double value)
 {
-    m_zAmpl *= value;
+    if(m_zAmpl < 5.0)
+        m_zAmpl *= value;
     refreshPlot(NULL);
 }
 //----------------------------------------------------------------------------------------------------------------------------------

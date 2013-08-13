@@ -28,20 +28,20 @@
 
 class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Itom2dQwtPlotPlugin(QObject *parent = 0);
+    Itom2dQwtPlotPlugin(QObject *parent = 0);
 
-	bool isContainer() const;
-	bool isInitialized() const;
-	QIcon icon() const;
-	QString domXml() const;
-	QString group() const;
-	QString includeFile() const;
-	QString name() const;
-	QString toolTip() const;
-	QString whatsThis() const;
+    bool isContainer() const;
+    bool isInitialized() const;
+    QIcon icon() const;
+    QString domXml() const;
+    QString group() const;
+    QString includeFile() const;
+    QString name() const;
+    QString toolTip() const;
+    QString whatsThis() const;
     QWidget *createWidget(QWidget *parent);
     QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
 	void initialize(QDesignerFormEditorInterface *core);
