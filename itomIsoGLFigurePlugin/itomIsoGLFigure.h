@@ -37,7 +37,6 @@
         #include "siapp.h"
         #define _DEBUG
     #else
-        #undef _DEBUG
         #define CONNEXION_ENABLE 1
         #include <windows.h>
         #include "spwmacro.h"
@@ -56,7 +55,7 @@
 #include <qpainter.h>
 #include <qaction.h>
 #include <qwidget.h>
-
+#include <qtimer.h>
 /*
 #include <GV_plot.h>
 #include <GV_plot_zoomer.h>
@@ -147,11 +146,12 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         void setContextMenuEnabled(bool show); 
         bool getContextMenuEnabled() const;
 
+    protected:
+        plotGLWidget* m_pContent;
+
 #if CONNEXION_ENABLE
         bool winEvent(MSG * message, long * result);
 #endif //CONNEXION_ENABLE
-    protected:
-        plotGLWidget* m_pContent;
 
     private:
         QAction* m_actScaleSetting;
@@ -191,6 +191,8 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         void riseZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->riseZAmplifierer(value);};
         void reduceZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->reduceZAmplifierer(value);};
 
+        QTimer myTimer;
+
     signals:
     
     private slots:
@@ -217,7 +219,11 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         void mnuExport();
         //void mnuSwitchColorMode(QAction *action);
 
-        
+/*
+#if CONNEXION_ENABLE
+        void callMeMaybe();
+#endif
+*/
         void triggerReplot();
 };
 

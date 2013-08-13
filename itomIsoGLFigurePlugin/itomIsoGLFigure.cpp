@@ -31,7 +31,9 @@
 //#include "dialog2DScale.h"
 
 using namespace ito;
-
+#if(CONNEXION_ENABLE)
+    int WM_3DXWARE = RegisterWindowMessage (L"SpaceWareMessage00");
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
@@ -272,17 +274,23 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     */
     m_SpwDeviceHandle = SI_NO_HANDLE;
     SiInitialize ();
-    //SiOpenWinInit (&m_SpwData, this->effectiveWinId());
-    SiOpenWinInit (&m_SpwData, this->winId());
+    SiOpenWinInit (&m_SpwData, this->effectiveWinId());
+    //SiOpenWinInit (&m_SpwData, this->winId());
+    SiSetUiMode (m_SpwDeviceHandle, SI_UI_NO_CONTROLS);
     m_SpwDeviceHandle = SiOpen ("isoWidget", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &m_SpwData);
-
+    SiSetUiMode (m_SpwDeviceHandle, SI_UI_NO_CONTROLS);
     if (m_SpwDeviceHandle == SI_NO_HANDLE)
     {
         SiTerminate ();
         m_SpwDeviceHandle = NULL;
     }
+/*  
+    myTimer.setInterval(50);
+    myTimer.setSingleShot(false);
+    connect(&myTimer, SIGNAL(timeout()), this, SLOT(callMeMaybe()));
+    myTimer.start();
+*/
 
-    SiSetUiMode (m_SpwDeviceHandle, SI_UI_ALL_CONTROLS);
 #endif
 
     m_pEventFilter = NULL;
@@ -707,11 +715,12 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
         {
             if(((const QWheelEvent *)e)->delta() > 0)
             {
-                m_plotObj->riseZAmplifierer(0.95);
+                m_plotObj->reduceZAmplifierer(1.05);
+                
             }
             else
             {
-                m_plotObj->reduceZAmplifierer(1.05);
+                m_plotObj->riseZAmplifierer(0.95);
             }
             break;
         }
@@ -810,8 +819,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 break;
             }
         }
-        default:
-            
+        default:       
             break;
     }
 
@@ -823,13 +831,15 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
 {
     //std::cout << "Got event\n";
 
-    int            num;      /* number of button returned */
+    if(!m_pContent || !message || message->message != WM_3DXWARE)
+        return false;
+  
     SiSpwEvent     pEvent;    /* SpaceWare Event */ 
     SiGetEventData EData;    /* SpaceWare Event Data */
-   
+
     /* init Window platform specific data for a call to SiGetEvent */
     SiGetEventWinInit(&EData, message->message, message->wParam, message->lParam);
-  
+
     /* check whether msg was a 3D mouse event and process it */
     if (SiGetEvent (m_SpwDeviceHandle, 0, &EData, &pEvent) == SI_IS_EVENT)
     {
@@ -845,21 +855,21 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
                 //pEvent.u.spwData.mData[SI_RZ];
                 if(abs(pEvent.u.spwData.mData[SI_TY]) > 2)
                 {
-                    double value = 1.0 - pEvent.u.spwData.mData[SI_TY] * 0.02;
+                    double value = 1.0 + pEvent.u.spwData.mData[SI_TY] * 0.02;
                     if(pEvent.u.spwData.mData[SI_TY] > 0)
                     {
-                        riseZAmplifierer(value);
+                        ((plotGLWidget*)m_pContent)->riseZAmplifierer(value);
                     }
                     else
                     {
-                        reduceZAmplifierer(value);
+                        ((plotGLWidget*)m_pContent)->reduceZAmplifierer(value);
                     }
                 }
                 if(abs(pEvent.u.spwData.mData[SI_TX]) > 2 ||
                 abs(pEvent.u.spwData.mData[SI_TZ]) > 2 ||
                 abs(pEvent.u.spwData.mData[SI_RY]) > 2 )
                 {
-                    m_pContent->rotateView(0.001* pEvent.u.spwData.mData[SI_TX], 0.001*pEvent.u.spwData.mData[SI_TZ], 0.001 * pEvent.u.spwData.mData[SI_RY]);
+                    m_pContent->rotateView(0.001* pEvent.u.spwData.mData[SI_RX], 0.001 * pEvent.u.spwData.mData[SI_RZ], 0.001 * pEvent.u.spwData.mData[SI_RY]);
                     m_pContent->paintEvent(NULL);
                 }
             }
@@ -883,8 +893,17 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
             break;
         
         } // end switch
+        *result = 0;
+        return true;
     } /* end SiGetEvent */
-    return true;
+    return false;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+//void ItomIsoGLWidget::callMeMaybe()
+//{
+//    MSG message;
+//    GetMessage(&message, NULL, 0,0);
+//    On3DxWare(&message, NULL);
+//}
 #endif
 //----------------------------------------------------------------------------------------------------------------------------------
