@@ -2468,10 +2468,23 @@ QRectF DataObjectSeriesData::boundingRect() const
             break;
         }
 
-        if( max-min < std::numeric_limits<double>::epsilon() )
+        if( (max-min) < std::numeric_limits<double>::epsilon() )
         {
-            min *= 0.99;
-            max *= 1.01;
+			if (min > 10.0)
+			{
+				min *= 0.99;
+				max *= 1.01;
+			}
+			else if(min < -10.0)
+			{
+				min *= 1.01;
+				max *= 0.99;
+			}
+			else
+			{
+				min -= 0.1;
+				max += 0.1;
+			}
         }
         
 

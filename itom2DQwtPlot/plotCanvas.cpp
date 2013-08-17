@@ -279,6 +279,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         ito::DataObjectTagType tag;
         tag = dObj->getTag("title", valid);
         m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
+		m_pData->m_dataType = (ito::tDataType)dObj->getType();
     } 
 
     updateLabels();

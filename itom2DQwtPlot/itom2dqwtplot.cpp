@@ -679,6 +679,10 @@ void Itom2dQwtPlot::mnuActStackCut(bool checked)
 void Itom2dQwtPlot::mnuActPlaneSelector(int plane)
 {
     if (m_pContent) m_pContent->changePlane(plane);
+
+	QStringList paramNames;
+    paramNames << "displayed";
+    updateChannels(paramNames);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
