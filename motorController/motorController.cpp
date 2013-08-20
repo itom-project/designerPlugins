@@ -54,11 +54,14 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_mnuSetUnit(NULL),
     m_mnuSetAbsRel(NULL),
     m_actSetAbsRel(NULL),
+    m_actSetAutoUpdate(NULL),
+    m_mnuSetAutoUpdate(NULL),
     m_unit("mm"),
     m_hasJoyStick(false),
     m_enableJoyStick(true),
     m_allowJoyStick(true),
-    m_joyModeFast(true)
+    m_joyModeFast(true),
+    m_autoUpdate(false)
 {
     unsigned int numAxisToUse = 6;
     setTitle("MotorMonitor");
@@ -209,8 +212,18 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     connect(m_mnuSetUnit, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetUnit(QAction*)));
     connect(m_actUpdatePos, SIGNAL(triggered()), this, SLOT(triggerUpdatePosition()));
     
+    //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
+    m_actSetAutoUpdate = new QAction(tr("Toogle Update (off)"), this);
+    m_mnuSetAutoUpdate = new QMenu("Update Switch");
+	m_mnuSetAutoUpdate->addAction("on");
+	m_mnuSetAutoUpdate->addAction("off");
+    m_actSetAutoUpdate->setMenu(m_mnuSetAutoUpdate);
+
+    connect(m_mnuSetAutoUpdate, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAutoUpdate(QAction*)));
+    
     setContextMenuPolicy( Qt::ActionsContextMenu );
     addAction( m_actUpdatePos );
+    addAction( m_actSetAutoUpdate );
     m_mnuSetAbsRel->addSeparator();
     addAction( m_actSetUnit );
     addAction( m_actSetAbsRel );
@@ -330,6 +343,11 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_conNeedsTermination = false;
 #endif
 
+    m_timer.setInterval(1000);
+    m_timer.setParent(this);
+    m_timer.setSingleShot(false);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(triggerUpdatePosition()));
+
     resizeEvent(NULL);
     m_isUpdating = false;
     return;
@@ -424,6 +442,7 @@ void MotorController::initializeJouStick()
 //-----------------------------------------------------------------------------------------------
 MotorController::~MotorController()
 {
+    m_timer.stop();
     if(m_actSetUnit)
     {
         delete m_actSetUnit;
@@ -450,6 +469,18 @@ MotorController::~MotorController()
     {
         delete m_mnuSetAbsRel;
         m_mnuSetAbsRel = NULL;
+    }
+
+    if(m_actSetAutoUpdate)
+    {
+        delete m_actSetAutoUpdate;
+        m_actSetAutoUpdate = NULL;
+    }
+
+    if(m_mnuSetAutoUpdate)
+    {
+        delete m_mnuSetAutoUpdate;
+        m_mnuSetAutoUpdate = NULL;
     }
 
     m_pActuator = NULL;
@@ -888,6 +919,35 @@ void MotorController::guiChangedLargeStep(double value)
 
     setBigStep(value / m_baseScale);
     return;
+}
+//-----------------------------------------------------------------------------------------------
+void MotorController::setAutoUpdate(const bool value)
+{
+    m_autoUpdate = value;
+
+    if(m_autoUpdate == true)
+    {
+        m_actSetAutoUpdate->setText("Toogle Update (on)");
+        m_timer.start();
+    }
+    else
+    {
+        m_actSetAutoUpdate->setText("Toogle Update (off)");
+        m_timer.stop();
+    }
+    return;
+}
+//-----------------------------------------------------------------------------------------------
+void MotorController::mnuSetAutoUpdate(QAction* inputAction)
+{
+    if(inputAction->text() == "on")
+    {
+        setAutoUpdate(true);
+    }
+    else if(inputAction->text() == "off")
+    {
+        setAutoUpdate(false);
+    }
 }
 //-----------------------------------------------------------------------------------------------
 #if CONNEXION_ENABLE // Only of CONNEXION is enabled

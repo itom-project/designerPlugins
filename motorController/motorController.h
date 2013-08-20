@@ -45,6 +45,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QLineEdit>
+#include <QTimer>
 
 #if defined(CONNEXION_FOUND) //&& !_DEBUG
     #ifdef _DEBUG
@@ -77,6 +78,7 @@ class MotorController : public QGroupBox
     Q_PROPERTY(int numberOfAxis READ getNumAxis WRITE setNumAxis DESIGNABLE true);
     Q_PROPERTY(QString unit READ getUnit WRITE setUnit DESIGNABLE true);
     Q_PROPERTY(bool readOnly READ getReadOnly WRITE setReadOnly DESIGNABLE true);
+    Q_PROPERTY(bool autoUpdate READ getAutoUpdate WRITE setAutoUpdate DESIGNABLE true);
     Q_PROPERTY(double smallStep READ getSmallStep WRITE setSmallStep DESIGNABLE true);
     Q_PROPERTY(double bigStep READ getBigStep WRITE setBigStep DESIGNABLE true);
     Q_PROPERTY(bool absRel READ getAbsRel WRITE setAbsRel DESIGNABLE true);
@@ -112,6 +114,12 @@ public:
     //! Retrive readOnly status
     bool getReadOnly() const {return m_readOnly;};
 
+    //! Retrive autoUpdate status
+    bool getAutoUpdate() const {return m_autoUpdate;};
+
+    //! Set the autoUpdate status. If true every second an update is triggered
+    void setAutoUpdate(const bool value);
+
     bool getAllowJoyStick() const {return m_allowJoyStick;};
     void setAllowJoyStick(const bool newState){m_allowJoyStick = newState;};
 
@@ -144,16 +152,16 @@ public:
 
     virtual QSize sizeHint() const;
 
-#if CONNEXION_ENABLE
-        bool winEvent(MSG * message, long * result);
-#endif //CONNEXION_ENABLE
-
 protected:
     //! Handle to the motor secured by QPointer
     QPointer<ito::AddInActuator> m_pActuator;
 
     void resizeEvent(QResizeEvent * event );
-    
+
+#if CONNEXION_ENABLE
+        bool winEvent(MSG * message, long * result);
+#endif //CONNEXION_ENABLE
+
 private:
 
 #if(CONNEXION_ENABLE)
@@ -225,6 +233,12 @@ private:
     //! If true, the joystick moves fast else slow
     bool m_joyModeFast;
 
+    //! Status for autoUpdate. Default is true
+    bool m_autoUpdate;
+
+    //! Internal trimer for autoUpdate
+    QTimer m_timer;
+
     //! QVector with the virtual origin position
     QVector<double> m_relPosNull;
 
@@ -242,6 +256,9 @@ private:
 
     QAction  *m_actSetUnit;
     QAction  *m_actUpdatePos;
+    QAction  *m_actSetAutoUpdate;
+    QMenu    *m_mnuSetAutoUpdate;
+
     QAction  *m_actSetAbsRel;
 
     QMenu    *m_mnuSetUnit;
@@ -288,6 +305,7 @@ public slots:
 
     void guiChangedSmallStep(double value);
     void guiChangedLargeStep(double value);
+    void mnuSetAutoUpdate(QAction* inputAction);
 
 signals:
     void RequestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
