@@ -1,5 +1,6 @@
 #include "matplotlibplot.h"
 
+//----------------------------------------------------------------------------------------------------------------------------------
 MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     : QMainWindow(parent),
     m_actHome(NULL),
@@ -18,27 +19,27 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
 
     m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("home"), this);
     m_actHome->setObjectName("actionHome");
-    m_actHome->setToolTip("Reset original view");
+    m_actHome->setToolTip(tr("Reset original view"));
 
     m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
     m_actForward->setObjectName("actionForward");
-    m_actForward->setToolTip("Forward to next view");
+    m_actForward->setToolTip(tr("Forward to next view"));
 
     m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
     m_actBack->setObjectName("actionBack");
-    m_actBack->setToolTip("Back to previous view");
+    m_actBack->setToolTip(tr("Back to previous view"));
 
     m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
-    m_actPan->setToolTip("Pan axes with left mouse, zoom with right");
+    m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
 
     m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
-    m_actZoomToRect->setToolTip("Zoom to rectangle");
+    m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
 
     m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
@@ -48,14 +49,14 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
 
     m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("subplot configuration"), this);
     m_actSubplotConfig->setObjectName("actionSubplotConfig");
-    m_actSubplotConfig->setToolTip("Configure subplots");
+    m_actSubplotConfig->setToolTip(tr("Configure subplots"));
 
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save"), this);
     m_actSave->setObjectName("actionSave");
-    m_actSave->setToolTip("Save the figure");
+    m_actSave->setToolTip(tr("Save the figure"));
 
     m_lblCoordinates = new QLabel("",this);
-    m_lblCoordinates->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_lblCoordinates->setAlignment(Qt::AlignRight | Qt::AlignTop);
     m_lblCoordinates->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
     m_lblCoordinates->setObjectName("lblCoordinates");
 
@@ -94,20 +95,22 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     setCentralWidget(m_pContent);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 MatplotlibPlot::~MatplotlibPlot()
 {
-    if(m_pMatplotlibSubfigConfig)
+    if (m_pMatplotlibSubfigConfig)
     {
         m_pMatplotlibSubfigConfig->deleteLater();
         m_pMatplotlibSubfigConfig = NULL;
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::resizeCanvas(int width, int height)
 {
-    if(m_toolbar->isVisible() && m_toolbar->isFloating() == false)
+    if (m_toolbar->isVisible() && m_toolbar->isFloating() == false)
     {
-        if(m_toolbar->orientation() == Qt::Horizontal)
+        if (m_toolbar->orientation() == Qt::Horizontal)
         {
             resize(width,height+m_toolbar->height());
         }
@@ -122,43 +125,49 @@ void MatplotlibPlot::resizeCanvas(int width, int height)
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::setToolbarVisible(bool visible)
 {
-    if(m_toolbar) m_toolbar->setVisible(visible);
+    if (m_toolbar) m_toolbar->setVisible(visible);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 bool MatplotlibPlot::getToolbarVisible() const 
 { 
-    if(m_toolbar) return m_toolbar->isVisible();
+    if (m_toolbar) return m_toolbar->isVisible();
     return false; 
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::mnuMarkerClick(bool checked)
 {
-    if(m_pContent)
+    if (m_pContent)
     {
         m_pContent->m_trackerActive = checked;
         m_pContent->setMouseTracking(checked);
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::setContextMenuEnabled(bool show)
 {
-    if(m_pContent) 
+    if (m_pContent) 
     {
         m_pContent->m_showContextMenu = show;
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 bool MatplotlibPlot::getContextMenuEnabled() const
 {
-    if(m_pContent) return m_pContent->m_showContextMenu;
+    if (m_pContent) return m_pContent->m_showContextMenu;
     return false;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace)
 {
-    if(m_pMatplotlibSubfigConfig == NULL)
+    if (m_pMatplotlibSubfigConfig == NULL)
     {
         m_pMatplotlibSubfigConfig = new MatplotlibSubfigConfig(valLeft, valTop, valRight, valBottom, valWSpace, valHSpace, this);
         connect(m_pMatplotlibSubfigConfig->sliderLeft(), SIGNAL(valueChanged(int)), this, SLOT(subplotConfigSliderLeftChanged(int)));

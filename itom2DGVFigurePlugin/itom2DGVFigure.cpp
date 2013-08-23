@@ -63,56 +63,56 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     //m_actHome
     m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     m_actHome->setObjectName("actHome");
-    m_actHome->setToolTip("Reset original view");
+    m_actHome->setToolTip(tr("Reset original view"));
 
 	//m_actSave
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"),tr("Save"), this);
     m_actSave->setObjectName("actSave");
-    m_actSave->setToolTip("Export current view");
+    m_actSave->setToolTip(tr("Export current view"));
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"),tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
-    m_actScaleSetting->setToolTip("Set the ranges and offsets oif this view");
+    m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
 
     //m_actPan
-    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), QObject::tr("move"), this);
+    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
     m_actPan->setEnabled(false);
-    m_actPan->setToolTip("Pan axes with left mouse, zoom with right");
+    m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
 
     //m_actZoomToRect
-    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), QObject::tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
-    m_actZoomToRect->setToolTip("Zoom to rectangle");
+    m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
 
     //m_actMarker
-    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), QObject::tr("marker"), this);
+    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
 
     //m_actLineCut
-    m_actLineCut = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"),tr("Linecut"),this);
+    m_actLineCut = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Linecut"),this);
     m_actLineCut->setCheckable(true);
     m_actLineCut->setObjectName("LineCut");
-    m_actLineCut->setToolTip("Show a in plane line cut");
+    m_actLineCut->setToolTip(tr("Show a in plane line cut"));
 
     //m_actPalette
-    m_actPalette = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"),tr("Palette"),this);
+    m_actPalette = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"), tr("Palette"),this);
     m_actPalette->setObjectName("TogglePalette");
-    m_actPalette->setToolTip("Switch between color palettes");
+    m_actPalette->setToolTip(tr("Switch between color palettes"));
 
     //m_actToggleColorBar
-    m_actToggleColorBar = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"),tr("Show Colorbar"), this);
+    m_actToggleColorBar = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"), tr("Show Colorbar"), this);
     m_actToggleColorBar->setCheckable(true);
     m_actToggleColorBar->setEnabled(true);
     m_actToggleColorBar->setObjectName("ShowColorBar");
-    m_actToggleColorBar->setToolTip("Toggle visibility of the color bar on right canvas side");
+    m_actToggleColorBar->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
 
     //m_actAspectSwitch
     m_actAspectSwitch = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/off.png"),tr("Switch between different aspect ratios"), this);
@@ -128,7 +128,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     //m_actAScan
     m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"),tr("Slice in z-direction"),this);
     m_actAScan->setObjectName("a-Scan");
-    m_actAScan->setToolTip("Show a slice through z-Stack");
+    m_actAScan->setToolTip(tr("Show a slice through z-Stack"));
     m_actAScan->setCheckable(true);
     m_actAScan->setVisible(false);
 
@@ -136,13 +136,13 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
     m_actForward->setObjectName("actionForward");
     m_actForward->setVisible(false);
-    m_actForward->setToolTip("Forward to next plane");
+    m_actForward->setToolTip(tr("Forward to next plane"));
 
     //m_actBack
     m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
     m_actBack->setObjectName("actionBack");
     m_actBack->setVisible(false);
-    m_actBack->setToolTip("Back to previous plane");
+    m_actBack->setToolTip(tr("Back to previous plane"));
     
     //m_actCmplxSwitch
     m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"),tr("Switch Imag, Real, Abs, Pha"), this);
@@ -196,7 +196,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     toolbar->addAction(m_actLineCut);
 
     m_lblCoordinates = new QLabel(" [0.000; 0.000]\n [0.000; 0.000]", this);
-    m_lblCoordinates->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_lblCoordinates->setAlignment(Qt::AlignRight | Qt::AlignTop);
     m_lblCoordinates->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_lblCoordinates->setObjectName("lblCoordinates");
 
@@ -210,11 +210,11 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
 
     m_pixMap.fromImage(QImage(10, 10, QImage::Format_Indexed8));
 
-    m_pPaletteRep = new QLabel("-     NOIMAGE     -", this);
+    m_pPaletteRep = new QLabel(tr("-     NOIMAGE     -"), this);
     m_pPaletteRep->setPixmap(m_pixMap);
 
     //m_pPaletteRep->setGeometry(0, 0, 128, 12);
-    m_pPaletteRep->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_pPaletteRep->setAlignment(Qt::AlignRight | Qt::AlignTop);
     m_pPaletteRep->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_pPaletteRep->setObjectName("Colors-Palette");
 
@@ -368,13 +368,19 @@ QSharedPointer<ito::DataObject> itom2DGVFigure::getSource(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::setContextMenuEnabled(bool show)
 {
-    if(m_pContent) ((plot2DWidget*)m_pContent)->m_showContextMenu = show;
+    if (m_pContent)
+    {
+        ((plot2DWidget*)m_pContent)->m_showContextMenu = show;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 bool itom2DGVFigure::getContextMenuEnabled() const
 {
-    if(m_pContent) return ((plot2DWidget*)m_pContent)->m_showContextMenu;
+    if (m_pContent)
+    {
+        return ((plot2DWidget*)m_pContent)->m_showContextMenu;
+    }
     return false;
 }
 
@@ -391,7 +397,7 @@ ito::RetVal itom2DGVFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32 
 
     retval += apiGetFigure("DObjLiveLine","",newUniqueID,&lineCutObj,this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
 
-    if(uniqueID != newUniqueID)
+    if (uniqueID != newUniqueID)
     {
         uniqueID = newUniqueID;
         ito::AbstractDObjFigure* lineCut = NULL;
@@ -414,6 +420,7 @@ ito::RetVal itom2DGVFigure::displayLineCut(QVector<QPointF> bounds, ito::uint32 
 
     return retval;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::mnuHome()
 {
@@ -421,10 +428,11 @@ void itom2DGVFigure::mnuHome()
     this->mnuAspectSwitch(&temp);
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::mnuPanner(bool checked)
 {
-    if(checked)
+    if (checked)
     {
         m_actAScan->setChecked(false);
         m_actZoomToRect->setChecked(false);
@@ -442,7 +450,7 @@ void itom2DGVFigure::mnuPanner(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::mnuZoomer(bool checked)
 {
-    if(checked)
+    if (checked)
     {
         m_actAScan->setChecked(false);
         m_actLineCut->setChecked(false);
@@ -461,7 +469,7 @@ void itom2DGVFigure::mnuZoomer(bool checked)
 void itom2DGVFigure::mnuValuePicker(bool checked)
 {
 
-    if(checked)
+    if (checked)
     {
         m_actAScan->setChecked(false);
         m_actZoomToRect->setChecked(false);
@@ -486,7 +494,7 @@ void itom2DGVFigure::mnuPalette()
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::mnuAScanPicker(bool checked)
 {
-    if(checked && m_pContent && ((plot2DWidget*)m_pContent)->getStackStatus())
+    if (checked && m_pContent && ((plot2DWidget*)m_pContent)->getStackStatus())
     {
         m_actPan->setChecked(false);
         m_actZoomToRect->setChecked(false);
@@ -506,7 +514,7 @@ void itom2DGVFigure::mnuAScanPicker(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::mnuLinePicker(bool checked)
 {
-    if(checked)
+    if (checked)
     {
         m_actPan->setChecked(false);
         m_actZoomToRect->setChecked(false);
@@ -535,20 +543,20 @@ void itom2DGVFigure::mnuExport()
         QImageWriter::supportedImageFormats();
 
     QStringList filter;
-    filter += "PDF Documents (*.pdf)";
+    filter += tr("PDF Documents (*.pdf)");
 #ifndef GV_NO_SVG
 #ifdef QT_SVG_LIB
-    filter += "SVG Documents (*.svg)";
+    filter += tr("SVG Documents (*.svg)");
 #endif
 #endif
-    filter += "Postscript Documents (*.ps)";
+    filter += tr("Postscript Documents (*.ps)");
 
-    if ( imageFormats.size() > 0 )
+    if (imageFormats.size() > 0)
     {
-        QString imageFilter("Images (");
-        for ( int i = 0; i < imageFormats.size(); i++ )
+        QString imageFilter(tr("Images ("));
+        for (int i = 0; i < imageFormats.size(); i++)
         {
-            if ( i > 0 )
+            if (i > 0)
                 imageFilter += " ";
             imageFilter += "*.";
             imageFilter += imageFormats[i];
@@ -559,12 +567,12 @@ void itom2DGVFigure::mnuExport()
     }
 
     fileName = QFileDialog::getSaveFileName(
-        this, "Export File Name", fileName,
+        this, tr("Export File Name"), fileName,
         filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
 #endif
 
 /*
-    if ( !fileName.isEmpty() )
+    if (!fileName.isEmpty())
     {
         GVPlotRenderer renderer;
 
@@ -588,7 +596,7 @@ void itom2DGVFigure::mnuScaleSetting()
     bool autoCalcX, autoCalcY, autoCalcZ;
     GVInterval interval;
 
-    if(rasterData)
+    if (rasterData)
     {
         interval = rasterData->interval(Qt::XAxis);
         minX = interval.minValue();
@@ -602,7 +610,7 @@ void itom2DGVFigure::mnuScaleSetting()
 
         QSharedPointer<ito::DataObject> dataObj = rasterData->getDataObject();
 
-        if(dataObj != NULL)
+        if (dataObj != NULL)
         {
             int dims = dataObj->getDims();
             bool test = false;
@@ -612,21 +620,21 @@ void itom2DGVFigure::mnuScaleSetting()
             maxRangeY = dataObj->getPixToPhys(dims - 2, dataObj->getSize(dims-2, true), test);
 
             dims = dataObj->getDims();
-            if(dims > 2)
+            if (dims > 2)
             {
                 int* wholeSize = new int[dims];
                 int* offsets = new int[dims];
 
                 dataObj->locateROI(wholeSize, offsets);
 
-                for(int cntPlane = 0; cntPlane < (dims-2); cntPlane++)
+                for (int cntPlane = 0; cntPlane < (dims-2); cntPlane++)
                 {
                     numPlanes *= wholeSize[cntPlane];
                 }
                 curPlane = offsets[dims-3];
-                if(dims > 4)
+                if (dims > 4)
                 {
-                    for(int cntPlane = 0; cntPlane < (dims-3); cntPlane++)
+                    for (int cntPlane = 0; cntPlane < (dims-3); cntPlane++)
                     {
                         curPlane += curPlane + offsets[cntPlane] * wholeSize[cntPlane - 1];
                     }
@@ -651,7 +659,7 @@ void itom2DGVFigure::mnuScaleSetting()
 
     Dialog2DScale *dlg = new Dialog2DScale(minX, maxX, minRangeX, maxRangeX, minY, maxY, minRangeY, maxRangeY, minZ, maxZ, dims, curPlane, numPlanes);
     dlg->exec();
-    if(dlg->result() == QDialog::Accepted)
+    if (dlg->result() == QDialog::Accepted)
     {
         dlg->getData(minX,maxX,minY,maxY,minZ,maxZ, curPlane, autoCalcX, autoCalcY, autoCalcZ);
 
@@ -665,6 +673,7 @@ void itom2DGVFigure::mnuScaleSetting()
     dlg = NULL;
 */
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::mnuColorBar(bool checked)
 {
@@ -822,6 +831,7 @@ void itom2DGVFigure::enableComplexGUI(const bool checked)
     m_actCmplxSwitch->setEnabled(checked);
     m_actCmplxSwitch->setVisible(checked);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::enableZStackGUI(const bool checked)
 {
@@ -832,15 +842,16 @@ void itom2DGVFigure::enableZStackGUI(const bool checked)
     m_actAScan->setEnabled(checked);
     m_actAScan->setVisible(checked);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DGVFigure::setLinePlotCoordinates(const QVector<QPointF> pts)
 {
     char buf[60] = {0};
-    if(pts.size() > 1)
+    if (pts.size() > 1)
     {
         sprintf(buf, "[%.4g; %.4g]\n[%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
     }
-    else if(pts.size() == 1)
+    else if (pts.size() == 1)
     {
         sprintf(buf, "[%.4g; %.4g]\n[ - ; - ]", pts[0].x(), pts[0].y());
     }

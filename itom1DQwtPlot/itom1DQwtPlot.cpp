@@ -58,65 +58,65 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_lblMarkerOffsets(NULL),
 	m_lblMarkerCoords(NULL)
 {
-    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
     
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
 	//m_actHome
-    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"),tr("Home"), this);
+    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     m_actHome->setObjectName("actHome");
-    m_actHome->setToolTip("Reset original view");
+    m_actHome->setToolTip(tr("Reset original view"));
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"),tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
     m_actSave->setObjectName("actSave");
-    m_actSave->setToolTip("Export current view");
+    m_actSave->setToolTip(tr("Export current view"));
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"),tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
-    m_actScaleSetting->setToolTip("Set the ranges and offsets of this view");
+    m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
 
     //m_rescaleParent
-    m_rescaleParent = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"),tr("Parent Scale Settings"), this);
+    m_rescaleParent = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"), tr("Parent Scale Settings"), this);
     m_rescaleParent->setObjectName("rescaleParent");
-    m_rescaleParent->setToolTip("Set the value-range of the parent view according to this plot");
+    m_rescaleParent->setToolTip(tr("Set the value-range of the parent view according to this plot"));
     m_rescaleParent->setVisible(false);
 
     //m_actForward
     m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
     m_actForward->setObjectName("actionForward");
     m_actForward->setEnabled(false);
-    m_actForward->setToolTip("Forward to next line");
+    m_actForward->setToolTip(tr("Forward to next line"));
 
     //m_actBack
     m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
     m_actBack->setObjectName("actionBack");
     m_actBack->setEnabled(false);
-    m_actBack->setToolTip("Back to previous line");
+    m_actBack->setToolTip(tr("Back to previous line"));
 
     //m_actPan
-    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), QObject::tr("move"), this);
+    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
-    m_actPan->setToolTip("Pan axes with left mouse, zoom with right");
+    m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
 
     //m_actZoomToRect
-    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), QObject::tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
-    m_actZoomToRect->setToolTip("Zoom to rectangle");
+    m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
 
     //m_actMarker
-    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), QObject::tr("marker"), this);
+    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
 
     //m_actSetMarker
-    m_actSetMarker = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"),tr("Set Markers to"), this);
+    m_actSetMarker = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"), tr("Set Markers to"), this);
 	m_mnuSetMarker = new QMenu("Marker Switch");
 	m_mnuSetMarker->addAction(tr("To Min-Max"));
 //	m_mnuSetMarker->addAction(tr("To Mean-Max"));
@@ -124,7 +124,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 	m_actSetMarker->setMenu(m_mnuSetMarker);
 
     //m_actCmplxSwitch
-    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"),tr("Switch Imag, Real, Abs, Pha"), this);
+    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
 	m_mnuCmplxSwitch = new QMenu("Complex Switch");
 	m_mnuCmplxSwitch->addAction(tr("Imag"));
 	m_mnuCmplxSwitch->addAction(tr("Real"));
@@ -145,7 +145,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     connect(m_mnuSetMarker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetMarker(QAction*)));
 	connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
-	QToolBar *toolbar = new QToolBar("1D plot toolbar", this);
+	QToolBar *toolbar = new QToolBar(tr("1D plot toolbar"), this);
 	addToolBar(toolbar, "mainToolBar");
 
 	QMenu *contextMenu = new QMenu(QObject::tr("plot1D"), this);
@@ -175,14 +175,14 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     toolbar->addAction(m_actSetMarker);
     
     m_lblMarkerCoords = new QLabel("    \n    ", this);
-    m_lblMarkerCoords->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_lblMarkerCoords->setAlignment(Qt::AlignRight | Qt::AlignTop);
     m_lblMarkerCoords->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
-    m_lblMarkerCoords->setObjectName("Marker Positions");
+    m_lblMarkerCoords->setObjectName(tr("Marker Positions"));
 
     m_lblMarkerOffsets = new QLabel("    \n    ", this);
-    m_lblMarkerOffsets->setAlignment( Qt::AlignRight | Qt::AlignTop);
+    m_lblMarkerOffsets->setAlignment(Qt::AlignRight | Qt::AlignTop);
     m_lblMarkerOffsets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
-    m_lblMarkerOffsets->setObjectName("Marker Offsets");
+    m_lblMarkerOffsets->setObjectName(tr("Marker Offsets"));
 
     QAction *lblAction = toolbar->addWidget(m_lblMarkerCoords);
     lblAction->setVisible(true);
@@ -229,10 +229,10 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
         // why "source" is used here and not "displayed" .... ck 05/15/2013
-        m_pContent->refreshPlot( (ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
 
         ito::Channel* dataChannel = getInputChannel("source");
-        m_rescaleParent->setVisible( dataChannel && dataChannel->getParent() );
+        m_rescaleParent->setVisible(dataChannel && dataChannel->getParent());
     }
 
     return ito::retOk;
@@ -248,7 +248,7 @@ void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getContextMenuEnabled() const
 {
-    if(m_pContent) return (m_pContent)->m_showContextMenu;
+    if (m_pContent) return (m_pContent)->m_showContextMenu;
     return false;
 }
 
@@ -277,7 +277,7 @@ QVector<QPointF> Itom1DQwtPlot::getBounds(void)
     int numPts = m_pInput["bounds"]->getLen();
     QVector<QPointF> boundsVec;
 
-    if(numPts > 0)
+    if (numPts > 0)
     {
         double *ptsDblVec = m_pInput["bounds"]->getVal<double*>();
         boundsVec.reserve(numPts / 2);
@@ -292,7 +292,7 @@ QVector<QPointF> Itom1DQwtPlot::getBounds(void)
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom1DQwtPlot::getTitle() const
 {
-    if(m_data.m_autoTitle)
+    if (m_data.m_autoTitle)
     {
         return "<auto>";
     }
@@ -302,7 +302,7 @@ QString Itom1DQwtPlot::getTitle() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setTitle(const QString &title)
 {
-    if(title == "<auto>")
+    if (title == "<auto>")
     {
         m_data.m_autoTitle = true;
     }
@@ -312,20 +312,20 @@ void Itom1DQwtPlot::setTitle(const QString &title)
         m_data.m_title = title;
     }
 
-    if(m_pContent) m_pContent->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetTitle()
 {
     m_data.m_autoTitle = true;
-    if(m_pContent) m_pContent->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom1DQwtPlot::getAxisLabel() const
 {
-    if(m_data.m_autoAxisLabel)
+    if (m_data.m_autoAxisLabel)
     {
         return "<auto>";
     }
@@ -335,7 +335,7 @@ QString Itom1DQwtPlot::getAxisLabel() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setAxisLabel(const QString &label)
 {
-    if(label == "<auto>")
+    if (label == "<auto>")
     {
         m_data.m_autoAxisLabel = true;
     }
@@ -344,20 +344,20 @@ void Itom1DQwtPlot::setAxisLabel(const QString &label)
         m_data.m_autoAxisLabel = false;
         m_data.m_axisLabel = label;
     }
-    if(m_pContent) m_pContent->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetAxisLabel()
 {
     m_data.m_autoAxisLabel = true;
-    if(m_pContent) m_pContent->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom1DQwtPlot::getValueLabel() const
 {
-    if(m_data.m_autoValueLabel)
+    if (m_data.m_autoValueLabel)
     {
         return "<auto>";
     }
@@ -367,7 +367,7 @@ QString Itom1DQwtPlot::getValueLabel() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setValueLabel(const QString &label)
 {
-    if(label == "<auto>")
+    if (label == "<auto>")
     {
         m_data.m_autoValueLabel = true;
     }
@@ -376,14 +376,14 @@ void Itom1DQwtPlot::setValueLabel(const QString &label)
         m_data.m_autoValueLabel = false;
         m_data.m_valueLabel = label;
     }
-    if(m_pContent) m_pContent->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetValueLabel()
 {
     m_data.m_autoValueLabel = true;
-    if(m_pContent) m_pContent->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -457,7 +457,7 @@ void Itom1DQwtPlot::setAxisFont(const QFont &font)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuPanner(bool checked)
 {
-    if(checked)
+    if (checked)
     {
         m_actZoomToRect->setChecked(false);
         m_actMarker->setChecked(false);
@@ -474,7 +474,7 @@ void Itom1DQwtPlot::mnuPanner(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuZoomer(bool checked)
 {
-    if(checked)
+    if (checked)
     {
         m_actMarker->setChecked(false);
         m_actPan->setChecked(false);
@@ -491,7 +491,7 @@ void Itom1DQwtPlot::mnuZoomer(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuMarkerClick(bool checked)
 {
-    if(checked)
+    if (checked)
     {
         m_actPan->setChecked(false);
         m_actZoomToRect->setChecked(false);
@@ -514,20 +514,20 @@ void Itom1DQwtPlot::mnuExport()
         QImageWriter::supportedImageFormats();
 
     QStringList filter;
-    filter += "PDF Documents (*.pdf)";
+    filter += tr("PDF Documents (*.pdf)");
 #ifndef QWT_NO_SVG
 #ifdef QT_SVG_LIB
-    filter += "SVG Documents (*.svg)";
+    filter += tr("SVG Documents (*.svg)");
 #endif
 #endif
-    filter += "Postscript Documents (*.ps)";
+    filter += tr("Postscript Documents (*.ps)");
 
-    if ( imageFormats.size() > 0 )
+    if (imageFormats.size() > 0)
     {
-        QString imageFilter("Images (");
-        for ( int i = 0; i < imageFormats.size(); i++ )
+        QString imageFilter(tr("Images ("));
+        for (int i = 0; i < imageFormats.size(); i++)
         {
-            if ( i > 0 )
+            if (i > 0)
                 imageFilter += " ";
             imageFilter += "*.";
             imageFilter += imageFormats[i];
@@ -538,11 +538,11 @@ void Itom1DQwtPlot::mnuExport()
     }
 
     fileName = QFileDialog::getSaveFileName(
-        this, "Export File Name", fileName,
+        this, tr("Export File Name"), fileName,
         filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
 #endif
 
-    if ( !fileName.isEmpty() )
+    if (!fileName.isEmpty())
     {
         QwtPlotRenderer renderer;
 
@@ -558,7 +558,7 @@ void Itom1DQwtPlot::mnuExport()
 void Itom1DQwtPlot::mnuScaleSetting()
 {
     Dialog1DScale *dlg = new Dialog1DScale(m_data, this);
-    if(dlg->exec() == QDialog::Accepted)
+    if (dlg->exec() == QDialog::Accepted)
     {
         dlg->getData(m_data);
 
@@ -579,10 +579,10 @@ void Itom1DQwtPlot::mnuScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuParentScaleSetting()
 {
-    if(m_pContent && m_pContent->m_plotCurveItems.size() > 0)
+    if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
         const QwtScaleDiv scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
-        QPointF bounds = QPointF( scale.lowerBound(), scale.upperBound() );
+        QPointF bounds = QPointF(scale.lowerBound(), scale.upperBound());
         /*
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
         int cmlpState = seriesData->getCmplxState();
@@ -591,15 +591,15 @@ void Itom1DQwtPlot::mnuParentScaleSetting()
 
         ito::DataObject temp = seriesData->getResampledDataObject();
 
-        if((temp.getType() != ito::tFloat64) || (temp.getDims() == 0))
+        if ((temp.getType() != ito::tFloat64) || (temp.getDims() == 0))
             return;*/
 
         //ito::dObjHelper::minMaxValueFunc<ito::float64>(&temp, minVal, minLoc, maxVal, maxLoc, true, cmlpState);
         
         ito::Channel* dataChannel = getInputChannel("source");
-        if( dataChannel && dataChannel->getParent() )
+        if (dataChannel && dataChannel->getParent())
         {
-            ( (ito::AbstractDObjFigure*)(dataChannel->getParent()) )->setZAxisInterval(bounds);
+            ((ito::AbstractDObjFigure*)(dataChannel->getParent()))->setZAxisInterval(bounds);
         }
     }
 }
@@ -607,25 +607,25 @@ void Itom1DQwtPlot::mnuParentScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 {
-    if(m_pContent && m_pContent->m_plotCurveItems.size() > 0)
+    if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
 
-		if (action->text() == QString("To Min-Max"))
+		if (action->text() == QString(tr("To Min-Max")))
         {
             DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
 
             ito::float64 minVal, maxVal;
             int minLoc, maxLoc;
-            if(seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
+            if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
             {
-                if(minLoc < maxLoc)
+                if (minLoc < maxLoc)
                 {
-                    m_pContent->setMainMarkersToIndex( minLoc, maxLoc, 0 );
+                    m_pContent->setMainMarkersToIndex(minLoc, maxLoc, 0);
                 }
                 else
                 {
-                    m_pContent->setMainMarkersToIndex( maxLoc, minLoc, 0 );
+                    m_pContent->setMainMarkersToIndex(maxLoc, minLoc, 0);
                 }
             }
         }
@@ -638,22 +638,22 @@ void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
     DataObjectSeriesData *seriesData;
 	if (m_pContent)
 	{
-        foreach( QwtPlotCurve *data, m_pContent->m_plotCurveItems )
+        foreach(QwtPlotCurve *data, m_pContent->m_plotCurveItems)
         {
             seriesData = (DataObjectSeriesData*)data->data();
-            if(seriesData)
+            if (seriesData)
             {
-		        if (action->text() == QString("Imag"))
+		        if (action->text() == QString(tr("Imag")))
                 {
 			        seriesData->setCmplxState(DataObjectSeriesData::cmplxImag);
                     m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
                 }
-		        else if (action->text() == QString("Real"))
+		        else if (action->text() == QString(tr("Real")))
                 {
 			        seriesData->setCmplxState(DataObjectSeriesData::cmplxReal);
                     m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
                 }
-		        else if (action->text() == QString("Pha"))
+		        else if (action->text() == QString(tr("Pha")))
                 {
 			        seriesData->setCmplxState(DataObjectSeriesData::cmplxArg);
                     m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));

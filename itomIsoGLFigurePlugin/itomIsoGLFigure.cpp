@@ -31,7 +31,7 @@
 //#include "dialog2DScale.h"
 
 using namespace ito;
-#if(CONNEXION_ENABLE)
+#if (CONNEXION_ENABLE)
     int WM_3DXWARE = RegisterWindowMessage (L"SpaceWareMessage00");
 #endif
 
@@ -61,11 +61,11 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_toggleInfoText(NULL),
 	m_lblCoordinates(NULL)
 {
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
-    QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
+    QMenu *contextMenu = new QMenu(tr("plot2D"), this);
 
     QGLFormat fmt;
     fmt.setDoubleBuffer(0);
@@ -91,97 +91,97 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     //m_pContent->setFocus();
 
     //m_actHome
-    m_actHome = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/home.png"),tr("Home"), this);
+    m_actHome = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/home.png"), tr("Home"), this);
     m_actHome->setObjectName("actHome");
-    m_actHome->setToolTip("Reset original view");
+    m_actHome->setToolTip(tr("Reset original view"));
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/filesave.png"),tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/filesave.png"), tr("Save"), this);
     m_actSave->setObjectName("actSave");
-    m_actSave->setToolTip("Export current view");
+    m_actSave->setToolTip(tr("Export current view"));
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"),tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
-    m_actScaleSetting->setToolTip("Set the ranges and offsets oif this view");
+    m_actScaleSetting->setToolTip(tr("Set the ranges and offsets oif this view"));
 
     //m_actPan
     /*
-    m_actPan = new QAction(QIcon(":/matplotlibFigure/icons/move.png"), QObject::tr("move"), this);
+    m_actPan = new QAction(QIcon(":/matplotlibFigure/icons/move.png"), tr("move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
     m_actPan->setEnabled(false);
-    m_actPan->setToolTip("Pan axes with left mouse, zoom with right");
+    m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
     */
 
     //m_actZoomToRect
     /*
-    m_actZoomToRect = new QAction(QIcon(":/matplotlibFigure/icons/zoom_to_rect.png"), QObject::tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/matplotlibFigure/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
-    m_actZoomToRect->setToolTip("Zoom to rectangle");
+    m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
     */
     //m_actMarker
     /*
-    m_actMarker = new QAction(QIcon(":/matplotlibFigure/icons/marker.png"), QObject::tr("marker"), this);
+    m_actMarker = new QAction(QIcon(":/matplotlibFigure/icons/marker.png"), tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
     */
     //m_actLineCut
     /*
-    m_actLineCut = new QAction(QIcon(":/plots/icons/itom_icons/pntline.png"),tr("Linecut"),this);
+    m_actLineCut = new QAction(QIcon(":/plots/icons/itom_icons/pntline.png"), tr("Linecut"), this);
     m_actLineCut->setCheckable(true);
     m_actLineCut->setObjectName("LineCut");
-    m_actLineCut->setToolTip("Show a in plane line cut");
+    m_actLineCut->setToolTip(tr("Show a in plane line cut"));
     */
     //m_actPalette
-    m_actPalette = new QAction(QIcon(":/plots/icons/itom_icons/color.png"),tr("Palette"),this);
+    m_actPalette = new QAction(QIcon(":/plots/icons/itom_icons/color.png"), tr("Palette"), this);
     m_actPalette->setObjectName("TogglePalette");
-    m_actPalette->setToolTip("Switch between color palettes");
+    m_actPalette->setToolTip(tr("Switch between color palettes"));
 
     //m_actToggleColorBar
-    m_actToggleColorBar = new QAction(QIcon(":/plots/icons/itom_icons/colorbar.png"),tr("Show Colorbar"), this);
+    m_actToggleColorBar = new QAction(QIcon(":/plots/icons/itom_icons/colorbar.png"), tr("Show Colorbar"), this);
     m_actToggleColorBar->setObjectName("ShowColorBar");
-    m_actToggleColorBar->setToolTip("Toggle visibility of the color bar on right canvas side");
+    m_actToggleColorBar->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
 
     //m_actChangeBGColor
-    m_actChangeBGColor = new QAction(QIcon(":/plots/icons/itom_icons/blkorwht.png"),tr("Change Background Color"), this);
+    m_actChangeBGColor = new QAction(QIcon(":/plots/icons/itom_icons/blkorwht.png"), tr("Change Background Color"), this);
     m_actChangeBGColor->setObjectName("Change Background Color");
-    m_actChangeBGColor->setToolTip("Switch between the different background colors");
+    m_actChangeBGColor->setToolTip(tr("Switch between the different background colors"));
 
     //m_toggleIllumination
-    m_toggleIllumination = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/LightOff.png"),tr("Enable Illumination"), this);
+    m_toggleIllumination = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/LightOff.png"), tr("Enable Illumination"), this);
     m_toggleIllumination->setCheckable(true);
-    m_toggleIllumination->setObjectName("Enable illumination rendering");
-    m_toggleIllumination->setToolTip("Enable illumination rendering");
+    m_toggleIllumination->setObjectName(tr("Enable illumination rendering"));
+    m_toggleIllumination->setToolTip(tr("Enable illumination rendering"));
 
     //m_toggleIlluminationRotation
-    m_toggleIlluminationRotation = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/LightDir.png"),tr("Change illumination direction"), this);
+    m_toggleIlluminationRotation = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/LightDir.png"), tr("Change illumination direction"), this);
     m_toggleIlluminationRotation->setCheckable(true);
-    m_toggleIlluminationRotation->setObjectName("Change illumination direction");
-    m_toggleIlluminationRotation->setToolTip("Change illumination direction");
+    m_toggleIlluminationRotation->setObjectName(tr("Change illumination direction"));
+    m_toggleIlluminationRotation->setToolTip(tr("Change illumination direction"));
 
 
     //m_actAspectSwitch
     m_actTringModeSwitch = new QAction(tr("Triangles"), this);
-    m_mnuTringModeSwitch = new QMenu("Mode Switch");
+    m_mnuTringModeSwitch = new QMenu(tr("Mode Switch"));
     m_mnuTringModeSwitch->addAction(tr("M++Mode"));
     m_mnuTringModeSwitch->addAction(tr("JoeMode"));
     m_actTringModeSwitch->setMenu(m_mnuTringModeSwitch);
 
-    m_toggleInfoText = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/info.png"),tr("Show Infotext"), this);
+    m_toggleInfoText = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/info.png"), tr("Show Infotext"), this);
     m_toggleInfoText->setCheckable(true);
-    m_toggleInfoText->setObjectName("Show Infotext");
-    m_toggleInfoText->setToolTip("Show Infotext");
+    m_toggleInfoText->setObjectName(tr("Show Infotext"));
+    m_toggleInfoText->setToolTip(tr("Show Infotext"));
 
     //m_actAScan
     /*
-    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"),tr("Slice in z-direction"),this);
+    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"), tr("Slice in z-direction"), this);
     m_actAScan->setObjectName("a-Scan");
-    m_actAScan->setToolTip("Show a slice through z-Stack");
+    m_actAScan->setToolTip(tr("Show a slice through z-Stack"));
     m_actAScan->setCheckable(true);
     m_actAScan->setVisible(false);
     */
@@ -190,18 +190,18 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actForward = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/forward.png"), tr("forward"), this);
     m_actForward->setObjectName("actionForward");
     m_actForward->setVisible(false);
-    m_actForward->setToolTip("Forward to next plane");
+    m_actForward->setToolTip(tr("Forward to next plane"));
     */
     //m_actBack
     /*
     m_actBack = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/back.png"), tr("back"), this);
     m_actBack->setObjectName("actionBack");
     m_actBack->setVisible(false);
-    m_actBack->setToolTip("Back to previous plane");
+    m_actBack->setToolTip(tr("Back to previous plane"));
     */
     //m_actCmplxSwitch
-    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"),tr("Switch Imag, Real, Abs, Pha"), this);
-    m_mnuCmplxSwitch = new QMenu("Complex Switch");
+    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
+    m_mnuCmplxSwitch = new QMenu(tr("Complex Switch"));
     m_mnuCmplxSwitch->addAction(tr("Imag"));
     m_mnuCmplxSwitch->addAction(tr("Real"));
     m_mnuCmplxSwitch->addAction(tr("Abs"));
@@ -268,7 +268,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
 //    m_toolbar->addAction(m_actForward);
     toolbar->addAction(m_actCmplxSwitch);
 
-#if(CONNEXION_ENABLE)
+#if (CONNEXION_ENABLE)
     /*
     *  Initialize the 3D mouse
     */
@@ -296,14 +296,14 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_pEventFilter = NULL;
 
     m_pEventFilter = new GL3DEFilter(this);
-    installEventFilter( m_pEventFilter );
+    installEventFilter(m_pEventFilter);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomIsoGLWidget::~ItomIsoGLWidget()
 {
-#if(CONNEXION_ENABLE)
-    if(m_SpwDeviceHandle)
+#if (CONNEXION_ENABLE)
+    if (m_SpwDeviceHandle)
     {
         SiClose (m_SpwDeviceHandle);
     }
@@ -335,13 +335,19 @@ QSharedPointer<ito::DataObject> ItomIsoGLWidget::getSource(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::setContextMenuEnabled(bool show)
 {
-    if(m_pContent) ((plotGLWidget*)m_pContent)->m_showContextMenu = show;
+    if (m_pContent)
+    {
+        ((plotGLWidget*)m_pContent)->m_showContextMenu = show;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 bool ItomIsoGLWidget::getContextMenuEnabled() const
 {
-    if(m_pContent) return ((plotGLWidget*)m_pContent)->m_showContextMenu;
+    if (m_pContent)
+    {
+        return ((plotGLWidget*)m_pContent)->m_showContextMenu;
+    }
     return false;
 }
 
@@ -353,7 +359,10 @@ ito::RetVal ItomIsoGLWidget::displayLineCut(QVector<QPointF> bounds, ito::uint32
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnuHome()
 {
-    if(m_pContent) ((plotGLWidget*)m_pContent)->homeView();
+    if (m_pContent)
+    {
+        ((plotGLWidget*)m_pContent)->homeView();
+    }
     return;
 }
 
@@ -363,7 +372,6 @@ void ItomIsoGLWidget::mnuPalette()
     ((plotGLWidget*)m_pContent)->m_paletteNum++;
     ((plotGLWidget*)m_pContent)->setColorMap("");
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnuExport()
@@ -387,12 +395,12 @@ void ItomIsoGLWidget::mnuExport()
 #endif
     filter += "Postscript Documents (*.ps)";
 
-    if ( imageFormats.size() > 0 )
+    if (imageFormats.size() > 0)
     {
         QString imageFilter("Images (");
-        for ( int i = 0; i < imageFormats.size(); i++ )
+        for (int i = 0; i < imageFormats.size(); i++)
         {
-            if ( i > 0 )
+            if (i > 0)
                 imageFilter += " ";
             imageFilter += "*.";
             imageFilter += imageFormats[i];
@@ -408,7 +416,7 @@ void ItomIsoGLWidget::mnuExport()
 #endif
 
 /*
-    if ( !fileName.isEmpty() )
+    if (!fileName.isEmpty())
     {
         GVPlotRenderer renderer;
 
@@ -432,7 +440,7 @@ void ItomIsoGLWidget::mnuScaleSetting()
     bool autoCalcX, autoCalcY, autoCalcZ;
     GVInterval interval;
 
-    if(rasterData)
+    if (rasterData)
     {
         interval = rasterData->interval(Qt::XAxis);
         minX = interval.minValue();
@@ -446,7 +454,7 @@ void ItomIsoGLWidget::mnuScaleSetting()
 
         QSharedPointer<ito::DataObject> dataObj = rasterData->getDataObject();
 
-        if(dataObj != NULL)
+        if (dataObj != NULL)
         {
             int dims = dataObj->getDims();
             bool test = false;
@@ -456,21 +464,21 @@ void ItomIsoGLWidget::mnuScaleSetting()
             maxRangeY = dataObj->getPixToPhys(dims - 2, dataObj->getSize(dims-2, true), test);
 
             dims = dataObj->getDims();
-            if(dims > 2)
+            if (dims > 2)
             {
                 int* wholeSize = new int[dims];
                 int* offsets = new int[dims];
 
                 dataObj->locateROI(wholeSize, offsets);
 
-                for(int cntPlane = 0; cntPlane < (dims-2); cntPlane++)
+                for (int cntPlane = 0; cntPlane < (dims-2); cntPlane++)
                 {
                     numPlanes *= wholeSize[cntPlane];
                 }
                 curPlane = offsets[dims-3];
-                if(dims > 4)
+                if (dims > 4)
                 {
-                    for(int cntPlane = 0; cntPlane < (dims-3); cntPlane++)
+                    for (int cntPlane = 0; cntPlane < (dims-3); cntPlane++)
                     {
                         curPlane += curPlane + offsets[cntPlane] * wholeSize[cntPlane - 1];
                     }
@@ -495,7 +503,7 @@ void ItomIsoGLWidget::mnuScaleSetting()
 
     Dialog2DScale *dlg = new Dialog2DScale(minX, maxX, minRangeX, maxRangeX, minY, maxY, minRangeY, maxRangeY, minZ, maxZ, dims, curPlane, numPlanes);
     dlg->exec();
-    if(dlg->result() == QDialog::Accepted)
+    if (dlg->result() == QDialog::Accepted)
     {
         dlg->getData(minX,maxX,minY,maxY,minZ,maxZ, curPlane, autoCalcX, autoCalcY, autoCalcZ);
 
@@ -512,15 +520,20 @@ void ItomIsoGLWidget::mnuScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnuColorBar()
 {
-    if(m_pContent)
+    if (m_pContent)
+    {
         ((plotGLWidget*)m_pContent)->togglePaletteMode();
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnutoggleIllumination(const bool checked)
 {
-    if(m_pContent) ((plotGLWidget*)m_pContent)->toggleIllumination(checked);
+    if (m_pContent)
+    {
+        ((plotGLWidget*)m_pContent)->toggleIllumination(checked);
+    }
     m_toggleIlluminationRotation->setEnabled(checked);
-    if(!checked)
+    if (!checked)
     {
         m_toggleIllumination->setIcon(QIcon(":/itomIsoGLFigurePlugin/icons/LightOff.png"));
         m_toggleIlluminationRotation->setChecked(false);
@@ -533,7 +546,10 @@ void ItomIsoGLWidget::mnutoggleIllumination(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnutoggleIlluminationRotation(const bool checked)
 {
-    if(m_pContent) ((plotGLWidget*)m_pContent)->toggleIlluminationRotation(checked);
+    if (m_pContent)
+    {
+        ((plotGLWidget*)m_pContent)->toggleIlluminationRotation(checked);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -544,8 +560,6 @@ void ItomIsoGLWidget::mnuCmplxSwitch(QAction *action)
 
     if (m_pContent)
     {
-
-
         if (action->text() == QString("Imag"))
         {
             ((plotGLWidget*)m_pContent)->setCmplxMode(0);
@@ -582,18 +596,17 @@ void ItomIsoGLWidget::mnuTringModeSwitch(QAction *action)
         {
             m_mnuTringModeSwitch->setTitle("Triangles");
             int vismode = ((plotGLWidget*)m_pContent)->getCurrentVisMode();
-            if(vismode == plotGLWidget::PAINT_POINTS) ((plotGLWidget*)m_pContent)->setCurrentVisMode(plotGLWidget::PAINT_TRIANG);
+            if (vismode == plotGLWidget::PAINT_POINTS) ((plotGLWidget*)m_pContent)->setCurrentVisMode(plotGLWidget::PAINT_TRIANG);
         }
         if (action->text() == QString("JoeMode"))
         {
             m_mnuTringModeSwitch->setTitle("Points");
             int vismode = ((plotGLWidget*)m_pContent)->getCurrentVisMode();
-            if(vismode == plotGLWidget::PAINT_TRIANG) ((plotGLWidget*)m_pContent)->setCurrentVisMode(plotGLWidget::PAINT_POINTS);
+            if (vismode == plotGLWidget::PAINT_TRIANG) ((plotGLWidget*)m_pContent)->setCurrentVisMode(plotGLWidget::PAINT_POINTS);
         }
     }
 
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF ItomIsoGLWidget::getZAxisInterval(void) const
@@ -620,34 +633,44 @@ void ItomIsoGLWidget::setColorMap(QString palette)
 {
     ((plotGLWidget*)m_pContent)->setColorMap(palette);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::enableIlluGUI(const bool checked)
 {
-    if(!checked) m_toggleIllumination->setChecked(false);
-    if(!checked) m_toggleIlluminationRotation->setChecked(false);
+    if (!checked)
+    {
+        m_toggleIllumination->setChecked(false);
+    }
+    if (!checked)
+    {
+        m_toggleIlluminationRotation->setChecked(false);
+    }
     m_toggleIllumination->setEnabled(checked);
     m_toggleIlluminationRotation->setEnabled(checked);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::enableComplexGUI(const bool checked)
 {
     m_actCmplxSwitch->setEnabled(checked);
     m_actCmplxSwitch->setVisible(checked);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::enableZStackGUI(const bool checked)
 {
 
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::setLinePlotCoordinates(const QVector<QPointF> pts)
 {
     char buf[60] = {0};
-    if(pts.size() > 1)
+    if (pts.size() > 1)
     {
         sprintf(buf, "[%.6g; %.6g]\n[%.6g; %.6g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
     }
-    else if(pts.size() == 1)
+    else if (pts.size() == 1)
     {
         sprintf(buf, "[%.6g; %.6g]\n[ - ; - ]", pts[0].x(), pts[0].y());
     }
@@ -661,7 +684,7 @@ void ItomIsoGLWidget::setLinePlotCoordinates(const QVector<QPointF> pts)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::triggerReplot()
 {
-    if(m_pContent != NULL)
+    if (m_pContent != NULL)
     {
         ((plotGLWidget*)m_pContent)->m_forceReplot = true;
         ((plotGLWidget*)m_pContent)->refreshPlot(NULL);
@@ -671,7 +694,7 @@ void ItomIsoGLWidget::triggerReplot()
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnuToggleBPColor()
 {
-    if(m_pContent != NULL)
+    if (m_pContent != NULL)
     {
         int color = ((plotGLWidget*)m_pContent)->getBGColor();
         ((plotGLWidget*)m_pContent)->setBGColor(color + 1);
@@ -681,7 +704,7 @@ void ItomIsoGLWidget::mnuToggleBPColor()
 //----------------------------------------------------------------------------------------------------------------------------------
 bool GL3DEFilter::event(QEvent *e)
 {
-    if ( e->type() == QEvent::User )
+    if (e->type() == QEvent::User)
     {
 //        showCursor(true);
         return true;
@@ -692,7 +715,7 @@ bool GL3DEFilter::event(QEvent *e)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
 {
-    if(e->type() == QEvent::Destroy)
+    if (e->type() == QEvent::Destroy)
         return false;
 
     if (!m_plotObj || m_plotObj == NULL|| ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent) == NULL)
@@ -713,7 +736,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
 
         case QEvent::Wheel:
         {
-            if(((const QWheelEvent *)e)->delta() > 0)
+            if (((const QWheelEvent *)e)->delta() > 0)
             {
                 m_plotObj->reduceZAmplifierer(1.05);
                 
@@ -743,7 +766,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
         case QEvent::MouseButtonRelease:
         case QEvent::MouseMove:
         {
-            if(!rotating) return true;
+            if (!rotating) return true;
 
             double deltaZ = (QCursor::pos().x() - startPos[0]) / 200.0;
             double deltaX = (QCursor::pos().y() - startPos[1]) / 200.0;
@@ -752,7 +775,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
             startPos[0] = QCursor::pos().x();
             startPos[1] = QCursor::pos().y();
 
-            if(((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->lightArrowEnabled())
+            if (((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->lightArrowEnabled())
             {
                 ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateLightArrow(deltaX, deltaY, deltaZ);
             }
@@ -761,7 +784,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(deltaX, deltaY, deltaZ);
             }
 
-            if(e->type() == QEvent::MouseButtonRelease)
+            if (e->type() == QEvent::MouseButtonRelease)
             {
                 rotating = true;
                 moving = false;
@@ -825,13 +848,14 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
 
     return QObject::eventFilter(object, e);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 #if CONNEXION_ENABLE // Only of CONNEXION is enabled
 bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
 {
     //std::cout << "Got event\n";
 
-    if(!m_pContent || !message || message->message != WM_3DXWARE)
+    if (!m_pContent || !message || message->message != WM_3DXWARE)
         return false;
   
     SiSpwEvent     pEvent;    /* SpaceWare Event */ 
@@ -853,10 +877,10 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
                 //pEvent.u.spwData.mData[SI_RX];
                 //pEvent.u.spwData.mData[SI_RY];
                 //pEvent.u.spwData.mData[SI_RZ];
-                if(abs(pEvent.u.spwData.mData[SI_TY]) > 2)
+                if (abs(pEvent.u.spwData.mData[SI_TY]) > 2)
                 {
                     double value = 1.0 + pEvent.u.spwData.mData[SI_TY] * 0.02;
-                    if(pEvent.u.spwData.mData[SI_TY] > 0)
+                    if (pEvent.u.spwData.mData[SI_TY] > 0)
                     {
                         ((plotGLWidget*)m_pContent)->riseZAmplifierer(value);
                     }
@@ -865,9 +889,9 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
                         ((plotGLWidget*)m_pContent)->reduceZAmplifierer(value);
                     }
                 }
-                if(abs(pEvent.u.spwData.mData[SI_TX]) > 2 ||
+                if (abs(pEvent.u.spwData.mData[SI_TX]) > 2 ||
                 abs(pEvent.u.spwData.mData[SI_TZ]) > 2 ||
-                abs(pEvent.u.spwData.mData[SI_RY]) > 2 )
+                abs(pEvent.u.spwData.mData[SI_RY]) > 2)
                 {
                     m_pContent->rotateView(0.001* pEvent.u.spwData.mData[SI_RX], 0.001 * pEvent.u.spwData.mData[SI_RZ], 0.001 * pEvent.u.spwData.mData[SI_RY]);
                     m_pContent->paintEvent(NULL);
@@ -898,6 +922,7 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
     } /* end SiGetEvent */
     return false;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 //void ItomIsoGLWidget::callMeMaybe()
 //{
@@ -905,5 +930,5 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
 //    GetMessage(&message, NULL, 0,0);
 //    On3DxWare(&message, NULL);
 //}
+
 #endif
-//----------------------------------------------------------------------------------------------------------------------------------

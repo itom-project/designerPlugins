@@ -37,7 +37,8 @@
 #include <QLayout>
 #include <iostream>
 //#include <qdebug.h>
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 MotorController::MotorController(QWidget *parent /*= 0*/)
     : QGroupBox(parent),
     m_pActuator(NULL),
@@ -122,7 +123,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_changePosButtons.clear();
     m_changePosButtons.reserve(numAxisToUse);
 
-    for(int i = 0; i < numAxisToUse; i++)
+    for (int i = 0; i < numAxisToUse; i++)
     {
         QList<QPushButton* > buttons;
         buttons.reserve(4);
@@ -190,7 +191,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetUnit = new QAction(tr("Toogle Unit"), this);
-    m_mnuSetUnit = new QMenu("Unit Switch");
+    m_mnuSetUnit = new QMenu(tr("Unit Switch"));
 	m_mnuSetUnit->addAction("nm");
 	m_mnuSetUnit->addAction(micron);
 	m_mnuSetUnit->addAction("mm");
@@ -200,11 +201,11 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_actUpdatePos = new QAction(tr("Update"), this);
     
     m_actSetAbsRel = new QAction(tr("Toogle Abs/Rel"), this);
-    m_mnuSetAbsRel = new QMenu("AbsRel-Switch");
-	m_mnuSetAbsRel->addAction("abs");
-	m_mnuSetAbsRel->addAction("rel");
+    m_mnuSetAbsRel = new QMenu(tr("AbsRel-Switch"));
+	m_mnuSetAbsRel->addAction(tr("abs"));
+	m_mnuSetAbsRel->addAction(tr("rel"));
 	m_mnuSetAbsRel->addSeparator();
-	m_mnuSetAbsRel->addAction("origin");
+	m_mnuSetAbsRel->addAction(tr("origin"));
     m_actSetAbsRel->setMenu(m_mnuSetAbsRel);
 
     connect(m_mnuSetAbsRel, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAbsRel(QAction*)));
@@ -214,24 +215,24 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetAutoUpdate = new QAction(tr("Toogle Update (off)"), this);
-    m_mnuSetAutoUpdate = new QMenu("Update Switch");
-	m_mnuSetAutoUpdate->addAction("on");
-	m_mnuSetAutoUpdate->addAction("off");
+    m_mnuSetAutoUpdate = new QMenu(tr("Update Switch"));
+	m_mnuSetAutoUpdate->addAction(tr("on"));
+	m_mnuSetAutoUpdate->addAction(tr("off"));
     m_actSetAutoUpdate->setMenu(m_mnuSetAutoUpdate);
 
     connect(m_mnuSetAutoUpdate, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAutoUpdate(QAction*)));
     
-    setContextMenuPolicy( Qt::ActionsContextMenu );
-    addAction( m_actUpdatePos );
-    addAction( m_actSetAutoUpdate );
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+    addAction(m_actUpdatePos);
+    addAction(m_actSetAutoUpdate);
     m_mnuSetAbsRel->addSeparator();
-    addAction( m_actSetUnit );
-    addAction( m_actSetAbsRel );
+    addAction(m_actSetUnit);
+    addAction(m_actSetAbsRel);
 
     m_numAxis = m_posWidgets.length();
     m_numVisAxis = m_posWidgets.length();
 
-    for(int i = 0; i < m_numVisAxis; i++)
+    for (int i = 0; i < m_numVisAxis; i++)
     {
         m_posWidgets[i]->setReadOnly(true);
         m_posWidgets[i]->setSuffix(m_unit);
@@ -260,7 +261,6 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
         connect(m_smallStepWidgets[i], SIGNAL(valueChanged(double)), this, SLOT(guiChangedSmallStep(double)));
         connect(m_largeStepWidgets[i], SIGNAL(valueChanged(double)), this, SLOT(guiChangedLargeStep(double)));
-
     }
 
     m_axisGroups.clear();
@@ -276,7 +276,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     mainLayout->setContentsMargins(2,2,2,2);
 
-    for(int i = 0; i < numAxisToUse; i++)
+    for (int i = 0; i < numAxisToUse; i++)
     {
         QHBoxLayout* line1 = new QHBoxLayout();
         QHBoxLayout* line2 = new QHBoxLayout();
@@ -321,9 +321,9 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     this->setLayout(mainLayout);
 
-    if(m_readOnly)
+    if (m_readOnly)
     {
-        for(int i = 0; i < m_numVisAxis; i++)
+        for (int i = 0; i < m_numVisAxis; i++)
         {
             m_changePosButtons[i][0]->setVisible(false);
             m_changePosButtons[i][1]->setVisible(false);
@@ -335,7 +335,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         }   
     }
 
-#if(CONNEXION_ENABLE)
+#if (CONNEXION_ENABLE)
     /*
     *  Initialize the 3D mouse
     */
@@ -353,8 +353,8 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     return;
 }
 
-//-----------------------------------------------------------------------------------------------
-void MotorController::resizeEvent(QResizeEvent * event )
+//----------------------------------------------------------------------------------------------------------------------------------
+void MotorController::resizeEvent(QResizeEvent * event)
 {
     /*
     int x = 0;
@@ -362,15 +362,15 @@ void MotorController::resizeEvent(QResizeEvent * event )
     int border = isFlat() ? 1 : 5;
     int upper = title().length() > 0 ? 10:1;
     int curpX = 0, curpY = 0;
-    if(m_readOnly)
+    if (m_readOnly)
     {
-        for(int i = 0; i < m_numVisAxis; i++)
+        for (int i = 0; i < m_numVisAxis; i++)
         {
             curpX = 75 * x + border;
             curpY = 25 * y + border + upper;
             m_posWidgets[i]->setGeometry(curpX,  curpY, 70, 20);
             x++;
-            if(x * 75 + 70 > size().width())
+            if (x * 75 + 70 > size().width())
             {
                 y++;
                 x = 0;
@@ -381,17 +381,17 @@ void MotorController::resizeEvent(QResizeEvent * event )
     else
     {
         
-        for(int i = 0; i < m_numVisAxis; i++)
+        for (int i = 0; i < m_numVisAxis; i++)
         {
             curpX = 75 * x + border;
             curpY = 45 * y + border + upper;
             m_posWidgets[i]->setGeometry(curpX, curpY, 70, 20);
-            for(int n = 0; n < 4; n++)
+            for (int n = 0; n < 4; n++)
             {
                 m_changePosButtons[i][n]->setGeometry(curpX + n * 17, curpY + 21, 17, 15);
             }
             x++;
-            if(x * 75 + 70 > size().width())
+            if (x * 75 + 70 > size().width())
             {
                 y++;
                 x = 0;
@@ -400,21 +400,21 @@ void MotorController::resizeEvent(QResizeEvent * event )
         this->setMinimumHeight(curpY + 42 + border);
     }
     */
-    for(int i = 0; i < m_numVisAxis; i++)
+    for (int i = 0; i < m_numVisAxis; i++)
     {
         m_axisGroups[i]->setVisible(true);
     }
 
-    for(int i = m_numVisAxis; i < m_axisGroups.size(); i++)
+    for (int i = m_numVisAxis; i < m_axisGroups.size(); i++)
     {
         m_axisGroups[i]->setVisible(false);
     }
-
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::initializeJouStick()
 {
-#if(CONNEXION_ENABLE)
+#if (CONNEXION_ENABLE)
     SiInitialize ();
     SiOpenWinInit (&m_SpwData, this->effectiveWinId());
     m_SpwDeviceHandle = SiOpen ("isoWidget", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &m_SpwData);
@@ -431,53 +431,53 @@ void MotorController::initializeJouStick()
 
     SiSetUiMode (m_SpwDeviceHandle, SI_UI_ALL_CONTROLS);
 
-    if(m_SpwDeviceHandle != SI_NO_HANDLE)
+    if (m_SpwDeviceHandle != SI_NO_HANDLE)
     {
-        m_hasJoyStick = connect( this, SIGNAL(TriggerSoftJoyStickMovement(QVector<int>, QVector<double>) ), m_pActuator, SLOT(startJoyStickMovement(QVector<int>, QVector<double>) ));
+        m_hasJoyStick = connect(this, SIGNAL(TriggerSoftJoyStickMovement(QVector<int>, QVector<double>)), m_pActuator, SLOT(startJoyStickMovement(QVector<int>, QVector<double>)));
         std::cout << "Connected to \"Spass-Stecken\"" << (m_hasJoyStick? "true" : "false") << "\n";
     }
     #endif
 }
 
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------
 MotorController::~MotorController()
 {
     m_timer.stop();
-    if(m_actSetUnit)
+    if (m_actSetUnit)
     {
         delete m_actSetUnit;
         m_actSetUnit = NULL;
     }
-    if(m_actUpdatePos)
+    if (m_actUpdatePos)
     {
         delete m_actUpdatePos;
         m_actUpdatePos = NULL;
     }
-    if(m_mnuSetUnit)
+    if (m_mnuSetUnit)
     {
         delete m_mnuSetUnit;
         m_mnuSetUnit = NULL;
     }
 
-    if(m_actSetAbsRel)
+    if (m_actSetAbsRel)
     {
         delete m_actSetAbsRel;
         m_actSetAbsRel = NULL;
     }
 
-    if(m_mnuSetAbsRel)
+    if (m_mnuSetAbsRel)
     {
         delete m_mnuSetAbsRel;
         m_mnuSetAbsRel = NULL;
     }
 
-    if(m_actSetAutoUpdate)
+    if (m_actSetAutoUpdate)
     {
         delete m_actSetAutoUpdate;
         m_actSetAutoUpdate = NULL;
     }
 
-    if(m_mnuSetAutoUpdate)
+    if (m_mnuSetAutoUpdate)
     {
         delete m_mnuSetAutoUpdate;
         m_mnuSetAutoUpdate = NULL;
@@ -485,10 +485,10 @@ MotorController::~MotorController()
 
     m_pActuator = NULL;
 
-#if(CONNEXION_ENABLE)
-    if(m_conNeedsTermination)
+#if (CONNEXION_ENABLE)
+    if (m_conNeedsTermination)
     {
-        if(m_SpwDeviceHandle)
+        if (m_SpwDeviceHandle)
         {
             SiClose (m_SpwDeviceHandle);
         }
@@ -496,10 +496,11 @@ MotorController::~MotorController()
     }
 #endif
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
 {
-    if(actuator.isNull())
+    if (actuator.isNull())
     {
         m_pActuator = NULL;
         setEnabled(false);
@@ -508,14 +509,14 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
     {
         m_pActuator = actuator;
 
-        connect( m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>) ), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>) ) );
+        connect(m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>)), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>)));
         
-        if(m_allowJoyStick)
+        if (m_allowJoyStick)
         {
             initializeJouStick();
         }
 
-        m_updateBySignal = connect( this, SIGNAL(RequestStatusAndPosition( bool, bool) ), m_pActuator, SLOT(RequestStatusAndPosition( bool, bool) ) );
+        m_updateBySignal = connect(this, SIGNAL(RequestStatusAndPosition(bool, bool)), m_pActuator, SLOT(RequestStatusAndPosition(bool, bool)));
 
         triggerUpdatePosition();
 
@@ -529,15 +530,16 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
 
     return;  
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::triggerUpdatePosition(void)
 {
-    if(m_pActuator.isNull())
+    if (m_pActuator.isNull())
     {
         return;
     }
 
-    if(m_updateBySignal)
+    if (m_updateBySignal)
     {
         emit RequestStatusAndPosition(true, false);
     }
@@ -552,23 +554,23 @@ void MotorController::triggerUpdatePosition(void)
 
         while (!locker.getSemaphore()->wait(500))
         {
-            retval += ito::RetVal(ito::retError, 0, "timeout while getting numaxis parameter");
+            retval += ito::RetVal(ito::retError, 0, tr("timeout while getting numaxis parameter").toAscii().data());
             break;
         }
 
-        if(!retval.containsError())
+        if (!retval.containsError())
         {
             retval += locker.getSemaphore()->returnValue;
         }
 
-        if(!retval.containsError())
+        if (!retval.containsError())
         {
             axisNumbers = (*qsParam).getVal<int>();
         }
 
-        if(axisNumbers != 0)
+        if (axisNumbers != 0)
         {
-            if(m_numVisAxis == 0)
+            if (m_numVisAxis == 0)
             {
                 setNumAxis(axisNumbers);
             }
@@ -578,7 +580,7 @@ void MotorController::triggerUpdatePosition(void)
             status.fill(0);
 
             QVector<int> axisNo(axisNumbers);
-            for(int i = 0; i < axisNumbers; i++)
+            for (int i = 0; i < axisNumbers; i++)
             {
                 axisNo[i] = i;
             }
@@ -589,16 +591,16 @@ void MotorController::triggerUpdatePosition(void)
 
             while (!posLocker.getSemaphore()->wait(5000))
             {
-                retval += ito::RetVal(ito::retError, 0, "timeout while getting numaxis parameter");
+                retval += ito::RetVal(ito::retError, 0, tr("timeout while getting numaxis parameter").toAscii().data());
                 break;
             }
 
-            if(!retval.containsError())
+            if (!retval.containsError())
             {
                 retval += posLocker.getSemaphore()->returnValue;
             }
 
-            if(!retval.containsError())
+            if (!retval.containsError())
             {
                 actuatorStatusChanged(status, *qsVector);
             }
@@ -606,17 +608,18 @@ void MotorController::triggerUpdatePosition(void)
     }
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setNumAxis(const int numAxis)
 {
     bool change = m_numVisAxis != numAxis ? true : false;
-    if(numAxis > 0 && numAxis < (m_numAxis + 1))
+    if (numAxis > 0 && numAxis < (m_numAxis + 1))
     {
         m_numVisAxis = numAxis;
     }
-    if(change)
+    if (change)
     {
-        if(m_numVisAxis == 1)
+        if (m_numVisAxis == 1)
         {
             m_axisGroups[0]->setFlat(true);
         }
@@ -626,11 +629,11 @@ void MotorController::setNumAxis(const int numAxis)
         }
 
         int i = 0;
-        for(; i < m_numVisAxis; i++)
+        for (; i < m_numVisAxis; i++)
         {
             m_axisGroups[i]->setVisible(true);
         }
-        for(; i < m_axisGroups.length(); i++)
+        for (; i < m_axisGroups.length(); i++)
         {
             m_axisGroups[i]->setVisible(false);
         }
@@ -638,9 +641,9 @@ void MotorController::setNumAxis(const int numAxis)
         i = 0;
 
 
-        if(!m_readOnly)
+        if (!m_readOnly)
         {
-            for(; i < m_numVisAxis; i++)
+            for (; i < m_numVisAxis; i++)
             {
                 m_largeStepWidgets[i]->setVisible(true);
                 m_smallStepWidgets[i]->setVisible(true);
@@ -649,7 +652,7 @@ void MotorController::setNumAxis(const int numAxis)
                 m_changePosButtons[i][2]->setVisible(true);
                 m_changePosButtons[i][3]->setVisible(true);
             }
-            for(; i < m_posWidgets.length(); i++)
+            for (; i < m_posWidgets.length(); i++)
             {
                 m_largeStepWidgets[i]->setVisible(false);
                 m_smallStepWidgets[i]->setVisible(false);
@@ -664,17 +667,19 @@ void MotorController::setNumAxis(const int numAxis)
     }
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QSize MotorController::sizeHint() const
 {
     
     return QSize(10,10);
     
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double> positions)
 {
-    if(status.size() != positions.size())
+    if (status.size() != positions.size())
     return;
 
     bool running = false;
@@ -682,18 +687,18 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
     unsigned char size = status.size();
     size = size > 6 ? 6 : size;
 
-    for(int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
-        if(status[i] & ito::actuatorMoving)
+        if (status[i] & ito::actuatorMoving)
         {
             style = "background-color: yellow";
             running = true;
         }
-        else if(status[i] & ito::actuatorInterrupted)
+        else if (status[i] & ito::actuatorInterrupted)
         {
             style = "background-color: red";
         }
-        //else if(status[i] & ito::actuatorTimeout) //timeout is bad for dummyMotor, since the waitForDone-method always drops into a timeout
+        //else if (status[i] & ito::actuatorTimeout) //timeout is bad for dummyMotor, since the waitForDone-method always drops into a timeout
         //{
         //    style = "background-color: green";
         //}
@@ -704,41 +709,42 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
 
         m_posWidgets[i]->setStyleSheet(style);
         m_curAbsPos[i] = positions[i] * m_baseScale;
-        if(m_absRelPosition)
+        if (m_absRelPosition)
         {
-            m_posWidgets[i]->setValue( m_curAbsPos[i] - m_relPosNull[i]);
+            m_posWidgets[i]->setValue(m_curAbsPos[i] - m_relPosNull[i]);
         }
         else
         {
-            m_posWidgets[i]->setValue( m_curAbsPos[i]);
+            m_posWidgets[i]->setValue(m_curAbsPos[i]);
         }
     }
 
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setUnit(const QString unit)
 {
     double oldScale = m_baseScale;
     QString micron(2, 181);
     micron[1] = 'm';
-    if(unit == "mm")
+    if (unit == "mm")
     {
         m_baseScale = 1.0;
     }
-    else if(unit == micron)
+    else if (unit == micron)
     {
         m_baseScale = 1000.0;
     }
-    else if(unit == "m")
+    else if (unit == "m")
     {
         m_baseScale = 0.001;
     }
-    else if(unit == "km")
+    else if (unit == "km")
     {
         m_baseScale = 0.000001;
     }
-    else if(unit == "nm")
+    else if (unit == "nm")
     {
         m_baseScale = 1000000.0;
     }
@@ -747,12 +753,12 @@ void MotorController::setUnit(const QString unit)
 
     m_unit = unit;
 
-    for(int i = 0; i < m_numVisAxis; i++)
+    for (int i = 0; i < m_numVisAxis; i++)
     {
         m_curAbsPos[i] *= m_baseScale / oldScale;
         m_relPosNull[i] *= m_baseScale / oldScale;
 
-        if(m_absRelPosition)
+        if (m_absRelPosition)
         {
             m_posWidgets[i]->setValue(m_curAbsPos[i] - m_relPosNull[i]);            
         }
@@ -769,15 +775,16 @@ void MotorController::setUnit(const QString unit)
 
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setReadOnly(const bool value)
 {
     bool changed = m_readOnly != value;
     m_readOnly = value;
 
-    if(changed)
+    if (changed)
     {
-        for(int i = 0; i < m_numVisAxis; i++)
+        for (int i = 0; i < m_numVisAxis; i++)
         {
             m_largeStepWidgets[i]->setVisible(!m_readOnly);
             m_smallStepWidgets[i]->setVisible(!m_readOnly);
@@ -791,39 +798,42 @@ void MotorController::setReadOnly(const bool value)
     }
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::mnuSetUnit(QAction* inputAction)
 {
     setUnit(inputAction->text());
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::mnuSetAbsRel(QAction* inputAction)
 {
-    if(inputAction->text() == QString("abs"))
+    if (inputAction->text() == QString(tr("abs")))
     {
         setAbsRel(false);
     }
-    else if(inputAction->text() == QString("rel"))
+    else if (inputAction->text() == QString(tr("rel")))
     {
         setAbsRel(true);
     }
-    else if(inputAction->text() == QString("origin")) 
+    else if (inputAction->text() == QString(tr("origin")))
     {
         m_relPosNull = m_curAbsPos;
         setAbsRel(m_absRelPosition);
     }
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setSmallStep(const double value)
 {
     m_isUpdating = true;
-    if(value > 0.0 && value < 1.0)
+    if (value > 0.0 && value < 1.0)
     {
         m_smallStep = value;
     }
 
-    for(int i = 0; i < m_smallStepWidgets.size(); i++) 
+    for (int i = 0; i < m_smallStepWidgets.size(); i++) 
     {
         m_smallStepWidgets[i]->setValue(m_smallStep * m_baseScale);    
     }
@@ -832,34 +842,36 @@ void MotorController::setSmallStep(const double value)
     m_isUpdating = false;
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setBigStep(const double value)
 {
     m_isUpdating = true;
-    if(value > 0.0 && value < 1000.0)
+    if (value > 0.0 && value < 1000.0)
     {
         m_bigStep = value;
     }
 
-    for(int i = 0; i < m_smallStepWidgets.size(); i++) 
+    for (int i = 0; i < m_smallStepWidgets.size(); i++) 
     {
         m_largeStepWidgets[i]->setValue(m_bigStep * m_baseScale);    
     }
     m_isUpdating = false;
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setAbsRel(const bool absRel)
 {
     m_absRelPosition = absRel;
     QChar axisName;
     
     char text[4] = {'%','c', ' ', 0};
-    if(m_absRelPosition)
+    if (m_absRelPosition)
     {
         text[2] = '\'';
     }
-    for(int i = 0; i < m_posWidgets.size(); i ++)
+    for (int i = 0; i < m_posWidgets.size(); i ++)
     {
         axisName = m_axisName[i][0];
         m_axisName[i].sprintf(text, axisName);
@@ -868,10 +880,11 @@ void MotorController::setAbsRel(const bool absRel)
     }
     triggerUpdatePosition();
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig, const bool forward)
 {
-    if(m_pActuator.isNull())
+    if (m_pActuator.isNull())
         return;
 
     double step = smallBig ? m_bigStep : m_smallStep;
@@ -879,7 +892,7 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
 
     bool ready = true;
 
-    if(m_needStepAdaption)
+    if (m_needStepAdaption)
     {
         ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
 
@@ -892,69 +905,74 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
             break;
         }
 
-        if(locker.getSemaphore()->returnValue.containsError())
+        if (locker.getSemaphore()->returnValue.containsError())
         {
             ready = false;
         }   
     }
 
-    if(ready)
+    if (ready)
     {
         QMetaObject::invokeMethod(m_pActuator, "setPosRel", Q_ARG(const int, axisNo), Q_ARG(const double, step), Q_ARG(ItomSharedSemaphore*, NULL));
     }
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::guiChangedSmallStep(double value)
 {
-    if(m_isUpdating) return;
+    if (m_isUpdating) return;
 
     setSmallStep(value / m_baseScale);
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::guiChangedLargeStep(double value)
 {
-    if(m_isUpdating) return;
+    if (m_isUpdating) return;
 
     setBigStep(value / m_baseScale);
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::setAutoUpdate(const bool value)
 {
     m_autoUpdate = value;
 
-    if(m_autoUpdate == true)
+    if (m_autoUpdate == true)
     {
-        m_actSetAutoUpdate->setText("Toogle Update (on)");
+        m_actSetAutoUpdate->setText(tr("Toogle Update (on)"));
         m_timer.start();
     }
     else
     {
-        m_actSetAutoUpdate->setText("Toogle Update (off)");
+        m_actSetAutoUpdate->setText(tr("Toogle Update (off)"));
         m_timer.stop();
     }
     return;
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::mnuSetAutoUpdate(QAction* inputAction)
 {
-    if(inputAction->text() == "on")
+    if (inputAction->text() == tr("on"))
     {
         setAutoUpdate(true);
     }
-    else if(inputAction->text() == "off")
+    else if (inputAction->text() == tr("off"))
     {
         setAutoUpdate(false);
     }
 }
-//-----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------------
 #if CONNEXION_ENABLE // Only of CONNEXION is enabled
 bool MotorController::winEvent(MSG * message, long * result)
 {
     std::cout << "Try to match event\n";
-    if(!(m_hasJoyStick && m_enableJoyStick && m_allowJoyStick))
+    if (!(m_hasJoyStick && m_enableJoyStick && m_allowJoyStick))
         return false;
 
     std::cout << "Got event\n";
@@ -982,7 +1000,7 @@ bool MotorController::winEvent(MSG * message, long * result)
                 //pEvent.u.spwData.mData[SI_RX];
                 //pEvent.u.spwData.mData[SI_RY];
                 //pEvent.u.spwData.mData[SI_RZ];
-                if(abs(pEvent.u.spwData.mData[SI_RY]) > 2)
+                if (abs(pEvent.u.spwData.mData[SI_RY]) > 2)
                 {
                     vel[0] = (m_joyModeFast ? m_bigStep : m_smallStep) *  pEvent.u.spwData.mData[SI_RY];
                     std::cout << "Gotcha\n";

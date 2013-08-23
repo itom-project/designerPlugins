@@ -14,6 +14,7 @@
 #include "qwt_scale_map.h"
 #include "qwt_interval.h"
 
+//----------------------------------------------------------------------------------------------------------------------------------
 class QwtAbstractScale::PrivateData
 {
 public:
@@ -40,6 +41,7 @@ public:
     double stepSize;
 };
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   Constructor
 
@@ -51,7 +53,6 @@ public:
   The scaleStepSize() is initialized to 0.0, scaleMaxMajor() to 5
   and scaleMaxMajor to 3.
 */
-
 QwtAbstractScale::QwtAbstractScale( QWidget *parent ):
     QWidget( parent )
 {
@@ -59,12 +60,14 @@ QwtAbstractScale::QwtAbstractScale( QWidget *parent ):
     rescale( 0.0, 100.0, d_data->stepSize );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 //! Destructor
 QwtAbstractScale::~QwtAbstractScale()
 {
     delete d_data;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   Set the lower bound of the scale
 
@@ -79,6 +82,7 @@ void QwtAbstractScale::setLowerBound( double value )
     setScale( value, upperBound() );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Lower bound of the scale
   \sa setLowerBound(), setScale(), upperBound()
@@ -88,6 +92,7 @@ double QwtAbstractScale::lowerBound() const
     return d_data->scaleDraw->scaleDiv().lowerBound();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   Set the upper bound of the scale
 
@@ -102,6 +107,7 @@ void QwtAbstractScale::setUpperBound( double value )
     setScale( lowerBound(), value );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Upper bound of the scale
   \sa setUpperBound(), setScale(), lowerBound()
@@ -111,6 +117,7 @@ double QwtAbstractScale::upperBound() const
     return d_data->scaleDraw->scaleDiv().upperBound();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \brief Specify a scale.
 
@@ -130,6 +137,7 @@ void QwtAbstractScale::setScale( double lowerBound, double upperBound )
     rescale( lowerBound, upperBound, d_data->stepSize );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \brief Specify a scale.
 
@@ -145,6 +153,7 @@ void QwtAbstractScale::setScale( const QwtInterval &interval )
     setScale( interval.minValue(), interval.maxValue() );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \brief Specify a scale.
 
@@ -171,6 +180,7 @@ void QwtAbstractScale::setScale( const QwtScaleDiv &scaleDiv )
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \brief Set the maximum number of major tick intervals.
 
@@ -193,6 +203,7 @@ void QwtAbstractScale::setScaleMaxMajor( int ticks )
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Maximal number of major tick intervals
   \sa setScaleMaxMajor(), scaleMaxMinor()
@@ -202,6 +213,7 @@ int QwtAbstractScale::scaleMaxMajor() const
     return d_data->maxMajor;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \brief Set the maximum number of minor tick intervals
 
@@ -223,6 +235,7 @@ void QwtAbstractScale::setScaleMaxMinor( int ticks )
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Maximal number of minor tick intervals
   \sa setScaleMaxMinor(), scaleMaxMajor()
@@ -232,6 +245,7 @@ int QwtAbstractScale::scaleMaxMinor() const
     return d_data->maxMinor;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
    \brief Set the step size used for calculating a scale division
 
@@ -255,6 +269,7 @@ void QwtAbstractScale::setScaleStepSize( double stepSize )
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Hint for the step size of the scale
   \sa setScaleStepSize(), QwtScaleEngine::divideScale()
@@ -264,6 +279,7 @@ double QwtAbstractScale::scaleStepSize() const
     return d_data->stepSize;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \brief Set a scale draw
 
@@ -284,6 +300,7 @@ void QwtAbstractScale::setAbstractScaleDraw( QwtAbstractScaleDraw *scaleDraw )
     d_data->scaleDraw = scaleDraw;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
     \return Scale draw
     \sa setAbstractScaleDraw()
@@ -293,6 +310,7 @@ QwtAbstractScaleDraw *QwtAbstractScale::abstractScaleDraw()
     return d_data->scaleDraw;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
     \return Scale draw
     \sa setAbstractScaleDraw()
@@ -302,6 +320,7 @@ const QwtAbstractScaleDraw *QwtAbstractScale::abstractScaleDraw() const
     return d_data->scaleDraw;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \brief Set a scale engine
 
@@ -320,6 +339,7 @@ void QwtAbstractScale::setScaleEngine( QwtScaleEngine *scaleEngine )
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Scale engine
   \sa setScaleEngine()
@@ -329,6 +349,7 @@ const QwtScaleEngine *QwtAbstractScale::scaleEngine() const
     return d_data->scaleEngine;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Scale engine
   \sa setScaleEngine()
@@ -338,6 +359,7 @@ QwtScaleEngine *QwtAbstractScale::scaleEngine()
     return d_data->scaleEngine;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Scale boundaries and positions of the ticks
 
@@ -349,6 +371,7 @@ const QwtScaleDiv &QwtAbstractScale::scaleDiv() const
     return d_data->scaleDraw->scaleDiv();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return Map to translate between scale and widget coordinates
  */
@@ -357,6 +380,7 @@ const QwtScaleMap &QwtAbstractScale::scaleMap() const
     return d_data->scaleDraw->scaleMap();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   Translate a scale value into a widget coordinate
 
@@ -369,6 +393,7 @@ int QwtAbstractScale::transform( double value ) const
     return qRound( d_data->scaleDraw->scaleMap().transform( value ) );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   Translate a widget coordinate into a scale value
 
@@ -381,6 +406,7 @@ double QwtAbstractScale::invTransform( int value ) const
     return d_data->scaleDraw->scaleMap().invTransform( value );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return True, when the scale is increasing in opposite direction
           to the widget coordinates
@@ -390,6 +416,7 @@ bool QwtAbstractScale::isInverted() const
     return d_data->scaleDraw->scaleMap().isInverting();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return The boundary with the smaller value
   \sa maximum(), lowerBound(), upperBound()
@@ -400,6 +427,7 @@ double QwtAbstractScale::minimum() const
         d_data->scaleDraw->scaleDiv().upperBound() );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   \return The boundary with the larger value
   \sa minimum(), lowerBound(), upperBound()
@@ -410,11 +438,13 @@ double QwtAbstractScale::maximum() const
         d_data->scaleDraw->scaleDiv().upperBound() );
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 //! Notify changed scale
 void QwtAbstractScale::scaleChange()
 {
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 /*!
   Recalculate the scale division and update the scale.
 
@@ -442,6 +472,7 @@ void QwtAbstractScale::rescale(
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void QwtAbstractScale::updateScaleDraw()
 {
     rescale( d_data->scaleDraw->scaleDiv().lowerBound(),
