@@ -145,9 +145,9 @@ ito::RetVal Plot1DWidget::init()
     QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
     QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
 
-    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",10),NULL).value<QFont>();
-    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",10),NULL).value<QFont>();
-    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",8),NULL).value<QFont>();
+    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
+    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
+    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();
     
     m_pZoomer->setRubberBandPen(rubberBandPen);
     m_pZoomer->setTrackerFont(trackerFont);

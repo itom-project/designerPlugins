@@ -46,6 +46,9 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
     Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
+    Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
+    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
+    Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -55,6 +58,9 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://yAxisFlipped", "Sets whether y-axis should be flipped (default: false, zero is at the bottom).")
     Q_CLASSINFO("prop://valueLabel", "Label of the value axis or '<auto>' if the description should be used from data object.")
     Q_CLASSINFO("prop://colorBarVisible", "Defines whether the color bar should be visible.")
+    Q_CLASSINFO("prop://titleFont", "Font for title.")
+    Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
+    Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -110,6 +116,15 @@ public:
         
     virtual QPointF getZAxisInterval(void) const;
     virtual void setZAxisInterval(QPointF point);
+
+    QFont getTitleFont(void) const;
+    void setTitleFont(const QFont &font);
+
+    QFont getLabelFont(void) const;
+    void setLabelFont(const QFont &font);
+
+    QFont getAxisFont(void) const;
+    void setAxisFont(const QFont &font);
 
     friend class PlotCanvas;
 
