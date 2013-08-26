@@ -180,6 +180,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 
     setAxisScale(QwtPlot::yRight, 0, 1.0 );
     enableAxis(QwtPlot::yRight, m_pData->m_colorBarVisible );
+    axisWidget(QwtPlot::yRight)->setLayoutFlag( QwtScaleWidget::TitleInverted, false ); //let the label be in the same direction than on the left side
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -223,6 +224,7 @@ void PlotCanvas::refreshStyles()
 
     QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
     QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
+    labelFont.setItalic(false);
     QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();
 
     if (m_inverseColor1.isValid())
@@ -275,6 +277,7 @@ void PlotCanvas::refreshStyles()
     t = axisWidget(QwtPlot::yRight)->title();
     t.setFont(labelFont);
     axisWidget(QwtPlot::yRight)->setTitle(t);
+    
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
 }
