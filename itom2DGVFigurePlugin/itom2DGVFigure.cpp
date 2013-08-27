@@ -66,7 +66,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actHome->setToolTip(tr("Reset original view"));
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"),tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip(tr("Export current view"));
 
@@ -115,7 +115,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actToggleColorBar->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
 
     //m_actAspectSwitch
-    m_actAspectSwitch = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/off.png"),tr("Switch between different aspect ratios"), this);
+    m_actAspectSwitch = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/off.png"), tr("Switch between different aspect ratios"), this);
 	m_mnuAspectSwitch = new QMenu("Aspect Switch");
     m_mnuAspectSwitch->addAction(tr("off"));
     m_mnuAspectSwitch->addAction(tr("1:4"));
@@ -145,7 +145,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actBack->setToolTip(tr("Back to previous plane"));
     
     //m_actCmplxSwitch
-    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"),tr("Switch Imag, Real, Abs, Pha"), this);
+    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
 	m_mnuCmplxSwitch = new QMenu("Complex Switch");
 	m_mnuCmplxSwitch->addAction(tr("Imag"));
 	m_mnuCmplxSwitch->addAction(tr("Real"));
