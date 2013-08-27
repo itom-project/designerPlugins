@@ -130,11 +130,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+117"/>
-        <source>plot2D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../itom2DGVFigurePlugin.cpp" line="+15"/>
         <source>ITOM widget for 2D DataObjects.</source>
         <translation type="unfinished"></translation>
@@ -156,7 +151,7 @@
 <context>
     <name>itom2DGVFigure</name>
     <message>
-        <location filename="../itom2DGVFigure.cpp" line="-112"/>
+        <location filename="../itom2DGVFigure.cpp" line="+5"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
@@ -168,7 +163,7 @@
     <message>
         <location line="+3"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -208,12 +203,12 @@
     <message>
         <location line="+3"/>
         <source>marker</source>
-        <translation type="unfinished"></translation>
+        <translation>Marker</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Linecut</source>
-        <translation type="unfinished"></translation>
+        <translation>Linienschnitt</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -223,12 +218,12 @@
     <message>
         <location line="+3"/>
         <source>Palette</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Switch between color palettes</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwischen Farbpaletten wechseln</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -243,37 +238,37 @@
     <message>
         <location line="+3"/>
         <source>Switch between different aspect ratios</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zwischen unterschiedlichen Seitenverhältnissen wählen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>off</source>
-        <translation type="unfinished"></translation>
+        <translation>aus</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>1:4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>1:2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>1:1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>2:1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>4:1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+4"/>
@@ -288,27 +283,27 @@
     <message>
         <location line="+5"/>
         <source>forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Weiter</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Forward to next plane</source>
-        <translation type="unfinished"></translation>
+        <translation>Weiter zur nächsten Ebene</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Back to previous plane</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück zur vorherigen Ebene</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Switch Imag, Real, Abs, Pha</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zwischen Imag, Real, Abs &amp; Pha wählen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -331,34 +326,44 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+20"/>
+        <source>2D plot toolbar</source>
+        <translation>2D Plot Symbolleiste</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>plot2D</source>
+        <translation>Plot 2D</translation>
+    </message>
+    <message>
+        <location line="+37"/>
         <source>-     NOIMAGE     -</source>
-        <translation type="unfinished"></translation>
+        <translation>-     KEIN BILD     -</translation>
     </message>
     <message>
         <location line="+333"/>
         <source>PDF Documents (*.pdf)</source>
-        <translation type="unfinished"></translation>
+        <translation>PDF-Dokumente (*.pdf)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>SVG Documents (*.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>SVG-Dokumente (*.svg)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Postscript Documents (*.ps)</source>
-        <translation type="unfinished"></translation>
+        <translation>PostScript-Dokumente (*.ps)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Images (</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild (</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Export File Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dateiname exportieren</translation>
     </message>
 </context>
 </TS>

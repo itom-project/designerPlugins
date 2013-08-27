@@ -231,7 +231,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     test = connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
     test = connect(m_mnuTringModeSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuTringModeSwitch(QAction*)));
 
-	QToolBar *toolbar = new QToolBar(this);
+	QToolBar *toolbar = new QToolBar(tr("Iso Toolbar"), this);
 	addToolBar(toolbar, "mainToolBar", Qt::TopToolBarArea, 1);
 
     contextMenu->addAction(m_actSave);

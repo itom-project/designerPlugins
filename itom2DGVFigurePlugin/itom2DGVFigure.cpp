@@ -126,7 +126,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
 	m_actAspectSwitch->setMenu(m_mnuAspectSwitch);
 
     //m_actAScan
-    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"),tr("Slice in z-direction"),this);
+    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"),tr("Slice in z-direction"), this);
     m_actAScan->setObjectName("a-Scan");
     m_actAScan->setToolTip(tr("Show a slice through z-Stack"));
     m_actAScan->setCheckable(true);
@@ -170,10 +170,10 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
 	connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
     connect(m_mnuAspectSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuAspectSwitch(QAction*)));
 
-	QToolBar *toolbar = new QToolBar(this);
+	QToolBar *toolbar = new QToolBar(tr("2D plot toolbar"), this);
 	addToolBar(toolbar, "mainToolBar");
 
-	QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
+	QMenu *contextMenu = new QMenu(tr("plot2D"), this);
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
     contextMenu->addAction(m_actHome);

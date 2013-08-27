@@ -148,6 +148,11 @@
         <source>Pha</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location line="+26"/>
+        <source>Iso Toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

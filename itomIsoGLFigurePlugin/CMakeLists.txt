@@ -139,7 +139,7 @@ IF(GLEW_FOUND)
 	#handle translations END STEP 1
 
     QT4_ADD_RESOURCES(designer_HEADERS ${designer_rcc})
-    ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
+    ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
     IF(3DCONNEXION_FOUND)
         Message(STATUS "3DCONNEXION was found ${3DCONNEXION_SIAPP}.")

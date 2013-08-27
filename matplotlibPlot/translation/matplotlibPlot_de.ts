@@ -80,7 +80,7 @@
     </message>
     <message>
         <location line="+7"/>
-        <source>Toolbar</source>
+        <source>MatPlotLib toolbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

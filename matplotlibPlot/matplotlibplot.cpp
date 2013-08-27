@@ -60,7 +60,7 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     m_lblCoordinates->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
     m_lblCoordinates->setObjectName("lblCoordinates");
 
-    m_toolbar = new QToolBar(tr("Toolbar"), this);
+    m_toolbar = new QToolBar(tr("MatPlotLib toolbar"), this);
     m_toolbar->setObjectName("toolbar");
     m_toolbar->addAction(m_actHome);
     m_toolbar->addAction(m_actBack);

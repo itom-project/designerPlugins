@@ -47,7 +47,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+122"/>
+        <location filename="../itom2dqwtplot.cpp" line="+124"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -172,7 +172,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+377"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -205,7 +205,7 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+365"/>
+        <location filename="../plotCanvas.cpp" line="+433"/>
         <source>No color maps defined.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -311,7 +311,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-732"/>
+        <location filename="../itom2dqwtplot.cpp" line="-804"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished"></translation>
     </message>
