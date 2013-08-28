@@ -185,7 +185,8 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
         ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
         int dims = dataObj->getDims();
         if( dims > 1)
-        {
+        {            
+
             //if (m_pItem)
             //    delete m_pItem;
             
@@ -214,9 +215,9 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
                 if(m_startScaledX) m_ObjectContainer->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
                 
                 ito::ItomPalette newPalette;
-
                 apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
-                m_ObjectContainer->setColorTable(newPalette.colorVector256);
+
+                if(newPalette.type != tPaletteNoType) m_ObjectContainer->setColorTable(newPalette.colorVector256);
                 //refreshColorMap();
             }
             else
@@ -241,20 +242,33 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
                 m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
                 m_pLineCut->setVisible(false);
                 m_lineIsSampling = false;
-                m_pLineCut->setPen(QPen(QColor(Qt::darkGreen)));
+
+                ito::ItomPalette newPalette;
+                apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
+
+                m_pLineCut->setPen(QPen(QColor(newPalette.inverseColorOne)));
             }
 
             if(!m_pointMarker)
             {
                 m_pointMarker = new QGraphicsEllipseItem(0.0, 0.0, 2.0, 2.0, NULL, m_pContent);
                 m_pointMarker->setVisible(false);
-                m_pointMarker->setPen(QPen(QColor(Qt::darkGreen)));
+
+                ito::ItomPalette newPalette;
+                apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
+
+
+                m_pointMarker->setPen(QPen(QColor(newPalette.inverseColorOne)));
             }
 
             if(!m_pointTracker)
             {
                 m_pointTracker = new QGraphicsTextItem("[0.0; 0.0]\n 0.0", NULL, m_pContent);
-                m_pointTracker->setDefaultTextColor(Qt::darkGray);
+
+                ito::ItomPalette newPalette;
+                apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
+
+                m_pointTracker->setDefaultTextColor(newPalette.inverseColorOne);
                 m_pointTracker->setVisible(false);
             }
             else
@@ -616,6 +630,16 @@ void plot2DWidget::refreshColorMap(QString palette)
         m_pLineCut->setPen(QPen(newPalette.inverseColorOne));
         //m_pLineCut->set
     }
+    if(newPalette.inverseColorOne.isValid() && m_pointMarker)
+    {
+        m_pointMarker->setPen(QPen(QColor(newPalette.inverseColorOne)));
+        //m_pLineCut->set
+    }
+    if(newPalette.inverseColorOne.isValid() && m_pointTracker)
+    {
+        m_pointTracker->setDefaultTextColor(QColor(newPalette.inverseColorOne));
+        //m_pLineCut->set
+    }    
     if(isFalseColor)
     {
 
@@ -928,6 +952,7 @@ void plot2DWidget::updatePointTracker()
             sprintf(buf, "[%i; %i]\n %.4g", (int)cursorPos.x(), (int)cursorPos.y(), value);
         }
     }
+    //m_pointTracker->setHtml("<div style=\"background:#ff8800;\">html item</p>");
     m_pointTracker->setPlainText(buf);
     m_pointTracker->setPos(cursorPos);
     return;

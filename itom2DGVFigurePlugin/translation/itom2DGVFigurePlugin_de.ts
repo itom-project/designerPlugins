@@ -16,22 +16,22 @@
     <message>
         <location/>
         <source>auto calc once</source>
-        <translation type="unfinished">Automatische Berechnung</translation>
+        <translation>Automatische Berechnung</translation>
     </message>
     <message>
         <location/>
         <source>manual adjustment:</source>
-        <translation type="unfinished">Manuelle Einstellung:</translation>
+        <translation>Manuelle Einstellung:</translation>
     </message>
     <message>
         <location/>
         <source>from</source>
-        <translation type="unfinished">von</translation>
+        <translation>von</translation>
     </message>
     <message>
         <location/>
         <source>to</source>
-        <translation type="unfinished">bis</translation>
+        <translation>bis</translation>
     </message>
     <message>
         <location/>
@@ -125,11 +125,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../itom2DGVFigure.cpp" line="+59"/>
-        <source>Points for line plots from 2d objects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../itom2DGVFigurePlugin.cpp" line="+15"/>
         <source>ITOM widget for 2D DataObjects.</source>
         <translation type="unfinished"></translation>
@@ -151,7 +146,12 @@
 <context>
     <name>itom2DGVFigure</name>
     <message>
-        <location filename="../itom2DGVFigure.cpp" line="+5"/>
+        <location filename="../itom2DGVFigure.cpp" line="+59"/>
+        <source>Points for line plots from 2d objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
@@ -161,7 +161,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
@@ -181,7 +181,7 @@
         <translation type="unfinished">Bereich und Offset für dieses Bild setzen</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>move</source>
         <translation type="unfinished"></translation>
     </message>
@@ -191,34 +191,93 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+16"/>
+        <source>Show a point marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+3"/>
-        <source>zoom to rectangle</source>
+        <source>linecut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>color bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Zoom to rectangle</source>
+        <source>Toggle visibility of the color bar name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
+        <location line="+1"/>
+        <source>zoom level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <location line="+8"/>
+        <source>Switch imaginary, real, absolute, phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <source>Complex Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+544"/>
+        <source>imaginary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-543"/>
+        <location line="+548"/>
+        <source>real</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-547"/>
+        <source>absolute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+551"/>
+        <source>phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-616"/>
+        <source>Zoom to rectangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <source>rectangle zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>marker</source>
-        <translation>Marker</translation>
+        <translation type="unfinished">Marker</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Linecut</source>
-        <translation>Linienschnitt</translation>
+        <translation type="obsolete">Linienschnitt</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+10"/>
         <source>Show a in plane line cut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Palette</source>
-        <translation></translation>
+        <source>color palettes</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
@@ -226,52 +285,21 @@
         <translation>Zwischen Farbpaletten wechseln</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Show Colorbar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Toggle visibility of the color bar on right canvas side</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
         <source>Switch between different aspect ratios</source>
-        <translation type="unfinished">Zwischen unterschiedlichen Seitenverhältnissen wählen</translation>
+        <translation type="obsolete">Zwischen unterschiedlichen Seitenverhältnissen wählen</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+12"/>
         <source>off</source>
         <translation>aus</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>1:4</source>
-        <translation></translation>
+        <location line="+7"/>
+        <source>Switch between different zoom levels with fixed aspect ration</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>1:2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>1:1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>2:1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>4:1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Slice in z-direction</source>
         <translation type="unfinished"></translation>
     </message>
@@ -301,32 +329,11 @@
         <translation>Zurück zur vorherigen Ebene</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Switch Imag, Real, Abs, Pha</source>
-        <translation type="unfinished">Zwischen Imag, Real, Abs &amp; Pha wählen</translation>
+        <translation type="obsolete">Zwischen Imag, Real, Abs &amp; Pha wählen</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Imag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Real</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Abs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pha</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+20"/>
+        <location line="+29"/>
         <source>2D plot toolbar</source>
         <translation>2D Plot Symbolleiste</translation>
     </message>
