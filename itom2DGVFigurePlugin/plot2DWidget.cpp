@@ -59,7 +59,6 @@ plot2DWidget::plot2DWidget(QMenu *contextMenu, QWidget * parent) :
         m_pointTracker(NULL),
         m_pointMarker(NULL)
 {
-
     this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
 
     m_pContent = new QGraphicsScene(this);
@@ -75,14 +74,14 @@ plot2DWidget::~plot2DWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::handleMouseEvent( int type, QMouseEvent *event)
+void plot2DWidget::handleMouseEvent(int type, QMouseEvent *event)
 {
     Qt::MouseButton btn = event->button();
     Qt::MouseButtons btns = event->buttons();
     int button = 0;
     QPointF scenePos = mapToScene(event->pos());
     
-    if(!m_pContent || !m_pItem || !m_pLineCut || !m_pointMarker)
+    if (!m_pContent || !m_pItem || !m_pLineCut || !m_pointMarker)
         return;
 
     switch(type)
@@ -92,12 +91,12 @@ void plot2DWidget::handleMouseEvent( int type, QMouseEvent *event)
             {
                 case Qt::LeftButton:
                 {
-                    if(m_pLineCut->isVisible())
+                    if (m_pLineCut->isVisible())
                     {
                         trackerAppended(scenePos);
                         m_lineIsSampling = true;
                     }
-                    else if(m_pointMarker->isVisible())
+                    else if (m_pointMarker->isVisible())
                     {
                         m_pointMarker->setPos(scenePos - QPointF(1.0, 1.0));
                         updatePointTracker();
@@ -109,7 +108,7 @@ void plot2DWidget::handleMouseEvent( int type, QMouseEvent *event)
 
         break;
         case 1:
-            if(m_pLineCut->isVisible())
+            if (m_pLineCut->isVisible())
             {
                 m_lineIsSampling = false;
             }
@@ -124,12 +123,12 @@ void plot2DWidget::handleMouseEvent( int type, QMouseEvent *event)
         break;
         case 2:
         {
-            if(m_lineIsSampling)
+            if (m_lineIsSampling)
             {
 
-                if(m_stateMoveAligned)
+                if (m_stateMoveAligned)
                 {
-                    if(abs(scenePos.x() - m_pLineCut->line().x1()) > abs(scenePos.y() - m_pLineCut->line().y1()))
+                    if (abs(scenePos.x() - m_pLineCut->line().x1()) > abs(scenePos.y() - m_pLineCut->line().y1()))
                     {
                         scenePos.setY(m_pLineCut->line().y1());
                     }
@@ -141,11 +140,11 @@ void plot2DWidget::handleMouseEvent( int type, QMouseEvent *event)
 
                 trackerMoved(scenePos);
             }
-            else if(m_trackerIsSampling)
+            else if (m_trackerIsSampling)
             {
-                if(m_stateMoveAligned)
+                if (m_stateMoveAligned)
                 {
-                    if(abs(scenePos.x() - m_pointMarker->pos().x()) > abs(scenePos.y() - m_pointMarker->pos().y()))
+                    if (abs(scenePos.x() - m_pointMarker->pos().x()) > abs(scenePos.y() - m_pointMarker->pos().y()))
                     {
                         scenePos.setY(m_pointMarker->pos().y() + 1.0);
                     }
@@ -161,11 +160,11 @@ void plot2DWidget::handleMouseEvent( int type, QMouseEvent *event)
         }
         break;
         case 3:
-            if(m_pLineCut->isVisible())
+            if (m_pLineCut->isVisible())
             {
                 m_lineIsSampling = false;
             }
-            else if(m_pointMarker->isVisible())
+            else if (m_pointMarker->isVisible())
             {
                 m_trackerIsSampling = false;        
             }
@@ -184,25 +183,23 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
         //check dataObj
         ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
         int dims = dataObj->getDims();
-        if( dims > 1)
+        if (dims > 1)
         {            
-
             //if (m_pItem)
             //    delete m_pItem;
             
-            if(dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
+            if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
             {
-                if(!m_cmplxState) ((itom2DGVFigure*)m_pParent)->enableComplexGUI(true);
+                if (!m_cmplxState) ((itom2DGVFigure*)m_pParent)->enableComplexGUI(true);
                 m_cmplxState = true;                
             }
             else
             {
-                if(!m_cmplxState) ((itom2DGVFigure*)m_pParent)->enableComplexGUI(false);
+                if (!m_cmplxState) ((itom2DGVFigure*)m_pParent)->enableComplexGUI(false);
                 m_cmplxState = false;                
             }
 
-
-            if(m_ObjectContainer == NULL)
+            if (m_ObjectContainer == NULL)
             {
                 QRect ROI(0, 0, dataObj->getSize(dims - 1), dataObj->getSize(dims - 2));
                 m_ObjectContainer = new RasterToQImageObj(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), ROI, /*dims -1, dims-2,*/ 1); 
@@ -210,14 +207,14 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
 
                 m_ObjectContainer->setColorMode(m_showColored);
 
-                if(m_startScaledZ) m_ObjectContainer->setIntervalRange(Qt::ZAxis, false, m_startRangeZ.x(), m_startRangeZ.y());
-                if(m_startScaledY) m_ObjectContainer->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
-                if(m_startScaledX) m_ObjectContainer->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
+                if (m_startScaledZ) m_ObjectContainer->setIntervalRange(Qt::ZAxis, false, m_startRangeZ.x(), m_startRangeZ.y());
+                if (m_startScaledY) m_ObjectContainer->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
+                if (m_startScaledX) m_ObjectContainer->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
                 
                 ito::ItomPalette newPalette;
                 apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
 
-                if(newPalette.type != tPaletteNoType) m_ObjectContainer->setColorTable(newPalette.colorVector256);
+                if (newPalette.type != tPaletteNoType) m_ObjectContainer->setColorTable(newPalette.colorVector256);
                 //refreshColorMap();
             }
             else
@@ -227,7 +224,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
 
             m_pixMap.convertFromImage(m_ObjectContainer->getRastersImage());               
 
-            if(!m_pItem)
+            if (!m_pItem)
             {
                 m_pItem = new QGraphicsPixmapItem(m_pixMap);
                 m_pContent->clear();
@@ -237,7 +234,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
             else
                 m_pItem->setPixmap(m_pixMap);
 
-            if(!m_pLineCut)
+            if (!m_pLineCut)
             {
                 m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
                 m_pLineCut->setVisible(false);
@@ -249,7 +246,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
                 m_pLineCut->setPen(QPen(QColor(newPalette.inverseColorOne)));
             }
 
-            if(!m_pointMarker)
+            if (!m_pointMarker)
             {
                 m_pointMarker = new QGraphicsEllipseItem(0.0, 0.0, 2.0, 2.0, NULL, m_pContent);
                 m_pointMarker->setVisible(false);
@@ -261,7 +258,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
                 m_pointMarker->setPen(QPen(QColor(newPalette.inverseColorOne)));
             }
 
-            if(!m_pointTracker)
+            if (!m_pointTracker)
             {
                 m_pointTracker = new QGraphicsTextItem("[0.0; 0.0]\n 0.0", NULL, m_pContent);
 
@@ -273,7 +270,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
             }
             else
             {
-                if(m_pointMarker->isVisible())
+                if (m_pointMarker->isVisible())
                 {
                     updatePointTracker();
                 }
@@ -282,11 +279,11 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
             repaint();
         }
     }
-    else if(m_ObjectContainer != NULL)
+    else if (m_ObjectContainer != NULL)
     {
         m_pixMap.convertFromImage(m_ObjectContainer->getRastersImage());               
 
-        if(!m_pItem)
+        if (!m_pItem)
         {
             m_pItem = new QGraphicsPixmapItem(m_pixMap);
             m_pContent->clear();
@@ -298,14 +295,15 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
 
         repaint();
     }
-    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::keyReleaseEvent ( QKeyEvent * event )
+void plot2DWidget::keyReleaseEvent (QKeyEvent * event)
 {
     if (!hasFocus())
+    {
         return;
+    }
 
     switch(((const QKeyEvent *)event)->key())
     {
@@ -320,38 +318,44 @@ void plot2DWidget::keyReleaseEvent ( QKeyEvent * event )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::keyPressEvent ( QKeyEvent * event ) 
+void plot2DWidget::keyPressEvent (QKeyEvent * event) 
 {
     if (!hasFocus())
+    {
         return;
+    }
 
-    if(!m_pContent || !m_pItem || !m_pLineCut || !m_pointMarker)
+    if (!m_pContent || !m_pItem || !m_pLineCut || !m_pointMarker)
+    {
         return;
+    }
 
     if (!m_ObjectContainer || !(m_pLineCut->isVisible() || m_pointMarker->isVisible()))
+    {
         return;
+    }
 
     switch(((const QKeyEvent *)event)->key())
     {
         case Qt::Key_Up:
         { 
-            if(m_pointMarker->isVisible())   // doing the linecut
+            if (m_pointMarker->isVisible())   // doing the linecut
             {
                 QPointF scenePos = m_pointMarker->pos() - QPointF(0.0, 1.0);
-                if(scenePos.y() < -1.0) scenePos.setY(-1.0);
+                if (scenePos.y() < -1.0) scenePos.setY(-1.0);
 
                 m_pointMarker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if(m_pLineCut->isVisible())
+            else if (m_pLineCut->isVisible())
             {
                 QPointF pt1 = m_pLineCut->line().p1() - QPointF(0.0, 1.0);
                 QPointF pt2 = m_pLineCut->line().p2() - QPointF(0.0, 1.0);
 
-                if(pt1.y() < 0.0) pt1.setY(0.0);
+                if (pt1.y() < 0.0) pt1.setY(0.0);
                 trackerAppended(pt1);
 
-                if(pt2.y() < 0.0) pt2.setY(0.0);
+                if (pt2.y() < 0.0) pt2.setY(0.0);
                 trackerMoved(pt2);
             }
         }
@@ -362,23 +366,23 @@ void plot2DWidget::keyPressEvent ( QKeyEvent * event )
             int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
             int y1 = m_ObjectContainer->getDataObject()->getSize(dims-2) - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
        
-            if(m_pointMarker->isVisible())   // doing the linecut
+            if (m_pointMarker->isVisible())   // doing the linecut
             {
                 QPointF scenePos = m_pointMarker->pos() + QPointF(0.0, 1.0);
-                if(scenePos.y() > (y1 - 1)) scenePos.setY(y1 - 1);
+                if (scenePos.y() > (y1 - 1)) scenePos.setY(y1 - 1);
 
                 m_pointMarker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if(m_pLineCut->isVisible())
+            else if (m_pLineCut->isVisible())
             {
                 QPointF pt1 = m_pLineCut->line().p1() + QPointF(0.0, 1.0);
                 QPointF pt2 = m_pLineCut->line().p2() + QPointF(0.0, 1.0);
 
-                if(pt1.y() > y1) pt1.setY(y1);
+                if (pt1.y() > y1) pt1.setY(y1);
                 trackerAppended(pt1);
 
-                if(pt2.y() > y1) pt2.setY(y1);
+                if (pt2.y() > y1) pt2.setY(y1);
                 trackerMoved(pt2);
             }
         }
@@ -389,23 +393,23 @@ void plot2DWidget::keyPressEvent ( QKeyEvent * event )
             int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
             int x1 = m_ObjectContainer->getDataObject()->getSize(dims-1) - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
  
-            if(m_pointMarker->isVisible())   // doing the linecut
+            if (m_pointMarker->isVisible())   // doing the linecut
             {
                 QPointF scenePos = m_pointMarker->pos() + QPointF(1.0, 0.0);
-                if(scenePos.x() > (x1-1.0)) scenePos.setX(x1-1.0);
+                if (scenePos.x() > (x1-1.0)) scenePos.setX(x1-1.0);
 
                 m_pointMarker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if(m_pLineCut->isVisible())
+            else if (m_pLineCut->isVisible())
             {
                 QPointF pt1 = m_pLineCut->line().p1() + QPointF(1.0, 0.0);
                 QPointF pt2 = m_pLineCut->line().p2() + QPointF(1.0, 0.0);
 
-                if(pt1.x() > x1) pt1.setX(x1);
+                if (pt1.x() > x1) pt1.setX(x1);
                 trackerAppended(pt1);
 
-                if(pt2.x() > x1) pt2.setX(x1);
+                if (pt2.x() > x1) pt2.setX(x1);
                 trackerMoved(pt2);
             }
         }
@@ -413,22 +417,22 @@ void plot2DWidget::keyPressEvent ( QKeyEvent * event )
 
         case Qt::Key_Left:
         {
-            if(m_pointMarker->isVisible())   // doing the linecut
+            if (m_pointMarker->isVisible())   // doing the linecut
             {
                 QPointF scenePos = m_pointMarker->pos() - QPointF(1.0, 0.0);
-                if(scenePos.x() < -1.0) scenePos.setX(-1.0);
+                if (scenePos.x() < -1.0) scenePos.setX(-1.0);
 
                 m_pointMarker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if(m_pLineCut->isVisible())
+            else if (m_pLineCut->isVisible())
             {
                 QPointF pt1 = m_pLineCut->line().p1() - QPointF(1.0, 0.0);
                 QPointF pt2 = m_pLineCut->line().p2() - QPointF(1.0, 0.0);
-                if(pt1.x() < 0.0) pt1.setX(0.0);
+                if (pt1.x() < 0.0) pt1.setX(0.0);
                 trackerAppended(pt1);
 
-                if(pt2.x() < 0.0) pt2.setX(0.0);
+                if (pt2.x() < 0.0) pt2.setX(0.0);
                 trackerMoved(pt2);
             }
         }
@@ -446,16 +450,16 @@ void plot2DWidget::keyPressEvent ( QKeyEvent * event )
             double xMin = 0.0;
             double xMax = m_ObjectContainer->getDataObject()->getSize(dims-1) - 1;
 
-            if(m_pointMarker->isVisible())   // doing the linecut
+            if (m_pointMarker->isVisible())   // doing the linecut
             {
                 QPointF scenePos = m_pointMarker->pos();
                 scenePos.setY(yCenter - 1.0);
-                if(scenePos.y() < -1.0) scenePos.setY(-1.0);
+                if (scenePos.y() < -1.0) scenePos.setY(-1.0);
 
                 m_pointMarker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if(m_pLineCut->isVisible())
+            else if (m_pLineCut->isVisible())
             {
                 QPointF pt(xMin, yCenter);
                 trackerAppended(pt);
@@ -475,16 +479,16 @@ void plot2DWidget::keyPressEvent ( QKeyEvent * event )
             double yMin = 0.0;
             double yMax = m_ObjectContainer->getDataObject()->getSize(dims-2) - 1;
 
-            if(m_pointMarker->isVisible())   // doing the linecut
+            if (m_pointMarker->isVisible())   // doing the linecut
             {
                 QPointF scenePos = m_pointMarker->pos();
                 scenePos.setX(xCenter - 1.0);
-                if(scenePos.x() < -1.0) scenePos.setX(-1.0);
+                if (scenePos.x() < -1.0) scenePos.setX(-1.0);
 
                 m_pointMarker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if(m_pLineCut->isVisible())
+            else if (m_pLineCut->isVisible())
             {
                 QPointF pt(xCenter, yMin);
                 trackerAppended(pt);
@@ -505,28 +509,30 @@ void plot2DWidget::keyPressEvent ( QKeyEvent * event )
     return;
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::mouseMoveEvent ( QMouseEvent * event )
+void plot2DWidget::mouseMoveEvent (QMouseEvent * event)
 {
     if (!hasFocus())
+    {
         return;
+    }
     handleMouseEvent(2, event);
     event->accept();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::mousePressEvent ( QMouseEvent * event )
+void plot2DWidget::mousePressEvent (QMouseEvent * event)
 {
     if (!hasFocus())
+    {
         return;
+    }
     handleMouseEvent(0, event);
     event->accept();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void plot2DWidget::mouseReleaseEvent ( QMouseEvent * event )
+void plot2DWidget::mouseReleaseEvent (QMouseEvent * event)
 {
     if (!hasFocus())
         return;
@@ -538,7 +544,7 @@ void plot2DWidget::mouseReleaseEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::contextMenuEvent(QContextMenuEvent * event)
 {
-    if(m_showContextMenu)
+    if (m_showContextMenu)
     {
         event->accept();
         m_contextMenu->exec(event->globalPos());
@@ -552,20 +558,19 @@ void plot2DWidget::contextMenuEvent(QContextMenuEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::resizeEvent(QResizeEvent * event)
 {
-    if(m_pItem)
+    if (m_pItem)
     {
-        if(!m_fixedZoom) fitInView(m_pItem, Qt::KeepAspectRatio);
+        if (!m_fixedZoom) fitInView(m_pItem, Qt::KeepAspectRatio);
         else
         {
-            if(m_ObjectContainer)
+            if (m_ObjectContainer)
             {
                 int ysize = m_ObjectContainer->getDataObjHeight();
                 int xsize = m_ObjectContainer->getDataObjWidth();
-                setSceneRect ( 0.0, 0.0, xsize, ysize);
+                setSceneRect (0.0, 0.0, xsize, ysize);
             }
         }
     }
-    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -574,12 +579,12 @@ void plot2DWidget::refreshColorMap(QString palette)
     ito::ItomPalette newPalette;
     ito::RetVal retval(ito::retOk);
     int numPalettes = 1;
-
     bool isFalseColor = true;
 
-
-	if(ITOM_API_FUNCS_GRAPH == NULL)
+	if (ITOM_API_FUNCS_GRAPH == NULL)
+    {
 		return;
+    }
 
     if (palette.isEmpty())
     {
@@ -592,9 +597,9 @@ void plot2DWidget::refreshColorMap(QString palette)
         //((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.getName());
         ((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.name);
     }
-    else if(!palette.compare("RGB24", Qt::CaseInsensitive))
+    else if (!palette.compare("RGB24", Qt::CaseInsensitive))
     {
-        if(m_ObjectContainer != NULL)
+        if (m_ObjectContainer != NULL)
         {
             m_ObjectContainer->setColorMode(RasterToQImageObj::ColorRGB24);
         }
@@ -602,9 +607,9 @@ void plot2DWidget::refreshColorMap(QString palette)
         ((itom2DGVFigure*)m_pParent)->setPaletteText("RGB24");
         isFalseColor = false;
     }
-    else if(!palette.compare("RGB32", Qt::CaseInsensitive))
+    else if (!palette.compare("RGB32", Qt::CaseInsensitive))
     {
-        if(m_ObjectContainer != NULL)
+        if (m_ObjectContainer != NULL)
         {
             m_ObjectContainer->setColorMode(RasterToQImageObj::ColorRGB32);
         }
@@ -619,34 +624,30 @@ void plot2DWidget::refreshColorMap(QString palette)
         //((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.getName());
         ((itom2DGVFigure*)m_pParent)->setPaletteText(newPalette.name);
     }
-
     
-    if(newPalette.colorVector256.isEmpty())
+    if (newPalette.colorVector256.isEmpty())
     {
         return;
     }
-    if(newPalette.inverseColorOne.isValid() && m_pLineCut)
+    if (newPalette.inverseColorOne.isValid() && m_pLineCut)
     {
         m_pLineCut->setPen(QPen(newPalette.inverseColorOne));
         //m_pLineCut->set
     }
-    if(newPalette.inverseColorOne.isValid() && m_pointMarker)
+    if (newPalette.inverseColorOne.isValid() && m_pointMarker)
     {
         m_pointMarker->setPen(QPen(QColor(newPalette.inverseColorOne)));
         //m_pLineCut->set
     }
-    if(newPalette.inverseColorOne.isValid() && m_pointTracker)
+    if (newPalette.inverseColorOne.isValid() && m_pointTracker)
     {
         m_pointTracker->setDefaultTextColor(QColor(newPalette.inverseColorOne));
         //m_pLineCut->set
     }    
-    if(isFalseColor)
+    if (isFalseColor)
     {
-
-        
-
         //QVector<ito::uint32> colors(newPalette.get256Colors());
-        if(m_ObjectContainer != NULL)
+        if (m_ObjectContainer != NULL)
         {
             //m_ObjectContainer->setColorTable(colors);
             m_ObjectContainer->setColorTable(newPalette.colorVector256);
@@ -654,13 +655,12 @@ void plot2DWidget::refreshColorMap(QString palette)
     }
     ito::ParamBase temp("newPalette", ito::ParamBase::Int, 1);
     refreshPlot(&temp);
-    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::trackerAppended(const QPointF &pt)
 {
-    if(!m_pLineCut) return;
+    if (!m_pLineCut) return;
 
     int ymax = m_ObjectContainer->getDataObjHeight() - 1;
     int xmax = m_ObjectContainer->getDataObjWidth() - 1;
@@ -672,11 +672,11 @@ void plot2DWidget::trackerAppended(const QPointF &pt)
     double x0 = pt.x();
     double y0 = pt.y();
 
-    if(x0 < 0) x0 = 0.0;
-    else if(x0 > xmax) x0 = xmax;
+    if (x0 < 0) x0 = 0.0;
+    else if (x0 > xmax) x0 = xmax;
 
-    if(y0 < 0) y0 = 0.0;
-    else if(y0 > ymax) y0 = ymax;
+    if (y0 < 0) y0 = 0.0;
+    else if (y0 > ymax) y0 = ymax;
 
     double x1 = x0 + 1;
     double y1 = y0 + 1;
@@ -694,14 +694,12 @@ void plot2DWidget::trackerAppended(const QPointF &pt)
     repaint();
 
     ((itom2DGVFigure*)m_pParent)->displayLineCut(pts, m_lineplotUID);
-    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::trackerMoved(const QPointF &pt)
 {
-
-    if(!m_pLineCut) return;
+    if (!m_pLineCut) return;
 
     int ymax = m_ObjectContainer->getDataObjHeight() - 1;
     int xmax = m_ObjectContainer->getDataObjWidth() - 1;
@@ -717,11 +715,11 @@ void plot2DWidget::trackerMoved(const QPointF &pt)
 
     pts[1] = pt;
 
-    if(x1 < 0) x1 = 0.0;
-    else if(x1 > xmax) x1 = xmax;
+    if (x1 < 0) x1 = 0.0;
+    else if (x1 > xmax) x1 = xmax;
 
-    if(y1 < 0) y1 = 0.0;
-    else if(y1 > ymax) y1 = ymax;
+    if (y1 < 0) y1 = 0.0;
+    else if (y1 > ymax) y1 = ymax;
 
     m_pLineCut->setLine(x0, y0, x1, y1);
 
@@ -786,7 +784,7 @@ void plot2DWidget::trackerAScanMoved(const QPoint &pt)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal plot2DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
 {
-    if(m_ObjectContainer)
+    if (m_ObjectContainer)
     {
         m_ObjectContainer->setIntervalRange(axis, autoCalcLimits, minValue, maxValue);
         ito::ParamBase temp("newPalette", ito::ParamBase::Int, 1);
@@ -822,7 +820,7 @@ ito::RetVal plot2DWidget::setCanvasZoom(const int zoolLevel)
     int xsize = 1;
     int ysize = 1;
 
-    if(m_ObjectContainer == NULL || m_pItem == NULL)
+    if (m_ObjectContainer == NULL || m_pItem == NULL)
     {
         return ito::retError;
     }
@@ -841,35 +839,35 @@ ito::RetVal plot2DWidget::setCanvasZoom(const int zoolLevel)
             break;
         case plot2DWidget::Ratio1_1:
             m_fixedZoom = true;
-            setSceneRect ( 0.0, 0.0, xsize, ysize);
+            setSceneRect (0.0, 0.0, xsize, ysize);
             setMatrix(QMatrix(1, 0, 0, 1, 1, 1), false);
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case plot2DWidget::Ratio1_2:
             m_fixedZoom = true;
-            setSceneRect ( 0.0, 0.0, xsize, ysize);
+            setSceneRect (0.0, 0.0, xsize, ysize);
             setMatrix(QMatrix(2, 0, 0, 2, 1, 1), false);
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case plot2DWidget::Ratio1_4:
             m_fixedZoom = true;
-            setSceneRect ( 0.0, 0.0, xsize, ysize);
+            setSceneRect (0.0, 0.0, xsize, ysize);
             setMatrix(QMatrix(4, 0, 0, 4, 1, 1), false);
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case plot2DWidget::Ratio2_1:
             m_fixedZoom = true;
-            setSceneRect ( 0.0, 0.0, xsize, ysize);
+            setSceneRect (0.0, 0.0, xsize, ysize);
             setMatrix(QMatrix(0.5, 0, 0, 0.5, 1, 1), false);
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case plot2DWidget::Ratio4_1:
             m_fixedZoom = true;
-            setSceneRect ( 0.0, 0.0, xsize, ysize);
+            setSceneRect (0.0, 0.0, xsize, ysize);
             setMatrix(QMatrix(0.25, 0, 0, 0.25, 1, 1), false);
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
@@ -878,12 +876,12 @@ ito::RetVal plot2DWidget::setCanvasZoom(const int zoolLevel)
 
     repaint();
     return ito::retError;
-
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::updatePointTracker()
 {
-    if(!m_ObjectContainer || !m_pointTracker || !m_pointMarker)
+    if (!m_ObjectContainer || !m_pointTracker || !m_pointMarker)
         return;
 
     char buf[50] = {0};
@@ -891,26 +889,26 @@ void plot2DWidget::updatePointTracker()
     int y1 = m_ObjectContainer->getDataObjHeight() - 1;
     int x1 = m_ObjectContainer->getDataObjWidth() - 1;
 
-    if(x1 < 0 || y1 < 0)
+    if (x1 < 0 || y1 < 0)
         return;
 
     QPointF cursorPos = m_pointMarker->pos() + QPointF(1.0, 1.0);
     
 
-    if(cursorPos.x() < 0 )
+    if (cursorPos.x() < 0)
     {
         cursorPos.setX(0);
     }
-    else if(cursorPos.x() > x1 )
+    else if (cursorPos.x() > x1)
     {
         cursorPos.setX(x1);
     }
 
-    if(cursorPos.y() < 0 )
+    if (cursorPos.y() < 0)
     {
         cursorPos.setY(0);
     }
-    else if(cursorPos.y() > y1 )
+    else if (cursorPos.y() > y1)
     {
         cursorPos.setY(y1);
     }
@@ -920,7 +918,7 @@ void plot2DWidget::updatePointTracker()
     bool isInt = false;
     int mode = m_ObjectContainer->getColorMode();
 
-    if(mode & (m_ObjectContainer->ColorRGB24 | m_ObjectContainer->ColorRGB32))
+    if (mode & (m_ObjectContainer->ColorRGB24 | m_ObjectContainer->ColorRGB32))
     {
         unsigned char A = 0;
         unsigned char R = 0;
@@ -929,7 +927,7 @@ void plot2DWidget::updatePointTracker()
 
         ito::float64 value = m_ObjectContainer->getPixelARGB(cursorPos, A, R, G, B);
 
-        if(mode & m_ObjectContainer->ColorRGB24)
+        if (mode & m_ObjectContainer->ColorRGB24)
         {
             sprintf(buf, "[%i; %i]\n %i, %i, %i", (int)cursorPos.x(), (int)cursorPos.y(), R, G, B);
         }
@@ -942,7 +940,7 @@ void plot2DWidget::updatePointTracker()
     else
     {
         ito::float64 value = m_ObjectContainer->getPixel(cursorPos, isInt);
-        if(isInt)
+        if (isInt)
         {
             sprintf(buf, "[%i; %i]\n %i", (int)cursorPos.x(), (int)cursorPos.y(), (int)value);
     
@@ -957,20 +955,22 @@ void plot2DWidget::updatePointTracker()
     m_pointTracker->setPos(cursorPos);
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::enableMarker(const bool enabled)
 {
     m_pointTracker->setVisible(enabled);
     m_pointMarker->setVisible(enabled);
 
-    if(!enabled) m_trackerIsSampling = false;
+    if (!enabled) m_trackerIsSampling = false;
 
     updatePointTracker();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::enableLinePointer(const bool enabled)
 {
     m_pLineCut->setVisible(enabled);
-    if(!enabled) m_lineIsSampling = false;
+    if (!enabled) m_lineIsSampling = false;
     return;
 }

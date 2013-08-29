@@ -146,37 +146,21 @@
 <context>
     <name>itom2DGVFigure</name>
     <message>
-        <location filename="../itom2DGVFigure.cpp" line="+59"/>
-        <source>Points for line plots from 2d objects</source>
-        <translation type="unfinished"></translation>
+        <location filename="../itom2DGVFigure.cpp" line="+66"/>
+        <source>Reset original view</source>
+        <translation type="unfinished">Ursprüngliche Ansicht wiederherstellen</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="obsolete">Speichern</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Export current view</source>
+        <translation type="unfinished">Aktuelles Bild exportieren</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Reset original view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Save</source>
-        <translation>Speichern</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Export current view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Scale Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
         <source>Set the ranges and offsets of this view</source>
         <translation type="unfinished">Bereich und Offset für dieses Bild setzen</translation>
     </message>
@@ -193,12 +177,12 @@
     <message>
         <location line="+16"/>
         <source>Show a point marker</source>
-        <translation type="unfinished"></translation>
+        <translation>Punktmarker anzeigen</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>linecut</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Linienschnitt</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -214,10 +198,19 @@
         <location line="+3"/>
         <location line="+1"/>
         <source>zoom level</source>
+        <translation type="unfinished">Zoom-Stufen</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>slice in z-direction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+19"/>
+        <source>complex switch</source>
+        <translation type="unfinished">Komplex-Einstellungen</translation>
+    </message>
+    <message>
         <location line="+8"/>
         <source>Switch imaginary, real, absolute, phase</source>
         <translation type="unfinished"></translation>
@@ -225,30 +218,50 @@
     <message>
         <location line="-7"/>
         <source>Complex Switch</source>
+        <translation type="unfinished">Komplex-Einstellungen</translation>
+    </message>
+    <message>
+        <location line="-96"/>
+        <source>Points for line plots from 2D objects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+5"/>
+        <source>home</source>
+        <translation type="unfinished">Zurücksetzen</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>save</source>
+        <translation type="unfinished">Speichern</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>scale settings</source>
+        <translation type="unfinished">Skaleneinstellungen</translation>
+    </message>
+    <message>
+        <location line="+81"/>
         <location line="+544"/>
         <source>imaginary</source>
-        <translation type="unfinished"></translation>
+        <translation>Imaginär</translation>
     </message>
     <message>
         <location line="-543"/>
         <location line="+548"/>
         <source>real</source>
-        <translation type="unfinished"></translation>
+        <translation>Real</translation>
     </message>
     <message>
         <location line="-547"/>
         <source>absolute</source>
-        <translation type="unfinished"></translation>
+        <translation>Absolut</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+551"/>
         <source>phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase</translation>
     </message>
     <message>
         <location line="-616"/>
@@ -277,7 +290,7 @@
     <message>
         <location line="+3"/>
         <source>color palettes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Farbpaletten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -299,12 +312,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Slice in z-direction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+5"/>
         <source>Show a slice through z-Stack</source>
         <translation type="unfinished"></translation>
     </message>

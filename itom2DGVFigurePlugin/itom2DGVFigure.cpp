@@ -56,23 +56,23 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_curPalette(NULL),
 	m_lblCoordinates(NULL)
 {
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toAscii().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
     //m_actHome
-    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
+    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("home"), this);
     m_actHome->setObjectName("actHome");
     m_actHome->setToolTip(tr("Reset original view"));
     m_actHome->setVisible(false);
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save"), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip(tr("Export current view"));
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("scale settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
     m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
     m_actScaleSetting->setVisible(false);
@@ -132,7 +132,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actAspectSwitch->setToolTip(tr("Switch between different zoom levels with fixed aspect ration"));
 
     //m_actAScan
-    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"), tr("Slice in z-direction"), this);
+    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"), tr("slice in z-direction"), this);
     m_actAScan->setObjectName("a-Scan");
     m_actAScan->setToolTip(tr("Show a slice through z-Stack"));
     m_actAScan->setCheckable(true);
@@ -151,7 +151,7 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actBack->setToolTip(tr("Back to previous plane"));
     
     //m_actCmplxSwitch
-    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch imaginary, real, absolute, phase"), this);
+    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("complex switch"), this);
 	m_mnuCmplxSwitch = new QMenu(tr("Complex Switch"));
 	m_mnuCmplxSwitch->addAction(tr("imaginary"));
 	m_mnuCmplxSwitch->addAction(tr("real"));

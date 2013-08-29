@@ -155,13 +155,13 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     //m_toggleIllumination
     m_toggleIllumination = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/LightOff.png"), tr("Enable Illumination"), this);
     m_toggleIllumination->setCheckable(true);
-    m_toggleIllumination->setObjectName(tr("Enable illumination rendering"));
+    m_toggleIllumination->setObjectName("Enable illumination rendering");
     m_toggleIllumination->setToolTip(tr("Enable illumination rendering"));
 
     //m_toggleIlluminationRotation
     m_toggleIlluminationRotation = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/LightDir.png"), tr("Change illumination direction"), this);
     m_toggleIlluminationRotation->setCheckable(true);
-    m_toggleIlluminationRotation->setObjectName(tr("Change illumination direction"));
+    m_toggleIlluminationRotation->setObjectName("Change illumination direction");
     m_toggleIlluminationRotation->setToolTip(tr("Change illumination direction"));
 
 
@@ -174,7 +174,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
 
     m_toggleInfoText = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/info.png"), tr("Show Infotext"), this);
     m_toggleInfoText->setCheckable(true);
-    m_toggleInfoText->setObjectName(tr("Show Infotext"));
+    m_toggleInfoText->setObjectName(tr"Show Infotext");
     m_toggleInfoText->setToolTip(tr("Show Infotext"));
 
     //m_actAScan
@@ -356,6 +356,7 @@ ito::RetVal ItomIsoGLWidget::displayLineCut(QVector<QPointF> bounds, ito::uint32
 {
     return ito::retError;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnuHome()
 {
@@ -387,17 +388,17 @@ void ItomIsoGLWidget::mnuExport()
         QImageWriter::supportedImageFormats();
 
     QStringList filter;
-    filter += "PDF Documents (*.pdf)";
+    filter += tr("PDF Documents (*.pdf)");
 #ifndef GV_NO_SVG
 #ifdef QT_SVG_LIB
-    filter += "SVG Documents (*.svg)";
+    filter += tr("SVG Documents (*.svg)");
 #endif
 #endif
-    filter += "Postscript Documents (*.ps)";
+    filter += tr("Postscript Documents (*.ps)");
 
     if (imageFormats.size() > 0)
     {
-        QString imageFilter("Images (");
+        QString imageFilter(tr("Images ("));
         for (int i = 0; i < imageFormats.size(); i++)
         {
             if (i > 0)
@@ -411,7 +412,7 @@ void ItomIsoGLWidget::mnuExport()
     }
 
     fileName = QFileDialog::getSaveFileName(
-        this, "Export File Name", fileName,
+        this, tr("Export File Name"), fileName,
         filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
 #endif
 
@@ -486,7 +487,6 @@ void ItomIsoGLWidget::mnuScaleSetting()
                 delete wholeSize;
                 delete offsets;
             }
-
         }
         else
         {
@@ -517,6 +517,7 @@ void ItomIsoGLWidget::mnuScaleSetting()
     dlg = NULL;
 */
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnuColorBar()
 {
@@ -525,6 +526,7 @@ void ItomIsoGLWidget::mnuColorBar()
         ((plotGLWidget*)m_pContent)->togglePaletteMode();
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnutoggleIllumination(const bool checked)
 {
@@ -543,6 +545,7 @@ void ItomIsoGLWidget::mnutoggleIllumination(const bool checked)
         m_toggleIllumination->setIcon(QIcon(":/itomIsoGLFigurePlugin/icons/LightOn.png"));
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomIsoGLWidget::mnutoggleIlluminationRotation(const bool checked)
 {
