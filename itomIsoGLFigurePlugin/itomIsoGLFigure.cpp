@@ -174,7 +174,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
 
     m_toggleInfoText = new QAction(QIcon(":/itomIsoGLFigurePlugin/icons/info.png"), tr("Show Infotext"), this);
     m_toggleInfoText->setCheckable(true);
-    m_toggleInfoText->setObjectName(tr"Show Infotext");
+    m_toggleInfoText->setObjectName("Show Infotext");
     m_toggleInfoText->setToolTip(tr("Show Infotext"));
 
     //m_actAScan

@@ -79,15 +79,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>Enable illumination rendering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <location line="+2"/>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>Change illumination direction</source>
         <translation type="unfinished"></translation>
     </message>
@@ -113,8 +111,7 @@
     </message>
     <message>
         <location line="+3"/>
-        <location line="+2"/>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>Show Infotext</source>
         <translation type="unfinished"></translation>
     </message>
@@ -151,6 +148,31 @@
     <message>
         <location line="+26"/>
         <source>Iso Toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+157"/>
+        <source>PDF Documents (*.pdf)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>SVG Documents (*.svg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Postscript Documents (*.ps)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Images (</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Export File Name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
