@@ -360,11 +360,7 @@ double DataObjRasterData::value(double x, double y) const
                         }
                     }
                 case ito::tComplex128:
-                    {
-                        ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
-                        if(!line) return std::numeric_limits<double>::signaling_NaN();
-                        ito::complex128 i = line[ m_xIndizes[n] ];
-                
+                    {                
                         if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
                         {
                             return m_plane->at<ito::complex128>(m,n).real();
