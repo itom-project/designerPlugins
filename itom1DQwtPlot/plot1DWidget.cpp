@@ -146,9 +146,9 @@ ito::RetVal Plot1DWidget::init()
     QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
     QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
 
-    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",10),NULL).value<QFont>();
-    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",10),NULL).value<QFont>();
-    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",8),NULL).value<QFont>();
+    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
+    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
+    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();
     
     m_pZoomer->setRubberBandPen(rubberBandPen);
     m_pZoomer->setTrackerFont(trackerFont);
@@ -787,9 +787,18 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
 
     if(dir == 0)
     {
+        if (thisIdx < 0)
+        {
+            thisIdx = 0;
+        }
+        else if (thisIdx >= s)
+        {
+            thisIdx = s-1;
+        }
+
         while(!found)
         {
-            if(thisIdx >= 0 && thisIdx < s)
+            if (thisIdx >= 0 && thisIdx < s)
             {
                 p = data->sample(thisIdx);
                 if(qIsFinite(p.ry()))
@@ -804,7 +813,7 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
                 break;
             }
 
-            if(d)
+            if (d) //iteratively search for the next valid point at the left or right of thisIdx
             {
                 thisIdx = -thisIdx + 1;
                 d = !d;
@@ -818,6 +827,15 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
     }
     if(dir == -1)
     {
+        if (thisIdx <= 0)
+        {
+            thisIdx = 1; //1 since it is decremented to 0 afterwards
+        }
+        else if (thisIdx > s)
+        {
+            thisIdx = s;
+        }
+
         while(!found)
         {
             thisIdx -= 1;
@@ -839,6 +857,15 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
     }
     else //dir > 0
     {
+        if (thisIdx <= -1)
+        {
+            thisIdx = -1; //-1 since it is incremented to 0 afterwards
+        }
+        else if (thisIdx > (s-2))
+        {
+            thisIdx = s-2;
+        }
+
         while(!found)
         {
             thisIdx += 1;

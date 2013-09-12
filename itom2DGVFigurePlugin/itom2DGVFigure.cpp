@@ -56,24 +56,26 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_curPalette(NULL),
 	m_lblCoordinates(NULL)
 {
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toAscii().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
     //m_actHome
-    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
+    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("home"), this);
     m_actHome->setObjectName("actHome");
     m_actHome->setToolTip(tr("Reset original view"));
+    m_actHome->setVisible(false);
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"),tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save"), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip(tr("Export current view"));
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("scale settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
     m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
+    m_actScaleSetting->setVisible(false);
 
     //m_actPan
     m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
@@ -82,51 +84,55 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actPan->setChecked(false);
     m_actPan->setEnabled(false);
     m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
+    m_actPan->setVisible(false);
 
     //m_actZoomToRect
-    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("rectangle zoom"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
     m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
+    m_actZoomToRect->setVisible(false);
 
     //m_actMarker
     m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
+    m_actMarker->setToolTip(tr("Show a point marker"));
 
     //m_actLineCut
-    m_actLineCut = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Linecut"),this);
+    m_actLineCut = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("linecut"),this);
     m_actLineCut->setCheckable(true);
     m_actLineCut->setObjectName("LineCut");
     m_actLineCut->setToolTip(tr("Show a in plane line cut"));
 
     //m_actPalette
-    m_actPalette = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"), tr("Palette"),this);
+    m_actPalette = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"), tr("color palettes"),this);
     m_actPalette->setObjectName("TogglePalette");
     m_actPalette->setToolTip(tr("Switch between color palettes"));
 
     //m_actToggleColorBar
-    m_actToggleColorBar = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"), tr("Show Colorbar"), this);
+    m_actToggleColorBar = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"), tr("color bar"), this);
     m_actToggleColorBar->setCheckable(true);
     m_actToggleColorBar->setEnabled(true);
     m_actToggleColorBar->setObjectName("ShowColorBar");
-    m_actToggleColorBar->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
+    m_actToggleColorBar->setToolTip(tr("Toggle visibility of the color bar name"));
 
     //m_actAspectSwitch
-    m_actAspectSwitch = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/off.png"),tr("Switch between different aspect ratios"), this);
-	m_mnuAspectSwitch = new QMenu("Aspect Switch");
+    m_actAspectSwitch = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/off.png"), tr("zoom level"), this);
+	m_mnuAspectSwitch = new QMenu(tr("zoom level"));
     m_mnuAspectSwitch->addAction(tr("off"));
-    m_mnuAspectSwitch->addAction(tr("1:4"));
-	m_mnuAspectSwitch->addAction(tr("1:2"));
-	m_mnuAspectSwitch->addAction(tr("1:1"));
-	m_mnuAspectSwitch->addAction(tr("2:1"));
-	m_mnuAspectSwitch->addAction(tr("4:1"));
+    m_mnuAspectSwitch->addAction("1:4");
+	m_mnuAspectSwitch->addAction("1:2");
+	m_mnuAspectSwitch->addAction("1:1");
+	m_mnuAspectSwitch->addAction("2:1");
+	m_mnuAspectSwitch->addAction("4:1");
 	m_actAspectSwitch->setMenu(m_mnuAspectSwitch);
+    m_actAspectSwitch->setToolTip(tr("Switch between different zoom levels with fixed aspect ration"));
 
     //m_actAScan
-    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"),tr("Slice in z-direction"),this);
+    m_actAScan = new QAction(QIcon(":/plots/icons/itom_icons/1dzdir.png"), tr("slice in z-direction"), this);
     m_actAScan->setObjectName("a-Scan");
     m_actAScan->setToolTip(tr("Show a slice through z-Stack"));
     m_actAScan->setCheckable(true);
@@ -145,14 +151,15 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
     m_actBack->setToolTip(tr("Back to previous plane"));
     
     //m_actCmplxSwitch
-    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"),tr("Switch Imag, Real, Abs, Pha"), this);
-	m_mnuCmplxSwitch = new QMenu("Complex Switch");
-	m_mnuCmplxSwitch->addAction(tr("Imag"));
-	m_mnuCmplxSwitch->addAction(tr("Real"));
-	m_mnuCmplxSwitch->addAction(tr("Abs"));
-	m_mnuCmplxSwitch->addAction(tr("Pha"));
+    m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("complex switch"), this);
+	m_mnuCmplxSwitch = new QMenu(tr("Complex Switch"));
+	m_mnuCmplxSwitch->addAction(tr("imaginary"));
+	m_mnuCmplxSwitch->addAction(tr("real"));
+	m_mnuCmplxSwitch->addAction(tr("absolute"));
+	m_mnuCmplxSwitch->addAction(tr("phase"));
 	m_actCmplxSwitch->setMenu(m_mnuCmplxSwitch);
     m_actCmplxSwitch->setVisible(false);
+    m_actCmplxSwitch->setToolTip(tr("Switch imaginary, real, absolute, phase"));
 
     connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
     connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
@@ -170,10 +177,10 @@ itom2DGVFigure::itom2DGVFigure(const QString &itomSettingsFile, AbstractFigure::
 	connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
     connect(m_mnuAspectSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuAspectSwitch(QAction*)));
 
-	QToolBar *toolbar = new QToolBar(this);
+	QToolBar *toolbar = new QToolBar(tr("2D plot toolbar"), this);
 	addToolBar(toolbar, "mainToolBar");
 
-	QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
+	QMenu *contextMenu = new QMenu(tr("plot2D"), this);
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
     contextMenu->addAction(m_actHome);
@@ -690,17 +697,17 @@ void itom2DGVFigure::mnuCmplxSwitch(QAction *action)
 	{
 		RasterToQImageObj* rasterData = static_cast<RasterToQImageObj*>(((plot2DWidget*)m_pContent)->m_ObjectContainer);
 
-		if (action->text() == QString("Imag"))
+		if (action->text() == tr("imaginary"))
         {
 			rasterData->setCmplxState(1);
             m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
         }
-		else if (action->text() == QString("Real"))
+		else if (action->text() == tr("real"))
         {
 			rasterData->setCmplxState(2);
             m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
         }
-		else if (action->text() == QString("Pha"))
+		else if (action->text() == tr("phase"))
         {
 			rasterData->setCmplxState(3);
             m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));

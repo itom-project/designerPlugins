@@ -180,6 +180,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 
     setAxisScale(QwtPlot::yRight, 0, 1.0 );
     enableAxis(QwtPlot::yRight, m_pData->m_colorBarVisible );
+    axisWidget(QwtPlot::yRight)->setLayoutFlag( QwtScaleWidget::TitleInverted, false ); //let the label be in the same direction than on the left side
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -221,6 +222,11 @@ void PlotCanvas::refreshStyles()
     QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
     QPen selectionPen = apiGetFigureSetting(parent(), "selectionPen", QPen(QBrush(Qt::gray),2,Qt::SolidLine),NULL).value<QPen>();
 
+    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
+    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
+    labelFont.setItalic(false);
+    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();
+
     if (m_inverseColor1.isValid())
     {
         rubberBandPen.setColor(m_inverseColor1);
@@ -253,6 +259,27 @@ void PlotCanvas::refreshStyles()
     //    m_pLineCutPicker->setRubberBandPen(QPen(Qt::gray));
     //    m_pLineCutPicker->setTrackerPen(QPen(Qt::gray));
     //    m_pLineCutLine->setPen(Qt::gray);
+
+    title().setFont(titleFont);
+
+    axisTitle(QwtPlot::xBottom).setFont(axisFont);
+    axisTitle(QwtPlot::yLeft).setFont(axisFont);
+    axisTitle(QwtPlot::yRight).setFont(axisFont);
+
+    QwtText t = axisWidget(QwtPlot::xBottom)->title();
+    t.setFont(labelFont);
+    axisWidget(QwtPlot::xBottom)->setTitle(t);
+
+    t = axisWidget(QwtPlot::yLeft)->title();
+    t.setFont(labelFont);
+    axisWidget(QwtPlot::yLeft)->setTitle(t);
+
+    t = axisWidget(QwtPlot::yRight)->title();
+    t.setFont(labelFont);
+    axisWidget(QwtPlot::yRight)->setTitle(t);
+    
+    //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
+    //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -271,20 +298,61 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
 
-        
-
         needToUpdate = m_rasterData->updateDataObject( dObj, plane);
 
-        bool valid;
-        ito::DataObjectTagType tag;
-        tag = dObj->getTag("title", valid);
-        m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
-		m_pData->m_dataType = (ito::tDataType)dObj->getType();
+        if (needToUpdate)
+        {
+            bool valid;
+            ito::DataObjectTagType tag;
+            std::string descr, unit;
+            tag = dObj->getTag("title", valid);
+            m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
+		    m_pData->m_dataType = (ito::tDataType)dObj->getType();
+
+            descr = dObj->getValueDescription();
+            unit = dObj->getValueUnit();
+
+            if (unit != "")
+            {
+                descr.append( " [" + unit + "]");
+            }
+            m_pData->m_valueLabelDObj = QString::fromStdString(descr);
+
+            if (dims >= 2)
+            {
+                descr = dObj->getAxisDescription(dims-1, valid);
+                if (!valid) descr = "";
+                unit = dObj->getAxisUnit(dims-1,valid);
+                if (!valid) unit = "";
+
+                if (unit != "")
+                {
+                    descr.append( " [" + unit + "]");
+                }
+                m_pData->m_xaxisLabelDObj = QString::fromStdString(descr);
+
+                descr = dObj->getAxisDescription(dims-2, valid);
+                if (!valid) descr = "";
+                unit = dObj->getAxisUnit(dims-2,valid);
+                if (!valid) unit = "";
+
+                if (unit != "")
+                {
+                    descr.append( " [" + unit + "]");
+                }
+                m_pData->m_yaxisLabelDObj = QString::fromStdString(descr);
+            }
+            else
+            {
+                m_pData->m_xaxisLabelDObj = "";
+                m_pData->m_yaxisLabelDObj = "";
+            }
+        }
     } 
 
     updateLabels();
 
-    if(needToUpdate)
+    if (needToUpdate)
     {
         Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
         if (p)

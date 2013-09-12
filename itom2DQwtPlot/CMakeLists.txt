@@ -7,15 +7,17 @@ cmake_minimum_required(VERSION 2.8)
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
+OPTION(UPDATE_TRANSLATIONS "Update source translation translation/*.ts files (WARNING: make clean will delete the source .ts files! Danger!)")
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
+SET (ITOM_LANGUAGES "de" CACHE STRING "semicolon separated list of languages that should be created (en must not be given since it is the default)")
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
 
 IF(BUILD_SHARED_LIBS)
-  SET(LIBRARY_TYPE SHARED)
+	SET(LIBRARY_TYPE SHARED)
 ELSE(BUILD_SHARED_LIBS)
-  SET(LIBRARY_TYPE STATIC)
+	SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
 find_package(Qt4 REQUIRED)
@@ -38,9 +40,9 @@ SET (QT_USE_QTXML TRUE)
 
 # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
 IF (DEFINED CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+	SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 ELSE(CMAKE_BUILD_TYPE)
-  SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build,
+	SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build,
 options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release
 RelWithDebInfo MinSizeRel.")
 ENDIF (DEFINED CMAKE_BUILD_TYPE)
@@ -124,13 +126,35 @@ if(MSVC)
     list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif(MSVC)
 
+#handle translations BEGIN STEP 1
+set (FILES_TO_TRANSLATE ${designer_SOURCES} ${designer_HEADERS} ${designer_ui})
+set (TRANSLATION_OUTPUT_FILES)
+set (TRANSLATIONS_FILES)
+
+file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
+#handle translations END STEP 1
+
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS_MOC} ${designer_HEADERS} ${designer_ui_MOC} ${designer_rcc_MOC})
+ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS_MOC} ${designer_HEADERS} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
 TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} qwtsrc)
+
+#handle translations BEGIN STEP 2
+if (UPDATE_TRANSLATIONS)
+	QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+	
+	add_custom_target (_${target_name}_translation DEPENDS ${TRANSLATION_OUTPUT_FILES})
+	add_dependencies(${target_name} _${target_name}_translation)
+	
+	QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
+else (UPDATE_TRANSLATIONS)
+	QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
+endif (UPDATE_TRANSLATIONS)
+#handle translations END STEP 2
 
 # COPY SECTION
 set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")
 ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
 POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)

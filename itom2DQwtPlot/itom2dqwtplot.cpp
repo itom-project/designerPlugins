@@ -28,6 +28,8 @@
 #include <qwt_plot_renderer.h>
 #include <qmenu.h>
 #include "dialog2DScale.h"
+#include <qwt_text_label.h>
+#include <qwt_scale_widget.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
@@ -509,6 +511,78 @@ void Itom2dQwtPlot::setColorMap(const QString &name)
     if (name != "" && m_pContent)
     {
         m_pContent->setColorMap(name);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QFont Itom2dQwtPlot::getTitleFont(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->titleLabel()->font();
+    }
+    return QFont();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setTitleFont(const QFont &font)
+{
+    if (m_pContent)
+    {
+        m_pContent->titleLabel()->setFont(font);
+        //m_pContent->replot();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QFont Itom2dQwtPlot::getLabelFont(void) const
+{
+    if (m_pContent)
+    {
+        QwtText t = m_pContent->axisWidget(QwtPlot::xBottom)->title();
+        return t.font();
+    }
+    return QFont();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setLabelFont(const QFont &font)
+{
+    if (m_pContent)
+    {
+        QwtText title;
+        title = m_pContent->axisWidget(QwtPlot::xBottom)->title();
+        title.setFont(font);
+        m_pContent->axisWidget(QwtPlot::xBottom)->setTitle(title);
+
+        title = m_pContent->axisWidget(QwtPlot::yLeft)->title();
+        title.setFont(font);
+        m_pContent->axisWidget(QwtPlot::yLeft)->setTitle(title);
+
+        title = m_pContent->axisWidget(QwtPlot::yRight)->title();
+        title.setFont(font);
+        m_pContent->axisWidget(QwtPlot::yRight)->setTitle(title);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QFont Itom2dQwtPlot::getAxisFont(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->axisFont(QwtPlot::xBottom);
+    }
+    return QFont();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setAxisFont(const QFont &font)
+{
+    if (m_pContent)
+    {
+        m_pContent->setAxisFont(QwtPlot::xBottom, font);
+        m_pContent->setAxisFont(QwtPlot::yLeft, font);
+        m_pContent->setAxisFont(QwtPlot::yRight, font);
     }
 }
 

@@ -60,6 +60,9 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
     Q_CLASSINFO("prop://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
+    Q_CLASSINFO("prop://titleFont", "Font for title.")
+    Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
+    Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
 
     public:
         Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
