@@ -26,6 +26,7 @@
 #include "qwtPlotCurveDataObject.h"
 #include "common/sharedStructuresGraphics.h"
 #include "common/apiFunctionsGraphInc.h"
+#include "qnumeric.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -502,8 +503,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             QRectF rect = seriesData->boundingRect();
             if(m_pData->m_valueScaleAuto)
             {
-                m_pData->m_valueMin = rect.top();
-                m_pData->m_valueMax = rect.bottom();
+                if (qIsFinite(rect.height()))
+                {
+                    m_pData->m_valueMin = rect.top();
+                    m_pData->m_valueMax = rect.bottom();
+                }
+                else
+                {
+                    m_pData->m_valueMin = -0.01;
+                    m_pData->m_valueMax = 0.01;
+                }
             }
 
             if(m_pData->m_axisScaleAuto)
@@ -1095,7 +1104,9 @@ void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
 
         foreach( QwtPlotCurve *curve, m_plotCurveItems)
         {
-            rect = rect.unite( ((DataObjectSeriesData *)curve->data())->boundingRect() );
+            QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
+            if (qIsFinite(tmpRect.height()))
+                rect = rect.unite( ((DataObjectSeriesData *)curve->data())->boundingRect() );
         }
 
         if(m_pData->m_valueScaleAuto)
