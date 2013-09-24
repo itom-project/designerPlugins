@@ -2432,8 +2432,8 @@ QRectF DataObjectSeriesData::boundingRect() const
 
     if(m_pDataObj && m_d.valid)
     {
-        double min, max;
-        int minIdx, maxIdx;
+        double min = 0.0, max = 0.0;
+        int minIdx = 0.0, maxIdx = 0.0;
         switch(m_pDataObj->getType())
         {
             case ito::tInt8:
@@ -2465,6 +2465,10 @@ QRectF DataObjectSeriesData::boundingRect() const
             break;
             case ito::tComplex128:
                 findMinMaxNonWeighted<ito::complex128>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
+            break;
+            case ito::tRGBA32:
+                min = 0.0;
+                max = 255.0;
             break;
         }
 
@@ -2563,6 +2567,10 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
             break;
             case ito::tComplex128:
                 findMinMaxNonWeighted<ito::complex128>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
+            break;
+            case ito::tRGBA32:
+                min = 0.0;
+                max = 255.0;
             break;
         }
 

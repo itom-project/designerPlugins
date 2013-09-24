@@ -205,8 +205,6 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
                 m_ObjectContainer = new RasterToQImageObj(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), ROI, /*dims -1, dims-2,*/ 1); 
                 newObjectContainer = true;
 
-                m_ObjectContainer->setColorMode(m_showColored);
-
                 if (m_startScaledZ) m_ObjectContainer->setIntervalRange(Qt::ZAxis, false, m_startRangeZ.x(), m_startRangeZ.y());
                 if (m_startScaledY) m_ObjectContainer->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
                 if (m_startScaledX) m_ObjectContainer->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
@@ -918,7 +916,7 @@ void plot2DWidget::updatePointTracker()
     bool isInt = false;
     int mode = m_ObjectContainer->getColorMode();
 
-    if (mode & (m_ObjectContainer->ColorRGB24 | m_ObjectContainer->ColorRGB32))
+    if ((mode & (m_ObjectContainer->ColorRGB24 | m_ObjectContainer->ColorRGB32)))
     {
         unsigned char A = 0;
         unsigned char R = 0;

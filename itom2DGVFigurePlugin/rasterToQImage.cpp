@@ -130,12 +130,20 @@ void RasterToQImageObj::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, dou
         {
             if(m_dataObj)
             {
-                m_dataObj->lockRead();
-                uint32 minPos[3] = {0, 0, 0};
-                uint32 maxPos[3] = {0, 0, 0};
-                ito::dObjHelper::minMaxValue(m_dataObj.data(), m_minZValue, minPos, m_maxZValue, maxPos, true, m_cmplxState);
-				//m_dataObj->getMinMaxValue(minValue, maxValue, true, m_cmplxState);
-                m_dataObj->unlock();
+                if(m_dataObj.data()->getType() == ito::tRGBA32)
+                {
+                    m_minZValue = 0.0;
+                    m_maxZValue = 255.0;
+                }
+                else
+                {
+                    m_dataObj->lockRead();
+                    uint32 minPos[3] = {0, 0, 0};
+                    uint32 maxPos[3] = {0, 0, 0};
+                    ito::dObjHelper::minMaxValue(m_dataObj.data(), m_minZValue, minPos, m_maxZValue, maxPos, true, m_cmplxState);
+                    //m_dataObj->getMinMaxValue(minValue, maxValue, true, m_cmplxState);
+                    m_dataObj->unlock();
+                }
             }
         }
         else
@@ -333,6 +341,15 @@ void RasterToQImageObj::updateDataObject(QSharedPointer<ito::DataObject> dataObj
         m_physROI.setCoords(0.0, 1.0, 0.0, 1.0);
 
         m_dataObj->unlock();
+
+        if(m_dataObj->getType() == ito::tRGBA32)
+        {
+            m_colorMode = RasterToQImageObj::ColorRGB32;
+        }
+        else
+        {
+            m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+        }
 
     }
     else
@@ -624,6 +641,11 @@ QImage RasterToQImageObj::getRastersImage()
                 return retImage;
             }
 
+        }
+        break;
+        case ito::tRGBA32:
+        {
+            return QImage(((cv::Mat*)m_dataObjWhileRastering->get_mdata()[0])->ptr(), m_dataObjWhileRastering->getSize(m_dataObjWhileRastering->getDims() - 1), m_dataObjWhileRastering->getSize(m_dataObjWhileRastering->getDims() - 2), m_dataObjWhileRastering->getSize(m_dataObjWhileRastering->getDims() - 1)*4, QImage::Format_ARGB32);
         }
         break;
         case ito::tFloat32:
@@ -918,6 +940,10 @@ bool RasterToQImageObj::getPixelARGB(const QPointF &coords, unsigned char &AValu
         //    break;
         case ito::tUInt32:
             val = (ito::uint32)m_dataObj->at<ito::uint32>(index);
+            ret = true;
+            break;
+        case ito::tRGBA32:
+            val = m_dataObj->at<ito::rgba32>(index).argb();
             ret = true;
             break;
     };
