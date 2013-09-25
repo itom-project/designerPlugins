@@ -863,47 +863,50 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                     return QPointF(fPos, *(reinterpret_cast<const ito::float64*>(ptr[0])) );
                 break;
                 case ito::tComplex64:
-				{
+                {
                     ito::complex64 val = *(reinterpret_cast<const ito::complex64*>(ptr[0]));
-					switch (m_cmplxState)
-					{
-						default:
-                        case cmplxAbs:
-							return QPointF(fPos, abs(val));
-						break;
-						case cmplxReal:
-							return QPointF(fPos, val.real());
-						break;
-						case cmplxImag:
-							return QPointF(fPos, val.imag());
-						break;
-						case cmplxArg:
-							return QPointF(fPos, arg(val));
-						break;
-					}
-				}
-            break;
-            case ito::tComplex128:
-			{
-				ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
-				switch (m_cmplxState)
-				{
-					default:
+                    switch (m_cmplxState)
+                    {
+                    default:
                     case cmplxAbs:
-						return QPointF(fPos, abs(val));
-					break;
-					case cmplxReal:
-						return QPointF(fPos, val.real());
-					break;
-					case cmplxImag:
-						return QPointF(fPos, val.imag());
-					break;
-					case cmplxArg:
-						return QPointF(fPos, arg(val));
-					break;
-				}
-			}
-            break;
+                        return QPointF(fPos, abs(val));
+                    break;
+                    case cmplxReal:
+                        return QPointF(fPos, val.real());
+                    break;
+                    case cmplxImag:
+                        return QPointF(fPos, val.imag());
+                    break;
+                    case cmplxArg:
+                        return QPointF(fPos, arg(val));
+                    break;
+                    }
+                    }
+                break;
+                case ito::tComplex128:
+                {
+	                ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
+	                switch (m_cmplxState)
+	                {
+		                default:
+                        case cmplxAbs:
+			                return QPointF(fPos, abs(val));
+		                break;
+		                case cmplxReal:
+			                return QPointF(fPos, val.real());
+		                break;
+		                case cmplxImag:
+			                return QPointF(fPos, val.imag());
+		                break;
+		                case cmplxArg:
+			                return QPointF(fPos, arg(val));
+		                break;
+	                }
+                }
+                break;
+                case ito::tRGBA32:
+                    return QPointF(fPos, (reinterpret_cast<const ito::rgba32*>(ptr[0]))->gray() );
+                break;
             }
         }
         else
