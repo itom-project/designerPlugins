@@ -580,6 +580,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::keyPressEvent ( QKeyEvent * event ) 
 {
+    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     m_activeModifiers = event->modifiers();
 
     QPointF incr;
@@ -613,7 +614,7 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
 
             QVector<QPointF> pts;
             pts.append(markerPosScaleCoords);
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+            (p)->displayCut(pts, m_zstackCutUID,true);
             replot();
         }
     }
@@ -628,11 +629,21 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
         {
             pts.append( QPointF(hInterval.minValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
             pts.append( QPointF(hInterval.maxValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
+
+            if (p)
+            {
+                p->setCoordinates(pts, true);
+            }
         }
         else if(event->key() == Qt::Key_V) // draw vertical line in the middle of the plotted dataObject
         {
             pts.append( QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.minValue()));
             pts.append( QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.maxValue()));
+
+            if (p)
+            {
+                p->setCoordinates(pts, true);
+            }
         }
         else
         {
@@ -658,13 +669,18 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
                 pts[1].ry()+=incr.ry();
                 break;
             }
+
+            if (p)
+            {
+                p->setCoordinates(pts, true);
+            }
         }
 
         if (m_rasterData->pointValid( pts[0] ) && m_rasterData->pointValid( pts[1] ))
         {
             m_pLineCutLine->setSamples(pts);
 
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+            (p)->displayCut(pts, m_lineCutUID, false);
             replot();
         }
     }
@@ -1070,6 +1086,11 @@ void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
         else if (UID == m_lineCutUID)
         {
             m_pLineCutLine->setVisible(false);
+            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+            if (p)
+            {
+                p->setCoordinates(QVector<QPointF>(), false);
+            }
         }
     }
     else
