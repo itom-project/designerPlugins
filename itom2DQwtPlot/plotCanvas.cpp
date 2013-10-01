@@ -1252,6 +1252,15 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
         {
             setState(tIdle);
             m_pMultiPointPicker->setEnabled(false);
+
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
         }
     }
     else
@@ -1301,7 +1310,8 @@ void PlotCanvas::multiPointActivated (bool on)
                 emit p->userInteractionDone(1, aborted, polygonScale);
             }
 
-            userInteractionStart(1, false, -1);
+            setState(tIdle);
+            m_pMultiPointPicker->setEnabled(false);
 
         }
     }
