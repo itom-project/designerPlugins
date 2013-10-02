@@ -666,21 +666,29 @@ void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
             }
         }
 
-		(m_pContent)->setInterval(Qt::ZAxis, true, 0, 0);
-		(m_pContent)->replot();
+		m_pContent->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
+		
 	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF Itom1DQwtPlot::getYAxisInterval(void) const
 { 
-    return (m_pContent)->m_startRangeY;
+    QPointF interval(m_data.m_valueMin, m_data.m_valueMax);
+    return interval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
 void Itom1DQwtPlot::setYAxisInterval(QPointF interval) 
 { 
-    (m_pContent)->setInterval(Qt::YAxis, 0, interval.x(), interval.y());
+    if (interval.isNull())
+    {
+        m_pContent->setInterval(Qt::YAxis, true, 0.0, 0.0);
+    }
+    else
+    {
+        m_pContent->setInterval(Qt::YAxis, false, interval.x(), interval.y());
+    }
     return; 
 }   
 

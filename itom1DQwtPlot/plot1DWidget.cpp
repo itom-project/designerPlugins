@@ -480,20 +480,6 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
     if(seriesData)
     {
-        /*
-        if(m_startScaledY)
-        {
-            seriesData->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
-            m_startScaledY = false;
-            m_pData->m_valueScaleAuto = false;
-        }
-        if(m_startScaledX)
-        {
-            seriesData->setIntervalRange(Qt::XAxis, false, m_startRangeX.x(), m_startRangeX.y());
-            m_startScaledY = false;
-        }
-        */
-
         QByteArray hash = seriesData->getHash();
 
         if(hash != m_hash)
@@ -990,10 +976,15 @@ void Plot1DWidget::contextMenuEvent(QContextMenuEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
 {
+    bool recalculateBoundaries = false;
     switch(axis)
     {
         case Qt::YAxis:
-            if(autoCalcLimits) m_pData->m_valueScaleAuto = true;
+            if(autoCalcLimits) 
+            {
+                m_pData->m_valueScaleAuto = true;
+                recalculateBoundaries = true;
+            }
             else
             {
                 m_pData->m_valueScaleAuto = false;
@@ -1002,7 +993,11 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
             }
         break;
         case Qt::XAxis:
-            if(autoCalcLimits) m_pData->m_axisScaleAuto = true;
+            if(autoCalcLimits) 
+            {
+                m_pData->m_axisScaleAuto = true;
+                recalculateBoundaries = true;
+            }
             else
             {
                 m_pData->m_axisScaleAuto = false;
@@ -1012,30 +1007,8 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
         break;
     }
 
-    /*
-    DataObjectSeriesData* seriesData = m_plotCurveItems.size() > 0 ? static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data()) : NULL;
-    if(seriesData)
-    {
-        seriesData->setIntervalRange(axis, autoCalcLimits, minValue, maxValue);
+    updateScaleValues(recalculateBoundaries); //replot is done here
 
-        replot();
-        return retOk;
-    }
-    else
-    {
-        switch(axis)
-        {
-            case Qt::YAxis:
-                m_startScaledY = true;
-                m_startRangeY = QPointF(minValue, maxValue);
-            break;
-            case Qt::XAxis:
-                m_startScaledX = true;
-                m_startRangeX = QPointF(minValue, maxValue);
-            break;
-        }
-    }
-    */
     return retOk;
 }
 
@@ -1152,26 +1125,6 @@ void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
     setAxisScale( QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax );
     
     setAxisScale( QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax );
-
-
-
-    /*if(m_pData->m_valueScaleAuto)
-    {
-        setAxisAutoScale( QwtPlot::yLeft, true );
-    }
-    else
-    {
-        setAxisScale( QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax );
-    }
-
-    if(m_pData->m_axisScaleAuto)
-    {
-        setAxisAutoScale( QwtPlot::xBottom, true );
-    }
-    else
-    {
-        setAxisScale( QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax );
-    }*/
 
     replot();
 }

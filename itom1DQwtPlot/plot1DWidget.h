@@ -158,8 +158,6 @@ class Plot1DWidget : public QwtPlot
         int m_actPickerIdx;
 
         QStringList m_colorList;
-        QPointF m_startRangeY;
-        QPointF m_startRangeX;
 
         QWidget *m_pParent;
         QwtPlotZoomer *m_pZoomer;
