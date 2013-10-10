@@ -153,6 +153,42 @@ template<> double bilinearInterpolation<ito::complex128>(cv::Mat* data, double x
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+template<> double bilinearInterpolation<ito::rgba32>(cv::Mat* data, double x, double y, int width, int height, double xScalingFactor, double xOffset, double yScalingFactor, double yOffset, int cmplxState)
+{
+    int xDOIndex = (int)(x*xScalingFactor + xOffset) < width-1 ? (int)(x*xScalingFactor + xOffset) : width-1;
+    int yDOIndex = (int)(y*yScalingFactor + yOffset) < height-1 ? (int)(y*yScalingFactor + yOffset) : height-1;
+
+    if(xDOIndex < 0) xDOIndex = 0;
+    if(yDOIndex < 0) yDOIndex = 0;
+
+#ifdef FAST_VALUES
+	switch (cmplxState)
+	{
+		default:
+		case 0:
+            return (data->at<ito::rgba32>(yDOIndex, xDOIndex)).blue();
+		break;
+
+		case 1:
+			return (data->at<ito::rgba32>(yDOIndex, xDOIndex)).green();
+		break;
+
+		case 2:
+			return (data->at<ito::rgba32>(yDOIndex, xDOIndex)).red();
+		break;
+
+		case 3:
+			return (data->at<ito::rgba32>(yDOIndex, xDOIndex)).alpha();
+		break;
+        default:
+		case 4:
+			return (data->at<ito::rgba32>(yDOIndex, xDOIndex)).gray();
+		break;
+	}
+#endif
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 DataObjectRasterData::DataObjectRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending) :
 m_wDimIndex(0), m_hDimIndex(0), m_width(0), m_height(0), m_DataObjectWidth(0), m_DataObjectHeight(0), m_xScalingFactor(1), m_yScalingFactor(1),
 		m_xOffset(0), m_yOffset(0), m_cmplxState(0), m_replotPending(replotPending)
@@ -215,6 +251,9 @@ double DataObjectRasterData::value(double x, double y) const
             case ito::tComplex128:
 				return bilinearInterpolation<ito::complex128>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset, m_cmplxState);
                 break;
+            case ito::tRGBA32:
+				return bilinearInterpolation<ito::rgba32>(curPlane, x, y, m_DataObjectWidth, m_DataObjectHeight, m_xScalingFactor, m_xOffset, m_yScalingFactor, m_yOffset, ito::rgba32::RGBA_Y);
+            break;
             default:
                 return 0;
         }

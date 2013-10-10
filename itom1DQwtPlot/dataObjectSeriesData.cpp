@@ -863,47 +863,50 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                     return QPointF(fPos, *(reinterpret_cast<const ito::float64*>(ptr[0])) );
                 break;
                 case ito::tComplex64:
-				{
+                {
                     ito::complex64 val = *(reinterpret_cast<const ito::complex64*>(ptr[0]));
-					switch (m_cmplxState)
-					{
-						default:
-                        case cmplxAbs:
-							return QPointF(fPos, abs(val));
-						break;
-						case cmplxReal:
-							return QPointF(fPos, val.real());
-						break;
-						case cmplxImag:
-							return QPointF(fPos, val.imag());
-						break;
-						case cmplxArg:
-							return QPointF(fPos, arg(val));
-						break;
-					}
-				}
-            break;
-            case ito::tComplex128:
-			{
-				ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
-				switch (m_cmplxState)
-				{
-					default:
+                    switch (m_cmplxState)
+                    {
+                    default:
                     case cmplxAbs:
-						return QPointF(fPos, abs(val));
-					break;
-					case cmplxReal:
-						return QPointF(fPos, val.real());
-					break;
-					case cmplxImag:
-						return QPointF(fPos, val.imag());
-					break;
-					case cmplxArg:
-						return QPointF(fPos, arg(val));
-					break;
-				}
-			}
-            break;
+                        return QPointF(fPos, abs(val));
+                    break;
+                    case cmplxReal:
+                        return QPointF(fPos, val.real());
+                    break;
+                    case cmplxImag:
+                        return QPointF(fPos, val.imag());
+                    break;
+                    case cmplxArg:
+                        return QPointF(fPos, arg(val));
+                    break;
+                    }
+                    }
+                break;
+                case ito::tComplex128:
+                {
+	                ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
+	                switch (m_cmplxState)
+	                {
+		                default:
+                        case cmplxAbs:
+			                return QPointF(fPos, abs(val));
+		                break;
+		                case cmplxReal:
+			                return QPointF(fPos, val.real());
+		                break;
+		                case cmplxImag:
+			                return QPointF(fPos, val.imag());
+		                break;
+		                case cmplxArg:
+			                return QPointF(fPos, arg(val));
+		                break;
+	                }
+                }
+                break;
+                case ito::tRGBA32:
+                    return QPointF(fPos, (reinterpret_cast<const ito::rgba32*>(ptr[0]))->gray() );
+                break;
             }
         }
         else
@@ -2432,8 +2435,8 @@ QRectF DataObjectSeriesData::boundingRect() const
 
     if(m_pDataObj && m_d.valid)
     {
-        double min, max;
-        int minIdx, maxIdx;
+        double min = 0.0, max = 0.0;
+        int minIdx = 0.0, maxIdx = 0.0;
         switch(m_pDataObj->getType())
         {
             case ito::tInt8:
@@ -2465,6 +2468,10 @@ QRectF DataObjectSeriesData::boundingRect() const
             break;
             case ito::tComplex128:
                 findMinMaxNonWeighted<ito::complex128>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
+            break;
+            case ito::tRGBA32:
+                min = 0.0;
+                max = 255.0;
             break;
         }
 
@@ -2563,6 +2570,10 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
             break;
             case ito::tComplex128:
                 findMinMaxNonWeighted<ito::complex128>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
+            break;
+            case ito::tRGBA32:
+                min = 0.0;
+                max = 255.0;
             break;
         }
 

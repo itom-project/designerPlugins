@@ -260,7 +260,7 @@ bool Itom2dQwtPlot::colorBarVisible() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setColorBarVisible(bool value)
 {
-	m_pActToggleColorBar->setChecked(value); //emits toggle signal of action
+    m_pActToggleColorBar->setChecked(value); //emits toggle signal of action
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
