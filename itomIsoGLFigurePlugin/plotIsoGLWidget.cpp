@@ -268,7 +268,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
         for(int i = 0; i < 256; i++)
         {
-            m_currentPalette[i] = i + i << 8 + i << 16;
+            m_currentPalette[i] = i + (i << 8) + (i << 16);
         }
 
     }
