@@ -47,8 +47,14 @@
 
 struct axisProperties
 {
-    axisProperties(): label(""), unit(""), dimIdx(0), idx({0, 0}), phys({0, 0}), scale(1),
-        autoScale(1), startScaled(0), isMetric(0), show(1), showTicks(1) {}
+    axisProperties(): label(""), unit(""), dimIdx(0), scale(1),
+        autoScale(1), startScaled(0), isMetric(0), show(1), showTicks(1) 
+    {
+        idx[0] = 0;
+        idx[1] = 0;
+        phys[0] = 0;
+        phys[1] = 0;
+    }
 
     std::string label;
     std::string unit;
