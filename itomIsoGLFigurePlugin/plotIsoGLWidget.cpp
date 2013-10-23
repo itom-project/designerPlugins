@@ -346,21 +346,51 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
     glPixelTransferi(GL_MAP_COLOR, GL_FALSE);
 
-    unsigned char * src = new unsigned char[m_currentPalette.size() * 4 *2];
+    int paletteSize = m_currentPalette.size();
+    unsigned char *src = NULL;
 
-    for(int i = 0; i < m_currentPalette.size(); i++)
+    if(paletteSize == 0)
     {
-        src[8*i] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
-        src[8*i+1] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
-        src[8*i+2] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-        src[8*i+3] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-        src[8*i+4] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
-        src[8*i+5] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
-        src[8*i+6] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-        src[8*i+7] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
+        src = new unsigned char[8];
+        memset(src, 255, 8);
     }
+    else
+    {
+        src = new unsigned char[paletteSize * 4 *2];
+        unsigned char* ptrPal =  (unsigned char*)m_currentPalette.data();
+        for(int i = 0; i < paletteSize; i++)
+        {
+            src[8*i] = ptrPal[4*paletteSize - 4 * i - 4];
+            src[8*i + 1] = ptrPal[4*paletteSize - 4 * i - 3];
+            src[8*i + 2] = ptrPal[4*paletteSize - 4 * i - 2];
+            src[8*i + 3] = 255;
+            src[8*i + 4] = ptrPal[4*paletteSize - 4 * i - 4];
+            src[8*i + 5] = ptrPal[4*paletteSize - 4 * i - 3];
+            src[8*i + 6] = ptrPal[4*paletteSize - 4 * i - 2];
+            src[8*i + 7] = 255;
+/*
+            src[8*i] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
+            src[8*i+1] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
+            src[8*i+2] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
+            src[8*i+3] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 3];
+            src[8*i+4] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
+            src[8*i+5] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
+            src[8*i+6] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
+            src[8*i+7] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 3];
+    
+            src[8*i]   = (m_currentPalette[paletteSize - i - 1])  & 0x000000FF;
+            src[8*i+1] = ((m_currentPalette[paletteSize - i - 1]) & 0x0000FF00) >> 8;
+            src[8*i+2] = ((m_currentPalette[paletteSize - i - 1]) & 0x00FF0000) >> 16;
+            src[8*i+3] = 0xFF000000;
+            src[8*i+4] = (m_currentPalette[paletteSize - i - 1])  & 0x000000FF;
+            src[8*i+5] = ((m_currentPalette[paletteSize - i - 1]) & 0x0000FF00) >> 8;
+            src[8*i+6] = ((m_currentPalette[paletteSize - i - 1]) & 0x00FF0000) >> 16;
+            src[8*i+7] = 0xFF000000;
+*/
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 256, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
+        }
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, paletteSize, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
 
     delete src;
 
