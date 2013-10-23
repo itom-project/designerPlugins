@@ -403,7 +403,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
     if (ret = glGetError())
     {
-        std::cerr << "error setting up projection window: " << ret << "\n";
+        std::cerr << "error setting up openGLWindow window: " << ret << "\n";
     }
 
 

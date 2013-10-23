@@ -309,6 +309,85 @@ ItomIsoGLWidget::~ItomIsoGLWidget()
     }
     SiTerminate();
 #endif
+
+    if(m_actScaleSetting != NULL)
+    {
+        delete m_actScaleSetting;
+        m_actScaleSetting = NULL;
+    }
+
+    if(m_actPalette != NULL)
+    {
+        delete m_actPalette;
+        m_actPalette = NULL;
+    }
+
+    if(m_actToggleColorBar != NULL)
+    {
+        delete m_actToggleColorBar;
+        m_actToggleColorBar = NULL;
+    }
+
+    if(m_actChangeBGColor != NULL)
+    {
+        delete m_actChangeBGColor;
+        m_actChangeBGColor = NULL;
+    }
+
+    if(m_toggleIllumination != NULL)
+    {
+        delete m_toggleIllumination;
+        m_toggleIllumination = NULL;
+    }
+
+
+    if(m_toggleIlluminationRotation != NULL)
+    {
+        delete m_toggleIlluminationRotation;
+        m_toggleIlluminationRotation = NULL;
+    }
+
+    if(m_mnuCmplxSwitch != NULL)
+    {
+        delete m_mnuCmplxSwitch;
+        m_mnuCmplxSwitch = NULL;
+    }
+
+    if(m_actCmplxSwitch != NULL)
+    {
+        delete m_actCmplxSwitch;
+        m_actCmplxSwitch = NULL;
+    }
+
+    if(m_mnuTringModeSwitch != NULL)
+    {
+        delete m_mnuTringModeSwitch;
+        m_toggleInfoText = NULL;
+    } 
+
+    if(m_actTringModeSwitch != NULL)
+    {
+        delete m_actTringModeSwitch;
+        m_actTringModeSwitch = NULL;
+    } 
+
+    if(m_toggleInfoText != NULL)
+    {
+        delete m_toggleInfoText;
+        m_toggleInfoText = NULL;
+    }    
+
+    if(m_lblCoordinates != NULL)
+    {
+        delete m_lblCoordinates;
+        m_lblCoordinates = NULL;
+    }
+
+    if(m_pContent != NULL)
+    {
+        delete m_pContent;
+        m_pContent = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
