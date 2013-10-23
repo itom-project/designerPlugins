@@ -47,6 +47,9 @@
 
 struct axisProperties
 {
+    axisProperties(): label(""), unit(""), dimIdx(0), idx({0, 0}), phys({0, 0}), scale(1),
+        autoScale(1), startScaled(0), isMetric(0), show(1), showTicks(1) {}
+
     std::string label;
     std::string unit;
     unsigned int dimIdx;
@@ -62,6 +65,8 @@ struct axisProperties
 
 struct protocol
 {
+    protocol() : show(0), m_psize(0), text("") {}
+
     bool show;
     double m_psize;
     std::string text;
@@ -69,6 +74,9 @@ struct protocol
 
 struct objectInfo
 {
+    objectInfo() : show(1), meanVal(0), divVal(0), xLength(""), yLength(""),
+        PeakText(""), MeanText(""), DevText("") {}
+
     bool show;
     double meanVal;
     double divVal;

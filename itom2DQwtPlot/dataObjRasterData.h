@@ -82,6 +82,9 @@ class DataObjRasterData : public QwtRasterData
         QPointF m_zBounds;
 
         struct DataParam {
+            DataParam() : m_dataPtr(NULL), m_planeIdx(0), m_yScaling(1), m_xScaling(1),
+                m_yOffset(0), m_xOffset(0), m_ySize(0), m_xSize(0), m_yaxisFlipped(0) {}
+
             int** m_dataPtr; //only for comparison
             size_t m_planeIdx;
             double m_yScaling;

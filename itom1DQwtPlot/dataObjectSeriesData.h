@@ -43,12 +43,14 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         enum Direction { dirX = 0, dirY = 1, dirZ = 2, dirXY = 3 };
 
         struct PtsWeighted {
+            PtsWeighted() : xPx({0, 0}), yPx({0, 0}), weights({0, 0, 0, 0}) {}
             size_t xPx[2];
             size_t yPx[2];
             float weights[4]; // weights are for (xPx[0],yPx[0]),(xPx[1],yPx[0]),(xPx[0],yPx[1]),(xPx[1],yPx[1])
         };
 
         struct LineData {
+            LineData() : nrPoints(0), startPhys(0), stepSizePhys(0), matOffset(0), matStepSize(1), valid(0) {}
             Direction dir;
             size_t nrPoints;
             float startPhys;

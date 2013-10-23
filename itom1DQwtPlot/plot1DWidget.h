@@ -53,6 +53,10 @@ class itom1DQwtFigure;
 
 struct InternalData
 {
+    InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
+        m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
+        m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1) {}
+
     ito::tDataType m_dataType;
 
     QString m_title;
@@ -121,6 +125,7 @@ class Plot1DWidget : public QwtPlot
 
         struct Marker
         {
+            Marker() : item(NULL), active(0), curveIdx(0) {}
             QwtPlotMarker *item;
             bool active;
             int curveIdx;

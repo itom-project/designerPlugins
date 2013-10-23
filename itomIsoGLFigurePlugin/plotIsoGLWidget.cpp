@@ -49,8 +49,9 @@ const char *dont_scale_units[] = {"frame", "frames", "frm", "frms", "digit", "di
 #define RotB0       -1.5
 #define RotC0       0.0
 
-struct achslabel
+struct axislabel
 {
+    axislabel() : dx(0), dy(0), write(0), unitydigit(0), lastdigit(0), unity(0), maxlen(0) {}
     double dx, dy, write;
     int unitydigit, lastdigit;
     double unity;
@@ -2162,7 +2163,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     GLdouble GLModelViewMatrix[16], GLProjectionMatrix[16];
     GLint GLViewport[4];
     GLdouble glx0, gly0, glz0, glx1, gly1, glz1, xpos, ypos, zpos;
-    struct achslabel al;
+    struct axislabel al;
     double ticklength=0.01;
     double VorzXAs, VorzYAs;
     int firstdigit, i;
@@ -2368,7 +2369,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         if (write)
         {
             gluProject(x0+a*(x1-x0), y0+a*(y1-y0), z0+a*(z1-z0), GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
-//			dreidogl_AchsLabel(fo, (void*)&al, xpos*1.1, ypos*1.1, v);
+//			dreidogl_AxisLabel(fo, (void*)&al, xpos*1.1, ypos*1.1, v);
             //paintAxisLabelOGL((void*)&al, xpos*(1+0.07 * m_windowXScale * internalObj.getSize(internalObj.getDims()-1,false)), ypos*(1+0.03 * m_windowYScale * internalObj.getSize(internalObj.getDims()-2,false)), v);
             paintAxisLabelOGL((void*)&al, xpos*(1+0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), ypos*(1+0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
         }
@@ -2405,7 +2406,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 }
 //-----------------------------------------------------------------------------------------------
 /**
-*\fn static void dreidogl_AchsLabel(class FilterObject *fo, void *vd, double x, double y,double v)
+*\fn static void dreidogl_AxisLabel(class FilterObject *fo, void *vd, double x, double y,double v)
 *\brief Schreibt die Achsenlabel
 *\param[in] *fo Zeiger auf das Goofi-Filterobjekt
 *\return error
@@ -2416,7 +2417,7 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
  char buffer[300];
  //char decimal;
  //char *p;
- struct achslabel *al = (struct achslabel *)vd;
+ struct axislabel *al = (struct axislabel *)vd;
  long l;
  int ret;
 
