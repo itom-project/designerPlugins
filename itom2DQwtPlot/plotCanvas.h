@@ -92,7 +92,7 @@ class PlotCanvas : public QwtPlot
         void updateScaleValues();
         void setColorBarVisible(bool visible);
         bool setColorMap(QString colormap = "__next__");
-        inline QString colorMapName() const { return m_colorMapName; };
+        inline QString colorMapName() const { return m_colorMapName; }
 
         void refreshStyles();
 
@@ -152,6 +152,42 @@ class PlotCanvas : public QwtPlot
 
 struct InternalData
 {
+    InternalData()
+    {
+        m_title = "";
+        m_yaxisLabel = "";
+        m_xaxisLabel = "";
+        m_valueLabel = "";
+        m_titleDObj = "";
+        m_xaxisLabelDObj = "";
+        m_yaxisLabelDObj = "";
+        m_valueLabelDObj = "";
+        m_autoTitle = 1;
+        m_autoxAxisLabel = 1;
+        m_autoyAxisLabel = 1;
+        m_autoValueLabel = 1;
+
+        m_valueScaleAuto = 1;
+        m_valueMin = 0;
+        m_valueMax = 0;
+
+        m_xaxisScaleAuto = 1;
+        m_xaxisMin = 0;
+        m_xaxisMax = 0;
+        m_xaxisVisible = 1;
+
+        m_yaxisScaleAuto = 1;
+        m_yaxisMin = 0;
+        m_yaxisMax = 0;
+        m_yaxisFlipped = 0;
+        m_yaxisVisible = 1;
+
+        m_colorBarVisible = 0;
+        m_cmplxType = PlotCanvas::Real;
+        m_state = PlotCanvas::tIdle;
+        m_pConstOutput = NULL;
+    }
+    ~InternalData() {}
     ito::tDataType m_dataType;
 
     QString m_title;
