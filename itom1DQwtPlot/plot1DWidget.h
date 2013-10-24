@@ -112,6 +112,8 @@ class Plot1DWidget : public QwtPlot
 
     protected:
         void keyPressEvent ( QKeyEvent * event );
+        void mousePressEvent ( QMouseEvent * event );
+        void mouseMoveEvent ( QMouseEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
         void contextMenuEvent(QContextMenuEvent * event);
 

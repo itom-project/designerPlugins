@@ -662,7 +662,7 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
+void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 {
     if(m_state == statePicker)
     {
@@ -706,6 +706,63 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
                 
                 m_markers.append(marker);
 
+            }
+
+            updateMarkerPosition(false,false);
+
+            replot();
+
+        }
+
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
+{
+    if(m_state == statePicker)
+    {
+        int xPx = m_pValuePicker->trackerPosition().x();
+        int yPx = m_pValuePicker->trackerPosition().y();
+        double xScale = invTransform( xBottom, xPx );
+        double yScale = invTransform( yLeft, yPx );
+
+        if (event->buttons() & Qt::LeftButton)
+        {
+            for(int i = 0 ; i < m_markers.size() ; i++)
+            {
+                if (m_markers[i].active == true)
+                {
+                    stickMarkerToXPx(&m_markers[i], xScale, 0);
+                }
+            }
+            updateMarkerPosition(false,false);
+
+            replot();
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
+{
+    if(m_state == statePicker)
+    {
+        int xPx = m_pValuePicker->trackerPosition().x();
+        int yPx = m_pValuePicker->trackerPosition().y();
+        double xScale = invTransform( xBottom, xPx );
+        double yScale = invTransform( yLeft, yPx );
+
+        bool closeToMarker = false;
+
+        if(event->button() == Qt::LeftButton)
+        {
+            for(int i = 0 ; i < m_markers.size() ; i++)
+            {
+                if (m_markers[i].active == true)
+                {
+                    stickMarkerToXPx(&m_markers[i], xScale, 0);
+                }
             }
 
             updateMarkerPosition(false,false);
