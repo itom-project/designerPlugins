@@ -905,7 +905,7 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                 }
                 break;
                 case ito::tRGBA32:
-                    return QPointF(fPos, (reinterpret_cast<const ito::rgba32*>(ptr[0]))->gray() );
+                    return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->gray() );
                 break;
             }
         }

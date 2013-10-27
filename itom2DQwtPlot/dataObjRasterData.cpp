@@ -381,7 +381,7 @@ double DataObjRasterData::value(double x, double y) const
                     }
                 case ito::tRGBA32:
                     {
-                        return m_plane->at<ito::rgba32>(m,n).gray();
+                        return m_plane->at<ito::Rgba32>(m,n).gray();
                     }
                 default:
                     return std::numeric_limits<double>::signaling_NaN();
@@ -495,7 +495,7 @@ double DataObjRasterData::value2(int m, int n) const
             }
         case ito::tRGBA32:
             {
-                ito::rgba32 *line = (ito::rgba32*)m_rasteredLinePtr[m];
+                ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
                 if(!line) return std::numeric_limits<double>::signaling_NaN();
                 return line[ m_xIndizes[n] ].gray();
             }
@@ -614,7 +614,7 @@ double DataObjRasterData::value2_yinv(int m, int n) const
             }
         case ito::tRGBA32:
             {
-                ito::rgba32 *line = (ito::rgba32*)m_rasteredLinePtr[m];
+                ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
                 if(!line) return std::numeric_limits<double>::signaling_NaN();
                 return line[ m_xIndizes[n] ].gray();
             }

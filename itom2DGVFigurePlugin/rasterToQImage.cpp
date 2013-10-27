@@ -943,7 +943,7 @@ bool RasterToQImageObj::getPixelARGB(const QPointF &coords, unsigned char &AValu
             ret = true;
             break;
         case ito::tRGBA32:
-            val = m_dataObj->at<ito::rgba32>(index).argb();
+            val = m_dataObj->at<ito::Rgba32>(index).argb();
             ret = true;
             break;
     };
