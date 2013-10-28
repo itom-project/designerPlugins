@@ -111,6 +111,11 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::~Itom2dQwtPlot()
 {
+    if (m_mnuCmplxSwitch != NULL)
+    {
+        delete m_mnuCmplxSwitch;
+        m_mnuCmplxSwitch = NULL;
+    }
 	m_pContent->deleteLater();
 	m_pContent = NULL;
 }

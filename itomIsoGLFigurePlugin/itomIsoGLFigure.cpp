@@ -388,6 +388,12 @@ ItomIsoGLWidget::~ItomIsoGLWidget()
         delete m_pContent;
         m_pContent = NULL;
     }
+
+    if (m_pEventFilter != NULL)
+    {
+        delete m_pEventFilter;
+        m_pEventFilter = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

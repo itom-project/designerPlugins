@@ -393,7 +393,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, paletteSize, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
 
-    delete src;
+    delete[] src;
 
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
 
