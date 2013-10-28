@@ -73,8 +73,8 @@ public:
     ito::RetVal applyUpdate();  //!> does the real update work
 
 	//properties (setter/getter)
-	void setContextMenuEnabled(bool show) {}; 
-	bool getContextMenuEnabled() const { return false; };
+    void setContextMenuEnabled(bool show) {}
+    bool getContextMenuEnabled() const { return false; }
 
 	bool colorBarVisible() const;
 	void setColorBarVisible(bool value);
@@ -131,7 +131,7 @@ public:
     friend class PlotCanvas;
 
 protected:
-    ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
+    ito::RetVal init() { return m_pContent->init(); } //called when api-pointers are transmitted, directly after construction
 
 	void createActions();
 
@@ -153,12 +153,16 @@ private:
     QAction *m_pActLineCut;
     QAction *m_pActStackCut;
     QWidgetAction *m_pActPlaneSelector;
+    QActionGroup *m_pDrawModeActGroup;
 
     QLabel *m_pCoordinates;
     QWidgetAction *m_pActCoordinates;
 
     QAction* m_pActCmplxSwitch;
 	QMenu *m_mnuCmplxSwitch;
+
+    QAction* m_pActDrawMode;
+    QMenu *m_pMnuDrawMode;
 
     QHash<QObject*,ito::uint32> m_childFigures;
 
@@ -174,6 +178,8 @@ private slots:
     void mnuActLineCut(bool checked);
     void mnuActStackCut(bool checked);
     void mnuActPlaneSelector(int plane);
+    void mnuDrawMode(QAction *action);
+    void mnuDrawMode(bool checked);
     void mnuCmplxSwitch(QAction *action);
     void childFigureDestroyed(QObject *obj);
 

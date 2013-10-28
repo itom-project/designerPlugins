@@ -25,7 +25,7 @@
 #include <complex>
 
 #include <QWidgetItem>
-#include "opencv2\imgproc\imgproc.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 #include "common/sharedStructuresGraphics.h"
 #include "DataObject/dataObjectFuncs.h"

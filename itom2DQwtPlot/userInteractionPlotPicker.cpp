@@ -25,6 +25,7 @@
 #include <qwt_picker_machine.h>
 #include <qwt_painter.h>
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::reset()
 {
     //at the beginning no point is clicked, nevertheless the Abort-Key should abort the selection and
@@ -37,6 +38,7 @@ void UserInteractionPlotPicker::reset()
     QwtPlotPicker::reset();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::setBackgroundFillBrush( const QBrush &brush )
 {
     if(brush != this->m_rectFillBrush)
@@ -46,6 +48,7 @@ void UserInteractionPlotPicker::setBackgroundFillBrush( const QBrush &brush )
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::drawTracker( QPainter *painter ) const
 {
     const QRect textRect = trackerRect( painter->font() );
@@ -60,7 +63,7 @@ void UserInteractionPlotPicker::drawTracker( QPainter *painter ) const
     }
 }
 
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
 {
     if ( !isActive() || rubberBand() == NoRubberBand ||
@@ -165,3 +168,5 @@ void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
             break;
     }
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------

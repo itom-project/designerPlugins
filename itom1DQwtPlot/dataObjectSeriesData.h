@@ -98,8 +98,8 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds);
 
-        inline void setCmplxState(ComplexType state) { m_cmplxState = state; };
-        inline ComplexType getCmplxState() const {return m_cmplxState; };
+        inline void setCmplxState(ComplexType state) { m_cmplxState = state; }
+        inline ComplexType getCmplxState() const {return m_cmplxState; }
 
         ito::DataObject getResampledDataObject();
 
@@ -110,7 +110,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         void setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue);
 
-        inline QByteArray getHash() const { return m_hash; };
+        inline QByteArray getHash() const { return m_hash; }
         void calcHash();
 
     protected:

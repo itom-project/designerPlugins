@@ -25,17 +25,19 @@
 #include <qevent.h>
 #include <qwt_event_pattern.h>
 
-
+//----------------------------------------------------------------------------------------------------------------------------------
 MultiPointPickerMachine::MultiPointPickerMachine() : 
     QwtPickerPolygonMachine()
 {
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void MultiPointPickerMachine::setMaxNrItems(int value)
 {
     m_maxNrItems = value;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 //! Transition
 QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
     const QwtEventPattern &eventPattern, const QEvent *event )
@@ -138,3 +140,5 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
 
     return cmdList;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------

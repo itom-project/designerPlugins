@@ -26,16 +26,19 @@
 #include <qbrush.h>
 #include <qwt_plot_canvas.h>
 
+//----------------------------------------------------------------------------------------------------------------------------------
 ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData) : 
     QwtPlotPicker(xAxis, yAxis, parent),
     m_valueData(valueData)
 {
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 ValuePicker2D::~ValuePicker2D()
 {
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
 {
     QString text;
@@ -52,6 +55,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
     return text;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void ValuePicker2D::drawTracker( QPainter *painter ) const
 {
     const QRect textRect = trackerRect( painter->font() );
@@ -66,6 +70,7 @@ void ValuePicker2D::drawTracker( QPainter *painter ) const
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void ValuePicker2D::setBackgroundFillBrush( const QBrush &brush )
 {
     if(brush != this->m_rectFillBrush)
@@ -74,3 +79,5 @@ void ValuePicker2D::setBackgroundFillBrush( const QBrush &brush )
         updateDisplay();
     }
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------

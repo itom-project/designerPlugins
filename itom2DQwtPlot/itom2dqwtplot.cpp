@@ -49,7 +49,10 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActCmplxSwitch(NULL),
 	m_mnuCmplxSwitch(NULL),
     m_pActCoordinates(NULL),
-    m_pCoordinates(NULL)
+    m_pCoordinates(NULL),
+    m_pActDrawMode(NULL),
+    m_pMnuDrawMode(NULL),
+    m_pDrawModeActGroup(NULL)
 {
 	m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy pass through of input source object").toAscii().data()));
@@ -102,6 +105,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 	mainTb->addAction(m_pActValuePicker);
 	mainTb->addAction(m_pActLineCut);
 	mainTb->addAction(m_pActStackCut);
+    mainTb->addAction(m_pActDrawMode);
 	mainTb->addSeparator();
 	mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
@@ -207,6 +211,39 @@ void Itom2dQwtPlot::createActions()
     wa->setVisible(false);
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
 
+    //m_actDrawMode
+    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Switch Draw Mode, Point, Line, Rectangle, Ellipse"), this);
+    m_pMnuDrawMode = new QMenu("Draw Mode");
+
+    m_pDrawModeActGroup = new QActionGroup(this);
+    a = m_pDrawModeActGroup->addAction(tr("Point"));
+    a->setData(PlotCanvas::tPoint);
+    m_pMnuDrawMode->addAction(a);
+    a->setCheckable(true);
+    a->setChecked(true);
+
+    a = m_pDrawModeActGroup->addAction(tr("Line"));
+    a->setData(PlotCanvas::tLine);
+    m_pMnuDrawMode->addAction(a);
+    a->setCheckable(true);
+
+    a = m_pDrawModeActGroup->addAction(tr("Rectangle"));
+    a->setData(PlotCanvas::tRect);
+    m_pMnuDrawMode->addAction(a);
+    a->setCheckable(true);
+
+    a = m_pDrawModeActGroup->addAction(tr("Ellipse"));
+    a->setData(PlotCanvas::tEllipse);
+    m_pMnuDrawMode->addAction(a);
+    a->setCheckable(true);
+
+    m_pActDrawMode->setMenu(m_pMnuDrawMode);
+    m_pActDrawMode->setVisible(true);
+    m_pActDrawMode->setCheckable(true);
+    connect(m_pDrawModeActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuDrawMode(QAction*)));
+    connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
+
+
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
 	m_mnuCmplxSwitch = new QMenu("Complex Switch");
@@ -236,6 +273,7 @@ void Itom2dQwtPlot::createActions()
 	m_pActCmplxSwitch->setMenu(m_mnuCmplxSwitch);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pCmplxActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
+
 
     m_pCoordinates = new QLabel("[0.0; 0.0]\n[0.0; 0.0]", this);
     m_pCoordinates->setAlignment(Qt::AlignRight | Qt::AlignTop);
@@ -660,6 +698,7 @@ void Itom2dQwtPlot::mnuActPan(bool checked)
         m_pActZoom->setChecked(false);
         m_pActLineCut->setChecked(false);
         m_pActStackCut->setChecked(false);
+        m_pActDrawMode->setChecked(false);
         m_pContent->setState(PlotCanvas::tPan);
     }
     else
@@ -677,6 +716,7 @@ void Itom2dQwtPlot::mnuActZoom(bool checked)
         m_pActPan->setChecked(false);
         m_pActLineCut->setChecked(false);
         m_pActStackCut->setChecked(false);
+        m_pActDrawMode->setChecked(false);
         m_pContent->setState(PlotCanvas::tZoom);
     }
     else
@@ -721,6 +761,7 @@ void Itom2dQwtPlot::mnuActValuePicker(bool checked)
         m_pActPan->setChecked(false);
         m_pActLineCut->setChecked(false);
         m_pActStackCut->setChecked(false);
+        m_pActDrawMode->setChecked(false);
     }
     
     m_pContent->setState(checked ? PlotCanvas::tValuePicker : PlotCanvas::tIdle);
@@ -735,6 +776,7 @@ void Itom2dQwtPlot::mnuActLineCut(bool checked)
         m_pActPan->setChecked(false);
         m_pActStackCut->setChecked(false);
         m_pActValuePicker->setChecked(false);
+        m_pActDrawMode->setChecked(false);
     }
     
     m_pContent->setState(checked ? PlotCanvas::tLineCut : PlotCanvas::tIdle);
@@ -749,6 +791,7 @@ void Itom2dQwtPlot::mnuActStackCut(bool checked)
         m_pActPan->setChecked(false);
         m_pActLineCut->setChecked(false);
         m_pActValuePicker->setChecked(false);
+        m_pActDrawMode->setChecked(false);
     }
     
     m_pContent->setState(checked ? PlotCanvas::tStackCut : PlotCanvas::tIdle);
@@ -782,6 +825,53 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
         m_pActPlaneSelector->setVisible((max-min) > 0);
 		m_pActStackCut->setVisible((max-min) > 0);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuDrawMode(bool checked)
+{
+    if (checked)
+    {
+        m_pActZoom->setChecked(false);
+        m_pActPan->setChecked(false);
+        m_pActLineCut->setChecked(false);
+        m_pActStackCut->setChecked(false);
+        m_pActValuePicker->setChecked(false);
+    }
+    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::tIdle);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuDrawMode(QAction *action)
+{
+    if (m_pActDrawMode->isChecked())
+    {
+        m_pActZoom->setChecked(false);
+        m_pActPan->setChecked(false);
+        m_pActLineCut->setChecked(false);
+        m_pActStackCut->setChecked(false);
+        m_pActValuePicker->setChecked(false);
+    }
+    switch (action->data().toInt())
+    {
+        default:
+        case PlotCanvas::tPoint:
+            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+        break;
+
+        case PlotCanvas::tLine:
+            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+        break;
+
+        case PlotCanvas::tRect:
+            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+        break;
+
+        case PlotCanvas::tEllipse:
+            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+        break;
+    }
+    m_pContent->setState(m_pActDrawMode->isChecked() ? PlotCanvas::tDraw : PlotCanvas::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -957,6 +1047,7 @@ void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     m_pActPan->setChecked(false);
     m_pActLineCut->setChecked(false);
     m_pActStackCut->setChecked(false);
+    m_pActDrawMode->setChecked(false);
 
     m_pContent->userInteractionStart(type, start, maxNrOfPoints);
 
@@ -989,3 +1080,5 @@ void Itom2dQwtPlot::setCoordinates(const QVector<QPointF> &pts, bool visible)
         m_pCoordinates->setText(buf);
     }
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
