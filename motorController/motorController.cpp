@@ -123,7 +123,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_changePosButtons.clear();
     m_changePosButtons.reserve(numAxisToUse);
 
-    for (int i = 0; i < numAxisToUse; i++)
+    for (unsigned int i = 0; i < numAxisToUse; i++)
     {
         QList<QPushButton* > buttons;
         buttons.reserve(4);
@@ -276,7 +276,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     mainLayout->setContentsMargins(2,2,2,2);
 
-    for (int i = 0; i < numAxisToUse; i++)
+    for (unsigned int i = 0; i < numAxisToUse; i++)
     {
         QHBoxLayout* line1 = new QHBoxLayout();
         QHBoxLayout* line2 = new QHBoxLayout();
