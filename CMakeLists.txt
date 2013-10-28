@@ -16,6 +16,7 @@ ADD_SUBDIRECTORY(matplotlibPlot)
 ADD_SUBDIRECTORY(motorController)
 ADD_SUBDIRECTORY(dataObjectTable)
 ADD_SUBDIRECTORY(dObMetaDataTable)
+ADD_SUBDIRECTORY(evaluateGeometrics)
 
 OPTION(COMPILE_DEPRECATED_PLUGINS "Compile deprecated plugins" OFF)
 if (COMPILE_DEPRECATED_PLUGINS)
