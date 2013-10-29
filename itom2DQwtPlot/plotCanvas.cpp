@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2012, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -60,13 +60,13 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_pPanner(NULL),
         m_pLineCutPicker(NULL),
         m_pStackCutMarker(NULL),
-		m_dObjItem(NULL),
+        m_dObjItem(NULL),
         m_rasterData(NULL),
-		m_pData(m_pData),
+        m_pData(m_pData),
         m_curColorMapIndex(0),
         m_pValuePicker(NULL),
         m_dObjPtr(NULL),
-		m_pStackPicker(NULL),
+        m_pStackPicker(NULL),
         m_zstackCutUID(0),
         m_lineCutUID(0),
         m_pLineCutLine(NULL),
@@ -74,31 +74,31 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 {
     setMouseTracking(false);
 
-	//this is the border between the canvas and the axes and the overall mainwindow
-	setContentsMargins(5,5,5,5);
-	
-	//canvas() is the real plotting area, where the plot is printed (without axes...)
-	//canvas()->setFrameShadow(QFrame::Plain);
-	//canvas()->setFrameShape(QFrame::NoFrame);
+    //this is the border between the canvas and the axes and the overall mainwindow
+    setContentsMargins(5,5,5,5);
 
-	canvas()->setStyleSheet("border: 0px;");
-	canvas()->setCursor( Qt::ArrowCursor );
-	
-	//main item on canvas -> the data object
+    //canvas() is the real plotting area, where the plot is printed (without axes...)
+    //canvas()->setFrameShadow(QFrame::Plain);
+    //canvas()->setFrameShape(QFrame::NoFrame);
+
+    canvas()->setStyleSheet("border: 0px;");
+    canvas()->setCursor( Qt::ArrowCursor );
+
+    //main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
     m_dObjItem->setRenderThreadCount(0);
     //m_dObjItem->setColorMap( new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
 
     m_rasterData = new DataObjRasterData(m_pData);
     m_dObjItem->setData(m_rasterData);
-	m_dObjItem->attach(this);
+    m_dObjItem->attach(this);
 
-	//zoom tool
+    //zoom tool
     m_pZoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
 
-	//pan tool
+    //pan tool
     m_pPanner = new QwtPlotPanner(canvas());
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis
     m_pPanner->setCursor(Qt::SizeAllCursor);
@@ -116,18 +116,18 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
 
-	//zStack cut picker
-	m_pStackPicker = new QwtPlotPicker(canvas());
-	m_pStackPicker->setStateMachine(new QwtPickerClickPointMachine());
-	m_pStackPicker->setTrackerMode(QwtPicker::AlwaysOn);
-	m_pStackPicker->setRubberBand(QwtPicker::CrossRubberBand); 
-	m_pStackPicker->setEnabled(false);
+    //zStack cut picker
+    m_pStackPicker = new QwtPlotPicker(canvas());
+    m_pStackPicker->setStateMachine(new QwtPickerClickPointMachine());
+    m_pStackPicker->setTrackerMode(QwtPicker::AlwaysOn);
+    m_pStackPicker->setRubberBand(QwtPicker::CrossRubberBand);
+    m_pStackPicker->setEnabled(false);
     //disable key movements for the picker (the marker will be moved by the key-event of this widget)
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyUp, 0);
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyDown, 0);
-	connect(m_pStackPicker, SIGNAL(appended(const QPoint&)), this, SLOT(zStackCutTrackerMoved(const QPoint&)));
+    connect(m_pStackPicker, SIGNAL(appended(const QPoint&)), this, SLOT(zStackCutTrackerMoved(const QPoint&)));
     connect(m_pStackPicker, SIGNAL(moved(const QPoint&)), this, SLOT(zStackCutTrackerMoved(const QPoint&)));
 
     //marker for zstack cut
@@ -159,15 +159,15 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
     m_pMultiPointPicker->setEnabled(false);
     m_pMultiPointPicker->setRubberBand( QwtPicker::UserRubberBand ); //user is cross here
-    //m_pMultiPointPicker->setStateMachine(new QwtPickerClickPointMachine); 
+    //m_pMultiPointPicker->setStateMachine(new QwtPickerClickPointMachine);
     m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine);
     m_pMultiPointPicker->setRubberBandPen( QPen(QBrush(Qt::green, Qt::SolidPattern),2) );
     connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
     //connect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon) ));
     //connect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint) ));
 
-	//prepare color bar
-	QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
+    //prepare color bar
+    QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
     rightAxis->setColorBarEnabled(true);
     rightAxis->setColorBarWidth(30);
 
@@ -188,14 +188,14 @@ PlotCanvas::~PlotCanvas()
 {
     m_pLineCutLine->detach();
     delete m_pLineCutLine;
-	m_pLineCutLine = NULL;
+    m_pLineCutLine = NULL;
 
     m_pStackCutMarker->detach();
     delete m_pStackCutMarker;
     m_pStackCutMarker = NULL;
 
     m_pMultiPointPicker = NULL;
-	
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -237,7 +237,7 @@ void PlotCanvas::refreshStyles()
         selectionPen.setColor(m_inverseColor0);
         trackerPen.setColor(m_inverseColor0);
     }
-    
+
     m_pZoomer->setRubberBandPen(rubberBandPen);
     m_pZoomer->setTrackerFont(trackerFont);
     m_pZoomer->setTrackerPen(trackerPen);
@@ -277,7 +277,7 @@ void PlotCanvas::refreshStyles()
     t = axisWidget(QwtPlot::yRight)->title();
     t.setFont(labelFont);
     axisWidget(QwtPlot::yRight)->setTitle(t);
-    
+
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
 }
@@ -307,7 +307,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             std::string descr, unit;
             tag = dObj->getTag("title", valid);
             m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
-		    m_pData->m_dataType = (ito::tDataType)dObj->getType();
+            m_pData->m_dataType = (ito::tDataType)dObj->getType();
 
             descr = dObj->getValueDescription();
             unit = dObj->getValueUnit();
@@ -348,7 +348,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 m_pData->m_yaxisLabelDObj = "";
             }
         }
-    } 
+    }
 
     updateLabels();
 
@@ -359,11 +359,11 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         {
             if(dObj->getType() == ito::tComplex128 || dObj->getType() == ito::tComplex64)
             {
-                p->setCmplxSwitch(m_pData->m_cmplxType, true);                
+                p->setCmplxSwitch(m_pData->m_cmplxType, true);
             }
             else
             {
-                p->setCmplxSwitch(m_pData->m_cmplxType, false);                  
+                p->setCmplxSwitch(m_pData->m_cmplxType, false);
             }
 
             int maxPlane = 0;
@@ -373,12 +373,12 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             }
 
             p->setPlaneRange(0, maxPlane);
-            
+
         }
 
 
         //updateMarkerPosition(true);
-                
+
         updateScaleValues(); //replot is done here
 
         m_pZoomer->setZoomBase( true );
@@ -475,7 +475,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     if(newPalette.getPos(newPalette.getSize() - 1) == newPalette.getPos(newPalette.getSize() - 2))  // BuxFix - For Gray-Marked
     {
         colorMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColor(newPalette.getSize() - 2), QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColor(newPalette.getSize() - 2), QwtColorMap::Indexed);   
+        colorBarMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColor(newPalette.getSize() - 2), QwtColorMap::Indexed);
         if(newPalette.getSize() > 2)
         {
             for(int i = 1; i < newPalette.getSize() - 2; i++)
@@ -485,12 +485,12 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
             }
             colorMap->addColorStop(newPalette.getPos(newPalette.getSize() - 1), newPalette.getColor(newPalette.getSize() - 1));
             colorBarMap->addColorStop(newPalette.getPos(newPalette.getSize() - 1), newPalette.getColor(newPalette.getSize() - 1));
-        }    
+        }
     }
     else
     {
         colorMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColorLast(), QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColorLast(), QwtColorMap::Indexed);   
+        colorBarMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColorLast(), QwtColorMap::Indexed);
         if(newPalette.getSize() > 2)
         {
             for(int i = 1; i < newPalette.getSize() - 1; i++)
@@ -522,7 +522,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     if(newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first )  // BuxFix - For Gray-Marked
     {
         colorMap    = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);   
+        colorBarMap = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
         if(totalStops > 2)
         {
             for(int i = 1; i < totalStops - 2; i++)
@@ -532,12 +532,12 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
             }
             colorMap->addColorStop(newPalette.colorStops[totalStops-1].first, newPalette.colorStops[totalStops-1].second);
             colorBarMap->addColorStop(newPalette.colorStops[totalStops-1].first, newPalette.colorStops[totalStops-1].second);
-        }    
+        }
     }
     else
     {
         colorMap    = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);   
+        colorBarMap = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
         if(totalStops > 2)
         {
             for(int i = 1; i < totalStops - 1; i++)
@@ -555,7 +555,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
             QwtInterval interval = m_rasterData->interval(Qt::ZAxis);
             /*setAxisScale(QwtPlot::yRight, interval.minValue(), interval.maxValue());
 
-            
+
             axisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
 */
             axisWidget(QwtPlot::yRight)->setColorMap(interval, colorBarMap);
@@ -578,7 +578,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::keyPressEvent ( QKeyEvent * event ) 
+void PlotCanvas::keyPressEvent ( QKeyEvent * event )
 {
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     m_activeModifiers = event->modifiers();
@@ -590,20 +590,20 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
     if (m_pData->m_state == tStackCut)
     {
         QPointF markerPosScaleCoords = m_pStackCutMarker->value();
-        
+
         switch(event->key())
         {
-        case Qt::Key_Left:
-            markerPosScaleCoords.rx()-=incr.rx();
+            case Qt::Key_Left:
+                markerPosScaleCoords.rx()-=incr.rx();
             break;
-        case Qt::Key_Right:
-            markerPosScaleCoords.rx()+=incr.rx();
+            case Qt::Key_Right:
+                markerPosScaleCoords.rx()+=incr.rx();
             break;
-        case Qt::Key_Up:
-            markerPosScaleCoords.ry()-=incr.ry();
+            case Qt::Key_Up:
+                markerPosScaleCoords.ry()-=incr.ry();
             break;
-        case Qt::Key_Down:
-            markerPosScaleCoords.ry()+=incr.ry();
+            case Qt::Key_Down:
+                markerPosScaleCoords.ry()+=incr.ry();
             break;
         }
 
@@ -652,21 +652,21 @@ void PlotCanvas::keyPressEvent ( QKeyEvent * event )
 
             switch(event->key())
             {
-            case Qt::Key_Left:
-                pts[0].rx()-=incr.rx();
-                pts[1].rx()-=incr.rx();
+                case Qt::Key_Left:
+                    pts[0].rx()-=incr.rx();
+                    pts[1].rx()-=incr.rx();
                 break;
-            case Qt::Key_Right:
-                pts[0].rx()+=incr.rx();
-                pts[1].rx()+=incr.rx();
+                case Qt::Key_Right:
+                    pts[0].rx()+=incr.rx();
+                    pts[1].rx()+=incr.rx();
                 break;
-            case Qt::Key_Up:
-                pts[0].ry()-=incr.ry();
-                pts[1].ry()-=incr.ry();
+                case Qt::Key_Up:
+                    pts[0].ry()-=incr.ry();
+                    pts[1].ry()-=incr.ry();
                 break;
-            case Qt::Key_Down:
-                pts[0].ry()+=incr.ry();
-                pts[1].ry()+=incr.ry();
+                case Qt::Key_Down:
+                    pts[0].ry()+=incr.ry();
+                    pts[1].ry()+=incr.ry();
                 break;
             }
 
@@ -695,7 +695,7 @@ void PlotCanvas::keyReleaseEvent ( QKeyEvent * event )
 void PlotCanvas::setColorBarVisible(bool visible)
 {
     m_pData->m_colorBarVisible = visible;
-	enableAxis(QwtPlot::yRight, visible );
+    enableAxis(QwtPlot::yRight, visible );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -781,7 +781,7 @@ void PlotCanvas::updateLabels()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateScaleValues()
 {
-	QwtInterval ival;
+    QwtInterval ival;
     if(m_pData->m_valueScaleAuto)
     {
         internalDataUpdated();
@@ -815,9 +815,9 @@ void PlotCanvas::updateScaleValues()
         QwtInterval ival(m_pData->m_valueMin, m_pData->m_valueMax);
         axisWidget(QwtPlot::yRight)->setColorMap( ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
     }
-    
+
     setAxisScale( QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
-    
+
     QwtScaleEngine *scaleEngine = axisScaleEngine(QwtPlot::yLeft);
 
     if (m_pData->m_yaxisFlipped)
@@ -862,7 +862,7 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
             scaleEngine->setAttribute( QwtScaleEngine::Inverted, false);
             setAxisScale( QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
         }
-        
+
     }
     else if (axis == Qt::ZAxis)
     {
@@ -871,7 +871,7 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
         m_pData->m_valueMax = interval.y();
 
         QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
-        
+
         if (widget)
         {
             QwtInterval ival(interval.x(), interval.y());
@@ -879,7 +879,7 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
         }
 
         setAxisScale( QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
-        
+
         m_rasterData->setInterval(Qt::ZAxis, QwtInterval(m_pData->m_valueMin, m_pData->m_valueMax));
     }
 
@@ -934,26 +934,29 @@ void PlotCanvas::setState( tState state)
 
         switch (state)
         {
-        case tIdle:
-            canvas()->setCursor( Qt::ArrowCursor );
+            default:
+            case tIdle:
+                canvas()->setCursor( Qt::ArrowCursor );
             break;
-		case tZoom:
-			canvas()->setCursor( Qt::CrossCursor );
-			break;
-		case tPan:
-			canvas()->setCursor( Qt::OpenHandCursor );
-			break;
-        case tValuePicker:
-            canvas()->setCursor( Qt::CrossCursor );
+
+            case tZoom:
+                canvas()->setCursor( Qt::CrossCursor );
             break;
-		case tStackCut:
-			canvas()->setCursor( Qt::CrossCursor );
-			break;
-        case tMultiPointPick:
-            canvas()->setCursor( Qt::CrossCursor );
+
+            case tPan:
+                canvas()->setCursor( Qt::OpenHandCursor );
             break;
-        default:
-            canvas()->setCursor( Qt::ArrowCursor );
+
+            case tValuePicker:
+                canvas()->setCursor( Qt::CrossCursor );
+            break;
+
+            case tStackCut:
+                canvas()->setCursor( Qt::CrossCursor );
+            break;
+
+            case tMultiPointPick:
+                canvas()->setCursor( Qt::CrossCursor );
             break;
         }
 
@@ -1106,114 +1109,115 @@ void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
 {
-	ito::RetVal retval;
-	size_t limits[] = {2,2,0,99999};
-	ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
+    ito::RetVal retval;
+    size_t limits[] = {2,2,0,99999};
+    ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
 
-	QwtSymbol::Style symStyle = QwtSymbol::XCross;
-	QSize symSize(5,5);
-	QBrush symBrush(Qt::NoBrush);
-	QPen symPen(Qt::red);
-
-
-	QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
-	if (rgexp.indexIn(style) != -1)
-	{
-		QString s = rgexp.cap(1);
-
-		if (s == "b") symPen.setColor( Qt::blue );
-		else if (s == "g") symPen.setColor( Qt::green );
-		else if (s == "r") symPen.setColor( Qt::red );
-		else if (s == "c") symPen.setColor( Qt::cyan );
-		else if (s == "m") symPen.setColor( Qt::magenta );
-		else if (s == "y") symPen.setColor( Qt::yellow );
-		else if (s == "k") symPen.setColor( Qt::black );
-		else if (s == "w") symPen.setColor( Qt::white );
-
-		s = rgexp.cap(2);
-		bool ok;
-
-		if (s == ".") symStyle = QwtSymbol::Ellipse;
-		else if (s == "o") symStyle = QwtSymbol::Ellipse;
-		else if (s == "s") symStyle = QwtSymbol::Rect;
-		else if (s == "d") symStyle = QwtSymbol::Diamond;
-		else if (s == ">") symStyle = QwtSymbol::RTriangle;
-		else if (s == "v") symStyle = QwtSymbol::DTriangle;
-		else if (s == "^") symStyle = QwtSymbol::UTriangle;
-		else if (s == "<") symStyle = QwtSymbol::LTriangle;
-		else if (s == "x") symStyle = QwtSymbol::XCross;
- 		else if (s == "*") symStyle = QwtSymbol::Star1;
-		else if (s == "+") symStyle = QwtSymbol::Cross;
-		else if (s == "h") symStyle = QwtSymbol::Hexagon;
-
-		s = rgexp.cap(3);
-		int size = s.toInt(&ok);
-		if (ok)
-		{
-			symSize = QSize(size,size);
-		}
-	}
-	else
-	{
-		retval += ito::RetVal(ito::retError,0,"The style tag does not correspond to the required format");
-	}
+    QwtSymbol::Style symStyle = QwtSymbol::XCross;
+    QSize symSize(5,5);
+    QBrush symBrush(Qt::NoBrush);
+    QPen symPen(Qt::red);
 
 
-	if (!retval.containsError())
-	{
-		//QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
-		QwtPlotMarker *marker = NULL;
-		int nrOfMarkers = dObj->getSize(1);
+    QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
+    if (rgexp.indexIn(style) != -1)
+    {
+//		QString s = rgexp.cap(1);
+        char s = rgexp.cap(1).toAscii()[0];
 
-		if (id == "") id = "unknown";
-		
-		ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0,0);
-		ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0,1);
+        if (s == 'b') symPen.setColor( Qt::blue );
+        else if (s == 'g') symPen.setColor( Qt::green );
+        else if (s == 'r') symPen.setColor( Qt::red );
+        else if (s == 'c') symPen.setColor( Qt::cyan );
+        else if (s == 'm') symPen.setColor( Qt::magenta );
+        else if (s == 'y') symPen.setColor( Qt::yellow );
+        else if (s == 'k') symPen.setColor( Qt::black );
+        else if (s == 'w') symPen.setColor( Qt::white );
 
-		for (int i = 0; i < nrOfMarkers; ++i)
-		{
-			marker = new QwtPlotMarker();
-			marker->setSymbol(new QwtSymbol(symStyle,symBrush,symPen,symSize) );
-			marker->setValue(xCoords[i], yCoords[i]);
-			marker->attach(this);
+        s = rgexp.cap(2).toAscii()[0];
+        bool ok;
 
-			m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
-		}
+        if (s == '.') symStyle = QwtSymbol::Ellipse;
+        else if (s == 'o') symStyle = QwtSymbol::Ellipse;
+        else if (s == 's') symStyle = QwtSymbol::Rect;
+        else if (s == 'd') symStyle = QwtSymbol::Diamond;
+        else if (s == '>') symStyle = QwtSymbol::RTriangle;
+        else if (s == 'v') symStyle = QwtSymbol::DTriangle;
+        else if (s == '^') symStyle = QwtSymbol::UTriangle;
+        else if (s == '<') symStyle = QwtSymbol::LTriangle;
+        else if (s == 'x') symStyle = QwtSymbol::XCross;
+        else if (s == '*') symStyle = QwtSymbol::Star1;
+        else if (s == '+') symStyle = QwtSymbol::Cross;
+        else if (s == 'h') symStyle = QwtSymbol::Hexagon;
 
-		replot();
-	}
+        //s = rgexp.cap(3);
+        int size = rgexp.cap(3).toInt(&ok);
+        if (ok)
+        {
+            symSize = QSize(size,size);
+        }
+    }
+    else
+    {
+        retval += ito::RetVal(ito::retError,0,"The style tag does not correspond to the required format");
+    }
 
-	if (dObj) delete dObj;
 
-	return retval;
+    if (!retval.containsError())
+    {
+        //QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
+        QwtPlotMarker *marker = NULL;
+        int nrOfMarkers = dObj->getSize(1);
+
+        if (id == "") id = "unknown";
+
+        ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0,0);
+        ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0,1);
+
+        for (int i = 0; i < nrOfMarkers; ++i)
+        {
+            marker = new QwtPlotMarker();
+            marker->setSymbol(new QwtSymbol(symStyle,symBrush,symPen,symSize) );
+            marker->setValue(xCoords[i], yCoords[i]);
+            marker->attach(this);
+
+            m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
+        }
+
+        replot();
+    }
+
+    if (dObj) delete dObj;
+
+    return retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotCanvas::deleteMarkers(const QString &id)
 {
-	ito::RetVal retval;
-	bool found = false;
-	QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
-	while ( i.hasNext() )
-	{
-		i.next();
-		if (i.key() == id || id == "")
-		{
-			i.value().second->detach();
-			delete i.value().second;
-			found = true;
-			i.remove();
-		}
-	}
+    ito::RetVal retval;
+    bool found = false;
+    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
+    while ( i.hasNext() )
+    {
+        i.next();
+        if (i.key() == id || id == "")
+        {
+            i.value().second->detach();
+            delete i.value().second;
+            found = true;
+            i.remove();
+        }
+    }
 
-	if (!found && id != "")
-	{
-		retval += ito::RetVal::format(ito::retError,0,"No marker with id '%s' found.", id.toAscii().data());
-	}
-	else
-	{
-		replot();
-	}
+    if (!found && id != "")
+    {
+        retval += ito::RetVal::format(ito::retError,0,"No marker with id '%s' found.", id.toAscii().data());
+    }
+    else
+    {
+        replot();
+    }
 
     return retval;
 }
@@ -1269,13 +1273,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
     }
 
     return retval;
-
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::multiPointActivated (bool on) 
-{ 
+void PlotCanvas::multiPointActivated (bool on)
+{
     if (m_pData->m_state == tMultiPointPick)
     {
         if (!on)
@@ -1315,16 +1317,16 @@ void PlotCanvas::multiPointActivated (bool on)
 
         }
     }
-};
+}
 
 ////----------------------------------------------------------------------------------------------------------------------------------
-//void PlotCanvas::multiPointSelected (const QPolygon &polygon) 
-//{ 
-//    qDebug() << "pointSelected:" << polygon; 
+//void PlotCanvas::multiPointSelected (const QPolygon &polygon)
+//{
+//    qDebug() << "pointSelected:" << polygon;
 //};
 //
 ////----------------------------------------------------------------------------------------------------------------------------------
-//void PlotCanvas::multiPointAppended (const QPoint &pos) 
-//{ 
-//    qDebug() << "pointAppended:" << pos; 
+//void PlotCanvas::multiPointAppended (const QPoint &pos)
+//{
+//    qDebug() << "pointAppended:" << pos;
 //};

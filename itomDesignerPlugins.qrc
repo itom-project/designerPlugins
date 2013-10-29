@@ -24,6 +24,9 @@
         <file>icons/autoscal.png</file>
         <file>icons/colorbar.png</file>
         <file>icons/colorPalette.png</file>
+	<file>icons/marker.png</file>
+	<file>icons/ellipse.png</file>
+	<file>icons/rectangle.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>

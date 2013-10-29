@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2012, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
-	m_pContent(NULL),
-	m_pActSave(NULL),
+    m_pContent(NULL),
+    m_pActSave(NULL),
     m_pActHome(NULL),
     m_pActPan(NULL),
     m_pActZoom(NULL),
@@ -47,20 +47,20 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActStackCut(NULL),
     m_pActPlaneSelector(NULL),
     m_pActCmplxSwitch(NULL),
-	m_mnuCmplxSwitch(NULL),
+    m_mnuCmplxSwitch(NULL),
     m_pActCoordinates(NULL),
     m_pCoordinates(NULL),
     m_pActDrawMode(NULL),
     m_pMnuDrawMode(NULL),
     m_pDrawModeActGroup(NULL)
 {
-	m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy pass through of input source object").toAscii().data()));
 
-	int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
+    int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
-	//init actions
-	createActions();
+    //init actions
+    createActions();
 
     //init internal data
     m_data.m_dataType = ito::tFloat64;
@@ -79,35 +79,35 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_cmplxType = PlotCanvas::Real;
     m_data.m_yaxisFlipped = false;
     m_data.m_pConstOutput = &m_pOutput;
-	m_data.m_state = PlotCanvas::tIdle;
+    m_data.m_state = PlotCanvas::tIdle;
 
-	//initialize canvas
-	m_pContent = new PlotCanvas(&m_data, this);
+    //initialize canvas
+    m_pContent = new PlotCanvas(&m_data, this);
     connect(m_pContent, SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
     connect(m_pContent, SIGNAL(statusBarMessage(QString)), statusBar(), SLOT(showMessage(QString)));
     connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
     setCentralWidget(m_pContent);
 
-	//initialize actions
-	QToolBar *mainTb = new QToolBar("plotting tools",this);
-	addToolBar(mainTb, "mainToolBar");
+    //initialize actions
+    QToolBar *mainTb = new QToolBar("plotting tools",this);
+    addToolBar(mainTb, "mainToolBar");
 
-	mainTb->addAction(m_pActSave);
-	mainTb->addSeparator();
-	mainTb->addAction(m_pActHome);
-	mainTb->addAction(m_pActPan);
-	mainTb->addAction(m_pActZoom);
-	mainTb->addSeparator();
-	mainTb->addAction(m_pActScaleSettings);
-	mainTb->addAction(m_pActToggleColorBar);
-	mainTb->addAction(m_pActColorPalette);
-	mainTb->addSeparator();
-	mainTb->addAction(m_pActValuePicker);
-	mainTb->addAction(m_pActLineCut);
-	mainTb->addAction(m_pActStackCut);
+    mainTb->addAction(m_pActSave);
+    mainTb->addSeparator();
+    mainTb->addAction(m_pActHome);
+    mainTb->addAction(m_pActPan);
+    mainTb->addAction(m_pActZoom);
+    mainTb->addSeparator();
+    mainTb->addAction(m_pActScaleSettings);
+    mainTb->addAction(m_pActToggleColorBar);
+    mainTb->addAction(m_pActColorPalette);
+    mainTb->addSeparator();
+    mainTb->addAction(m_pActValuePicker);
+    mainTb->addAction(m_pActLineCut);
+    mainTb->addAction(m_pActStackCut);
     mainTb->addAction(m_pActDrawMode);
-	mainTb->addSeparator();
-	mainTb->addAction(m_pActPlaneSelector);
+    mainTb->addSeparator();
+    mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
     mainTb->addAction(m_pActCoordinates);
 }
@@ -120,28 +120,28 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
         delete m_mnuCmplxSwitch;
         m_mnuCmplxSwitch = NULL;
     }
-	m_pContent->deleteLater();
-	m_pContent = NULL;
+    m_pContent->deleteLater();
+    m_pContent = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::createActions()
 {
-	QAction *a = NULL;
-	
-	//m_actSave
+    QAction *a = NULL;
+
+    //m_actSave
     m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
 
-	//m_actHome
+    //m_actHome
     m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     a->setObjectName("actHome");
     a->setToolTip(tr("Reset original view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActHome()));
 
-	//m_actPan
+    //m_actPan
     m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
     a->setObjectName("actPan");
     a->setCheckable(true);
@@ -149,7 +149,7 @@ void Itom2dQwtPlot::createActions()
     a->setToolTip(tr("Pan axes with left mouse, zoom with right"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActPan(bool)));
 
-	//m_actZoom
+    //m_actZoom
     m_pActZoom = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
     a->setObjectName("actZoom");
     a->setCheckable(true);
@@ -174,7 +174,7 @@ void Itom2dQwtPlot::createActions()
     a->setCheckable(true);
     a->setObjectName("actShowColorBar");
     a->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
-	connect(a,SIGNAL(toggled(bool)),this,SLOT(mnuActToggleColorBar(bool)));
+    connect(a,SIGNAL(toggled(bool)),this,SLOT(mnuActToggleColorBar(bool)));
 
     //m_actMarker
     m_pActValuePicker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
@@ -198,16 +198,16 @@ void Itom2dQwtPlot::createActions()
     a->setVisible(false);
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActStackCut(bool)));
 
-	QSpinBox *planeSelector = new QSpinBox(this);
+    QSpinBox *planeSelector = new QSpinBox(this);
     planeSelector->setMinimum(0);
     planeSelector->setMaximum(0);
     planeSelector->setValue(0);
     planeSelector->setKeyboardTracking(false);
-	planeSelector->setToolTip(tr("Select image plane"));
-	QWidgetAction *wa = new QWidgetAction(this);
-	wa->setDefaultWidget(planeSelector);
-	m_pActPlaneSelector = wa;
-	wa->setObjectName("planeSelector");
+    planeSelector->setToolTip(tr("Select image plane"));
+    QWidgetAction *wa = new QWidgetAction(this);
+    wa->setDefaultWidget(planeSelector);
+    m_pActPlaneSelector = wa;
+    wa->setObjectName("planeSelector");
     wa->setVisible(false);
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
 
@@ -246,7 +246,7 @@ void Itom2dQwtPlot::createActions()
 
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
-	m_mnuCmplxSwitch = new QMenu("Complex Switch");
+    m_mnuCmplxSwitch = new QMenu("Complex Switch");
 
     QActionGroup *m_pCmplxActGroup = new QActionGroup(this);
     a = m_pCmplxActGroup->addAction(tr("Real"));
@@ -254,23 +254,23 @@ void Itom2dQwtPlot::createActions()
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
 
-	a = m_pCmplxActGroup->addAction(tr("Imag"));
+    a = m_pCmplxActGroup->addAction(tr("Imag"));
     a->setData(PlotCanvas::Imag);
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
 
-	a = m_pCmplxActGroup->addAction(tr("Abs"));
+    a = m_pCmplxActGroup->addAction(tr("Abs"));
     a->setData(PlotCanvas::Abs);
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
     a->setChecked(true);
 
-	a = m_pCmplxActGroup->addAction(tr("Pha"));
+    a = m_pCmplxActGroup->addAction(tr("Pha"));
     a->setData(PlotCanvas::Phase);
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
 
-	m_pActCmplxSwitch->setMenu(m_mnuCmplxSwitch);
+    m_pActCmplxSwitch->setMenu(m_mnuCmplxSwitch);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pCmplxActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
@@ -281,7 +281,7 @@ void Itom2dQwtPlot::createActions()
     m_pCoordinates->setObjectName("lblCoordinates");
 
     m_pActCoordinates = new QWidgetAction(this);
-	m_pActCoordinates->setDefaultWidget(m_pCoordinates);
+    m_pActCoordinates->setDefaultWidget(m_pCoordinates);
     m_pActCoordinates->setVisible(false);
 }
 
@@ -297,7 +297,7 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::colorBarVisible() const
 {
-	return m_pActToggleColorBar->isChecked();
+    return m_pActToggleColorBar->isChecked();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -446,7 +446,7 @@ void Itom2dQwtPlot::setyAxisFlipped(const bool &value)
 {
     m_data.m_yaxisFlipped = value;
 
-    if (m_pContent) 
+    if (m_pContent)
     {
         m_pContent->updateScaleValues();
         m_pContent->internalDataUpdated();
@@ -466,7 +466,7 @@ void Itom2dQwtPlot::setxAxisVisible(const bool &value)
 
     if (m_pContent) m_pContent->enableAxis(QwtPlot::xBottom, value);
 }
-    
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getyAxisVisible() const
 {
@@ -499,7 +499,7 @@ void Itom2dQwtPlot::setXAxisInterval(QPointF point)
         m_pContent->setInterval(Qt::XAxis, point);
     }
 }
-        
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF Itom2dQwtPlot::getYAxisInterval(void) const
 {
@@ -518,7 +518,7 @@ void Itom2dQwtPlot::setYAxisInterval(QPointF point)
         m_pContent->setInterval(Qt::YAxis, point);
     }
 }
-   
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF Itom2dQwtPlot::getZAxisInterval(void) const
 {
@@ -763,14 +763,14 @@ void Itom2dQwtPlot::mnuActValuePicker(bool checked)
         m_pActStackCut->setChecked(false);
         m_pActDrawMode->setChecked(false);
     }
-    
+
     m_pContent->setState(checked ? PlotCanvas::tValuePicker : PlotCanvas::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActLineCut(bool checked)
 {
-	if (checked)
+    if (checked)
     {
         m_pActZoom->setChecked(false);
         m_pActPan->setChecked(false);
@@ -778,14 +778,14 @@ void Itom2dQwtPlot::mnuActLineCut(bool checked)
         m_pActValuePicker->setChecked(false);
         m_pActDrawMode->setChecked(false);
     }
-    
+
     m_pContent->setState(checked ? PlotCanvas::tLineCut : PlotCanvas::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActStackCut(bool checked)
 {
-	if (checked)
+    if (checked)
     {
         m_pActZoom->setChecked(false);
         m_pActPan->setChecked(false);
@@ -793,7 +793,7 @@ void Itom2dQwtPlot::mnuActStackCut(bool checked)
         m_pActValuePicker->setChecked(false);
         m_pActDrawMode->setChecked(false);
     }
-    
+
     m_pContent->setState(checked ? PlotCanvas::tStackCut : PlotCanvas::tIdle);
 }
 
@@ -802,7 +802,7 @@ void Itom2dQwtPlot::mnuActPlaneSelector(int plane)
 {
     if (m_pContent) m_pContent->changePlane(plane);
 
-	QStringList paramNames;
+    QStringList paramNames;
     paramNames << "displayed";
     updateChannels(paramNames);
 }
@@ -823,7 +823,7 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
             spinBox->setValue(value);
         }
         m_pActPlaneSelector->setVisible((max-min) > 0);
-		m_pActStackCut->setVisible((max-min) > 0);
+        m_pActStackCut->setVisible((max-min) > 0);
     }
 }
 
@@ -864,11 +864,11 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
         break;
 
         case PlotCanvas::tRect:
-            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
         break;
 
         case PlotCanvas::tEllipse:
-            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
         break;
     }
     m_pContent->setState(m_pActDrawMode->isChecked() ? PlotCanvas::tDraw : PlotCanvas::tIdle);
@@ -877,7 +877,7 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuCmplxSwitch(QAction *action)
 {
-	setCmplxSwitch((PlotCanvas::ComplexType)(action->data().toInt()), true);
+    setCmplxSwitch((PlotCanvas::ComplexType)(action->data().toInt()), true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -921,7 +921,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     ito::uint32 newUniqueID = uniqueID;
     QWidget *lineCutObj = NULL;
 
-	double *pointArr = new double[2 * bounds.size()];
+    double *pointArr = new double[2 * bounds.size()];
     for (int np = 0; np < bounds.size(); np++)
     {
         pointArr[np * 2] = bounds[np].x();
@@ -936,25 +936,25 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
     if (!retval.containsError())
     {
-        
+
 
         if (uniqueID != newUniqueID)
         {
             uniqueID = newUniqueID;
             ito::AbstractDObjFigure* figure = NULL;
             if (lineCutObj->inherits("ito::AbstractDObjFigure"))
-			{
+            {
                 figure = (ito::AbstractDObjFigure*)lineCutObj;
                 m_childFigures[lineCutObj] = newUniqueID;
                 connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
-			}
+            }
             else
-			{
+            {
                 return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toAscii().data());
-			}
+            }
 
             retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-            
+
             if (zStack)
             {
                 // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
@@ -1030,13 +1030,13 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
-	return m_pContent->plotMarkers(&coords, style, id, plane);
+    return m_pContent->plotMarkers(&coords, style, id, plane);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::deleteMarkers(QString id)
 {
-	return m_pContent->deleteMarkers(id);
+    return m_pContent->deleteMarkers(id);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
