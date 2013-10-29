@@ -24,6 +24,7 @@
 #define PLOTTABLE_H
 
 #include "common/sharedStructures.h"
+#include "common/sharedStructuresPrimitives.h"
 #include "DataObject/dataobj.h"
 
 #include <qtabwidget.h>
@@ -103,6 +104,8 @@ class PlotTable : public QTabWidget
 		QMenu *m_pCmplxMenu;
 
         State m_state;
+
+        ito::PrimitiveContainer m_data;
 
     signals:
         void spawnNewChild(QVector<QPointF>);
