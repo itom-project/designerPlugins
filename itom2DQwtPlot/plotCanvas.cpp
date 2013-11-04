@@ -51,6 +51,7 @@
 #include <qpixmap.h>
 #include <qdebug.h>
 #include <qmessagebox.h>
+#include <boost/concept_check.hpp>
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -195,7 +196,6 @@ PlotCanvas::~PlotCanvas()
     m_pStackCutMarker = NULL;
 
     m_pMultiPointPicker = NULL;
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -900,7 +900,8 @@ void PlotCanvas::setState( tState state)
 
     if (m_pData->m_state != state)
     {
-        if (m_pData->m_state == tMultiPointPick && state != tIdle)
+        if ((m_pData->m_state == tMultiPointPick || m_pData->m_state == tPoint 
+            || m_pData->m_state == tLine || m_pData->m_state == tRect || m_pData->m_state == tEllipse) && state != tIdle)
         {
             return; //multiPointPick needs to go back to idle
         }
@@ -912,7 +913,8 @@ void PlotCanvas::setState( tState state)
         if (m_pStackPicker) m_pStackPicker->setEnabled( state == tStackCut );
         //if (m_pMultiPointPicker) m_pMultiPointPicker->setEnabled( state == tMultiPointPick );
 
-        if (state == tMultiPointPick || state == tIdle)
+        if (state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine 
+            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == tIdle)
         {
             if (p)
             {
@@ -924,7 +926,8 @@ void PlotCanvas::setState( tState state)
             }
         }
 
-        if (state == tZoom || state == tPan || state == tMultiPointPick ||state == tValuePicker ||state == tIdle)
+        if (state == tZoom || state == tPan || state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine 
+            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == tValuePicker || state == tIdle)
         {
             if (p)
             {
@@ -958,6 +961,13 @@ void PlotCanvas::setState( tState state)
             case tMultiPointPick:
                 canvas()->setCursor( Qt::CrossCursor );
             break;
+            
+            case tPoint:
+            case tLine:
+            case tRect:
+            case tEllipse:
+                canvas()->setCursor( Qt::CrossCursor );
+            break;            
         }
 
         m_pData->m_state = state;
@@ -1227,11 +1237,13 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
 {
     ito::RetVal retval;
 
-    if (type == 1) //multiPointPick
+    if (type == tPoint) //multiPointPick
     {
         if (start)
         {
-            setState(tMultiPointPick);
+            setState(tPoint);
+            m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);            
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 
             if (m)
@@ -1267,6 +1279,102 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             }
         }
     }
+    else if (type == tLine)
+    {
+        if (start)
+        {
+            setState(tLine);
+            m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::PolygonRubberBand);
+            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+            
+            if (m)
+            {
+                m->setMaxNrItems( 2 );
+                m_pMultiPointPicker->setEnabled(true);
+                
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+            }
+        }
+        else //start == false
+        {
+            setState(tIdle);
+            m_pMultiPointPicker->setEnabled(false);
+            
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+            
+            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
+        }        
+    }
+    else if (type == tRect)
+    {
+        if (start)
+        {
+            setState(tRect);
+            m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
+            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+            
+            if (m)
+            {
+                m->setMaxNrItems( 2 );
+                m_pMultiPointPicker->setEnabled(true);
+                
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+            }
+        }
+        else //start == false
+        {
+            setState(tIdle);
+            m_pMultiPointPicker->setEnabled(false);
+            
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+            
+            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
+        }             
+    }
+    else if (type == tEllipse)
+    {
+        if (start)
+        {
+            setState(tEllipse);
+            m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
+            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+            
+            if (m)
+            {
+                m->setMaxNrItems( 2 );
+                m_pMultiPointPicker->setEnabled(true);
+                
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+            }
+        }
+        else //start == false
+        {
+            setState(tIdle);
+            m_pMultiPointPicker->setEnabled(false);
+            
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+            
+            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
+        }          
+    }
     else
     {
         retval += ito::RetVal(ito::retError,0,"Unknown type for userInteractionStart");
@@ -1278,44 +1386,87 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::multiPointActivated (bool on)
 {
-    if (m_pData->m_state == tMultiPointPick)
+    switch(m_pData->m_state)
     {
-        if (!on)
-        {
-            QPolygon polygon = m_pMultiPointPicker->selection();
-
-            QPolygonF polygonScale;
-            bool aborted = false;
-
-            if (polygon.size() == 0)
+        case tMultiPointPick:
+            if (!on)
             {
-                emit statusBarMessage( tr("Selection has been aborted."), 2000 );
-                aborted = true;
-            }
-            else
-            {
-                QPointF pt;
-
-                for (int i = 0; i < polygon.size() - 1; ++i)
+                QPolygon polygon = m_pMultiPointPicker->selection();
+                
+                QPolygonF polygonScale;
+                bool aborted = false;
+                
+                if (polygon.size() == 0)
                 {
-                    pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-                    pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-                    polygonScale.append( pt );
+                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+                    aborted = true;
                 }
-
-                emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
-            }
-
-            Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
-            if (p)
+                else
+                {
+                    QPointF pt;
+                    
+                    for (int i = 0; i < polygon.size() - 1; ++i)
+                    {
+                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+                        polygonScale.append( pt );
+                    }
+                    
+                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+                }
+                
+                Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+                if (p)
+                {
+                    emit p->userInteractionDone(1, aborted, polygonScale);
+                }
+                
+                setState(tIdle);
+                m_pMultiPointPicker->setEnabled(false);
+            }            
+        break;
+        
+        case tPoint:
+        case tLine:
+        case tRect:
+        case tEllipse:
+            if (!on)
             {
-                emit p->userInteractionDone(1, aborted, polygonScale);
-            }
-
-            setState(tIdle);
-            m_pMultiPointPicker->setEnabled(false);
-
-        }
+                QPolygon polygon = m_pMultiPointPicker->selection();
+                
+                QPolygonF polygonScale;
+                bool aborted = false;
+                
+                if (polygon.size() == 0)
+                {
+                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+                    aborted = true;
+                }
+                else
+                {
+                    QPointF pt;
+                    
+                    for (int i = 0; i < polygon.size() - 1; ++i)
+                    {
+                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+                        polygonScale.append( pt );
+                    }
+                    
+                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+                }
+                
+                Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+                if (p)
+                {
+                    emit p->userInteractionDone(1, aborted, polygonScale);
+                }
+                
+                setState(tIdle);
+                m_pMultiPointPicker->setEnabled(false);
+            } 
+        break;
+        
     }
 }
 

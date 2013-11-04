@@ -21,6 +21,8 @@
 *********************************************************************** */
 
 #include "itom2dqwtplot.h"
+#include "userInteractionPlotPicker.h"
+#include "multiPointPickerMachine.h"
 
 #include <qwidgetaction.h>
 #include <qfiledialog.h>
@@ -30,6 +32,7 @@
 #include "dialog2DScale.h"
 #include <qwt_text_label.h>
 #include <qwt_scale_widget.h>
+#include <qwt_picker_machine.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
@@ -838,40 +841,47 @@ void Itom2dQwtPlot::mnuDrawMode(bool checked)
         m_pActStackCut->setChecked(false);
         m_pActValuePicker->setChecked(false);
     }
-    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::tIdle);
+    // we need to find out which draw mode we should activate here ...
+//    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuDrawMode(QAction *action)
 {
-    if (m_pActDrawMode->isChecked())
-    {
-        m_pActZoom->setChecked(false);
-        m_pActPan->setChecked(false);
-        m_pActLineCut->setChecked(false);
-        m_pActStackCut->setChecked(false);
-        m_pActValuePicker->setChecked(false);
-    }
+    m_pActZoom->setChecked(false);
+    m_pActPan->setChecked(false);
+    m_pActLineCut->setChecked(false);
+    m_pActStackCut->setChecked(false);
+    m_pActValuePicker->setChecked(false);
+    m_pActDrawMode->setChecked(true);
+
     switch (action->data().toInt())
     {
-        default:
+        default:        
         case PlotCanvas::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+            m_pContent->userInteractionStart(PlotCanvas::tPoint, 1, 1);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
         break;
 
         case PlotCanvas::tLine:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+            m_pContent->userInteractionStart(PlotCanvas::tLine, 1, 2);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
         break;
 
         case PlotCanvas::tRect:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
+            m_pContent->userInteractionStart(PlotCanvas::tRect, 1, 2);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
         break;
 
         case PlotCanvas::tEllipse:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
+            m_pContent->userInteractionStart(PlotCanvas::tEllipse, 1, 2);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
         break;
     }
-    m_pContent->setState(m_pActDrawMode->isChecked() ? PlotCanvas::tDraw : PlotCanvas::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -894,17 +904,17 @@ void Itom2dQwtPlot::setCmplxSwitch(PlotCanvas::ComplexType type, bool visible)
 
             switch (type)
             {
-            case PlotCanvas::Imag:
-                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
+                case PlotCanvas::Imag:
+                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
                 break;
-            case PlotCanvas::Real:
-                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
+                case PlotCanvas::Real:
+                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
                 break;
-            case PlotCanvas::Phase:
-                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
+                case PlotCanvas::Phase:
+                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
                 break;
-            case PlotCanvas::Abs:
-                m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
+                case PlotCanvas::Abs:
+                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
                 break;
             }
         }
@@ -936,8 +946,6 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
     if (!retval.containsError())
     {
-
-
         if (uniqueID != newUniqueID)
         {
             uniqueID = newUniqueID;
@@ -1050,6 +1058,8 @@ void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     m_pActDrawMode->setChecked(false);
 
     m_pContent->userInteractionStart(type, start, maxNrOfPoints);
+    m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+    m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
 
     //m_pContent->setWindowState((m_pContent->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     //m_pContent->raise(); //for MacOS

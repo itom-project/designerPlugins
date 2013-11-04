@@ -27,6 +27,7 @@
 #include "DataObject/dataobj.h"
 
 #include "dataObjItem.h"
+#include "userInteractionPlotPicker.h"
 
 
 #include <qwidget.h>
@@ -52,16 +53,15 @@ class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
 struct InternalData;
 class DataObjRasterData;
-class UserInteractionPlotPicker;
+//class UserInteractionPlotPicker;
 
 
 class PlotCanvas : public QwtPlot
 {
     Q_OBJECT
     public:
-        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut, tMultiPointPick, tDraw };
+        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut, tMultiPointPick, tPoint, tLine, tRect, tEllipse };
         enum ComplexType { Real = 2, Imag = 1, Abs = 0, Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
-        enum drawType { tPoint = 1, tLine = 2, tRect = 3, tEllipse = 4 };
 
         PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
@@ -78,8 +78,8 @@ class PlotCanvas : public QwtPlot
         QPointF getInterval(Qt::Axis axis) const;
         void setInterval(Qt::Axis axis, const QPointF &interval);
 
-		ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
-		ito::RetVal deleteMarkers(const QString &id);
+        ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
+        ito::RetVal deleteMarkers(const QString &id);
 
         friend class Itom2dQwtPlot;
 
@@ -99,33 +99,29 @@ class PlotCanvas : public QwtPlot
 
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
     
-	private:
+    private:
         QwtPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
         QwtPlotMagnifier *m_pMagnifier;
         
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
-        
         ValuePicker2D *m_pValuePicker;
-
-		QwtPlotPicker *m_pStackPicker;
+        QwtPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
-
         UserInteractionPlotPicker *m_pMultiPointPicker;
 
         QString m_colorMapName;
+        QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
 
-		QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
-
-		int m_curColorMapIndex;
-		DataObjItem *m_dObjItem;
+        int m_curColorMapIndex;
+        DataObjItem *m_dObjItem;
         DataObjRasterData *m_rasterData;
 
         ito::uint32 m_zstackCutUID;
         ito::uint32 m_lineCutUID;
 
-		InternalData *m_pData;
+        InternalData *m_pData;
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
 
         Qt::KeyboardModifiers m_activeModifiers;
@@ -139,9 +135,9 @@ class PlotCanvas : public QwtPlot
         void statusBarClear();
         void statusBarMessage(const QString &message, int timeout = 0);
 
-	private slots:
+    private slots:
         void zStackCutTrackerMoved(const QPoint &pt);
-		void zStackCutTrackerAppended(const QPoint &pt);
+        void zStackCutTrackerAppended(const QPoint &pt);
         void lineCutMoved(const QPoint &pt);
         void lineCutAppended(const QPoint &pt);
 
@@ -225,7 +221,7 @@ struct InternalData
 
     PlotCanvas::ComplexType m_cmplxType;
 
-	PlotCanvas::tState m_state;
+    PlotCanvas::tState m_state;
 
     const QHash<QString, ito::Param*> *m_pConstOutput;
 };

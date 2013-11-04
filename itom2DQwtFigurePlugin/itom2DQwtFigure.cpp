@@ -45,9 +45,9 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     m_actAScan(NULL),
     m_actForward(NULL),
     m_actBack(NULL),
-	m_actCmplxSwitch(NULL),
-	m_mnuCmplxSwitch(NULL),
-	m_lblCoordinates(NULL)
+    m_actCmplxSwitch(NULL),
+    m_mnuCmplxSwitch(NULL),
+    m_lblCoordinates(NULL)
 {
     statusBar()->showMessage("This plot is deprecated. Please replace it by itom2DQwtPlot");
 
@@ -129,12 +129,12 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
 
     //m_actCmplxSwitch
     m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"),tr("Switch Imag, Real, Abs, Pha"), this);
-	m_mnuCmplxSwitch = new QMenu("Complex Switch");
-	m_mnuCmplxSwitch->addAction(tr("Imag"));
-	m_mnuCmplxSwitch->addAction(tr("Real"));
-	m_mnuCmplxSwitch->addAction(tr("Abs"));
-	m_mnuCmplxSwitch->addAction(tr("Pha"));
-	m_actCmplxSwitch->setMenu(m_mnuCmplxSwitch);
+    m_mnuCmplxSwitch = new QMenu("Complex Switch");
+    m_mnuCmplxSwitch->addAction(tr("Imag"));
+    m_mnuCmplxSwitch->addAction(tr("Real"));
+    m_mnuCmplxSwitch->addAction(tr("Abs"));
+    m_mnuCmplxSwitch->addAction(tr("Pha"));
+    m_actCmplxSwitch->setMenu(m_mnuCmplxSwitch);
     m_actCmplxSwitch->setVisible(false);
 
     connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
@@ -150,16 +150,16 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     connect(m_actToggleColorBar, SIGNAL(toggled(bool)), this, SLOT(mnuColorBar(bool)));
     
     connect(m_actAScan, SIGNAL(toggled(bool)), this, SLOT(mnuAScanPicker(bool)));
-	connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
+    connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
     connect(m_actForward, SIGNAL(triggered()), this, SLOT(mnuForward()));
     connect(m_actBack, SIGNAL(triggered()), this, SLOT(mnuBack()));
 
     //this->menuBar()->addAction(m_actPan);
-	QToolBar *toolbar = new QToolBar(this);
-	addToolBar(toolbar, "mainToolBar");
+    QToolBar *toolbar = new QToolBar(this);
+    addToolBar(toolbar, "mainToolBar");
 
-	QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
+    QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);    
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
     contextMenu->addAction(m_actHome);
@@ -171,14 +171,14 @@ itom2DQwtFigure::itom2DQwtFigure(const QString &itomSettingsFile, AbstractFigure
     contextMenu->addSeparator();
     contextMenu->addAction(toolbar->toggleViewAction());
 
-	toolbar->addAction(m_actSave);
-	toolbar->addSeparator();
+    toolbar->addAction(m_actSave);
+    toolbar->addSeparator();
 
     // first block is zoom, scale settings, home
     toolbar->addAction(m_actHome);
     toolbar->addAction(m_actPan);
     toolbar->addAction(m_actZoomToRect);
-	toolbar->addAction(m_actScaleSetting);
+    toolbar->addAction(m_actScaleSetting);
 
     // next block get pixel-Info
     toolbar->addSeparator();
@@ -332,23 +332,23 @@ ito::RetVal itom2DQwtFigure::applyUpdate()
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> itom2DQwtFigure::getDisplayed(void)
 {
-	ito::DataObject *dObj = m_pOutput["displayed"]->getVal<ito::DataObject*>();
-	if(dObj)
-	{
-		return QSharedPointer<ito::DataObject>( new ito::DataObject(*(dObj)) );
-	}
-	return QSharedPointer<ito::DataObject>();
+    ito::DataObject *dObj = m_pOutput["displayed"]->getVal<ito::DataObject*>();
+    if(dObj)
+    {
+        return QSharedPointer<ito::DataObject>( new ito::DataObject(*(dObj)) );
+    }
+    return QSharedPointer<ito::DataObject>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> itom2DQwtFigure::getSource(void) const
 {
-	ito::DataObject *dObj = m_pInput["source"]->getVal<ito::DataObject*>();
-	if(dObj)
-	{
-		return QSharedPointer<ito::DataObject>( new ito::DataObject(*(dObj)) );
-	}
-	return QSharedPointer<ito::DataObject>();
+    ito::DataObject *dObj = m_pInput["source"]->getVal<ito::DataObject*>();
+    if(dObj)
+    {
+        return QSharedPointer<ito::DataObject>( new ito::DataObject(*(dObj)) );
+    }
+    return QSharedPointer<ito::DataObject>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -674,38 +674,38 @@ void itom2DQwtFigure::mnuColorBar(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void itom2DQwtFigure::mnuCmplxSwitch(QAction *action)
 {
-	if (m_pContent)
-	{
-		DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(m_pContent->m_pContent->data());
+    if (m_pContent)
+    {
+        DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(m_pContent->m_pContent->data());
 
-		if (action->text() == QString("Imag"))
+        if (action->text() == QString("Imag"))
         {
-			rasterData->setCmplxState(1);
+            rasterData->setCmplxState(1);
             m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
         }
-		else if (action->text() == QString("Real"))
+        else if (action->text() == QString("Real"))
         {
-			rasterData->setCmplxState(2);
+            rasterData->setCmplxState(2);
             m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
         }
-		else if (action->text() == QString("Pha"))
+        else if (action->text() == QString("Pha"))
         {
-			rasterData->setCmplxState(3);
+            rasterData->setCmplxState(3);
             m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
         }
-		else
+        else
         {
-			rasterData->setCmplxState(0);
+            rasterData->setCmplxState(0);
             m_actCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
         }
-		rasterData->setIntervalRange(Qt::ZAxis, true, 0,0);
-		((Plot2DWidget*)m_pContent)->replot();
-	}
+        rasterData->setIntervalRange(Qt::ZAxis, true, 0,0);
+        ((Plot2DWidget*)m_pContent)->replot();
+    }
 }
 
 void itom2DQwtFigure::mnuHome()
 {
-	m_pContent->m_pZoomer->zoom(0);
+    m_pContent->m_pZoomer->zoom(0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        

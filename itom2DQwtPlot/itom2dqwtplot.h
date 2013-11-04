@@ -36,7 +36,7 @@ Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
 class Itom2dQwtPlot : public ito::AbstractDObjFigure
 {
-	Q_OBJECT
+    Q_OBJECT
 
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
     Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel RESET resetxAxisLabel)
@@ -66,7 +66,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
-	~Itom2dQwtPlot();
+    ~Itom2dQwtPlot();
 
     ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack = false);
 
@@ -76,8 +76,8 @@ public:
     void setContextMenuEnabled(bool show) {}
     bool getContextMenuEnabled() const { return false; }
 
-	bool colorBarVisible() const;
-	void setColorBarVisible(bool value);
+    bool colorBarVisible() const;
+    void setColorBarVisible(bool value);
 
     QString getTitle() const;
     void setTitle(const QString &title);
@@ -133,13 +133,13 @@ public:
 protected:
     ito::RetVal init() { return m_pContent->init(); } //called when api-pointers are transmitted, directly after construction
 
-	void createActions();
+    void createActions();
 
-	//void setLinePlotCoordinates(const QVector<QPointF> pts);
+    //void setLinePlotCoordinates(const QVector<QPointF> pts);
 
 private:
 
-	PlotCanvas *m_pContent;	
+    PlotCanvas *m_pContent;	
     InternalData m_data;
 
     QAction *m_pActSave;
@@ -159,7 +159,7 @@ private:
     QWidgetAction *m_pActCoordinates;
 
     QAction* m_pActCmplxSwitch;
-	QMenu *m_mnuCmplxSwitch;
+    QMenu *m_mnuCmplxSwitch;
 
     QAction* m_pActDrawMode;
     QMenu *m_pMnuDrawMode;
@@ -187,10 +187,14 @@ private slots:
     void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
 
 public slots:
-	ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
-	ito::RetVal deleteMarkers(QString id);
-    
+    ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
+    ito::RetVal deleteMarkers(QString id);
+
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
+//    void userInteractionEndRect(const QRectF &rect);
+//    void userInteractionEndEllipse(const QRectF &rect);    
+//    void userInteractionEndPt(const QVector<QPointF> &points);
+//    void userInteractionEndLine(const QVector<QPointF> &points);    
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);
