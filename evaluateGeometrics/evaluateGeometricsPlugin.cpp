@@ -10,7 +10,7 @@ EvaluateGeometricsPlugin::EvaluateGeometricsPlugin(QObject *parent)
 {
     m_plotDataFormats = ito::Format_Float32;
     m_plotDataTypes = ito::DataObjPlane;
-    m_plotFeatures = ito::Live | ito::Static | ito::Cartesian;
+    m_plotFeatures = ito::Static | ito::Cartesian;
 
     m_description = QObject::tr("itom widget");
     m_detaildescription = QObject::tr("");
@@ -46,7 +46,7 @@ QWidget *EvaluateGeometricsPlugin::createWidgetWithMode(ito::AbstractFigure::Win
 
 QString EvaluateGeometricsPlugin::name() const
 {
-    return "EvaluateGeometricsFigure";
+    return "EvaluateGeometrics";
 }
 
 QString EvaluateGeometricsPlugin::group() const
@@ -76,7 +76,7 @@ bool EvaluateGeometricsPlugin::isContainer() const
 
 QString EvaluateGeometricsPlugin::domXml() const
 {
-    return "<widget class=\"EvaluateGeometrics\" name=\"EvaluateGeometrics\">\n"
+    return "<widget class=\"EvaluateGeometrics\" name=\"evaluateGeometrics\">\n"
         " <property name=\"geometry\">\n"
         "  <rect>\n"
         "   <x>0</x>\n"
@@ -90,7 +90,7 @@ QString EvaluateGeometricsPlugin::domXml() const
 
 QString EvaluateGeometricsPlugin::includeFile() const
 {
-    return "EvaluateGeometrics.h";
+    return "evaluateGeometrics.h";
 }
 
 Q_EXPORT_PLUGIN2(EvaluateGeometrics, EvaluateGeometricsPlugin)

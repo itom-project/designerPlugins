@@ -129,8 +129,6 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     toolbar->addAction(m_actPan);
     toolbar->addAction(m_actZoomToRect);
 
-    
-
 
     // next block is for complex and stacks
     toolbar->addSeparator();
@@ -138,11 +136,14 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     toolbar->addAction(m_actForward);
 
 
-    m_pContent = new PlotTable(contextMenu, this);
+    m_pContent = new PlotTable(contextMenu, &m_info, this);
     m_pContent->setObjectName("canvasWidget");
 
     setFocus();
     setCentralWidget(m_pContent);
+    
+    
+
     m_pContent->setFocus();
 
     m_info.m_autoAxisLabel = true;

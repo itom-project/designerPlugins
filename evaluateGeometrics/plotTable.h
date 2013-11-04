@@ -35,8 +35,12 @@
 #include <qpoint.h>
 #include <qtimer.h>
 #include <qmenu.h>
+#include <qvector.h>
+#include <qstringlist.h>
 
 class EvaluateGeomatricsFigure;
+
+static char const* primitivNames[] = {"not defined", "point", "line", "elipse", "retangle", "square", "err", "err", "err", "polygon"};
 
 struct InternalInfo
 {
@@ -50,6 +54,16 @@ struct InternalInfo
     QString titleLabel;
 };
 
+struct relationsShip
+{
+    ito::uint32 type;
+    ito::float32 firstElementIdx;
+    ito::float32 secondElementIdx;
+    ito::uint32 firstElementRow;
+    ito::uint32 secondElementRow;
+    ito::float32 extValue;
+};
+
 class PlotTable : public QTabWidget
 {
     Q_OBJECT
@@ -57,13 +71,24 @@ class PlotTable : public QTabWidget
         friend class EvaluateGeometricsFigure;
 
     public:
-        enum MultiLineMode { FirstRow, FirstCol, MultiRows, MultiCols };
         enum State { stateIdle, statePanner, stateZoomer, statePicker };
 
-        PlotTable(QMenu *contextMenu, QWidget * parent = 0);
+        PlotTable(QMenu *contextMenu, InternalInfo *data, QWidget * parent = 0);
         ~PlotTable();
 
         ito::RetVal init();
+
+        enum tMeasurementType
+        {
+            tNoType       =   0,
+            tRadius       =   1,
+            tAngle        =   2,
+            tDistance     =   3,
+            tIntersection =   4,
+            tArea         =   5,
+            tProtected    =   0x4000,
+            tExtern       =   0x8000
+        }; 
 
         bool m_showContextMenu;
         void refreshPlot(const ito::DataObject* dataObj);
@@ -90,22 +115,37 @@ class PlotTable : public QTabWidget
 
     private:
 
+        void updateRelationShips(const bool fastUpdate);
+        inline void setPrimitivElement(const int row, const bool update, const int cols, ito::float32 *val);
+
+        inline bool calculateAngle(ito::float32 *first, ito::float32 *second, ito::float32 &angle);
+        inline bool calculateDistance(ito::float32 *first, ito::float32 *second, ito::float32 &distance);
+        inline bool calculateRadius(ito::float32 *first, ito::float32 &radius);
+        inline bool calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point);
+
+        ito::RetVal m_lastRetVal;
+
         QMenu *m_contextMenu;
 
         bool m_xDirect;
         bool m_yDirect;
-        bool m_cmplxState;
 
         QWidget *m_pParent;
 
         QTableWidget * m_geometrics;
         QTableWidget * m_relations;
 
-		QMenu *m_pCmplxMenu;
+        QWidget* m_firstTab;
+        QWidget* m_secondTab;
 
         State m_state;
 
-        ito::PrimitiveContainer m_data;
+        InternalInfo *m_data;
+
+        QVector<geometricPrimitives> m_rowHash;
+        QVector<relationsShip> m_relationsList;
+
+        QStringList m_relationNames;
 
     signals:
         void spawnNewChild(QVector<QPointF>);

@@ -43,6 +43,8 @@ Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
+
+    Q_PROPERTY(QSharedPointer<ito::DataObject> data /*READ getData */ WRITE setData DESIGNABLE false);
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
@@ -63,6 +65,15 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         virtual ~EvaluateGeometricsFigure();
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
+
+        void setData(QSharedPointer<ito::DataObject> dataObj) 
+        {
+            if(m_pContent != NULL)
+            {
+                m_pContent->refreshPlot(dataObj.data());
+            }
+        };
+       // QSharedPointer<ito::DataObject> getData() const {return };
 
         //properties
         bool getContextMenuEnabled() const;

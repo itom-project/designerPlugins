@@ -24,9 +24,12 @@
         <file>icons/autoscal.png</file>
         <file>icons/colorbar.png</file>
         <file>icons/colorPalette.png</file>
-	<file>icons/marker.png</file>
-	<file>icons/ellipse.png</file>
-	<file>icons/rectangle.png</file>
+        <file>icons/marker.png</file>
+        <file>icons/ellipse.png</file>
+        <file>icons/rectangle.png</file>
+        <file>icons/circle.png</file>
+        <file>icons/square.png</file>
+        <file>icons/polygon.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>
