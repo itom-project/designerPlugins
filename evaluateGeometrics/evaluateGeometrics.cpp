@@ -106,10 +106,11 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     connect(m_actZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
     connect(m_actPan, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
 
-	QToolBar *toolbar = new QToolBar(tr("1D plot toolbar"), this);
+	QToolBar *toolbar = new QToolBar(tr("basic options"), this);
 	addToolBar(toolbar, "mainToolBar");
+    toolbar->setVisible(false);
 
-	QMenu *contextMenu = new QMenu(QObject::tr("plot1D"), this);
+	QMenu *contextMenu = new QMenu(QObject::tr("Calculate"), this);
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
     contextMenu->addAction(m_actHome);
@@ -152,13 +153,13 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 
     m_pContent->setFocus();
 
-    m_info.m_autoAxisLabel = true;
-    m_info.m_autoValueLabel = true;
-    m_info.m_autoTitle = true;
+    m_info.m_autoAxisLabel = false;
+    m_info.m_autoValueLabel = false;
+    m_info.m_autoTitle = false;
 
     m_info.m_title = "";
     m_info.m_axisLabel = "";
-    m_info.m_valueLabel = "";
+    m_info.m_valueLabel = "mm";
     m_info.titleLabel = "";
 
 }
@@ -469,3 +470,155 @@ void EvaluateGeometricsFigure::mnuHome()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+
+void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> importedData)
+{
+    int dims = 0;
+
+    if(importedData.isNull())
+    {
+        return;
+    }
+
+    if((dims = importedData->getDims()) == 0 || importedData->calcNumMats() > 1)
+    {
+        return;
+    }
+
+    int rows = importedData->getSize(dims-2);
+
+    m_info.m_relationsList.clear();
+    m_info.m_relationsList.reserve(rows);
+
+    cv::Mat * myMat = (cv::Mat*)(importedData->get_mdata()[0]);
+    ito::float32* ptr = NULL;
+
+    relationsShip newRelation;
+
+    switch(myMat->cols)
+    {
+        case 1:
+            for(int i = 0; i < myMat->rows; i ++)
+            {
+                ptr = myMat->ptr<ito::float32>(i);
+                newRelation.type = (ito::uint32)ptr[0];
+                newRelation.firstElementIdx = -1;
+                newRelation.secondElementIdx = -1;
+                newRelation.extValue = 0.0;
+                m_info.m_relationsList.append(newRelation);
+            }
+        break;
+
+        case 2:
+            for(int i = 0; i < myMat->rows; i ++)
+            {
+                ptr = myMat->ptr<ito::float32>(i);
+                newRelation.type = (ito::uint32)ptr[0];
+                newRelation.firstElementIdx = (ito::int32)ptr[1];
+                newRelation.secondElementIdx = -1;
+                newRelation.extValue = 0.0;
+                m_info.m_relationsList.append(newRelation);
+            }
+
+        break;
+
+
+        case 3:
+            for(int i = 0; i < myMat->rows; i ++)
+            {
+                ptr = myMat->ptr<ito::float32>(i);
+                newRelation.type = (ito::uint32)ptr[0];
+                newRelation.firstElementIdx = (ito::int32)ptr[1];
+                newRelation.secondElementIdx = (ito::int32)ptr[2];
+                newRelation.extValue = 0.0;
+                m_info.m_relationsList.append(newRelation);
+            }
+        break;
+
+        default:
+        case 4:
+            for(int i = 0; i < myMat->rows; i ++)
+            {
+                ptr = myMat->ptr<ito::float32>(i);
+                newRelation.type = (ito::uint32)ptr[0];
+                newRelation.firstElementIdx = (ito::int32)ptr[1];
+                newRelation.secondElementIdx = (ito::int32)ptr[2];
+                newRelation.extValue = (ito::float32)ptr[3];
+                m_info.m_relationsList.append(newRelation);
+            }
+        break;
+    }
+
+    if(m_pContent)
+    {
+        m_pContent->updateRelationShips(false);
+    }
+
+    return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+
+QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) const
+{
+    if(m_info.m_relationsList.size() == 0)
+    {
+        return QSharedPointer<ito::DataObject>(new ito::DataObject());
+    }
+
+    QSharedPointer<ito::DataObject> exportedData(new ito::DataObject(4, m_info.m_relationsList.size(), ito::tFloat32));
+
+    cv::Mat * myMat = (cv::Mat*)(exportedData->get_mdata()[0]);
+    ito::float32* ptr = NULL;
+    for(int i = 0; i < m_info.m_relationsList.size(); i ++)
+    {
+        ptr = myMat->ptr<ito::float32>(i);
+        ptr[0] = (ito::float32)m_info.m_relationsList[i].type;
+        ptr[1] = (ito::float32)m_info.m_relationsList[i].firstElementIdx;
+        ptr[2] = (ito::float32)m_info.m_relationsList[i].secondElementIdx;
+        ptr[3] = (ito::float32)m_info.m_relationsList[i].extValue;
+    }
+
+    return exportedData;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+
+void EvaluateGeometricsFigure::addRelation(const QVector<ito::float32> relation)
+{
+    relationsShip newRelation;
+            
+    newRelation.secondElementRow = -1;
+    newRelation.firstElementRow = -1;
+
+    switch(relation.size())
+    {
+        case 4:
+        default:
+            newRelation.extValue = (ito::int32)(relation[3]);
+        case 3:
+            newRelation.secondElementIdx = (ito::int32)(relation[2]);
+        case 2:
+
+            newRelation.firstElementIdx = (ito::int32)(relation[1]);
+        case 1:
+            newRelation.type = (ito::int32)(relation[0]);
+        break;
+        case 0:
+            newRelation.type = 0;
+            newRelation.firstElementIdx = -1.0;
+            newRelation.secondElementIdx  = -1.0;
+            newRelation.extValue  = 0.0;
+            break;
+    }
+
+            
+
+    m_info.m_relationsList.append(newRelation);
+
+    if(m_pContent)
+    {
+        m_pContent->updateRelationShips(false);
+    }
+    return;
+}

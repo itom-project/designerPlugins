@@ -76,6 +76,7 @@ PlotTable::PlotTable(QMenu *contextMenu, InternalInfo *data, QWidget * parent) :
 
 
     m_geometrics->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_relations->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 }
 
@@ -113,8 +114,12 @@ inline void PlotTable::setPrimitivElement(const int row, const bool update, cons
 
     if(!update)
     {
-        m_geometrics->setCellWidget(row, 0, new QLabel(QString::number((ito::uint32)(val[0])), m_geometrics, 0));
-        m_geometrics->setCellWidget(row, 1, new QLabel("", m_geometrics, 0));
+        QLabel* firstElement  = new QLabel(QString::number((ito::uint32)(val[0])), m_geometrics, 0);
+        firstElement->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+
+        QLabel* secondElement = new QLabel("", m_geometrics, 0);
+        m_geometrics->setCellWidget(row, 0, firstElement);
+        m_geometrics->setCellWidget(row, 1, secondElement);
        
 
         switch (((ito::uint32)(val[1])) & 0x0000FFFF)
@@ -564,7 +569,80 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
         
         for(int i = 0; i < m_relations->rowCount(); i++)
         {
-            QWidget* test = m_relations->cellWidget(i, 0);
+            QLabel* test = (QLabel*)(m_relations->cellWidget(i, 0));
+            int idx = m_data->m_relationsList[i].type & 0x0FFF;
+            idx = idx < m_data->m_relationNames.length() ? idx : 0;
+
+            if(test)
+            {
+                test->setText(m_data->m_relationNames[idx]);
+
+            }
+            else
+            {
+                test = new QLabel(m_data->m_relationNames[idx], m_relations, 0);
+                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+            }
+
+            idx = m_data->m_relationsList[i].firstElementIdx;
+            int idx2 = m_data->m_relationsList[i].secondElementIdx;
+
+            int firstType  = 0;
+            int secondType = 0;
+
+            m_data->m_relationsList[i].firstElementRow = -1;
+            m_data->m_relationsList[i].secondElementRow = -1;
+
+            for(int k = 0; k < this->m_rowHash.size(); k++)
+            {
+                if(idx ==  (ito::int32)m_rowHash[k].cells[0])
+                {
+                    m_data->m_relationsList[i].firstElementRow = k;
+                    firstType = (ito::int32)(m_rowHash[k].cells[1]) & 0x0000FFFF;
+                }
+
+                if(idx2 ==  (ito::int32)m_rowHash[k].cells[0])
+                {
+                    m_data->m_relationsList[i].secondElementRow = k;
+                    secondType = (ito::int32)(m_rowHash[k].cells[1]) & 0x0000FFFF;
+                }
+            }
+
+            firstType = firstType < 10 ? firstType : 0;
+            secondType = secondType < 10 ? secondType : 0;
+
+            test = (QLabel*)(m_relations->cellWidget(i, 1));
+            if(test)
+            {
+                if(idx2 > - 1) test->setText(QString(primitivNames[firstType]).append(QString::number(idx)));
+                else test->setText(QString(primitivNames[firstType]));
+            }
+            else
+            {
+                if(idx2 > - 1) test = new QLabel(QString(primitivNames[firstType]).append(QString::number(idx)), m_relations, 0);
+                else test = new QLabel(QString(primitivNames[firstType]), m_relations, 0);
+                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+            }
+
+            test = (QLabel*)(m_relations->cellWidget(i, 2));
+            if(test)
+            {
+                if(idx2 > - 1) test->setText(QString(primitivNames[secondType]).append(QString::number(idx2)));
+                else test->setText(QString(primitivNames[secondType]));
+            }
+            else
+            {
+                if(idx2 > - 1) test = new QLabel(QString(primitivNames[secondType]).append(QString::number(idx2)), m_relations, 0);
+                else test = new QLabel(QString(primitivNames[secondType]), m_relations, 0);
+                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+            }
+
+            test = (QLabel*)(m_relations->cellWidget(i, 3));
+            if(!test)
+            {
+                test = new QLabel("", m_relations, 0);
+                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+            }
         }
 
     }

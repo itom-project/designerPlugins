@@ -40,13 +40,13 @@
 
 class EvaluateGeomatricsFigure;
 
-static char const* primitivNames[] = {"not defined", "point", "line", "elipse", "retangle", "square", "err", "err", "err", "polygon"};
+static char const* primitivNames[] = {"none", "point", "line", "elipse", "retangle", "square", "err", "err", "err", "polygon"};
 
 struct relationsShip
 {
-    ito::int32 type;
-    ito::float32 firstElementIdx;
-    ito::float32 secondElementIdx;
+    ito::uint32 type;
+    ito::int32 firstElementIdx;
+    ito::int32 secondElementIdx;
     ito::int32 firstElementRow;
     ito::int32 secondElementRow;
     ito::float32 extValue;

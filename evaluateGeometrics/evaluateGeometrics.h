@@ -145,55 +145,11 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         }
 
 
-        void setRelations(QSharedPointer<ito::DataObject> relations)
-        {
-            if(m_pContent)
-            {
-                m_pContent->updateRelationShips(false);
-            }
-            return;
-        }
+        void setRelations(QSharedPointer<ito::DataObject> relations);
 
         QSharedPointer<ito::DataObject> getRelations(void) const;
 
-        void addRelation(const QVector<ito::float32> relation)
-        {
-            relationsShip newRelation;
-            
-            newRelation.secondElementRow = -1;
-            newRelation.firstElementRow = -1;
-
-            switch(relation.size())
-            {
-                case 4:
-                default:
-                    newRelation.extValue = (ito::int32)(relation[3]);
-                case 3:
-                    newRelation.secondElementIdx = (ito::int32)(relation[2]);
-                case 2:
-
-                    newRelation.firstElementIdx = (ito::int32)(relation[1]);
-                case 1:
-                    newRelation.type = (ito::int32)(relation[0]);
-                break;
-                case 0:
-                    newRelation.type = 0;
-                    newRelation.firstElementIdx = -1.0;
-                    newRelation.secondElementIdx  = -1.0;
-                    newRelation.extValue  = 0.0;
-                    break;
-            }
-
-            
-
-            m_info.m_relationsList.append(newRelation);
-
-            if(m_pContent)
-            {
-                m_pContent->updateRelationShips(false);
-            }
-            return;
-        }
+        void addRelation(const QVector<ito::float32> importedData);
 
         void clearRelation(const bool apply)
         {
