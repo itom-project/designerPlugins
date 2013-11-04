@@ -85,9 +85,9 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
         case QEvent::Wheel:
         {
             if ( state() != 0 )
-			{
+            {
                 cmdList += Move;
-			}
+            }
             break;
         }
         case QEvent::KeyPress:

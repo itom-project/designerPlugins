@@ -31,6 +31,7 @@
 #include <qaction.h>
 #include <qwidgetaction.h>
 #include <qspinbox.h>
+#include <qwt_plot_shapeitem.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 

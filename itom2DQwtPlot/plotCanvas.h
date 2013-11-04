@@ -47,6 +47,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_magnifier.h>
+#include <qwt_plot_shapeitem.h>
 #include <qcolor.h>
 
 class Itom2dQwtPlot; //forward declaration
@@ -224,6 +225,7 @@ struct InternalData
     PlotCanvas::tState m_state;
 
     const QHash<QString, ito::Param*> *m_pConstOutput;
+    QVector<QwtPlotShapeItem *> m_pDrawItems;
 };
 
 
