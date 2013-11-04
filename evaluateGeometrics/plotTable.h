@@ -40,7 +40,7 @@
 
 class EvaluateGeomatricsFigure;
 
-static char const* primitivNames[] = {"none", "point", "line", "elipse", "retangle", "square", "err", "err", "err", "polygon"};
+static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "retangle", "square", "err", "err", "polygon"};
 
 struct relationsShip
 {
@@ -86,7 +86,8 @@ class PlotTable : public QTabWidget
             tAngle        =   2,
             tDistance     =   3,
             tIntersection =   4,
-            tArea         =   5,
+            tLength       =   5,
+            tArea         =   6,
             tProtected    =   0x4000,
             tExtern       =   0x8000
         }; 
@@ -122,12 +123,13 @@ class PlotTable : public QTabWidget
     private:
 
         void updateRelationShips(const bool fastUpdate);
-        inline void setPrimitivElement(const int row, const bool update, const int cols, ito::float32 *val);
+        void setPrimitivElement(const int row, const bool update, const int cols, ito::float32 *val);
 
-        inline bool calculateAngle(ito::float32 *first, ito::float32 *second, ito::float32 &angle);
-        inline bool calculateDistance(ito::float32 *first, ito::float32 *second, ito::float32 &distance);
-        inline bool calculateRadius(ito::float32 *first, ito::float32 &radius);
-        inline bool calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point);
+        bool calculateAngle(ito::float32 *first, ito::float32 *second, ito::float32 &angle);
+        bool calculateDistance(ito::float32 *first, ito::float32 *second, ito::float32 &distance);
+        bool calculateRadius(ito::float32 *first, ito::float32 &radius);
+        bool calculateLength(ito::float32 *first, ito::float32 &length);
+        bool calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point);
 
         ito::RetVal m_lastRetVal;
 

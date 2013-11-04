@@ -142,6 +142,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_info.m_relationNames.append("angle");
     m_info.m_relationNames.append("distance");
     m_info.m_relationNames.append("intersection point");
+    m_info.m_relationNames.append("length");
     m_info.m_relationNames.append("area");
 
 

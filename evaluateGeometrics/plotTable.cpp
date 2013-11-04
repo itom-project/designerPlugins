@@ -107,7 +107,7 @@ ito::RetVal PlotTable::init()
 //}
 
 //----------------------------------------------------------------------------------------------------------------------------------
-inline void PlotTable::setPrimitivElement(const int row, const bool update, const int cols, ito::float32 *val)
+void PlotTable::setPrimitivElement(const int row, const bool update, const int cols, ito::float32 *val)
 {
     int neededCols = 0;
     int colsToFill = cols;
@@ -573,16 +573,13 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             int idx = m_data->m_relationsList[i].type & 0x0FFF;
             idx = idx < m_data->m_relationNames.length() ? idx : 0;
 
-            if(test)
+            if(!test)
             {
-                test->setText(m_data->m_relationNames[idx]);
-
-            }
-            else
-            {
-                test = new QLabel(m_data->m_relationNames[idx], m_relations, 0);
+                m_relations->setCellWidget(i, 0, new QLabel("", m_relations, 0));
+                test = (QLabel*)(m_relations->cellWidget(i, 0));
                 test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
             }
+            test->setText(m_data->m_relationNames[idx]);
 
             idx = m_data->m_relationsList[i].firstElementIdx;
             int idx2 = m_data->m_relationsList[i].secondElementIdx;
@@ -612,50 +609,57 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             secondType = secondType < 10 ? secondType : 0;
 
             test = (QLabel*)(m_relations->cellWidget(i, 1));
-            if(test)
+            if(!test)
             {
-                if(idx2 > - 1) test->setText(QString(primitivNames[firstType]).append(QString::number(idx)));
-                else test->setText(QString(primitivNames[firstType]));
-            }
-            else
-            {
-                if(idx2 > - 1) test = new QLabel(QString(primitivNames[firstType]).append(QString::number(idx)), m_relations, 0);
-                else test = new QLabel(QString(primitivNames[firstType]), m_relations, 0);
+                m_relations->setCellWidget(i, 1, new QLabel("", m_relations, 0));
+                test = (QLabel*)(m_relations->cellWidget(i, 1));
                 test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
             }
 
+            if(idx > - 1) test->setText(QString(primitivNames[firstType]).append(QString::number(idx)));
+            else test->setText(QString(primitivNames[firstType]));
+
             test = (QLabel*)(m_relations->cellWidget(i, 2));
-            if(test)
+            if(!test)
             {
-                if(idx2 > - 1) test->setText(QString(primitivNames[secondType]).append(QString::number(idx2)));
-                else test->setText(QString(primitivNames[secondType]));
-            }
-            else
-            {
-                if(idx2 > - 1) test = new QLabel(QString(primitivNames[secondType]).append(QString::number(idx2)), m_relations, 0);
-                else test = new QLabel(QString(primitivNames[secondType]), m_relations, 0);
+                m_relations->setCellWidget(i, 2, new QLabel("", m_relations, 0));
+                test = (QLabel*)(m_relations->cellWidget(i, 2));
                 test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
             }
+            if(idx2 > - 1) test->setText(QString(primitivNames[secondType]).append(QString::number(idx2)));
+            else test->setText(QString(primitivNames[secondType]));
+
 
             test = (QLabel*)(m_relations->cellWidget(i, 3));
             if(!test)
             {
-                test = new QLabel("", m_relations, 0);
-                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+                m_relations->setCellWidget(i, 3, new QLabel("", m_relations, 0));
+
+                test = (QLabel*)(m_relations->cellWidget(i, 3));
+                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);
             }
         }
 
     }
+
+    QString resultString("");
+    resultString.reserve(50);
 
     for(int i = 0; i < m_data->m_relationsList.size(); i++)
     {
         ito::float32* first;
         ito::float32* second;
         bool check;
+        
+        QLabel* resultLabel = (QLabel*)(m_relations->cellWidget(i, 3));
+
+        resultString = "NaN";
 
         if(m_data->m_relationsList[i].type & tExtern)
         {
-            ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_data->m_relationsList[i].extValue);
+            resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
+            
+            resultLabel->setText(resultString);
             continue;
         }
         else if(m_data->m_relationsList[i].firstElementRow > -1)
@@ -664,13 +668,14 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
         }
         else
         {
+            resultLabel->setText(resultString);
             continue;
         }
 
         if(m_data->m_relationsList[i].type == tRadius)
         {
             check = calculateRadius(first, m_data->m_relationsList[i].extValue);
-            ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_data->m_relationsList[i].extValue);
+            resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
         }
         else
         {
@@ -682,26 +687,50 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
                 {
                 case tAngle:
                     check = calculateAngle(first, second, m_data->m_relationsList[i].extValue);
+                    resultString = QString("%1°").arg(QString::number(m_data->m_relationsList[i].extValue));
                     break;
                 case tDistance:
                     check = calculateDistance(first, second, m_data->m_relationsList[i].extValue);
+                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
                     break;
+                case tIntersection:
+                {
+                    cv::Vec3f val;
+                    check = calculateIntersections(first, second, val);
+                    resultString = QString("%1,%2,%3 [%4]").arg(QString::number(val[0])).arg(QString::number(val[1])).arg(QString::number(val[2])).arg(m_data->m_valueLabel);
+                    break;
+                }
+                case tLength:
+                {
+                    check = calculateLength(first, m_data->m_relationsList[i].extValue);
+                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
+                    break;
+                }
+                case tArea:
+                    //check = calculateArea(first, m_data->m_relationsList[i].extValue);
+                    //resultString = QString("%1%2²").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
+                    //break;
                 default:
+                    resultLabel->setText(resultString);
                     continue;
                 }
-                ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_data->m_relationsList[i].extValue);
+                
             }
             else
             {
+                resultLabel->setText(resultString);
                 continue;
             }
         }
+
+        
+        resultLabel->setText(resultString);
 
     }
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-inline bool PlotTable::calculateAngle(ito::float32 *first, ito::float32 *second, ito::float32 &angle)
+bool PlotTable::calculateAngle(ito::float32 *first, ito::float32 *second, ito::float32 &angle)
 {
     if(((ito::uint32)(first[1]) & 0x0000FFFF )!= ito::PrimitiveContainer::tLine && ((ito::uint32)(first[1]) & 0x0000FFFF)!= ito::PrimitiveContainer::tPolygon)
     {
@@ -714,13 +743,13 @@ inline bool PlotTable::calculateAngle(ito::float32 *first, ito::float32 *second,
         return false;
     }
     cv::Vec3f firstVector(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
-    cv::Vec3f secondVector(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
+    cv::Vec3f secondVector(second[5] - second[2], second[6] - second[3], second[7] - second[4]);
 
     ito::float32 abs = (sqrt(pow(firstVector[0],2) + pow(firstVector[1],2) + pow(firstVector[2],2)) * sqrt(pow(secondVector[0],2) + pow(secondVector[1],2) + pow(secondVector[2],2)));
 
     if(ito::dObjHelper::isNotZero(abs))
     {
-        angle = firstVector.dot(secondVector) / abs;
+        angle = acos(firstVector.dot(secondVector) / abs) * 180 / 3.14159265358979323846;
         return true;    
     }
     angle = std::numeric_limits<ito::float32>::signaling_NaN();
@@ -728,13 +757,23 @@ inline bool PlotTable::calculateAngle(ito::float32 *first, ito::float32 *second,
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-inline bool PlotTable::calculateDistance(ito::float32 *first, ito::float32 *second, ito::float32 &distance)
+bool PlotTable::calculateDistance(ito::float32 *first, ito::float32 *second, ito::float32 &distance)
 {
     cv::Vec3f lineDirVector;
     cv::Vec3f linePosVector;
     cv::Vec3f pointDirVector;
     cv::Vec3f pointPosVector;
 
+    // distance of two points or two circles or combination
+    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tPoint || ((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle &&
+       ((ito::uint32)(second[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tPoint || ((ito::uint32)(second[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
+    {
+        pointPosVector = cv::Vec3f(first[2] - second[2], first[3] - second[3], first[4] - second[4]);
+        distance = sqrt( pow(pointPosVector[0],2) + pow(pointPosVector[1],2) + pow(pointPosVector[2],2) );
+        return true;
+    }
+
+    // distance of line to points or circles
     if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tLine && ((ito::uint32)(second[1]) & 0x0000FFFF ) != ito::PrimitiveContainer::tLine && ((ito::uint32)(second[1]) & 0x0000FFFF ) != ito::PrimitiveContainer::tRetangle)
     {
         lineDirVector = cv::Vec3f(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
@@ -768,7 +807,7 @@ inline bool PlotTable::calculateDistance(ito::float32 *first, ito::float32 *seco
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-inline bool PlotTable::calculateRadius(ito::float32 *first, ito::float32 &radius)
+bool PlotTable::calculateRadius(ito::float32 *first, ito::float32 &radius)
 {
     if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
     {
@@ -783,9 +822,21 @@ inline bool PlotTable::calculateRadius(ito::float32 *first, ito::float32 &radius
     radius = std::numeric_limits<ito::float32>::signaling_NaN();
     return false;
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
-inline bool PlotTable::calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point)
+bool PlotTable::calculateLength(ito::float32 *first, ito::float32 &length)
+{
+    if(((ito::uint32)(first[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine)
+    {
+        length = std::numeric_limits<ito::float32>::signaling_NaN();
+        return false;
+    }
+
+    length = sqrt(pow(first[2] - first[5], 2)  + pow(first[3] - first[6], 2) + pow(first[4] - first[7], 2));
+
+    return true;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+bool PlotTable::calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point)
 {
 
     if(((ito::uint32)(first[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine || ((ito::uint32)(second[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine)
@@ -819,7 +870,9 @@ inline bool PlotTable::calculateIntersections(ito::float32 *first, ito::float32 
     ito::float32 kappa  = 0.0;
 
     // Vectors are the same we have to check if the positions vectors are on the same line
-    if( ito::dObjHelper::isNotZero(firstLineDirVector.dot(secondLineDirVector))) 
+    if( ito::dObjHelper::isNotZero(firstLineDirVector[0] - secondLineDirVector[0]) &&
+        ito::dObjHelper::isNotZero(firstLineDirVector[1] - secondLineDirVector[1]) &&
+        ito::dObjHelper::isNotZero(firstLineDirVector[2] - secondLineDirVector[2])) 
     {
         secondLinePosVector -= firstLinePosVector;
         lambda = secondLinePosVector[0] / firstLinePosVector[0];

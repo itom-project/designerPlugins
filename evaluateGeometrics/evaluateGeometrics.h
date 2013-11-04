@@ -52,6 +52,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
+    Q_PROPERTY(QVector<QPointF> appendRelations /*READ getBounds*/ WRITE setBounds DESIGNABLE false)
+    Q_PROPERTY(QSharedPointer<ito::DataObject> relations READ getRelations WRITE setRelations DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
