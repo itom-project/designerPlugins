@@ -42,6 +42,16 @@ class EvaluateGeomatricsFigure;
 
 static char const* primitivNames[] = {"not defined", "point", "line", "elipse", "retangle", "square", "err", "err", "err", "polygon"};
 
+struct relationsShip
+{
+    ito::int32 type;
+    ito::float32 firstElementIdx;
+    ito::float32 secondElementIdx;
+    ito::int32 firstElementRow;
+    ito::int32 secondElementRow;
+    ito::float32 extValue;
+};
+
 struct InternalInfo
 {
     bool m_autoTitle;
@@ -50,18 +60,9 @@ struct InternalInfo
     QString m_axisLabel;
     bool m_autoValueLabel;
     QString m_valueLabel;
-
     QString titleLabel;
-};
-
-struct relationsShip
-{
-    ito::uint32 type;
-    ito::float32 firstElementIdx;
-    ito::float32 secondElementIdx;
-    ito::uint32 firstElementRow;
-    ito::uint32 secondElementRow;
-    ito::float32 extValue;
+    QStringList m_relationNames;
+    QVector<relationsShip> m_relationsList;
 };
 
 class PlotTable : public QTabWidget
@@ -98,6 +99,11 @@ class PlotTable : public QTabWidget
         void setZoomerEnable(const bool checked);
         void setPickerEnable(const bool checked);
         void setPannerEnable(const bool checked);
+
+        void setRelations(QSharedPointer<ito::DataObject> relations);
+        QSharedPointer<ito::DataObject> getRelations(void) const;
+        void addRelation(const QVector<QPointF> relation);
+        void clearRelation(const bool apply);
 
     protected:
         /*
@@ -143,9 +149,6 @@ class PlotTable : public QTabWidget
         InternalInfo *m_data;
 
         QVector<geometricPrimitives> m_rowHash;
-        QVector<relationsShip> m_relationsList;
-
-        QStringList m_relationNames;
 
     signals:
         void spawnNewChild(QVector<QPointF>);

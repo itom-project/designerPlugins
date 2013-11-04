@@ -135,14 +135,20 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     toolbar->addAction(m_actBack);
     toolbar->addAction(m_actForward);
 
+    m_info.m_relationNames.clear();
+    m_info.m_relationNames.append("N.A.");
+    m_info.m_relationNames.append("radius");
+    m_info.m_relationNames.append("angle");
+    m_info.m_relationNames.append("distance");
+    m_info.m_relationNames.append("intersection point");
+    m_info.m_relationNames.append("area");
+
 
     m_pContent = new PlotTable(contextMenu, &m_info, this);
     m_pContent->setObjectName("canvasWidget");
 
     setFocus();
     setCentralWidget(m_pContent);
-    
-    
 
     m_pContent->setFocus();
 

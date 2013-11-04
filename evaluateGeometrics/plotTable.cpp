@@ -77,16 +77,6 @@ PlotTable::PlotTable(QMenu *contextMenu, InternalInfo *data, QWidget * parent) :
 
     m_geometrics->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    m_relationNames.clear();
-    m_relationNames.append("N.A.");
-    m_relationNames.append("radius");
-    m_relationNames.append("angle");
-    m_relationNames.append("distance");
-    m_relationNames.append("intersection point");
-    m_relationNames.append("area");
-
-    m_relationsList.clear();
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -560,15 +550,15 @@ inline void PlotTable::setPrimitivElement(const int row, const bool update, cons
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::updateRelationShips(const bool fastUpdate)
 {
-    if(m_relationsList.size() == m_relations->rowCount() && fastUpdate)
+    if(m_data->m_relationsList.size() == m_relations->rowCount() && fastUpdate)
     {
         // do nothing!!
     }
     else
     {
-        if(m_relationsList.size() != m_relations->rowCount())
+        if(m_data->m_relationsList.size() != m_relations->rowCount())
         {
-            m_relations->setRowCount(m_relationsList.size());
+            m_relations->setRowCount(m_data->m_relationsList.size());
         }
         
         
@@ -579,49 +569,49 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
 
     }
 
-    for(int i = 0; i < m_relationsList.size(); i++)
+    for(int i = 0; i < m_data->m_relationsList.size(); i++)
     {
         ito::float32* first;
         ito::float32* second;
         bool check;
 
-        if(m_relationsList[i].type & tExtern)
+        if(m_data->m_relationsList[i].type & tExtern)
         {
-            ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_relationsList[i].extValue);
+            ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_data->m_relationsList[i].extValue);
             continue;
         }
-        else if(m_relationsList[i].firstElementRow > -1)
+        else if(m_data->m_relationsList[i].firstElementRow > -1)
         {
-            first = m_rowHash[m_relationsList[i].firstElementRow].cells;
+            first = m_rowHash[m_data->m_relationsList[i].firstElementRow].cells;
         }
         else
         {
             continue;
         }
 
-        if(m_relationsList[i].type == tRadius)
+        if(m_data->m_relationsList[i].type == tRadius)
         {
-            check = calculateRadius(first, m_relationsList[i].extValue);
-            ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_relationsList[i].extValue);
+            check = calculateRadius(first, m_data->m_relationsList[i].extValue);
+            ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_data->m_relationsList[i].extValue);
         }
         else
         {
-            if(m_relationsList[i].secondElementRow > -1)
+            if(m_data->m_relationsList[i].secondElementRow > -1)
             {
-                second = m_rowHash[m_relationsList[i].secondElementRow].cells;
+                second = m_rowHash[m_data->m_relationsList[i].secondElementRow].cells;
 
-                switch(m_relationsList[i].type & 0x0FFF)
+                switch(m_data->m_relationsList[i].type & 0x0FFF)
                 {
                 case tAngle:
-                    check = calculateAngle(first, second, m_relationsList[i].extValue);
+                    check = calculateAngle(first, second, m_data->m_relationsList[i].extValue);
                     break;
                 case tDistance:
-                    check = calculateDistance(first, second, m_relationsList[i].extValue);
+                    check = calculateDistance(first, second, m_data->m_relationsList[i].extValue);
                     break;
                 default:
                     continue;
                 }
-                ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_relationsList[i].extValue);
+                ((QDoubleSpinBox*)(m_relations->cellWidget(i, 3)))->setValue(m_data->m_relationsList[i].extValue);
             }
             else
             {
@@ -919,7 +909,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
             memcpy(m_rowHash[dcnt].cells, srcPtr, sizeof(ito::float32) * cols);
             setPrimitivElement(dcnt, true, cols, m_rowHash[dcnt].cells);
         }
-        
+        updateRelationShips(true);
     }
     else if(changed)
     {
@@ -935,10 +925,12 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
         {
             setPrimitivElement(dcnt, false, cols, m_rowHash[dcnt].cells);
         }
+
+        updateRelationShips(false);
     }
     else
     {
-    
+        updateRelationShips(true);
     }
 
 }

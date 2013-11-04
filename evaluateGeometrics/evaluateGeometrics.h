@@ -44,7 +44,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
-    Q_PROPERTY(QSharedPointer<ito::DataObject> data /*READ getData */ WRITE setData DESIGNABLE false);
+    //Q_PROPERTY(QSharedPointer<ito::DataObject> data /*READ getData */ WRITE setData DESIGNABLE false);
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
@@ -107,6 +107,98 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         QFont getAxisFont(void) const;
         void setAxisFont(const QFont &font);
+
+        QStringList getRelationNames(void) const 
+        {
+            return m_info.m_relationNames;
+        }
+
+        void setRelationNames(const QStringList input)
+        {
+            if(input.size() < 7)
+            {
+                return;
+            }
+
+            if(m_info.m_relationNames.length() < input.size())
+            {
+                m_info.m_relationNames.reserve(input.length());
+            }
+
+            for( int i = 6; i < input.length(); i++)
+            {
+                if(m_info.m_relationNames.length() > i)
+                {
+                    m_info.m_relationNames[i] = input[i];
+                }
+                else
+                {
+                    m_info.m_relationNames.append(input[i]);
+                }
+            }
+
+            while(m_info.m_relationNames.length() > input.size())
+            {
+                m_info.m_relationNames.removeLast();
+            }
+            return;
+        }
+
+
+        void setRelations(QSharedPointer<ito::DataObject> relations)
+        {
+            if(m_pContent)
+            {
+                m_pContent->updateRelationShips(false);
+            }
+            return;
+        }
+
+        QSharedPointer<ito::DataObject> getRelations(void) const;
+
+        void addRelation(const QVector<ito::float32> relation)
+        {
+            relationsShip newRelation;
+            
+            newRelation.secondElementRow = -1;
+            newRelation.firstElementRow = -1;
+
+            switch(relation.size())
+            {
+                case 4:
+                default:
+                    newRelation.extValue = (ito::int32)(relation[3]);
+                case 3:
+                    newRelation.secondElementIdx = (ito::int32)(relation[2]);
+                case 2:
+
+                    newRelation.firstElementIdx = (ito::int32)(relation[1]);
+                case 1:
+                    newRelation.type = (ito::int32)(relation[0]);
+                break;
+                case 0:
+                    newRelation.type = 0;
+                    newRelation.firstElementIdx = -1.0;
+                    newRelation.secondElementIdx  = -1.0;
+                    newRelation.extValue  = 0.0;
+                    break;
+            }
+
+            
+
+            m_info.m_relationsList.append(newRelation);
+
+            if(m_pContent)
+            {
+                m_pContent->updateRelationShips(false);
+            }
+            return;
+        }
+
+        void clearRelation(const bool apply)
+        {
+            m_info.m_relationsList.clear();
+        }
 
         void setSource(QSharedPointer<ito::DataObject> source);
     
