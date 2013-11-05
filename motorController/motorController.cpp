@@ -908,6 +908,7 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
         if (locker.getSemaphore()->returnValue.containsError())
         {
             ready = false;
+            std::cout << locker.getSemaphore()->returnValue.errorMessage() << "\n";
         }   
     }
 
