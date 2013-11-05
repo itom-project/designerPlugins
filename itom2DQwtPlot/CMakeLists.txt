@@ -89,12 +89,13 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.h
-	${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.h
-	${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.h
-	${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/drawItem.h
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
@@ -120,11 +121,12 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotplugin.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/drawItem.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
