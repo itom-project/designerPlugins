@@ -25,7 +25,7 @@
 
 #include "plot/AbstractDObjFigure.h"
 
-#include "plotTable.h"
+#include "plotTreeWidget.h"
 
 #include <qgridlayout.h>
 #include <qstyle.h>
@@ -52,7 +52,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
-    Q_PROPERTY(QVector<QPointF> appendRelations /*READ getBounds*/ WRITE setBounds DESIGNABLE false)
+    Q_PROPERTY(QSharedPointer<ito::DataObject> appendRelation READ readLastRelation WRITE addRelation DESIGNABLE false)
     Q_PROPERTY(QSharedPointer<ito::DataObject> relations READ getRelations WRITE setRelations DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -151,7 +151,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         QSharedPointer<ito::DataObject> getRelations(void) const;
 
-        void addRelation(const QVector<ito::float32> importedData);
+        QSharedPointer<ito::DataObject> readLastRelation(void) {return QSharedPointer<ito::DataObject>(new ito::DataObject());}
+        void addRelation(QSharedPointer<ito::DataObject> importedData);
 
         void clearRelation(const bool apply)
         {
@@ -163,7 +164,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     protected:
         ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
-        PlotTable *m_pContent;
+        PlotTreeWidget *m_pContent;
 
     private:
 

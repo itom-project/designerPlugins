@@ -52,7 +52,6 @@ INCLUDE_DIRECTORIES(
     ${OpenCV_DIR}/include
     ${ITOM_SDK_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
-    ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
 )
 
 LINK_DIRECTORIES(
@@ -75,7 +74,7 @@ set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/plotTable.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/plotTreeWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
@@ -89,6 +88,7 @@ QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
 
 set(designer_rcc
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.qrc
 )
 
 set(designer_SOURCES 
@@ -101,7 +101,7 @@ set(designer_SOURCES
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometrics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/plotTable.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/plotTreeWidget.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
@@ -120,7 +120,7 @@ file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} qwtsrc) #glu32 opengl32 qwtsrc)
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} )
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)

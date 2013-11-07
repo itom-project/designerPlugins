@@ -138,15 +138,15 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 
     m_info.m_relationNames.clear();
     m_info.m_relationNames.append("N.A.");
-    m_info.m_relationNames.append("radius");
-    m_info.m_relationNames.append("angle");
-    m_info.m_relationNames.append("distance");
-    m_info.m_relationNames.append("intersection point");
-    m_info.m_relationNames.append("length");
-    m_info.m_relationNames.append("area");
+    m_info.m_relationNames.append(tr("radius (own)"));
+    m_info.m_relationNames.append(tr("angle to"));
+    m_info.m_relationNames.append(tr("distance to"));
+    m_info.m_relationNames.append(tr("intersection with"));
+    m_info.m_relationNames.append(tr("length (own)"));
+    m_info.m_relationNames.append(tr("area"));
 
 
-    m_pContent = new PlotTable(contextMenu, &m_info, this);
+    m_pContent = new PlotTreeWidget(contextMenu, &m_info, this);
     m_pContent->setObjectName("canvasWidget");
 
     setFocus();
@@ -495,6 +495,10 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
     ito::float32* ptr = NULL;
 
     relationsShip newRelation;
+    newRelation.secondElementRow = -1;
+    newRelation.firstElementRow = -1;
+    newRelation.myWidget = NULL;
+
 
     switch(myMat->cols)
     {
@@ -502,8 +506,8 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
             for(int i = 0; i < myMat->rows; i ++)
             {
                 ptr = myMat->ptr<ito::float32>(i);
-                newRelation.type = (ito::uint32)ptr[0];
-                newRelation.firstElementIdx = -1;
+                newRelation.firstElementIdx = (ito::uint32)ptr[0];
+                newRelation.type = 0;
                 newRelation.secondElementIdx = -1;
                 newRelation.extValue = 0.0;
                 m_info.m_relationsList.append(newRelation);
@@ -514,8 +518,8 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
             for(int i = 0; i < myMat->rows; i ++)
             {
                 ptr = myMat->ptr<ito::float32>(i);
-                newRelation.type = (ito::uint32)ptr[0];
-                newRelation.firstElementIdx = (ito::int32)ptr[1];
+                newRelation.firstElementIdx = (ito::int32)ptr[0];
+                newRelation.type = (ito::uint32)ptr[1];
                 newRelation.secondElementIdx = -1;
                 newRelation.extValue = 0.0;
                 m_info.m_relationsList.append(newRelation);
@@ -528,8 +532,8 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
             for(int i = 0; i < myMat->rows; i ++)
             {
                 ptr = myMat->ptr<ito::float32>(i);
-                newRelation.type = (ito::uint32)ptr[0];
-                newRelation.firstElementIdx = (ito::int32)ptr[1];
+                newRelation.firstElementIdx = (ito::int32)ptr[0];
+                newRelation.type = (ito::uint32)ptr[1];
                 newRelation.secondElementIdx = (ito::int32)ptr[2];
                 newRelation.extValue = 0.0;
                 m_info.m_relationsList.append(newRelation);
@@ -541,8 +545,8 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
             for(int i = 0; i < myMat->rows; i ++)
             {
                 ptr = myMat->ptr<ito::float32>(i);
-                newRelation.type = (ito::uint32)ptr[0];
-                newRelation.firstElementIdx = (ito::int32)ptr[1];
+                newRelation.firstElementIdx = (ito::int32)ptr[0];
+                newRelation.type = (ito::uint32)ptr[1];
                 newRelation.secondElementIdx = (ito::int32)ptr[2];
                 newRelation.extValue = (ito::float32)ptr[3];
                 m_info.m_relationsList.append(newRelation);
@@ -574,8 +578,8 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) con
     for(int i = 0; i < m_info.m_relationsList.size(); i ++)
     {
         ptr = myMat->ptr<ito::float32>(i);
-        ptr[0] = (ito::float32)m_info.m_relationsList[i].type;
-        ptr[1] = (ito::float32)m_info.m_relationsList[i].firstElementIdx;
+        ptr[0] = (ito::float32)m_info.m_relationsList[i].firstElementIdx;
+        ptr[1] = (ito::float32)m_info.m_relationsList[i].type; 
         ptr[2] = (ito::float32)m_info.m_relationsList[i].secondElementIdx;
         ptr[3] = (ito::float32)m_info.m_relationsList[i].extValue;
     }
@@ -585,25 +589,36 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) con
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
-void EvaluateGeometricsFigure::addRelation(const QVector<ito::float32> relation)
+void EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relation)
 {
     relationsShip newRelation;
             
+
+    if(relation.isNull() || relation->getDims() != 2 || relation->getSize(0) != 1 || (relation->getType() != ito::tFloat32 && relation->getType() != ito::tFloat64))
+    {
+        return;
+    }
+
     newRelation.secondElementRow = -1;
     newRelation.firstElementRow = -1;
 
-    switch(relation.size())
+    newRelation.myWidget = NULL;
+
+    switch(relation->getSize(1))
     {
         case 4:
         default:
-            newRelation.extValue = (ito::int32)(relation[3]);
+            if(relation->getType() == ito::tFloat32) newRelation.extValue = (ito::int32)(relation->at<ito::float32>(0,3));
+            else newRelation.extValue = (ito::int32)(relation->at<ito::float64>(0,3));
         case 3:
-            newRelation.secondElementIdx = (ito::int32)(relation[2]);
+            if(relation->getType() == ito::tFloat32) newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float32>(0,2));
+            else newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float64>(0,2));
         case 2:
-
-            newRelation.firstElementIdx = (ito::int32)(relation[1]);
+            if(relation->getType() == ito::tFloat32) newRelation.type = (ito::int32)(relation->at<ito::float32>(0,1));
+            else newRelation.type = (ito::int32)(relation->at<ito::float64>(0,1));
         case 1:
-            newRelation.type = (ito::int32)(relation[0]);
+            if(relation->getType() == ito::tFloat32) newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float32>(0,0));
+            else newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float64>(0,0));
         break;
         case 0:
             newRelation.type = 0;

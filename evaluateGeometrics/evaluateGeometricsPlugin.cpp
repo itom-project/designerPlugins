@@ -46,7 +46,7 @@ QWidget *EvaluateGeometricsPlugin::createWidgetWithMode(ito::AbstractFigure::Win
 
 QString EvaluateGeometricsPlugin::name() const
 {
-    return "EvaluateGeometrics";
+    return "EvaluateGeometricsFigure";
 }
 
 QString EvaluateGeometricsPlugin::group() const
@@ -76,7 +76,7 @@ bool EvaluateGeometricsPlugin::isContainer() const
 
 QString EvaluateGeometricsPlugin::domXml() const
 {
-    return "<widget class=\"EvaluateGeometrics\" name=\"evaluateGeometrics\">\n"
+    return "<widget class=\"EvaluateGeometricsFigure\" name=\"EvaluateGeometricsFigure\">\n"
         " <property name=\"geometry\">\n"
         "  <rect>\n"
         "   <x>0</x>\n"
@@ -93,4 +93,4 @@ QString EvaluateGeometricsPlugin::includeFile() const
     return "evaluateGeometrics.h";
 }
 
-Q_EXPORT_PLUGIN2(EvaluateGeometrics, EvaluateGeometricsPlugin)
+Q_EXPORT_PLUGIN2(EvaluateGeometricsFigure, EvaluateGeometricsPlugin)

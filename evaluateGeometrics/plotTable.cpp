@@ -577,7 +577,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             {
                 m_relations->setCellWidget(i, 0, new QLabel("", m_relations, 0));
                 test = (QLabel*)(m_relations->cellWidget(i, 0));
-                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);               
             }
             test->setText(m_data->m_relationNames[idx]);
 
@@ -613,7 +613,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             {
                 m_relations->setCellWidget(i, 1, new QLabel("", m_relations, 0));
                 test = (QLabel*)(m_relations->cellWidget(i, 1));
-                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);               
             }
 
             if(idx > - 1) test->setText(QString(primitivNames[firstType]).append(QString::number(idx)));
@@ -624,7 +624,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             {
                 m_relations->setCellWidget(i, 2, new QLabel("", m_relations, 0));
                 test = (QLabel*)(m_relations->cellWidget(i, 2));
-                test->setAlignment(Qt::AlignRight | Qt::AlignCenter);               
+                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);               
             }
             if(idx2 > - 1) test->setText(QString(primitivNames[secondType]).append(QString::number(idx2)));
             else test->setText(QString(primitivNames[secondType]));
@@ -687,17 +687,17 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
                 {
                 case tAngle:
                     check = calculateAngle(first, second, m_data->m_relationsList[i].extValue);
-                    resultString = QString("%1°").arg(QString::number(m_data->m_relationsList[i].extValue));
+                    resultString = QString("%1 %2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(QChar(248));
                     break;
                 case tDistance:
                     check = calculateDistance(first, second, m_data->m_relationsList[i].extValue);
-                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
+                    resultString = QString("%1 %2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
                     break;
                 case tIntersection:
                 {
                     cv::Vec3f val;
                     check = calculateIntersections(first, second, val);
-                    resultString = QString("%1,%2,%3 [%4]").arg(QString::number(val[0])).arg(QString::number(val[1])).arg(QString::number(val[2])).arg(m_data->m_valueLabel);
+                    resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0])).arg(QString::number(val[1])).arg(QString::number(val[2])).arg(m_data->m_valueLabel);
                     break;
                 }
                 case tLength:
