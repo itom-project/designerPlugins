@@ -378,7 +378,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
             src[8*i+5] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
             src[8*i+6] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
             src[8*i+7] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 3];
-    
+
             src[8*i]   = (m_currentPalette[paletteSize - i - 1])  & 0x000000FF;
             src[8*i+1] = ((m_currentPalette[paletteSize - i - 1]) & 0x0000FF00) >> 8;
             src[8*i+2] = ((m_currentPalette[paletteSize - i - 1]) & 0x00FF0000) >> 16;
@@ -412,7 +412,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
     m_pContent = QSharedPointer<ito::DataObject>(new ito::DataObject());
     m_pContent->ones(3,3,ito::tFloat32);
-    
+
     refreshPlot(NULL);
 
 }
@@ -1046,7 +1046,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
         else // PAINT_TRIANG
         {
             m_pColTriangles = static_cast<GLubyte *>(calloc(xsizeObj * ysizeObj * 2 * 12, sizeof(GLubyte)));
-            m_pColIndices = static_cast<unsigned char *>(calloc(xsizeObj * ysizeObj * 2, sizeof(unsigned char)));
+            m_pColIndices = static_cast<unsigned char *>(calloc(xsizeObj * ysizeObj * 2 * 3, sizeof(unsigned char)));
 
             m_pTriangles = static_cast<GLfloat *>(calloc(xsizeObj * ysizeObj * 2 * 9, sizeof(GLfloat)));
             m_pNormales = static_cast<GLfloat *>(calloc(xsizeObj * ysizeObj * 2 * 9, sizeof(GLfloat)));
@@ -1120,6 +1120,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
 
                     dpixel2 = ptrScaledTopo[cntX + 1];
 
+
                     dpixel3 = ptrScaledTopo[cntX];
 
                     if(ito::dObjHelper::isFinite<ito::float64>(dpixel1) && ito::dObjHelper::isFinite<ito::float64>(dpixel2) && ito::dObjHelper::isFinite<ito::float64>(dpixel2))
@@ -1159,7 +1160,9 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                         m_pNormales[count*9+7] = m_pNormales[count*9+4] = m_pNormales[count*9+1] = (Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2]);
                         m_pNormales[count*9+8] = m_pNormales[count*9+5] = m_pNormales[count*9+2] = (Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0]);
 
-                        m_pColIndices[count] = cv::saturate_cast<unsigned char>(color*255.0);
+                        m_pColIndices[count * 3] = cv::saturate_cast<unsigned char>(dpixel1 * 255.0);
+                        m_pColIndices[count * 3 + 1] = cv::saturate_cast<unsigned char>(dpixel2 * 255.0);
+                        m_pColIndices[count * 3 + 2] = cv::saturate_cast<unsigned char>(dpixel3 * 255.0);
 
                         m_NumElements++;
                         count++;
@@ -1207,27 +1210,10 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                         m_pNormales[count*9+7] = m_pNormales[count*9+4] = m_pNormales[count*9+1] = Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2];
                         m_pNormales[count*9+8] = m_pNormales[count*9+5] = m_pNormales[count*9+2] = Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0];
 
-                        if (color != 0)
-                        {
-                            m_pColIndices[count] = cv::saturate_cast<unsigned char>(color*255.0);
-                        }
-                        else
-                        {
-                            m_pColTriangles[count*12] = 0;
-                            m_pColTriangles[count*12+1] = 0;
-                            m_pColTriangles[count*12+2] = 1;
-                            m_pColTriangles[count*12+3] = 1.0;
+                        m_pColIndices[count * 3] = cv::saturate_cast<unsigned char>(dpixel1 * 255.0);
+                        m_pColIndices[count * 3 + 1] = cv::saturate_cast<unsigned char>(dpixel2 * 255.0);
+                        m_pColIndices[count * 3 + 2] = cv::saturate_cast<unsigned char>(dpixel3 * 255.0);
 
-                            m_pColTriangles[count*12+4] = 0;
-                            m_pColTriangles[count*12+5] = 0;
-                            m_pColTriangles[count*12+6] = 1;
-                            m_pColTriangles[count*12+7] = 1.0;
-
-                            m_pColTriangles[count*12+8] = 0;
-                            m_pColTriangles[count*12+9] = 0;
-                            m_pColTriangles[count*12+10] = 1;
-                            m_pColTriangles[count*12+11] = 1.0;
-                        }
                         m_NumElements++;
                         count++;
                     }
@@ -1271,15 +1257,16 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     }
     else
     {
-        m_pColIndices = static_cast<unsigned char *>(realloc(m_pColIndices, m_NumElements*sizeof(unsigned char)));
 
         if(m_elementMode == PAINT_POINTS)
         {
+            m_pColIndices = static_cast<unsigned char *>(realloc(m_pColIndices, m_NumElements*sizeof(unsigned char)));
             m_pPoints = static_cast<GLfloat *>(realloc(m_pPoints, m_NumElements*3*sizeof(GLfloat)));
             m_pColTriangles = static_cast<GLubyte *>(realloc(m_pColTriangles, m_NumElements*4*sizeof(GLubyte)));
         }
         else
         {
+            m_pColIndices = static_cast<unsigned char *>(realloc(m_pColIndices, m_NumElements * 3 * sizeof(unsigned char)));
             m_pTriangles = static_cast<GLfloat *>(realloc(m_pTriangles, m_NumElements*9*sizeof(GLfloat)));
             m_pColTriangles = static_cast<GLubyte *>(realloc(m_pColTriangles, m_NumElements*12*sizeof(GLubyte)));
             m_pNormales = static_cast<GLfloat *>(realloc(m_pNormales, m_NumElements*9*sizeof(GLfloat)));
@@ -1744,9 +1731,15 @@ ito::RetVal plotGLWidget::ResetColors()
         {
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColTriangles[count*12+8] = m_pColTriangles[count*12+4] = m_pColTriangles[count*12] = ((m_currentPalette[m_pColIndices[count]]&0xFF0000L)>>16);
-                m_pColTriangles[count*12+9] = m_pColTriangles[count*12+5] = m_pColTriangles[count*12+1] = ((m_currentPalette[m_pColIndices[count]]&0x00FF00L)>>8);
-                m_pColTriangles[count*12+10] = m_pColTriangles[count*12+6] = m_pColTriangles[count*12+2] = ((m_currentPalette[m_pColIndices[count]]&0x0000FFL));
+                m_pColTriangles[count*12+8] = ((m_currentPalette[m_pColIndices[count * 3]]&0xFF0000L)>>16);
+                m_pColTriangles[count*12+4] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0xFF0000L)>>16);
+                m_pColTriangles[count*12] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0xFF0000L)>>16);
+                m_pColTriangles[count*12+9] = ((m_currentPalette[m_pColIndices[count * 3]]&0x00FF00L)>>8);
+                m_pColTriangles[count*12+5] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0x00FF00L)>>8);
+                m_pColTriangles[count*12+1] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x00FF00L)>>8);
+                m_pColTriangles[count*12+10] = ((m_currentPalette[m_pColIndices[count * 3]]&0x0000FFL));
+                m_pColTriangles[count*12+6] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0x0000FFL));
+                m_pColTriangles[count*12+2] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x0000FFL));
                 m_pColTriangles[count*12+11] = m_pColTriangles[count*12+7] = m_pColTriangles[count*12+3] = 255;
             }
         }
@@ -1754,9 +1747,15 @@ ito::RetVal plotGLWidget::ResetColors()
         {
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColIndices[count*12+8] = m_pColIndices[count*12+4] = m_pColIndices[count*12] = m_pColIndices[count];
-                m_pColIndices[count*12+9] = m_pColIndices[count*12+5] = m_pColIndices[count*12+1] = m_pColIndices[count];
-                m_pColIndices[count*12+10] = m_pColIndices[count*12+6] = m_pColIndices[count*12+2] = m_pColIndices[count];
+                m_pColIndices[count*12+8] = m_pColIndices[count * 3];
+                m_pColIndices[count*12+4] = m_pColIndices[count * 3 + 1];
+                m_pColIndices[count*12] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count*12+9] = m_pColIndices[count * 3];
+                m_pColIndices[count*12+5] = m_pColIndices[count * 3 + 1];
+                m_pColIndices[count*12+1] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count*12+10] = m_pColIndices[count * 3];
+                m_pColIndices[count*12+6] = m_pColIndices[count * 3 + 1];
+                m_pColIndices[count*12+2] = m_pColIndices[count * 3 + 2];
 
                 m_pColIndices[count*12+11] = m_pColIndices[count*12+7] = m_pColIndices[count*12+3] = 255;
             }
