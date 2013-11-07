@@ -321,13 +321,11 @@ void EvaluateGeometricsFigure::mnuExport()
 
     fileName = QFileDialog::getSaveFileName(this, tr("select destination file"), m_lastFolder, "*.csv");
                 
-    
-
     if (m_pContent && !fileName.isEmpty())
     {
         QFileInfo exportFile = fileName; 
         m_lastFolder = exportFile.path();
-        m_pContent->writeToCSV(exportFile.filePath(), exportMode);
+        m_pContent->writeToCSV(exportFile, exportMode);
     }
 }
 
