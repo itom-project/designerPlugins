@@ -27,6 +27,7 @@
 
 #include <qmessagebox.h>
 #include <qsharedpointer.h>
+#include <qfiledialog.h>
 
 using namespace ito;
 
@@ -35,23 +36,12 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actScaleSetting(NULL),
-    m_rescaleParent(NULL),
-    m_actForward(NULL),
-    m_actBack(NULL),
-	m_actHome(NULL),
 	m_actSave(NULL),
-    m_actPan(NULL),
-    m_actZoomToRect(NULL),
-    m_actMarker(NULL)
+    m_lastFolder("")
 {
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
     
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
-
-	//m_actHome
-    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
-    m_actHome->setObjectName("actHome");
-    m_actHome->setToolTip(tr("Reset original view"));
 
 	//m_actSave
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
@@ -63,78 +53,26 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actScaleSetting->setObjectName("actScaleSetting");
     m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
 
-    //m_rescaleParent
-    m_rescaleParent = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"), tr("Parent Scale Settings"), this);
-    m_rescaleParent->setObjectName("rescaleParent");
-    m_rescaleParent->setToolTip(tr("Set the value-range of the parent view according to this plot"));
-    m_rescaleParent->setVisible(false);
 
-    //m_actForward
-    m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
-    m_actForward->setObjectName("actionForward");
-    m_actForward->setEnabled(false);
-    m_actForward->setToolTip(tr("Forward to next line"));
-
-    //m_actBack
-    m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
-    m_actBack->setObjectName("actionBack");
-    m_actBack->setEnabled(false);
-    m_actBack->setToolTip(tr("Back to previous line"));
-
-    //m_actPan
-    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
-    m_actPan->setObjectName("actionPan");
-    m_actPan->setCheckable(true);
-    m_actPan->setChecked(false);
-    m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
-
-    //m_actZoomToRect
-    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
-    m_actZoomToRect->setObjectName("actionZoomToRect");
-    m_actZoomToRect->setCheckable(true);
-    m_actZoomToRect->setChecked(false);
-    m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
-
-
-    connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
     connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
     
     connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
-    connect(m_rescaleParent, SIGNAL(triggered()), this, SLOT(mnuParentScaleSetting()));
 
-    connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
-    connect(m_actZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
-    connect(m_actPan, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
 
 	QToolBar *toolbar = new QToolBar(tr("basic options"), this);
 	addToolBar(toolbar, "mainToolBar");
-    toolbar->setVisible(false);
 
 	QMenu *contextMenu = new QMenu(QObject::tr("Calculate"), this);
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
-    contextMenu->addAction(m_actHome);
     contextMenu->addAction(m_actScaleSetting);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_actPan);
-    contextMenu->addAction(m_actZoomToRect);
     contextMenu->addSeparator();
     contextMenu->addAction(toolbar->toggleViewAction());
 
     // first block is zoom, scale settings, home
 	toolbar->addAction(m_actSave);
 	toolbar->addSeparator();
-	toolbar->addAction(m_actHome);
     toolbar->addAction(m_actScaleSetting);
-    toolbar->addAction(m_rescaleParent);
-    toolbar->addAction(m_actPan);
-    toolbar->addAction(m_actZoomToRect);
-
-
-    // next block is for complex and stacks
-    toolbar->addSeparator();
-    toolbar->addAction(m_actBack);
-    toolbar->addAction(m_actForward);
 
     m_info.m_relationNames.clear();
     m_info.m_relationNames.append("N.A.");
@@ -144,7 +82,6 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_info.m_relationNames.append(tr("intersection with"));
     m_info.m_relationNames.append(tr("length (own)"));
     m_info.m_relationNames.append(tr("area"));
-
 
     m_pContent = new PlotTreeWidget(contextMenu, &m_info, this);
     m_pContent->setObjectName("canvasWidget");
@@ -173,7 +110,7 @@ EvaluateGeometricsFigure::~EvaluateGeometricsFigure()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal EvaluateGeometricsFigure::applyUpdate()
 {
-    QVector<QPointF> bounds = getBounds();
+    //QVector<QPointF> bounds = getBounds();
 
     if ((ito::DataObject*)m_pInput["source"]->getVal<void*>())
     {
@@ -181,8 +118,6 @@ ito::RetVal EvaluateGeometricsFigure::applyUpdate()
         // why "source" is used here and not "displayed" .... ck 05/15/2013
         m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>());
 
-        ito::Channel* dataChannel = getInputChannel("source");
-        m_rescaleParent->setVisible(dataChannel && dataChannel->getParent());
     }
 
     return ito::retOk;
@@ -206,7 +141,7 @@ void EvaluateGeometricsFigure::setContextMenuEnabled(bool show)
 {
     if (m_pContent) (m_pContent)->m_showContextMenu = show;
 }
-
+/*
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::setBounds(QVector<QPointF> bounds) 
 { 
@@ -223,7 +158,7 @@ QVector<QPointF> EvaluateGeometricsFigure::getBounds(void)
     val[3] = QPointF(1.0, 1.0);
     return val;
 }
-
+*/
 //----------------------------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsFigure::getTitle() const
 {
@@ -378,69 +313,28 @@ void EvaluateGeometricsFigure::setAxisFont(const QFont &font)
     }
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::mnuPanner(bool checked)
-{
-    if (checked)
-    {
-        m_actZoomToRect->setChecked(false);
-        m_actMarker->setChecked(false);
-        //(m_pContent)->setMouseTracking(true);
-        m_pContent->setPannerEnable(true);
-    }
-    else
-    {
-        m_pContent->setPannerEnable(false);
-        //(m_pContent)->setMouseTracking(false);
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::mnuZoomer(bool checked)
-{
-    if (checked)
-    {
-        m_actMarker->setChecked(false);
-        m_actPan->setChecked(false);
-        //(m_pContent)->setMouseTracking(true);
-        m_pContent->setZoomerEnable(true);
-    }
-    else
-    {
-        m_pContent->setZoomerEnable(false);
-        //(m_pContent)->setMouseTracking(false);
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::mnuMarkerClick(bool checked)
-{
-    if (checked)
-    {
-        m_actPan->setChecked(false);
-        m_actZoomToRect->setChecked(false);
-    }
-    
-    m_pContent->setPickerEnable(checked);
-}
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuExport()
 {
+    bool exportMode = false;
+    QString fileName = 0;
 
+    fileName = QFileDialog::getSaveFileName(this, tr("select destination file"), m_lastFolder, "*.csv");
+                
+    
+
+    if (m_pContent && !fileName.isEmpty())
+    {
+        QFileInfo exportFile = fileName; 
+        m_lastFolder = exportFile.path();
+        m_pContent->writeToCSV(exportFile.filePath(), exportMode);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuScaleSetting()
 {
 
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::mnuParentScaleSetting()
-{
-   
 }
 
 

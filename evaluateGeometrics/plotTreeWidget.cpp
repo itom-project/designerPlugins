@@ -30,6 +30,7 @@
 #include <qmessagebox.h>
 #include <QDoubleSpinBox>
 #include <qlayout.h>
+#include <qfile.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -775,6 +776,77 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
         updateRelationShips(true);
     }
 
+}
+ito::RetVal PlotTreeWidget::writeToCSV(const QFileInfo &fileName, const bool asTable)
+{
+    if(fileName.exists() && !fileName.isWritable())
+    {
+        return ito::RetVal(ito::retError, 0, tr("could not write csv-data to file %1").arg(fileName.fileName()).toAscii().data());
+    }
+
+    QFile saveFile(fileName.filePath());
+
+    saveFile.open(QIODevice::OpenModeFlag::WriteOnly | QIODevice::OpenModeFlag::Text);
+
+    QByteArray outBuffer;
+    outBuffer.reserve(200);
+
+    for(int geo = 0; geo < topLevelItemCount(); geo++)
+    {
+        outBuffer.clear();
+        QTreeWidgetItem *curItem = topLevelItem(geo);
+        for(int col = 0; col < this->columnCount() -1; col++)
+        {
+            outBuffer.append(curItem->text(col));
+            outBuffer.append(',');
+        }
+        outBuffer.append(curItem->text(curItem->columnCount() -1));
+        outBuffer.append('\n');
+
+        saveFile.write(outBuffer);
+
+        int relCount = curItem->childCount();
+
+        if(asTable)
+        {
+
+            for(int rel = 0; rel < relCount; rel ++)
+            {
+                outBuffer.clear();
+                outBuffer.append(curItem->text(0));
+                outBuffer.append(',');
+                for(int col = 0; col < this->columnCount() -1; col++)
+                {
+                    outBuffer.append(curItem->child(rel)->text(col));
+                    outBuffer.append(',');
+                }
+                outBuffer.append(curItem->child(rel)->text(curItem->child(rel)->columnCount() -1));
+                outBuffer.append('\n');
+
+                saveFile.write(outBuffer);
+            }
+        }
+        else
+        {
+            for(int rel = 0; rel < relCount; rel ++)
+            {
+                outBuffer.clear();
+                for(int col = 0; col < this->columnCount() -1; col++)
+                {
+                    outBuffer.append(curItem->child(rel)->text(col));
+                    outBuffer.append(',');
+                }
+                outBuffer.append(curItem->child(rel)->text(curItem->child(rel)->columnCount() -1));
+                outBuffer.append('\n');
+
+                saveFile.write(outBuffer);
+            }
+        }
+    }
+
+    saveFile.close();
+
+    return ito::retOk;
 }
 /*
 //----------------------------------------------------------------------------------------------------------------------------------

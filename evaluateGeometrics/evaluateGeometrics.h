@@ -45,7 +45,6 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_OBJECT
 
     //Q_PROPERTY(QSharedPointer<ito::DataObject> data /*READ getData */ WRITE setData DESIGNABLE false);
-    Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
@@ -54,6 +53,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
     Q_PROPERTY(QSharedPointer<ito::DataObject> appendRelation READ readLastRelation WRITE addRelation DESIGNABLE false)
     Q_PROPERTY(QSharedPointer<ito::DataObject> relations READ getRelations WRITE setRelations DESIGNABLE false)
+    Q_PROPERTY(QString destinationFolder READ getDestinationFolder WRITE setDestinationFolder DESIGNABLE true)
+    
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -81,8 +82,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         bool getContextMenuEnabled() const;
         void setContextMenuEnabled(bool show); 
 
-        QVector<QPointF> getBounds(void);
-        void setBounds(QVector<QPointF> bounds);
+        //QVector<QPointF> getBounds(void);
+        //void setBounds(QVector<QPointF> bounds);
 
         void enableComplexGUI(const bool checked);
 
@@ -159,6 +160,9 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
             m_info.m_relationsList.clear();
         }
 
+        void setDestinationFolder(const QString folder) {m_lastFolder = folder;}
+        QString getDestinationFolder() const {return m_lastFolder;};
+
         void setSource(QSharedPointer<ito::DataObject> source);
     
     protected:
@@ -171,24 +175,12 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         InternalInfo m_info;
 
         QAction* m_actScaleSetting;
-        QAction* m_rescaleParent;
-
-        QAction  *m_actPan;
-        QAction  *m_actZoomToRect;
-        QAction  *m_actMarker;
 
 		QAction *m_actSave;
-		QAction *m_actHome;
-
-        QAction *m_actForward;
-        QAction *m_actBack;
+        QString m_lastFolder;
 
     public slots:
-        void mnuMarkerClick(bool checked);
-        void mnuPanner(bool checked);
         void mnuScaleSetting();
-        void mnuParentScaleSetting();
-        void mnuZoomer(bool checked);
         void mnuExport();
         
     private slots:

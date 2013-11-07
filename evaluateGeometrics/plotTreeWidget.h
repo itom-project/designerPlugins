@@ -38,6 +38,9 @@
 #include <qvector.h>
 #include <qstringlist.h>
 
+#include <qfileinfo.h>
+
+
 class EvaluateGeomatricsFigure;
 
 static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "retangle", "square", "err", "err", "polygon"};
@@ -132,6 +135,8 @@ class PlotTreeWidget : public QTreeWidget
         bool calculateLength(ito::float32 *first, ito::float32 &length);
         bool calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point);
 
+        ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);
+
         ito::RetVal m_lastRetVal;
 
         QMenu *m_contextMenu;
@@ -152,6 +157,8 @@ class PlotTreeWidget : public QTreeWidget
         void updateChildren(QVector<QPointF>);
 
     public slots:
+
+        
         //void replot();
 
 };
