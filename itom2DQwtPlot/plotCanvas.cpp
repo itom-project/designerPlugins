@@ -31,6 +31,7 @@
 #include "valuePicker2d.h"
 #include "multiPointPickerMachine.h"
 #include "userInteractionPlotPicker.h"
+#include "drawItem.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -60,7 +61,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_pZoomer(NULL),
         m_pPanner(NULL),
         m_pLineCutPicker(NULL),
-        m_pStackCutMarker(NULL),
+//        m_pStackCut(NULL),
         m_dObjItem(NULL),
         m_rasterData(NULL),
         m_pData(m_pData),
@@ -1500,9 +1501,11 @@ void PlotCanvas::multiPointActivated (bool on)
                     emit p->userInteractionDone(1, aborted, polygonScale);
                 }
 
-                QwtPlotShapeItem *newItem = NULL;
                 QPainterPath *path = new QPainterPath();
-                newItem = new QwtPlotShapeItem();
+//                QwtPlotShapeItem *newItem = NULL;
+//                newItem = new QwtPlotShapeItem();
+                DrawItem *newItem = NULL;
+                newItem = new DrawItem(this);
                 //QPainterPath path();
 //                path->moveTo(polygon[0].rx(), polygon[0].ry());
 //                path->lineTo((double)polygon[1].rx(), (double)polygon[1].ry());
@@ -1597,6 +1600,36 @@ void PlotCanvas::multiPointActivated (bool on)
             }
         break;
 
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
+{
+    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
+        || m_pData->m_state == tPoint)
+    {
+        int a = 1;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mousePressEvent ( QMouseEvent * event )
+{
+    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
+        || m_pData->m_state == tPoint)
+    {
+        int a = 1;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
+{
+    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
+        || m_pData->m_state == tPoint)
+    {
+        int a = 1;
     }
 }
 

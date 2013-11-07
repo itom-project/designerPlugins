@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2012, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -99,12 +99,16 @@ class PlotCanvas : public QwtPlot
         void refreshStyles();
 
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
-    
+
+        void mousePressEvent ( QMouseEvent * event );
+        void mouseMoveEvent ( QMouseEvent * event );
+        void mouseReleaseEvent ( QMouseEvent * event );
+
     private:
         QwtPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
         QwtPlotMagnifier *m_pMagnifier;
-        
+
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
         ValuePicker2D *m_pValuePicker;
@@ -126,7 +130,7 @@ class PlotCanvas : public QwtPlot
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
 
         Qt::KeyboardModifiers m_activeModifiers;
-        
+
         QColor m_inverseColor0, m_inverseColor1;
 
     signals:
@@ -145,7 +149,7 @@ class PlotCanvas : public QwtPlot
         void multiPointActivated (bool on);
         //void multiPointSelected (const QPolygon &polygon);
         //void multiPointAppended (const QPoint &pos);
-        
+
 };
 
 struct InternalData
