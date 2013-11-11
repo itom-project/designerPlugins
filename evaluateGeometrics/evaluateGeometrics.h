@@ -44,24 +44,20 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
-    //Q_PROPERTY(QSharedPointer<ito::DataObject> data /*READ getData */ WRITE setData DESIGNABLE false);
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
-    Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
-    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
+    Q_PROPERTY(QString valueUnit READ getValueUnit WRITE setValueUnit RESET resetValueUnit)
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
-    Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
-    Q_PROPERTY(QSharedPointer<ito::DataObject> appendRelation READ readLastRelation WRITE addRelation DESIGNABLE false)
     Q_PROPERTY(QSharedPointer<ito::DataObject> relations READ getRelations WRITE setRelations DESIGNABLE false)
     Q_PROPERTY(QString destinationFolder READ getDestinationFolder WRITE setDestinationFolder DESIGNABLE true)
     
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
-    Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
-    Q_CLASSINFO("prop://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
-    Q_CLASSINFO("prop://titleFont", "Font for title.")
-    Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
-    Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
+    Q_CLASSINFO("prop://valueUnit", "The value unit for the metrical calculations that is used within the plot.")
+    Q_CLASSINFO("prop://titleFont", "Font for title (toDo).")
+    Q_CLASSINFO("prop://labelFont", "Font for axes descriptions (toDo).")
+    Q_CLASSINFO("prop://relations", "Get or set geometric elements via N x 11 dataObject of type float32.")
+    Q_CLASSINFO("prop://destinationFolder", "Set a default export directory.")
 
     public:
         EvaluateGeometricsFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -91,13 +87,9 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         void setTitle(const QString &title);
         void resetTitle();
 
-        QString getAxisLabel() const;
-        void setAxisLabel(const QString &label);
-        void resetAxisLabel();
-
-        QString getValueLabel() const;
-        void setValueLabel(const QString &label);
-        void resetValueLabel();
+        QString getValueUnit() const;
+        void setValueUnit(const QString &label);
+        void resetValueUnit();
 
         QPointF getYAxisInterval(void) const;
         void setYAxisInterval(QPointF);
@@ -107,9 +99,6 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         QFont getLabelFont(void) const;
         void setLabelFont(const QFont &font);
-
-        QFont getAxisFont(void) const;
-        void setAxisFont(const QFont &font);
 
         QStringList getRelationNames(void) const 
         {
@@ -152,8 +141,17 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         QSharedPointer<ito::DataObject> getRelations(void) const;
 
-        QSharedPointer<ito::DataObject> readLastRelation(void) {return QSharedPointer<ito::DataObject>(new ito::DataObject());}
-        void addRelation(QSharedPointer<ito::DataObject> importedData);
+        //QSharedPointer<ito::DataObject> readLastRelation(void) {return QSharedPointer<ito::DataObject>(new ito::DataObject());}
+        
+
+        enum exportFlags
+        {
+            exportCSVTree  = 0x00,
+            exportCSVTable = 0x01,
+            exportXMLTree  = 0x02,
+            exportCSVList  = 0x03,
+            showExportWindow = 0x10
+        };
 
         void clearRelation(const bool apply)
         {
@@ -184,7 +182,12 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         void mnuScaleSetting();
         void mnuExport(QAction* action);
         
+        ito::RetVal addRelation(QSharedPointer<ito::DataObject> importedData);
+        //ito::RetVal addRelation(QVector<ito::float64> importedData);
+        ito::RetVal exportData(QString fileName, ito::uint8 exportFlag);
+
     private slots:
+        
         void mnuHome();
 };
 

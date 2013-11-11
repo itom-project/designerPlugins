@@ -60,10 +60,8 @@ struct InternalInfo
 {
     bool m_autoTitle;
     QString m_title;
-    bool m_autoAxisLabel;
-    QString m_axisLabel;
-    bool m_autoValueLabel;
-    QString m_valueLabel;
+    bool m_autoValueUnit;
+    QString m_valueUnit;
     QString titleLabel;
     QStringList m_relationNames;
     QVector<relationsShip> m_relationsList;
@@ -150,7 +148,7 @@ class PlotTreeWidget : public QTreeWidget
 
         State m_state;
 
-        InternalInfo *m_data;
+        InternalInfo *m_pData;
 
         QVector<geometricPrimitives> m_rowHash;
 

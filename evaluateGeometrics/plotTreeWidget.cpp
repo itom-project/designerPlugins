@@ -44,7 +44,7 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     m_state(stateIdle),
     m_lastRetVal(ito::retOk)
 {
-    m_data = data;
+    m_pData = data;
     //this is the border between the canvas and the axes and the overall mainwindow
 	setContentsMargins(2,2,2,2);
 
@@ -189,16 +189,16 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
             topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            //elements[2]->setText(QString("r = %1 %2").arg(QString::number(val[5])).arg(m_data->m_valueLabel));
-            topLevelItem(row)->setText(2, QString("r = %1 %2").arg(QString::number(val[5])).arg(m_data->m_valueLabel));
+            //elements[2]->setText(QString("r = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
+            topLevelItem(row)->setText(2, QString("r = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
             break;
         }
         case ito::PrimitiveContainer::tElipse:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
             topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            //elements[2]->setText(QString("a,b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_data->m_valueLabel));
-            topLevelItem(row)->setText(2, QString("a, b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_data->m_valueLabel));
+            //elements[2]->setText(QString("a,b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_pData->m_valueUnit));
+            topLevelItem(row)->setText(2, QString("a, b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_pData->m_valueUnit));
             if(ito::dObjHelper::isFinite(val[7]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar((uchar)248)));
@@ -233,8 +233,8 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
             topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            //elements[2]->setText(QString("a = %1 %2").arg(QString::number(val[5])).arg(m_data->m_valueLabel));
-            topLevelItem(row)->setText(2, QString("a = %1 %2").arg(QString::number(val[5])).arg(m_data->m_valueLabel));
+            //elements[2]->setText(QString("a = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
+            topLevelItem(row)->setText(2, QString("a = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
             if(ito::dObjHelper::isFinite(val[6]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar((uchar)248)));
@@ -279,11 +279,11 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
     else
     {
 
-        for(int rel = 0; rel < m_data->m_relationsList.size(); rel++)
+        for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
         {
-            m_data->m_relationsList[rel].myWidget = NULL;
-            m_data->m_relationsList[rel].firstElementRow = -1;
-            m_data->m_relationsList[rel].secondElementRow = -1;
+            m_pData->m_relationsList[rel].myWidget = NULL;
+            m_pData->m_relationsList[rel].firstElementRow = -1;
+            m_pData->m_relationsList[rel].secondElementRow = -1;
         }
 
         for(int geo = 0; geo < m_rowHash.size(); geo++)
@@ -291,9 +291,9 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             QTreeWidgetItem* currentGeometry = topLevelItem(geo);
             QVector<ito::int16> relationIdxVec;
             relationIdxVec.reserve(24);
-            for(int rel = 0; rel < m_data->m_relationsList.size(); rel++)
+            for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
             {
-                if(m_data->m_relationsList[rel].firstElementIdx == (ito::uint32)(m_rowHash[geo].cells[0]) && m_data->m_relationsList[rel].type != 0)
+                if(m_pData->m_relationsList[rel].firstElementIdx == (ito::uint32)(m_rowHash[geo].cells[0]) && m_pData->m_relationsList[rel].type != 0)
                 {
                     relationIdxVec.append(rel);
                 }
@@ -333,28 +333,28 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     currentGeometry->child(childIdx)->setText(i, "");
                 }
 
-                m_data->m_relationsList[relationIdxVec[childIdx]].myWidget = currentGeometry->child(childIdx);
+                m_pData->m_relationsList[relationIdxVec[childIdx]].myWidget = currentGeometry->child(childIdx);
 
                 int curRel = relationIdxVec[childIdx];
-                int idx = m_data->m_relationsList[curRel].type & 0x0FFF;
+                int idx = m_pData->m_relationsList[curRel].type & 0x0FFF;
 
-                idx = idx < m_data->m_relationNames.length() ? idx : 0;
-                //elements[0]->setText(m_data->m_relationNames[idx]);
-                currentGeometry->child(childIdx)->setText(0, m_data->m_relationNames[idx]);
+                idx = idx < m_pData->m_relationNames.length() ? idx : 0;
+                //elements[0]->setText(m_pData->m_relationNames[idx]);
+                currentGeometry->child(childIdx)->setText(0, m_pData->m_relationNames[idx]);
 
-                int idx2 = m_data->m_relationsList[curRel].secondElementIdx;
+                int idx2 = m_pData->m_relationsList[curRel].secondElementIdx;
 
                 int secondType = 0;
 
-                m_data->m_relationsList[curRel].firstElementRow = geo;
+                m_pData->m_relationsList[curRel].firstElementRow = geo;
 
-                m_data->m_relationsList[curRel].secondElementRow = -1;
+                m_pData->m_relationsList[curRel].secondElementRow = -1;
 
                 for(int geo2 = 0; geo2 < geo; geo2++)
                 {
                     if(idx2 ==  (ito::int32)m_rowHash[geo2].cells[0])
                     {
-                        m_data->m_relationsList[curRel].secondElementRow = geo2;
+                        m_pData->m_relationsList[curRel].secondElementRow = geo2;
                         secondType = (ito::int32)(m_rowHash[geo2].cells[1]) & 0x0000FFFF;
                     }
                 }
@@ -363,7 +363,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 {
                     if(idx2 ==  (ito::int32)m_rowHash[geo2].cells[0])
                     {
-                        m_data->m_relationsList[curRel].secondElementRow = geo2;
+                        m_pData->m_relationsList[curRel].secondElementRow = geo2;
                         secondType = (ito::int32)(m_rowHash[geo2].cells[1]) & 0x0000FFFF;
                     }
                 }
@@ -380,39 +380,39 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
         }
 
-        for(int rel = 0; rel < m_data->m_relationsList.size(); rel++)
+        for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
         {
-            if(m_data->m_relationsList[rel].myWidget == NULL)
+            if(m_pData->m_relationsList[rel].myWidget == NULL)
             {
                 continue;
             }
 
-            switch(m_data->m_relationsList[rel].type & 0x0FFF)
+            switch(m_pData->m_relationsList[rel].type & 0x0FFF)
             {
             case tRadius:
-                m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
-                m_data->m_relationsList[rel].myWidget->setText(1, "");
+                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
+                m_pData->m_relationsList[rel].myWidget->setText(1, "");
                 break;
             case tAngle:
-                m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
+                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
                 break;
             case tDistance:
-                m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
+                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
                 break;
             case tIntersection:
             {
-                m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
+                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
                 break;
             }
             case tLength:
             {
-                m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
-                m_data->m_relationsList[rel].myWidget->setText(1, ""); 
+                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
+                m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
                 break;
             }
             case tArea:
-                m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/area.png"));
-                m_data->m_relationsList[rel].myWidget->setText(1, ""); 
+                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/area.png"));
+                m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
                 break;
             default:
 
@@ -425,7 +425,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
     QString resultString("");
     resultString.reserve(50);
 
-    for(int rel = 0; rel < m_data->m_relationsList.size(); rel++)
+    for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
     {
         ito::float32* first;
         ito::float32* second;
@@ -434,7 +434,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         /*
         for(int col = 1; col < 5; col++)
         {
-            elements[col] = (QLabel*) (itemWidget(m_data->m_relationsList[rel].myWidget, col));
+            elements[col] = (QLabel*) (itemWidget(m_pData->m_relationsList[rel].myWidget, col));
         }
         */
         resultString = "NaN";
@@ -446,94 +446,94 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         }
         */
 
-        if(m_data->m_relationsList[rel].myWidget == NULL)
+        if(m_pData->m_relationsList[rel].myWidget == NULL)
         {
             continue;
         }
 
-        if(m_data->m_relationsList[rel].type & tExtern)
+        if(m_pData->m_relationsList[rel].type & tExtern)
         {
-            resultString = QString("%1 %2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(m_data->m_valueLabel);
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(m_pData->m_valueUnit);
             //elements[2]->setText(resultString);
-            m_data->m_relationsList[rel].myWidget->setText(2, resultString); 
+            m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
             continue;
         }
-        else if(m_data->m_relationsList[rel].firstElementRow > -1)
+        else if(m_pData->m_relationsList[rel].firstElementRow > -1)
         {
-            first = m_rowHash[m_data->m_relationsList[rel].firstElementRow].cells;
+            first = m_rowHash[m_pData->m_relationsList[rel].firstElementRow].cells;
         }
         else
         {
             //elements[2]->setText(resultString);
-            m_data->m_relationsList[rel].myWidget->setText(2, resultString); 
+            m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
             continue;
         }
 
-        if(m_data->m_relationsList[rel].type == tRadius)
+        if(m_pData->m_relationsList[rel].type == tRadius)
         {
-            //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
-            check = calculateRadius(first, m_data->m_relationsList[rel].extValue);
-            resultString = QString("%1 %2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(m_data->m_valueLabel);
+            //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
+            check = calculateRadius(first, m_pData->m_relationsList[rel].extValue);
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(m_pData->m_valueUnit);
             //elements[1]->setText("");
-            //m_data->m_relationsList[rel].myWidget->setText(1, ""); 
+            //m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
         }
-        else if(m_data->m_relationsList[rel].type == tLength)
+        else if(m_pData->m_relationsList[rel].type == tLength)
         {
-            //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
-            check = calculateLength(first, m_data->m_relationsList[rel].extValue);
-            resultString = QString("%1 %2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(m_data->m_valueLabel);
-            //m_data->m_relationsList[rel].myWidget->setText(1, ""); 
+            //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
+            check = calculateLength(first, m_pData->m_relationsList[rel].extValue);
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(m_pData->m_valueUnit);
+            //m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
         }
-        else if(m_data->m_relationsList[rel].type == tArea)
+        else if(m_pData->m_relationsList[rel].type == tArea)
         {
-            //check = calculateArea(first, m_data->m_relationsList[i].extValue);
-            //resultString = QString("%1%2%3").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel).arg(QChar(L'²'));;
-            //m_data->m_relationsList[rel].myWidget->setText(1, "");       
+            //check = calculateArea(first, m_pData->m_relationsList[i].extValue);
+            //resultString = QString("%1%2%3").arg(QString::number(m_pData->m_relationsList[i].extValue)).arg(m_pData->m_valueUnit).arg(QChar(L'²'));;
+            //m_pData->m_relationsList[rel].myWidget->setText(1, "");       
         }
         else
         {
-            if(m_data->m_relationsList[rel].secondElementRow > -1)
+            if(m_pData->m_relationsList[rel].secondElementRow > -1)
             {
-                second = m_rowHash[m_data->m_relationsList[rel].secondElementRow].cells;
+                second = m_rowHash[m_pData->m_relationsList[rel].secondElementRow].cells;
 
-                switch(m_data->m_relationsList[rel].type & 0x0FFF)
+                switch(m_pData->m_relationsList[rel].type & 0x0FFF)
                 {
                 case tAngle:
-                    //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
-                    check = calculateAngle(first, second, m_data->m_relationsList[rel].extValue);
-                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(QChar(0x00B0));
+                    //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
+                    check = calculateAngle(first, second, m_pData->m_relationsList[rel].extValue);
+                    resultString = QString("%1%2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(QChar(0x00B0));
                     break;
                 case tIntersection:
                 {
                     cv::Vec3f val;
-                    //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
+                    //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
                     check = calculateIntersections(first, second, val);
-                    resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0])).arg(QString::number(val[1])).arg(QString::number(val[2])).arg(m_data->m_valueLabel);
+                    resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0])).arg(QString::number(val[1])).arg(QString::number(val[2])).arg(m_pData->m_valueUnit);
                     break;
                 }
                 default:
                     //elements[2]->setText(resultString);
-                    m_data->m_relationsList[rel].myWidget->setText(2, resultString); 
+                    m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
                     continue;
                 }
             }
             else
             {
                 //elements[2]->setText(resultString);
-                m_data->m_relationsList[rel].myWidget->setText(2, resultString); 
+                m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
                 continue;
             }
         }        
         //elements[2]->setText(resultString);
-        m_data->m_relationsList[rel].myWidget->setText(2, resultString); 
+        m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
 
         if(check)
         {
-            m_data->m_relationsList[rel].myWidget->setBackgroundColor(0, QColor(255,255,255));
+            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(0, QColor(255,255,255));
         }
         else
         {
-            m_data->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
+            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
         }
     }
     //free(elements);
@@ -1000,9 +1000,9 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
 
             QVector<ito::int16> relationIdxVec;
             relationIdxVec.reserve(24);
-            for(int rel = 0; rel < m_data->m_relationsList.size(); rel++)
+            for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
             {
-                if(m_data->m_relationsList[rel].firstElementIdx == (ito::uint32)(m_rowHash[geo].cells[0]) && m_data->m_relationsList[rel].type != 0)
+                if(m_pData->m_relationsList[rel].firstElementIdx == (ito::uint32)(m_rowHash[geo].cells[0]) && m_pData->m_relationsList[rel].type != 0)
                 {
                     relationIdxVec.append(rel);
                 }
@@ -1098,10 +1098,10 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
             {
                 stream.writeStartElement(QString::number(rel));
 
-                stream.writeAttribute("element0", QString::number(m_data->m_relationsList[relationIdxVec[rel]].firstElementIdx));
-                stream.writeAttribute("type", QString::number(m_data->m_relationsList[relationIdxVec[rel]].type));
-                stream.writeAttribute("element1", QString::number(m_data->m_relationsList[relationIdxVec[rel]].secondElementIdx));
-                stream.writeAttribute("value", QString::number(m_data->m_relationsList[relationIdxVec[rel]].extValue));
+                stream.writeAttribute("element0", QString::number(m_pData->m_relationsList[relationIdxVec[rel]].firstElementIdx));
+                stream.writeAttribute("type", QString::number(m_pData->m_relationsList[relationIdxVec[rel]].type));
+                stream.writeAttribute("element1", QString::number(m_pData->m_relationsList[relationIdxVec[rel]].secondElementIdx));
+                stream.writeAttribute("value", QString::number(m_pData->m_relationsList[relationIdxVec[rel]].extValue));
 
                 stream.writeEndElement();
             }
@@ -1144,16 +1144,16 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
         saveFile.write(outBuffer);
     }
 
-    for(int rel = 0; rel < m_data->m_relationsList.size(); rel++)
+    for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
     {
         outBuffer.clear();
-        outBuffer.append(QByteArray::number(m_data->m_relationsList[rel].firstElementIdx));
+        outBuffer.append(QByteArray::number(m_pData->m_relationsList[rel].firstElementIdx));
         outBuffer.append(", ");
-        outBuffer.append(QByteArray::number(m_data->m_relationsList[rel].type));
+        outBuffer.append(QByteArray::number(m_pData->m_relationsList[rel].type));
         outBuffer.append(", ");
-        outBuffer.append(QByteArray::number(m_data->m_relationsList[rel].secondElementIdx));
+        outBuffer.append(QByteArray::number(m_pData->m_relationsList[rel].secondElementIdx));
         outBuffer.append(", ");
-        outBuffer.append(QByteArray::number(m_data->m_relationsList[rel].extValue));
+        outBuffer.append(QByteArray::number(m_pData->m_relationsList[rel].extValue));
         outBuffer.append('\n');
         saveFile.write(outBuffer);
     }

@@ -97,13 +97,11 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 
     m_pContent->setFocus();
 
-    m_info.m_autoAxisLabel = false;
-    m_info.m_autoValueLabel = false;
+    m_info.m_autoValueUnit = false;
     m_info.m_autoTitle = false;
 
     m_info.m_title = "";
-    m_info.m_axisLabel = "";
-    m_info.m_valueLabel = "mm";
+    m_info.m_valueUnit = "mm";
     m_info.titleLabel = "";
 
 }
@@ -216,66 +214,34 @@ void EvaluateGeometricsFigure::resetTitle()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString EvaluateGeometricsFigure::getAxisLabel() const
+QString EvaluateGeometricsFigure::getValueUnit() const
 {
-    if (m_info.m_autoAxisLabel)
+    if (m_info.m_autoValueUnit)
     {
         return "<auto>";
     }
-    return m_info.m_axisLabel;
+    return m_info.m_valueUnit;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::setAxisLabel(const QString &label)
+void EvaluateGeometricsFigure::setValueUnit(const QString &label)
 {
     if (label == "<auto>")
     {
-        m_info.m_autoAxisLabel = true;
+        m_info.m_autoValueUnit = true;
     }
     else
     {
-        m_info.m_autoAxisLabel = false;
-        m_info.m_axisLabel = label;
+        m_info.m_autoValueUnit = false;
+        m_info.m_valueUnit = label;
     }
     if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::resetAxisLabel()
+void EvaluateGeometricsFigure::resetValueUnit()
 {
-    m_info.m_autoAxisLabel = true;
-    if (m_pContent) m_pContent->updateLabels();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QString EvaluateGeometricsFigure::getValueLabel() const
-{
-    if (m_info.m_autoValueLabel)
-    {
-        return "<auto>";
-    }
-    return m_info.m_valueLabel;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::setValueLabel(const QString &label)
-{
-    if (label == "<auto>")
-    {
-        m_info.m_autoValueLabel = true;
-    }
-    else
-    {
-        m_info.m_autoValueLabel = false;
-        m_info.m_valueLabel = label;
-    }
-    if (m_pContent) m_pContent->updateLabels();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::resetValueLabel()
-{
-    m_info.m_autoValueLabel = true;
+    m_info.m_autoValueUnit = true;
     if (m_pContent) m_pContent->updateLabels();
 }
 
@@ -316,46 +282,26 @@ void EvaluateGeometricsFigure::setLabelFont(const QFont &font)
 
     }
 }
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QFont EvaluateGeometricsFigure::getAxisFont(void) const
-{
-    if (m_pContent)
-    {
-
-    }
-    return QFont();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::setAxisFont(const QFont &font)
-{
-    if (m_pContent)
-    {
-
-    }
-}
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuExport(QAction* action)
 {
     QString fileName = 0;
 
-    ito::int32 saveType = 0;
+    ito::int32 saveType = exportCSVTree;
     QString saveFilter("*.csv");
 
     if (action->text() == QString(tr("table")))
     {
-        saveType = 1;
+        saveType = exportCSVTable;
     }
     else if (action->text() == QString(tr("xml")))
     {
-        saveType = 2;
+        saveType = exportXMLTree;
         saveFilter = "*.xml";
     }
     else if (action->text() == QString(tr("list")))
     {
-        saveType = 3;
+        saveType = exportCSVList;
         saveFilter = "*.csv";
     }
 
@@ -369,20 +315,68 @@ void EvaluateGeometricsFigure::mnuExport(QAction* action)
         switch(saveType)
         {
             default:
-            case 0:
+            case exportCSVTree:
                 m_pContent->writeToCSV(exportFile, false);
                 break;
-            case 1:
+            case exportCSVTable:
                 m_pContent->writeToCSV(exportFile, true);
                 break;
-            case 2:
+            case exportXMLTree:
                 m_pContent->writeToXML(exportFile);
                 break;
-            case 3:
+            case exportCSVList:
                 m_pContent->writeToRAW(exportFile);
                 break;
         }
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, ito::uint8 exportFlag)
+{
+    ito::RetVal retVal = ito::retOk;
+
+    QString saveFilter("*.csv");
+
+    if ((exportFlag& 0x0F) == exportXMLTree )
+    {
+        saveFilter = "*.xml";
+    }
+    
+    if(!fileName.isEmpty())
+    {
+        m_lastFolder = fileName;        
+    }
+
+    if(exportXMLTree & showExportWindow)
+    {
+        fileName = QFileDialog::getSaveFileName(this, tr("select destination file"), m_lastFolder, saveFilter);
+    }
+                
+    if (m_pContent && !fileName.isEmpty())
+    {
+        QFileInfo exportFile = fileName; 
+        m_lastFolder = exportFile.path();
+
+        switch(exportFlag & 0x0F)
+        {
+            default:
+            case exportCSVTree:
+                retVal = m_pContent->writeToCSV(exportFile, false);
+                break;
+            case exportCSVTable:
+                retVal = m_pContent->writeToCSV(exportFile, true);
+                break;
+            case exportXMLTree:
+                retVal = m_pContent->writeToXML(exportFile);
+                break;
+            case exportCSVList:
+                retVal = m_pContent->writeToRAW(exportFile);
+                break;
+        }
+    }
+
+    return retVal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -537,14 +531,19 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) con
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
-void EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relation)
+ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relation)
 {
     relationsShip newRelation;
             
 
-    if(relation.isNull() || relation->getDims() != 2 || relation->getSize(0) != 1 || (relation->getType() != ito::tFloat32 && relation->getType() != ito::tFloat64))
+    if(relation.isNull() || relation->getDims() != 2 || relation->getSize(0) != 1)
     {
-        return;
+        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalud object dims").toAscii().data());
+    }
+
+    if((relation->getType() != ito::tFloat32 && relation->getType() != ito::tFloat64))
+    {
+        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalud object type").toAscii().data());
     }
 
     newRelation.secondElementRow = -1;
@@ -569,14 +568,8 @@ void EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relat
             else newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float64>(0,0));
         break;
         case 0:
-            newRelation.type = 0;
-            newRelation.firstElementIdx = -1.0;
-            newRelation.secondElementIdx  = -1.0;
-            newRelation.extValue  = 0.0;
-            break;
+            return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toAscii().data());
     }
-
-            
 
     m_info.m_relationsList.append(newRelation);
 
@@ -584,5 +577,40 @@ void EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relat
     {
         m_pContent->updateRelationShips(false);
     }
-    return;
+    return ito::retOk;
 }
+/*
+ito::RetVal EvaluateGeometricsFigure::addRelation(QVector<ito::float64> importedData)
+{
+    relationsShip newRelation;
+            
+    newRelation.secondElementRow = -1;
+    newRelation.firstElementRow = -1;
+
+    newRelation.myWidget = NULL;
+
+    switch(importedData.size())
+    {
+        case 4:
+        default:
+            newRelation.secondElementIdx = (ito::int32)(importedData[3]);
+        case 3:
+            newRelation.secondElementIdx = (ito::int32)(importedData[2]);
+        case 2:
+            newRelation.type = (ito::int32)(importedData[1]);
+        case 1:
+            newRelation.firstElementIdx = (ito::int32)(importedData[0]);
+        break;
+        case 0:
+            return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toAscii().data());
+    }
+
+    m_info.m_relationsList.append(newRelation);
+
+    if(m_pContent)
+    {
+        m_pContent->updateRelationShips(false);
+    }
+    return ito::retOk;
+
+}*/
