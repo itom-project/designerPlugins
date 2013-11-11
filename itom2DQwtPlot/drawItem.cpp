@@ -55,10 +55,10 @@ void DrawItem::setShape(const QPainterPath &path)
         for (int n = 0; n < m_marker.size(); n++)
         {
             m_marker[n]->detach();
-            m_marker.remove(n);
+//            m_marker.remove(n);
 //            delete m_marker[n];
         }
-//        m_marker.clear();
+        m_marker.clear();
     }
     if (path.length() >= 1)
     {
