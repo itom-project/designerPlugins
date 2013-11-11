@@ -62,13 +62,28 @@ void DrawItem::setShape(const QPainterPath &path)
     }
     if (path.length() >= 1)
     {
-        QRectF brect = path.boundingRect();
+        QPainterPath::Element el;
         marker = new QwtPlotMarker();
         marker->setLinePen(QPen(Qt::green));
         marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
 
-        x1 = brect.left();
-        y1 = brect.bottom();
+        switch (m_type)
+        {
+            case PlotCanvas::tLine:
+            case PlotCanvas::tRect:
+                el = path.elementAt(0);
+                x1 = el.x;
+                y1 = el.y;
+            break;
+
+            case PlotCanvas::tEllipse:
+                el = path.elementAt(6);
+                x1 = el.x;
+                el = path.elementAt(9);
+                y1 = el.y;
+            break;
+        }
+
         marker->setXValue(x1);
         marker->setYValue(y1);
         marker->setVisible(true);
@@ -78,12 +93,32 @@ void DrawItem::setShape(const QPainterPath &path)
     }
     if (path.length() >= 2)
     {
-        QRectF brect = path.boundingRect();
+        QPainterPath::Element el;
         marker = new QwtPlotMarker();
         marker->setLinePen(QPen(Qt::green));
         marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
-        x2 = brect.right();
-        y2 = brect.top();
+
+        switch (m_type)
+        {
+            case PlotCanvas::tLine:
+                el = path.elementAt(1);
+                x2 = el.x;
+                y2 = el.y;
+            break;
+
+            case PlotCanvas::tRect:
+                el = path.elementAt(2);
+                x2 = el.x;
+                y2 = el.y;
+            break;
+
+            case PlotCanvas::tEllipse:
+                el = path.elementAt(0);
+                x2 = el.x;
+                el = path.elementAt(3);
+                y2 = el.y;
+            break;
+        }
 
         marker->setXValue(x2);
         marker->setYValue(y2);
