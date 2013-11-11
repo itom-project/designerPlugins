@@ -37,6 +37,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_pContent(NULL),
     m_actScaleSetting(NULL),
 	m_actSave(NULL),
+    m_mnuSaveSwitch(NULL),
     m_lastFolder("")
 {
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
@@ -44,18 +45,23 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save as table, tree, xml"), this);
     m_actSave->setObjectName("actSave");
-    m_actSave->setToolTip(tr("Export current view"));
+    m_actSave->setToolTip(tr("Export current data"));
+
+	m_mnuSaveSwitch = new QMenu("Save Switch", this);
+	m_mnuSaveSwitch->addAction(tr("table"));
+	m_mnuSaveSwitch->addAction(tr("tree"));
+	m_mnuSaveSwitch->addAction(tr("list"));
+    m_mnuSaveSwitch->addAction(tr("xml"));
+	m_actSave->setMenu(m_mnuSaveSwitch);
 
     //m_actScaleSetting
     m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
     m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
 
-
-    connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
-    
+    connect(m_mnuSaveSwitch, SIGNAL(triggered(QAction *)), this, SLOT(mnuExport(QAction *)));
     connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
 
 
@@ -105,6 +111,23 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 //----------------------------------------------------------------------------------------------------------------------------------
 EvaluateGeometricsFigure::~EvaluateGeometricsFigure()
 {
+    if(m_mnuSaveSwitch)
+    {
+        m_mnuSaveSwitch->deleteLater();
+        m_mnuSaveSwitch = NULL;
+    }
+
+    if(m_actScaleSetting)
+    {
+        m_actScaleSetting->deleteLater();
+        m_actScaleSetting = NULL;
+    }
+
+    if(m_actSave)
+    {
+        m_actSave->deleteLater();
+        m_actSave = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -314,18 +337,51 @@ void EvaluateGeometricsFigure::setAxisFont(const QFont &font)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::mnuExport()
+void EvaluateGeometricsFigure::mnuExport(QAction* action)
 {
-    bool exportMode = false;
     QString fileName = 0;
 
-    fileName = QFileDialog::getSaveFileName(this, tr("select destination file"), m_lastFolder, "*.csv");
+    ito::int32 saveType = 0;
+    QString saveFilter("*.csv");
+
+    if (action->text() == QString(tr("table")))
+    {
+        saveType = 1;
+    }
+    else if (action->text() == QString(tr("xml")))
+    {
+        saveType = 2;
+        saveFilter = "*.xml";
+    }
+    else if (action->text() == QString(tr("list")))
+    {
+        saveType = 3;
+        saveFilter = "*.csv";
+    }
+
+    fileName = QFileDialog::getSaveFileName(this, tr("select destination file"), m_lastFolder, saveFilter);
                 
     if (m_pContent && !fileName.isEmpty())
     {
         QFileInfo exportFile = fileName; 
         m_lastFolder = exportFile.path();
-        m_pContent->writeToCSV(exportFile, exportMode);
+
+        switch(saveType)
+        {
+            default:
+            case 0:
+                m_pContent->writeToCSV(exportFile, false);
+                break;
+            case 1:
+                m_pContent->writeToCSV(exportFile, true);
+                break;
+            case 2:
+                m_pContent->writeToXML(exportFile);
+                break;
+            case 3:
+                m_pContent->writeToRAW(exportFile);
+                break;
+        }
     }
 }
 

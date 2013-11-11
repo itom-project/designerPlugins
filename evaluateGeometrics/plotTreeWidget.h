@@ -136,6 +136,8 @@ class PlotTreeWidget : public QTreeWidget
         bool calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point);
 
         ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);
+        ito::RetVal writeToXML(const QFileInfo &fileName);
+        ito::RetVal writeToRAW(const QFileInfo &fileName);
 
         ito::RetVal m_lastRetVal;
 

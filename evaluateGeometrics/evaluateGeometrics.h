@@ -174,14 +174,15 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         InternalInfo m_info;
 
-        QAction* m_actScaleSetting;
-
+        QAction * m_actScaleSetting;
 		QAction *m_actSave;
+        QMenu   *m_mnuSaveSwitch;
+
         QString m_lastFolder;
 
     public slots:
         void mnuScaleSetting();
-        void mnuExport();
+        void mnuExport(QAction* action);
         
     private slots:
         void mnuHome();
