@@ -50,7 +50,7 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     setColumnCount(5);
 
     setEditTriggers(QAbstractItemView::NoEditTriggers);
-
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             if(ito::dObjHelper::isFinite(val[7]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar((uchar)248)));
-                topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar((uchar)248)));
+                topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar(0x00B0)));
             }
             else
             {
@@ -219,7 +219,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             if(ito::dObjHelper::isFinite(val[8]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[8])).arg(QChar((uchar)248)));
-                 topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[8])).arg(QChar((uchar)248)));
+                 topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[8])).arg(QChar(0x00B0)));
             }
             else
             {
@@ -237,7 +237,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             if(ito::dObjHelper::isFinite(val[6]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar((uchar)248)));
-                 topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar((uchar)248)));
+                 topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar(0x00B0)));
             }
             else
             {
@@ -483,6 +483,12 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             resultString = QString("%1 %2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(m_data->m_valueLabel);
             //m_data->m_relationsList[rel].myWidget->setText(1, ""); 
         }
+        else if(m_data->m_relationsList[rel].type == tArea)
+        {
+            //check = calculateArea(first, m_data->m_relationsList[i].extValue);
+            //resultString = QString("%1%2%3").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel).arg(QChar(L'²'));;
+            //m_data->m_relationsList[rel].myWidget->setText(1, "");       
+        }
         else
         {
             if(m_data->m_relationsList[rel].secondElementRow > -1)
@@ -494,7 +500,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 case tAngle:
                     //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
                     check = calculateAngle(first, second, m_data->m_relationsList[rel].extValue);
-                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(QChar('°'));
+                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(QChar(L'°'));
                     break;
                 case tDistance:
                     //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
@@ -509,11 +515,6 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0])).arg(QString::number(val[1])).arg(QString::number(val[2])).arg(m_data->m_valueLabel);
                     break;
                 }
-                case tArea:
-                    //check = calculateArea(first, m_data->m_relationsList[i].extValue);
-                    //resultString = QString("%1%2²").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
-                    //elements[1]->setText("");
-                    break;
                 default:
                     //elements[2]->setText(resultString);
                     m_data->m_relationsList[rel].myWidget->setText(2, resultString); 
@@ -529,6 +530,15 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         }        
         //elements[2]->setText(resultString);
         m_data->m_relationsList[rel].myWidget->setText(2, resultString); 
+
+        if(check)
+        {
+            m_data->m_relationsList[rel].myWidget->setBackgroundColor(0, QColor(255,255,255));
+        }
+        else
+        {
+            m_data->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
+        }
     }
     //free(elements);
     return;
@@ -823,7 +833,16 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
                     {
                         changed = true;
                         memcpy(newVal.cells, srcPtr, sizeof(ito::float32) * cols);
-                        m_rowHash.insert(scnt, newVal);
+
+                        if(m_rowHash.size() < scnt)
+                        {
+                            m_rowHash.append(newVal);
+                        }
+                        else
+                        {
+                            m_rowHash.insert(scnt, newVal);
+                        }
+                        
                     }
 
                 }
