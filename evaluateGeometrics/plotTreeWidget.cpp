@@ -32,6 +32,7 @@
 #include <qlayout.h>
 #include <qfile.h>
 #include <QXmlStreamWriter>
+#include <QCoreApplication>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget * parent) :
@@ -500,12 +501,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 case tAngle:
                     //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
                     check = calculateAngle(first, second, m_data->m_relationsList[rel].extValue);
-                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(QChar(L'°'));
-                    break;
-                case tDistance:
-                    //m_data->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
-                    check = calculateDistance(first, second, m_data->m_relationsList[rel].extValue);
-                    resultString = QString("%1 %2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(m_data->m_valueLabel);
+                    resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[rel].extValue)).arg(QChar(0x00B0));
                     break;
                 case tIntersection:
                 {
