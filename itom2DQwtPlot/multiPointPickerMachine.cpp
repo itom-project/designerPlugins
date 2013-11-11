@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2012, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -26,8 +26,8 @@
 #include <qwt_event_pattern.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-MultiPointPickerMachine::MultiPointPickerMachine() : 
-    QwtPickerPolygonMachine()
+MultiPointPickerMachine::MultiPointPickerMachine() :
+    QwtPickerPolygonMachine(), m_maxNrItems(0), m_currentNrItems(0)
 {
 }
 

@@ -21,11 +21,13 @@
  *********************************************************************** */
 
 #include "drawItem.h"
+#include "plotCanvas.h"
 
 #include <qwt_symbol.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(QwtPlot *parent, const QString &title) : m_pparent(parent)
+DrawItem::DrawItem(QwtPlot *parent, char type, const QString &title) : m_pparent(parent), m_type(type), m_active(0), x1(-1), y1(-1),
+    x2(-1), y2(-1)
 {
 
 }
@@ -33,12 +35,12 @@ DrawItem::DrawItem(QwtPlot *parent, const QString &title) : m_pparent(parent)
 //----------------------------------------------------------------------------------------------------------------------------------
 DrawItem::~DrawItem()
 {
-/*
     for (int n = 0; n < m_marker.size(); n++)
     {
-        delete m_marker.at(n);
+        m_marker[n]->detach();
+//        m_marker.remove(n);
+//        delete m_marker[n];
     }
-*/
     m_marker.clear();
 }
 
@@ -47,29 +49,48 @@ void DrawItem::setShape(const QPainterPath &path)
 {
     QwtPlotMarker *marker = NULL;
     QwtPlotShapeItem::setShape(path);
-    if (path.length() >= 1)
+    if (m_marker.size() > 0)
     {
-        marker = new QwtPlotMarker();
-        marker->setLinePen(QPen(Qt::green));
-        marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
-        QPainterPath::Element el = path.elementAt(0);
-        marker->setXValue(el.x);
-        marker->setYValue(el.y);
-        marker->setVisible(true);
-        marker->attach(m_pparent);
-        m_marker.append(marker);
+
+        for (int n = 0; n < m_marker.size(); n++)
+        {
+            m_marker[n]->detach();
+            m_marker.remove(n);
+//            delete m_marker[n];
+        }
+//        m_marker.clear();
     }
     if (path.length() >= 1)
     {
+        QRectF brect = path.boundingRect();
         marker = new QwtPlotMarker();
         marker->setLinePen(QPen(Qt::green));
         marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
-        QPainterPath::Element el = path.elementAt(1);
-        marker->setXValue(el.x);
-        marker->setYValue(el.y);
+
+        x1 = brect.left();
+        y1 = brect.bottom();
+        marker->setXValue(x1);
+        marker->setYValue(y1);
         marker->setVisible(true);
         marker->attach(m_pparent);
         m_marker.append(marker);
+//        m_active = 1;
+    }
+    if (path.length() >= 2)
+    {
+        QRectF brect = path.boundingRect();
+        marker = new QwtPlotMarker();
+        marker->setLinePen(QPen(Qt::green));
+        marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
+        x2 = brect.right();
+        y2 = brect.top();
+
+        marker->setXValue(x2);
+        marker->setYValue(y2);
+        marker->setVisible(true);
+        marker->attach(m_pparent);
+        m_marker.append(marker);
+//        m_active = 2;
     }
 }
 

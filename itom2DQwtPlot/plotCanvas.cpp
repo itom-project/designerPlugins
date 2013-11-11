@@ -1485,7 +1485,7 @@ void PlotCanvas::multiPointActivated (bool on)
                 {
                     QPointF pt;
 
-                    for (int i = 0; i < polygon.size() - 1; ++i)
+                    for (int i = 0; i < polygon.size(); ++i)
                     {
                         pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
                         pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
@@ -1502,13 +1502,8 @@ void PlotCanvas::multiPointActivated (bool on)
                 }
 
                 QPainterPath *path = new QPainterPath();
-//                QwtPlotShapeItem *newItem = NULL;
-//                newItem = new QwtPlotShapeItem();
                 DrawItem *newItem = NULL;
-                newItem = new DrawItem(this);
-                //QPainterPath path();
-//                path->moveTo(polygon[0].rx(), polygon[0].ry());
-//                path->lineTo((double)polygon[1].rx(), (double)polygon[1].ry());
+                newItem = new DrawItem(this, tLine);
                 path->moveTo(polygonScale[0].x(), polygonScale[0].y());
                 path->lineTo(polygonScale[1].x(), polygonScale[1].y());
 
@@ -1541,7 +1536,7 @@ void PlotCanvas::multiPointActivated (bool on)
                 {
                     QPointF pt;
 
-                    for (int i = 0; i < polygon.size() - 1; ++i)
+                    for (int i = 0; i < polygon.size(); ++i)
                     {
                         pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
                         pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
@@ -1556,6 +1551,22 @@ void PlotCanvas::multiPointActivated (bool on)
                 {
                     emit p->userInteractionDone(1, aborted, polygonScale);
                 }
+
+                QPainterPath *path = new QPainterPath();
+                DrawItem *newItem = NULL;
+                newItem = new DrawItem(this, tRect);
+                path->addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
+                              polygonScale[1].y() - polygonScale[0].y());
+
+                newItem->setShape(*path);
+                newItem->setPen(QPen(Qt::green));
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                replot();
+                m_pData->m_pDrawItems.append(newItem);
+                setState(tIdle);
+                m_pMultiPointPicker->setEnabled(false);
 
                 setState(tIdle);
                 m_pMultiPointPicker->setEnabled(false);
@@ -1579,7 +1590,7 @@ void PlotCanvas::multiPointActivated (bool on)
                 {
                     QPointF pt;
 
-                    for (int i = 0; i < polygon.size() - 1; ++i)
+                    for (int i = 0; i < polygon.size(); ++i)
                     {
                         pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
                         pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
@@ -1595,6 +1606,19 @@ void PlotCanvas::multiPointActivated (bool on)
                     emit p->userInteractionDone(1, aborted, polygonScale);
                 }
 
+                QPainterPath *path = new QPainterPath();
+                DrawItem *newItem = NULL;
+                newItem = new DrawItem(this, tEllipse);
+                path->addEllipse(polygonScale[0].x(), polygonScale[0].y(),
+                        (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
+
+                newItem->setShape(*path);
+                newItem->setPen(QPen(Qt::green));
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                replot();
+                m_pData->m_pDrawItems.append(newItem);
                 setState(tIdle);
                 m_pMultiPointPicker->setEnabled(false);
             }
@@ -1606,20 +1630,104 @@ void PlotCanvas::multiPointActivated (bool on)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
 {
-    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
-        || m_pData->m_state == tPoint)
+    if (m_pData->m_state == tIdle)
     {
-        int a = 1;
+        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        {
+            if (m_pData->m_pDrawItems[n]->m_active == 1)
+            {
+                QPainterPath *path = new QPainterPath();
+                switch (m_pData->m_pDrawItems[n]->m_type)
+                {
+                    case tPoint:
+                    break;
+
+                    case tLine:
+                        path->moveTo(invTransform(QwtPlot::xBottom, event->x()), invTransform(QwtPlot::yLeft, event->y()));
+                        path->lineTo(m_pData->m_pDrawItems[n]->x2, m_pData->m_pDrawItems[n]->y2);
+                        m_pData->m_pDrawItems[n]->setShape(*path);
+                        replot();
+                    break;
+
+                    case tRect:
+                        path->addRect(invTransform(QwtPlot::xBottom, event->x()), invTransform(QwtPlot::yLeft, event->y()),
+                            m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, event->x()),
+                            m_pData->m_pDrawItems[n]->y2 - invTransform(QwtPlot::yLeft, event->y()));
+                        m_pData->m_pDrawItems[n]->setShape(*path);
+                        replot();
+                    break;
+
+                    case tEllipse:
+                        path->addEllipse(invTransform(QwtPlot::xBottom, event->x()),
+                            invTransform(QwtPlot::yLeft, event->y()),
+                             m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, event->x()),
+                             m_pData->m_pDrawItems[n]->y2 - invTransform(QwtPlot::yLeft, event->y()));
+                        m_pData->m_pDrawItems[n]->setShape(*path);
+                        replot();
+                    break;
+                }
+
+                break;
+            }
+            else if (m_pData->m_pDrawItems[n]->m_active == 2)
+            {
+                QPainterPath *path = new QPainterPath();
+                switch (m_pData->m_pDrawItems[n]->m_type)
+                {
+                    case tPoint:
+                    break;
+
+                    case tLine:
+                        path->moveTo(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1);
+                        path->lineTo(invTransform(QwtPlot::xBottom, event->x()), invTransform(QwtPlot::yLeft, event->y()));
+                        m_pData->m_pDrawItems[n]->setShape(*path);
+                        replot();
+                    break;
+
+                    case tRect:
+                        path->addRect(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1,
+                            invTransform(QwtPlot::xBottom, event->x()) - m_pData->m_pDrawItems[n]->x1,
+                            invTransform(QwtPlot::yLeft, event->y()) - m_pData->m_pDrawItems[n]->y1);
+                        m_pData->m_pDrawItems[n]->setShape(*path);
+                        replot();
+                    break;
+
+                    case tEllipse:
+                        path->addEllipse(m_pData->m_pDrawItems[n]->x1,
+                            m_pData->m_pDrawItems[n]->y1,
+                            (invTransform(QwtPlot::xBottom, event->x())- m_pData->m_pDrawItems[n]->x1),
+                            (invTransform(QwtPlot::yLeft, event->y()) - m_pData->m_pDrawItems[n]->y1)),
+                        m_pData->m_pDrawItems[n]->setShape(*path);
+                        replot();
+                    break;
+                }
+
+                break;
+            }
+        }
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mousePressEvent ( QMouseEvent * event )
 {
-    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
-        || m_pData->m_state == tPoint)
+    if (m_pData->m_state == tIdle)
     {
-        int a = 1;
+        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        {
+            if (fabs(m_pData->m_pDrawItems[n]->x1 - invTransform(QwtPlot::xBottom, event->x())) < 10
+                && fabs(m_pData->m_pDrawItems[n]->y1 - invTransform(QwtPlot::yLeft, event->y())) < 10)
+            {
+                m_pData->m_pDrawItems[n]->m_active = 1;
+                break;
+            }
+            else if (fabs(m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, event->x())) < 10
+                && fabs(m_pData->m_pDrawItems[n]->y2 - invTransform(QwtPlot::yLeft, event->y())) < 10)
+            {
+                m_pData->m_pDrawItems[n]->m_active = 2;
+                break;
+            }
+        }
     }
 }
 
@@ -1627,9 +1735,12 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
 void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
 {
     if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
-        || m_pData->m_state == tPoint)
+        || m_pData->m_state == tPoint || m_pData->m_state == tIdle)
     {
-        int a = 1;
+        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        {
+            m_pData->m_pDrawItems[n]->m_active = 0;
+        }
     }
 }
 

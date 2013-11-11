@@ -33,11 +33,14 @@
 class DrawItem : public QwtPlotShapeItem
 {
     public:
-        explicit DrawItem(QwtPlot *parent, const QString &title = QString::null);
+        explicit DrawItem(QwtPlot *parent, char type, const QString &title = QString::null);
         virtual ~DrawItem();
         void setRect(const QRectF &);
         void setShape( const QPainterPath & );
-
+        QVector<QwtPlotMarker *> m_marker;
+        double x1, y1, x2, y2;
+        char m_active;
+        char m_type;
     //    virtual QwtText trackerTextF( const QPointF &pos ) const;
     //    void drawTracker( QPainter *painter ) const;
     //    void setBackgroundFillBrush( const QBrush &brush );
@@ -49,7 +52,6 @@ class DrawItem : public QwtPlotShapeItem
         QPen m_markerPen;
         QBrush m_markerBrush;
         QPen m_linePen;
-        QVector<QwtPlotMarker *> m_marker;
         QwtPlot *m_pparent;
 
     signals:

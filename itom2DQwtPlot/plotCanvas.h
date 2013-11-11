@@ -28,6 +28,7 @@
 
 #include "dataObjItem.h"
 #include "userInteractionPlotPicker.h"
+#include "drawItem.h"
 
 
 #include <qwidget.h>
@@ -149,7 +150,6 @@ class PlotCanvas : public QwtPlot
         void multiPointActivated (bool on);
         //void multiPointSelected (const QPolygon &polygon);
         //void multiPointAppended (const QPoint &pos);
-
 };
 
 struct InternalData
@@ -189,7 +189,15 @@ struct InternalData
         m_state = PlotCanvas::tIdle;
         m_pConstOutput = NULL;
     }
-    ~InternalData() {}
+    ~InternalData()
+    {
+        for (int n = 0; n < m_pDrawItems.size(); n++)
+        {
+            m_pDrawItems[n]->detach();
+            delete m_pDrawItems[n];
+        }
+        m_pDrawItems.clear();
+    }
     ito::tDataType m_dataType;
 
     QString m_title;
@@ -229,7 +237,7 @@ struct InternalData
     PlotCanvas::tState m_state;
 
     const QHash<QString, ito::Param*> *m_pConstOutput;
-    QVector<QwtPlotShapeItem *> m_pDrawItems;
+    QVector<DrawItem *> m_pDrawItems;
 };
 
 
