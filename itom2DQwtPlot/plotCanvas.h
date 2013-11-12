@@ -62,7 +62,7 @@ class PlotCanvas : public QwtPlot
 {
     Q_OBJECT
     public:
-        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut, tMultiPointPick, tPoint, tLine, tRect, tEllipse };
+        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut, tMultiPointPick, tPoint, tLine, tRect, tEllipse, tCircle, tSquare };
         enum ComplexType { Real = 2, Imag = 1, Abs = 0, Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
 
         PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
@@ -134,6 +134,8 @@ class PlotCanvas : public QwtPlot
         Qt::KeyboardModifiers m_activeModifiers;
 
         QColor m_inverseColor0, m_inverseColor1;
+
+        int m_lastGeometricItem;
 
     signals:
         void spawnNewChild(QVector<QPointF>);

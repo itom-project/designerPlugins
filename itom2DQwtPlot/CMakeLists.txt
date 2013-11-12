@@ -80,6 +80,7 @@ set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.h
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.h
+    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresPrimitives.h
     ${ITOM_SDK_INCLUDE_DIR}/common/typeDefs.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
@@ -114,6 +115,7 @@ set(designer_SOURCES
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresPrimitives.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp

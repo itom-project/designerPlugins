@@ -34,6 +34,8 @@
 #include <qwt_scale_widget.h>
 #include <qwt_picker_machine.h>
 
+#include "common\sharedStructuresPrimitives.h"
+
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
@@ -1091,4 +1093,94 @@ void Itom2dQwtPlot::setCoordinates(const QVector<QPointF> &pts, bool visible)
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer< ito::DataObject > Itom2dQwtPlot::getGeometricElements()
+{
+    int ysize = m_data.m_pDrawItems.size();
+    int xsize = PRIM_ELEMENTLENGTH;
+
+    QSharedPointer< ito::DataObject > exportItem(new ito::DataObject(ysize, xsize, ito::tFloat32));
+
+    qvector2DataObject(exportItem.data());
+
+    return exportItem;
+}
+
+ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
+{
+    int ysize = dstObject->getSize(0);
+    int xsize = dstObject->getSize(1);
+
+    cv::Mat *tarMat = (cv::Mat*)(dstObject->get_mdata()[0]);
+    ito::float32* rowPtr = tarMat->ptr<ito::float32>(0);
+    memset(rowPtr, 0, sizeof(ito::float32) * xsize * ysize);
+
+    for(int y = 0; y < ysize; y++)
+    {
+        rowPtr = tarMat->ptr<ito::float32>(y);
+        rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+        switch (m_data.m_pDrawItems[y]->m_type)
+        {
+            case PlotCanvas::tPoint:
+                
+                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tPoint;
+                rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
+                rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
+            break;
+
+            case PlotCanvas::tLine:
+
+                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tLine;
+                rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
+                rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
+                rowPtr[5] = (ito::float32) (m_data.m_pDrawItems[y]->x2);
+                rowPtr[6] = (ito::float32) (m_data.m_pDrawItems[y]->y2);
+            break;
+
+            case PlotCanvas::tRect:
+                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRetangle;
+                rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
+                rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
+                rowPtr[5] = (ito::float32) (m_data.m_pDrawItems[y]->x2);
+                rowPtr[6] = (ito::float32) (m_data.m_pDrawItems[y]->y2);
+            break;
+
+            case PlotCanvas::tEllipse:
+                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tElipse;
+                rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
+                rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
+                rowPtr[5] = (abs((ito::float32)m_data.m_pDrawItems[y]->x1 - (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
+                rowPtr[6] = (abs((ito::float32)m_data.m_pDrawItems[y]->y1 - (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
+            break;
+
+            case PlotCanvas::tCircle:
+                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tCircle;
+                rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
+                rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
+                rowPtr[5] = (abs((ito::float32)m_data.m_pDrawItems[y]->x1 - (ito::float32)m_data.m_pDrawItems[y]->x2) / 4.0) + (abs((ito::float32)m_data.m_pDrawItems[y]->y1 - (ito::float32)m_data.m_pDrawItems[y]->y2) / 4.0);
+            break;
+
+            case PlotCanvas::tSquare:
+                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tSquare;
+                rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
+                rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
+                rowPtr[5] = (abs((ito::float32)m_data.m_pDrawItems[y]->x1 - (ito::float32)m_data.m_pDrawItems[y]->x2) / 4.0) + (abs((ito::float32)m_data.m_pDrawItems[y]->y1 - (ito::float32)m_data.m_pDrawItems[y]->y2) / 4.0);
+            break;
+        }
+    }
+    
+    return ito::retOk;
+}
+
+void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
+{
+
+    return;
+}
 //----------------------------------------------------------------------------------------------------------------------------------

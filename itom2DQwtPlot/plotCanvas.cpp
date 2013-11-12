@@ -25,6 +25,7 @@
 #include "DataObject/dataObjectFuncs.h"
 #include "common/apiFunctionsGraphInc.h"
 #include "common/apiFunctionsInc.h"
+#include "common\sharedStructuresPrimitives.h"
 
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
@@ -57,7 +58,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
-        QwtPlot(parent),
+        QwtPlot(parent),    
         m_pZoomer(NULL),
         m_pPanner(NULL),
         m_pLineCutPicker(NULL),
@@ -72,7 +73,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_zstackCutUID(0),
         m_lineCutUID(0),
         m_pLineCutLine(NULL),
-        m_pMultiPointPicker(NULL)
+        m_pMultiPointPicker(NULL),
+        m_lastGeometricItem(0)
 {
     setMouseTracking(false);
 
@@ -1461,6 +1463,7 @@ void PlotCanvas::multiPointActivated (bool on)
                 if (p)
                 {
                     emit p->userInteractionDone(1, aborted, polygonScale);
+                    emit p->plotItemsFinished(ito::PrimitiveContainer::tPoint, aborted);
                 }
 
                 setState(tIdle);
@@ -1499,11 +1502,12 @@ void PlotCanvas::multiPointActivated (bool on)
                 if (p)
                 {
                     emit p->userInteractionDone(1, aborted, polygonScale);
+                    emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
                 }
 
                 QPainterPath *path = new QPainterPath();
                 DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, tLine);
+                newItem = new DrawItem(this, tLine, m_lastGeometricItem++);
                 path->moveTo(polygonScale[0].x(), polygonScale[0].y());
                 path->lineTo(polygonScale[1].x(), polygonScale[1].y());
 
@@ -1550,11 +1554,12 @@ void PlotCanvas::multiPointActivated (bool on)
                 if (p)
                 {
                     emit p->userInteractionDone(1, aborted, polygonScale);
+                    emit p->plotItemsFinished(ito::PrimitiveContainer::tRetangle, aborted);
                 }
 
                 QPainterPath *path = new QPainterPath();
                 DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, tRect);
+                newItem = new DrawItem(this, tRect, m_lastGeometricItem++);
                 path->addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
                               polygonScale[1].y() - polygonScale[0].y());
 
@@ -1604,11 +1609,12 @@ void PlotCanvas::multiPointActivated (bool on)
                 if (p)
                 {
                     emit p->userInteractionDone(1, aborted, polygonScale);
+                    emit p->plotItemsFinished(ito::PrimitiveContainer::tElipse, aborted);
                 }
 
                 QPainterPath *path = new QPainterPath();
                 DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, tEllipse);
+                newItem = new DrawItem(this, tEllipse, m_lastGeometricItem++);
                 path->addEllipse(polygonScale[0].x(), polygonScale[0].y(),
                         (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
@@ -1630,6 +1636,7 @@ void PlotCanvas::multiPointActivated (bool on)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
 {
+    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     if (m_pData->m_state == tIdle)
     {
         int canxpos = event->x() - canvas()->x();
@@ -1677,12 +1684,14 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                 switch (m_pData->m_pDrawItems[n]->m_type)
                 {
                     case tPoint:
+                        if(p) emit p->plotItemChanged(n);
                     break;
 
                     case tLine:
                         path->moveTo(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1);
                         path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                         m_pData->m_pDrawItems[n]->setShape(*path);
+                        if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
 
@@ -1691,6 +1700,7 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             invTransform(QwtPlot::xBottom, canxpos) - m_pData->m_pDrawItems[n]->x1,
                             invTransform(QwtPlot::yLeft, canypos) - m_pData->m_pDrawItems[n]->y1);
                         m_pData->m_pDrawItems[n]->setShape(*path);
+                        if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
 
@@ -1700,6 +1710,7 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             (invTransform(QwtPlot::xBottom, canxpos)- m_pData->m_pDrawItems[n]->x1),
                             (invTransform(QwtPlot::yLeft, canypos) - m_pData->m_pDrawItems[n]->y1)),
                         m_pData->m_pDrawItems[n]->setShape(*path);
+                        if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
                 }

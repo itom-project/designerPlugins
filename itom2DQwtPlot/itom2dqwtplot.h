@@ -51,6 +51,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
+    Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -64,6 +65,8 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://titleFont", "Font for title.")
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
+    Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
+
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -129,6 +132,9 @@ public:
     QFont getAxisFont(void) const;
     void setAxisFont(const QFont &font);
 
+    QSharedPointer< ito::DataObject > getGeometricElements();
+    void setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
+
     friend class PlotCanvas;
 
 protected:
@@ -167,6 +173,8 @@ private:
 
     QHash<QObject*,ito::uint32> m_childFigures;
 
+    ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
+
 private slots:
     void mnuActSave();
     void mnuActHome();
@@ -192,6 +200,7 @@ public slots:
     ito::RetVal deleteMarkers(QString id);
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
+    
 //    void userInteractionEndRect(const QRectF &rect);
 //    void userInteractionEndEllipse(const QRectF &rect);    
 //    void userInteractionEndPt(const QVector<QPointF> &points);
@@ -199,6 +208,8 @@ public slots:
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);
+    void plotItemChanged(int index);
+    void plotItemsFinished(int type, bool aborted);
 
 };
 

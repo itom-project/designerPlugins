@@ -26,8 +26,8 @@
 #include <qwt_symbol.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(QwtPlot *parent, char type, const QString &title) : m_pparent(parent), m_type(type), m_active(0), x1(-1), y1(-1),
-    x2(-1), y2(-1)
+DrawItem::DrawItem(QwtPlot *parent, char type, const int &idx, const QString &title) : m_pparent(parent), m_type(type), m_active(0), x1(-1), y1(-1),
+    x2(-1), y2(-1), m_idx(idx)
 {
 
 }
