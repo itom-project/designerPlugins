@@ -84,6 +84,7 @@ class PlotCanvas : public QwtPlot
         ito::RetVal deleteMarkers(const QString &id);
 
         friend class Itom2dQwtPlot;
+        friend class DrawItem;
 
     protected:
         void contextMenuEvent(QContextMenuEvent * event);

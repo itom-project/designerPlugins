@@ -64,8 +64,18 @@ void DrawItem::setShape(const QPainterPath &path)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
-        marker->setLinePen(QPen(Qt::green));
-        marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
+        if (((PlotCanvas*)m_pparent)->m_inverseColor1.isValid())
+        {
+            marker->setLinePen(QPen(((PlotCanvas*)m_pparent)->m_inverseColor1));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+        }
+        else
+        {
+            marker->setLinePen(QPen(Qt::green));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
+        }
+
 
         switch (m_type)
         {
@@ -95,8 +105,17 @@ void DrawItem::setShape(const QPainterPath &path)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
-        marker->setLinePen(QPen(Qt::green));
-        marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
+        if (((PlotCanvas*)m_pparent)->m_inverseColor1.isValid())
+        {
+            marker->setLinePen(QPen(((PlotCanvas*)m_pparent)->m_inverseColor1));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7, 7) ));
+        }
+        else
+        {
+            marker->setLinePen(QPen(Qt::green));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
+        }
 
         switch (m_type)
         {
