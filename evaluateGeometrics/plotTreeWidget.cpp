@@ -52,6 +52,8 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
 
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     
+    m_rowHash.clear();
+    m_rowHash.reserve(24);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -839,13 +841,13 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
                         changed = true;
                         memcpy(newVal.cells, srcPtr, sizeof(ito::float32) * cols);
 
-                        if(m_rowHash.size() < scnt)
+                        if(m_rowHash.size() > scnt)
                         {
-                            m_rowHash.append(newVal);
+                            m_rowHash.insert(scnt, newVal);
                         }
                         else
                         {
-                            m_rowHash.insert(scnt, newVal);
+                            m_rowHash.append(newVal);
                         }
                         
                     }
