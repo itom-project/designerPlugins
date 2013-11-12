@@ -25,7 +25,7 @@
 #include "DataObject/dataObjectFuncs.h"
 #include "common/apiFunctionsGraphInc.h"
 #include "common/apiFunctionsInc.h"
-#include "common\sharedStructuresPrimitives.h"
+#include "common/sharedStructuresPrimitives.h"
 
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
-        QwtPlot(parent),    
+        QwtPlot(parent),
         m_pZoomer(NULL),
         m_pPanner(NULL),
         m_pLineCutPicker(NULL),
@@ -1304,7 +1304,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
                 {
                     m_pData->m_elementsToPick = (maxNrOfPoints / 2);
                 }
-                
+
                 m->setMaxNrItems( 2 );
                 m_pMultiPointPicker->setEnabled(true);
 
@@ -1339,15 +1339,15 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
-            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+//            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 
-            if (m)
+//            if (m)
             {
                 if(m_pData)
                 {
                     m_pData->m_elementsToPick = (maxNrOfPoints / 2);
                 }
-                m->setMaxNrItems( 2 );
+//                m->setMaxNrItems( 2 );
                 m_pMultiPointPicker->setEnabled(true);
 
                 emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
@@ -1381,15 +1381,15 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
-            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+//            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 
-            if (m)
+//            if (m)
             {
                 if(m_pData)
                 {
                     m_pData->m_elementsToPick = (maxNrOfPoints / 2);
                 }
-                m->setMaxNrItems( 2 );
+//                m->setMaxNrItems( 2 );
                 m_pMultiPointPicker->setEnabled(true);
 
                 emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
@@ -1415,6 +1415,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             }
         }
     }
+
     else
     {
         retval += ito::RetVal(ito::retError,0,"Unknown type for userInteractionStart");
@@ -1810,6 +1811,7 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                         if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
+
                 }
 
                 break;

@@ -34,7 +34,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_picker_machine.h>
 
-#include "common\sharedStructuresPrimitives.h"
+#include "common/sharedStructuresPrimitives.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
@@ -861,7 +861,7 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
 
     switch (action->data().toInt())
     {
-        default:        
+        default:
         case PlotCanvas::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
             m_pContent->userInteractionStart(PlotCanvas::tPoint, 1, 1);
@@ -1182,7 +1182,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
         }
     }
-    
+
     return ito::retOk;
 }
 

@@ -35,11 +35,12 @@ DrawItem::DrawItem(QwtPlot *parent, char type, const int &idx, const QString &ti
 //----------------------------------------------------------------------------------------------------------------------------------
 DrawItem::~DrawItem()
 {
+    detach();
     for (int n = 0; n < m_marker.size(); n++)
     {
         m_marker[n]->detach();
 //        m_marker.remove(n);
-//        delete m_marker[n];
+        delete m_marker[n];
     }
     m_marker.clear();
 }
@@ -56,7 +57,7 @@ void DrawItem::setShape(const QPainterPath &path)
         {
             m_marker[n]->detach();
 //            m_marker.remove(n);
-//            delete m_marker[n];
+            delete m_marker[n];
         }
         m_marker.clear();
     }
@@ -79,6 +80,7 @@ void DrawItem::setShape(const QPainterPath &path)
 
         switch (m_type)
         {
+            default:
             case PlotCanvas::tLine:
             case PlotCanvas::tRect:
                 el = path.elementAt(0);
@@ -87,11 +89,18 @@ void DrawItem::setShape(const QPainterPath &path)
             break;
 
             case PlotCanvas::tEllipse:
-                el = path.elementAt(6);
-                x1 = el.x;
-                el = path.elementAt(9);
-                y1 = el.y;
+                if (path.length() >= 7)
+                {
+                    el = path.elementAt(6);
+                    x1 = el.x;
+                }
+                if (path.length() >= 10)
+                {
+                    el = path.elementAt(9);
+                    y1 = el.y;
+                }
             break;
+
         }
 
         marker->setXValue(x1);
@@ -119,6 +128,7 @@ void DrawItem::setShape(const QPainterPath &path)
 
         switch (m_type)
         {
+            default:
             case PlotCanvas::tLine:
                 el = path.elementAt(1);
                 x2 = el.x;
@@ -126,17 +136,24 @@ void DrawItem::setShape(const QPainterPath &path)
             break;
 
             case PlotCanvas::tRect:
-                el = path.elementAt(2);
-                x2 = el.x;
-                y2 = el.y;
+                if (path.length() >= 3)
+                {
+                    el = path.elementAt(2);
+                    x2 = el.x;
+                    y2 = el.y;
+                }
             break;
 
             case PlotCanvas::tEllipse:
                 el = path.elementAt(0);
                 x2 = el.x;
-                el = path.elementAt(3);
-                y2 = el.y;
+                if (path.length() >= 4)
+                {
+                    el = path.elementAt(3);
+                    y2 = el.y;
+                }
             break;
+
         }
 
         marker->setXValue(x2);
