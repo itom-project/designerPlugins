@@ -579,38 +579,12 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
     }
     return ito::retOk;
 }
-/*
-ito::RetVal EvaluateGeometricsFigure::addRelation(QVector<ito::float64> importedData)
+//---------------------------------------------------------------------------------------------------------
+ito::RetVal EvaluateGeometricsFigure::plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values)
 {
-    relationsShip newRelation;
-            
-    newRelation.secondElementRow = -1;
-    newRelation.firstElementRow = -1;
-
-    newRelation.myWidget = NULL;
-
-    switch(importedData.size())
-    {
-        case 4:
-        default:
-            newRelation.secondElementIdx = (ito::int32)(importedData[3]);
-        case 3:
-            newRelation.secondElementIdx = (ito::int32)(importedData[2]);
-        case 2:
-            newRelation.type = (ito::int32)(importedData[1]);
-        case 1:
-            newRelation.firstElementIdx = (ito::int32)(importedData[0]);
-        break;
-        case 0:
-            return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toAscii().data());
-    }
-
-    m_info.m_relationsList.append(newRelation);
-
     if(m_pContent)
     {
-        m_pContent->updateRelationShips(false);
+        return m_pContent->updateElement(idx, flags, values);
     }
     return ito::retOk;
-
-}*/
+}

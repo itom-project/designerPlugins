@@ -186,6 +186,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         //ito::RetVal addRelation(QVector<ito::float64> importedData);
         ito::RetVal exportData(QString fileName, ito::uint8 exportFlag);
 
+        ito::RetVal plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);
+
     private slots:
         
         void mnuHome();

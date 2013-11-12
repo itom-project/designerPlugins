@@ -1782,14 +1782,14 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                 switch (m_pData->m_pDrawItems[n]->m_type)
                 {
                     case tPoint:
-                        if(p) emit p->plotItemChanged(n);
+                        //if(p) emit p->plotItemChanged(n);
                     break;
 
                     case tLine:
                         path->moveTo(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1);
                         path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                         m_pData->m_pDrawItems[n]->setShape(*path);
-                        if(p) emit p->plotItemChanged(n);
+                        //if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
 
@@ -1798,7 +1798,7 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             invTransform(QwtPlot::xBottom, canxpos) - m_pData->m_pDrawItems[n]->x1,
                             invTransform(QwtPlot::yLeft, canypos) - m_pData->m_pDrawItems[n]->y1);
                         m_pData->m_pDrawItems[n]->setShape(*path);
-                        if(p) emit p->plotItemChanged(n);
+                        //if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
 
@@ -1808,7 +1808,7 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             (invTransform(QwtPlot::xBottom, canxpos)- m_pData->m_pDrawItems[n]->x1),
                             (invTransform(QwtPlot::yLeft, canypos) - m_pData->m_pDrawItems[n]->y1)),
                         m_pData->m_pDrawItems[n]->setShape(*path);
-                        if(p) emit p->plotItemChanged(n);
+                        //if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
 
@@ -1823,6 +1823,7 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mousePressEvent ( QMouseEvent * event )
 {
+
     if (m_pData->m_state == tIdle)
     {
         for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
@@ -1848,12 +1849,72 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
 {
-
+    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
         || m_pData->m_state == tPoint || m_pData->m_state == tIdle)
     {
         for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
+            if(m_pData->m_pDrawItems[n]->m_active != 0 && p)
+            {
+                int type = 0;
+                QVector<ito::float32> values;
+                values.reserve(11);
+                switch(m_pData->m_pDrawItems[n]->m_type)
+                {
+                    case tPoint:
+                        type = ito::PrimitiveContainer::tPoint;
+                        values.append(m_pData->m_pDrawItems[n]->x1);
+                        values.append(m_pData->m_pDrawItems[n]->y1);
+                        values.append(0.0);
+                        break;
+                    case tLine:
+                        type = ito::PrimitiveContainer::tLine;
+                        values.append(m_pData->m_pDrawItems[n]->x1);
+                        values.append(m_pData->m_pDrawItems[n]->y1);
+                        values.append(0.0);
+                        values.append(m_pData->m_pDrawItems[n]->x2);
+                        values.append(m_pData->m_pDrawItems[n]->y2);
+                        values.append(0.0);
+                        break;
+                    case tRect:
+                        type = ito::PrimitiveContainer::tRetangle;
+                        values.append(m_pData->m_pDrawItems[n]->x1);
+                        values.append(m_pData->m_pDrawItems[n]->y1);
+                        values.append(0.0);
+                        values.append(m_pData->m_pDrawItems[n]->x2);
+                        values.append(m_pData->m_pDrawItems[n]->y2);
+                        values.append(0.0);
+                        break;
+                    case tEllipse:
+                        type = ito::PrimitiveContainer::tElipse;
+                        values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append((m_pData->m_pDrawItems[n]->y1 + m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append(0.0);
+                        values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append(abs(m_pData->m_pDrawItems[n]->y1 - m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append(0.0);
+                        break;
+                    case tCircle:
+                        type = ito::PrimitiveContainer::tCircle;
+                        values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append((m_pData->m_pDrawItems[n]->y1 + m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append(0.0);
+                        values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append(0.0);
+                        break;
+                    case tSquare:
+                        type = ito::PrimitiveContainer::tSquare;
+                        values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append((m_pData->m_pDrawItems[n]->y1 + m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append(0.0);
+                        values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append(0.0);
+                        break;
+                }
+
+                emit p->plotItemChanged(m_pData->m_pDrawItems[n]->m_idx, type, values);
+            }
             m_pData->m_pDrawItems[n]->m_active = 0;
         }
     }

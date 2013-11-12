@@ -152,6 +152,8 @@ class PlotTreeWidget : public QTreeWidget
 
         QVector<geometricPrimitives> m_rowHash;
 
+        ito::RetVal updateElement(const ito::int32 &idx, const ito::int32 &flags,const QVector<ito::float32> &values);
+
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
