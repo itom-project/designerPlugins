@@ -1251,6 +1251,10 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
 
             if (m)
             {
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = 0;
+                }
                 m->setMaxNrItems( maxNrOfPoints );
                 m_pMultiPointPicker->setEnabled(true);
 
@@ -1292,12 +1296,19 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 
+
             if (m)
             {
+
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = (maxNrOfPoints / 2);
+                }
+                
                 m->setMaxNrItems( 2 );
                 m_pMultiPointPicker->setEnabled(true);
 
-                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
             }
         }
         else //start == false
@@ -1306,6 +1317,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             m_pMultiPointPicker->setEnabled(false);
 
             emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            if(m_pData)
+            {
+                m_pData->m_elementsToPick = 0;
+            }
 
             Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
             if (p)
@@ -1327,10 +1343,14 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
 
             if (m)
             {
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = (maxNrOfPoints / 2);
+                }
                 m->setMaxNrItems( 2 );
                 m_pMultiPointPicker->setEnabled(true);
 
-                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
             }
         }
         else //start == false
@@ -1339,6 +1359,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             m_pMultiPointPicker->setEnabled(false);
 
             emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            if(m_pData)
+            {
+                m_pData->m_elementsToPick = 0;
+            }
 
             Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
             if (p)
@@ -1360,10 +1385,14 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
 
             if (m)
             {
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = (maxNrOfPoints / 2);
+                }
                 m->setMaxNrItems( 2 );
                 m_pMultiPointPicker->setEnabled(true);
 
-                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
             }
         }
         else //start == false
@@ -1372,6 +1401,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             m_pMultiPointPicker->setEnabled(false);
 
             emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            if(m_pData)
+            {
+                m_pData->m_elementsToPick = 0;
+            }
 
             Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
             if (p)
@@ -1419,6 +1453,22 @@ void PlotCanvas::multiPointActivated (bool on)
                     }
 
                     emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+                }
+
+                if(m_pData && (m_pData->m_elementsToPick > 1))
+                {
+                    m_pData->m_elementsToPick--;
+                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                    if (m)
+                    {
+                        m->setMaxNrItems( 2 );
+                        m_pMultiPointPicker->setEnabled(true);
+                    }
+                    return;
+                }
+                else
+                {
+                    m_pData->m_elementsToPick = 0;
                 }
 
                 Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
@@ -1498,13 +1548,6 @@ void PlotCanvas::multiPointActivated (bool on)
                     emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
                 }
 
-                Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
-                if (p)
-                {
-                    emit p->userInteractionDone(1, aborted, polygonScale);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
-                }
-
                 QPainterPath *path = new QPainterPath();
                 DrawItem *newItem = NULL;
                 newItem = new DrawItem(this, tLine, m_lastGeometricItem++);
@@ -1518,8 +1561,32 @@ void PlotCanvas::multiPointActivated (bool on)
                 newItem->attach(this);
                 replot();
                 m_pData->m_pDrawItems.append(newItem);
-                setState(tIdle);
-                m_pMultiPointPicker->setEnabled(false);
+
+                // if further elements are needed reset the plot engine and go ahead else finish editing
+                if(m_pData && (m_pData->m_elementsToPick > 1))
+                {
+                    m_pData->m_elementsToPick--;
+                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                    if (m)
+                    {
+                        m->setMaxNrItems( 2 );
+                        m_pMultiPointPicker->setEnabled(true);
+                    }
+                    return;
+                }
+                else
+                {
+                    m_pData->m_elementsToPick = 0;
+                    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+                    if (p)
+                    {
+                        emit p->userInteractionDone(1, aborted, polygonScale);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
+                    }
+                    setState(tIdle);
+                    m_pMultiPointPicker->setEnabled(false);
+                }
+
             }
         break;
 
@@ -1550,13 +1617,6 @@ void PlotCanvas::multiPointActivated (bool on)
                     emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
                 }
 
-                Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
-                if (p)
-                {
-                    emit p->userInteractionDone(1, aborted, polygonScale);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tRetangle, aborted);
-                }
-
                 QPainterPath *path = new QPainterPath();
                 DrawItem *newItem = NULL;
                 newItem = new DrawItem(this, tRect, m_lastGeometricItem++);
@@ -1570,11 +1630,31 @@ void PlotCanvas::multiPointActivated (bool on)
                 newItem->attach(this);
                 replot();
                 m_pData->m_pDrawItems.append(newItem);
-                setState(tIdle);
-                m_pMultiPointPicker->setEnabled(false);
 
-                setState(tIdle);
-                m_pMultiPointPicker->setEnabled(false);
+                // if further elements are needed reset the plot engine and go ahead else finish editing
+                if(m_pData && (m_pData->m_elementsToPick > 1))
+                {
+                    m_pData->m_elementsToPick--;
+                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                    if (m)
+                    {
+                        m->setMaxNrItems( 2 );
+                        m_pMultiPointPicker->setEnabled(true);
+                    }
+                    return;
+                }
+                else
+                {
+                    m_pData->m_elementsToPick = 0;
+                    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+                    if (p)
+                    {
+                        emit p->userInteractionDone(1, aborted, polygonScale);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tRetangle, aborted);
+                    }
+                    setState(tIdle);
+                    m_pMultiPointPicker->setEnabled(false);
+                }
             }
         break;
 
@@ -1605,13 +1685,6 @@ void PlotCanvas::multiPointActivated (bool on)
                     emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
                 }
 
-                Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
-                if (p)
-                {
-                    emit p->userInteractionDone(1, aborted, polygonScale);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tElipse, aborted);
-                }
-
                 QPainterPath *path = new QPainterPath();
                 DrawItem *newItem = NULL;
                 newItem = new DrawItem(this, tEllipse, m_lastGeometricItem++);
@@ -1625,8 +1698,32 @@ void PlotCanvas::multiPointActivated (bool on)
                 newItem->attach(this);
                 replot();
                 m_pData->m_pDrawItems.append(newItem);
-                setState(tIdle);
-                m_pMultiPointPicker->setEnabled(false);
+
+
+                // if further elements are needed reset the plot engine and go ahead else finish editing
+                if(m_pData && (m_pData->m_elementsToPick > 1))
+                {
+                    m_pData->m_elementsToPick--;
+                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                    if (m)
+                    {
+                        m->setMaxNrItems( 2 );
+                        m_pMultiPointPicker->setEnabled(true);
+                    }
+                    return;
+                }
+                else
+                {
+                    m_pData->m_elementsToPick = 0;
+                    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+                    if (p)
+                    {
+                        emit p->userInteractionDone(1, aborted, polygonScale);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tElipse, aborted);
+                    }
+                    setState(tIdle);
+                    m_pMultiPointPicker->setEnabled(false);
+                }
             }
         break;
 
@@ -1749,6 +1846,7 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
 {
+
     if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
         || m_pData->m_state == tPoint || m_pData->m_state == tIdle)
     {

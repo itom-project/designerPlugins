@@ -191,6 +191,10 @@ struct InternalData
         m_cmplxType = PlotCanvas::Real;
         m_state = PlotCanvas::tIdle;
         m_pConstOutput = NULL;
+
+        m_elementsToPick = 0;
+
+        m_pDrawItems.clear();
     }
     ~InternalData()
     {
@@ -234,6 +238,8 @@ struct InternalData
     bool m_yaxisVisible;
 
     bool m_colorBarVisible;
+
+    int m_elementsToPick;
 
     PlotCanvas::ComplexType m_cmplxType;
 

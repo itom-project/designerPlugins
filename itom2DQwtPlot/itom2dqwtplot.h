@@ -52,6 +52,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
+    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount WRITE setGeometricElementsCount DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -98,6 +99,9 @@ public:
     QString getValueLabel() const;
     void setValueLabel(const QString &label);
     void resetValueLabel();
+
+    int getGeometricElementsCount() const { return m_data.m_pDrawItems.size();}
+    void setGeometricElementsCount(const int value){ return;}
 
     bool getyAxisFlipped() const;
     void setyAxisFlipped(const bool &value);

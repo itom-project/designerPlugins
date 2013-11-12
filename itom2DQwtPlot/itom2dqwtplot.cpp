@@ -85,6 +85,8 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_yaxisFlipped = false;
     m_data.m_pConstOutput = &m_pOutput;
     m_data.m_state = PlotCanvas::tIdle;
+    m_data.m_elementsToPick = 0;
+    m_data.m_pDrawItems.clear();
 
     //initialize canvas
     m_pContent = new PlotCanvas(&m_data, this);
@@ -1060,9 +1062,12 @@ void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     m_pActDrawMode->setChecked(false);
 
     m_pContent->userInteractionStart(type, start, maxNrOfPoints);
-    m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
-    m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
 
+    if(type == PlotCanvas::tPoint)
+    {
+        m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+        m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
+    }
     //m_pContent->setWindowState((m_pContent->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     //m_pContent->raise(); //for MacOS
     //m_pContent->activateWindow(); //for Windows
@@ -1099,6 +1104,11 @@ QSharedPointer< ito::DataObject > Itom2dQwtPlot::getGeometricElements()
     int ysize = m_data.m_pDrawItems.size();
     int xsize = PRIM_ELEMENTLENGTH;
 
+    if(ysize == 0)
+    {
+        return QSharedPointer< ito::DataObject >(new ito::DataObject());
+    }
+
     QSharedPointer< ito::DataObject > exportItem(new ito::DataObject(ysize, xsize, ito::tFloat32));
 
     qvector2DataObject(exportItem.data());
@@ -1109,6 +1119,12 @@ QSharedPointer< ito::DataObject > Itom2dQwtPlot::getGeometricElements()
 ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 {
     int ysize = dstObject->getSize(0);
+
+    if(ysize == 0)
+    {
+        return ito::retError;
+    }
+
     int xsize = dstObject->getSize(1);
 
     cv::Mat *tarMat = (cv::Mat*)(dstObject->get_mdata()[0]);
@@ -1122,16 +1138,12 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
         switch (m_data.m_pDrawItems[y]->m_type)
         {
             case PlotCanvas::tPoint:
-                
-                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tPoint;
                 rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
                 rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
             break;
 
             case PlotCanvas::tLine:
-
-                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tLine;
                 rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
                 rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
@@ -1140,7 +1152,6 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case PlotCanvas::tRect:
-                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRetangle;
                 rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
                 rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
@@ -1149,7 +1160,6 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case PlotCanvas::tEllipse:
-                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tElipse;
                 rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
@@ -1158,7 +1168,6 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case PlotCanvas::tCircle:
-                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tCircle;
                 rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
@@ -1166,7 +1175,6 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case PlotCanvas::tSquare:
-                rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tSquare;
                 rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
