@@ -1061,13 +1061,28 @@ void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     m_pActStackCut->setChecked(false);
     m_pActDrawMode->setChecked(false);
 
-    m_pContent->userInteractionStart(type, start, maxNrOfPoints);
-
-    if(type == PlotCanvas::tPoint)
+    switch (type)
     {
-        m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
-        m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
+        default:
+        case PlotCanvas::tPoint:
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints);
+            m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+            m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
+        break;
+
+        case PlotCanvas::tLine:
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
+        break;
+
+        case PlotCanvas::tRect:
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
+        break;
+
+        case PlotCanvas::tEllipse:
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
+        break;
     }
+
     //m_pContent->setWindowState((m_pContent->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     //m_pContent->raise(); //for MacOS
     //m_pContent->activateWindow(); //for Windows

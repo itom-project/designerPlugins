@@ -1,10 +1,12 @@
 <RCC>
     <qresource prefix="/evaluateGeometrics">
-      <file>icons/radius.png</file>
-      <file>icons/angle.png</file>
-      <file>icons/distance.png</file>
-      <file>icons/area.png</file>
-      <file>icons/intersec.png</file>
-      <file>icons/length.png</file>
+        <file>icons/radius.png</file>
+        <file>icons/angle.png</file>
+        <file>icons/distance.png</file>
+        <file>icons/area.png</file>
+        <file>icons/intersec.png</file>
+        <file>icons/length.png</file>
+        <file>icons/addRel.png</file>
+        <file>icons/remRel.png</file>
     </qresource>
 </RCC>

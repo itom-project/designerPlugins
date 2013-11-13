@@ -34,6 +34,7 @@
 #include <QXmlStreamWriter>
 #include <QCoreApplication>
 
+#define GEO_PI 3.14159265358979323846
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget * parent) :
     QTreeWidget(parent),
@@ -54,6 +55,15 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     
     m_rowHash.clear();
     m_rowHash.reserve(24);
+
+    setColumnCount(5);
+    setColumnWidth(0, 142);
+    setColumnWidth(1, 72);
+    setColumnWidth(2, 72);
+    setColumnWidth(3, 48);
+    setColumnWidth(4, 48);
+    
+    setIconSize(QSize(24, 24));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -176,35 +186,64 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         case ito::PrimitiveContainer::tPoint:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
+                                        .arg( QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+
             break;
         }
         case ito::PrimitiveContainer::tLine:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+
             //elements[2]->setText(QString("[%1; %2; %3]").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-            topLevelItem(row)->setText(2, QString("[%1, %2, %3]").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
+            topLevelItem(row)->setText(2, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[7], 'f', m_pData->numberOfDigits)));
+
             break;
         }
         case ito::PrimitiveContainer::tCircle:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+
             //elements[2]->setText(QString("r = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
-            topLevelItem(row)->setText(2, QString("r = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
+            topLevelItem(row)->setText(2, QString("r = %1 %2")
+                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(m_pData->m_valueUnit));
+
             break;
         }
         case ito::PrimitiveContainer::tElipse:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+
             //elements[2]->setText(QString("a,b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_pData->m_valueUnit));
-            topLevelItem(row)->setText(2, QString("a, b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_pData->m_valueUnit));
+            topLevelItem(row)->setText(2, QString("a,b = %1 %3, %2 %3")
+                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
+                                        .arg(m_pData->m_valueUnit));
+
             if(ito::dObjHelper::isFinite(val[7]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar((uchar)248)));
-                topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar(0x00B0)));
+                topLevelItem(row)->setText(3, QString("alpha = %1%2")
+                                            .arg(QString::number(val[7], 'f', m_pData->numberOfDigits))
+                                            .arg(QChar(0x00B0)));
             }
             else
             {
@@ -216,13 +255,23 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         case ito::PrimitiveContainer::tRetangle:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+
             //elements[2]->setText(QString("[%1; %2; %3]").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-            topLevelItem(row)->setText(2, QString("[%1, %2, %3]").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
+            topLevelItem(row)->setText(2, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[7], 'f', m_pData->numberOfDigits)));
+
             if(ito::dObjHelper::isFinite(val[8]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[8])).arg(QChar((uchar)248)));
-                 topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[8])).arg(QChar(0x00B0)));
+                 topLevelItem(row)->setText(3, QString("alpha = %1%2")
+                                             .arg(QString::number(val[8], 'f', m_pData->numberOfDigits))
+                                             .arg(QChar(0x00B0)));
             }
             else
             {
@@ -234,13 +283,22 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         case ito::PrimitiveContainer::tSquare:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+
             //elements[2]->setText(QString("a = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
-            topLevelItem(row)->setText(2, QString("a = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
+            topLevelItem(row)->setText(2, QString("a = %1 %2")
+                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(m_pData->m_valueUnit));
+
             if(ito::dObjHelper::isFinite(val[6]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar((uchar)248)));
-                 topLevelItem(row)->setText(3, QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar(0x00B0)));
+                 topLevelItem(row)->setText(3, QString("alpha = %1%2")
+                                             .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
+                                             .arg(QChar(0x00B0)));
             }
             else
             {
@@ -252,11 +310,21 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         case ito::PrimitiveContainer::tPolygon:
         {
             //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+
             //elements[2]->setText(QString("[%1; %2; %3]").arg(QString::number(val[4])).arg(QString::number(val[5])).arg(QString::number(val[6])));
-            topLevelItem(row)->setText(2, QString("[%1, %2, %3]").arg(QString::number(val[4])).arg(QString::number(val[5])).arg(QString::number(val[6])));
+            topLevelItem(row)->setText(2, QString("[%1, %2, %3]")
+                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits)));
+
             //elements[3]->setText(QString("%1 [%2]").arg(QString::number(val[7])).arg(QString::number(val[8])));
-             topLevelItem(row)->setText(3, QString("%1 [%2]").arg(QString::number(val[7])).arg(QString::number(val[8])));
+             topLevelItem(row)->setText(3, QString("%1 [%2]")
+                                         .arg(QString::number(val[7], 'f', m_pData->numberOfDigits))
+                                         .arg(QString::number(val[8], 'f', m_pData->numberOfDigits)));
             break;
         }
     }
@@ -464,7 +532,9 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
         if(m_pData->m_relationsList[rel].type & tExtern)
         {
-            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(m_pData->m_valueUnit);
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+                                           .arg(m_pData->m_valueUnit);
+
             //elements[2]->setText(resultString);
             m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
             continue;
@@ -476,7 +546,8 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         else
         {
             //elements[2]->setText(resultString);
-            m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
+            m_pData->m_relationsList[rel].myWidget->setText(2, resultString);
+            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
             continue;
         }
 
@@ -484,7 +555,10 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         {
             //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
             check = calculateRadius(first, m_pData->m_relationsList[rel].extValue);
-            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(m_pData->m_valueUnit);
+
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+                                           .arg(m_pData->m_valueUnit);
+
             //elements[1]->setText("");
             //m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
         }
@@ -492,13 +566,16 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         {
             //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
             check = calculateLength(first, m_pData->m_relationsList[rel].extValue);
-            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(m_pData->m_valueUnit);
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+                                           .arg(m_pData->m_valueUnit);
             //m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
         }
         else if(m_pData->m_relationsList[rel].type == tArea)
         {
-            //check = calculateArea(first, m_pData->m_relationsList[i].extValue);
-            //resultString = QString("%1%2%3").arg(QString::number(m_pData->m_relationsList[i].extValue)).arg(m_pData->m_valueUnit).arg(QChar(L'²'));;
+            check = calculateArea(first, m_pData->m_relationsList[rel].extValue);
+            resultString = QString("%1%2%3").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+                                            .arg(m_pData->m_valueUnit)
+                                            .arg(QChar(0x00B2));
             //m_pData->m_relationsList[rel].myWidget->setText(1, "");       
         }
         else
@@ -512,14 +589,18 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 case tAngle:
                     //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
                     check = calculateAngle(first, second, m_pData->m_relationsList[rel].extValue);
-                    resultString = QString("%1%2").arg(QString::number(m_pData->m_relationsList[rel].extValue)).arg(QChar(0x00B0));
+                    resultString = QString("%1%2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+                                                  .arg(QChar(0x00B0));
                     break;
                 case tIntersection:
                 {
                     cv::Vec3f val;
                     //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
                     check = calculateIntersections(first, second, val);
-                    resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0])).arg(QString::number(val[1])).arg(QString::number(val[2])).arg(m_pData->m_valueUnit);
+                    resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0], 'f', m_pData->numberOfDigits))
+                                                             .arg(QString::number(val[1], 'f', m_pData->numberOfDigits))
+                                                             .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
+                                                             .arg(m_pData->m_valueUnit);
                     break;
                 }
                 default:
@@ -540,7 +621,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
         if(check)
         {
-            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(0, QColor(255,255,255));
+            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255,255,255));
         }
         else
         {
@@ -570,7 +651,7 @@ bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, i
 
     if(ito::dObjHelper::isNotZero(abs))
     {
-        angle = acos(firstVector.dot(secondVector) / abs) * 180 / 3.14159265358979323846;
+        angle = acos(firstVector.dot(secondVector) / abs) * 180 / GEO_PI;
         return true;    
     }
     angle = std::numeric_limits<ito::float32>::signaling_NaN();
@@ -657,6 +738,57 @@ bool PlotTreeWidget::calculateLength(ito::float32 *first, ito::float32 &length)
     return true;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+bool PlotTreeWidget::calculateArea(ito::float32 *first, ito::float32 &area)
+{
+    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tRetangle)
+    {
+        area = abs((first[5] - first[2]) * (first[6] - first[3]));
+        return true;
+    }
+    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tSquare)
+    {
+        area = (first[5] * first[5]);
+        return true;
+    }
+    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
+    {
+        area = (first[5] * first[5])* GEO_PI;
+        return true;
+    }
+    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tElipse)
+    {
+        area = (first[5] * first[6])* GEO_PI;
+        return true;
+    }
+
+    area = std::numeric_limits<ito::float32>::signaling_NaN();
+
+    return false;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &length)
+{
+    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tRetangle)
+    {
+        length = abs( 2 * (first[5] - first[2])) + abs (2 * (first[6] - first[3])); 
+        return true;
+    }
+    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tSquare)
+    {
+        length = 4 * first[5];
+        return true;
+    }
+    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
+    {
+        length =  2 * first[5] * GEO_PI;
+        return true;
+    }
+
+    length = std::numeric_limits<ito::float32>::signaling_NaN();
+
+    return false;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point)
 {
 
@@ -712,15 +844,24 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
             return true;
         }
     }
-    else if(ito::dObjHelper::isNotZero(firstLinePosVector[2]) && 
-            ito::dObjHelper::isNotZero(secondLinePosVector[2]) &&
-            ito::dObjHelper::isNotZero(firstLineDirVector[2]) && 
-            ito::dObjHelper::isNotZero(secondLineDirVector[2])) // is a two dimensional problem
+    else if(!ito::dObjHelper::isNotZero(firstLinePosVector[2]) && 
+            !ito::dObjHelper::isNotZero(secondLinePosVector[2]) &&
+            !ito::dObjHelper::isNotZero(firstLineDirVector[2]) && 
+            !ito::dObjHelper::isNotZero(secondLineDirVector[2])) // is a two dimensional problem
     {
-        secondLinePosVector -= firstLinePosVector;
-        lambda = secondLinePosVector[0] / firstLinePosVector[0];
+        //secondLinePosVector -= firstLinePosVector;
+        //lambda = secondLinePosVector[0] / firstLinePosVector[0];
 
+        firstLineDirVector  = cv::Vec3f(first[5], first[6], first[7]);
+        firstLinePosVector  = cv::Vec3f(first[2], first[3], first[4]);
+        secondLineDirVector  = cv::Vec3f(second[5], second[6], second[7]);
+        secondLinePosVector  = cv::Vec3f(second[2], second[3], second[4]);
 
+        point = (secondLinePosVector.cross(secondLineDirVector)).cross(firstLinePosVector.cross(firstLineDirVector));
+
+        point[0] /= point[2];
+        point[1] /= point[2];
+        point[2] = 0.0;
         return true;
     }
     else // otherwise we have do do it the hard way
@@ -859,6 +1000,10 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
 
     }
      
+    if(clear)
+    {
+        this->clear();
+    }
     if(identical)
     {
         cv::Mat* scrMat = (cv::Mat*)(dataObj->get_mdata()[dataObj->seekMat(0)]);
@@ -876,16 +1021,6 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
     else if(changed)
     {
         this->clear();
-
-        
-        setColumnCount(5);
-        setColumnWidth(0, 142);
-        setColumnWidth(1, 72);
-        setColumnWidth(2, 72);
-        setColumnWidth(3, 48);
-        setColumnWidth(4, 48);
-    
-        setIconSize(QSize(24, 24));
 
         for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
         {
@@ -1043,79 +1178,79 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 case ito::PrimitiveContainer::tPoint:
                 {
                     stream.writeAttribute("name", "point");
-                    stream.writeAttribute("x0", QString::number((ito::int32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::int32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::int32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
                 }
                 break;
                 case ito::PrimitiveContainer::tLine:
                 {
                     stream.writeAttribute("name", "line");
-                    stream.writeAttribute("x0", QString::number((ito::int32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::int32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::int32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("x1", QString::number((ito::int32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("y1", QString::number((ito::int32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("z1", QString::number((ito::int32)m_rowHash[geo].cells[7]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("x1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
+                    stream.writeAttribute("y1", QString::number((ito::float32)m_rowHash[geo].cells[6]));
+                    stream.writeAttribute("z1", QString::number((ito::float32)m_rowHash[geo].cells[7]));
                 }
                 break;
                 case ito::PrimitiveContainer::tElipse:
                 {
                     stream.writeAttribute("name", "ellipse");
-                    stream.writeAttribute("x0", QString::number((ito::int32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::int32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::int32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("r1", QString::number((ito::int32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("r2", QString::number((ito::int32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("alpha", QString::number((ito::int32)m_rowHash[geo].cells[7]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("r1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
+                    stream.writeAttribute("r2", QString::number((ito::float32)m_rowHash[geo].cells[6]));
+                    stream.writeAttribute("alpha", QString::number((ito::float32)m_rowHash[geo].cells[7]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tCircle:
                 {
                     stream.writeAttribute("name", "circle");
-                    stream.writeAttribute("x0", QString::number((ito::int32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::int32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::int32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("r1", QString::number((ito::int32)m_rowHash[geo].cells[5]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("r1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tRetangle:
                 {
                     stream.writeAttribute("name", "retangle");
-                    stream.writeAttribute("x0", QString::number((ito::int32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::int32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::int32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("x1", QString::number((ito::int32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("y1", QString::number((ito::int32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("z1", QString::number((ito::int32)m_rowHash[geo].cells[7]));
-                    stream.writeAttribute("alpha", QString::number((ito::int32)m_rowHash[geo].cells[8]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("x1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
+                    stream.writeAttribute("y1", QString::number((ito::float32)m_rowHash[geo].cells[6]));
+                    stream.writeAttribute("z1", QString::number((ito::float32)m_rowHash[geo].cells[7]));
+                    stream.writeAttribute("alpha", QString::number((ito::float32)m_rowHash[geo].cells[8]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tSquare:
                 {
                     stream.writeAttribute("name", "square");
-                    stream.writeAttribute("x0", QString::number((ito::int32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::int32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::int32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("a", QString::number((ito::int32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("alpha", QString::number((ito::int32)m_rowHash[geo].cells[6]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("a", QString::number((ito::float32)m_rowHash[geo].cells[5]));
+                    stream.writeAttribute("alpha", QString::number((ito::float32)m_rowHash[geo].cells[6]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tPolygon:
                 {
                     stream.writeAttribute("name", "polygoneElement");
-                    stream.writeAttribute("x0", QString::number((ito::int32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::int32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::int32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("xDir", QString::number((ito::int32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("yDir", QString::number((ito::int32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("zDir", QString::number((ito::int32)m_rowHash[geo].cells[7]));
-                    stream.writeAttribute("No", QString::number((ito::int32)m_rowHash[geo].cells[8]));
-                    stream.writeAttribute("Total", QString::number((ito::int32)m_rowHash[geo].cells[9]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("xDir", QString::number((ito::float32)m_rowHash[geo].cells[5]));
+                    stream.writeAttribute("yDir", QString::number((ito::float32)m_rowHash[geo].cells[6]));
+                    stream.writeAttribute("zDir", QString::number((ito::float32)m_rowHash[geo].cells[7]));
+                    stream.writeAttribute("No", QString::number((ito::float32)m_rowHash[geo].cells[8]));
+                    stream.writeAttribute("Total", QString::number((ito::float32)m_rowHash[geo].cells[9]));
                 }
                 break;
 
@@ -1163,7 +1298,7 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
     for(int geo = 0; geo < m_rowHash.size(); geo++)
     {
         outBuffer.clear();
-        outBuffer.append(QByteArray::number(m_rowHash[geo].cells[0]));
+        outBuffer.append(QByteArray::number((ito::int32)m_rowHash[geo].cells[0]));
         for(int i = 1; i < PRIM_ELEMENTLENGTH; i++)
         {
             outBuffer.append(", ");

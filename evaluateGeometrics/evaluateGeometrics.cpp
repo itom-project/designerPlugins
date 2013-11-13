@@ -35,8 +35,12 @@ using namespace ito;
 EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
-    m_actScaleSetting(NULL),
+    m_actSetting(NULL),
 	m_actSave(NULL),
+    m_actAddRel(NULL),
+    m_actRemoveRel(NULL),
+    m_actUpdate(NULL),
+    m_actAutoFitCols(NULL),
     m_mnuSaveSwitch(NULL),
     m_lastFolder("")
 {
@@ -57,13 +61,37 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 	m_actSave->setMenu(m_mnuSaveSwitch);
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
-    m_actScaleSetting->setObjectName("actScaleSetting");
-    m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
+    m_actSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("system settings"), this);
+    m_actSetting->setObjectName("actScaleSetting");
+    m_actSetting->setToolTip(tr("Set the ranges and offsets of this view"));
+    
+    //m_actAddRel
+    m_actAddRel = new QAction(QIcon(":/evaluateGeometrics/icons/addRel.png"), tr("add relation"), this);
+    m_actAddRel->setObjectName("actAddRelation");
+    m_actAddRel->setToolTip(tr("Add a further relation to this table or fix a defect one."));
+
+    //m_actAddRel
+    m_actRemoveRel = new QAction(QIcon(":/evaluateGeometrics/icons/remRel.png"), tr("remove relation"), this);
+    m_actRemoveRel->setObjectName("actRemoveRelation");
+    m_actRemoveRel->setToolTip(tr("Remove a relation from the table."));
+
+    //m_actUpdate
+    m_actUpdate = new QAction(QIcon(":/itomDesignerPlugins/general/icons/upDate.png"), tr("update relation"), this);
+    m_actUpdate->setObjectName("actUpdate");
+    m_actUpdate->setToolTip(tr("Force update of this table."));
+
+    //m_actAutoFitCols
+    m_actAutoFitCols = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("auto-scale columns"), this);
+    m_actAutoFitCols->setObjectName("actAutoFitCols");
+    m_actAutoFitCols->setToolTip(tr("Adapts columns to idle width."));
 
     connect(m_mnuSaveSwitch, SIGNAL(triggered(QAction *)), this, SLOT(mnuExport(QAction *)));
-    connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
+    connect(m_actSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
 
+    connect(m_actAddRel, SIGNAL(triggered()), this, SLOT(mnuAddRelation()));
+    connect(m_actRemoveRel, SIGNAL(triggered()), this, SLOT(mnuDeleteRelation()));
+    connect(m_actUpdate, SIGNAL(triggered()), this, SLOT(mnuUpdate()));
+    connect(m_actAutoFitCols, SIGNAL(triggered()), this, SLOT(mnuAutoFitCols()));
 
 	QToolBar *toolbar = new QToolBar(tr("basic options"), this);
 	addToolBar(toolbar, "mainToolBar");
@@ -71,14 +99,19 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 	QMenu *contextMenu = new QMenu(QObject::tr("Calculate"), this);
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
-    contextMenu->addAction(m_actScaleSetting);
+    contextMenu->addAction(m_actSetting);
     contextMenu->addSeparator();
     contextMenu->addAction(toolbar->toggleViewAction());
 
     // first block is zoom, scale settings, home
 	toolbar->addAction(m_actSave);
+    toolbar->addSeparator();
+    toolbar->addAction(m_actSetting);
+    toolbar->addAction(m_actAutoFitCols);
+    toolbar->addAction(m_actUpdate);
 	toolbar->addSeparator();
-    toolbar->addAction(m_actScaleSetting);
+    toolbar->addAction(m_actAddRel);
+    toolbar->addAction(m_actRemoveRel);
 
     m_info.m_relationNames.clear();
     m_info.m_relationNames.append("N.A.");
@@ -101,8 +134,9 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_info.m_autoTitle = false;
 
     m_info.m_title = "";
-    m_info.m_valueUnit = "mm";
+    m_info.m_valueUnit = "";
     m_info.titleLabel = "";
+    m_info.numberOfDigits = 2;
 
 }
 
@@ -115,10 +149,28 @@ EvaluateGeometricsFigure::~EvaluateGeometricsFigure()
         m_mnuSaveSwitch = NULL;
     }
 
-    if(m_actScaleSetting)
+    if(m_actAddRel)
     {
-        m_actScaleSetting->deleteLater();
-        m_actScaleSetting = NULL;
+        m_actAddRel->deleteLater();
+        m_actAddRel = NULL;
+    }
+
+    if(m_actRemoveRel)
+    {
+        m_actRemoveRel->deleteLater();
+        m_actRemoveRel = NULL;
+    }
+
+    if(m_actUpdate)
+    {
+        m_actUpdate->deleteLater();
+        m_actUpdate = NULL;
+    }
+
+    if(m_actSetting)
+    {
+        m_actSetting->deleteLater();
+        m_actSetting = NULL;
     }
 
     if(m_actSave)
@@ -555,8 +607,8 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
     {
         case 4:
         default:
-            if(relation->getType() == ito::tFloat32) newRelation.extValue = (ito::int32)(relation->at<ito::float32>(0,3));
-            else newRelation.extValue = (ito::int32)(relation->at<ito::float64>(0,3));
+            if(relation->getType() == ito::tFloat32) newRelation.extValue = relation->at<ito::float32>(0,3);
+            else newRelation.extValue = (ito::float32)(relation->at<ito::float64>(0,3));
         case 3:
             if(relation->getType() == ito::tFloat32) newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float32>(0,2));
             else newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float64>(0,2));
@@ -585,6 +637,41 @@ ito::RetVal EvaluateGeometricsFigure::plotItemChanged(ito::int32 idx, ito::int32
     if(m_pContent)
     {
         return m_pContent->updateElement(idx, flags, values);
+    }
+    return ito::retOk;
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::mnuAddRelation()
+{
+
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::mnuDeleteRelation()
+{
+
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::mnuUpdate()
+{
+    if(m_pContent)
+    {
+        m_pContent->updateRelationShips(false);
+    }
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::mnuAutoFitCols()
+{
+
+}
+//---------------------------------------------------------------------------------------------------------
+ito::RetVal EvaluateGeometricsFigure::clearAll(void) 
+{
+    m_info.m_relationsList.clear();
+
+    if(m_pContent)
+    {
+        ito::DataObject dummyObject;
+        m_pContent->refreshPlot(&dummyObject);
     }
     return ito::retOk;
 }

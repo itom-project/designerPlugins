@@ -65,6 +65,7 @@ struct InternalInfo
     QString titleLabel;
     QStringList m_relationNames;
     QVector<relationsShip> m_relationsList;
+    ito::uint8 numberOfDigits;
 };
 
 class PlotTreeWidget : public QTreeWidget
@@ -132,6 +133,8 @@ class PlotTreeWidget : public QTreeWidget
         bool calculateRadius(ito::float32 *first, ito::float32 &radius);
         bool calculateLength(ito::float32 *first, ito::float32 &length);
         bool calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point);
+        bool calculateArea(ito::float32 *first, ito::float32 &area);
+        bool calculateCircumference(ito::float32 *first, ito::float32 &length);
 
         ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);
         ito::RetVal writeToXML(const QFileInfo &fileName);

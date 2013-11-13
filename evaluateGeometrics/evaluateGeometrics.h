@@ -31,6 +31,8 @@
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qpainter.h>
+#include <qstring.h>
+#include <qstringlist.h>
 
 #include <qaction.h>
 
@@ -49,6 +51,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
     Q_PROPERTY(QSharedPointer<ito::DataObject> relations READ getRelations WRITE setRelations DESIGNABLE false)
+    Q_PROPERTY(QStringList relationNames READ getRelationNames WRITE setRelationNames DESIGNABLE true)
     Q_PROPERTY(QString destinationFolder READ getDestinationFolder WRITE setDestinationFolder DESIGNABLE true)
     
 
@@ -172,8 +175,12 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         InternalInfo m_info;
 
-        QAction * m_actScaleSetting;
+        QAction *m_actSetting;
 		QAction *m_actSave;
+        QAction *m_actAddRel;
+        QAction *m_actRemoveRel;
+        QAction *m_actUpdate;
+        QAction *m_actAutoFitCols;
         QMenu   *m_mnuSaveSwitch;
 
         QString m_lastFolder;
@@ -181,13 +188,17 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     public slots:
         void mnuScaleSetting();
         void mnuExport(QAction* action);
-        
+        void mnuAddRelation();
+        void mnuDeleteRelation();
+        void mnuUpdate();
+        void mnuAutoFitCols();
+
         ito::RetVal addRelation(QSharedPointer<ito::DataObject> importedData);
-        //ito::RetVal addRelation(QVector<ito::float64> importedData);
+
         ito::RetVal exportData(QString fileName, ito::uint8 exportFlag);
 
         ito::RetVal plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);
-
+        ito::RetVal clearAll(void);
     private slots:
         
         void mnuHome();
