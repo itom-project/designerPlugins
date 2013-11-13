@@ -872,13 +872,6 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
 
     return true;
 }
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::updateLabels()
-{
-  
-}
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
 {
@@ -1358,26 +1351,7 @@ void PlotTreeWidget::contextMenuEvent(QContextMenuEvent * event)
 {
 
 }
-
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal PlotTreeWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
-{
- 
-
-    return ito::retOk;
-}
 */
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::setZoomerEnable(const bool checked)
-{
- 
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::setPickerEnable(const bool checked)
-{
-   
-}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTreeWidget::setPannerEnable(const bool checked)
@@ -1386,8 +1360,65 @@ void PlotTreeWidget::setPannerEnable(const bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
+void PlotTreeWidget::updatePrimitives()
 {
-   
+    for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
+    {
+        setPrimitivElement(dcnt, true, m_rowHash[dcnt].cells);
+    }   
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotTreeWidget::autoFitCols()
+{
+    int fontWidth = 5;
+    int max = 0;
+    int val = 0;
+    for( int topItem = 0; topItem < topLevelItemCount(); topItem++)
+    {
+        val = topLevelItem(topItem)->text(0).size() * fontWidth +  2 * fontWidth + iconSize().width() + 24;
+        if(val > max)
+        {
+            max = val;
+        }
 
+        if(topLevelItem(topItem)->childCount() > 0)
+        {
+            for( int childItem = 0; childItem < topLevelItem(topItem)->childCount(); childItem++)
+            {
+                val = topLevelItem(topItem)->child(childItem)->text(0).size() * fontWidth + 2 * fontWidth + iconSize().width() + 46;
+                if(val > max)
+                {
+                    max = val;
+                }
+            }            
+        }
+    }
+    setColumnWidth(0 ,max);
+
+    for( int col = 1; col < columnCount(); col++)
+    {
+        max = 0;
+        val = 0;
+        for( int topItem = 0; topItem < topLevelItemCount(); topItem++)
+        {
+            val = topLevelItem(topItem)->text(col).size() * fontWidth + 2 * fontWidth;
+            if(val > max)
+            {
+                max = val;
+            }
+
+            if(topLevelItem(topItem)->childCount() > 0)
+            {
+                for( int childItem = 0; childItem < topLevelItem(topItem)->childCount(); childItem++)
+                {
+                    val = topLevelItem(topItem)->child(childItem)->text(col).size() * fontWidth + 2 * fontWidth;
+                    if(val > max)
+                    {
+                        max = val;
+                    }
+                }            
+            }
+        }
+        setColumnWidth(col, max);
+    }
+}

@@ -130,7 +130,6 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 
     m_pContent->setFocus();
 
-    m_info.m_autoValueUnit = false;
     m_info.m_autoTitle = false;
 
     m_info.m_title = "";
@@ -255,46 +254,42 @@ void EvaluateGeometricsFigure::setTitle(const QString &title)
         m_info.m_title = title;
     }
 
-    if (m_pContent) m_pContent->updateLabels();
+    //if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::resetTitle()
 {
     m_info.m_autoTitle = true;
-    if (m_pContent) m_pContent->updateLabels();
+    //if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsFigure::getValueUnit() const
 {
-    if (m_info.m_autoValueUnit)
-    {
-        return "<auto>";
-    }
     return m_info.m_valueUnit;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::setValueUnit(const QString &label)
 {
-    if (label == "<auto>")
+    m_info.m_valueUnit = label;
+    if (m_pContent)
     {
-        m_info.m_autoValueUnit = true;
+        m_pContent->updatePrimitives();
+        m_pContent->updateRelationShips(true);
     }
-    else
-    {
-        m_info.m_autoValueUnit = false;
-        m_info.m_valueUnit = label;
-    }
-    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::resetValueUnit()
 {
-    m_info.m_autoValueUnit = true;
-    if (m_pContent) m_pContent->updateLabels();
+    m_info.m_valueUnit = "";
+    if (m_pContent)
+    {
+        m_pContent->updatePrimitives();
+        m_pContent->updateRelationShips(true);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -661,7 +656,10 @@ void EvaluateGeometricsFigure::mnuUpdate()
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuAutoFitCols()
 {
-
+    if(m_pContent)
+    {
+        m_pContent->autoFitCols();
+    }
 }
 //---------------------------------------------------------------------------------------------------------
 ito::RetVal EvaluateGeometricsFigure::clearAll(void) 

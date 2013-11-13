@@ -60,7 +60,6 @@ struct InternalInfo
 {
     bool m_autoTitle;
     QString m_title;
-    bool m_autoValueUnit;
     QString m_valueUnit;
     QString titleLabel;
     QStringList m_relationNames;
@@ -119,10 +118,9 @@ class PlotTreeWidget : public QTreeWidget
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         */
-        void updateScaleValues(bool recalculateBoundaries = false);
+        void updatePrimitives();
 
-        void updateLabels();
-
+        void autoFitCols();
     private:
 
         void updateRelationShips(const bool fastUpdate);
