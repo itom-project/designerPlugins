@@ -225,12 +225,12 @@
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+104"/>
-        <location line="+44"/>
+        <location line="+46"/>
         <source>duplicate Channel, in addChannel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-36"/>
+        <location line="-38"/>
         <location line="+7"/>
         <source>parameters incompatible, while adding channel</source>
         <translation type="unfinished"></translation>
@@ -241,13 +241,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>invalid child pointer, in addChannel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
-        <location line="+25"/>
+        <location line="+27"/>
+        <location line="+27"/>
         <source>channel does not exist</source>
         <translation type="unfinished"></translation>
     </message>

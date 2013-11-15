@@ -47,7 +47,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+124"/>
+        <location filename="../itom2dqwtplot.cpp" line="+140"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -148,6 +148,31 @@
     </message>
     <message>
         <location line="+9"/>
+        <source>Switch Draw Mode, Point, Line, Rectangle, Ellipse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Rectangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Ellipse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Switch Imag, Real, Abs, Pha</source>
         <translation type="unfinished"></translation>
     </message>
@@ -172,7 +197,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+377"/>
+        <location line="+378"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -197,7 +222,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+231"/>
+        <location line="+288"/>
         <source>the opened figure is not inherited from ito::AbstractDObjFigure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -205,7 +230,7 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+433"/>
+        <location filename="../plotCanvas.cpp" line="+436"/>
         <source>No color maps defined.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -215,7 +240,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+751"/>
+        <location line="+792"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -225,12 +250,35 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+12"/>
+        <location line="+40"/>
+        <location line="+42"/>
+        <location line="+42"/>
+        <source>Selection has been interrupted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-92"/>
+        <location line="+42"/>
+        <location line="+42"/>
+        <source>Please select 2 points or press Space to quit earlier. Esc aborts the selection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <location line="+54"/>
+        <location line="+39"/>
+        <location line="+69"/>
+        <location line="+68"/>
         <source>Selection has been aborted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="-216"/>
+        <location line="+54"/>
+        <location line="+39"/>
+        <location line="+69"/>
+        <location line="+68"/>
         <source>%1 points have been selected.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -249,12 +297,12 @@
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+104"/>
-        <location line="+44"/>
+        <location line="+46"/>
         <source>duplicate Channel, in addChannel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-36"/>
+        <location line="-38"/>
         <location line="+7"/>
         <source>parameters incompatible, while adding channel</source>
         <translation type="unfinished"></translation>
@@ -265,13 +313,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>invalid child pointer, in addChannel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
-        <location line="+25"/>
+        <location line="+27"/>
+        <location line="+27"/>
         <source>channel does not exist</source>
         <translation type="unfinished"></translation>
     </message>
@@ -311,7 +359,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-804"/>
+        <location filename="../itom2dqwtplot.cpp" line="-903"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished"></translation>
     </message>

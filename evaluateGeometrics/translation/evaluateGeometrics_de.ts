@@ -2,177 +2,209 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de">
 <context>
-    <name>ItomIsoGLWidget</name>
+    <name>EvaluateGeometricsFigure</name>
     <message>
-        <location filename="../itomIsoGLFigure.cpp" line="+64"/>
+        <location filename="../evaluateGeometrics.cpp" line="+47"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>plot2D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>Home</source>
+        <location line="+5"/>
+        <source>Save as table, tree, xml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Reset original view</source>
+        <source>Export current data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Save</source>
+        <location line="+283"/>
+        <source>table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Export current view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Scale Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Set the ranges and offsets oif this view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>Palette</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Switch between color palettes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Show Colorbar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Toggle visibility of the color bar on right canvas side</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Change Background Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Switch between the different background colors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Enable Illumination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Enable illumination rendering</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <location line="+3"/>
-        <source>Change illumination direction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Triangles</source>
+        <location line="-282"/>
+        <source>tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Mode Switch</source>
+        <location line="+290"/>
+        <source>list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>M++Mode</source>
+        <location line="-289"/>
+        <location line="+284"/>
+        <source>xml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>JoeMode</source>
+        <location line="-280"/>
+        <source>system settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Set the ranges and offsets of this view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
+        <source>add relation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Add a further relation to this table or fix a defect one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+3"/>
-        <source>Show Infotext</source>
+        <source>remove relation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Remove a relation from the table.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>update relation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Force update of this table.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>auto-scale columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Adapts columns to idle width.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>basic options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>radius (own)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>angle to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>distance to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>intersection with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>length (own)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+232"/>
+        <location line="+45"/>
+        <source>select destination file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+188"/>
+        <source>set relation failed due to invalud object dims</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>set relation failed due to invalud object type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
-        <source>Switch Imag, Real, Abs, Pha</source>
+        <source>set relation failed due to empty vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PlotTreeWidget</name>
+    <message>
+        <location filename="../plotTreeWidget.cpp" line="+125"/>
+        <source>notype %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Complex Switch</source>
+        <location line="+7"/>
+        <source>point %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Imag</source>
+        <location line="+7"/>
+        <source>line %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Real</source>
+        <location line="+7"/>
+        <source>circle %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Abs</source>
+        <location line="+7"/>
+        <source>ellipse %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Pha</source>
+        <location line="+7"/>
+        <source>retangle %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+26"/>
-        <source>Iso Toolbar</source>
+        <location line="+7"/>
+        <source>square %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+242"/>
-        <source>PDF Documents (*.pdf)</source>
+        <location line="+7"/>
+        <source>polygon %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>SVG Documents (*.svg)</source>
+        <location line="+723"/>
+        <source>DataObject must be ito::float32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Postscript Documents (*.ps)</source>
+        <location line="+5"/>
+        <source>DataObject has not enough columns</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Images (</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Export File Name</source>
+        <location line="+157"/>
+        <location line="+76"/>
+        <location line="+146"/>
+        <source>could not write csv-data to file %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -252,13 +284,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../itomIsoGLFigurePlugin.cpp" line="+37"/>
-        <source>ITOM widget for isometric visualisation of 2D DataObjects.</source>
+        <location filename="../evaluateGeometrics.cpp" line="-519"/>
+        <source>Calculate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../evaluateGeometricsPlugin.cpp" line="+15"/>
+        <source>itom widget</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>LGPL with ITO itom-exception</source>
+        <source>LGPL 2.0</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

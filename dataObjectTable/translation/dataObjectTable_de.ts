@@ -4,7 +4,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../dataobjecttablefactory.cpp" line="+53"/>
+        <location filename="../dataobjecttablefactory.cpp" line="+75"/>
         <source>itom widget to interprete a dataObject as a table.</source>
         <translation type="unfinished"></translation>
     </message>
