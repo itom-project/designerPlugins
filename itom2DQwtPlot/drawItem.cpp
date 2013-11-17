@@ -61,7 +61,8 @@ void DrawItem::setShape(const QPainterPath &path)
         }
         m_marker.clear();
     }
-    if (path.length() >= 1)
+    //if (path.length() >= 1) // len gives the physical length, not the number of elements!!!
+    if (path.elementCount() >= 1)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
@@ -89,12 +90,14 @@ void DrawItem::setShape(const QPainterPath &path)
             break;
 
             case PlotCanvas::tEllipse:
-                if (path.length() >= 7)
+                //if (path.length() >= 7) // len gives the physical length, not the number of elements!!!
+                if (path.elementCount() >= 7)
                 {
                     el = path.elementAt(6);
                     x1 = el.x;
                 }
-                if (path.length() >= 10)
+                //if (path.length() >= 10) // len gives the physical length, not the number of elements!!!
+                if (path.elementCount() >= 10)
                 {
                     el = path.elementAt(9);
                     y1 = el.y;
@@ -110,7 +113,8 @@ void DrawItem::setShape(const QPainterPath &path)
         m_marker.append(marker);
 //        m_active = 1;
     }
-    if (path.length() >= 2)
+    //if (path.length() >= 2) // len gives the physical length, not the number of elements!!!
+    if (path.elementCount() >= 2)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
@@ -136,7 +140,8 @@ void DrawItem::setShape(const QPainterPath &path)
             break;
 
             case PlotCanvas::tRect:
-                if (path.length() >= 3)
+                //if (path.length() >= 3) // len gives the physical length, not the number of elements!!!
+                if (path.elementCount() >= 3)
                 {
                     el = path.elementAt(2);
                     x2 = el.x;
@@ -147,7 +152,8 @@ void DrawItem::setShape(const QPainterPath &path)
             case PlotCanvas::tEllipse:
                 el = path.elementAt(0);
                 x2 = el.x;
-                if (path.length() >= 4)
+                //if (path.length() >= 4) // len gives the physical length, not the number of elements!!!
+                if (path.elementCount() >= 4)
                 {
                     el = path.elementAt(3);
                     y2 = el.y;
