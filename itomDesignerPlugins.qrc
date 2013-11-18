@@ -41,5 +41,6 @@
         <file>icons/subplots.png</file>
         <file>icons/zoom_to_rect.png</file>
         <file>icons/upDate.png</file>
+        <file>icons/settings.png</file>
     </qresource>
 </RCC>

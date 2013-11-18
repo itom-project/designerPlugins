@@ -61,10 +61,11 @@ struct InternalInfo
     bool m_autoTitle;
     QString m_title;
     QString m_valueUnit;
-    QString titleLabel;
+    QString m_titleLabel;
     QStringList m_relationNames;
     QVector<relationsShip> m_relationsList;
-    ito::uint8 numberOfDigits;
+    ito::uint8 m_numberOfDigits;
+    bool m_consider2DOnly;
 };
 
 class PlotTreeWidget : public QTreeWidget
@@ -126,12 +127,12 @@ class PlotTreeWidget : public QTreeWidget
         void updateRelationShips(const bool fastUpdate);
         void setPrimitivElement(const int row, const bool update, ito::float32 *val);
 
-        bool calculateAngle(ito::float32 *first, ito::float32 *second, ito::float32 &angle);
-        bool calculateDistance(ito::float32 *first, ito::float32 *second, ito::float32 &distance);
+        bool calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle);
+        bool calculateDistance(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &distance);
         bool calculateRadius(ito::float32 *first, ito::float32 &radius);
-        bool calculateLength(ito::float32 *first, ito::float32 &length);
-        bool calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point);
-        bool calculateArea(ito::float32 *first, ito::float32 &area);
+        bool calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length);
+        bool calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point);
+        bool calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area);
         bool calculateCircumference(ito::float32 *first, ito::float32 &length);
 
         ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);

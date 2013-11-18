@@ -97,6 +97,13 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
     int type = ((ito::uint32)(val[1])) & 0x0000FFFF;
 
+    QString coordsString("[%1, %2, %3]");
+
+    if(m_pData->m_consider2DOnly)
+    {
+        coordsString = "[%1, %2]";
+    }
+
     if(!update)
     {
         /*
@@ -185,64 +192,64 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
         case ito::PrimitiveContainer::tPoint:
         {
-            //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
-                                        .arg( QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg( QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
 
             break;
         }
         case ito::PrimitiveContainer::tLine:
         {
-            //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
 
-            //elements[2]->setText(QString("[%1; %2; %3]").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-            topLevelItem(row)->setText(2, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[7], 'f', m_pData->numberOfDigits)));
+            //elements[2]->setText(QString(coordsString).arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
+            topLevelItem(row)->setText(2, QString(coordsString)
+                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits)));
 
             break;
         }
         case ito::PrimitiveContainer::tCircle:
         {
-            //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
 
             //elements[2]->setText(QString("r = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
             topLevelItem(row)->setText(2, QString("r = %1 %2")
-                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
                                         .arg(m_pData->m_valueUnit));
 
             break;
         }
         case ito::PrimitiveContainer::tElipse:
         {
-            //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
 
             //elements[2]->setText(QString("a,b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_pData->m_valueUnit));
             topLevelItem(row)->setText(2, QString("a,b = %1 %3, %2 %3")
-                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
                                         .arg(m_pData->m_valueUnit));
 
             if(ito::dObjHelper::isFinite(val[7]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar((uchar)248)));
                 topLevelItem(row)->setText(3, QString("alpha = %1%2")
-                                            .arg(QString::number(val[7], 'f', m_pData->numberOfDigits))
+                                            .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits))
                                             .arg(QChar(0x00B0)));
             }
             else
@@ -254,23 +261,23 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tRetangle:
         {
-            //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
 
-            //elements[2]->setText(QString("[%1; %2; %3]").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-            topLevelItem(row)->setText(2, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[7], 'f', m_pData->numberOfDigits)));
+            //elements[2]->setText(QString(coordsString).arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
+            topLevelItem(row)->setText(2, QString(coordsString)
+                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits)));
 
             if(ito::dObjHelper::isFinite(val[8]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[8])).arg(QChar((uchar)248)));
                  topLevelItem(row)->setText(3, QString("alpha = %1%2")
-                                             .arg(QString::number(val[8], 'f', m_pData->numberOfDigits))
+                                             .arg(QString::number(val[8], 'f', m_pData->m_numberOfDigits))
                                              .arg(QChar(0x00B0)));
             }
             else
@@ -282,22 +289,22 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tSquare:
         {
-            //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
 
             //elements[2]->setText(QString("a = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
             topLevelItem(row)->setText(2, QString("a = %1 %2")
-                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
+                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
                                         .arg(m_pData->m_valueUnit));
 
             if(ito::dObjHelper::isFinite(val[6]))
             {
                 //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar((uchar)248)));
                  topLevelItem(row)->setText(3, QString("alpha = %1%2")
-                                             .arg(QString::number(val[6], 'f', m_pData->numberOfDigits))
+                                             .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
                                              .arg(QChar(0x00B0)));
             }
             else
@@ -309,22 +316,22 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tPolygon:
         {
-            //elements[1]->setText(QString("[%1; %2; %3]").arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-            topLevelItem(row)->setText(1, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[3], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits)));
+            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+            topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
 
-            //elements[2]->setText(QString("[%1; %2; %3]").arg(QString::number(val[4])).arg(QString::number(val[5])).arg(QString::number(val[6])));
-            topLevelItem(row)->setText(2, QString("[%1, %2, %3]")
-                                        .arg(QString::number(val[4], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[5], 'f', m_pData->numberOfDigits))
-                                        .arg(QString::number(val[6], 'f', m_pData->numberOfDigits)));
+            //elements[2]->setText(QString(coordsString).arg(QString::number(val[4])).arg(QString::number(val[5])).arg(QString::number(val[6])));
+            topLevelItem(row)->setText(2, QString(coordsString)
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits)));
 
             //elements[3]->setText(QString("%1 [%2]").arg(QString::number(val[7])).arg(QString::number(val[8])));
              topLevelItem(row)->setText(3, QString("%1 [%2]")
-                                         .arg(QString::number(val[7], 'f', m_pData->numberOfDigits))
-                                         .arg(QString::number(val[8], 'f', m_pData->numberOfDigits)));
+                                         .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits))
+                                         .arg(QString::number(val[8], 'f', m_pData->m_numberOfDigits)));
             break;
         }
     }
@@ -532,7 +539,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
         if(m_pData->m_relationsList[rel].type & tExtern)
         {
-            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                            .arg(m_pData->m_valueUnit);
 
             //elements[2]->setText(resultString);
@@ -556,7 +563,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
             check = calculateRadius(first, m_pData->m_relationsList[rel].extValue);
 
-            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                            .arg(m_pData->m_valueUnit);
 
             //elements[1]->setText("");
@@ -565,15 +572,15 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         else if(m_pData->m_relationsList[rel].type == tLength)
         {
             //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
-            check = calculateLength(first, m_pData->m_relationsList[rel].extValue);
-            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+            check = calculateLength(first, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+            resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                            .arg(m_pData->m_valueUnit);
             //m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
         }
         else if(m_pData->m_relationsList[rel].type == tArea)
         {
-            check = calculateArea(first, m_pData->m_relationsList[rel].extValue);
-            resultString = QString("%1%2%3").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+            check = calculateArea(first, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+            resultString = QString("%1 %2%3").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                             .arg(m_pData->m_valueUnit)
                                             .arg(QChar(0x00B2));
             //m_pData->m_relationsList[rel].myWidget->setText(1, "");       
@@ -588,19 +595,29 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 {
                 case tAngle:
                     //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
-                    check = calculateAngle(first, second, m_pData->m_relationsList[rel].extValue);
-                    resultString = QString("%1%2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->numberOfDigits))
+                    check = calculateAngle(first, second, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+                    resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                                   .arg(QChar(0x00B0));
                     break;
                 case tIntersection:
                 {
                     cv::Vec3f val;
                     //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
-                    check = calculateIntersections(first, second, val);
-                    resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0], 'f', m_pData->numberOfDigits))
-                                                             .arg(QString::number(val[1], 'f', m_pData->numberOfDigits))
-                                                             .arg(QString::number(val[2], 'f', m_pData->numberOfDigits))
-                                                             .arg(m_pData->m_valueUnit);
+                    check = calculateIntersections(first, second, m_pData->m_consider2DOnly, val);
+                    if(m_pData->m_consider2DOnly)
+                    {
+                        resultString = QString("%1, %2 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
+                                                                 .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
+                                                                 .arg(m_pData->m_valueUnit);                       
+                    }
+                    else
+                    {
+                        resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
+                                                                 .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
+                                                                 .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                                                 .arg(m_pData->m_valueUnit);                    
+                    }
+
                     break;
                 }
                 default:
@@ -632,7 +649,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, ito::float32 &angle)
+bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle)
 {
     if(((ito::uint32)(first[1]) & 0x0000FFFF )!= ito::PrimitiveContainer::tLine && ((ito::uint32)(first[1]) & 0x0000FFFF)!= ito::PrimitiveContainer::tPolygon)
     {
@@ -644,8 +661,15 @@ bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, i
         angle = std::numeric_limits<ito::float32>::signaling_NaN();
         return false;
     }
+
     cv::Vec3f firstVector(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
     cv::Vec3f secondVector(second[5] - second[2], second[6] - second[3], second[7] - second[4]);
+
+    if(eval2D)
+    {
+        firstVector[2] = 0.0;
+        secondVector[2] = 0.0;
+    }
 
     ito::float32 abs = (sqrt(pow(firstVector[0],2) + pow(firstVector[1],2) + pow(firstVector[2],2)) * sqrt(pow(secondVector[0],2) + pow(secondVector[1],2) + pow(secondVector[2],2)));
 
@@ -659,7 +683,7 @@ bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, i
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second, ito::float32 &distance)
+bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &distance)
 {
     cv::Vec3f lineDirVector;
     cv::Vec3f linePosVector;
@@ -670,7 +694,13 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tPoint || ((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle &&
        ((ito::uint32)(second[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tPoint || ((ito::uint32)(second[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
     {
+
         pointPosVector = cv::Vec3f(first[2] - second[2], first[3] - second[3], first[4] - second[4]);
+        if(eval2D)
+        {
+            pointPosVector[2] = 0.0;
+        }
+
         distance = sqrt( pow(pointPosVector[0],2) + pow(pointPosVector[1],2) + pow(pointPosVector[2],2) );
         return true;
     }
@@ -692,6 +722,13 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     {
         distance = std::numeric_limits<ito::float32>::signaling_NaN();
         return false;
+    }
+
+    if(eval2D)
+    {
+        lineDirVector[2] = 0.0;
+        linePosVector[2] = 0.0;
+        pointPosVector[2] = 0.0;
     }
 
     if(!ito::dObjHelper::isNotZero(lineDirVector[0]) && !ito::dObjHelper::isNotZero(lineDirVector[1]) && !ito::dObjHelper::isNotZero(lineDirVector[2]))
@@ -725,7 +762,7 @@ bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
     return false;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateLength(ito::float32 *first, ito::float32 &length)
+bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length)
 {
     if(((ito::uint32)(first[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine)
     {
@@ -733,12 +770,13 @@ bool PlotTreeWidget::calculateLength(ito::float32 *first, ito::float32 &length)
         return false;
     }
 
-    length = sqrt(pow(first[2] - first[5], 2)  + pow(first[3] - first[6], 2) + pow(first[4] - first[7], 2));
+    if(eval2D) length = sqrt(pow(first[2] - first[5], 2)  + pow(first[3] - first[6], 2));
+    else length = sqrt(pow(first[2] - first[5], 2)  + pow(first[3] - first[6], 2) + pow(first[4] - first[7], 2));
 
     return true;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateArea(ito::float32 *first, ito::float32 &area)
+bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area)
 {
     if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tRetangle)
     {
@@ -789,7 +827,7 @@ bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &l
     return false;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *second, cv::Vec3f &point)
+bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point)
 {
 
     if(((ito::uint32)(first[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine || ((ito::uint32)(second[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine)
@@ -844,25 +882,13 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
             return true;
         }
     }
-    else if(!ito::dObjHelper::isNotZero(firstLinePosVector[2]) && 
+    else if(eval2D ||  
+            (!ito::dObjHelper::isNotZero(firstLinePosVector[2]) && 
             !ito::dObjHelper::isNotZero(secondLinePosVector[2]) &&
             !ito::dObjHelper::isNotZero(firstLineDirVector[2]) && 
-            !ito::dObjHelper::isNotZero(secondLineDirVector[2])) // is a two dimensional problem
+            !ito::dObjHelper::isNotZero(secondLineDirVector[2]))) // is a two dimensional problem
     {
-        //secondLinePosVector -= firstLinePosVector;
-        //lambda = secondLinePosVector[0] / firstLinePosVector[0];
 
-        firstLineDirVector  = cv::Vec3f(first[5], first[6], first[7]);
-        firstLinePosVector  = cv::Vec3f(first[2], first[3], first[4]);
-        secondLineDirVector  = cv::Vec3f(second[5], second[6], second[7]);
-        secondLinePosVector  = cv::Vec3f(second[2], second[3], second[4]);
-
-        point = (secondLinePosVector.cross(secondLineDirVector)).cross(firstLinePosVector.cross(firstLineDirVector));
-
-        point[0] /= point[2];
-        point[1] /= point[2];
-        point[2] = 0.0;
-        return true;
     }
     else // otherwise we have do do it the hard way
     {

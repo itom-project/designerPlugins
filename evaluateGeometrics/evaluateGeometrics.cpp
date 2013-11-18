@@ -25,6 +25,10 @@
 #include "DataObject/dataObjectFuncs.h"
 #include "DataObject/dataobj.h"
 
+#include "dialogSettings.h"
+#include "dialogDeleteRelation.h"
+#include "dialogAddRelation.h"
+
 #include <qmessagebox.h>
 #include <qsharedpointer.h>
 #include <qfiledialog.h>
@@ -61,7 +65,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
 	m_actSave->setMenu(m_mnuSaveSwitch);
 
     //m_actScaleSetting
-    m_actSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("system settings"), this);
+    m_actSetting = new QAction(QIcon(":/itomDesignerPlugins/general/icons/settings.png"), tr("system settings"), this);
     m_actSetting->setObjectName("actScaleSetting");
     m_actSetting->setToolTip(tr("Set the ranges and offsets of this view"));
     
@@ -86,7 +90,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actAutoFitCols->setToolTip(tr("Adapts columns to idle width."));
 
     connect(m_mnuSaveSwitch, SIGNAL(triggered(QAction *)), this, SLOT(mnuExport(QAction *)));
-    connect(m_actSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
+    connect(m_actSetting, SIGNAL(triggered()), this, SLOT(mnuSetting()));
 
     connect(m_actAddRel, SIGNAL(triggered()), this, SLOT(mnuAddRelation()));
     connect(m_actRemoveRel, SIGNAL(triggered()), this, SLOT(mnuDeleteRelation()));
@@ -113,6 +117,14 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     toolbar->addAction(m_actAddRel);
     toolbar->addAction(m_actRemoveRel);
 
+    m_info.m_autoTitle = false;
+    m_info.m_title = "";
+    m_info.m_valueUnit = "";
+    m_info.m_titleLabel = "";
+    m_info.m_relationsList.clear();
+    m_info.m_numberOfDigits = 2;
+    m_info.m_consider2DOnly = false;
+
     m_info.m_relationNames.clear();
     m_info.m_relationNames.append("N.A.");
     m_info.m_relationNames.append(tr("radius (own)"));
@@ -129,13 +141,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     setCentralWidget(m_pContent);
 
     m_pContent->setFocus();
-
-    m_info.m_autoTitle = false;
-
-    m_info.m_title = "";
-    m_info.m_valueUnit = "";
-    m_info.titleLabel = "";
-    m_info.numberOfDigits = 2;
+    
 
 }
 
@@ -427,9 +433,19 @@ ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, ito::uint8 ex
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometricsFigure::mnuScaleSetting()
+void EvaluateGeometricsFigure::mnuSetting()
 {
+    DialogSettings *dlg = new DialogSettings(m_info, this->m_pContent->m_rowHash.size(), this);
+    if (dlg->exec() == QDialog::Accepted)
+    {
+        dlg->getData(m_info);
 
+        m_pContent->updatePrimitives();
+        m_pContent->updateRelationShips(false);
+    }
+
+    delete dlg;
+    dlg = NULL;
 }
 
 
@@ -638,12 +654,30 @@ ito::RetVal EvaluateGeometricsFigure::plotItemChanged(ito::int32 idx, ito::int32
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuAddRelation()
 {
+    DialogAddRelation *dlg = new DialogAddRelation(m_info, this);
+    if (dlg->exec() == QDialog::Accepted)
+    {
+        dlg->getData(m_info);
 
+        m_pContent->updateRelationShips(false);
+    }
+
+    delete dlg;
+    dlg = NULL;
 }
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuDeleteRelation()
 {
+    DialogDeleteRelation *dlg = new DialogDeleteRelation(m_info, this);
+    if (dlg->exec() == QDialog::Accepted)
+    {
+        dlg->getData(m_info);
 
+        m_pContent->updateRelationShips(false);
+    }
+
+    delete dlg;
+    dlg = NULL;
 }
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuUpdate()

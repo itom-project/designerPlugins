@@ -186,7 +186,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         QString m_lastFolder;
 
     public slots:
-        void mnuScaleSetting();
+        void mnuSetting();
         void mnuExport(QAction* action);
         void mnuAddRelation();
         void mnuDeleteRelation();

@@ -76,15 +76,19 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotTreeWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogSettings.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogDeleteRelation.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogAddRelation.h    
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
 
-#set(designer_ui
-#    ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
-#)
+set(designer_ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogRelation.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogSettings.ui
+)
 
-#QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
+QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
 
 set(designer_rcc
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
@@ -102,6 +106,9 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometrics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotTreeWidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogSettings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogDeleteRelation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogAddRelation.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
@@ -110,7 +117,7 @@ if(MSVC)
 endif(MSVC)
 
 #handle translations BEGIN STEP 1
-set (FILES_TO_TRANSLATE ${designer_SOURCES} ${designer_HEADERS}) #${designer_ui})
+set (FILES_TO_TRANSLATE ${designer_SOURCES} ${designer_HEADERS} ${designer_ui})
 set (TRANSLATION_OUTPUT_FILES)
 set (TRANSLATIONS_FILES)
 
