@@ -1510,6 +1510,20 @@ void PlotCanvas::multiPointActivated (bool on)
                     emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
                 }
 
+                QPainterPath *path = new QPainterPath();
+                DrawItem *newItem = NULL;
+                newItem = new DrawItem(this, tPoint, m_lastGeometricItem++);
+                path->moveTo(polygonScale[0].x(), polygonScale[0].y());
+                path->lineTo(polygonScale[0].x(), polygonScale[0].y());
+                
+                newItem->setShape(*path);
+                newItem->setPen(QPen(Qt::green));
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                replot();
+                m_pData->m_pDrawItems.append(newItem);
+                
                 Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
                 if (p)
                 {
@@ -1738,18 +1752,34 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
     if (m_pData->m_state == tIdle)
     {
         int canxpos = event->x() - canvas()->x();
-        int canypos = event->y() - canvas()->y();
+        int canypos = event->y() - canvas()->y();   
+        
         for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
             if (m_pData->m_pDrawItems[n]->m_active == 1)
             {
+                int dx, dy;
+                
                 QPainterPath *path = new QPainterPath();
                 switch (m_pData->m_pDrawItems[n]->m_type)
                 {
                     case tPoint:
+                        path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        m_pData->m_pDrawItems[n]->setShape(*path);
+                        replot();                        
                     break;
 
                     case tLine:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                            else
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
+                        }
                         path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                         path->lineTo(m_pData->m_pDrawItems[n]->x2, m_pData->m_pDrawItems[n]->y2);
                         m_pData->m_pDrawItems[n]->setShape(*path);
@@ -1757,6 +1787,15 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     break;
 
                     case tRect:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * fabs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * fabs(dx) / dx;
+                        }
                         path->addRect(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos),
                             m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, canxpos),
                             m_pData->m_pDrawItems[n]->y2 - invTransform(QwtPlot::yLeft, canypos));
@@ -1765,6 +1804,15 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     break;
 
                     case tEllipse:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * fabs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * fabs(dx) / dx;
+                        }                        
                         path->addEllipse(invTransform(QwtPlot::xBottom, canxpos),
                             invTransform(QwtPlot::yLeft, canypos),
                              m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, canxpos),
@@ -1778,14 +1826,25 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
             }
             else if (m_pData->m_pDrawItems[n]->m_active == 2)
             {
+                int dx, dy;
+                
                 QPainterPath *path = new QPainterPath();
                 switch (m_pData->m_pDrawItems[n]->m_type)
                 {
-                    case tPoint:
-                        //if(p) emit p->plotItemChanged(n);
-                    break;
+                    
+//                    case tPoint:
+//                    break;
 
                     case tLine:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                            else
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
+                        }                        
                         path->moveTo(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1);
                         path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                         m_pData->m_pDrawItems[n]->setShape(*path);
@@ -1794,6 +1853,15 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     break;
 
                     case tRect:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * fabs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * fabs(dx) / dx;
+                        }
                         path->addRect(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1,
                             invTransform(QwtPlot::xBottom, canxpos) - m_pData->m_pDrawItems[n]->x1,
                             invTransform(QwtPlot::yLeft, canypos) - m_pData->m_pDrawItems[n]->y1);
@@ -1803,6 +1871,15 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     break;
 
                     case tEllipse:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * fabs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * fabs(dx) / dx;
+                        }
                         path->addEllipse(m_pData->m_pDrawItems[n]->x1,
                             m_pData->m_pDrawItems[n]->y1,
                             (invTransform(QwtPlot::xBottom, canxpos)- m_pData->m_pDrawItems[n]->x1),
@@ -1813,7 +1890,6 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     break;
 
                 }
-
                 break;
             }
         }
@@ -1871,7 +1947,8 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                         values.append(m_pData->m_pDrawItems[n]->x1);
                         values.append(m_pData->m_pDrawItems[n]->y1);
                         values.append(0.0);
-                        break;
+                    break;
+                    
                     case tLine:
                         type = ito::PrimitiveContainer::tLine;
                         values.append(m_pData->m_pDrawItems[n]->x1);
@@ -1880,7 +1957,10 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                         values.append(m_pData->m_pDrawItems[n]->x2);
                         values.append(m_pData->m_pDrawItems[n]->y2);
                         values.append(0.0);
-                        break;
+                    break;
+                    
+                    // square is a rect
+                    case tSquare:                    
                     case tRect:
                         type = ito::PrimitiveContainer::tRetangle;
                         values.append(m_pData->m_pDrawItems[n]->x1);
@@ -1889,7 +1969,10 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                         values.append(m_pData->m_pDrawItems[n]->x2);
                         values.append(m_pData->m_pDrawItems[n]->y2);
                         values.append(0.0);
-                        break;
+                    break;
+
+                    // circle is an ellispe
+                    case tCircle:                    
                     case tEllipse:
                         type = ito::PrimitiveContainer::tElipse;
                         values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
@@ -1898,7 +1981,9 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                         values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
                         values.append(abs(m_pData->m_pDrawItems[n]->y1 - m_pData->m_pDrawItems[n]->y2)*0.5);
                         values.append(0.0);
-                        break;
+                    break;
+                    
+/*                    
                     case tCircle:
                         type = ito::PrimitiveContainer::tCircle;
                         values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
@@ -1906,7 +1991,9 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                         values.append(0.0);
                         values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
                         values.append(0.0);
-                        break;
+                    break;
+*/
+/*
                     case tSquare:
                         type = ito::PrimitiveContainer::tSquare;
                         values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
@@ -1914,7 +2001,8 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                         values.append(0.0);
                         values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
                         values.append(0.0);
-                        break;
+                    break;
+*/                    
                 }
 
                 emit p->plotItemChanged(m_pData->m_pDrawItems[n]->m_idx, type, values);

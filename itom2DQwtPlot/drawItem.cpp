@@ -82,6 +82,7 @@ void DrawItem::setShape(const QPainterPath &path)
         switch (m_type)
         {
             default:
+            case PlotCanvas::tPoint:
             case PlotCanvas::tLine:
             case PlotCanvas::tRect:
                 el = path.elementAt(0);
