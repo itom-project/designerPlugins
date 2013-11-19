@@ -1794,9 +1794,9 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
                             dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * abs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * abs(dx) / dx;
                         }
                         path->addRect(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos),
                             m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, canxpos),
@@ -1812,9 +1812,9 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
                             dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * abs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * abs(dx) / dx;
                         }
                         path->addEllipse(invTransform(QwtPlot::xBottom, canxpos),
                             invTransform(QwtPlot::yLeft, canypos),
@@ -1863,9 +1863,9 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
                             dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * abs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * abs(dx) / dx;
                         }
                         path->addRect(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1,
                             invTransform(QwtPlot::xBottom, canxpos) - m_pData->m_pDrawItems[n]->x1,
@@ -1882,9 +1882,9 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                             dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
                             dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * abs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * abs(dx) / dx;
                         }
                         path->addEllipse(m_pData->m_pDrawItems[n]->x1,
                             m_pData->m_pDrawItems[n]->y1,
