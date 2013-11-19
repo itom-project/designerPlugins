@@ -134,8 +134,8 @@ class PlotCanvas : public QwtPlot
         Qt::KeyboardModifiers m_activeModifiers;
 
         QColor m_inverseColor0, m_inverseColor1;
+        int m_activeDrawItem;
 
-        int m_lastGeometricItem;
 
     signals:
         void spawnNewChild(QVector<QPointF>);

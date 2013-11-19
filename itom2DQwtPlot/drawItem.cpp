@@ -25,11 +25,13 @@
 
 #include <qwt_symbol.h>
 
-//----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(QwtPlot *parent, char type, const int &idx, const QString &title) : m_pparent(parent), m_type(type), m_active(0), x1(-1), y1(-1),
-    x2(-1), y2(-1), m_idx(idx)
-{
+int DrawItem::m_idx = 0;
 
+//----------------------------------------------------------------------------------------------------------------------------------
+DrawItem::DrawItem(QwtPlot *parent, char type, const QString &title) : m_pparent(parent), m_type(type), m_active(0), x1(-1), y1(-1),
+    x2(-1), y2(-1)
+{
+    m_idx++;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -43,6 +45,27 @@ DrawItem::~DrawItem()
         delete m_marker[n];
     }
     m_marker.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setActive(int active)
+{
+    for (int n = 0; n < m_marker.size(); n++)
+        m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+            QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+
+    if (active == 1)
+    {
+        if (m_marker.size() >= 1)
+            m_marker[0]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+    }
+    else if (active == 2)
+    {
+        if (m_marker.size() >= 2)
+            m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
