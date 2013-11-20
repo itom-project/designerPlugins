@@ -83,6 +83,10 @@ class PlotCanvas : public QwtPlot
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
         ito::RetVal deleteMarkers(const QString &id);
 
+/*        
+        ito::RetVal addDrawItems(const ito::DataObject *items, QString style);
+        ito::RetVal delDrawItems(const ito::DataObject *items, QString style);
+*/        
         friend class Itom2dQwtPlot;
         friend class DrawItem;
 
@@ -198,11 +202,19 @@ struct InternalData
     }
     ~InternalData()
     {
+        QHash<int, DrawItem*>::iterator it = m_pDrawItems.begin();
+        for (; it != m_pDrawItems.end(); it++)
+        {
+            it.value()->detach();
+            delete it.value();
+        }
+/*        
         for (int n = 0; n < m_pDrawItems.size(); n++)
         {
             m_pDrawItems[n]->detach();
             delete m_pDrawItems[n];
         }
+*/        
         m_pDrawItems.clear();
     }
     ito::tDataType m_dataType;
@@ -246,7 +258,8 @@ struct InternalData
     PlotCanvas::tState m_state;
 
     const QHash<QString, ito::Param*> *m_pConstOutput;
-    QVector<DrawItem *> m_pDrawItems;
+//    QVector<DrawItem *> m_pDrawItems;
+    QHash<int, DrawItem *> m_pDrawItems;
 };
 
 

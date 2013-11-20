@@ -1178,23 +1178,56 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
 
     if (!retval.containsError())
     {
-        //QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
-        QwtPlotMarker *marker = NULL;
-        int nrOfMarkers = dObj->getSize(1);
-
-        if (id == "") id = "unknown";
-
-        ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0,0);
-        ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0,1);
-
-        for (int i = 0; i < nrOfMarkers; ++i)
+        if (dObj->getSize(0) <= 2)
         {
-            marker = new QwtPlotMarker();
-            marker->setSymbol(new QwtSymbol(symStyle,symBrush,symPen,symSize) );
-            marker->setValue(xCoords[i], yCoords[i]);
-            marker->attach(this);
+            //QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
+            QwtPlotMarker *marker = NULL;
+            int nrOfMarkers = dObj->getSize(1);
 
-            m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
+            if (id == "") id = "unknown";
+
+            ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0,0);
+            ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0,1);
+
+            for (int i = 0; i < nrOfMarkers; ++i)
+            {
+                marker = new QwtPlotMarker();
+                marker->setSymbol(new QwtSymbol(symStyle,symBrush,symPen,symSize) );
+                marker->setValue(xCoords[i], yCoords[i]);
+                marker->attach(this);
+
+                m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
+            }
+        }
+        else if (dObj->getSize(0) >= 4)
+        {
+            QwtPlotMarker *marker = NULL;
+            int nrOfMarkers = dObj->getSize(1);
+            
+            if (id == "") id = "unknown";
+            
+            ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0, 0);
+            ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0, 1);
+            ito::float32 *types = (ito::float32*)dObj->rowPtr(0, 2);
+            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 3);
+            
+            for (int i = 0; i < nrOfMarkers; ++i)
+            {
+                switch ((int)types[i])
+                {
+                    case tPoint:
+                    break;
+                    
+                    case tLine:
+                    break;
+                    
+                    case tRect:
+                    break;
+                    
+                    case tEllipse:
+                    break;
+                }
+            }
         }
 
         replot();
@@ -1522,7 +1555,8 @@ void PlotCanvas::multiPointActivated (bool on)
                 newItem->show();
                 newItem->attach(this);
                 replot();
-                m_pData->m_pDrawItems.append(newItem);
+//                m_pData->m_pDrawItems.append(newItem);
+                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
 
                 Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
                 if (p)
@@ -1575,7 +1609,8 @@ void PlotCanvas::multiPointActivated (bool on)
                 newItem->show();
                 newItem->attach(this);
                 replot();
-                m_pData->m_pDrawItems.append(newItem);
+                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);                
+//                m_pData->m_pDrawItems.append(newItem);
 
                 // if further elements are needed reset the plot engine and go ahead else finish editing
                 if(m_pData && (m_pData->m_elementsToPick > 1))
@@ -1644,7 +1679,8 @@ void PlotCanvas::multiPointActivated (bool on)
                 newItem->show();
                 newItem->attach(this);
                 replot();
-                m_pData->m_pDrawItems.append(newItem);
+                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+//                m_pData->m_pDrawItems.append(newItem);
 
                 // if further elements are needed reset the plot engine and go ahead else finish editing
                 if(m_pData && (m_pData->m_elementsToPick > 1))
@@ -1712,7 +1748,8 @@ void PlotCanvas::multiPointActivated (bool on)
                 newItem->show();
                 newItem->attach(this);
                 replot();
-                m_pData->m_pDrawItems.append(newItem);
+                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+//                m_pData->m_pDrawItems.append(newItem);
 
 
                 // if further elements are needed reset the plot engine and go ahead else finish editing
@@ -1754,86 +1791,89 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
         int canxpos = event->x() - canvas()->x();
         int canypos = event->y() - canvas()->y();
 
-        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        QHash<int, DrawItem*>::Iterator it = m_pData->m_pDrawItems.begin();
+        for (; it != m_pData->m_pDrawItems.end(); it++)
+//        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
-            if (m_pData->m_pDrawItems[n]->m_active == 1)
+//            if (m_pData->m_pDrawItems[n]->m_active == 1)
+            if (it.value()->m_active == 1)
             {
                 int dx, dy;
 
                 QPainterPath *path = new QPainterPath();
-                switch (m_pData->m_pDrawItems[n]->m_type)
+                switch (it.value()->m_type)
                 {
                     case tPoint:
                         path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                         path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
-                        m_pData->m_pDrawItems[n]->setShape(*path);
-                        m_pData->m_pDrawItems[n]->setActive(m_pData->m_pDrawItems[n]->m_active);
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
 
                     case tLine:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
-                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                                canypos = transform(QwtPlot::yLeft, it.value()->y2);
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x2);
                         }
                         path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
-                        path->lineTo(m_pData->m_pDrawItems[n]->x2, m_pData->m_pDrawItems[n]->y2);
-                        m_pData->m_pDrawItems[n]->setShape(*path);
-                        m_pData->m_pDrawItems[n]->setActive(m_pData->m_pDrawItems[n]->m_active);
+                        path->lineTo(it.value()->x2, it.value()->y2);
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
 
                     case tRect:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
-                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, it.value()->y2) - dx * fabs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x2) - dy * fabs(dx) / dx;
                         }
                         path->addRect(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos),
-                            m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, canxpos),
-                            m_pData->m_pDrawItems[n]->y2 - invTransform(QwtPlot::yLeft, canypos));
-                        m_pData->m_pDrawItems[n]->setShape(*path);
-                        m_pData->m_pDrawItems[n]->setActive(m_pData->m_pDrawItems[n]->m_active);
+                            it.value()->x2 - invTransform(QwtPlot::xBottom, canxpos),
+                            it.value()->y2 - invTransform(QwtPlot::yLeft, canypos));
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
 
                     case tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2);
-                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2);
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, it.value()->y2) - dx * fabs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x2) - dy * fabs(dx) / dx;
                         }
                         path->addEllipse(invTransform(QwtPlot::xBottom, canxpos),
                             invTransform(QwtPlot::yLeft, canypos),
-                             m_pData->m_pDrawItems[n]->x2 - invTransform(QwtPlot::xBottom, canxpos),
-                             m_pData->m_pDrawItems[n]->y2 - invTransform(QwtPlot::yLeft, canypos));
-                        m_pData->m_pDrawItems[n]->setShape(*path);
-                        m_pData->m_pDrawItems[n]->setActive(m_pData->m_pDrawItems[n]->m_active);
+                             it.value()->x2 - invTransform(QwtPlot::xBottom, canxpos),
+                             it.value()->y2 - invTransform(QwtPlot::yLeft, canypos));
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
                 }
 
                 break;
             }
-            else if (m_pData->m_pDrawItems[n]->m_active == 2)
+            else if (it.value()->m_active == 2)
             {
                 int dx, dy;
 
                 QPainterPath *path = new QPainterPath();
-                switch (m_pData->m_pDrawItems[n]->m_type)
+                switch (it.value()->m_type)
                 {
 
 //                    case tPoint:
@@ -1842,17 +1882,17 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     case tLine:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
-                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                                canypos = transform(QwtPlot::yLeft, it.value()->y1);
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x1);
                         }
-                        path->moveTo(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1);
+                        path->moveTo(it.value()->x1, it.value()->y1);
                         path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
-                        m_pData->m_pDrawItems[n]->setShape(*path);
-                        m_pData->m_pDrawItems[n]->setActive(m_pData->m_pDrawItems[n]->m_active);
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
                         //if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
@@ -1860,18 +1900,18 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     case tRect:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
-                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, it.value()->y1) + dx * fabs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x1) + dy * fabs(dx) / dx;
                         }
-                        path->addRect(m_pData->m_pDrawItems[n]->x1, m_pData->m_pDrawItems[n]->y1,
-                            invTransform(QwtPlot::xBottom, canxpos) - m_pData->m_pDrawItems[n]->x1,
-                            invTransform(QwtPlot::yLeft, canypos) - m_pData->m_pDrawItems[n]->y1);
-                        m_pData->m_pDrawItems[n]->setShape(*path);
-                        m_pData->m_pDrawItems[n]->setActive(m_pData->m_pDrawItems[n]->m_active);
+                        path->addRect(it.value()->x1, it.value()->y1,
+                            invTransform(QwtPlot::xBottom, canxpos) - it.value()->x1,
+                            invTransform(QwtPlot::yLeft, canypos) - it.value()->y1);
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
                         //if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
@@ -1879,19 +1919,19 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
                     case tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
-                            dy = canypos - transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1);
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) + dx * fabs(dy) / dy;
+                                canypos = transform(QwtPlot::yLeft, it.value()->y1) + dx * fabs(dy) / dy;
                             else
-                                canxpos = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) + dy * fabs(dx) / dx;
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x1) + dy * fabs(dx) / dx;
                         }
-                        path->addEllipse(m_pData->m_pDrawItems[n]->x1,
-                            m_pData->m_pDrawItems[n]->y1,
-                            (invTransform(QwtPlot::xBottom, canxpos)- m_pData->m_pDrawItems[n]->x1),
-                            (invTransform(QwtPlot::yLeft, canypos) - m_pData->m_pDrawItems[n]->y1)),
-                        m_pData->m_pDrawItems[n]->setShape(*path);
-                        m_pData->m_pDrawItems[n]->setActive(m_pData->m_pDrawItems[n]->m_active);
+                        path->addEllipse(it.value()->x1,
+                            it.value()->y1,
+                            (invTransform(QwtPlot::xBottom, canxpos)- it.value()->x1),
+                            (invTransform(QwtPlot::yLeft, canypos) - it.value()->y1)),
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
                         //if(p) emit p->plotItemChanged(n);
                         replot();
                     break;
@@ -1910,38 +1950,41 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
     if (m_pData->m_state == tIdle)
     {
         int n;
-        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
+        for (;it != m_pData->m_pDrawItems.end(); it++)
+//        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
             int canxpos = event->x() - canvas()->x();
             int canypos = event->y() - canvas()->y();
-            double x = m_pData->m_pDrawItems[n]->x1;
-            double y = m_pData->m_pDrawItems[n]->y1;
-            double xx = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1);
-            double yy = transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->y1);
-            if (fabs(transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x1) - canxpos) < 10
-                && fabs(transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y1) - canypos) < 10)
+            double x = it.value()->x1;
+            double y = it.value()->y1;
+            double xx = transform(QwtPlot::xBottom, it.value()->x1);
+            double yy = transform(QwtPlot::xBottom, it.value()->y1);
+            if (fabs(transform(QwtPlot::xBottom, it.value()->x1) - canxpos) < 10
+                && fabs(transform(QwtPlot::yLeft, it.value()->y1) - canypos) < 10)
             {
-                m_pData->m_pDrawItems[n]->m_active = 1;
-                m_activeDrawItem = m_pData->m_pDrawItems[n]->m_idx;
-                m_pData->m_pDrawItems[n]->setActive(1);
+                it.value()->m_active = 1;
+                m_activeDrawItem = it.value()->m_idx;
+                it.value()->setActive(1);
                 break;
             }
-            else if (fabs(transform(QwtPlot::xBottom, m_pData->m_pDrawItems[n]->x2) - canxpos) < 10
-                && fabs(transform(QwtPlot::yLeft, m_pData->m_pDrawItems[n]->y2) - canypos) < 10)
+            else if (fabs(transform(QwtPlot::xBottom, it.value()->x2) - canxpos) < 10
+                && fabs(transform(QwtPlot::yLeft, it.value()->y2) - canypos) < 10)
             {
-                m_pData->m_pDrawItems[n]->m_active = 2;
-                m_activeDrawItem = m_pData->m_pDrawItems[n]->m_idx;
-                m_pData->m_pDrawItems[n]->setActive(2);
+                it.value()->m_active = 2;
+                m_activeDrawItem = it.value()->m_idx;
+                it.value()->setActive(2);
                 break;
             }
             else
             {
-                m_pData->m_pDrawItems[n]->setActive(0);
+                it.value()->setActive(0);
             }
         }
-        for (n++; n < m_pData->m_pDrawItems.size(); n++)
+//        for (n++; n < m_pData->m_pDrawItems.size(); n++)
+        for (;it != m_pData->m_pDrawItems.end(); it++)
         {
-            m_pData->m_pDrawItems[n]->setActive(0);
+            it.value()->setActive(0);
         }
         replot();
     }
@@ -1954,29 +1997,31 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
     if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
         || m_pData->m_state == tPoint || m_pData->m_state == tIdle)
     {
-        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
+        for (;it != m_pData->m_pDrawItems.end(); it++)        
+//        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
-            if(m_pData->m_pDrawItems[n]->m_active != 0 && p)
+            if(it.value()->m_active != 0 && p)
             {
                 int type = 0;
                 QVector<ito::float32> values;
                 values.reserve(11);
-                switch(m_pData->m_pDrawItems[n]->m_type)
+                switch(it.value()->m_type)
                 {
                     case tPoint:
                         type = ito::PrimitiveContainer::tPoint;
-                        values.append(m_pData->m_pDrawItems[n]->x1);
-                        values.append(m_pData->m_pDrawItems[n]->y1);
+                        values.append(it.value()->x1);
+                        values.append(it.value()->y1);
                         values.append(0.0);
                     break;
 
                     case tLine:
                         type = ito::PrimitiveContainer::tLine;
-                        values.append(m_pData->m_pDrawItems[n]->x1);
-                        values.append(m_pData->m_pDrawItems[n]->y1);
+                        values.append(it.value()->x1);
+                        values.append(it.value()->y1);
                         values.append(0.0);
-                        values.append(m_pData->m_pDrawItems[n]->x2);
-                        values.append(m_pData->m_pDrawItems[n]->y2);
+                        values.append(it.value()->x2);
+                        values.append(it.value()->y2);
                         values.append(0.0);
                     break;
 
@@ -1984,11 +2029,11 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                     case tSquare:
                     case tRect:
                         type = ito::PrimitiveContainer::tRetangle;
-                        values.append(m_pData->m_pDrawItems[n]->x1);
-                        values.append(m_pData->m_pDrawItems[n]->y1);
+                        values.append(it.value()->x1);
+                        values.append(it.value()->y1);
                         values.append(0.0);
-                        values.append(m_pData->m_pDrawItems[n]->x2);
-                        values.append(m_pData->m_pDrawItems[n]->y2);
+                        values.append(it.value()->x2);
+                        values.append(it.value()->y2);
                         values.append(0.0);
                     break;
 
@@ -1996,39 +2041,39 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                     case tCircle:
                     case tEllipse:
                         type = ito::PrimitiveContainer::tElipse;
-                        values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
-                        values.append((m_pData->m_pDrawItems[n]->y1 + m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append((it.value()->x1 + it.value()->x2)*0.5);
+                        values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
-                        values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
-                        values.append(abs(m_pData->m_pDrawItems[n]->y1 - m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
+                        values.append(abs(it.value()->y1 - it.value()->y2)*0.5);
                         values.append(0.0);
                     break;
 
 /*
                     case tCircle:
                         type = ito::PrimitiveContainer::tCircle;
-                        values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
-                        values.append((m_pData->m_pDrawItems[n]->y1 + m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append((it.value()->x1 + it.value()->x2)*0.5);
+                        values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
-                        values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
                         values.append(0.0);
                     break;
 */
 /*
                     case tSquare:
                         type = ito::PrimitiveContainer::tSquare;
-                        values.append((m_pData->m_pDrawItems[n]->x1 + m_pData->m_pDrawItems[n]->x2)*0.5);
-                        values.append((m_pData->m_pDrawItems[n]->y1 + m_pData->m_pDrawItems[n]->y2)*0.5);
+                        values.append((it.value()->x1 + it.value()->x2)*0.5);
+                        values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
-                        values.append(abs(m_pData->m_pDrawItems[n]->x1 - m_pData->m_pDrawItems[n]->x2)*0.5);
+                        values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
                         values.append(0.0);
                     break;
 */
                 }
 
-                emit p->plotItemChanged(m_pData->m_pDrawItems[n]->m_idx, type, values);
+                emit p->plotItemChanged(it.value()->m_idx, type, values);
             }
-            m_pData->m_pDrawItems[n]->m_active = 0;
+            it.value()->m_active = 0;
         }
     }
 }
