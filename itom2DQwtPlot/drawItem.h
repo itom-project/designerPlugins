@@ -33,7 +33,7 @@
 class DrawItem : public QwtPlotShapeItem
 {
     public:
-        explicit DrawItem(QwtPlot *parent, char type, const QString &title = QString::null);
+        explicit DrawItem(QwtPlot *parent, char type, const int id = 0, const QString &title = QString::null);
         virtual ~DrawItem();
         void setRect(const QRectF &);
         void setShape( const QPainterPath & );

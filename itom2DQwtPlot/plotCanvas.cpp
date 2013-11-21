@@ -1123,7 +1123,7 @@ void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
 ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
 {
     ito::RetVal retval;
-    size_t limits[] = {2,2,0,99999};
+    size_t limits[] = {2,8,0,99999};
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
 
     QwtSymbol::Style symStyle = QwtSymbol::XCross;
@@ -1199,34 +1199,89 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
             }
         }
-        else if (dObj->getSize(0) >= 4)
+        else if (dObj->getSize(0) >= 8)
         {
             QwtPlotMarker *marker = NULL;
             int nrOfMarkers = dObj->getSize(1);
             
             if (id == "") id = "unknown";
-            
-            ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0, 0);
-            ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0, 1);
-            ito::float32 *types = (ito::float32*)dObj->rowPtr(0, 2);
-            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 3);
+
+            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 0);            
+            ito::float32 *types = (ito::float32*)dObj->rowPtr(0, 1);
+            ito::float32 *xCoords1 = (ito::float32*)dObj->rowPtr(0, 2);
+            ito::float32 *yCoords1 = (ito::float32*)dObj->rowPtr(0, 3);
+            ito::float32 *xCoords2 = (ito::float32*)dObj->rowPtr(0, 4);
+            ito::float32 *yCoords2 = (ito::float32*)dObj->rowPtr(0, 5);
             
             for (int i = 0; i < nrOfMarkers; ++i)
             {
+                QPainterPath path;
+                DrawItem *newItem = NULL;                
+                
                 switch ((int)types[i])
                 {
                     case tPoint:
+                        path.moveTo(xCoords1[i], yCoords1[i]);
+                        path.lineTo(xCoords1[i], yCoords1[i]);
                     break;
-                    
+                        
                     case tLine:
+                        path.moveTo(xCoords1[i], yCoords1[i]);
+                        path.lineTo(xCoords2[i], yCoords2[i]);                        
                     break;
-                    
+                        
                     case tRect:
+                        path.addRect(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
+                    break;
+                        
+                    case tEllipse:
+                        path.addEllipse(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
                     break;
                     
-                    case tEllipse:
+                    default:
+                        retval += ito::RetVal(ito::retError, 0, tr("incalid marker type").toAscii().data());
                     break;
+                }                    
+                if (m_pData->m_pDrawItems.contains((int)ids[i]))
+                {
+                    m_pData->m_pDrawItems[(int)ids[i]]->setShape(path);
                 }
+                else
+                {
+                    switch ((int)types[i])
+                    {
+                        case tPoint:                    
+                            newItem = new DrawItem(this, tPoint, (int)ids[i]);
+                        break;
+                        
+                        case tLine:
+                            newItem = new DrawItem(this, tLine, (int)ids[i]);
+                        break;
+                        
+                        case tRect:
+                            newItem = new DrawItem(this, tRect, (int)ids[i]);
+                        break;
+                        
+                        case tEllipse:
+                            newItem = new DrawItem(this, tEllipse, (int)ids[i]);
+                        break;
+                        
+                        default:
+                            retval += ito::RetVal(ito::retError, 0, tr("incalid marker type").toAscii().data());
+                        break;                        
+                    }
+                    if (newItem)
+                    {
+                        newItem->setShape(path);
+                        newItem->setPen(QPen(Qt::green));
+                        newItem->setVisible(true);
+                        newItem->show();
+                        newItem->attach(this);
+                        replot();
+                        //                m_pData->m_pDrawItems.append(newItem);
+                        m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+                    }
+                }                
             }
         }
 
