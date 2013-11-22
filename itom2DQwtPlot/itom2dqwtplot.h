@@ -202,6 +202,7 @@ private slots:
 public slots:
     ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id);
+    ito::RetVal deleteMarkers(int id);
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
     ito::RetVal clearGeometricElements(void) {return ito::retOk;}

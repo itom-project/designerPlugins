@@ -1052,6 +1052,12 @@ ito::RetVal Itom2dQwtPlot::deleteMarkers(QString id)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::deleteMarkers(int id)
+{
+    return m_pContent->deleteMarkers(id);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints /*= -1*/)
 {
     m_pActValuePicker->setChecked(false);

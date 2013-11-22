@@ -1324,6 +1324,31 @@ ito::RetVal PlotCanvas::deleteMarkers(const QString &id)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::deleteMarkers(const int id)
+{
+    ito::RetVal retval;
+    bool found = false;
+    
+    if (m_pData->m_pDrawItems.contains(id))
+    {
+        DrawItem *delItem = m_pData->m_pDrawItems[id];
+        m_pData->m_pDrawItems.remove(id);
+        delete delItem;
+    }
+    
+    if (!found)
+    {
+        retval += ito::RetVal::format(ito::retError,0,"No marker with id '%d' found.", id);
+    }
+    else
+    {
+        replot();
+    }
+    
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPoints)
 {
     ito::RetVal retval;

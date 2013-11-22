@@ -25,16 +25,26 @@
 
 #include <qwt_symbol.h>
 
-int DrawItem::m_idx = 0;
+QVector<int> DrawItem::idxVec;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &title) : m_pparent(parent), m_type(type), m_active(0), x1(-1), y1(-1),
+DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &title) : m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1),
     x2(-1), y2(-1)
 {
     if (id <= 0)
-        m_idx++;
+    {
+        int idxCtr = 0;
+        do 
+            idxCtr++;
+        while (idxVec.contains(idxCtr));
+        m_idx = idxCtr;
+        idxVec.append(m_idx);
+    }
     else 
+    {
         m_idx = id;
+        idxVec.append(id);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -48,6 +58,7 @@ DrawItem::~DrawItem()
         delete m_marker[n];
     }
     m_marker.clear();
+    idxVec.remove(m_idx);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

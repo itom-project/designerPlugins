@@ -43,7 +43,8 @@ class DrawItem : public QwtPlotShapeItem
         double x1, y1, x2, y2;
         char m_active;
         char m_type;
-        static int m_idx;
+        static QVector<int> idxVec;
+        int m_idx;
     //    virtual QwtText trackerTextF( const QPointF &pos ) const;
     //    void drawTracker( QPainter *painter ) const;
     //    void setBackgroundFillBrush( const QBrush &brush );
