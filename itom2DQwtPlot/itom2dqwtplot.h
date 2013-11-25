@@ -213,7 +213,7 @@ public slots:
     ito::RetVal deleteMarkers(int id);
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
-    ito::RetVal clearGeometricElements(void) {return ito::retOk;}
+    ito::RetVal clearGeometricElements(void);
 //    void userInteractionEndRect(const QRectF &rect);
 //    void userInteractionEndEllipse(const QRectF &rect);    
 //    void userInteractionEndPt(const QVector<QPointF> &points);

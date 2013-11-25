@@ -1072,6 +1072,19 @@ ito::RetVal Itom2dQwtPlot::deleteMarkers(int id)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::clearGeometricElements(void)
+{
+    QList<int> keys = m_data.m_pDrawItems.keys();
+    ito::RetVal retVal = ito::retOk;
+
+    for(int i = 0; i < keys.size(); i++)
+    {
+        retVal += m_pContent->deleteMarkers(keys[i]);
+    }
+    return retVal;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints /*= -1*/)
 {
     m_pActValuePicker->setChecked(false);
@@ -1155,7 +1168,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 {
     int ysize = dstObject->getSize(0);
 
-    if(ysize == 0)
+    if(ysize == 0 || ysize < m_data.m_pDrawItems.size())
     {
         return ito::retError;
     }
@@ -1166,56 +1179,68 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
     ito::float32* rowPtr = tarMat->ptr<ito::float32>(0);
     memset(rowPtr, 0, sizeof(ito::float32) * xsize * ysize);
 
-    for(int y = 0; y < ysize; y++)
+    QHash<int, DrawItem*>::Iterator it = m_data.m_pDrawItems.begin();
+
+//    for(int y = 0; y < ysize; y++)
+//    {
+    int y = 0;
+    for (; it != m_data.m_pDrawItems.end(); it++)
     {
         rowPtr = tarMat->ptr<ito::float32>(y);
-        rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
-        switch (m_data.m_pDrawItems[y]->m_type)
+        //if(m_data.m_pDrawItems[y] == NULL)
+        if(it.value() == NULL)
+        {
+            continue;
+        }
+        //rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+        rowPtr[0] = (ito::float32) (it.value()->m_idx);
+        switch (it.value()->m_type)
         {
             case PlotCanvas::tPoint:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tPoint;
-                rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
-                rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
+                rowPtr[2] = (ito::float32) (it.value()->x1);
+                rowPtr[3] = (ito::float32) (it.value()->y1);
             break;
 
             case PlotCanvas::tLine:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tLine;
-                rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
-                rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
-                rowPtr[5] = (ito::float32) (m_data.m_pDrawItems[y]->x2);
-                rowPtr[6] = (ito::float32) (m_data.m_pDrawItems[y]->y2);
+                rowPtr[2] = (ito::float32) (it.value()->x1);
+                rowPtr[3] = (ito::float32) (it.value()->y1);
+                rowPtr[5] = (ito::float32) (it.value()->x2);
+                rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
             case PlotCanvas::tRect:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRetangle;
-                rowPtr[2] = (ito::float32) (m_data.m_pDrawItems[y]->x1);
-                rowPtr[3] = (ito::float32) (m_data.m_pDrawItems[y]->y1);
-                rowPtr[5] = (ito::float32) (m_data.m_pDrawItems[y]->x2);
-                rowPtr[6] = (ito::float32) (m_data.m_pDrawItems[y]->y2);
+                rowPtr[2] = (ito::float32) (it.value()->x1);
+                rowPtr[3] = (ito::float32) (it.value()->y1);
+                rowPtr[5] = (ito::float32) (it.value()->x2);
+                rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
             case PlotCanvas::tEllipse:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tElipse;
-                rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
-                rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
-                rowPtr[5] = (abs((ito::float32)m_data.m_pDrawItems[y]->x1 - (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
-                rowPtr[6] = (abs((ito::float32)m_data.m_pDrawItems[y]->y1 - (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
+                rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
+                rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
+                rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 2.0);
+                rowPtr[6] = (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 2.0);
             break;
 
             case PlotCanvas::tCircle:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tCircle;
-                rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
-                rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
-                rowPtr[5] = (abs((ito::float32)m_data.m_pDrawItems[y]->x1 - (ito::float32)m_data.m_pDrawItems[y]->x2) / 4.0) + (abs((ito::float32)m_data.m_pDrawItems[y]->y1 - (ito::float32)m_data.m_pDrawItems[y]->y2) / 4.0);
+                rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
+                rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
+                rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
             break;
 
             case PlotCanvas::tSquare:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tSquare;
-                rowPtr[2] = (((ito::float32)m_data.m_pDrawItems[y]->x1 + (ito::float32)m_data.m_pDrawItems[y]->x2) / 2.0);
-                rowPtr[3] = (((ito::float32)m_data.m_pDrawItems[y]->y1 + (ito::float32)m_data.m_pDrawItems[y]->y2) / 2.0);
-                rowPtr[5] = (abs((ito::float32)m_data.m_pDrawItems[y]->x1 - (ito::float32)m_data.m_pDrawItems[y]->x2) / 4.0) + (abs((ito::float32)m_data.m_pDrawItems[y]->y1 - (ito::float32)m_data.m_pDrawItems[y]->y2) / 4.0);
+                rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
+                rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
+                rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
             break;
         }
+        y++;
     }
 
     return ito::retOk;

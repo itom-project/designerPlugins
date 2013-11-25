@@ -1022,6 +1022,8 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
     if(clear)
     {
         this->clear();
+        m_rowHash.clear();
+        m_pData->m_relationsList.clear();
     }
     if(identical)
     {

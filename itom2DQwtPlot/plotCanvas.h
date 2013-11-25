@@ -210,11 +210,21 @@ struct InternalData
     }
     ~InternalData()
     {
-        QHash<int, DrawItem*>::iterator it = m_pDrawItems.begin();
-        for (; it != m_pDrawItems.end(); it++)
+        QList<int> keys = m_pDrawItems.keys();
+        for (int i = 0; i < keys.size(); i++)
         {
-            it.value()->detach();
-            delete it.value();
+            if(m_pDrawItems[keys[i]] != NULL)
+            {
+                DrawItem *delItem = m_pDrawItems[keys[i]];
+                delItem->detach();
+                //delete delItem;
+                //m_pDrawItems[keys[i]] = NULL;
+                m_pDrawItems.remove(keys[i]);
+                // ToDo: Check for memoryleak!!!
+                
+            }
+            //it.value()->detach();
+            //delete it.value();
         }
 /*        
         for (int n = 0; n < m_pDrawItems.size(); n++)

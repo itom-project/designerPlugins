@@ -1360,11 +1360,21 @@ ito::RetVal PlotCanvas::deleteMarkers(const int id)
     
     if (m_pData->m_pDrawItems.contains(id))
     {
+        //
         DrawItem *delItem = m_pData->m_pDrawItems[id];
+        //delItem->setActive(0);
+        //delItem->m_marker.detach();
+        delItem->detach();
         m_pData->m_pDrawItems.remove(id);
-        delete delItem;
+        //delete delItem; // ToDo check for memory leak
+        found = true;
     }
     
+    if(m_pData->m_pDrawItems.size() == 0)
+    {
+       m_pData->m_pDrawItems.clear(); 
+    }
+
     if (!found)
     {
         retval += ito::RetVal::format(ito::retError,0,"No marker with id '%d' found.", id);
@@ -1905,6 +1915,12 @@ void PlotCanvas::mouseMoveEvent ( QMouseEvent * event )
 //        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
 //            if (m_pData->m_pDrawItems[n]->m_active == 1)
+
+            if(it.value() == NULL)
+            {
+                continue;
+            }
+
             if (it.value()->m_active == 1)
             {
                 int dx, dy;
@@ -2063,6 +2079,12 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
         for (;it != m_pData->m_pDrawItems.end(); it++)
 //        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
+
+            if(it.value() == NULL)
+            {
+                continue;
+            }
+
             int canxpos = event->x() - canvas()->x();
             int canypos = event->y() - canvas()->y();
             double x = it.value()->x1;
@@ -2093,6 +2115,12 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
 //        for (n++; n < m_pData->m_pDrawItems.size(); n++)
         for (;it != m_pData->m_pDrawItems.end(); it++)
         {
+
+            if(it.value() == NULL)
+            {
+                continue;
+            }
+
             it.value()->setActive(0);
         }
         replot();
@@ -2110,7 +2138,7 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
         for (;it != m_pData->m_pDrawItems.end(); it++)        
 //        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
-            if(it.value()->m_active != 0 && p)
+            if(it.value() != NULL && it.value()->m_active != 0 && p)
             {
                 int type = 0;
                 QVector<ito::float32> values;
@@ -2181,8 +2209,9 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                 }
 
                 emit p->plotItemChanged(it.value()->m_idx, type, values);
+
             }
-            it.value()->m_active = 0;
+            if(it.value()) it.value()->m_active = 0;
         }
     }
 }
