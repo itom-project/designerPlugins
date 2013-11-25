@@ -1237,3 +1237,8 @@ void Itom2dQwtPlot::mnuActRatio(bool checked)
     m_data.m_keepAspect = checked;
     if(m_pContent) m_pContent->configRescaler();
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::resizeEvent ( QResizeEvent * event )
+{
+    if(m_pContent) m_pContent->configRescaler();
+}

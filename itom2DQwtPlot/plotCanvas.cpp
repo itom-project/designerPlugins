@@ -2058,7 +2058,7 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
 
     if (m_pData->m_state == tIdle)
     {
-        int n;
+        //int n;
         QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
         for (;it != m_pData->m_pDrawItems.end(); it++)
 //        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
@@ -2191,13 +2191,19 @@ void PlotCanvas::configRescaler(void)
 {
     if(m_pData->m_keepAspect)
     {
+        int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
+        
         if(m_pRescaler == NULL)
         {
-            m_pRescaler = new QwtPlotRescaler(canvas(), QwtPlot::xBottom, QwtPlotRescaler::Fixed);
+            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fixed);
+            m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
+            m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
+            m_pRescaler->setAspectRatio(1.0);
         }
-        m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
-        m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
-        m_pRescaler->setAspectRatio(1.0);
+        else
+        {
+            m_pRescaler->setReferenceAxis(refAxis);
+        }
         m_pRescaler->setEnabled(true);
     }
     else

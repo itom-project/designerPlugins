@@ -203,6 +203,8 @@ private slots:
     void childFigureDestroyed(QObject *obj);
 
 private slots:
+    void resizeEvent ( QResizeEvent * event );
+
     void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
 
 public slots:
