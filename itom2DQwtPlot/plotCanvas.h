@@ -51,6 +51,8 @@
 #include <qwt_plot_shapeitem.h>
 #include <qcolor.h>
 
+#include <qwt_plot_rescaler.h>
+
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
 struct InternalData;
@@ -111,7 +113,11 @@ class PlotCanvas : public QwtPlot
         void mouseMoveEvent ( QMouseEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
 
+        void configRescaler(void);
+
     private:
+        QwtPlotRescaler* m_pRescaler;
+
         QwtPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
         QwtPlotMagnifier *m_pMagnifier;
@@ -200,6 +206,7 @@ struct InternalData
         m_elementsToPick = 0;
 
         m_pDrawItems.clear();
+        m_keepAspect = false; 
     }
     ~InternalData()
     {
@@ -230,6 +237,7 @@ struct InternalData
     QString m_yaxisLabelDObj;
     QString m_valueLabelDObj;
 
+    bool m_keepAspect;
     bool m_autoTitle;
     bool m_autoxAxisLabel;
     bool m_autoyAxisLabel;

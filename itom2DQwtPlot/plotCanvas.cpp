@@ -74,7 +74,9 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_lineCutUID(0),
         m_pLineCutLine(NULL),
         m_pMultiPointPicker(NULL),
+        m_pRescaler(NULL),
         m_activeDrawItem(-1)
+        
 {
     setMouseTracking(false);
 
@@ -185,6 +187,11 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     setAxisScale(QwtPlot::yRight, 0, 1.0 );
     enableAxis(QwtPlot::yRight, m_pData->m_colorBarVisible );
     axisWidget(QwtPlot::yRight)->setLayoutFlag( QwtScaleWidget::TitleInverted, false ); //let the label be in the same direction than on the left side
+
+    
+    //m_pRescaler = new QwtPlotRescaler(canvas(), QwtPlot::xBottom, QwtPlotRescaler::Fixed);
+    configRescaler();
+    //m_pRescaler->setEnabled(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -199,6 +206,12 @@ PlotCanvas::~PlotCanvas()
     m_pStackCutMarker = NULL;
 
     m_pMultiPointPicker = NULL;
+    
+    if(m_pRescaler != NULL)
+    {
+        m_pRescaler->deleteLater();
+        m_pRescaler = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -350,7 +363,23 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 m_pData->m_xaxisLabelDObj = "";
                 m_pData->m_yaxisLabelDObj = "";
             }
+
+
+            double aspRatio = (m_pData->m_xaxisMax - m_pData->m_xaxisMin) /  (m_pData->m_yaxisMax - m_pData->m_yaxisMin);
+
+            aspRatio = aspRatio > 20 ? 20 : aspRatio < 0.05 ? 0.05 : aspRatio;
+
+            
+            if(m_pRescaler != NULL)
+            {
+                m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
+                m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
+            }
+            //m_pRescaler->setEnabled(m_pData->m_keepAspect);
+
         }
+
+
     }
 
     updateLabels();
@@ -2157,7 +2186,31 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
         }
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::configRescaler(void)
+{
+    if(m_pData->m_keepAspect)
+    {
+        if(m_pRescaler == NULL)
+        {
+            m_pRescaler = new QwtPlotRescaler(canvas(), QwtPlot::xBottom, QwtPlotRescaler::Fixed);
+        }
+        m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
+        m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
+        m_pRescaler->setAspectRatio(1.0);
+        m_pRescaler->setEnabled(true);
+    }
+    else
+    {
+        if(m_pRescaler != NULL)
+        {
+            m_pRescaler->deleteLater();
+            m_pRescaler = NULL;
+        }
+        
+    }
+    replot();
+}
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void PlotCanvas::multiPointSelected (const QPolygon &polygon)
 //{

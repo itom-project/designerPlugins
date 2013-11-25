@@ -34,7 +34,10 @@
 #include <qwt_scale_widget.h>
 #include <qwt_picker_machine.h>
 
+#include <qwt_plot_layout.h>
+
 #include "common/sharedStructuresPrimitives.h"
+#include "DataObject/dataObjectFuncs.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
@@ -57,6 +60,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pCoordinates(NULL),
     m_pActDrawMode(NULL),
     m_pMnuDrawMode(NULL),
+    m_pActAspectRatio(NULL),
     m_pDrawModeActGroup(NULL)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
@@ -104,6 +108,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
+    mainTb->addAction(m_pActAspectRatio);
     mainTb->addSeparator();
     mainTb->addAction(m_pActScaleSettings);
     mainTb->addAction(m_pActToggleColorBar);
@@ -117,6 +122,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
     mainTb->addAction(m_pActCoordinates);
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -155,6 +161,14 @@ void Itom2dQwtPlot::createActions()
     a->setChecked(false);
     a->setToolTip(tr("Pan axes with left mouse, zoom with right"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActPan(bool)));
+
+    //m_actApectRatio
+    m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("lock aspect ratio"), this);
+    a->setObjectName("actRatio");
+    a->setCheckable(true);
+    a->setChecked(false);
+    a->setToolTip(tr("Toogle fixed / variable aspect ration between axis x and y"));
+    connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
     //m_actZoom
     m_pActZoom = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
@@ -1136,7 +1150,7 @@ QSharedPointer< ito::DataObject > Itom2dQwtPlot::getGeometricElements()
 
     return exportItem;
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 {
     int ysize = dstObject->getSize(0);
@@ -1206,10 +1220,20 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 
     return ito::retOk;
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
 {
 
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
+{
+    mnuActRatio(keepAspectEnable);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuActRatio(bool checked)
+{
+    m_data.m_keepAspect = checked;
+    if(m_pContent) m_pContent->configRescaler();
+}

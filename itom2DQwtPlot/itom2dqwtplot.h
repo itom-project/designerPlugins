@@ -53,6 +53,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount WRITE setGeometricElementsCount DESIGNABLE false)
+    Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -67,7 +68,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
     Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
-
+    Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -136,6 +137,9 @@ public:
     QFont getAxisFont(void) const;
     void setAxisFont(const QFont &font);
 
+    bool getkeepAspectRatio(void) const {return this->m_data.m_keepAspect;}
+    void setkeepAspectRatio(const bool &keepAspectEnable);
+
     QSharedPointer< ito::DataObject > getGeometricElements();
     void setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
 
@@ -157,6 +161,7 @@ private:
     QAction *m_pActHome;
     QAction *m_pActPan;
     QAction *m_pActZoom;
+    QAction *m_pActAspectRatio;
     QAction *m_pActScaleSettings;
     QAction *m_pActColorPalette;
     QAction *m_pActToggleColorBar;
@@ -184,6 +189,7 @@ private slots:
     void mnuActHome();
     void mnuActPan(bool checked);
     void mnuActZoom(bool checked);
+    void mnuActRatio(bool checked);
     void mnuActScaleSettings();
     void mnuActColorPalette();
     void mnuActToggleColorBar(bool checked);
