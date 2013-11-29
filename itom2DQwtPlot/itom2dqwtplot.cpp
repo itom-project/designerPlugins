@@ -1254,6 +1254,10 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 {
+    if (m_pActAspectRatio) //if property is set in designer or by python, the action should represent the current status, too
+    {
+        m_pActAspectRatio->setChecked(keepAspectEnable);
+    }
     mnuActRatio(keepAspectEnable);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
