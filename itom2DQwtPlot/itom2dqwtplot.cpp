@@ -1304,6 +1304,11 @@ void Itom2dQwtPlot::mnuActCenterMarker(bool checked)
 
 void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
 {
+    if (m_pActCntrMarker && m_pActCntrMarker->isChecked() != enabled) //if property is set in designer or by python, the action should represent the current status, too
+    {
+        m_pActCntrMarker->setChecked(enabled);
+    }
+
     m_data.m_showCenterMarker = enabled;
     if(m_pContent)
     {
