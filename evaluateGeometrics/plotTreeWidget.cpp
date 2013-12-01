@@ -54,7 +54,9 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     
     m_rowHash.clear();
-    m_rowHash.reserve(24);
+    //m_rowHash.reserve(24);
+    //m_pData->m_rowHash.clear();
+    //m_pData->m_rowHash.reserve(24);
 
     setColumnCount(5);
     setColumnWidth(0, 142);
@@ -106,21 +108,6 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
     if(!update)
     {
-        /*
-        for(int i = 0; i < 5; i++)
-        {
-            elements[i] = (QLabel*) (itemWidget(topLevelItem(row), i));
-            if(elements[i] == NULL)
-            {
-                elements[i]  = new QLabel("", this, 0);
-                setItemWidget(topLevelItem(row), i, elements[i]);
-            }
-            else
-            {
-                elements[i]->setText("");
-            }
-        }
-        */
 
         switch (type)
         {
@@ -355,22 +342,22 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
     }
     else
     {
-
+        QList<ito::int32> keys = m_rowHash.keys();
         for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
         {
             m_pData->m_relationsList[rel].myWidget = NULL;
-            m_pData->m_relationsList[rel].firstElementRow = -1;
-            m_pData->m_relationsList[rel].secondElementRow = -1;
+            //m_pData->m_relationsList[rel].firstElementRow = -1;
+            //m_pData->m_relationsList[rel].secondElementRow = -1;
         }
 
-        for(int geo = 0; geo < m_rowHash.size(); geo++)
+        for(int geo = 0; geo < keys.size(); geo++)
         {
             QTreeWidgetItem* currentGeometry = topLevelItem(geo);
             QVector<ito::int16> relationIdxVec;
             relationIdxVec.reserve(24);
             for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
             {
-                if(m_pData->m_relationsList[rel].firstElementIdx == (ito::uint32)(m_rowHash[geo].cells[0]) && m_pData->m_relationsList[rel].type != 0)
+                if(m_pData->m_relationsList[rel].firstElementIdx == keys[geo] && m_pData->m_relationsList[rel].type != 0)
                 {
                     relationIdxVec.append(rel);
                 }
@@ -423,25 +410,24 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
                 int secondType = 0;
 
-                m_pData->m_relationsList[curRel].firstElementRow = geo;
-
-                m_pData->m_relationsList[curRel].secondElementRow = -1;
+                //m_pData->m_relationsList[curRel].firstElementRow = geo;
+                //m_pData->m_relationsList[curRel].secondElementRow = -1;
 
                 for(int geo2 = 0; geo2 < geo; geo2++)
                 {
-                    if(idx2 ==  (ito::int32)m_rowHash[geo2].cells[0])
+                    if(idx2 ==  keys[geo2])
                     {
-                        m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[geo2].cells[1]) & 0x0000FFFF;
+                        //m_pData->m_relationsList[curRel].secondElementRow = geo2;
+                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & 0x0000FFFF;
                     }
                 }
 
-                for(int geo2 = geo + 1; geo2 < this->m_rowHash.size(); geo2++)
+                for(int geo2 = geo + 1; geo2 < keys.size(); geo2++)
                 {
-                    if(idx2 ==  (ito::int32)m_rowHash[geo2].cells[0])
+                    if(idx2 ==  keys[geo2])
                     {
-                        m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[geo2].cells[1]) & 0x0000FFFF;
+                        //m_pData->m_relationsList[curRel].secondElementRow = geo2;
+                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & 0x0000FFFF;
                     }
                 }
 
@@ -546,9 +532,11 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
             continue;
         }
-        else if(m_pData->m_relationsList[rel].firstElementRow > -1)
+        //else if(m_pData->m_relationsList[rel].firstElementRow > -1)
+        else if(m_rowHash.contains(m_pData->m_relationsList[rel].firstElementIdx))
         {
-            first = m_rowHash[m_pData->m_relationsList[rel].firstElementRow].cells;
+            //first = m_rowHash[m_pData->m_relationsList[rel].firstElementRow].cells;
+            first = m_rowHash[m_pData->m_relationsList[rel].firstElementIdx].cells;
         }
         else
         {
@@ -587,9 +575,10 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         }
         else
         {
-            if(m_pData->m_relationsList[rel].secondElementRow > -1)
+            //if(m_pData->m_relationsList[rel].secondElementRow > -1)
+            if(m_rowHash.contains(m_pData->m_relationsList[rel].secondElementIdx))
             {
-                second = m_rowHash[m_pData->m_relationsList[rel].secondElementRow].cells;
+                second = m_rowHash[m_pData->m_relationsList[rel].secondElementIdx].cells;
 
                 switch(m_pData->m_relationsList[rel].type & 0x0FFF)
                 {
@@ -908,7 +897,6 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
     int cols = 0;
     int dims = 0;
    
-
     if(dataObj)
     {
         dims = dataObj->getDims();
@@ -930,20 +918,21 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
         }
         else
         {
+            QList<ito::int32> hashKeys = m_rowHash.keys();
             cv::Mat* scrMat = (cv::Mat*)(dataObj->get_mdata()[dataObj->seekMat(0)]);
 
             bool found = false;
             
-            cols = std::min(scrMat->cols, (ito::int32)(sizeof(geometricPrimitives) / 4));
+            cols = std::min(scrMat->cols, PRIM_ELEMENTLENGTH);
 
             ito::float32* srcPtr;
 
-            if(scrMat->rows == m_rowHash.size())
+            if(scrMat->rows == hashKeys.size())
             {
-                for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
+                for(int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
                 {
                     srcPtr = scrMat->ptr<ito::float32>(dcnt);
-                    if((m_rowHash[dcnt].cells[0] != srcPtr[0]) || ((ito::int32)m_rowHash[dcnt].cells[1] != (ito::int32)srcPtr[1]) )
+                    if((hashKeys[dcnt] != (ito::int32)srcPtr[0]) || ((ito::int32)m_rowHash[hashKeys[dcnt]].cells[1] != (ito::int32)srcPtr[1]) )
                     {
                         identical = false;
                         break;
@@ -957,15 +946,13 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
 
             if(!identical)
             {
-                geometricPrimitives newVal;
-
-                for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
+                for(int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
                 {
                     found = false;
                     for(int scnt = 0; scnt < scrMat->rows; scnt++)
                     {
                         srcPtr = scrMat->ptr<ito::float32>(scnt);
-                        if(m_rowHash[dcnt].cells[0] == srcPtr[0])
+                        if(hashKeys[dcnt] == (ito::int32)srcPtr[0])
                         {
                             found = true;
                             break;
@@ -975,22 +962,26 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
                     if(!found)
                     {
                         changed = true;
-                        m_rowHash.remove(dcnt);
+                        m_rowHash.remove(hashKeys[dcnt]);
+
                     }
+                }
+
+                if(changed)
+                {
+                    hashKeys = m_rowHash.keys();
                 }
 
                 for(int scnt = 0; scnt < scrMat->rows; scnt++)
                 {
                     found = false;
                     srcPtr = scrMat->ptr<ito::float32>(scnt);
-                    for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
+                    for(int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
                     {
-                   
-                        if(m_rowHash[dcnt].cells[0] == srcPtr[0])
+                        if(hashKeys[dcnt] == (ito::int32)srcPtr[0])
                         {
-                            //std::fill(m_rowHash[dcnt].cells, m_rowHash[dcnt].cells + sizeof(geometricPrimitives), std::numeric_limits<ito::float32>::signaling_NaN());
-                            std::fill(m_rowHash[dcnt].cells, m_rowHash[dcnt].cells + PRIM_ELEMENTLENGTH, std::numeric_limits<ito::float32>::signaling_NaN());
-                            memcpy(m_rowHash[dcnt].cells, srcPtr, sizeof(ito::float32) * cols);
+                            std::fill(m_rowHash[hashKeys[dcnt]].cells, m_rowHash[hashKeys[dcnt]].cells + PRIM_ELEMENTLENGTH, std::numeric_limits<ito::float32>::signaling_NaN());
+                            memcpy(m_rowHash[hashKeys[dcnt]].cells, srcPtr, sizeof(ito::float32) * cols);
                             found = true;
                             break;
                         }
@@ -998,18 +989,14 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
 
                     if(!found && (((ito::int32)(srcPtr[1]) & 0x0000FFFF)!= 0))
                     {
+                        geometricPrimitives newVal;
+                        std::fill(newVal.cells, newVal.cells + PRIM_ELEMENTLENGTH, 0);
                         changed = true;
                         memcpy(newVal.cells, srcPtr, sizeof(ito::float32) * cols);
 
-                        if(m_rowHash.size() > scnt)
-                        {
-                            m_rowHash.insert(scnt, newVal);
-                        }
-                        else
-                        {
-                            m_rowHash.append(newVal);
-                        }
-                        
+                        int idx = 0;
+                        if(ito::dObjHelper::isFinite(newVal.cells[0]) && newVal.cells[0] < 65355 && newVal.cells[0] > -1) idx = (ito::int32)newVal.cells[0];
+                        m_rowHash.insert(idx, newVal);
                     }
 
                 }
@@ -1021,35 +1008,42 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
      
     if(clear)
     {
-        this->clear();
-        m_rowHash.clear();
+        QList<ito::int32> hashTags = m_rowHash.keys();
+        for(int i = 0; i < hashTags.size(); i++)
+        {
+            m_rowHash.remove(hashTags[i]);
+        }
+        
         m_pData->m_relationsList.clear();
+        this->clear();
     }
     if(identical)
     {
         cv::Mat* scrMat = (cv::Mat*)(dataObj->get_mdata()[dataObj->seekMat(0)]);
         ito::float32* srcPtr;
 
-        for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
+        QList<ito::int32> hashTags = m_rowHash.keys();
+
+        for(int dcnt = 0; dcnt < hashTags.size(); dcnt++)
         {
             srcPtr = scrMat->ptr<ito::float32>(dcnt);
-            memset(m_rowHash[dcnt].cells, 0, sizeof(geometricPrimitives));
-            memcpy(m_rowHash[dcnt].cells, srcPtr, sizeof(ito::float32) * cols);
-            setPrimitivElement(dcnt, true, m_rowHash[dcnt].cells);
+            std::fill(m_rowHash[hashTags[dcnt]].cells, m_rowHash[hashTags[dcnt]].cells + PRIM_ELEMENTLENGTH, 0);
+            memcpy(m_rowHash[hashTags[dcnt]].cells, srcPtr, sizeof(ito::float32) * cols);
+            setPrimitivElement(dcnt, true, m_rowHash[hashTags[dcnt]].cells);
         }
         updateRelationShips(true);
     }
     else if(changed)
     {
         this->clear();
-
-        for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
+        QList<ito::int32> hashTags = m_rowHash.keys();
+        for(int dcnt = 0; dcnt < hashTags.size(); dcnt++)
         {
             QStringList tempList;
             tempList << QString("") << QString("") << QString("") << QString("") << QString("");
             QTreeWidgetItem* temp = new QTreeWidgetItem(this, tempList);
             addTopLevelItem(temp);
-            setPrimitivElement(dcnt, false, m_rowHash[dcnt].cells);
+            setPrimitivElement(dcnt, false, m_rowHash[hashTags[dcnt]].cells);
         }
 
         updateRelationShips(false);
@@ -1063,17 +1057,13 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx,const ito::int32&flags,const QVector<ito::float32> &values)
 {
-    for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
-    {
-        if((ito::int32)m_rowHash[dcnt].cells[0] == idx)
-        {
-            if((ito::int32)m_rowHash[dcnt].cells[1] ==  flags)
-            {
-                memset(&(m_rowHash[dcnt].cells[2]), 0, sizeof(geometricPrimitives) - 2);
-                memcpy(&(m_rowHash[dcnt].cells[2]), values.data(), sizeof(ito::float32) * std::min(values.size(), PRIM_ELEMENTLENGTH -2));
-                setPrimitivElement(dcnt, true, m_rowHash[dcnt].cells);
-            }
-            break;
+    if(m_rowHash.contains(idx))
+    {        
+        if((ito::int32)m_rowHash[idx].cells[1] ==  flags)
+        {  
+            std::fill(&(m_rowHash[idx].cells[2]), m_rowHash[idx].cells + PRIM_ELEMENTLENGTH, 0);
+            memcpy(&(m_rowHash[idx].cells[2]), values.data(), sizeof(ito::float32) * std::min(values.size(), PRIM_ELEMENTLENGTH -2));
+            setPrimitivElement(m_rowHash.keys().indexOf(idx), true, m_rowHash[idx].cells);
         }
     }
     updateRelationShips(true);
@@ -1178,100 +1168,102 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
     {
         stream.writeAttribute("href", "http://www.ito.uni-stuttgart.de");
         
-        for(int geo = 0; geo < m_rowHash.size(); geo++)
+        QHash<ito::int32, geometricPrimitives >::const_iterator curValue = m_rowHash.constBegin();
+        for(int geo = 0; curValue !=  m_rowHash.end(); curValue++, geo++)
+        //for(int geo = 0; geo < m_rowHash.size(); geo++)
         {
             stream.writeStartElement(QString::number(geo));
-            stream.writeAttribute("index", QString::number((ito::int32)m_rowHash[geo].cells[0]));
-            stream.writeAttribute("flags", QString::number((ito::int32)m_rowHash[geo].cells[1]));
+            stream.writeAttribute("index", QString::number((ito::int32)curValue->cells[0]));
+            stream.writeAttribute("flags", QString::number((ito::int32)curValue->cells[1]));
 
             QVector<ito::int16> relationIdxVec;
             relationIdxVec.reserve(24);
             for(int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
             {
-                if(m_pData->m_relationsList[rel].firstElementIdx == (ito::uint32)(m_rowHash[geo].cells[0]) && m_pData->m_relationsList[rel].type != 0)
+                if(m_pData->m_relationsList[rel].firstElementIdx == (ito::uint32)(curValue->cells[0]) && m_pData->m_relationsList[rel].type != 0)
                 {
                     relationIdxVec.append(rel);
                 }
             }
 
-            switch(((ito::int32)m_rowHash[geo].cells[1]) & 0x0000FFFF)
+            switch(((ito::int32)curValue->cells[1]) & 0x0000FFFF)
             {
                 case ito::PrimitiveContainer::tPoint:
                 {
                     stream.writeAttribute("name", "point");
-                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
                 }
                 break;
                 case ito::PrimitiveContainer::tLine:
                 {
                     stream.writeAttribute("name", "line");
-                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("x1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("y1", QString::number((ito::float32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("z1", QString::number((ito::float32)m_rowHash[geo].cells[7]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
+                    stream.writeAttribute("x1", QString::number((ito::float32)curValue->cells[5]));
+                    stream.writeAttribute("y1", QString::number((ito::float32)curValue->cells[6]));
+                    stream.writeAttribute("z1", QString::number((ito::float32)curValue->cells[7]));
                 }
                 break;
                 case ito::PrimitiveContainer::tElipse:
                 {
                     stream.writeAttribute("name", "ellipse");
-                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("r1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("r2", QString::number((ito::float32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("alpha", QString::number((ito::float32)m_rowHash[geo].cells[7]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
+                    stream.writeAttribute("r1", QString::number((ito::float32)curValue->cells[5]));
+                    stream.writeAttribute("r2", QString::number((ito::float32)curValue->cells[6]));
+                    stream.writeAttribute("alpha", QString::number((ito::float32)curValue->cells[7]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tCircle:
                 {
                     stream.writeAttribute("name", "circle");
-                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("r1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
+                    stream.writeAttribute("r1", QString::number((ito::float32)curValue->cells[5]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tRetangle:
                 {
                     stream.writeAttribute("name", "retangle");
-                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("x1", QString::number((ito::float32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("y1", QString::number((ito::float32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("z1", QString::number((ito::float32)m_rowHash[geo].cells[7]));
-                    stream.writeAttribute("alpha", QString::number((ito::float32)m_rowHash[geo].cells[8]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
+                    stream.writeAttribute("x1", QString::number((ito::float32)curValue->cells[5]));
+                    stream.writeAttribute("y1", QString::number((ito::float32)curValue->cells[6]));
+                    stream.writeAttribute("z1", QString::number((ito::float32)curValue->cells[7]));
+                    stream.writeAttribute("alpha", QString::number((ito::float32)curValue->cells[8]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tSquare:
                 {
                     stream.writeAttribute("name", "square");
-                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("a", QString::number((ito::float32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("alpha", QString::number((ito::float32)m_rowHash[geo].cells[6]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
+                    stream.writeAttribute("a", QString::number((ito::float32)curValue->cells[5]));
+                    stream.writeAttribute("alpha", QString::number((ito::float32)curValue->cells[6]));
                 }
                 break;
 
                 case ito::PrimitiveContainer::tPolygon:
                 {
                     stream.writeAttribute("name", "polygoneElement");
-                    stream.writeAttribute("x0", QString::number((ito::float32)m_rowHash[geo].cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)m_rowHash[geo].cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)m_rowHash[geo].cells[4]));
-                    stream.writeAttribute("xDir", QString::number((ito::float32)m_rowHash[geo].cells[5]));
-                    stream.writeAttribute("yDir", QString::number((ito::float32)m_rowHash[geo].cells[6]));
-                    stream.writeAttribute("zDir", QString::number((ito::float32)m_rowHash[geo].cells[7]));
-                    stream.writeAttribute("No", QString::number((ito::float32)m_rowHash[geo].cells[8]));
-                    stream.writeAttribute("Total", QString::number((ito::float32)m_rowHash[geo].cells[9]));
+                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
+                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
+                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
+                    stream.writeAttribute("xDir", QString::number((ito::float32)curValue->cells[5]));
+                    stream.writeAttribute("yDir", QString::number((ito::float32)curValue->cells[6]));
+                    stream.writeAttribute("zDir", QString::number((ito::float32)curValue->cells[7]));
+                    stream.writeAttribute("No", QString::number((ito::float32)curValue->cells[8]));
+                    stream.writeAttribute("Total", QString::number((ito::float32)curValue->cells[9]));
                 }
                 break;
 
@@ -1316,14 +1308,16 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
     QByteArray outBuffer;
     outBuffer.reserve(200);
 
-    for(int geo = 0; geo < m_rowHash.size(); geo++)
+    QHash<ito::int32, geometricPrimitives >::const_iterator curValue = m_rowHash.constBegin();
+    for(int geo = 0; curValue !=  m_rowHash.end(); curValue++, geo++)
+    //for(int geo = 0; geo < m_rowHash.size(); geo++)
     {
         outBuffer.clear();
-        outBuffer.append(QByteArray::number((ito::int32)m_rowHash[geo].cells[0]));
+        outBuffer.append(QByteArray::number((ito::int32)curValue->cells[0]));
         for(int i = 1; i < PRIM_ELEMENTLENGTH; i++)
         {
             outBuffer.append(", ");
-            outBuffer.append(QByteArray::number(m_rowHash[geo].cells[i]));
+            outBuffer.append(QByteArray::number(curValue->cells[i]));
             
         }
         outBuffer.append('\n');
@@ -1390,9 +1384,10 @@ void PlotTreeWidget::setPannerEnable(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTreeWidget::updatePrimitives()
 {
-    for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
+    QList<ito::int32> hashKeys = m_rowHash.keys();
+    for(int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
     {
-        setPrimitivElement(dcnt, true, m_rowHash[dcnt].cells);
+        setPrimitivElement(dcnt, true, m_rowHash[hashKeys[dcnt]].cells);
     }   
 }
 //----------------------------------------------------------------------------------------------------------------------------------

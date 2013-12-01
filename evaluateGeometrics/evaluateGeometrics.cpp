@@ -124,7 +124,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_info.m_relationsList.clear();
     m_info.m_numberOfDigits = 2;
     m_info.m_consider2DOnly = false;
-
+    //m_info.m_rowHash.clear();
     m_info.m_relationNames.clear();
     m_info.m_relationNames.append("N.A.");
     m_info.m_relationNames.append(tr("radius (own)"));
@@ -500,8 +500,8 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
     ito::float32* ptr = NULL;
 
     relationsShip newRelation;
-    newRelation.secondElementRow = -1;
-    newRelation.firstElementRow = -1;
+//    newRelation.secondElementRow = -1;
+//    newRelation.firstElementRow = -1;
     newRelation.myWidget = NULL;
 
 
@@ -609,8 +609,8 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
         return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalud object type").toAscii().data());
     }
 
-    newRelation.secondElementRow = -1;
-    newRelation.firstElementRow = -1;
+//    newRelation.secondElementRow = -1;
+//    newRelation.firstElementRow = -1;
 
     newRelation.myWidget = NULL;
 

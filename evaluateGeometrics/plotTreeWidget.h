@@ -36,6 +36,7 @@
 #include <qtimer.h>
 #include <qmenu.h>
 #include <qvector.h>
+#include <qhash.h>
 #include <qstringlist.h>
 
 #include <qfileinfo.h>
@@ -50,8 +51,8 @@ struct relationsShip
     ito::int32 firstElementIdx;
     ito::uint32 type;
     ito::int32 secondElementIdx;
-    ito::int32 firstElementRow;
-    ito::int32 secondElementRow;
+//    ito::int32 firstElementRow;
+//    ito::int32 secondElementRow;
     QTreeWidgetItem* myWidget;
     ito::float32 extValue;
 };
@@ -64,6 +65,7 @@ struct InternalInfo
     QString m_titleLabel;
     QStringList m_relationNames;
     QVector<relationsShip> m_relationsList;
+    //QHash<int, geometricPrimitives> m_rowHash;
     ito::uint8 m_numberOfDigits;
     bool m_consider2DOnly;
 };
@@ -152,7 +154,8 @@ class PlotTreeWidget : public QTreeWidget
 
         InternalInfo *m_pData;
 
-        QVector<geometricPrimitives> m_rowHash;
+        //QVector<geometricPrimitives> m_rowHash;
+        QHash<ito::int32, geometricPrimitives> m_rowHash;
 
         ito::RetVal updateElement(const ito::int32 &idx, const ito::int32 &flags,const QVector<ito::float32> &values);
 
