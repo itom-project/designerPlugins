@@ -289,6 +289,14 @@ void PlotCanvas::refreshStyles()
     m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7) ));
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor0), QPen(QBrush(m_inverseColor0),1),  QSize(11,11) ));
     
+    QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
+    for (;it != m_pData->m_pDrawItems.end(); it++)        
+    {
+        if(it.value() != NULL && it.value()->m_autoColor)
+        {
+            it.value()->setColor(m_inverseColor1, m_inverseColor0);
+        }
+    }
     //}
     //else
     //{
@@ -1337,7 +1345,14 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                     if (newItem)
                     {
                         newItem->setShape(path);
-                        newItem->setPen(QPen(Qt::green));
+                        
+                        if(this->m_inverseColor0.isValid())
+                        {
+                            newItem->setPen(QPen(m_inverseColor0));
+                            newItem->setBrush(QBrush(m_inverseColor0));
+                        }
+                        else newItem->setPen(QPen(Qt::green));
+                        
                         newItem->setVisible(true);
                         newItem->show();
                         newItem->attach(this);
@@ -1399,9 +1414,10 @@ ito::RetVal PlotCanvas::deleteMarkers(const int id)
         DrawItem *delItem = m_pData->m_pDrawItems[id];
         //delItem->setActive(0);
         //delItem->m_marker.detach();
+
         delItem->detach();
         m_pData->m_pDrawItems.remove(id);
-        //delete delItem; // ToDo check for memory leak
+        delete delItem; // ToDo check for memory leak
         found = true;
     }
     
@@ -1704,7 +1720,14 @@ void PlotCanvas::multiPointActivated (bool on)
                 path->lineTo(polygonScale[0].x(), polygonScale[0].y());
 
                 newItem->setShape(*path);
-                newItem->setPen(QPen(Qt::green));
+
+                if(this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                    //newItem->setBrush(QBrush(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
@@ -1758,7 +1781,14 @@ void PlotCanvas::multiPointActivated (bool on)
                 path->lineTo(polygonScale[1].x(), polygonScale[1].y());
 
                 newItem->setShape(*path);
-                newItem->setPen(QPen(Qt::green));
+
+                if(this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                    //newItem->setBrush(QBrush(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
@@ -1828,7 +1858,14 @@ void PlotCanvas::multiPointActivated (bool on)
                               polygonScale[1].y() - polygonScale[0].y());
 
                 newItem->setShape(*path);
-                newItem->setPen(QPen(Qt::green));
+
+                if(this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                    //newItem->setBrush(QBrush(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+                
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
@@ -1897,7 +1934,14 @@ void PlotCanvas::multiPointActivated (bool on)
                         (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
                 newItem->setShape(*path);
-                newItem->setPen(QPen(Qt::green));
+                
+                if(this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                    //newItem->setBrush(QBrush(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);

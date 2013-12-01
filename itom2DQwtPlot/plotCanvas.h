@@ -221,9 +221,9 @@ struct InternalData
             {
                 DrawItem *delItem = m_pDrawItems[keys[i]];
                 delItem->detach();
-                //delete delItem;
                 //m_pDrawItems[keys[i]] = NULL;
                 m_pDrawItems.remove(keys[i]);
+                delete delItem;
                 // ToDo: Check for memoryleak!!!
                 
             }

@@ -38,6 +38,7 @@ class DrawItem : public QwtPlotShapeItem
         void setRect(const QRectF &);
         void setShape( const QPainterPath & );
         void setActive(int active);
+        void setColor(const QColor &markerColor, const QColor &lineColor);
 
         QVector<QwtPlotMarker *> m_marker;
         double x1, y1, x2, y2;
@@ -45,6 +46,9 @@ class DrawItem : public QwtPlotShapeItem
         char m_type;
         static QVector<int> idxVec;
         int m_idx;
+
+        bool m_autoColor;
+        
     //    virtual QwtText trackerTextF( const QPointF &pos ) const;
     //    void drawTracker( QPainter *painter ) const;
     //    void setBackgroundFillBrush( const QBrush &brush );

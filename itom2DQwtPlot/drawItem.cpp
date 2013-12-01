@@ -28,7 +28,7 @@
 QVector<int> DrawItem::idxVec;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &title) : m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1),
+DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &title) : m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1), m_autoColor(true),
     x2(-1), y2(-1)
 {
     if (id <= 0)
@@ -58,14 +58,14 @@ DrawItem::~DrawItem()
         delete m_marker[n];
     }
     m_marker.clear();
-    idxVec.remove(m_idx);
+    idxVec.remove(idxVec.indexOf(m_idx));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setActive(int active)
 {
     for (int n = 0; n < m_marker.size(); n++)
-        m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+        m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
             QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
 
     if (active == 1)
@@ -81,7 +81,27 @@ void DrawItem::setActive(int active)
                 QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
+{
+    for (int n = 0; n < m_marker.size(); n++)
+        m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(markerColor),
+            QPen(QBrush(markerColor), 3),  QSize(7,7) ));
 
+    if (m_active == 1)
+    {
+        if (m_marker.size() >= 1)
+            m_marker[0]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
+                QPen(QBrush(markerColor), 3),  QSize(7,7) ));
+    }
+    else if (m_active == 2)
+    {
+        if (m_marker.size() >= 2)
+            m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
+                QPen(QBrush(markerColor), 3),  QSize(7,7) ));
+    }
+    setPen(QColor(lineColor));
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setShape(const QPainterPath &path)
 {
@@ -109,13 +129,13 @@ void DrawItem::setShape(const QPainterPath &path)
         if (((PlotCanvas*)m_pparent)->m_inverseColor1.isValid())
         {
             marker->setLinePen(QPen(((PlotCanvas*)m_pparent)->m_inverseColor1));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
                 QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
         }
         else
         {
             marker->setLinePen(QPen(Qt::green));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
         }
 
 
@@ -162,13 +182,13 @@ void DrawItem::setShape(const QPainterPath &path)
         if (((PlotCanvas*)m_pparent)->m_inverseColor1.isValid())
         {
             marker->setLinePen(QPen(((PlotCanvas*)m_pparent)->m_inverseColor1));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
                 QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7, 7) ));
         }
         else
         {
             marker->setLinePen(QPen(Qt::green));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7) ));
         }
 
         switch (m_type)
@@ -210,6 +230,7 @@ void DrawItem::setShape(const QPainterPath &path)
         m_marker.append(marker);
 //        m_active = 2;
     }
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
