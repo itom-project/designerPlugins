@@ -127,6 +127,8 @@ class PlotCanvas : public QwtPlot
         ValuePicker2D *m_pValuePicker;
         QwtPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
+        QwtPlotMarker *m_pCenterMarker;
+
         UserInteractionPlotPicker *m_pMultiPointPicker;
 
         QString m_colorMapName;
@@ -206,7 +208,9 @@ struct InternalData
         m_elementsToPick = 0;
 
         m_pDrawItems.clear();
-        m_keepAspect = false; 
+        m_keepAspect = false;
+        m_enablePlotting = true;
+        m_showCenterMarker = false;
     }
     ~InternalData()
     {
@@ -271,6 +275,9 @@ struct InternalData
     bool m_colorBarVisible;
 
     int m_elementsToPick;
+
+    bool m_enablePlotting;
+    bool m_showCenterMarker;
 
     PlotCanvas::ComplexType m_cmplxType;
 

@@ -55,11 +55,13 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActStackCut(NULL),
     m_pActPlaneSelector(NULL),
     m_pActCmplxSwitch(NULL),
+    m_pActClearDrawings(NULL),
     m_mnuCmplxSwitch(NULL),
     m_pActCoordinates(NULL),
     m_pCoordinates(NULL),
     m_pActDrawMode(NULL),
     m_pMnuDrawMode(NULL),
+    m_pActCntrMarker(NULL),
     m_pActAspectRatio(NULL),
     m_pDrawModeActGroup(NULL)
 {
@@ -115,9 +117,11 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActColorPalette);
     mainTb->addSeparator();
     mainTb->addAction(m_pActValuePicker);
+    mainTb->addAction(m_pActCntrMarker);
     mainTb->addAction(m_pActLineCut);
     mainTb->addAction(m_pActStackCut);
     mainTb->addAction(m_pActDrawMode);
+    mainTb->addAction(m_pActClearDrawings);
     mainTb->addSeparator();
     mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
@@ -161,6 +165,14 @@ void Itom2dQwtPlot::createActions()
     a->setChecked(false);
     a->setToolTip(tr("Pan axes with left mouse, zoom with right"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActPan(bool)));
+
+    //m_pActClearDrawings
+    m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("clear Marker"), this);
+    a->setObjectName("actClearMarker");
+    a->setCheckable(false);
+    a->setChecked(false);
+    a->setToolTip(tr("Clear all existing marker"));
+    connect(a, SIGNAL(triggered()), this, SLOT(clearGeometricElements()));
 
     //m_actApectRatio
     m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("lock aspect ratio"), this);
@@ -264,7 +276,15 @@ void Itom2dQwtPlot::createActions()
     connect(m_pDrawModeActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuDrawMode(QAction*)));
     connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
 
-
+    //m_pActCntrMarker
+    m_pActCntrMarker = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"), tr("center marker"), this);
+    a->setObjectName("actCenterMarker");
+    a->setToolTip(tr("Show a marker at data object center"));
+    a->setCheckable(true);
+    a->setVisible(true);
+    a->setChecked(false);
+    connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActCenterMarker(bool)));
+    
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
     m_mnuCmplxSwitch = new QMenu("Complex Switch");
@@ -1068,7 +1088,9 @@ ito::RetVal Itom2dQwtPlot::deleteMarkers(QString id)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::deleteMarkers(int id)
 {
-    return m_pContent->deleteMarkers(id);
+    ito::RetVal retVal = m_pContent->deleteMarkers(id);
+    if(!retVal.containsWarningOrError()) emit plotItemDeleted(id);
+    return retVal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1081,6 +1103,7 @@ ito::RetVal Itom2dQwtPlot::clearGeometricElements(void)
     {
         retVal += m_pContent->deleteMarkers(keys[i]);
     }
+    emit plotItemsDeleted();
     return retVal;
 }
 
@@ -1270,4 +1293,30 @@ void Itom2dQwtPlot::mnuActRatio(bool checked)
 void Itom2dQwtPlot::resizeEvent ( QResizeEvent * event )
 {
     if(m_pContent) m_pContent->configRescaler();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuActCenterMarker(bool checked)
+{
+    setEnabledCenterMarker(checked);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+
+void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
+{
+    m_data.m_showCenterMarker = enabled;
+    if(m_pContent)
+    {
+        m_pContent->setState(m_data.m_state);
+        m_pContent->replot();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setEnabledPlotting(const bool &enabled)
+{
+    m_data.m_enablePlotting = enabled;
+    m_pActClearDrawings->setEnabled(enabled);
+    m_pActDrawMode->setEnabled(enabled);
+    if(m_pActDrawMode->isChecked() && !enabled) m_pActDrawMode->setChecked(enabled);
+
 }

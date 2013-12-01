@@ -30,6 +30,7 @@
         <file>icons/circle.png</file>
         <file>icons/square.png</file>
         <file>icons/polygon.png</file>
+        <file>icons/markerCntr.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>
@@ -42,5 +43,6 @@
         <file>icons/zoom_to_rect.png</file>
         <file>icons/upDate.png</file>
         <file>icons/settings.png</file>
+        <file>icons/editDelete.png</file>
     </qresource>
 </RCC>

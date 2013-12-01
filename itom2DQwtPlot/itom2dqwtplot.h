@@ -54,6 +54,8 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount WRITE setGeometricElementsCount DESIGNABLE false)
     Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
+    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
+    Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -69,6 +71,8 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
     Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
+    Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
+    Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -143,6 +147,12 @@ public:
     QSharedPointer< ito::DataObject > getGeometricElements();
     void setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
 
+    bool getEnabledPlotting(void) const {return m_data.m_enablePlotting;}
+    void setEnabledPlotting(const bool &enabled);
+
+    bool getEnabledCenterMarker(void) const {return m_data.m_showCenterMarker;}
+    void setEnabledCenterMarker(const bool &enabled);
+
     friend class PlotCanvas;
 
 protected:
@@ -170,6 +180,7 @@ private:
     QAction *m_pActStackCut;
     QWidgetAction *m_pActPlaneSelector;
     QActionGroup *m_pDrawModeActGroup;
+    QAction *m_pActClearDrawings;
 
     QLabel *m_pCoordinates;
     QWidgetAction *m_pActCoordinates;
@@ -179,6 +190,8 @@ private:
 
     QAction* m_pActDrawMode;
     QMenu *m_pMnuDrawMode;
+
+    QAction* m_pActCntrMarker;
 
     QHash<QObject*,ito::uint32> m_childFigures;
 
@@ -199,6 +212,9 @@ private slots:
     void mnuActPlaneSelector(int plane);
     void mnuDrawMode(QAction *action);
     void mnuDrawMode(bool checked);
+
+    void mnuActCenterMarker(bool checked);
+
     void mnuCmplxSwitch(QAction *action);
     void childFigureDestroyed(QObject *obj);
 
@@ -222,6 +238,8 @@ public slots:
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);
     void plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);
+    void plotItemDeleted(ito::int32 idx);
+    void plotItemsDeleted();
     //void plotItemChanged(ito::int32 idx);
     void plotItemsFinished(int type, bool aborted);
 

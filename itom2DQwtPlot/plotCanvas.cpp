@@ -62,6 +62,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_pZoomer(NULL),
         m_pPanner(NULL),
         m_pLineCutPicker(NULL),
+        m_pCenterMarker(NULL),
 //        m_pStackCut(NULL),
         m_dObjItem(NULL),
         m_rasterData(NULL),
@@ -142,6 +143,17 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pStackCutMarker->attach(this);
     m_pStackCutMarker->setVisible(false);
 
+    //marker for the camera center
+
+    m_pCenterMarker = new QwtPlotMarker();
+    m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green), 1),  QSize(11,11) ));
+    m_pCenterMarker->attach(this);
+    m_pCenterMarker->setVisible(m_pData->m_showCenterMarker);
+    m_pCenterMarker->setValue(QPointF(0.0, 0.0));
+    m_pCenterMarker->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
+    m_pCenterMarker->setSpacing(0);
+
+
     //picker for line picking
     m_pLineCutPicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, canvas());
     m_pLineCutPicker->setEnabled(false);
@@ -204,6 +216,10 @@ PlotCanvas::~PlotCanvas()
     m_pStackCutMarker->detach();
     delete m_pStackCutMarker;
     m_pStackCutMarker = NULL;
+
+    m_pCenterMarker->detach();
+    delete m_pCenterMarker;
+    m_pCenterMarker = NULL;
 
     m_pMultiPointPicker = NULL;
     
@@ -269,6 +285,10 @@ void PlotCanvas::refreshStyles()
     m_pLineCutPicker->setRubberBandPen(rubberBandPen);
     m_pLineCutPicker->setTrackerPen(trackerPen);
     m_pLineCutLine->setPen(selectionPen);
+
+    m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7) ));
+    m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor0), QPen(QBrush(m_inverseColor0),1),  QSize(11,11) ));
+    
     //}
     //else
     //{
@@ -365,9 +385,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             }
 
 
-            double aspRatio = (m_pData->m_xaxisMax - m_pData->m_xaxisMin) /  (m_pData->m_yaxisMax - m_pData->m_yaxisMin);
+            //double aspRatio = (m_pData->m_xaxisMax - m_pData->m_xaxisMin) /  (m_pData->m_yaxisMax - m_pData->m_yaxisMin);
 
-            aspRatio = aspRatio > 20 ? 20 : aspRatio < 0.05 ? 0.05 : aspRatio;
+            //aspRatio = aspRatio > 20 ? 20 : aspRatio < 0.05 ? 0.05 : aspRatio;
 
             
             if(m_pRescaler != NULL)
@@ -377,6 +397,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             }
             //m_pRescaler->setEnabled(m_pData->m_keepAspect);
 
+             
+            m_pCenterMarker->setXValue(m_dObjPtr->getPixToPhys( dims-1, (width - 1)/ 2.0, valid));
+            m_pCenterMarker->setYValue(m_dObjPtr->getPixToPhys( dims-2, (height - 1) / 2.0, valid));
         }
 
 
@@ -929,6 +952,18 @@ QPointF PlotCanvas::getInterval(Qt::Axis axis) const
 void PlotCanvas::setState( tState state)
 {
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+
+    m_pCenterMarker->setVisible(m_pData->m_showCenterMarker);
+    if(m_pData->m_showCenterMarker && m_dObjPtr)
+    {
+        if(m_dObjPtr->getDims() > 1)
+        {
+            bool valid;
+            m_pCenterMarker->setXValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-1, (m_dObjPtr->getSize(m_dObjPtr->getDims()-1) - 1) / 2.0, valid));
+            m_pCenterMarker->setYValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-2, (m_dObjPtr->getSize(m_dObjPtr->getDims()-2) - 1) / 2.0, valid));
+        }
+        
+    }
 
     if (m_pData->m_state != state)
     {
