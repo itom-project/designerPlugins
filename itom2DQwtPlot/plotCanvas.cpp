@@ -1317,7 +1317,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                     break;
                     
                     default:
-                        retval += ito::RetVal(ito::retError, 0, tr("incalid marker type").toAscii().data());
+                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
                     break;
                 }                    
                 if (m_pData->m_pDrawItems.contains((int)ids[i]))
@@ -1345,7 +1345,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                         break;
                         
                         default:
-                            retval += ito::RetVal(ito::retError, 0, tr("incalid marker type").toAscii().data());
+                            retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
                         break;                        
                     }
                     if (newItem)
@@ -1355,7 +1355,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                         if(this->m_inverseColor0.isValid())
                         {
                             newItem->setPen(QPen(m_inverseColor0));
-                            newItem->setBrush(QBrush(m_inverseColor0));
+//                            newItem->setBrush(QBrush(m_inverseColor0));
                         }
                         else newItem->setPen(QPen(Qt::green));
                         
