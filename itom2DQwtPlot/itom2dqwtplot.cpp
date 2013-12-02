@@ -1325,3 +1325,13 @@ void Itom2dQwtPlot::setEnabledPlotting(const bool &enabled)
     if(m_pActDrawMode->isChecked() && !enabled) m_pActDrawMode->setChecked(enabled);
 
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
+{
+    if(!m_pContent)
+    {
+        return QSharedPointer<ito::DataObject>(); 
+    }
+
+    return m_pContent->getDisplayed();
+}

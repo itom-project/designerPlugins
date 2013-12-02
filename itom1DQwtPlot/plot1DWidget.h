@@ -110,6 +110,8 @@ class Plot1DWidget : public QwtPlot
 
         void setMainMarkersToIndex(int idx1, int idx2, int curveIdx);
 
+        
+
     protected:
         void keyPressEvent ( QKeyEvent * event );
         void mousePressEvent ( QMouseEvent * event );

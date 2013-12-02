@@ -86,6 +86,9 @@ class PlotCanvas : public QwtPlot
         ito::RetVal deleteMarkers(const QString &id);
         ito::RetVal deleteMarkers(const int id);
 
+        ito::int32 getCurrentPlane() const;
+        QSharedPointer<ito::DataObject> getDisplayed(void);
+
 /*        
         ito::RetVal addDrawItems(const ito::DataObject *items, QString style);
         ito::RetVal delDrawItems(const ito::DataObject *items, QString style);

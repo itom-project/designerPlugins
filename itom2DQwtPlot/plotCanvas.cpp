@@ -957,6 +957,12 @@ QPointF PlotCanvas::getInterval(Qt::Axis axis) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::int32 PlotCanvas::getCurrentPlane() const
+{
+    return m_rasterData->getCurrentPlane();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setState( tState state)
 {
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
@@ -2325,6 +2331,17 @@ void PlotCanvas::configRescaler(void)
     }
     replot();
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)
+{
+    if(!m_rasterData)
+    {
+        return QSharedPointer<ito::DataObject>(); 
+    }
+
+    return m_rasterData->rasterToObject(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft));
+}
+
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void PlotCanvas::multiPointSelected (const QPolygon &polygon)
 //{

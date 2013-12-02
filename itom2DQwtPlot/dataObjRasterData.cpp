@@ -709,6 +709,65 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
         m_validData = true;
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInterval &xInterval, const QwtInterval &yInterval)
+{
+//    const QwtInterval xInterval = interval( Qt::XAxis );
+//    const QwtInterval yInterval = interval( Qt::YAxis );
+
+    if(!m_dataObjPlane || m_dataObjPlane->getDims() < 2)
+    {
+        return QSharedPointer<ito::DataObject>();
+    }
+
+    double yd0, yd1, xd0, xd1, temp;
+    int yi0, yi1, xi0, xi1;
+    int dims = m_dataObjPlane->getDims();
+    int width = m_dataObjPlane->getSize(dims - 1);
+    int height = m_dataObjPlane->getSize(dims - 2);
+
+    bool validY, validX;
+
+    m_dataObjPlane->getPhysToPix2D(yInterval.minValue(), yd0, validY, xInterval.minValue(), xd0, validX);
+    m_dataObjPlane->getPhysToPix2D(yInterval.maxValue(), yd1, validY, xInterval.maxValue(), xd1, validX);
+
+    temp = std::max(yd0, yd1);
+    yd0 = std::min(yd0, yd1);
+    yd1 = temp;
+
+    temp = std::max(xd0, xd1);
+    xd0 = std::min(xd0, xd1);
+    xd1 = temp;
+
+    yi0 = yd0 < 0 ? 0.0 : (int)(yd0);
+    yi1 = yd1 < 0 ? 0.0 : (int)(yd1 + 0.9);
+
+    xi0 = xd0 < 0 ? 0.0 : (int)(xd0);
+    xi1 = xd1 < 0 ? 0.0 : (int)(xd1 + 0.9);
+
+    xi0 = xi0 > width -1 ? width -1 : xi0;
+    xi1 = xi1 > width -1 ? width -1 : xi1;
+
+    yi0 = yi0 > height -1 ? height -1 : yi0;
+    yi1 = yi1 > height -1 ? height -1 : yi1;
+
+    ito::Range* curRange = new ito::Range[dims];
+    for(int i = 0; i < dims - 2; i++)
+    {
+        curRange[i] = ito::Range(0, 0);
+    }
+    //if(dims > 2) curRange[dims - 3] = ito::Range(getCurrentPlane(), getCurrentPlane());
+    curRange[dims - 2] = ito::Range(yi0, yi1 + 1);
+    curRange[dims - 1] = ito::Range(xi0, xi1 + 1);
+
+    ito::DataObject dataObjectOut;
+    m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
+
+    delete curRange;
+
+    return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::discardRaster()

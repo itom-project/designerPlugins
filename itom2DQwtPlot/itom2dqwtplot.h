@@ -233,7 +233,9 @@ public slots:
 //    void userInteractionEndRect(const QRectF &rect);
 //    void userInteractionEndEllipse(const QRectF &rect);    
 //    void userInteractionEndPt(const QVector<QPointF> &points);
-//    void userInteractionEndLine(const QVector<QPointF> &points);    
+//    void userInteractionEndLine(const QVector<QPointF> &points);
+
+    QSharedPointer<ito::DataObject> getDisplayed(void);
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);

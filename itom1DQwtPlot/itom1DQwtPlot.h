@@ -144,6 +144,8 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();
+
+        QSharedPointer<ito::DataObject> getDisplayed(void);
         
     private slots:
         void mnuHome();

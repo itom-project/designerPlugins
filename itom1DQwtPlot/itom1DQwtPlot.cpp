@@ -711,5 +711,59 @@ void Itom1DQwtPlot::mnuHome()
 {
     m_pContent->m_pZoomer->zoom(0);
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
+{
+    if(!m_pContent)
+    {
+        return QSharedPointer<ito::DataObject>(); 
+    }
 
+    ito::DataObject dataObjectOut;
+
+    if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
+    {
+        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
+
+        if(seriesData->size() < 2)
+        {
+            return QSharedPointer<ito::DataObject>();
+        }
+
+        ito::float64 length = 0.0;
+
+        if(seriesData->floatingPointValues())
+        {
+            dataObjectOut = ito::DataObject(1, seriesData->size(), ito::tFloat64);
+            ito::float64* rowPtr = ((cv::Mat*)dataObjectOut.get_mdata()[0])->ptr<ito::float64>();
+            QPointF curPos;
+            for(int i = 0; i < seriesData->size(); i++)
+            {
+                curPos = seriesData->sample(i);
+                length += curPos.x();
+                rowPtr[i] = curPos.y();
+            }
+        }
+        else
+        {
+            dataObjectOut = ito::DataObject(1, seriesData->size(), ito::tInt32);
+            ito::int32* rowPtr = ((cv::Mat*)dataObjectOut.get_mdata()[0])->ptr<ito::int32>();
+            QPointF curPos;            
+            for(int i = 0; i < seriesData->size(); i++)
+            {
+                curPos = seriesData->sample(i);
+                length += curPos.x();
+                rowPtr[i] = (ito::int32)(curPos.y());
+            }
+        }
+
+        dataObjectOut.setAxisScale(1, length / (seriesData->size() - 1));
+
+        dataObjectOut.setAxisUnit(1, seriesData->getDObjAxisLabel().toAscii().data());
+        dataObjectOut.setValueUnit(seriesData->getDObjValueLabel().toAscii().data());
+
+    }
+
+    return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
+}
 //----------------------------------------------------------------------------------------------------------------------------------

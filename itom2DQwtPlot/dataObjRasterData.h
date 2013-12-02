@@ -57,6 +57,9 @@ class DataObjRasterData : public QwtRasterData
 
         bool pointValid(const QPointF &point) const;
        
+        ito::int32 getCurrentPlane() const {return m_D.m_planeIdx;}
+        QSharedPointer<ito::DataObject> rasterToObject(const QwtInterval &xInterval, const QwtInterval &yInterval);
+
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
         inline double pxToScaleCoords(double px, double offset, double scaling) { return ((double)px - offset) * scaling; }

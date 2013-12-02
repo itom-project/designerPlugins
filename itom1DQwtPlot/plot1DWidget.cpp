@@ -1239,6 +1239,8 @@ void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = fal
 
     emit setMarkerText(coords,offsets);
 }
+
+
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void Itom1DQwtFigure::setMarkerCoordinates(const QVector<QPointF> pts)
 //{
