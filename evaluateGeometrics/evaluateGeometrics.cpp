@@ -591,9 +591,7 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) con
 
     return exportedData;
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
-
 ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relation)
 {
     relationsShip newRelation;
@@ -641,6 +639,30 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
         m_pContent->updateRelationShips(false);
     }
     return ito::retOk;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal EvaluateGeometricsFigure::addRelationName(const QString newName)
+{
+    ito::RetVal retval(ito::retOk);
+
+    int idx = m_info.m_relationNames.indexOf(newName);
+
+    if(idx < 7 && idx != -1)
+    {
+        retval = ito::RetVal(ito::retError, 0, tr("add relation name failed: relation as one of the restricted relations").toAscii().data());
+        return retval;
+    }
+
+    if(idx == -1)
+    {
+        m_info.m_relationNames.append(newName);
+    }
+    else
+    {
+        m_info.m_relationNames[idx] = newName;
+        retval = ito::RetVal(ito::retWarning, 0, tr("add relation name exited with warning: relation already existed").toAscii().data());
+    }
+    return retval;
 }
 //---------------------------------------------------------------------------------------------------------
 ito::RetVal EvaluateGeometricsFigure::plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values)

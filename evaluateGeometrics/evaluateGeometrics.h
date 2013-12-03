@@ -122,6 +122,12 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
             for( int i = 6; i < input.length(); i++)
             {
+                int idx = m_info.m_relationNames.indexOf(input[i]);
+                if(idx < 7 && idx != -1)
+                {
+                    continue;
+                }
+
                 if(m_info.m_relationNames.length() > i)
                 {
                     m_info.m_relationNames[i] = input[i];
@@ -132,7 +138,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
                 }
             }
 
-            while(m_info.m_relationNames.length() > input.size())
+            while(m_info.m_relationNames.length() > input.size() && m_info.m_relationNames.length() > 6)
             {
                 m_info.m_relationNames.removeLast();
             }
@@ -194,6 +200,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         void mnuAutoFitCols();
 
         ito::RetVal addRelation(QSharedPointer<ito::DataObject> importedData);
+        ito::RetVal addRelationName(const QString newName);
 
         ito::RetVal exportData(QString fileName, ito::uint8 exportFlag);
 
