@@ -1328,6 +1328,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 {
                     switch ((int)types[i])
                     {
+                        case tMultiPointPick:
                         case tPoint:                    
                             newItem = new DrawItem(this, tPoint, (int)ids[i]);
                         break;
@@ -1449,11 +1450,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
 {
     ito::RetVal retval;
 
-    if (type == tPoint) //multiPointPick
+    if (type == tPoint || type == tMultiPointPick) //multiPointPick
     {
         if (start)
         {
-            setState(tPoint);
+            setState((PlotCanvas::tState)type);
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
@@ -1719,27 +1720,30 @@ void PlotCanvas::multiPointActivated (bool on)
                     emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
                 }
 
-                QPainterPath *path = new QPainterPath();
-                DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, tPoint);
-                path->moveTo(polygonScale[0].x(), polygonScale[0].y());
-                path->lineTo(polygonScale[0].x(), polygonScale[0].y());
-
-                newItem->setShape(*path);
-
-                if(this->m_inverseColor0.isValid())
+                if (!aborted && polygon.size() > 0)
                 {
-                    newItem->setPen(QPen(m_inverseColor0));
-                    //newItem->setBrush(QBrush(m_inverseColor0));
-                }
-                else newItem->setPen(QPen(Qt::green));
+                    QPainterPath *path = new QPainterPath();
+                    DrawItem *newItem = NULL;
+                    newItem = new DrawItem(this, tPoint);
+                    path->moveTo(polygonScale[0].x(), polygonScale[0].y());
+                    path->lineTo(polygonScale[0].x(), polygonScale[0].y());
 
-                newItem->setVisible(true);
-                newItem->show();
-                newItem->attach(this);
-                replot();
+                    newItem->setShape(*path);
+
+                    if(this->m_inverseColor0.isValid())
+                    {
+                        newItem->setPen(QPen(m_inverseColor0));
+                        //newItem->setBrush(QBrush(m_inverseColor0));
+                    }
+                    else newItem->setPen(QPen(Qt::green));
+
+                    newItem->setVisible(true);
+                    newItem->show();
+                    newItem->attach(this);
+                    replot();
 //                m_pData->m_pDrawItems.append(newItem);
-                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+                    m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+                }
 
                 Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
                 if (p)
