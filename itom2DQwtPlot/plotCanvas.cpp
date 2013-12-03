@@ -2248,7 +2248,7 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                     break;
 
                     // square is a rect
-                    case tSquare:
+//                    case tSquare:
                     case tRect:
                         type = ito::PrimitiveContainer::tRetangle;
                         values.append(it.value()->x1);
@@ -2260,7 +2260,7 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                     break;
 
                     // circle is an ellispe
-                    case tCircle:
+//                    case tCircle:
                     case tEllipse:
                         type = ito::PrimitiveContainer::tElipse;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);

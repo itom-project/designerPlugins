@@ -64,8 +64,27 @@ class PlotCanvas : public QwtPlot
 {
     Q_OBJECT
     public:
-        enum tState { tIdle, tZoom, tValuePicker, tPan, tLineCut, tStackCut, tMultiPointPick, tPoint, tLine, tRect, tEllipse, tCircle, tSquare };
-        enum ComplexType { Real = 2, Imag = 1, Abs = 0, Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
+        enum tState { 
+            tIdle = 0, 
+            tZoom = 1, 
+            tValuePicker = 2, 
+            tPan = 3, 
+            tLineCut = 4, 
+            tStackCut = 5, 
+            tMultiPointPick = 6, 
+            tPoint = 101, 
+            tLine = 102, 
+            tRect = 103, 
+//            tSquare = 104,
+            tEllipse = 105, 
+//            tCircle = 106, 
+            tPolygon = 110 };
+
+        enum ComplexType { 
+            Abs = 0, 
+            Imag = 1, 
+            Real = 2, 
+            Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
 
         PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();

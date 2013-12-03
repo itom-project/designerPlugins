@@ -1248,7 +1248,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[6] = (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 2.0);
             break;
-
+/*
             case PlotCanvas::tCircle:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tCircle;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
@@ -1262,6 +1262,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
                 rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
             break;
+*/
         }
         y++;
     }
