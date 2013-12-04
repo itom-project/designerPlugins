@@ -1,10 +1,37 @@
+/* ********************************************************************
+   itom measurement system
+   URL: http://www.uni-stuttgart.de/ito
+   Copyright (C) 2012, Institut für Technische Optik (ITO), 
+   Universität Stuttgart, Germany 
+ 
+   This file is part of itom.
+
+   itom is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   itom is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with itom. If not, see <http://www.gnu.org/licenses/>.
+*********************************************************************** */
+
 #include "evaluateGeometricsPlugin.h"
 #include "pluginVersion.h"
 
 #include <QtCore/QtPlugin>
 #include "evaluateGeometrics.h"
 
+/*!
+ * \file evaluateGeometricsPlugin.cpp
+ * \brief This file contains the factory definition for the evaluateGeometrics-Widget.
+ */
 
+//---------------------------------------------------------------------------------------------------------------
 EvaluateGeometricsPlugin::EvaluateGeometricsPlugin(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
@@ -12,15 +39,15 @@ EvaluateGeometricsPlugin::EvaluateGeometricsPlugin(QObject *parent)
     m_plotDataTypes = ito::DataObjPlane;
     m_plotFeatures = ito::Static | ito::Cartesian;
 
-    m_description = QObject::tr("itom widget");
-    m_detaildescription = QObject::tr("");
-    m_author = "Christian Kohler, twip OS";
+    m_description = QObject::tr("itom measurement widget");
+    m_detaildescription = QObject::tr("The evaluate geometrics plugin can be used to evaluate geometric parameters of primitives drawn in itom plots.");
+    m_author = "Christian Kohler and Wolfram Lyda, twip OS";
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL 2.0");
 
     initialized = false;
 }
-
+//---------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsPlugin::initialize(QDesignerFormEditorInterface * /*core*/)
 {
     if (initialized)
@@ -28,52 +55,52 @@ void EvaluateGeometricsPlugin::initialize(QDesignerFormEditorInterface * /*core*
 
     initialized = true;
 }
-
+//---------------------------------------------------------------------------------------------------------------
 bool EvaluateGeometricsPlugin::isInitialized() const
 {
     return initialized;
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QWidget *EvaluateGeometricsPlugin::createWidget(QWidget *parent)
 {
     return new EvaluateGeometricsFigure(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QWidget *EvaluateGeometricsPlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
 {
     return new EvaluateGeometricsFigure(m_itomSettingsFile, winMode, parent);
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::name() const
 {
     return "EvaluateGeometricsFigure";
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::group() const
 {
     return "itom Plugins";
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QIcon EvaluateGeometricsPlugin::icon() const
 {
     return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::toolTip() const
 {
-    return QString(".");
+    return QString("Evaluated geometric elements and mathematic relations between geometric elements.");
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::whatsThis() const
 {
     return m_description;
 }
-
+//---------------------------------------------------------------------------------------------------------------
 bool EvaluateGeometricsPlugin::isContainer() const
 {
     return false;
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::domXml() const
 {
     return "<widget class=\"EvaluateGeometricsFigure\" name=\"EvaluateGeometricsFigure\">\n"
@@ -87,10 +114,10 @@ QString EvaluateGeometricsPlugin::domXml() const
         " </property>\n"
         "</widget>\n";
 }
-
+//---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::includeFile() const
 {
     return "evaluateGeometrics.h";
 }
-
+//---------------------------------------------------------------------------------------------------------------
 Q_EXPORT_PLUGIN2(EvaluateGeometricsFigure, EvaluateGeometricsPlugin)

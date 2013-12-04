@@ -20,6 +20,11 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/*!
+ * \file dialogAddRelation.h
+ * \brief This file contains the declarations for the dialog "addRelation" for the evaluateGeometrics-Widget.
+ */
+
 #ifndef DIALOGADDRELATION
 #define DIALOGADDRELATION
 
@@ -30,17 +35,23 @@
 
 #include "ui_dialogRelation.h"
 
+/*!
+ * \class DialogAddRelation
+ * \brief This class manages the dialog for adding relations it inherites and corresponding ui-dialog "dialogRelation.ui"
+ * \todo  Implement this dialog
+ */
+
 class DialogAddRelation : public QDialog 
 {
 public:
-    DialogAddRelation(const InternalInfo &data, QWidget *parent = NULL);
-    ~DialogAddRelation() {};
+    DialogAddRelation(const InternalInfo &data, QWidget *parent = NULL);    /*!< Class constructor, which takes all necessary informations to create the correspondig dialog and fill in the information of each relations.*/
+    ~DialogAddRelation() {};                                                /*!< Class destructor, currently not used */
 
-    void getData(InternalInfo &data);
+    void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
 
 private:
 
-    Ui::UIDialogRelation ui;
+    Ui::UIDialogRelation ui;                                                /*!< Handle to the UI dialog, defined in "ui_dialogRelation.h"*/
 
 private slots:
 

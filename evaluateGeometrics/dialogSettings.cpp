@@ -20,6 +20,11 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/*!
+ * \file dialogSettings.cpp
+ * \brief This file contains the definitions for the dialog "settings" for the evaluateGeometrics-Widget.
+ */
+
 #include "dialogSettings.h"
 
 //-----------------------------------------------------------------------------------------------

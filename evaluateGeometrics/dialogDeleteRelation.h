@@ -20,6 +20,11 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/*!
+ * \file dialogDeleteRelation.h
+ * \brief This file contains the declarations for the dialog "deleteRelation" for the evaluateGeometrics-Widget.
+ */
+
 #ifndef DIALOGDELETERELATION
 #define DIALOGDELETERELATION
 
@@ -30,17 +35,23 @@
 
 #include "ui_dialogRelation.h"
 
+/*!
+ * \class DialogDeleteRelation
+ * \brief This class manages the dialog for deleting relations it inherites and corresponding ui-dialog "dialogRelation.ui"
+ * \todo  Implement this dialog
+ */
+
 class DialogDeleteRelation : public QDialog 
 {
 public:
-    DialogDeleteRelation(const InternalInfo &data, QWidget *parent = NULL);
-    ~DialogDeleteRelation() {};
+    DialogDeleteRelation(const InternalInfo &data, QWidget *parent = NULL); /*!< Class constructor, which takes all necessary informations to create the correspondig dialog and fill in the information of each relations.*/
+    ~DialogDeleteRelation() {};                                             /*!< Class destructor, currently not used */
 
-    void getData(InternalInfo &data);
+    void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
 
 private:
 
-    Ui::UIDialogRelation ui;
+    Ui::UIDialogRelation ui;                                                /*!< Handle to the UI dialog, defiend in "ui_dialogRelation.h" */
 
 private slots:
 

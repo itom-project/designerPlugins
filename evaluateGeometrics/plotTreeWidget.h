@@ -41,34 +41,94 @@
 
 #include <qfileinfo.h>
 
-
 class EvaluateGeomatricsFigure;
 
-static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "retangle", "square", "err", "err", "polygon"};
+/*!
+* \struct relationsShip
+* \brief  This struct defines the geometric elements.
+*
+* \sa PlotTreeWidget, EvaluateGeometrics, PlotTreeWidget::tMeasurementType
+*/
 
 struct relationsShip
 {
-    ito::int32 firstElementIdx;
-    ito::uint32 type;
-    ito::int32 secondElementIdx;
-//    ito::int32 firstElementRow;
+    ito::int32 firstElementIdx;     /*!< The index of the first geometric element. The relations will be a child of this element.  */
+    ito::uint32 type;               /*!< The type of the relations as defiend by PlotTreeWidget::tMeasurementType.  */
+    ito::int32 secondElementIdx;    /*!< The index of the second geometric element. For some measurement types, this is ignored  */
+//    ito::int32 firstElementRow;   
 //    ito::int32 secondElementRow;
-    QTreeWidgetItem* myWidget;
-    ito::float32 extValue;
+    QTreeWidgetItem* myWidget;      /*!< Handle to the childWidget of PlotTreeWidget, which will contain the data for this relation  */
+    ito::float32 extValue;          /*!< An external value or the result from the last caluclation.  */
 };
+
+/*!
+* \struct InternalInfo
+* \brief  This struct contains most of the shared data for PlotTreeWidget and EvaluateGeometrics.
+*
+* \sa PlotTreeWidget, EvaluateGeometrics, relationsShip
+*/
 
 struct InternalInfo
 {
-    bool m_autoTitle;
-    QString m_title;
-    QString m_valueUnit;
-    QString m_titleLabel;
-    QStringList m_relationNames;
-    QVector<relationsShip> m_relationsList;
-    //QHash<int, geometricPrimitives> m_rowHash;
-    ito::uint8 m_numberOfDigits;
-    bool m_consider2DOnly;
+    InternalInfo()
+    {
+        m_autoTitle = false;
+        m_title = "";
+        m_valueUnit = "";
+        m_titleLabel = "";
+
+        m_numberOfDigits = 2;
+        m_consider2DOnly = false;
+
+        //m_info.m_rowHash.clear();
+        m_relationNames.clear();
+        m_relationNames.append("N.A.");
+        m_relationNames.append(QObject::tr("radius (own)"));
+        m_relationNames.append(QObject::tr("angle to"));
+        m_relationNames.append(QObject::tr("distance to"));
+        m_relationNames.append(QObject::tr("intersection with"));
+        m_relationNames.append(QObject::tr("length (own)"));
+        m_relationNames.append(QObject::tr("area"));
+
+        m_primitivNames.clear();
+        m_primitivNames.insert(0, "none");
+        m_primitivNames.insert(ito::PrimitiveContainer::tPoint, QObject::tr("point"));
+        m_primitivNames.insert(ito::PrimitiveContainer::tLine, QObject::tr("line"));
+        m_primitivNames.insert(ito::PrimitiveContainer::tEllipse, QObject::tr("ellipse"));
+        m_primitivNames.insert(ito::PrimitiveContainer::tCircle, QObject::tr("circle"));
+        m_primitivNames.insert(ito::PrimitiveContainer::tRectangle, QObject::tr("rectangle"));
+        m_primitivNames.insert(ito::PrimitiveContainer::tSquare, QObject::tr("square"));
+        m_primitivNames.insert(ito::PrimitiveContainer::tPolygon, QObject::tr("polygon"));
+
+static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};
+
+        m_relationsList.clear();
+    }
+    ~InternalInfo()
+    {
+        
+    }
+
+    bool m_autoTitle;                               /*!< If true, the table will get a title one day */
+    QString m_title;                                /*!< If m_autoTitle == false, this title will be used one day.  */
+    QString m_valueUnit;                            /*!< The value unit for all caluclations */
+    QString m_titleLabel;                           /*!< A title labeld which will be used on day */
+    QHash<ito::uint16, QString> m_primitivNames;     /*!< A hashTable containing all possible primites type in it */
+    QStringList m_relationNames;                    /*!< A list with the relation names to be plotted. First 6 are protected other can be added but should be used with external defined values */
+    QVector<relationsShip> m_relationsList;         /*!< A list with all relations to be evaluated for the figure*/
+    //QHash<int, geometricPrimitives> m_rowHash;    /*!< A hashList with all geometric elements to be evaluated for the figure*/
+    ito::uint8 m_numberOfDigits;                    /*!< Number of digits to be plotted */
+    bool m_consider2DOnly;                          /*!< Toogle wether only x and y or all coordinates of primitivs should be considered for evaluation of relations */
 };
+
+/*!
+* \class PlotTreeWidget
+* \brief  The main functionality of the evaluate geometric widget is realized here.
+* \detail The PlotTreeWidget visualisated the geometric primitives and the relations between different relativs.
+*         It is inheritad from QTreeWidget.
+*
+* \sa EvaluateGeometricsPlugin, EvaluateGeometrics
+*/
 
 class PlotTreeWidget : public QTreeWidget
 {
@@ -77,14 +137,14 @@ class PlotTreeWidget : public QTreeWidget
         friend class EvaluateGeometricsFigure;
 
     public:
-        enum State { stateIdle, statePanner, stateZoomer, statePicker };
+        enum State { stateIdle, statePanner, stateZoomer, statePicker };    /*!< Statemaschine currently not used */
 
-        PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget * parent = 0);
-        ~PlotTreeWidget();
+        PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget * parent = 0); /*!< Class constructor */
+        ~PlotTreeWidget();                                                            /*!< Class destructur */
 
-        ito::RetVal init();
+        ito::RetVal init();                                                           /*!< Initialisation function for this subwidget */
 
-        enum tMeasurementType
+        enum tMeasurementType                                                         /*!< Enumeration containing list of different relationship types. For dynamic adding of relations use a new number correspondig to new name and add tExtern to the type.*/
         {
             tNoType       =   0,
             tRadius       =   1,
@@ -97,19 +157,18 @@ class PlotTreeWidget : public QTreeWidget
             tExtern       =   0x8000
         }; 
 
-        bool m_showContextMenu;
-        void refreshPlot(const ito::DataObject* dataObj);
+        bool m_showContextMenu;                                                       /*!< Toogle wether context menu should be accessable or not */
+        void refreshPlot(const ito::DataObject* dataObj);                             /*!< Refresh plot with new primitive list defiend by a dataObject */
 
-        ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);
+        //ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);
+        //void setZoomerEnable(const bool checked);   
+        //void setPickerEnable(const bool checked);
+        //void setPannerEnable(const bool checked);
 
-        void setZoomerEnable(const bool checked);
-        void setPickerEnable(const bool checked);
-        void setPannerEnable(const bool checked);
-
-        void setRelations(QSharedPointer<ito::DataObject> relations);
-        QSharedPointer<ito::DataObject> getRelations(void) const;
-        void addRelation(const QVector<QPointF> relation);
-        void clearRelation(const bool apply);
+        void setRelations(QSharedPointer<ito::DataObject> relations);                 /*! set a set of relations and overwrite old relations */
+        QSharedPointer<ito::DataObject> getRelations(void) const;                     /*! get all relations of this widget */
+        void addRelation(const QVector<QPointF> relation);                            /*! add a single relations, multiple relation setting is possible */
+        void clearRelation(const bool apply);                                         /*! clear the relations list and be happy */
 
     protected:
         /*
@@ -121,47 +180,44 @@ class PlotTreeWidget : public QTreeWidget
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         */
-        void updatePrimitives();
+        void updatePrimitives();                                                      /*! force a replot of all primitives and its relations */
 
-        void autoFitCols();
+        void autoFitCols();                                                           /*! calculate the idle width of the widget columns */
     private:
 
-        void updateRelationShips(const bool fastUpdate);
-        void setPrimitivElement(const int row, const bool update, ito::float32 *val);
+        void updateRelationShips(const bool fastUpdate);                              /*! force an update of all relation ships. */
+        void setPrimitivElement(const int row, const bool update, ito::float32 *val); /*! Set a primitiv element in row number row */
 
-        bool calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle);
-        bool calculateDistance(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &distance);
-        bool calculateRadius(ito::float32 *first, ito::float32 &radius);
-        bool calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length);
-        bool calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point);
-        bool calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area);
-        bool calculateCircumference(ito::float32 *first, ito::float32 &length);
+        bool calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle);       /*! calculate the angle between to elements */
+        bool calculateDistance(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &distance); /*! calculate the distance between to elements */
+        bool calculateRadius(ito::float32 *first, ito::float32 &radius);                                              /*! calculate the radius of a sigle circle or ellipse */
+        bool calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length);                           /*! calculate the length of a line */
+        //bool calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point);  /*! calculate the intersection point of two lines */
+        bool calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area);                                 /*! calculate the area of a geometric element */
+        bool calculateCircumference(ito::float32 *first, ito::float32 &length);                                         /*! calculate the circumference of a circle, rectangle or square */
 
-        ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);
-        ito::RetVal writeToXML(const QFileInfo &fileName);
-        ito::RetVal writeToRAW(const QFileInfo &fileName);
+        ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);                                 /*! export content to comma seperated values */
+        ito::RetVal writeToXML(const QFileInfo &fileName);                                                              /*! export content to XML-style file */
+        ito::RetVal writeToRAW(const QFileInfo &fileName);                                                              /*! export raw content as two tables */
 
-        ito::RetVal m_lastRetVal;
+        ito::RetVal m_lastRetVal;                                                                                       /*! last retval for error checking, currently not used */
 
-        QMenu *m_contextMenu;
+        QMenu *m_contextMenu;                                                                                           /*! handle to the internal context menu */
 
-        bool m_xDirect;
-        bool m_yDirect;
+        QWidget *m_pParent;                                                                                             /*! handle to the parent widget of this (see EvaluateGeometrics) */
 
-        QWidget *m_pParent;
+        State m_state;                                                                                                  /*! current state for the state maschine */
 
-        State m_state;
-
-        InternalInfo *m_pData;
+        InternalInfo *m_pData;                                                                                          /*! handle to the shared configuration struct */
 
         //QVector<geometricPrimitives> m_rowHash;
-        QHash<ito::int32, geometricPrimitives> m_rowHash;
+        QHash<ito::int32, geometricPrimitives> m_rowHash;                                                               /*! the hash table with data for all primitives */
 
-        ito::RetVal updateElement(const ito::int32 &idx, const ito::int32 &flags,const QVector<ito::float32> &values);
+        ito::RetVal updateElement(const ito::int32 &idx, const ito::int32 &flags,const QVector<ito::float32> &values);  /*! update a certain element of the hash table */
 
     signals:
-        void spawnNewChild(QVector<QPointF>);
-        void updateChildren(QVector<QPointF>);
+        //void spawnNewChild(QVector<QPointF>);
+        //void updateChildren(QVector<QPointF>);
 
     public slots:
 

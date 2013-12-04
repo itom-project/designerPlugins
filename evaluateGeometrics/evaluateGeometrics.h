@@ -20,6 +20,11 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/*!
+ * \file evaluateGeometrics.h
+ * \brief This file contains basic container for the evaluateGeometrics-Widget.
+ */
+
 #ifndef ITOMPLOT_H
 #define ITOMPLOT_H
 
@@ -41,6 +46,14 @@
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
+/*!
+* \class EvaluateGeometricsFigure
+* \brief The container class for the evaluate geometric widget.
+* \detail This container contains the toolbar, context menu, setter- / getter-functions for the properties and slots.
+*          It manages most of the relevant communication to the itom surface. For visualisation, it contains a plotTreeWidget.
+*
+* \sa EvaluateGeometricsPlugin, PlotTreeWidget
+*/
 
 class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 {

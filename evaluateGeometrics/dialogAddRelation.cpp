@@ -20,6 +20,11 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/*!
+ * \file dialogAddRelation.cpp
+ * \brief This file contains the definitions for the dialog "addRelation" for the evaluateGeometrics-Widget.
+ */
+
 #include "dialogAddRelation.h"
 
 //-----------------------------------------------------------------------------------------------

@@ -20,6 +20,11 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/*!
+ * \file dialogSettings.h
+ * \brief This file contains the declarations for the dialog "settings" for the evaluateGeometrics-Widget.
+ */
+
 #ifndef DIALOGSETTING
 #define DIALOGSETTING
 
@@ -30,18 +35,23 @@
 
 #include "ui_dialogSettings.h"
 
+/*!
+ * \class DialogSettings
+ * \brief This class manages the dialog for basic settings and it inherrits the ui-dialog "dialogSettings.ui"
+ */
+
 class DialogSettings : public QDialog 
 {
 public:
-    DialogSettings(const InternalInfo &input, const int &geometicElements, QWidget *parent = NULL);
-    ~DialogSettings() {};
+    DialogSettings(const InternalInfo &input, const int &geometicElements, QWidget *parent = NULL); /*!< Class constructor, which takes all necessary informations to create the correspondig dialog.*/
+    ~DialogSettings() {};                                                                           /*!< Class destructor, currently not used */
 
-    void getData(InternalInfo &data);
+    void getData(InternalInfo &data);                                                               /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
 
 private:
 
 
-    Ui::UIDialogSettings ui;
+    Ui::UIDialogSettings ui;                                                                        /*!< Handle to the UI dialog, defined in "ui_dialogSettings.h"*/
 
 private slots:
 

@@ -117,22 +117,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     toolbar->addAction(m_actAddRel);
     toolbar->addAction(m_actRemoveRel);
 
-    m_info.m_autoTitle = false;
-    m_info.m_title = "";
-    m_info.m_valueUnit = "";
-    m_info.m_titleLabel = "";
-    m_info.m_relationsList.clear();
-    m_info.m_numberOfDigits = 2;
-    m_info.m_consider2DOnly = false;
-    //m_info.m_rowHash.clear();
-    m_info.m_relationNames.clear();
-    m_info.m_relationNames.append("N.A.");
-    m_info.m_relationNames.append(tr("radius (own)"));
-    m_info.m_relationNames.append(tr("angle to"));
-    m_info.m_relationNames.append(tr("distance to"));
-    m_info.m_relationNames.append(tr("intersection with"));
-    m_info.m_relationNames.append(tr("length (own)"));
-    m_info.m_relationNames.append(tr("area"));
+
 
     m_pContent = new PlotTreeWidget(contextMenu, &m_info, this);
     m_pContent->setObjectName("canvasWidget");
