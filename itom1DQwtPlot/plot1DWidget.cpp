@@ -28,6 +28,9 @@
 #include "common/apiFunctionsGraphInc.h"
 #include "qnumeric.h"
 
+#include "common/sharedStructuresPrimitives.h"
+#include "multiPointPickerMachine.h"
+
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
 #include <qwt_matrix_raster_data.h>
@@ -68,14 +71,26 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_pParent(parent),
         m_actPickerIdx(-1),
         m_cmplxState(false),
-        m_pData(data),
-        m_state(stateIdle)
+        m_pData(data)
 {
     this->setMouseTracking(false);
 
     //this is the border between the canvas and the axes and the overall mainwindow
 	setContentsMargins(5,5,5,5);
 	
+    m_inverseColor0 = Qt::green;
+    m_inverseColor1 = Qt::blue;
+    m_activeDrawItem = 0;
+
+    //multi point picker for pick-point action (equivalent to matlabs ginput)
+    m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
+    m_pMultiPointPicker->setEnabled(false);
+    m_pMultiPointPicker->setRubberBand( QwtPicker::UserRubberBand ); //user is cross here
+    //m_pMultiPointPicker->setStateMachine(new QwtPickerClickPointMachine);
+    m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine);
+    m_pMultiPointPicker->setRubberBandPen( QPen(QBrush(Qt::green, Qt::SolidPattern),2) );
+    connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
+
 	//canvas() is the real plotting area, where the plot is printed (without axes...)
 	//canvas()->setFrameShadow(QFrame::Plain); //deprecated in qwt 6.1.0
 	//canvas()->setFrameShape(QFrame::NoFrame); //deprecated in qwt 6.1.0
@@ -111,6 +126,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
     //all others settings for tracker are set in init (since they need access to the settings via api)
+
+    setState(m_pData->m_state);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -135,6 +152,12 @@ Plot1DWidget::~Plot1DWidget()
         m_pPlotGrid->detach();
         delete m_pPlotGrid;
         m_pPlotGrid = NULL;
+    }
+
+    if(m_pRescaler != NULL)
+    {
+        m_pRescaler->deleteLater();
+        m_pRescaler = NULL;
     }
 }
 
@@ -555,7 +578,7 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
     Marker *m;
     int curves = m_plotCurveItems.size();
 
-    if(m_state == statePicker)
+    if(m_pData->m_state == statePicker)
     {
         switch(event->key())
         {
@@ -664,7 +687,7 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 {
-    if(m_state == statePicker)
+    if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
@@ -720,7 +743,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
 {
-    if(m_state == statePicker)
+    if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
@@ -746,7 +769,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
 {
-    if(m_state == statePicker)
+    if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
@@ -1077,7 +1100,7 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
         setPickerEnable(false);
         setPannerEnable(false);
 
-        m_state = stateZoomer;
+        m_pData->m_state = stateZoomer;
 
         m_pPanner->setEnabled(false);
 
@@ -1094,7 +1117,7 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
     }
     else
     {
-        m_state = stateIdle;
+        m_pData->m_state = stateIdle;
 
         m_pZoomer->setEnabled(false);
         canvas()->setCursor( Qt::ArrowCursor );
@@ -1115,13 +1138,13 @@ void Plot1DWidget::setPickerEnable(const bool checked)
         setZoomerEnable(false);
         setPannerEnable(false);
 
-        m_state = statePicker;
+        m_pData->m_state = statePicker;
         m_pValuePicker->setEnabled(true);
         canvas()->setCursor( Qt::CrossCursor );
     }
     else
     {
-        m_state = stateIdle;
+        m_pData->m_state = stateIdle;
         m_pValuePicker->setEnabled(false);
         canvas()->setCursor( Qt::ArrowCursor );
 
@@ -1141,12 +1164,12 @@ void Plot1DWidget::setPannerEnable(const bool checked)
     {
         setZoomerEnable(false);
         setPickerEnable(false);
-        m_state = statePanner;
+        m_pData->m_state = statePanner;
         canvas()->setCursor( Qt::OpenHandCursor);
     }
     else
     {
-        m_state = stateIdle;
+        m_pData->m_state = stateIdle;
         canvas()->setCursor( Qt::ArrowCursor );
     }
     m_pPanner->setEnabled(checked);
@@ -1239,7 +1262,794 @@ void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = fal
 
     emit setMarkerText(coords,offsets);
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::configRescaler(void)
+{
+    if(m_pData->m_keepAspect)
+    {
+        int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
+        
+        if(m_pRescaler == NULL)
+        {
+            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fixed);
+            //m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
+            //m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
+            m_pRescaler->setAspectRatio(1.0);
+        }
+        else
+        {
+            m_pRescaler->setReferenceAxis(refAxis);
+        }
+        m_pRescaler->setEnabled(true);
+    }
+    else
+    {
+        if(m_pRescaler != NULL)
+        {
+            m_pRescaler->deleteLater();
+            m_pRescaler = NULL;
+        }
+        
+    }
+    replot();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOfPoints)
+{
+    ito::RetVal retval;
 
+    if (type == tPoint) //multiPointPick
+    {
+        if (start)
+        {
+            setState((Plot1DWidget::tState)type);
+            m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
+            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+
+            if (m)
+            {
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = 1;
+                }
+                m->setMaxNrItems( maxNrOfPoints );
+                m_pMultiPointPicker->setEnabled(true);
+
+                if (maxNrOfPoints > 0)
+                {
+                    emit statusBarMessage( tr("Please select %1 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+                }
+                else
+                {
+                    emit statusBarMessage( tr("Please select points and press Space to end the selection. Esc aborts the selection.") );
+                }
+
+                //QKeyEvent evt(QEvent::KeyPress, Qt::Key_M, Qt::NoModifier);
+                //m_pMultiPointPicker->eventFilter( m_pMultiPointPicker->parent(), &evt); //starts the process
+            }
+        }
+        else //start == false
+        {
+            setState(stateIdle);
+            m_pMultiPointPicker->setEnabled(false);
+
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            if(m_pData)
+            {
+                m_pData->m_elementsToPick = 0;
+            }
+
+            Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
+        }
+    }
+    else if (type == tLine)
+    {
+        if (start)
+        {
+            setState(tLine);
+            m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::PolygonRubberBand);
+            m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+
+
+            if (m)
+            {
+
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = (maxNrOfPoints / 2);
+                }
+
+                m->setMaxNrItems( 2 );
+                m_pMultiPointPicker->setEnabled(true);
+
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
+            }
+        }
+        else //start == false
+        {
+            setState(stateIdle);
+            m_pMultiPointPicker->setEnabled(false);
+
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            if(m_pData)
+            {
+                m_pData->m_elementsToPick = 0;
+            }
+
+            Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
+        }
+    }
+    else if (type == tRect)
+    {
+        if (start)
+        {
+            setState(tRect);
+            m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
+            m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+//            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+
+//            if (m)
+            {
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = (maxNrOfPoints / 2);
+                }
+//                m->setMaxNrItems( 2 );
+                m_pMultiPointPicker->setEnabled(true);
+
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
+            }
+        }
+        else //start == false
+        {
+            setState(stateIdle);
+            m_pMultiPointPicker->setEnabled(false);
+
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            if(m_pData)
+            {
+                m_pData->m_elementsToPick = 0;
+            }
+
+            Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
+        }
+    }
+    else if (type == tEllipse)
+    {
+        if (start)
+        {
+            setState(tEllipse);
+            m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
+            m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+//            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+
+//            if (m)
+            {
+                if(m_pData)
+                {
+                    m_pData->m_elementsToPick = (maxNrOfPoints / 2);
+                }
+//                m->setMaxNrItems( 2 );
+                m_pMultiPointPicker->setEnabled(true);
+
+                emit statusBarMessage( tr("Please select 2 points or press Space to quit earlier. Esc aborts the selection."));
+            }
+        }
+        else //start == false
+        {
+            setState(stateIdle);
+            m_pMultiPointPicker->setEnabled(false);
+
+            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+
+            if(m_pData)
+            {
+                m_pData->m_elementsToPick = 0;
+            }
+
+            Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+            if (p)
+            {
+                QPolygonF polygonScale;
+                emit p->userInteractionDone(1, true, polygonScale);
+            }
+        }
+    }
+
+    else
+    {
+        retval += ito::RetVal(ito::retError,0,"Unknown type for userInteractionStart");
+    }
+
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setState( tState state)
+{
+    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(parent());
+
+    if (m_pData->m_state != state)
+    {
+        if ((m_pData->m_state == tPoint || m_pData->m_state == tLine || 
+             m_pData->m_state == tRect  || m_pData->m_state == tEllipse) 
+             && state != stateIdle)
+        {
+            return; //drawFunction needs to go back to idle
+        }
+
+        if (m_pZoomer) m_pZoomer->setEnabled( state == stateZoomer );
+        if (m_pPanner) m_pPanner->setEnabled( state == statePanner );
+        if (m_pValuePicker) m_pValuePicker->setEnabled( state == statePicker );
+
+        if ( m_pData->m_state == tPoint || m_pData->m_state == tLine
+            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == stateIdle)
+        {
+            if (p)
+            {
+                p->m_pActZoomToRect->setEnabled(state == stateIdle);
+                p->m_pActMarker->setEnabled(state == stateIdle);
+                p->m_pActPan->setEnabled(state == stateIdle);
+                this->setZoomerEnable(state == stateIdle);
+
+            }
+        }
+
+        switch (state)
+        {
+            default:
+            case stateIdle:
+                canvas()->setCursor( Qt::ArrowCursor );
+            break;
+
+            case stateZoomer:
+                canvas()->setCursor( Qt::CrossCursor );
+            break;
+
+            case statePanner:
+                canvas()->setCursor( Qt::OpenHandCursor );
+            break;
+
+            case statePicker:
+                canvas()->setCursor( Qt::CrossCursor );
+            break;
+
+            case tPoint:
+            case tLine:
+            case tRect:
+            case tEllipse:
+                canvas()->setCursor( Qt::CrossCursor );
+            break;
+        }
+
+        m_pData->m_state = state;
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::multiPointActivated (bool on)
+{
+    switch(m_pData->m_state)
+    {
+
+        case tPoint:
+            if (!on)
+            {
+                QPolygon polygon = m_pMultiPointPicker->selection();
+
+                QPolygonF polygonScale;
+                bool aborted = false;
+
+                if (polygon.size() == 0)
+                {
+                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+                    aborted = true;
+                }
+                else
+                {
+                    QPointF pt;
+
+                    for (int i = 0; i < polygon.size() - 1; ++i)
+                    {
+                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+                        polygonScale.append( pt );
+                    }
+
+                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+                }
+
+                if (!aborted && polygonScale.size() > 0)
+                {
+                    for(int i = 0; i < polygonScale.size(); i++)
+                    {
+                        QPainterPath *path = new QPainterPath();
+                        DrawItem *newItem = NULL;
+                        newItem = new DrawItem(this, tPoint);
+                        path->moveTo(polygonScale[i].x(), polygonScale[i].y());
+                        path->lineTo(polygonScale[i].x(), polygonScale[i].y());
+
+                        newItem->setShape(*path);
+
+                        if(this->m_inverseColor0.isValid())
+                        {
+                            newItem->setPen(QPen(m_inverseColor0));
+                            //newItem->setBrush(QBrush(m_inverseColor0));
+                        }
+                        else newItem->setPen(QPen(Qt::green));
+
+                        newItem->setVisible(true);
+                        newItem->show();
+                        newItem->attach(this);
+                        
+    //                m_pData->m_pDrawItems.append(newItem);
+                        m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+                    }
+                    replot();
+                }
+
+                Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+                if (p)
+                {
+                    emit p->userInteractionDone(1, aborted, polygonScale);
+                    emit p->plotItemsFinished(ito::PrimitiveContainer::tPoint, aborted);
+                }
+
+                setState(stateIdle);
+                m_pMultiPointPicker->setEnabled(false);
+            }
+        break;
+
+        case tLine:
+            if (!on)
+            {
+                QPolygon polygon = m_pMultiPointPicker->selection();
+
+                QPolygonF polygonScale;
+                bool aborted = false;
+
+                if (polygon.size() == 0)
+                {
+                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+                    aborted = true;
+                }
+                else
+                {
+                    QPointF pt;
+
+                    for (int i = 0; i < polygon.size(); ++i)
+                    {
+                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+                        polygonScale.append( pt );
+                    }
+
+                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+                }
+
+                QPainterPath *path = new QPainterPath();
+                DrawItem *newItem = NULL;
+                newItem = new DrawItem(this, tLine);
+                path->moveTo(polygonScale[0].x(), polygonScale[0].y());
+                path->lineTo(polygonScale[1].x(), polygonScale[1].y());
+
+                newItem->setShape(*path);
+
+                if(this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                    //newItem->setBrush(QBrush(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                replot();
+                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);                
+//                m_pData->m_pDrawItems.append(newItem);
+
+                // if further elements are needed reset the plot engine and go ahead else finish editing
+                if(m_pData && (m_pData->m_elementsToPick > 1))
+                {
+                    m_pData->m_elementsToPick--;
+                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                    if (m)
+                    {
+                        m->setMaxNrItems( 2 );
+                        m_pMultiPointPicker->setEnabled(true);
+                    }
+                    return;
+                }
+                else
+                {
+                    m_pData->m_elementsToPick = 0;
+                    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+                    if (p)
+                    {
+                        emit p->userInteractionDone(1, aborted, polygonScale);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
+                    }
+                    setState(stateIdle);
+                    m_pMultiPointPicker->setEnabled(false);
+                }
+
+            }
+        break;
+
+        case tRect:
+            if (!on)
+            {
+                QPolygon polygon = m_pMultiPointPicker->selection();
+
+                QPolygonF polygonScale;
+                bool aborted = false;
+
+                if (polygon.size() == 0)
+                {
+                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+                    aborted = true;
+                }
+                else
+                {
+                    QPointF pt;
+
+                    for (int i = 0; i < polygon.size(); ++i)
+                    {
+                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+                        polygonScale.append( pt );
+                    }
+
+                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+                }
+
+                QPainterPath *path = new QPainterPath();
+                DrawItem *newItem = NULL;
+                newItem = new DrawItem(this, tRect);
+                path->addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
+                              polygonScale[1].y() - polygonScale[0].y());
+
+                newItem->setShape(*path);
+
+                if(this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                    //newItem->setBrush(QBrush(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+                
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                replot();
+                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+//                m_pData->m_pDrawItems.append(newItem);
+
+                // if further elements are needed reset the plot engine and go ahead else finish editing
+                if(m_pData && (m_pData->m_elementsToPick > 1))
+                {
+                    m_pData->m_elementsToPick--;
+                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                    if (m)
+                    {
+                        m->setMaxNrItems( 2 );
+                        m_pMultiPointPicker->setEnabled(true);
+                    }
+                    return;
+                }
+                else
+                {
+                    m_pData->m_elementsToPick = 0;
+                    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+                    if (p)
+                    {
+                        emit p->userInteractionDone(1, aborted, polygonScale);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tRectangle, aborted);
+                    }
+                    setState(stateIdle);
+                    m_pMultiPointPicker->setEnabled(false);
+                }
+            }
+        break;
+
+        case tEllipse:
+            if (!on)
+            {
+                QPolygon polygon = m_pMultiPointPicker->selection();
+
+                QPolygonF polygonScale;
+                bool aborted = false;
+
+                if (polygon.size() == 0)
+                {
+                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+                    aborted = true;
+                }
+                else
+                {
+                    QPointF pt;
+
+                    for (int i = 0; i < polygon.size(); ++i)
+                    {
+                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+                        polygonScale.append( pt );
+                    }
+
+                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+                }
+
+                QPainterPath *path = new QPainterPath();
+                DrawItem *newItem = NULL;
+                newItem = new DrawItem(this, tEllipse);
+                path->addEllipse(polygonScale[0].x(), polygonScale[0].y(),
+                        (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
+
+                newItem->setShape(*path);
+                
+                if(this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                    //newItem->setBrush(QBrush(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                replot();
+                m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+//                m_pData->m_pDrawItems.append(newItem);
+
+
+                // if further elements are needed reset the plot engine and go ahead else finish editing
+                if(m_pData && (m_pData->m_elementsToPick > 1))
+                {
+                    m_pData->m_elementsToPick--;
+                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                    if (m)
+                    {
+                        m->setMaxNrItems( 2 );
+                        m_pMultiPointPicker->setEnabled(true);
+                    }
+                    return;
+                }
+                else
+                {
+                    m_pData->m_elementsToPick = 0;
+                    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+                    if (p)
+                    {
+                        emit p->userInteractionDone(1, aborted, polygonScale);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tEllipse, aborted);
+                    }
+                    setState(stateIdle);
+                    m_pMultiPointPicker->setEnabled(false);
+                }
+            }
+        break;
+
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
+{
+    ito::RetVal retval;
+    size_t limits[] = {2,8,0,99999};
+    ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
+
+    QwtSymbol::Style symStyle = QwtSymbol::XCross;
+    QSize symSize(5,5);
+    QBrush symBrush(Qt::NoBrush);
+    QPen symPen(Qt::red);
+
+
+    QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
+    if (rgexp.indexIn(style) != -1)
+    {
+//		QString s = rgexp.cap(1);
+        char s = rgexp.cap(1).toAscii()[0];
+
+        if (s == 'b') symPen.setColor( Qt::blue );
+        else if (s == 'g') symPen.setColor( Qt::green );
+        else if (s == 'r') symPen.setColor( Qt::red );
+        else if (s == 'c') symPen.setColor( Qt::cyan );
+        else if (s == 'm') symPen.setColor( Qt::magenta );
+        else if (s == 'y') symPen.setColor( Qt::yellow );
+        else if (s == 'k') symPen.setColor( Qt::black );
+        else if (s == 'w') symPen.setColor( Qt::white );
+
+        s = rgexp.cap(2).toAscii()[0];
+        bool ok;
+
+        if (s == '.') symStyle = QwtSymbol::Ellipse;
+        else if (s == 'o') symStyle = QwtSymbol::Ellipse;
+        else if (s == 's') symStyle = QwtSymbol::Rect;
+        else if (s == 'd') symStyle = QwtSymbol::Diamond;
+        else if (s == '>') symStyle = QwtSymbol::RTriangle;
+        else if (s == 'v') symStyle = QwtSymbol::DTriangle;
+        else if (s == '^') symStyle = QwtSymbol::UTriangle;
+        else if (s == '<') symStyle = QwtSymbol::LTriangle;
+        else if (s == 'x') symStyle = QwtSymbol::XCross;
+        else if (s == '*') symStyle = QwtSymbol::Star1;
+        else if (s == '+') symStyle = QwtSymbol::Cross;
+        else if (s == 'h') symStyle = QwtSymbol::Hexagon;
+
+        //s = rgexp.cap(3);
+        int size = rgexp.cap(3).toInt(&ok);
+        if (ok)
+        {
+            symSize = QSize(size,size);
+        }
+    }
+    else
+    {
+        retval += ito::RetVal(ito::retError,0,"The style tag does not correspond to the required format");
+    }
+
+
+    if (!retval.containsError())
+    {
+        if (dObj->getSize(0) >= 8)
+        {
+            QwtPlotMarker *marker = NULL;
+            int nrOfMarkers = dObj->getSize(1);
+            
+            if (id == "") id = "unknown";
+
+            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 0);            
+            ito::float32 *types = (ito::float32*)dObj->rowPtr(0, 1);
+            ito::float32 *xCoords1 = (ito::float32*)dObj->rowPtr(0, 2);
+            ito::float32 *yCoords1 = (ito::float32*)dObj->rowPtr(0, 3);
+            ito::float32 *xCoords2 = (ito::float32*)dObj->rowPtr(0, 4);
+            ito::float32 *yCoords2 = (ito::float32*)dObj->rowPtr(0, 5);
+            
+            for (int i = 0; i < nrOfMarkers; ++i)
+            {
+                QPainterPath path;
+                DrawItem *newItem = NULL;                
+                
+                switch ((int)types[i])
+                {
+                    case tPoint:
+                        path.moveTo(xCoords1[i], yCoords1[i]);
+                        path.lineTo(xCoords1[i], yCoords1[i]);
+                    break;
+                        
+                    case tLine:
+                        path.moveTo(xCoords1[i], yCoords1[i]);
+                        path.lineTo(xCoords2[i], yCoords2[i]);                        
+                    break;
+                        
+                    case tRect:
+                        path.addRect(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
+                    break;
+                        
+                    case tEllipse:
+                        path.addEllipse(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
+                    break;
+                    
+                    default:
+                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
+                    break;
+                }                    
+                if (m_pData->m_pDrawItems.contains((int)ids[i]))
+                {
+                    m_pData->m_pDrawItems[(int)ids[i]]->setShape(path);
+                }
+                else
+                {
+                    switch ((int)types[i])
+                    {
+                        case tPoint:                    
+                            newItem = new DrawItem(this, tPoint, (int)ids[i]);
+                        break;
+                        
+                        case tLine:
+                            newItem = new DrawItem(this, tLine, (int)ids[i]);
+                        break;
+                        
+                        case tRect:
+                            newItem = new DrawItem(this, tRect, (int)ids[i]);
+                        break;
+                        
+                        case tEllipse:
+                            newItem = new DrawItem(this, tEllipse, (int)ids[i]);
+                        break;
+                        
+                        default:
+                            retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
+                        break;                        
+                    }
+                    if (newItem)
+                    {
+                        newItem->setShape(path);
+                        
+                        if(this->m_inverseColor0.isValid())
+                        {
+                            newItem->setPen(QPen(m_inverseColor0));
+//                            newItem->setBrush(QBrush(m_inverseColor0));
+                        }
+                        else newItem->setPen(QPen(Qt::green));
+                        
+                        newItem->setVisible(true);
+                        newItem->show();
+                        newItem->attach(this);
+                        replot();
+                        //                m_pData->m_pDrawItems.append(newItem);
+                        m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+                    }
+                }                
+            }
+        }
+
+        replot();
+    }
+
+    if (dObj) delete dObj;
+
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Plot1DWidget::deleteMarkers(const int id)
+{
+    ito::RetVal retval;
+    bool found = false;
+    
+    if (m_pData->m_pDrawItems.contains(id))
+    {
+        //
+        DrawItem *delItem = m_pData->m_pDrawItems[id];
+        //delItem->setActive(0);
+        //delItem->m_marker.detach();
+
+        delItem->detach();
+        m_pData->m_pDrawItems.remove(id);
+        delete delItem; // ToDo check for memory leak
+        found = true;
+    }
+    
+    if(m_pData->m_pDrawItems.size() == 0)
+    {
+       m_pData->m_pDrawItems.clear(); 
+    }
+
+    if (!found)
+    {
+        retval += ito::RetVal::format(ito::retError,0,"No marker with id '%d' found.", id);
+    }
+    else
+    {
+        replot();
+    }
+    
+    return retval;
+}
 
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void Itom1DQwtFigure::setMarkerCoordinates(const QVector<QPointF> pts)

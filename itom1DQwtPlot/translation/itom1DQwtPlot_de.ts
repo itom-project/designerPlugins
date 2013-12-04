@@ -42,7 +42,7 @@
 <context>
     <name>Itom1DQwtPlot</name>
     <message>
-        <location filename="../itom1DQwtPlot.cpp" line="+61"/>
+        <location filename="../Itom1DQwtPlot.cpp" line="+61"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -287,12 +287,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlot.cpp" line="-390"/>
+        <location filename="../Itom1DQwtPlot.cpp" line="-390"/>
         <source>plot1D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlotPlugin.cpp" line="+15"/>
+        <location filename="../Itom1DQwtPlotPlugin.cpp" line="+15"/>
         <source>itom widget for 1D DataObjects based on QWT.</source>
         <translation type="unfinished"></translation>
     </message>

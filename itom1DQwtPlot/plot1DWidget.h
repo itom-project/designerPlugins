@@ -40,6 +40,7 @@
 #include <qqueue.h>
 #include <qmenu.h>
 
+#include <qwt_plot_rescaler.h>
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_panner.h>
@@ -49,49 +50,32 @@
 
 #include "valuepicker1d.h"
 
-class itom1DQwtFigure;
+#include "userInteractionPlotPicker.h"
+#include "drawItem.h"
 
-struct InternalData
-{
-    InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
-        m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
-        m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1) {}
+class Itom1DQwtPlot;
 
-    ito::tDataType m_dataType;
-
-    QString m_title;
-    QString m_axisLabel;
-    QString m_valueLabel;
-
-    QString m_titleDObj;
-    QString m_axisLabelDObj;
-    QString m_valueLabelDObj;
-
-    bool m_autoTitle;
-    bool m_autoAxisLabel;
-    bool m_autoValueLabel;
-
-    bool m_valueScaleAuto;
-    double m_valueMin;
-    double m_valueMax;
-
-    bool m_axisScaleAuto;
-    double m_axisMin;
-    double m_axisMax;
-
-    //true for one replot if setSource-Property has been set 
-    //(even if the same data object is given one more time, 
-    //the hash might be the same, but we want to recalcuate 
-    //boundaries if values of dataObject changed.
-    bool m_forceValueParsing; 
-};
+struct InternalData;
 
 class Plot1DWidget : public QwtPlot
 {
     Q_OBJECT
     public:
         enum MultiLineMode { FirstRow, FirstCol, MultiRows, MultiCols };
-        enum State { stateIdle, statePanner, stateZoomer, statePicker };
+        enum tState
+        { 
+            stateIdle   = 0, 
+            statePanner = 1, 
+            stateZoomer = 2, 
+            statePicker = 3, 
+            tPoint      = 101, 
+            tLine       = 102, 
+            tRect       = 103, 
+//            tSquare   = 104,
+            tEllipse    = 105, 
+//            tCircle   = 106, 
+            tPolygon    = 110
+        };
 
         Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
         ~Plot1DWidget();
@@ -110,7 +94,11 @@ class Plot1DWidget : public QwtPlot
 
         void setMainMarkersToIndex(int idx1, int idx2, int curveIdx);
 
-        
+        ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
+        ito::RetVal deleteMarkers(const int id);
+
+        friend class Itom1DQwtPlot;
+        friend class DrawItem;      
 
     protected:
         void keyPressEvent ( QKeyEvent * event );
@@ -123,9 +111,14 @@ class Plot1DWidget : public QwtPlot
         void updateLabels();
         void updateScaleValues(bool recalculateBoundaries = false);
 
-        
+        void configRescaler();
+
+        ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
+
+        void setState( tState state);
 
     private:
+        QwtPlotRescaler* m_pRescaler;
 
         struct Marker
         {
@@ -178,9 +171,16 @@ class Plot1DWidget : public QwtPlot
 
 		QMenu *m_pCmplxMenu;
 
-        State m_state;
+        QColor m_inverseColor0, m_inverseColor1;
+        int m_activeDrawItem;
+
+        UserInteractionPlotPicker *m_pMultiPointPicker;
 
     signals:
+
+        void statusBarClear();
+        void statusBarMessage(const QString &message, int timeout = 0);
+
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
@@ -189,7 +189,75 @@ class Plot1DWidget : public QwtPlot
     public slots:
         //void replot();
 
+
+    private slots:
+        void multiPointActivated (bool on);
+        
+
 };
 
+struct InternalData
+{
+    InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
+        m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
+        m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_elementsToPick(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
+        m_enablePlotting(true), m_keepAspect(false) 
+    {
+        m_pDrawItems.clear();
+        m_state = Plot1DWidget::stateIdle;
+    }
+
+    ~InternalData()
+    {
+        QList<int> keys = m_pDrawItems.keys();
+        for (int i = 0; i < keys.size(); i++)
+        {
+            if(m_pDrawItems[keys[i]] != NULL)
+            {
+                DrawItem *delItem = m_pDrawItems[keys[i]];
+                delItem->detach();
+                m_pDrawItems.remove(keys[i]);
+                delete delItem;          
+            }
+        }
+
+        m_pDrawItems.clear();    
+    }
+    ito::tDataType m_dataType;
+
+    Plot1DWidget::tState m_state;
+
+    QString m_title;
+    QString m_axisLabel;
+    QString m_valueLabel;
+
+    QString m_titleDObj;
+    QString m_axisLabelDObj;
+    QString m_valueLabelDObj;
+
+    bool m_autoTitle;
+    bool m_autoAxisLabel;
+    bool m_autoValueLabel;
+
+    bool m_valueScaleAuto;
+    double m_valueMin;
+    double m_valueMax;
+
+    bool m_axisScaleAuto;
+    double m_axisMin;
+    double m_axisMax;
+
+    int m_elementsToPick;
+    bool m_enablePlotting;
+    bool m_keepAspect;
+
+    //true for one replot if setSource-Property has been set 
+    //(even if the same data object is given one more time, 
+    //the hash might be the same, but we want to recalcuate 
+    //boundaries if values of dataObject changed.
+    bool m_forceValueParsing; 
+
+    QHash<int, DrawItem *> m_pDrawItems;
+};
 
 #endif
