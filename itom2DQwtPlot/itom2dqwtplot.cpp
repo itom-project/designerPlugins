@@ -1234,7 +1234,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case PlotCanvas::tRect:
-                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRetangle;
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRectangle;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
                 rowPtr[5] = (ito::float32) (it.value()->x2);
@@ -1242,7 +1242,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case PlotCanvas::tEllipse:
-                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tElipse;
+                rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tEllipse;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
                 rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 2.0);

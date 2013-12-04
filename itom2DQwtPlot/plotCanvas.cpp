@@ -1902,7 +1902,7 @@ void PlotCanvas::multiPointActivated (bool on)
                     if (p)
                     {
                         emit p->userInteractionDone(1, aborted, polygonScale);
-                        emit p->plotItemsFinished(ito::PrimitiveContainer::tRetangle, aborted);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tRectangle, aborted);
                     }
                     setState(tIdle);
                     m_pMultiPointPicker->setEnabled(false);
@@ -1979,7 +1979,7 @@ void PlotCanvas::multiPointActivated (bool on)
                     if (p)
                     {
                         emit p->userInteractionDone(1, aborted, polygonScale);
-                        emit p->plotItemsFinished(ito::PrimitiveContainer::tElipse, aborted);
+                        emit p->plotItemsFinished(ito::PrimitiveContainer::tEllipse, aborted);
                     }
                     setState(tIdle);
                     m_pMultiPointPicker->setEnabled(false);
@@ -2254,7 +2254,7 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                     // square is a rect
 //                    case tSquare:
                     case tRect:
-                        type = ito::PrimitiveContainer::tRetangle;
+                        type = ito::PrimitiveContainer::tRectangle;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
@@ -2266,7 +2266,7 @@ void PlotCanvas::mouseReleaseEvent ( QMouseEvent * event )
                     // circle is an ellispe
 //                    case tCircle:
                     case tEllipse:
-                        type = ito::PrimitiveContainer::tElipse;
+                        type = ito::PrimitiveContainer::tEllipse;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
