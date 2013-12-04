@@ -70,6 +70,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
     Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
+    Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
     Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")

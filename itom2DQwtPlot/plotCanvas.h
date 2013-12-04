@@ -136,7 +136,7 @@ class PlotCanvas : public QwtPlot
         void mouseReleaseEvent ( QMouseEvent * event );
 
         void configRescaler(void);
-
+        
     private:
         QwtPlotRescaler* m_pRescaler;
 
@@ -243,22 +243,12 @@ struct InternalData
             {
                 DrawItem *delItem = m_pDrawItems[keys[i]];
                 delItem->detach();
-                //m_pDrawItems[keys[i]] = NULL;
                 m_pDrawItems.remove(keys[i]);
                 delete delItem;
-                // ToDo: Check for memoryleak!!!
                 
             }
-            //it.value()->detach();
-            //delete it.value();
         }
-/*        
-        for (int n = 0; n < m_pDrawItems.size(); n++)
-        {
-            m_pDrawItems[n]->detach();
-            delete m_pDrawItems[n];
-        }
-*/        
+   
         m_pDrawItems.clear();
     }
     ito::tDataType m_dataType;
