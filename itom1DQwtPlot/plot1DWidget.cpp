@@ -71,7 +71,9 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_pParent(parent),
         m_actPickerIdx(-1),
         m_cmplxState(false),
-        m_pData(data)
+        m_pData(data),
+        m_activeDrawItem(1),
+        m_pRescaler(NULL)
 {
     this->setMouseTracking(false);
 
@@ -80,7 +82,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 	
     m_inverseColor0 = Qt::green;
     m_inverseColor1 = Qt::blue;
-    m_activeDrawItem = 0;
+    
 
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
@@ -159,6 +161,9 @@ Plot1DWidget::~Plot1DWidget()
         m_pRescaler->deleteLater();
         m_pRescaler = NULL;
     }
+
+    if(m_pMultiPointPicker != NULL) m_pMultiPointPicker->deleteLater();
+    m_pMultiPointPicker = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -687,7 +692,60 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 {
-    if(m_pData->m_state == statePicker)
+    if (m_pData->m_state == stateIdle)
+    {
+        //int n;
+        QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
+        for (;it != m_pData->m_pDrawItems.end(); it++)
+//        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        {
+
+            if(it.value() == NULL)
+            {
+                continue;
+            }
+
+            int canxpos = event->x() - canvas()->x();
+            int canypos = event->y() - canvas()->y();
+            double x = it.value()->x1;
+            double y = it.value()->y1;
+            double xx = transform(QwtPlot::xBottom, it.value()->x1);
+            double yy = transform(QwtPlot::xBottom, it.value()->y1);
+            if (fabs(transform(QwtPlot::xBottom, it.value()->x1) - canxpos) < 10
+                && fabs(transform(QwtPlot::yLeft, it.value()->y1) - canypos) < 10)
+            {
+                it.value()->m_active = 1;
+                m_activeDrawItem = it.value()->m_idx;
+                it.value()->setActive(1);
+                break;
+            }
+            else if (fabs(transform(QwtPlot::xBottom, it.value()->x2) - canxpos) < 10
+                && fabs(transform(QwtPlot::yLeft, it.value()->y2) - canypos) < 10)
+            {
+                it.value()->m_active = 2;
+                m_activeDrawItem = it.value()->m_idx;
+                it.value()->setActive(2);
+                break;
+            }
+            else
+            {
+                it.value()->setActive(0);
+            }
+        }
+//        for (n++; n < m_pData->m_pDrawItems.size(); n++)
+        for (;it != m_pData->m_pDrawItems.end(); it++)
+        {
+
+            if(it.value() == NULL)
+            {
+                continue;
+            }
+
+            it.value()->setActive(0);
+        }
+        replot();
+    }
+    else if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
@@ -743,6 +801,8 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
 {
+    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+
     if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
@@ -764,12 +824,257 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
             replot();
         }
     }
+    else if (m_pData->m_state == stateIdle)
+    {
+        int canxpos = event->x() - canvas()->x();
+        int canypos = event->y() - canvas()->y();
+
+        QHash<int, DrawItem*>::Iterator it = m_pData->m_pDrawItems.begin();
+        for (; it != m_pData->m_pDrawItems.end(); it++)
+//        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        {
+//            if (m_pData->m_pDrawItems[n]->m_active == 1)
+
+            if(it.value() == NULL)
+            {
+                continue;
+            }
+
+            if (it.value()->m_active == 1)
+            {
+                int dx, dy;
+
+                QPainterPath *path = new QPainterPath();
+                switch (it.value()->m_type)
+                {
+                    case tPoint:
+                        path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
+                        replot();
+                    break;
+
+                    case tLine:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, it.value()->y2);
+                            else
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x2);
+                        }
+                        path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        path->lineTo(it.value()->x2, it.value()->y2);
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
+                        replot();
+                    break;
+
+                    case tRect:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, it.value()->y2) - dx * abs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x2) - dy * abs(dx) / dx;
+                        }
+                        path->addRect(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos),
+                            it.value()->x2 - invTransform(QwtPlot::xBottom, canxpos),
+                            it.value()->y2 - invTransform(QwtPlot::yLeft, canypos));
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
+                        replot();
+                    break;
+
+                    case tEllipse:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, it.value()->y2) - dx * abs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x2) - dy * abs(dx) / dx;
+                        }
+                        path->addEllipse(invTransform(QwtPlot::xBottom, canxpos),
+                            invTransform(QwtPlot::yLeft, canypos),
+                             it.value()->x2 - invTransform(QwtPlot::xBottom, canxpos),
+                             it.value()->y2 - invTransform(QwtPlot::yLeft, canypos));
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
+                        replot();
+                    break;
+                }
+
+                break;
+            }
+            else if (it.value()->m_active == 2)
+            {
+                int dx, dy;
+
+                QPainterPath *path = new QPainterPath();
+                switch (it.value()->m_type)
+                {
+
+//                    case tPoint:
+//                    break;
+
+                    case tLine:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, it.value()->y1);
+                            else
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x1);
+                        }
+                        path->moveTo(it.value()->x1, it.value()->y1);
+                        path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
+                        //if(p) emit p->plotItemChanged(n);
+                        replot();
+                    break;
+
+                    case tRect:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, it.value()->y1) + dx * abs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x1) + dy * abs(dx) / dx;
+                        }
+                        path->addRect(it.value()->x1, it.value()->y1,
+                            invTransform(QwtPlot::xBottom, canxpos) - it.value()->x1,
+                            invTransform(QwtPlot::yLeft, canypos) - it.value()->y1);
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
+                        //if(p) emit p->plotItemChanged(n);
+                        replot();
+                    break;
+
+                    case tEllipse:
+                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        {
+                            dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
+                            dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
+                            if (abs(dx) > abs(dy))
+                                canypos = transform(QwtPlot::yLeft, it.value()->y1) + dx * abs(dy) / dy;
+                            else
+                                canxpos = transform(QwtPlot::xBottom, it.value()->x1) + dy * abs(dx) / dx;
+                        }
+                        path->addEllipse(it.value()->x1,
+                            it.value()->y1,
+                            (invTransform(QwtPlot::xBottom, canxpos)- it.value()->x1),
+                            (invTransform(QwtPlot::yLeft, canypos) - it.value()->y1)),
+                        it.value()->setShape(*path);
+                        it.value()->setActive(it.value()->m_active);
+                        //if(p) emit p->plotItemChanged(n);
+                        replot();
+                    break;
+
+                }
+                break;
+            }
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
 {
-    if(m_pData->m_state == statePicker)
+    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
+        || m_pData->m_state == tPoint || m_pData->m_state == stateIdle)
+    {
+        QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
+        for (;it != m_pData->m_pDrawItems.end(); it++)        
+//        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
+        {
+            if(it.value() != NULL && it.value()->m_active != 0 && p)
+            {
+                int type = 0;
+                QVector<ito::float32> values;
+                values.reserve(11);
+                switch(it.value()->m_type)
+                {
+                    case tPoint:
+                        type = ito::PrimitiveContainer::tPoint;
+                        values.append(it.value()->x1);
+                        values.append(it.value()->y1);
+                        values.append(0.0);
+                    break;
+
+                    case tLine:
+                        type = ito::PrimitiveContainer::tLine;
+                        values.append(it.value()->x1);
+                        values.append(it.value()->y1);
+                        values.append(0.0);
+                        values.append(it.value()->x2);
+                        values.append(it.value()->y2);
+                        values.append(0.0);
+                    break;
+
+                    // square is a rect
+//                    case tSquare:
+                    case tRect:
+                        type = ito::PrimitiveContainer::tRectangle;
+                        values.append(it.value()->x1);
+                        values.append(it.value()->y1);
+                        values.append(0.0);
+                        values.append(it.value()->x2);
+                        values.append(it.value()->y2);
+                        values.append(0.0);
+                    break;
+
+                    // circle is an ellispe
+//                    case tCircle:
+                    case tEllipse:
+                        type = ito::PrimitiveContainer::tEllipse;
+                        values.append((it.value()->x1 + it.value()->x2)*0.5);
+                        values.append((it.value()->y1 + it.value()->y2)*0.5);
+                        values.append(0.0);
+                        values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
+                        values.append(abs(it.value()->y1 - it.value()->y2)*0.5);
+                        values.append(0.0);
+                    break;
+
+/*
+                    case tCircle:
+                        type = ito::PrimitiveContainer::tCircle;
+                        values.append((it.value()->x1 + it.value()->x2)*0.5);
+                        values.append((it.value()->y1 + it.value()->y2)*0.5);
+                        values.append(0.0);
+                        values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
+                        values.append(0.0);
+                    break;
+*/
+/*
+                    case tSquare:
+                        type = ito::PrimitiveContainer::tSquare;
+                        values.append((it.value()->x1 + it.value()->x2)*0.5);
+                        values.append((it.value()->y1 + it.value()->y2)*0.5);
+                        values.append(0.0);
+                        values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
+                        values.append(0.0);
+                    break;
+*/
+                }
+
+                emit p->plotItemChanged(it.value()->m_idx, type, values);
+
+            }
+            if(it.value()) it.value()->m_active = 0;
+        }
+    }
+    else if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
@@ -1492,16 +1797,23 @@ void Plot1DWidget::setState( tState state)
 {
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(parent());
 
+    
+
     if (m_pData->m_state != state)
     {
         if ((m_pData->m_state == tPoint || m_pData->m_state == tLine || 
              m_pData->m_state == tRect  || m_pData->m_state == tEllipse) 
              && state != stateIdle)
         {
+            
             return; //drawFunction needs to go back to idle
         }
 
-        if (m_pZoomer) m_pZoomer->setEnabled( state == stateZoomer );
+        if (m_pZoomer)
+        {
+            m_pZoomer->setEnabled( state == stateZoomer );
+            this->setZoomerEnable(state == stateZoomer);
+        }
         if (m_pPanner) m_pPanner->setEnabled( state == statePanner );
         if (m_pValuePicker) m_pValuePicker->setEnabled( state == statePicker );
 
@@ -1513,7 +1825,7 @@ void Plot1DWidget::setState( tState state)
                 p->m_pActZoomToRect->setEnabled(state == stateIdle);
                 p->m_pActMarker->setEnabled(state == stateIdle);
                 p->m_pActPan->setEnabled(state == stateIdle);
-                this->setZoomerEnable(state == stateIdle);
+                this->setZoomerEnable(state != stateIdle);
 
             }
         }

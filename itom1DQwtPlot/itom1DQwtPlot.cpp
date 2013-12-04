@@ -95,12 +95,13 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pRescaleParent);
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoomToRect);
-
+    mainTb->addAction(m_pActAspectRatio);
     // first block is zoom, scale settings, home
     mainTb->addSeparator();
     mainTb->addAction(m_pActMarker);
     mainTb->addAction(m_pActSetMarker);
-    
+    mainTb->addAction(m_pActDrawMode);
+    mainTb->addAction(m_pActClearDrawings);
     // Add labels to toolbar
     QAction *lblAction = mainTb->addWidget(m_pLblMarkerCoords);
     lblAction->setVisible(true);
@@ -141,6 +142,13 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::~Itom1DQwtPlot()
 {
+    if (m_pMnuCmplxSwitch != NULL)
+    {
+        m_pMnuCmplxSwitch->deleteLater();
+        m_pMnuCmplxSwitch = NULL;
+    }
+    m_pContent->deleteLater();
+    m_pContent = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -590,6 +598,8 @@ void Itom1DQwtPlot::mnuDrawMode(QAction *action)
     m_pActMarker->setChecked(false);
     m_pContent->setZoomerEnable(true);
 
+    m_pActDrawMode->setChecked(true);
+
     switch (action->data().toInt())
     {
         default:
@@ -958,7 +968,7 @@ void Itom1DQwtPlot::mnuActRatio(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )
 {
-    resizeEvent(event);
+    //resizeEvent(event);
     if(m_pContent) m_pContent->configRescaler();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
