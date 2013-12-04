@@ -48,17 +48,17 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pRescaleParent(NULL),
     m_pActForward(NULL),
     m_pActBack(NULL),
-	m_pActHome(NULL),
-	m_pActSave(NULL),
+    m_pActHome(NULL),
+    m_pActSave(NULL),
     m_pActPan(NULL),
     m_pActZoomToRect(NULL),
     m_pActMarker(NULL),
     m_pMnuSetMarker(NULL),
     m_pActSetMarker(NULL),
-	m_pActCmplxSwitch(NULL),
-	m_pMnuCmplxSwitch(NULL),
+    m_pActCmplxSwitch(NULL),
+    m_pMnuCmplxSwitch(NULL),
     m_pLblMarkerOffsets(NULL),
-	m_pLblMarkerCoords(NULL),
+    m_pLblMarkerCoords(NULL),
     m_pActAspectRatio(NULL),
     m_pActClearDrawings(NULL),
     m_pActDrawMode(NULL),
@@ -72,10 +72,10 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
-	QToolBar *mainTb = new QToolBar(tr("1D plotting toolbar"), this);
-	addToolBar(mainTb, "mainToolBar");
+    QToolBar *mainTb = new QToolBar(tr("1D plotting toolbar"), this);
+    addToolBar(mainTb, "mainToolBar");
 
-	QMenu *contextMenu = new QMenu(QObject::tr("plot1D"), this);
+    QMenu *contextMenu = new QMenu(QObject::tr("plot1D"), this);
     contextMenu->addAction(m_pActSave);
     contextMenu->addSeparator();
     contextMenu->addAction(m_pActHome);
@@ -88,9 +88,9 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     contextMenu->addAction(mainTb->toggleViewAction());
 
     // first block is zoom, scale settings, home
-	mainTb->addAction(m_pActSave);
-	mainTb->addSeparator();
-	mainTb->addAction(m_pActHome);
+    mainTb->addAction(m_pActSave);
+    mainTb->addSeparator();
+    mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActScaleSetting);
     mainTb->addAction(m_pRescaleParent);
     mainTb->addAction(m_pActPan);
@@ -156,20 +156,20 @@ void Itom1DQwtPlot::createActions()
 {
     QAction *a = NULL;
 
-	//m_actHome
+    //m_actHome
     m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     a->setObjectName("actHome");
     a->setToolTip(tr("Reset original view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuHome()));
  
-	//m_actSave
+    //m_actSave
     m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuExport()));
 
     //m_actScaleSetting
-    m_pActScaleSetting = a = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
+    m_pActScaleSetting = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings"), this);
     a->setObjectName("actScaleSetting");
     a->setToolTip(tr("Set the ranges and offsets of this view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
@@ -226,19 +226,19 @@ void Itom1DQwtPlot::createActions()
 
     //m_actSetMarker
     m_pActSetMarker = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"), tr("Set Markers to"), this);
-	m_pMnuSetMarker = new QMenu("Marker Switch");
-	m_pMnuSetMarker->addAction(tr("To Min-Max"));
-	m_pActSetMarker->setMenu(m_pMnuSetMarker);
+    m_pMnuSetMarker = new QMenu("Marker Switch");
+    m_pMnuSetMarker->addAction(tr("To Min-Max"));
+    m_pActSetMarker->setMenu(m_pMnuSetMarker);
     connect(m_pMnuSetMarker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetMarker(QAction*)));
 
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
-	m_pMnuCmplxSwitch = new QMenu("Complex Switch");
-	m_pMnuCmplxSwitch->addAction(tr("Imag"));
-	m_pMnuCmplxSwitch->addAction(tr("Real"));
-	m_pMnuCmplxSwitch->addAction(tr("Abs"));
-	m_pMnuCmplxSwitch->addAction(tr("Pha"));
-	m_pActCmplxSwitch->setMenu(m_pMnuCmplxSwitch);
+    m_pMnuCmplxSwitch = new QMenu("Complex Switch");
+    m_pMnuCmplxSwitch->addAction(tr("Imag"));
+    m_pMnuCmplxSwitch->addAction(tr("Real"));
+    m_pMnuCmplxSwitch->addAction(tr("Abs"));
+    m_pMnuCmplxSwitch->addAction(tr("Pha"));
+    m_pActCmplxSwitch->setMenu(m_pMnuCmplxSwitch);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
@@ -739,7 +739,7 @@ void Itom1DQwtPlot::mnuSetMarker(QAction *action)
     {
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
 
-		if (action->text() == QString(tr("To Min-Max")))
+        if (action->text() == QString(tr("To Min-Max")))
         {
             DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
 
@@ -820,39 +820,39 @@ void Itom1DQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
 void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
 {
     DataObjectSeriesData *seriesData;
-	if (m_pContent)
-	{
+    if (m_pContent)
+    {
         foreach(QwtPlotCurve *data, m_pContent->m_plotCurveItems)
         {
             seriesData = (DataObjectSeriesData*)data->data();
             if (seriesData)
             {
-		        if (action->text() == QString(tr("Imag")))
+                if (action->text() == QString(tr("Imag")))
                 {
-			        seriesData->setCmplxState(DataObjectSeriesData::cmplxImag);
+                    seriesData->setCmplxState(DataObjectSeriesData::cmplxImag);
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
                 }
-		        else if (action->text() == QString(tr("Real")))
+                else if (action->text() == QString(tr("Real")))
                 {
-			        seriesData->setCmplxState(DataObjectSeriesData::cmplxReal);
+                    seriesData->setCmplxState(DataObjectSeriesData::cmplxReal);
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
                 }
-		        else if (action->text() == QString(tr("Pha")))
+                else if (action->text() == QString(tr("Pha")))
                 {
-			        seriesData->setCmplxState(DataObjectSeriesData::cmplxArg);
+                    seriesData->setCmplxState(DataObjectSeriesData::cmplxArg);
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
                 }
-		        else
+                else
                 {
-			        seriesData->setCmplxState(DataObjectSeriesData::cmplxAbs);
+                    seriesData->setCmplxState(DataObjectSeriesData::cmplxAbs);
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
                 }
             }
         }
 
-		m_pContent->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
-		
-	}
+        m_pContent->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
+        
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
