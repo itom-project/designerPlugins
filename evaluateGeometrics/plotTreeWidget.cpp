@@ -562,16 +562,19 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 switch(m_pData->m_relationsList[rel].type & 0x0FFF)
                 {
                 case tAngle:
-                    //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
                     check = calculateAngle(first, second, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
                     resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                                   .arg(QChar(0x00B0));
+                    break;
+                case tDistance:
+                    check = calculateDistance(first, second, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+                    resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
+                                                  .arg(m_pData->m_valueUnit);
                     break;
                 /*
                 case tIntersection:
                 {
                     cv::Vec3f val;
-                    //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
                     check = calculateIntersections(first, second, m_pData->m_consider2DOnly, val);
                     if(m_pData->m_consider2DOnly)
                     {
@@ -591,19 +594,16 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 }
                 */
                 default:
-                    //elements[2]->setText(resultString);
                     m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
                     continue;
                 }
             }
             else
             {
-                //elements[2]->setText(resultString);
                 m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
                 continue;
             }
         }        
-        //elements[2]->setText(resultString);
         m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
 
         if(check)
@@ -615,7 +615,6 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
         }
     }
-    //free(elements);
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
