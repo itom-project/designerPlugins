@@ -73,7 +73,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_actSave->setToolTip(tr("Export current view"));
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
     m_actScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
 
