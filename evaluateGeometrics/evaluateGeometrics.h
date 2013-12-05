@@ -66,6 +66,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(QSharedPointer<ito::DataObject> relations READ getRelations WRITE setRelations DESIGNABLE false)
     Q_PROPERTY(QStringList relationNames READ getRelationNames WRITE setRelationNames DESIGNABLE true)
     Q_PROPERTY(QString destinationFolder READ getDestinationFolder WRITE setDestinationFolder DESIGNABLE true)
+    Q_PROPERTY(int lastAddedRelation READ getLastRelation DESIGNABLE true)
+    Q_PROPERTY(bool considerOnly2D READ getConsider2dStatus WRITE setConsider2dStatus DESIGNABLE true)
     
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -74,6 +76,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions (toDo).")
     Q_CLASSINFO("prop://relations", "Get or set geometric elements via N x 11 dataObject of type float32.")
     Q_CLASSINFO("prop://destinationFolder", "Set a default export directory.")
+    Q_CLASSINFO("prop://lastAddedRelation", "Get the index of the last added relation.")
+    Q_CLASSINFO("prop://considerOnly2D",    "If true, only the x & y coordinates are considered.")
 
     public:
         EvaluateGeometricsFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -93,9 +97,6 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         //properties
         bool getContextMenuEnabled() const;
         void setContextMenuEnabled(bool show); 
-
-        //QVector<QPointF> getBounds(void);
-        //void setBounds(QVector<QPointF> bounds);
 
         void enableComplexGUI(const bool checked);
 
@@ -183,6 +184,17 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         void setDestinationFolder(const QString folder) {m_lastFolder = folder;}
         QString getDestinationFolder() const {return m_lastFolder;};
 
+        int getLastRelation(void) const {return m_lastAddedRelation;}
+
+        bool getConsider2dStatus(void) const {return m_info.m_consider2DOnly;}
+        void setConsider2dStatus(const bool enabled)
+        {
+            m_info.m_consider2DOnly = enabled;
+            m_pContent->updatePrimitives();
+            m_pContent->updateRelationShips(false);
+            return;
+        }
+
         void setSource(QSharedPointer<ito::DataObject> source);
     
     protected:
@@ -204,6 +216,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         QString m_lastFolder;
 
+        int m_lastAddedRelation;
+
     public slots:
         void mnuSetting();
         void mnuExport(QAction* action);
@@ -213,6 +227,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         void mnuAutoFitCols();
 
         ito::RetVal addRelation(QSharedPointer<ito::DataObject> importedData);
+        ito::RetVal modifyRelation(const int idx, QSharedPointer<ito::DataObject> relation);
+
         ito::RetVal addRelationName(const QString newName);
 
         ito::RetVal exportData(QString fileName, ito::uint8 exportFlag);

@@ -860,13 +860,28 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         {
                             dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
                             dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
+
+                            dx = dx == 0 ? 1 : dx;
+                            dy = dy == 0 ? 1 : dy;
+
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, it.value()->y2);
+                            {
+                                path->moveTo(invTransform(QwtPlot::xBottom, canxpos), it.value()->y2);
+                                path->lineTo(it.value()->x2, it.value()->y2);  
+                                //canypos = transform(QwtPlot::yLeft, it.value()->y2);
+                            }
                             else
-                                canxpos = transform(QwtPlot::xBottom, it.value()->x2);
+                            {
+                                path->moveTo(it.value()->x2, invTransform(QwtPlot::yLeft, canypos));
+                                path->lineTo(it.value()->x2, it.value()->y2);  
+                                //canxpos = transform(QwtPlot::xBottom, it.value()->x2);
+                            }
                         }
-                        path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
-                        path->lineTo(it.value()->x2, it.value()->y2);
+                        else
+                        {
+                            path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                            path->lineTo(it.value()->x2, it.value()->y2);                        
+                        }
                         it.value()->setShape(*path);
                         it.value()->setActive(it.value()->m_active);
                         replot();
@@ -877,6 +892,10 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         {
                             dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
                             dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
+
+                            dx = dx == 0 ? 1 : dx;
+                            dy = dy == 0 ? 1 : dy;
+
                             if (abs(dx) > abs(dy))
                                 canypos = transform(QwtPlot::yLeft, it.value()->y2) - dx * abs(dy) / dy;
                             else
@@ -895,6 +914,10 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         {
                             dx = canxpos - transform(QwtPlot::xBottom, it.value()->x2);
                             dy = canypos - transform(QwtPlot::yLeft, it.value()->y2);
+
+                            dx = dx == 0 ? 1 : dx;
+                            dy = dy == 0 ? 1 : dy;
+
                             if (abs(dx) > abs(dy))
                                 canypos = transform(QwtPlot::yLeft, it.value()->y2) - dx * abs(dy) / dy;
                             else
@@ -928,13 +951,27 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         {
                             dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
                             dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
+
                             if (abs(dx) > abs(dy))
-                                canypos = transform(QwtPlot::yLeft, it.value()->y1);
+                            {
+                                path->moveTo(it.value()->x1, it.value()->y1);
+                                path->lineTo(invTransform(QwtPlot::xBottom, canxpos), it.value()->y1);
+                                //canypos = transform(QwtPlot::yLeft, it.value()->y1);
+                            }
                             else
-                                canxpos = transform(QwtPlot::xBottom, it.value()->x1);
+                            {
+                                path->moveTo(it.value()->x1, it.value()->y1);
+                                path->lineTo(it.value()->x1, invTransform(QwtPlot::yLeft, canypos));
+                                //canxpos = transform(QwtPlot::xBottom, it.value()->x1);
+                            }
                         }
-                        path->moveTo(it.value()->x1, it.value()->y1);
-                        path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        else
+                        {
+
+                            path->moveTo(it.value()->x1, it.value()->y1);
+                            path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                        }
+
                         it.value()->setShape(*path);
                         it.value()->setActive(it.value()->m_active);
                         //if(p) emit p->plotItemChanged(n);
@@ -946,6 +983,10 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         {
                             dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
                             dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
+
+                            dx = dx == 0 ? 1 : dx;
+                            dy = dy == 0 ? 1 : dy;
+
                             if (abs(dx) > abs(dy))
                                 canypos = transform(QwtPlot::yLeft, it.value()->y1) + dx * abs(dy) / dy;
                             else
@@ -965,6 +1006,11 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         {
                             dx = canxpos - transform(QwtPlot::xBottom, it.value()->x1);
                             dy = canypos - transform(QwtPlot::yLeft, it.value()->y1);
+                            
+                            dx = dx == 0 ? 1 : dx;
+                            dy = dy == 0 ? 1 : dy;
+
+
                             if (abs(dx) > abs(dy))
                                 canypos = transform(QwtPlot::yLeft, it.value()->y1) + dx * abs(dy) / dy;
                             else

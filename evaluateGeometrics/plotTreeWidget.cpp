@@ -620,12 +620,15 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle)
 {
-    if(((ito::uint32)(first[1]) & 0x0000FFFF )!= ito::PrimitiveContainer::tLine && ((ito::uint32)(first[1]) & 0x0000FFFF)!= ito::PrimitiveContainer::tPolygon)
+    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & 0x0000FFFF);
+    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & 0x0000FFFF);
+
+    if(typeOne != ito::PrimitiveContainer::tLine)
     {
         angle = std::numeric_limits<ito::float32>::signaling_NaN();
         return false;
     }
-    if(((ito::uint32)(second[1]) & 0x0000FFFF)!= ito::PrimitiveContainer::tLine && ((ito::uint32)(second[1]) & 0x0000FFFF)!= ito::PrimitiveContainer::tPolygon)
+    if(typeTwo != ito::PrimitiveContainer::tLine)
     {
         angle = std::numeric_limits<ito::float32>::signaling_NaN();
         return false;
@@ -656,18 +659,24 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
 {
     cv::Vec3f lineDirVector;
     cv::Vec3f linePosVector;
-    cv::Vec3f pointDirVector;
     cv::Vec3f pointPosVector;
 
+    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & 0x0000FFFF);
+    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & 0x0000FFFF);
+
     // distance of two points or two circles or combination
-    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tPoint || ((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle &&
-       ((ito::uint32)(second[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tPoint || ((ito::uint32)(second[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
+    if((typeOne == ito::PrimitiveContainer::tPoint || typeOne == ito::PrimitiveContainer::tCircle) &&
+       (typeTwo == ito::PrimitiveContainer::tPoint || typeTwo == ito::PrimitiveContainer::tCircle))
     {
 
-        pointPosVector = cv::Vec3f(first[2] - second[2], first[3] - second[3], first[4] - second[4]);
+        
         if(eval2D)
         {
-            pointPosVector[2] = 0.0;
+            pointPosVector = cv::Vec3f(first[2] - second[2], first[3] - second[3], 0.0);
+        }
+        else
+        {
+            pointPosVector = cv::Vec3f(first[2] - second[2], first[3] - second[3], first[4] - second[4]);
         }
 
         distance = sqrt( pow(pointPosVector[0],2) + pow(pointPosVector[1],2) + pow(pointPosVector[2],2) );
@@ -675,13 +684,15 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     }
 
     // distance of line to points or circles
-    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tLine && ((ito::uint32)(second[1]) & 0x0000FFFF ) != ito::PrimitiveContainer::tLine && ((ito::uint32)(second[1]) & 0x0000FFFF ) != ito::PrimitiveContainer::tRectangle)
+    if( typeOne == ito::PrimitiveContainer::tLine && 
+        typeTwo == ito::PrimitiveContainer::tPoint)
     {
         lineDirVector = cv::Vec3f(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
         linePosVector = cv::Vec3f(first[2], first[3], first[4]);
         pointPosVector = cv::Vec3f(second[2], second[3], second[4]);
     }
-    else if((ito::uint32)(second[1]) == ito::PrimitiveContainer::tLine && (ito::uint32)(first[1]) != ito::PrimitiveContainer::tLine && (ito::uint32)(first[1]) != ito::PrimitiveContainer::tRectangle)
+    else if(typeTwo == ito::PrimitiveContainer::tLine && 
+            typeOne == ito::PrimitiveContainer::tPoint)
     {
         lineDirVector = cv::Vec3f(second[5] - second[2], second[6] - second[3], second[7] - second[4]);
         linePosVector = cv::Vec3f(second[2], second[3], second[4]);
@@ -706,28 +717,34 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
         return false;
     }
 
-    ito::float32 lambda = (pointPosVector.dot(lineDirVector) - lineDirVector.dot(linePosVector) /  lineDirVector.dot(lineDirVector)); 
+    ito::float32 lambda = 0.0;
 
-    pointDirVector = (lambda * lineDirVector + linePosVector) - pointPosVector;
+    lambda = (pointPosVector - linePosVector).dot(lineDirVector) / lineDirVector.dot(lineDirVector);
+    
+    cv::Vec3f temp = pointPosVector - (linePosVector + lambda * lineDirVector);
 
-    distance = (sqrt(pow(pointDirVector[0],2) + pow(pointDirVector[1],2) + pow(pointDirVector[2],2)) * sqrt(pow(pointDirVector[0],2) + pow(pointDirVector[1],2) + pow(pointDirVector[2],2)));
+    distance = sqrt(temp.dot(temp));
+
     return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
 {
-    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & 0x0000FFFF);
+
+    switch(type)
     {
-        radius = first[5];
-        return true;
+        case ito::PrimitiveContainer::tCircle:
+            radius = first[5];
+            return true;
+        case ito::PrimitiveContainer::tEllipse:
+            radius = (first[5] +  first[6])/2;   
+            return true;
+        default:
+            radius = std::numeric_limits<ito::float32>::signaling_NaN();
+            return false;
     }
-    else if((ito::uint32)(first[1]) == ito::PrimitiveContainer::tEllipse)
-    {
-        radius = (first[5] +  first[6])/2;   
-        return true;
-    }
-    radius = std::numeric_limits<ito::float32>::signaling_NaN();
     return false;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -747,52 +764,49 @@ bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area)
 {
-    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tRectangle)
-    {
-        area = abs((first[5] - first[2]) * (first[6] - first[3]));
-        return true;
-    }
-    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tSquare)
-    {
-        area = (first[5] * first[5]);
-        return true;
-    }
-    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
-    {
-        area = (first[5] * first[5])* GEO_PI;
-        return true;
-    }
-    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tEllipse)
-    {
-        area = (first[5] * first[6])* GEO_PI;
-        return true;
-    }
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & 0x0000FFFF);
 
-    area = std::numeric_limits<ito::float32>::signaling_NaN();
+    switch(type)
+    {
+        case ito::PrimitiveContainer::tRectangle:
+            area = abs((first[5] - first[2]) * (first[6] - first[3]));
+            return true;
+        case ito::PrimitiveContainer::tSquare:
+            area = (first[5] * first[5]);
+            return true;
+        case ito::PrimitiveContainer::tCircle:
+            area = (first[5] * first[5])* GEO_PI;
+            return true;
+        case ito::PrimitiveContainer::tEllipse:
+            area = (first[5] * first[6])* GEO_PI;
+            return true;
+        default:
+            area = std::numeric_limits<ito::float32>::signaling_NaN();
+            return false;
+    }
 
     return false;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &length)
 {
-    if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tRectangle)
-    {
-        length = abs( 2 * (first[5] - first[2])) + abs (2 * (first[6] - first[3])); 
-        return true;
-    }
-    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tSquare)
-    {
-        length = 4 * first[5];
-        return true;
-    }
-    else if(((ito::uint32)(first[1]) & 0x0000FFFF) == ito::PrimitiveContainer::tCircle)
-    {
-        length =  2 * first[5] * GEO_PI;
-        return true;
-    }
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & 0x0000FFFF);
 
-    length = std::numeric_limits<ito::float32>::signaling_NaN();
-
+    switch(type)
+    {
+        case ito::PrimitiveContainer::tRectangle:
+            length = abs( 2 * (first[5] - first[2])) + abs (2 * (first[6] - first[3])); 
+            return true;
+        case ito::PrimitiveContainer::tSquare:
+            length = 4 * first[5];
+            return true;
+        case ito::PrimitiveContainer::tCircle:
+            length =  2 * first[5] * GEO_PI;
+            return true;
+        default:
+            length = std::numeric_limits<ito::float32>::signaling_NaN();
+            return false;
+    }
     return false;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -972,7 +986,7 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
                     if(!found && (((ito::int32)(srcPtr[1]) & 0x0000FFFF)!= 0))
                     {
                         geometricPrimitives newVal;
-                        std::fill(newVal.cells, newVal.cells + PRIM_ELEMENTLENGTH, 0);
+                        std::fill(newVal.cells, newVal.cells + PRIM_ELEMENTLENGTH, 0.0f);
                         changed = true;
                         memcpy(newVal.cells, srcPtr, sizeof(ito::float32) * cols);
 
@@ -1009,7 +1023,7 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
         for(int dcnt = 0; dcnt < hashTags.size(); dcnt++)
         {
             srcPtr = scrMat->ptr<ito::float32>(dcnt);
-            std::fill(m_rowHash[hashTags[dcnt]].cells, m_rowHash[hashTags[dcnt]].cells + PRIM_ELEMENTLENGTH, 0);
+            std::fill(m_rowHash[hashTags[dcnt]].cells, m_rowHash[hashTags[dcnt]].cells + PRIM_ELEMENTLENGTH, 0.0f);
             memcpy(m_rowHash[hashTags[dcnt]].cells, srcPtr, sizeof(ito::float32) * cols);
             setPrimitivElement(dcnt, true, m_rowHash[hashTags[dcnt]].cells);
         }
@@ -1043,7 +1057,7 @@ ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx,const ito::int32
     {        
         if((ito::int32)m_rowHash[idx].cells[1] ==  flags)
         {  
-            std::fill(&(m_rowHash[idx].cells[2]), m_rowHash[idx].cells + PRIM_ELEMENTLENGTH, 0);
+            std::fill(&(m_rowHash[idx].cells[2]), m_rowHash[idx].cells + PRIM_ELEMENTLENGTH, 0.0f);
             memcpy(&(m_rowHash[idx].cells[2]), values.data(), sizeof(ito::float32) * std::min(values.size(), PRIM_ELEMENTLENGTH -2));
             setPrimitivElement(m_rowHash.keys().indexOf(idx), true, m_rowHash[idx].cells);
         }

@@ -100,16 +100,19 @@ void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
             m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
                 QPen(QBrush(markerColor), 3),  QSize(7,7) ));
     }
-    setPen(QColor(lineColor));
+    setPen(QColor(lineColor), 1.0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setShape(const QPainterPath &path)
 {
     QwtPlotMarker *marker = NULL;
-    if (path.elementCount() <= 0)
+    int numOfElements = path.elementCount();
+
+    if (numOfElements <= 0)
         return;
     
     QwtPlotShapeItem::setShape(path);
+    
     if (m_marker.size() > 0)
     {
 
@@ -122,7 +125,7 @@ void DrawItem::setShape(const QPainterPath &path)
         m_marker.clear();
     }
     //if (path.length() >= 1) // len gives the physical length, not the number of elements!!!
-    if (path.elementCount() >= 1)
+    if (numOfElements >= 1)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
@@ -152,13 +155,13 @@ void DrawItem::setShape(const QPainterPath &path)
 
             case PlotCanvas::tEllipse:
                 //if (path.length() >= 7) // len gives the physical length, not the number of elements!!!
-                if (path.elementCount() >= 7)
+                if (numOfElements >= 7)
                 {
                     el = path.elementAt(6);
                     x1 = el.x;
                 }
                 //if (path.length() >= 10) // len gives the physical length, not the number of elements!!!
-                if (path.elementCount() >= 10)
+                if (numOfElements >= 10)
                 {
                     el = path.elementAt(9);
                     y1 = el.y;
@@ -175,7 +178,7 @@ void DrawItem::setShape(const QPainterPath &path)
 //        m_active = 1;
     }
     //if (path.length() >= 2) // len gives the physical length, not the number of elements!!!
-    if (path.elementCount() >= 2)
+    if (numOfElements >= 2)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
@@ -202,7 +205,7 @@ void DrawItem::setShape(const QPainterPath &path)
 
             case PlotCanvas::tRect:
                 //if (path.length() >= 3) // len gives the physical length, not the number of elements!!!
-                if (path.elementCount() >= 3)
+                if (numOfElements >= 3)
                 {
                     el = path.elementAt(2);
                     x2 = el.x;
@@ -214,7 +217,7 @@ void DrawItem::setShape(const QPainterPath &path)
                 el = path.elementAt(0);
                 x2 = el.x;
                 //if (path.length() >= 4) // len gives the physical length, not the number of elements!!!
-                if (path.elementCount() >= 4)
+                if (numOfElements >= 4)
                 {
                     el = path.elementAt(3);
                     y2 = el.y;
