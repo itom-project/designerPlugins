@@ -1336,3 +1336,45 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
 
     return m_pContent->getDisplayed();
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom2dQwtPlot::getSelectedElement(void)const
+{
+    QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
+    for (;it != m_data.m_pDrawItems.end(); it++)        
+    {
+        if(it.value() != NULL && it.value()->selected() != 0)
+        { 
+            return it.value()->m_idx;
+        }
+    }
+    return -1;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setSelectedElement(const int idx)
+{
+    bool replot = false;
+    bool failed = idx == -1 ? false : true;
+    QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
+    for (;it != m_data.m_pDrawItems.end(); it++)        
+    {
+        if(it.value() != NULL && it.value()->m_idx == idx)
+        {
+            it.value()->setSelected(true);
+            failed = false;
+            continue;
+        }
+        if(it.value() != NULL && (it.value()->m_active != 0 || it.value()->selected()))
+        { 
+            it.value()->m_active = 0;
+            it.value()->setActive(0);
+            it.value()->setSelected(false);
+        }
+    }
+
+    if(m_pContent)
+    {
+        if(replot) m_pContent->replot();
+        if(failed) emit m_pContent->statusBarMessage(tr("Could not set active element, index out of range."), 12000 );
+    }
+    return;
+}

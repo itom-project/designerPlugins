@@ -24,6 +24,8 @@
 #define PLOTCANVAS_H
 
 #include "common/sharedStructures.h"
+#include "common/sharedStructuresPrimitives.h"
+
 #include "DataObject/dataobj.h"
 
 #include "dataObjItem.h"
@@ -64,7 +66,8 @@ class PlotCanvas : public QwtPlot
 {
     Q_OBJECT
     public:
-        enum tState { 
+        enum tState 
+        { 
             tIdle = 0, 
             tZoom = 1, 
             tValuePicker = 2, 
@@ -72,13 +75,14 @@ class PlotCanvas : public QwtPlot
             tLineCut = 4, 
             tStackCut = 5, 
             tMultiPointPick = 6, 
-            tPoint = 101, 
-            tLine = 102, 
-            tRect = 103, 
-//            tSquare = 104,
-            tEllipse = 105, 
-//            tCircle = 106, 
-            tPolygon = 110 };
+            tPoint = ito::PrimitiveContainer::tPoint, 
+            tLine = ito::PrimitiveContainer::tLine, 
+            tRect = ito::PrimitiveContainer::tRectangle, 
+//            tSquare = ito::PrimitiveContainer::tSquare,
+            tEllipse = ito::PrimitiveContainer::tEllipse, 
+//            tCircle = ito::PrimitiveContainer::tCircle, 
+            tPolygon = ito::PrimitiveContainer::tPolygon
+        };
 
         enum ComplexType { 
             Abs = 0, 

@@ -36,9 +36,12 @@ class DrawItem : public QwtPlotShapeItem
         explicit DrawItem(QwtPlot *parent, char type, const int id = 0, const QString &title = QString::null);
         virtual ~DrawItem();
         void setRect(const QRectF &);
-        void setShape( const QPainterPath & );
+        void setShape( const QPainterPath & , const QColor &, const QColor &);
         void setActive(int active);
         void setColor(const QColor &markerColor, const QColor &lineColor);
+        
+        void setSelected(const bool selected);
+        bool selected() const;
 
         QVector<QwtPlotMarker *> m_marker;
         double x1, y1, x2, y2;
@@ -61,6 +64,8 @@ class DrawItem : public QwtPlotShapeItem
         QBrush m_markerBrush;
         QPen m_linePen;
         QwtPlot *m_pparent;
+
+        bool m_selected;
 
     signals:
 

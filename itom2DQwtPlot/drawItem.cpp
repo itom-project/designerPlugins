@@ -21,7 +21,7 @@
  *********************************************************************** */
 
 #include "drawItem.h"
-#include "plotCanvas.h"
+#include "common/sharedStructuresPrimitives.h"
 
 #include <qwt_symbol.h>
 
@@ -29,8 +29,9 @@ QVector<int> DrawItem::idxVec;
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &title) : m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1), m_autoColor(true),
-    x2(-1), y2(-1)
+    x2(-1), y2(-1), m_selected(false)
 {
+
     if (id <= 0)
     {
         int idxCtr = 0;
@@ -60,25 +61,41 @@ DrawItem::~DrawItem()
     m_marker.clear();
     idxVec.remove(idxVec.indexOf(m_idx));
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setSelected(const bool selected)
+{
+    m_selected = selected;
+    setPen(pen().color(), m_selected ? 3 : 1);
+    return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool DrawItem::selected() const
+{
+    return m_selected;
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setActive(int active)
 {
+    QColor markerColor = Qt::green;
+    if(m_marker.size()) markerColor = m_marker[0]->linePen().color();
+
     for (int n = 0; n < m_marker.size(); n++)
-        m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
-            QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+        m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(markerColor),
+            QPen(QBrush(markerColor), 3),  QSize(7,7) ));
 
     if (active == 1)
     {
         if (m_marker.size() >= 1)
-            m_marker[0]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
-                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+            m_marker[0]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
+                QPen(QBrush(markerColor), 3),  QSize(7,7) ));
     }
     else if (active == 2)
     {
         if (m_marker.size() >= 2)
-            m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
-                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+            m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
+                QPen(QBrush(markerColor), 3),  QSize(7,7) ));
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -100,10 +117,10 @@ void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
             m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
                 QPen(QBrush(markerColor), 3),  QSize(7,7) ));
     }
-    setPen(QColor(lineColor), 1.0);
+    setPen(QColor(lineColor), m_selected ? 3 : 1);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setShape(const QPainterPath &path)
+void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, const QColor &secondColor)
 {
     QwtPlotMarker *marker = NULL;
     int numOfElements = path.elementCount();
@@ -111,6 +128,8 @@ void DrawItem::setShape(const QPainterPath &path)
     if (numOfElements <= 0)
         return;
     
+    setPen(firstColor);
+
     QwtPlotShapeItem::setShape(path);
     
     if (m_marker.size() > 0)
@@ -129,11 +148,11 @@ void DrawItem::setShape(const QPainterPath &path)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
-        if (((PlotCanvas*)m_pparent)->m_inverseColor1.isValid())
+        if (secondColor.isValid())
         {
-            marker->setLinePen(QPen(((PlotCanvas*)m_pparent)->m_inverseColor1));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
-                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7,7) ));
+            marker->setLinePen(QPen(secondColor));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(secondColor),
+                QPen(QBrush(secondColor), 3),  QSize(7,7) ));
         }
         else
         {
@@ -145,15 +164,15 @@ void DrawItem::setShape(const QPainterPath &path)
         switch (m_type)
         {
             default:
-            case PlotCanvas::tPoint:
-            case PlotCanvas::tLine:
-            case PlotCanvas::tRect:
+            case ito::PrimitiveContainer::tPoint:
+            case ito::PrimitiveContainer::tLine:
+            case ito::PrimitiveContainer::tRectangle:
                 el = path.elementAt(0);
                 x1 = el.x;
                 y1 = el.y;
             break;
 
-            case PlotCanvas::tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
                 //if (path.length() >= 7) // len gives the physical length, not the number of elements!!!
                 if (numOfElements >= 7)
                 {
@@ -182,11 +201,11 @@ void DrawItem::setShape(const QPainterPath &path)
     {
         QPainterPath::Element el;
         marker = new QwtPlotMarker();
-        if (((PlotCanvas*)m_pparent)->m_inverseColor1.isValid())
+        if (secondColor.isValid())
         {
-            marker->setLinePen(QPen(((PlotCanvas*)m_pparent)->m_inverseColor1));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1),
-                QPen(QBrush(((PlotCanvas*)m_pparent)->m_inverseColor1), 3),  QSize(7, 7) ));
+            marker->setLinePen(QPen(secondColor));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(secondColor),
+                QPen(QBrush(secondColor), 3),  QSize(7, 7) ));
         }
         else
         {
@@ -197,13 +216,13 @@ void DrawItem::setShape(const QPainterPath &path)
         switch (m_type)
         {
             default:
-            case PlotCanvas::tLine:
+            case ito::PrimitiveContainer::tLine:
                 el = path.elementAt(1);
                 x2 = el.x;
                 y2 = el.y;
             break;
 
-            case PlotCanvas::tRect:
+            case ito::PrimitiveContainer::tRectangle:
                 //if (path.length() >= 3) // len gives the physical length, not the number of elements!!!
                 if (numOfElements >= 3)
                 {
@@ -213,7 +232,7 @@ void DrawItem::setShape(const QPainterPath &path)
                 }
             break;
 
-            case PlotCanvas::tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
                 el = path.elementAt(0);
                 x2 = el.x;
                 //if (path.length() >= 4) // len gives the physical length, not the number of elements!!!

@@ -56,6 +56,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker)
+    Q_PROPERTY(int selectedGeometrie READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -74,6 +75,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
     Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
+    Q_CLASSINFO("prop://selectedGeometrie", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -153,6 +155,9 @@ public:
 
     bool getEnabledCenterMarker(void) const {return m_data.m_showCenterMarker;}
     void setEnabledCenterMarker(const bool &enabled);
+
+    int getSelectedElement(void) const;
+    void setSelectedElement(const int idx);
 
     friend class PlotCanvas;
 
