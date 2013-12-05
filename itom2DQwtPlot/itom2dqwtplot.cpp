@@ -21,8 +21,8 @@
 *********************************************************************** */
 
 #include "itom2dqwtplot.h"
-#include "userInteractionPlotPicker.h"
-#include "multiPointPickerMachine.h"
+#include "plot/userInteractionPlotPicker.h"
+#include "plot/multiPointPickerMachine.h"
 
 #include <qwidgetaction.h>
 #include <qfiledialog.h>
@@ -1361,10 +1361,12 @@ void Itom2dQwtPlot::setSelectedElement(const int idx)
         {
             it.value()->setSelected(true);
             failed = false;
+            replot = true;
             continue;
         }
         if(it.value() != NULL && (it.value()->m_active != 0 || it.value()->selected()))
         { 
+            replot = true;
             it.value()->m_active = 0;
             it.value()->setActive(0);
             it.value()->setSelected(false);

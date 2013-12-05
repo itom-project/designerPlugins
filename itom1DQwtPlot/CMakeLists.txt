@@ -87,9 +87,9 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
 	${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/drawItem.h
+    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.h
+    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.h
+    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.h
 )
 
 QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
@@ -119,9 +119,9 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/drawItem.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.

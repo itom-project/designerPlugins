@@ -62,7 +62,7 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount WRITE setGeometricElementsCount DESIGNABLE false)
     Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
-
+    Q_PROPERTY(int selectedGeometrie READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -129,6 +129,9 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         bool getEnabledPlotting(void) const {return m_data.m_enablePlotting;}
         void setEnabledPlotting(const bool &enabled);
+
+        int getSelectedElement(void) const;
+        void setSelectedElement(const int idx);
 
         friend class Plot1DWidget;
 

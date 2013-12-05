@@ -29,7 +29,7 @@
 #include "qnumeric.h"
 
 #include "common/sharedStructuresPrimitives.h"
-#include "multiPointPickerMachine.h"
+#include "plot/multiPointPickerMachine.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -717,6 +717,8 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
                 it.value()->m_active = 1;
                 m_activeDrawItem = it.value()->m_idx;
                 it.value()->setActive(1);
+                it.value()->setSelected(true);
+                it++;
                 break;
             }
             else if (fabs(transform(QwtPlot::xBottom, it.value()->x2) - canxpos) < 10
@@ -725,10 +727,13 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
                 it.value()->m_active = 2;
                 m_activeDrawItem = it.value()->m_idx;
                 it.value()->setActive(2);
+                it.value()->setSelected(true);
+                it++;
                 break;
             }
             else
             {
+                it.value()->setSelected(false);
                 it.value()->setActive(0);
             }
         }
@@ -740,7 +745,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
             {
                 continue;
             }
-
+            it.value()->setSelected(false);
             it.value()->setActive(0);
         }
         replot();
@@ -850,7 +855,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                     case tPoint:
                         path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                         path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
-                        it.value()->setShape(*path);
+                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
@@ -882,7 +887,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                             path->moveTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                             path->lineTo(it.value()->x2, it.value()->y2);                        
                         }
-                        it.value()->setShape(*path);
+                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
@@ -904,7 +909,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         path->addRect(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos),
                             it.value()->x2 - invTransform(QwtPlot::xBottom, canxpos),
                             it.value()->y2 - invTransform(QwtPlot::yLeft, canypos));
-                        it.value()->setShape(*path);
+                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
@@ -927,7 +932,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                             invTransform(QwtPlot::yLeft, canypos),
                              it.value()->x2 - invTransform(QwtPlot::xBottom, canxpos),
                              it.value()->y2 - invTransform(QwtPlot::yLeft, canypos));
-                        it.value()->setShape(*path);
+                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
@@ -972,7 +977,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                             path->lineTo(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
                         }
 
-                        it.value()->setShape(*path);
+                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if(p) emit p->plotItemChanged(n);
                         replot();
@@ -995,7 +1000,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                         path->addRect(it.value()->x1, it.value()->y1,
                             invTransform(QwtPlot::xBottom, canxpos) - it.value()->x1,
                             invTransform(QwtPlot::yLeft, canypos) - it.value()->y1);
-                        it.value()->setShape(*path);
+                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if(p) emit p->plotItemChanged(n);
                         replot();
@@ -1020,7 +1025,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                             it.value()->y1,
                             (invTransform(QwtPlot::xBottom, canxpos)- it.value()->x1),
                             (invTransform(QwtPlot::yLeft, canypos) - it.value()->y1)),
-                        it.value()->setShape(*path);
+                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if(p) emit p->plotItemChanged(n);
                         replot();
@@ -1117,7 +1122,11 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
                 emit p->plotItemChanged(it.value()->m_idx, type, values);
 
             }
-            if(it.value()) it.value()->m_active = 0;
+            if(it.value())
+            {
+                it.value()->m_active = 0;
+                it.value()->setActive(0);
+            }
         }
     }
     else if(m_pData->m_state == statePicker)
@@ -1949,7 +1958,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                         path->moveTo(polygonScale[i].x(), polygonScale[i].y());
                         path->lineTo(polygonScale[i].x(), polygonScale[i].y());
 
-                        newItem->setShape(*path);
+                        newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
 
                         if(this->m_inverseColor0.isValid())
                         {
@@ -1961,6 +1970,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                         newItem->setVisible(true);
                         newItem->show();
                         newItem->attach(this);
+                        newItem->setSelected(true);
                         
     //                m_pData->m_pDrawItems.append(newItem);
                         m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
@@ -2013,18 +2023,12 @@ void Plot1DWidget::multiPointActivated (bool on)
                 path->moveTo(polygonScale[0].x(), polygonScale[0].y());
                 path->lineTo(polygonScale[1].x(), polygonScale[1].y());
 
-                newItem->setShape(*path);
-
-                if(this->m_inverseColor0.isValid())
-                {
-                    newItem->setPen(QPen(m_inverseColor0));
-                    //newItem->setBrush(QBrush(m_inverseColor0));
-                }
-                else newItem->setPen(QPen(Qt::green));
+                newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
 
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
+                newItem->setSelected(true);
                 replot();
                 m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);                
 //                m_pData->m_pDrawItems.append(newItem);
@@ -2090,18 +2094,12 @@ void Plot1DWidget::multiPointActivated (bool on)
                 path->addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
                               polygonScale[1].y() - polygonScale[0].y());
 
-                newItem->setShape(*path);
-
-                if(this->m_inverseColor0.isValid())
-                {
-                    newItem->setPen(QPen(m_inverseColor0));
-                    //newItem->setBrush(QBrush(m_inverseColor0));
-                }
-                else newItem->setPen(QPen(Qt::green));
+                newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
                 
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
+                newItem->setSelected(true);
                 replot();
                 m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
 //                m_pData->m_pDrawItems.append(newItem);
@@ -2166,7 +2164,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 path->addEllipse(polygonScale[0].x(), polygonScale[0].y(),
                         (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
-                newItem->setShape(*path);
+                newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
                 
                 if(this->m_inverseColor0.isValid())
                 {
@@ -2178,6 +2176,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
+                newItem->setSelected(true);
                 replot();
                 m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
 //                m_pData->m_pDrawItems.append(newItem);
@@ -2317,7 +2316,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
                 }                    
                 if (m_pData->m_pDrawItems.contains((int)ids[i]))
                 {
-                    m_pData->m_pDrawItems[(int)ids[i]]->setShape(path);
+                    m_pData->m_pDrawItems[(int)ids[i]]->setShape(path, m_inverseColor0, m_inverseColor1);
                 }
                 else
                 {
@@ -2345,18 +2344,12 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
                     }
                     if (newItem)
                     {
-                        newItem->setShape(path);
-                        
-                        if(this->m_inverseColor0.isValid())
-                        {
-                            newItem->setPen(QPen(m_inverseColor0));
-//                            newItem->setBrush(QBrush(m_inverseColor0));
-                        }
-                        else newItem->setPen(QPen(Qt::green));
+                        newItem->setShape(path, m_inverseColor0, m_inverseColor1);
                         
                         newItem->setVisible(true);
                         newItem->show();
                         newItem->attach(this);
+                        newItem->setSelected(true);
                         replot();
                         //                m_pData->m_pDrawItems.append(newItem);
                         m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);

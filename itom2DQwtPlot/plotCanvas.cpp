@@ -29,9 +29,9 @@
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
 #include "valuePicker2d.h"
-#include "multiPointPickerMachine.h"
-#include "userInteractionPlotPicker.h"
-#include "drawItem.h"
+#include "plot/multiPointPickerMachine.h"
+#include "plot/userInteractionPlotPicker.h"
+#include "plot/drawItem.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>

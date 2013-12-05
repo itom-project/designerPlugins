@@ -50,8 +50,8 @@
 
 #include "valuepicker1d.h"
 
-#include "userInteractionPlotPicker.h"
-#include "drawItem.h"
+#include "plot/userInteractionPlotPicker.h"
+#include "plot/drawItem.h"
 
 class Itom1DQwtPlot;
 
