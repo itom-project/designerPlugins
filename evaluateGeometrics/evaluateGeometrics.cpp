@@ -86,7 +86,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actUpdate->setToolTip(tr("Force update of this table."));
 
     //m_actAutoFitCols
-    m_actAutoFitCols = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("auto-scale columns"), this);
+    m_actAutoFitCols = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("auto-scale columns"), this);
     m_actAutoFitCols->setObjectName("actAutoFitCols");
     m_actAutoFitCols->setToolTip(tr("Adapts columns to idle width."));
 
@@ -709,7 +709,9 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
     if(m_pContent)
     {
         m_pContent->updateRelationShips(false);
+        m_pContent->expandAll();
     }
+
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------

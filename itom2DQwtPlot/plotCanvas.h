@@ -74,7 +74,7 @@ class PlotCanvas : public QwtPlot
             tPan = 3, 
             tLineCut = 4, 
             tStackCut = 5, 
-            tMultiPointPick = 6, 
+            tMultiPointPick = ito::PrimitiveContainer::tMultiPointPick, 
             tPoint = ito::PrimitiveContainer::tPoint, 
             tLine = ito::PrimitiveContainer::tLine, 
             tRect = ito::PrimitiveContainer::tRectangle, 
@@ -175,7 +175,7 @@ class PlotCanvas : public QwtPlot
         QColor m_inverseColor0, m_inverseColor1;
         int m_activeDrawItem;
 
-
+        QVector<ito::uint16> m_drawedIemsIndexes;
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);

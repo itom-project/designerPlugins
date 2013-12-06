@@ -25,6 +25,7 @@
 
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
+#include "common/sharedStructuresPrimitives.h"
 
 #include <qwidget.h>
 #include <qstring.h>
@@ -67,14 +68,14 @@ class Plot1DWidget : public QwtPlot
             stateIdle   = 0, 
             statePanner = 1, 
             stateZoomer = 2, 
-            statePicker = 3, 
-            tPoint      = 101, 
-            tLine       = 102, 
-            tRect       = 103, 
-//            tSquare   = 104,
-            tEllipse    = 105, 
-//            tCircle   = 106, 
-            tPolygon    = 110
+            statePicker = 3,             
+			tPoint = ito::PrimitiveContainer::tPoint, 
+            tLine = ito::PrimitiveContainer::tLine, 
+            tRect = ito::PrimitiveContainer::tRectangle, 
+//            tSquare = ito::PrimitiveContainer::tSquare,
+            tEllipse = ito::PrimitiveContainer::tEllipse, 
+//            tCircle = ito::PrimitiveContainer::tCircle, 
+            tPolygon = ito::PrimitiveContainer::tPolygon
         };
 
         Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
@@ -138,6 +139,8 @@ class Plot1DWidget : public QwtPlot
         QList<QwtPlotCurve*> m_plotCurveItems;
 
         QwtPlotGrid *m_pPlotGrid;
+
+        QVector<ito::uint16> m_drawedIemsIndexes;
 
         QByteArray m_hash; //hash of recently loaded dataObject
 
