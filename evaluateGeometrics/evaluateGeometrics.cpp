@@ -74,11 +74,13 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actAddRel = new QAction(QIcon(":/evaluateGeometrics/icons/addRel.png"), tr("add relation"), this);
     m_actAddRel->setObjectName("actAddRelation");
     m_actAddRel->setToolTip(tr("Add a further relation to this table or fix a defect one."));
+    m_actAddRel->setVisible(false);
 
-    //m_actAddRel
+    //m_actRemoveRel
     m_actRemoveRel = new QAction(QIcon(":/evaluateGeometrics/icons/remRel.png"), tr("remove relation"), this);
     m_actRemoveRel->setObjectName("actRemoveRelation");
     m_actRemoveRel->setToolTip(tr("Remove a relation from the table."));
+    m_actRemoveRel->setVisible(false);
 
     //m_actUpdate
     m_actUpdate = new QAction(QIcon(":/itomDesignerPlugins/general/icons/upDate.png"), tr("update relation"), this);
