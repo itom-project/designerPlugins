@@ -1764,6 +1764,8 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
     {
         if (start)
         {
+
+            maxNrOfPoints = 2;
             setState(tRect);
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
@@ -1807,6 +1809,8 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
     {
         if (start)
         {
+            maxNrOfPoints = 2;
+
             setState(tEllipse);
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
@@ -2049,7 +2053,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);                
 //                m_pData->m_pDrawItems.append(newItem);
 
-                m_drawedIemsIndexes << newItem->m_idx;
+                m_drawedIemsIndexes.append(newItem->m_idx);
 
                 // if further elements are needed reset the plot engine and go ahead else finish editing
                 if(m_pData && (m_pData->m_elementsToPick > 1))
@@ -2075,18 +2079,17 @@ void Plot1DWidget::multiPointActivated (bool on)
                     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
                     if (p)
                     {
-                        polygonScale.clear();
-                        polygonScale.reserve(m_drawedIemsIndexes.size() * 4);
+                        QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
                         for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
                         {
                             if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                            polygonScale.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tLine));
-                            polygonScale.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
-                            polygonScale.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
-                            polygonScale.append(QPointF(0.0, 0.0));
+                            destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tLine));
+                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
+                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
+                            destPolygon.append(QPointF(0.0, 0.0));
                         }
                         m_drawedIemsIndexes.clear();
-                        emit p->userInteractionDone(ito::PrimitiveContainer::tLine, aborted, polygonScale);
+                        emit p->userInteractionDone(ito::PrimitiveContainer::tLine, aborted, destPolygon);
                         emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
 
                         
@@ -2101,6 +2104,8 @@ void Plot1DWidget::multiPointActivated (bool on)
         case tRect:
             if (!on)
             {
+                
+
                 QPolygon polygon = m_pMultiPointPicker->selection();
 
                 QPolygonF polygonScale;
@@ -2142,7 +2147,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
 //                m_pData->m_pDrawItems.append(newItem);
 
-                m_drawedIemsIndexes << newItem->m_idx;
+                m_drawedIemsIndexes.append(newItem->m_idx);
 
                 // if further elements are needed reset the plot engine and go ahead else finish editing
                 if(m_pData && (m_pData->m_elementsToPick > 1))
@@ -2168,19 +2173,18 @@ void Plot1DWidget::multiPointActivated (bool on)
                     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
                     if (p)
                     {
-                        polygonScale.clear();
-                        polygonScale.reserve(m_drawedIemsIndexes.size() * 4);
+                        QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
                         for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
                         {
                             if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                            polygonScale.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tRectangle));
-                            polygonScale.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
-                            polygonScale.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
-                            polygonScale.append(QPointF(0.0, 0.0));
+                            destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tRectangle));
+                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
+                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
+                            destPolygon.append(QPointF(0.0, 0.0));
                         }
                         m_drawedIemsIndexes.clear();
 
-                        emit p->userInteractionDone(ito::PrimitiveContainer::tRectangle, aborted, polygonScale);
+                        emit p->userInteractionDone(ito::PrimitiveContainer::tRectangle, aborted, destPolygon);
                         emit p->plotItemsFinished(ito::PrimitiveContainer::tRectangle, aborted);
                     }
                     setState(stateIdle);
@@ -2240,7 +2244,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
 //                m_pData->m_pDrawItems.append(newItem);
 
-                m_drawedIemsIndexes << newItem->m_idx;
+                m_drawedIemsIndexes.append(newItem->m_idx);
 
                 // if further elements are needed reset the plot engine and go ahead else finish editing
                 if(m_pData && (m_pData->m_elementsToPick > 1))
@@ -2266,19 +2270,18 @@ void Plot1DWidget::multiPointActivated (bool on)
                     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
                     if (p)
                     {
-                        polygonScale.clear();
-                        polygonScale.reserve(m_drawedIemsIndexes.size() * 4);
+                        QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
                         for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
                         {
                             if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                            polygonScale.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tEllipse));
-                            polygonScale.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
-                            polygonScale.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
-                            polygonScale.append(QPointF(0.0, 0.0));
+                            destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tEllipse));
+                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
+                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
+                            destPolygon.append(QPointF(0.0, 0.0));
                         }
                         m_drawedIemsIndexes.clear();
 
-                        emit p->userInteractionDone(ito::PrimitiveContainer::tEllipse, aborted, polygonScale);
+                        emit p->userInteractionDone(ito::PrimitiveContainer::tEllipse, aborted, destPolygon);
                         emit p->plotItemsFinished(ito::PrimitiveContainer::tEllipse, aborted);
                     }
                     setState(stateIdle);
