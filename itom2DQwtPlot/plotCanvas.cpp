@@ -1560,7 +1560,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
     {
         if (start)
         {
-            maxNrOfPoints = 2;
+            //maxNrOfPoints = 2;
             setState(tRect);
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
@@ -1604,7 +1604,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
     {
         if (start)
         {
-            maxNrOfPoints = 2;
+            //maxNrOfPoints = 2;
 
             setState(tEllipse);
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
@@ -1922,7 +1922,7 @@ void PlotCanvas::multiPointActivated (bool on)
                     MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                     if (m)
                     {
-                        m->setMaxNrItems( 2 );
+                        //m->setMaxNrItems( 2 );
                         m_pMultiPointPicker->setEnabled(true);
 
                         if(!aborted)
@@ -2011,7 +2011,7 @@ void PlotCanvas::multiPointActivated (bool on)
                     MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                     if (m)
                     {
-                        m->setMaxNrItems( 2 );
+                        //m->setMaxNrItems( 2 );
                         m_pMultiPointPicker->setEnabled(true);
 
                         if(!aborted)

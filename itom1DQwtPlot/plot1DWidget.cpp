@@ -1765,7 +1765,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
         if (start)
         {
 
-            maxNrOfPoints = 2;
+            //maxNrOfPoints = 2;
             setState(tRect);
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
@@ -1809,7 +1809,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
     {
         if (start)
         {
-            maxNrOfPoints = 2;
+            //maxNrOfPoints = 2;
 
             setState(tEllipse);
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
@@ -2156,7 +2156,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                     MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                     if (m)
                     {
-                        m->setMaxNrItems( 2 );
+                        //m->setMaxNrItems( 2 );
                         m_pMultiPointPicker->setEnabled(true);
 
                         if(!aborted)
@@ -2253,7 +2253,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                     MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                     if (m)
                     {
-                        m->setMaxNrItems( 2 );
+                        //m->setMaxNrItems( 2 );
                         m_pMultiPointPicker->setEnabled(true);
 
                         if(!aborted)
