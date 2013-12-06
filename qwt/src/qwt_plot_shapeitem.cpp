@@ -12,6 +12,7 @@
 #include "qwt_painter.h"
 #include "qwt_curve_fitter.h"
 #include "qwt_clipper.h"
+#include <limits>
 
 static QPainterPath qwtTransformPath( const QwtScaleMap &xMap,
         const QwtScaleMap &yMap, const QPainterPath &path, bool doAlign )

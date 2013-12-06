@@ -86,7 +86,6 @@ class Plot1DWidget : public QwtPlot
         bool m_showContextMenu;
         void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>() );
 
-        friend class Itom1DQwtPlot;
         ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);
 
         void setZoomerEnable(const bool checked);

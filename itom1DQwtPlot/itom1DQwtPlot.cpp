@@ -586,8 +586,6 @@ void Itom1DQwtPlot::mnuDrawMode(bool checked)
         m_pActZoomToRect->setChecked(false);
         m_pActMarker->setChecked(false);
         m_pContent->setZoomerEnable(false);
-
-        m_pContent->setState(
     }
     // we need to find out which draw mode we should activate here ...
 //    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::stateIdle);
