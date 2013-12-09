@@ -100,6 +100,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addSeparator();
     mainTb->addAction(m_pActMarker);
     mainTb->addAction(m_pActSetMarker);
+    mainTb->addSeparator();
     mainTb->addAction(m_pActDrawMode);
     mainTb->addAction(m_pActClearDrawings);
     // Add labels to toolbar
@@ -965,6 +966,19 @@ void Itom1DQwtPlot::mnuActRatio(bool checked)
 {
     m_data.m_keepAspect = checked;
     if(m_pContent) m_pContent->configRescaler();
+
+    if(m_pActZoomToRect->isChecked()) m_pActZoomToRect->setChecked(false);
+    if(m_pActPan->isChecked()) m_pActPan->setChecked(false);
+    
+    m_pActPan->setEnabled(!checked);
+    m_pActZoomToRect->setEnabled(!checked);
+
+    if(m_pContent)
+    {
+        m_pContent->m_pZoomer->zoom(0);
+        m_pContent->setState(Plot1DWidget::stateIdle);
+        m_pContent->configRescaler();
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )

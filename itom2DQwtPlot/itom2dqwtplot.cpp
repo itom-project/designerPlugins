@@ -120,6 +120,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActCntrMarker);
     mainTb->addAction(m_pActLineCut);
     mainTb->addAction(m_pActStackCut);
+    mainTb->addSeparator();
     mainTb->addAction(m_pActDrawMode);
     mainTb->addAction(m_pActClearDrawings);
     mainTb->addSeparator();
@@ -1288,7 +1289,19 @@ void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 void Itom2dQwtPlot::mnuActRatio(bool checked)
 {
     m_data.m_keepAspect = checked;
-    if(m_pContent) m_pContent->configRescaler();
+    
+    if(m_pActZoom->isChecked()) m_pActZoom->setChecked(false);
+    if(m_pActPan->isChecked()) m_pActPan->setChecked(false);
+    
+    m_pActPan->setEnabled(!checked);
+    m_pActZoom->setEnabled(!checked);
+
+    if(m_pContent)
+    {
+        m_pContent->m_pZoomer->zoom(0);
+        m_pContent->setState(PlotCanvas::tIdle);
+        m_pContent->configRescaler();
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resizeEvent ( QResizeEvent * event )
@@ -1380,3 +1393,4 @@ void Itom2dQwtPlot::setSelectedElement(const int idx)
     }
     return;
 }
+//----------------------------------------------------------------------------------------------------------------------------------

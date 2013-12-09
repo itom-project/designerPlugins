@@ -394,20 +394,6 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 m_pData->m_yaxisLabelDObj = "";
             }
 
-
-            //double aspRatio = (m_pData->m_xaxisMax - m_pData->m_xaxisMin) /  (m_pData->m_yaxisMax - m_pData->m_yaxisMin);
-
-            //aspRatio = aspRatio > 20 ? 20 : aspRatio < 0.05 ? 0.05 : aspRatio;
-
-            
-            if(m_pRescaler != NULL)
-            {
-                m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
-                m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
-            }
-            //m_pRescaler->setEnabled(m_pData->m_keepAspect);
-
-             
             m_pCenterMarker->setXValue(m_dObjPtr->getPixToPhys( dims-1, (width - 1)/ 2.0, valid));
             m_pCenterMarker->setYValue(m_dObjPtr->getPixToPhys( dims-2, (height - 1) / 2.0, valid));
         }
@@ -445,6 +431,18 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         //updateMarkerPosition(true);
 
         updateScaleValues(); //replot is done here
+
+        if(m_pRescaler != NULL)
+        {
+
+            QwtInterval curXInterVal = m_rasterData->interval( Qt::XAxis );
+            QwtInterval curYInterVal = m_rasterData->interval( Qt::YAxis );
+
+            m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
+            m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
+
+            if(m_pData->m_keepAspect)m_pRescaler->rescale();
+        }
 
         m_pZoomer->setZoomBase( true );
     }
@@ -2444,31 +2442,80 @@ void PlotCanvas::configRescaler(void)
 {
     if(m_pData->m_keepAspect)
     {
+
         int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
-        
+    
+        /*
+        QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
+        QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
+
+        QwtInterval userXInterVal = m_rasterData->interval( Qt::XAxis );
+        QwtInterval userYInterVal = m_rasterData->interval( Qt::YAxis );
+
+
+
+        if(curXInterVal.minValue() < userXInterVal.minValue())
+        {
+            curXInterVal.setMinValue(userXInterVal.minValue());
+        }
+
+        if(curXInterVal.maxValue() > userXInterVal.maxValue())
+        {
+            curXInterVal.setMaxValue(userXInterVal.maxValue());
+        }
+
+        if(curYInterVal.minValue() < userYInterVal.minValue())
+        {
+            curYInterVal.setMinValue(userYInterVal.minValue());
+        }
+
+        if(curYInterVal.maxValue() > userYInterVal.maxValue())
+        {
+            curYInterVal.setMaxValue(userYInterVal.maxValue());
+        }
+        */
         if(m_pRescaler == NULL)
         {
-            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fixed);
-            m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
-            m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
+
+            QwtInterval curXInterVal = m_rasterData->interval( Qt::XAxis );
+            QwtInterval curYInterVal = m_rasterData->interval( Qt::YAxis );
+
+            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
+            m_pRescaler->setEnabled(false);
+            m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
+            m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
+            m_pRescaler->setIntervalHint(QwtPlot::yRight, m_rasterData->interval(Qt::ZAxis));
             m_pRescaler->setAspectRatio(1.0);
+            m_pRescaler->setAspectRatio(QwtPlot::yRight, 0.0);
+            m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
+            m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+            m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
         }
         else
         {
             m_pRescaler->setReferenceAxis(refAxis);
         }
+
+        //m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
+        //m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
+
         m_pRescaler->setEnabled(true);
     }
     else
     {
         if(m_pRescaler != NULL)
         {
-            m_pRescaler->deleteLater();
-            m_pRescaler = NULL;
+            m_pRescaler->setEnabled(false);
+            //m_pRescaler->deleteLater();
+            //m_pRescaler = NULL;
         }
         
     }
-    replot();
+    if(m_pRescaler != NULL && m_pData->m_keepAspect)
+    {
+        m_pRescaler->rescale();
+    }
+    //replot();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)

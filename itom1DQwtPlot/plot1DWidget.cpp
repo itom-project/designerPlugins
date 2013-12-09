@@ -336,10 +336,13 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtPlotCurveDataObject *dObjCurve = NULL;
     bool _unused;
 
+    bool gotNewObject = false;
+
     //QString valueLabel, axisLabel, title;
 
     if (dataObj)
     {
+        gotNewObject = true;
         int dims = dataObj->getDims();
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dataObj->getSize(dims - 2) : 1;
@@ -503,6 +506,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         ito::DataObjectTagType tag;
         tag = dataObj->getTag("title", valid);
         m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
+
     } 
 
     updateLabels();
@@ -1630,17 +1634,27 @@ void Plot1DWidget::configRescaler(void)
 {
     if(m_pData->m_keepAspect)
     {
+        //int height = plotLayout()->canvasRect().height();
+        //int width = plotLayout()->canvasRect().width();
+
         int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
         
         if(m_pRescaler == NULL)
         {
-            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fixed);
-            //m_pRescaler->setIntervalHint(Qt::XAxis, m_rasterData->interval( Qt::XAxis ));
-            //m_pRescaler->setIntervalHint(Qt::YAxis, m_rasterData->interval( Qt::YAxis ));
+            QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
+            QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
+
+            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
+            m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
+            m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
             m_pRescaler->setAspectRatio(1.0);
+            m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
+            m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+            //m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
         }
         else
         {
+
             m_pRescaler->setReferenceAxis(refAxis);
         }
         m_pRescaler->setEnabled(true);
@@ -1649,12 +1663,17 @@ void Plot1DWidget::configRescaler(void)
     {
         if(m_pRescaler != NULL)
         {
-            m_pRescaler->deleteLater();
-            m_pRescaler = NULL;
+            m_pRescaler->setEnabled(false);
+            //m_pRescaler->deleteLater();
+            //m_pRescaler = NULL;
         }
         
     }
-    replot();
+    if(m_pRescaler != NULL && m_pData->m_keepAspect)
+    {
+        m_pRescaler->rescale();
+    }
+    //replot();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOfPoints)
