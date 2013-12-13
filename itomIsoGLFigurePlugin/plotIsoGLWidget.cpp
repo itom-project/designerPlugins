@@ -58,6 +58,8 @@ struct axislabel
     long maxlen;
 };
 
+extern int NTHREADS;
+
 //----------------------------------------------------------------------------------------------------------------------------------
 /** initialize openGL (below version two - i.e. using static pipelines)
 *	@param [in]	width	window width
@@ -162,11 +164,8 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
     move(0, 0);
     resize(100, 100);
-
     fmt.setDepth(0);
-
     m_myCharBitmapBuffer = 0;
-
     int ret = 0;
 
     lighDirAngles[0] = 0.0;
@@ -252,7 +251,6 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
         apiPaletteGetColorBarIdx((m_currentColor + 1) % numColBars, newPalette);
 
         m_currentPalette = newPalette.colorVector256;
-
     }
     else
     {
@@ -271,19 +269,14 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
         {
             m_currentPalette[i] = i + (i << 8) + (i << 16);
         }
-
     }
-
-
 
     makeCurrent();
 
     m_errorDisplMsg.clear();
     m_errorDisplMsg.append("No Data");
 
-
     /* Basic view coordinates */
-
     //RotA0 = -1.4;
     //RotB0 = -1.5;
     //RotC0 = 0.0;
@@ -292,9 +285,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_RotB = 1.571 + RotB0;
     m_RotC = 1.025 + RotC0;
 
-
     ret = initOGL2(width(), height());
-
     if(!ret)
         m_isInit = IS_INIT;
 
@@ -342,9 +333,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     glPixelTransferf(GL_ALPHA_BIAS,  1.0);
 
     glPixelTransferi(GL_MAP_COLOR, GL_TRUE);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Screen und Tiefenpuffer leeren
-
     glPixelTransferi(GL_MAP_COLOR, GL_FALSE);
 
     int paletteSize = m_currentPalette.size();
@@ -357,18 +346,24 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     }
     else
     {
-        src = new unsigned char[paletteSize * 4 *2];
+        src = new unsigned char[paletteSize * 4 * 2];
         unsigned char* ptrPal =  (unsigned char*)m_currentPalette.data();
+
+        #if (USEOMP)
+        #pragma omp parallel num_threads(NTHREADS)
+        {
+        #pragma omp for schedule(guided)
+        #endif
         for(int i = 0; i < paletteSize; i++)
         {
-            src[8*i] = ptrPal[4*paletteSize - 4 * i - 4];
-            src[8*i + 1] = ptrPal[4*paletteSize - 4 * i - 3];
-            src[8*i + 2] = ptrPal[4*paletteSize - 4 * i - 2];
-            src[8*i + 3] = 255;
-            src[8*i + 4] = ptrPal[4*paletteSize - 4 * i - 4];
-            src[8*i + 5] = ptrPal[4*paletteSize - 4 * i - 3];
-            src[8*i + 6] = ptrPal[4*paletteSize - 4 * i - 2];
-            src[8*i + 7] = 255;
+            src[8 * i] = ptrPal[4*paletteSize - 4 * i - 4];
+            src[8 * i + 1] = ptrPal[4*paletteSize - 4 * i - 3];
+            src[8 * i + 2] = ptrPal[4*paletteSize - 4 * i - 2];
+            src[8 * i + 3] = 255;
+            src[8 * i + 4] = ptrPal[4*paletteSize - 4 * i - 4];
+            src[8 * i + 5] = ptrPal[4*paletteSize - 4 * i - 3];
+            src[8 * i + 6] = ptrPal[4*paletteSize - 4 * i - 2];
+            src[8 * i + 7] = 255;
 /*
             src[8*i] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
             src[8*i+1] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
@@ -390,7 +385,11 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 */
 
         }
+        #if (USEOMP)
+        }
+        #endif
     }
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, paletteSize, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
 
     delete[] src;
@@ -653,18 +652,22 @@ void plotGLWidget::paintGL()
 template<typename _Type> inline ito::RetVal plotGLWidget::NormalizeObj(cv::Mat &scaledTopo, ito::float64 &normedInvalid)
 {
     ito::RetVal retVal(retOk);
-
-
     cv::Mat* topoMat = (cv::Mat*)(m_pContentWhileRastering->get_mdata()[0]);
     _Type *ptrTopo = (_Type*)topoMat->ptr(0);
     ito::float64* ptrScaledTopo = (ito::float64*)scaledTopo.ptr(0);
-
-    ito::float64 pixval = 0.0;
-
     ito::float64 norm = m_axisZ.phys[1] - m_axisZ.phys[0];
 
     if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
+    #if (USEOMP)
+    #pragma omp parallel num_threads(NTHREADS)
+    {
+    #endif
+    ito::float64 pixval = 0.0;
+
+    #if (USEOMP)
+    #pragma omp for schedule(guided)
+    #endif
     for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
     {
         ptrTopo = (_Type*)topoMat->ptr(cntY);
@@ -678,6 +681,9 @@ template<typename _Type> inline ito::RetVal plotGLWidget::NormalizeObj(cv::Mat &
             ptrScaledTopo[cntX] = pixval;
         }
     }
+    #if (USEOMP)
+    }
+    #endif
 
     // rescale the invalud value
     normedInvalid = (m_invalid - m_axisZ.phys[0]) / norm;
@@ -689,27 +695,32 @@ template<typename _Type> inline ito::RetVal plotGLWidget::NormalizeObj(cv::Mat &
 template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat &scaledTopo, ito::float64 &normedInvalid)
 {
     ito::RetVal retVal(retOk);
-
-
     cv::Mat* topoMat = (cv::Mat*)(m_pContentWhileRastering->get_mdata()[0]);
     ito::complex64 *ptrTopo = (ito::complex64*)topoMat->ptr(0);
-
     ito::float64* ptrScaledTopo = (ito::float64*)scaledTopo.ptr(0);
-
     ito::float64 norm = m_axisZ.phys[1] - m_axisZ.phys[0];
 
-    ito::float64 pixval = 0.0;
-
     if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
+
+    #if (USEOMP)
+    #pragma omp parallel num_threads(NTHREADS)
+    {
+    #endif
+
+    ito::float64 pixval = 0.0;
 
     switch(m_cmplxMode)
     {
         default:
         case 0:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex64*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = abs(ptrTopo[cntX]);
@@ -720,10 +731,14 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
             }
         break;
         case 1:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex64*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = ptrTopo[cntX].imag();
@@ -734,10 +749,14 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
             }
         break;
         case 2:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex64*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = ptrTopo[cntX].real();
@@ -748,10 +767,14 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
             }
         break;
         case 3:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex64*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = arg(ptrTopo[cntX]);
@@ -762,6 +785,10 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
             }
         break;
     }
+
+    #if (USEOMP)
+    }
+    #endif
 
     // rescale the invalud value
     normedInvalid = (m_invalid - m_axisZ.phys[0]) / norm;
@@ -773,26 +800,31 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
 template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Mat &scaledTopo, ito::float64 &normedInvalid)
 {
     ito::RetVal retVal(retOk);
-
-
     cv::Mat* topoMat = (cv::Mat*)(m_pContentWhileRastering->get_mdata()[0]);
     ito::complex128 *ptrTopo = (ito::complex128*)topoMat->ptr(0);
-
     ito::float64* ptrScaledTopo = (ito::float64*)scaledTopo.ptr(0);;
-
     ito::float64 norm = m_axisZ.phys[1] - m_axisZ.phys[0];
-    ito::float64 pixval = 0.0;
 
     if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
+    #if (USEOMP)
+    #pragma omp parallel num_threads(NTHREADS)
+    {
+    #endif
+
+    ito::float64 pixval = 0.0;
     switch(m_cmplxMode)
     {
         default:
         case 0:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex128*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = abs(ptrTopo[cntX]);
@@ -803,10 +835,14 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
             }
         break;
         case 1:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex128*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = ptrTopo[cntX].imag();
@@ -817,10 +853,14 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
             }
         break;
         case 2:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex128*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = ptrTopo[cntX].real();
@@ -831,10 +871,14 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
             }
         break;
         case 3:
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (int cntY = 0; cntY < scaledTopo.rows; cntY++)
             {
                 ptrTopo = (ito::complex128*)topoMat->ptr(cntY);
                 ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
+
                 for (int cntX = 0; cntX < scaledTopo.cols; cntX++)
                 {
                     pixval = arg(ptrTopo[cntX]);
@@ -845,6 +889,10 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
             }
         break;
     }
+
+    #if (USEOMP)
+    }
+    #endif
 
     // rescale the invalud value
     normedInvalid = (m_invalid - m_axisZ.phys[0]) / norm;
@@ -897,7 +945,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     }
 
     cv::Mat_<float64> scaledTopo(ysizeObj, xsizeObj);
-
     ito::float64 invalidValue = m_invalid;
 
     switch(m_pContentWhileRastering->getType())
@@ -961,7 +1008,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
 
     m_NumElements = 0;
 
-    int count = 0;
+    int totCount = 0;
 
     ito::float64 xshift = m_windowXScale * xsizeObj / 2.0;
     ito::float64 yshift = m_windowYScale * ysizeObj / 2.0;
@@ -971,14 +1018,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     int cntX;
     bool isFinite = false;
 
-    GLfloat Vec1[3];
-    GLfloat Vec2[3];
-
-    ito::float64 color = 0.0;
-    ito::float64 zsum = 0.0;
-    ito::float64 dpixel1;
-    ito::float64 dpixel2;
-    ito::float64 dpixel3;
     ito::float64 Schwelle = 1.0;
     ito::float64 ZScale = 1.0;
 
@@ -1079,10 +1118,28 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
             }
         }
     }
+
+    #if (USEOMP)
+    #pragma omp parallel num_threads(NTHREADS)
+    {
+    #endif
+    ito::float64 color = 0.0;
+    ito::float64 zsum = 0.0;
+    ito::float64 dpixel1;
+    ito::float64 dpixel2;
+    ito::float64 dpixel3;
+    int count = 0;
+
+    GLfloat Vec1[3];
+    GLfloat Vec2[3];
+
     if(!retVal.containsError())
     {
         if(m_elementMode == PAINT_POINTS)
         {
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (cntY = 0; cntY < ysizeObj -1; cntY++)
             {
                 ptrScaledTopoNext = (ito::float64*)scaledTopo.ptr(cntY);
@@ -1090,17 +1147,22 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                 for (cntX = 0; cntX < xsizeObj - 1; cntX++)
                 {
                     dpixel1 = ptrScaledTopoNext[cntX];
-
-
                     if ((fabs(color - dpixel1) < Schwelle) && ito::dObjHelper::isFinite<ito::float64>(dpixel1) && (dpixel1 != invalidValue))
                     {
-                        m_pPoints[count*3] = ((double)(cntX) * m_windowXScale - xshift);
-                        m_pPoints[count*3+1] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pPoints[count*3+2] = ZScale * dpixel1 - zshift;
+                        #if (USEOMP)
+                        #pragma omp critical 
+                        {
+                        #endif
+                        count = totCount++;
+                        m_NumElements++;
+                        #if (USEOMP)
+                        }
+                        #endif
+                        m_pPoints[count * 3] = ((double)(cntX) * m_windowXScale - xshift);
+                        m_pPoints[count * 3 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
+                        m_pPoints[count * 3 + 2] = ZScale * dpixel1 - zshift;
 
                         m_pColIndices[count] = cv::saturate_cast<unsigned char>(dpixel1*255.0);
-                        m_NumElements++;
-                        count++;
                     }
                 }
             }
@@ -1109,6 +1171,9 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
         {
             ptrScaledTopoNext = (ito::float64*)scaledTopo.ptr(0);
 
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
             for (cntY = 0; cntY < ysizeObj -1; cntY++)
             {
                 ptrScaledTopo = ptrScaledTopoNext;
@@ -1117,10 +1182,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                 for (cntX = 0; cntX < xsizeObj - 1; cntX++)
                 {
                     dpixel1 = ptrScaledTopoNext[cntX];
-
                     dpixel2 = ptrScaledTopo[cntX + 1];
-
-
                     dpixel3 = ptrScaledTopo[cntX];
 
                     if(ito::dObjHelper::isFinite<ito::float64>(dpixel1) && ito::dObjHelper::isFinite<ito::float64>(dpixel2) && ito::dObjHelper::isFinite<ito::float64>(dpixel2))
@@ -1138,40 +1200,45 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                     if ((fabs(color - dpixel1) < Schwelle) && (fabs(color - dpixel2) < Schwelle) && (fabs(color - dpixel3) < Schwelle)
                         && /*(fabs(dpixel1) < 1.6e308)*/ isFinite && (dpixel1 != invalidValue) && (dpixel2 != invalidValue) && (dpixel3 != invalidValue))
                     {
-                        m_pTriangles[count*9] = ((double)(cntX) * m_windowXScale - xshift);
-                        m_pTriangles[count*9+1] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pTriangles[count*9+2] = ZScale * dpixel1 - zshift;
+                        #if (USEOMP)
+                        #pragma omp critical 
+                        {
+                        #endif
+                        count = totCount++;
+                        m_NumElements++;
+                        #if (USEOMP)
+                        }
+                        #endif
+                        m_pTriangles[count * 9] = ((double)(cntX) * m_windowXScale - xshift);
+                        m_pTriangles[count * 9 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
+                        m_pTriangles[count * 9 + 2] = ZScale * dpixel1 - zshift;
 
-                        m_pTriangles[count*9+3] = ((double)(cntX + 1) * m_windowXScale - xshift);
-                        m_pTriangles[count*9+4] = ((double)(cntY) * m_windowYScale - yshift);
-                        m_pTriangles[count*9+5] = ZScale * dpixel2 - zshift;
+                        m_pTriangles[count * 9 + 3] = ((double)(cntX + 1) * m_windowXScale - xshift);
+                        m_pTriangles[count * 9 + 4] = ((double)(cntY) * m_windowYScale - yshift);
+                        m_pTriangles[count * 9 + 5] = ZScale * dpixel2 - zshift;
 
-                        m_pTriangles[count*9+6] = ((double)(cntX) * m_windowXScale - xshift);
-                        m_pTriangles[count*9+7] = ((double)(cntY) * m_windowYScale - yshift);
-                        m_pTriangles[count*9+8] = ZScale * dpixel3 - zshift;
+                        m_pTriangles[count * 9 + 6] = ((double)(cntX) * m_windowXScale - xshift);
+                        m_pTriangles[count * 9 + 7] = ((double)(cntY) * m_windowYScale - yshift);
+                        m_pTriangles[count * 9 + 8] = ZScale * dpixel3 - zshift;
 
                         for (int n=0;n<3;n++)
                         {
-                            Vec1[n] = m_pTriangles[count*9+3+n] - m_pTriangles[count*9+n];
-                            Vec2[n] = m_pTriangles[count*9+6+n] - m_pTriangles[count*9+n];
+                            Vec1[n] = m_pTriangles[count * 9 + 3 + n] - m_pTriangles[count * 9 + n];
+                            Vec2[n] = m_pTriangles[count * 9 + 6 + n] - m_pTriangles[count * 9 + n];
                         }
 
-                        m_pNormales[count*9+6] = m_pNormales[count*9+3] = m_pNormales[count*9] = (Vec1[1] * Vec2[2] - Vec1[2] * Vec2[1]);
-                        m_pNormales[count*9+7] = m_pNormales[count*9+4] = m_pNormales[count*9+1] = (Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2]);
-                        m_pNormales[count*9+8] = m_pNormales[count*9+5] = m_pNormales[count*9+2] = (Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0]);
+                        m_pNormales[count * 9 + 6] = m_pNormales[count * 9 + 3] = m_pNormales[count * 9] = (Vec1[1] * Vec2[2] - Vec1[2] * Vec2[1]);
+                        m_pNormales[count * 9 + 7] = m_pNormales[count * 9 + 4] = m_pNormales[count * 9 + 1] = (Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2]);
+                        m_pNormales[count * 9 + 8] = m_pNormales[count * 9 + 5] = m_pNormales[count * 9 + 2] = (Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0]);
 
                         m_pColIndices[count * 3] = cv::saturate_cast<unsigned char>(dpixel1 * 255.0);
                         m_pColIndices[count * 3 + 1] = cv::saturate_cast<unsigned char>(dpixel2 * 255.0);
                         m_pColIndices[count * 3 + 2] = cv::saturate_cast<unsigned char>(dpixel3 * 255.0);
-
-                        m_NumElements++;
-                        count++;
                     }
-
 
                     dpixel1 = ptrScaledTopoNext[cntX];
                     dpixel2 = ptrScaledTopoNext[cntX + 1];
-                    dpixel3 = ptrScaledTopo[cntX+1];
+                    dpixel3 = ptrScaledTopo[cntX + 1];
 
                     if(ito::dObjHelper::isFinite<ito::float64>(dpixel1) && ito::dObjHelper::isFinite<ito::float64>(dpixel2) && ito::dObjHelper::isFinite<ito::float64>(dpixel3))
                     {
@@ -1188,40 +1255,47 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                     if ((fabs(color - dpixel1) < Schwelle) && (fabs(color - dpixel2) < Schwelle) && (fabs(color - dpixel3) < Schwelle)
                         && isFinite /*(fabs(dpixel1) < 1.6e308)*/ && (dpixel1 != invalidValue) && (dpixel2 != invalidValue) && (dpixel3 != invalidValue))
                     {
-
-                        m_pTriangles[count*9] = ((double)(cntX) * m_windowXScale - xshift);
-                        m_pTriangles[count*9+1] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pTriangles[count*9+2] = ZScale * dpixel1 - zshift;
-
-                        m_pTriangles[count*9+3] = ((double)(cntX + 1) * m_windowXScale - xshift);
-                        m_pTriangles[count*9+4] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pTriangles[count*9+5] = ZScale * dpixel2 - zshift;
-
-                        m_pTriangles[count*9+6] = ((double)(cntX + 1) * m_windowXScale - xshift);
-                        m_pTriangles[count*9+7] = ((double)(cntY) * m_windowYScale - yshift);
-                        m_pTriangles[count*9+8] = ZScale * dpixel3 - zshift;
-
-                        for (int n=0;n<3;n++)
+                        #if (USEOMP)
+                        #pragma omp critical 
                         {
-                            Vec1[n] = m_pTriangles[count*9+3+n] - m_pTriangles[count*9+n];
-                            Vec2[n] = m_pTriangles[count*9+6+n] - m_pTriangles[count*9+n];
+                        #endif
+                        count = totCount++;
+                        m_NumElements++;
+                        #if (USEOMP)
                         }
-                        m_pNormales[count*9+6] = m_pNormales[count*9+3] = m_pNormales[count*9] = Vec1[1] * Vec2[2] - Vec1[2] * Vec2[1];
-                        m_pNormales[count*9+7] = m_pNormales[count*9+4] = m_pNormales[count*9+1] = Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2];
-                        m_pNormales[count*9+8] = m_pNormales[count*9+5] = m_pNormales[count*9+2] = Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0];
+                        #endif
+                        m_pTriangles[count * 9] = ((double)(cntX) * m_windowXScale - xshift);
+                        m_pTriangles[count * 9 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
+                        m_pTriangles[count * 9 + 2] = ZScale * dpixel1 - zshift;
+
+                        m_pTriangles[count * 9 + 3] = ((double)(cntX + 1) * m_windowXScale - xshift);
+                        m_pTriangles[count * 9 + 4] = ((double)(cntY + 1) * m_windowYScale - yshift);
+                        m_pTriangles[count * 9 + 5] = ZScale * dpixel2 - zshift;
+
+                        m_pTriangles[count * 9 + 6] = ((double)(cntX + 1) * m_windowXScale - xshift);
+                        m_pTriangles[count * 9 + 7] = ((double)(cntY) * m_windowYScale - yshift);
+                        m_pTriangles[count * 9 + 8] = ZScale * dpixel3 - zshift;
+
+                        for (int n = 0; n < 3; n++)
+                        {
+                            Vec1[n] = m_pTriangles[count * 9 + 3 + n] - m_pTriangles[count * 9 + n];
+                            Vec2[n] = m_pTriangles[count * 9 + 6 + n] - m_pTriangles[count * 9 + n];
+                        }
+                        m_pNormales[count * 9 + 6] = m_pNormales[count * 9 + 3] = m_pNormales[count * 9] = Vec1[1] * Vec2[2] - Vec1[2] * Vec2[1];
+                        m_pNormales[count * 9 + 7] = m_pNormales[count * 9 + 4] = m_pNormales[count * 9 + 1] = Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2];
+                        m_pNormales[count * 9 + 8] = m_pNormales[count * 9 + 5] = m_pNormales[count * 9 + 2] = Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0];
 
                         m_pColIndices[count * 3] = cv::saturate_cast<unsigned char>(dpixel1 * 255.0);
                         m_pColIndices[count * 3 + 1] = cv::saturate_cast<unsigned char>(dpixel2 * 255.0);
                         m_pColIndices[count * 3 + 2] = cv::saturate_cast<unsigned char>(dpixel3 * 255.0);
-
-                        m_NumElements++;
-                        count++;
                     }
                 }
             }
         }
-
     }
+    #if (USEOMP)
+    }
+    #endif
 
     if (m_NumElements == 0 || retVal.containsError())
     {
@@ -1257,7 +1331,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     }
     else
     {
-
         if(m_elementMode == PAINT_POINTS)
         {
             m_pColIndices = static_cast<unsigned char *>(realloc(m_pColIndices, m_NumElements*sizeof(unsigned char)));
@@ -1273,9 +1346,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
         }
 
         ResetColors();
-
         m_errorDisplMsg.clear();
-
         m_isInit &= ~IS_CALCTRIANG;
     }
 
@@ -1287,48 +1358,71 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscaleing, const double zscaleing)
 {
-    long n, m;
-    double Vec1[3], Vec2[3];
-
-
     if(m_elementMode == PAINT_POINTS)
     {
         if(!m_pPoints)
             return;
 
-        for (n = 0; n < m_NumElements; n++)
+        #if (USEOMP)
+        #pragma omp parallel num_threads(NTHREADS)
         {
-            m_pPoints[n*3] *= xscaleing;
-            m_pPoints[n*3+1] *= yscaleing;
-            m_pPoints[n*3+2] *= zscaleing;
-        }
+        #endif
 
+        double Vec1[3], Vec2[3];
+
+        #if (USEOMP)
+        #pragma omp for schedule(guided)
+        #endif
+        for (ito::int32 n = 0; n < (ito::int32)m_NumElements; n++)
+        {
+            m_pPoints[n * 3] *= xscaleing;
+            m_pPoints[n * 3 + 1] *= yscaleing;
+            m_pPoints[n * 3 + 2] *= zscaleing;
+        }
+        #if (USEOMP)
+        }
+        #endif
     }
     else
     {
         if(!m_pTriangles || !m_pNormales)
             return;
 
-        for (n = 0; n < m_NumElements*3; n++)
+        #if (USEOMP)
+        #pragma omp parallel num_threads(NTHREADS)
         {
-            m_pTriangles[n*3] *= xscaleing;
-            m_pTriangles[n*3+1] *= yscaleing;
-            m_pTriangles[n*3+2] *= zscaleing;
+        #endif
+
+        double Vec1[3], Vec2[3];
+
+        #if (USEOMP)
+        #pragma omp for schedule(guided)
+        #endif
+        for (ito::int32 n = 0; n < (ito::int32)(m_NumElements * 3); n++)
+        {
+            m_pTriangles[n * 3] *= xscaleing;
+            m_pTriangles[n * 3 + 1] *= yscaleing;
+            m_pTriangles[n * 3 + 2] *= zscaleing;
         }
 
-        for ( n = 0; n < m_NumElements ; n++)
+        #if (USEOMP)
+        #pragma omp for schedule(guided)
+        #endif
+        for (ito::int32 n = 0; n < (ito::int32)m_NumElements; n++)
         {
-            for (m=0;m<3;m++)
+            for (ito::int32 m = 0; m < 3; m++)
             {
-                Vec1[m] = m_pTriangles[n*9+3+m] - m_pTriangles[n*9+m];
-                Vec2[m] = m_pTriangles[n*9+6+m] - m_pTriangles[n*9+m];
+                Vec1[m] = m_pTriangles[n * 9 + 3 + m] - m_pTriangles[n * 9 + m];
+                Vec2[m] = m_pTriangles[n * 9 + 6 + m] - m_pTriangles[n * 9 + m];
             }
-            m_pNormales[n*9+6] = m_pNormales[n*9+3] = m_pNormales[n*9] = Vec1[1] * Vec2[2] - Vec1[2] * Vec2[1];
-            m_pNormales[n*9+7] = m_pNormales[n*9+4] = m_pNormales[n*9+1] = Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2];
-            m_pNormales[n*9+8] = m_pNormales[n*9+5] = m_pNormales[n*9+2] = Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0];
+            m_pNormales[n * 9 + 6] = m_pNormales[n * 9 + 3] = m_pNormales[n * 9] = Vec1[1] * Vec2[2] - Vec1[2] * Vec2[1];
+            m_pNormales[n * 9 + 7] = m_pNormales[n * 9 + 4] = m_pNormales[n * 9 + 1] = Vec1[2] * Vec2[0] - Vec1[0] * Vec2[2];
+            m_pNormales[n * 9 + 8] = m_pNormales[n * 9 + 5] = m_pNormales[n * 9 + 2] = Vec1[0] * Vec2[1] - Vec1[1] * Vec2[0];
         }
+        #if (USEOMP)
+        }
+        #endif
     }
-
 
     ResetColors();
 
@@ -1344,7 +1438,6 @@ void plotGLWidget::paintEvent(QPaintEvent * /*pevent*/)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::refreshPlot(ito::ParamBase *param)
 {
-
     int ret = 0;
     int width = this->width();
     int height = this->height();
@@ -1366,7 +1459,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         m_errorDisplMsg.append("Currently rendering");
         return;
     }
-
 
     if ((param != NULL) && (param->getType() == (ito::Param::DObjPtr & ito::paramTypeMask)))
     {
@@ -1430,7 +1522,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
                 m_axisY.phys[1] = tempVal;
             }
 
-
             m_protocol.text = m_pContent->getTag("protocol", test).getVal_ToString();
 
             m_axisX.label = m_pContent->getAxisDescription(dims - 1, test);
@@ -1474,7 +1565,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         double windowXScaleOld = m_windowXScale;
         double windowYScaleOld = m_windowYScale;
         double windowZScaleOld = m_windowZScale;
-
 
         ito::uint32 firstMin[3];
         ito::uint32 firstMax[3];

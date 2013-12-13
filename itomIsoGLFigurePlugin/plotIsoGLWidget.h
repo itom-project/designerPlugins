@@ -44,6 +44,11 @@
 
 //#include "valuepicker2d.h"
 
+#ifdef USEOPENMP
+    #define USEOMP 1
+#else
+    #define USEOMP 0
+#endif
 
 struct axisProperties
 {
