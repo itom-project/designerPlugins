@@ -147,8 +147,6 @@ class itom2DGVFigure : public ito::AbstractDObjFigure
         void mnuZoomer(bool checked);
         void mnuExport();
         void mnuSwitchColorMode(QAction *action);
-
-        
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

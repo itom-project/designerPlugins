@@ -99,9 +99,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
-   
     public:
-
         friend class GL3DEFilter;
 
 #if(CONNEXION_ENABLE)
@@ -216,7 +214,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 		void mnuCmplxSwitch(QAction *action);
         void mnuTringModeSwitch(QAction *action);
         //void mnuZoomer(bool checked);
-        void mnuExport();
+        void mnuActSave();
         //void mnuSwitchColorMode(QAction *action);
 
 /*

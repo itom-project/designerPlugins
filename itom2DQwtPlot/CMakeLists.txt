@@ -67,7 +67,6 @@ LINK_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}/../../DataObject
 	${CMAKE_CURRENT_SOURCE_DIR}/..
     ${OpenCV_DIR}/lib
-#	${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/glew/lib
 )
 
 INCLUDE(${QT_USE_FILE})

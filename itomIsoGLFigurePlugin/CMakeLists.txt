@@ -133,6 +133,7 @@ IF(GLEW_FOUND)
     
     
     set(designer_rcc
+		${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.qrc
     )
     

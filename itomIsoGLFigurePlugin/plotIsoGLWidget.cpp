@@ -477,8 +477,10 @@ void plotGLWidget::paintGL()
 
     makeCurrent();
 
+    glViewport(0, 0, (GLsizei)this->width(), (GLsizei)this->height());				//Window resizen
+    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
+
     m_ticklength = (int)(sqrt(winSizeX * winSizeX + winSizeY * winSizeY) * 10/1000); //tut
-//	dd->ticklength = sqrt(2.0)/100.0;
 
     glMatrixMode(GL_MODELVIEW);					//Projektionsmatrix wählen
     glLoadIdentity();
@@ -496,11 +498,6 @@ void plotGLWidget::paintGL()
         m_isInit &= ~IS_RENDERING;
         return;
     }
-
-
-    //	glTranslatef(0, 0, -2);
-//	glTranslated(TransX, TransY+(double)psize/dd->win->ysize, TransZ);
-
 
     glTranslated(m_TransX, m_TransY, m_TransZ);
     glRotated(m_RotA/PI*180.0, 1.0f, 0.0f, 0.0f);
@@ -554,22 +551,13 @@ void plotGLWidget::paintGL()
         glDisable(GL_NORMALIZE);
     }
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, (GLsizei)this->width(), (GLsizei)this->height());				//Window resizen
-    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
 
-    if(m_protocol.show) glTranslatef(0.0, 0.7 * (double) m_protocol.m_psize / winSizeY, 0.0);
-    else glTranslatef(0.0, 0.0, 0.0);
-
-    glMatrixMode(GL_MODELVIEW);
-
-
-
-//	glEnableClientState(GL_COLOR_ARRAY);
-
-    //glColorPointer(4, GL_FLOAT, 0, ColTriangles);
-
+    if(m_protocol.show) 
+        glTranslatef(0.0, 0.7 * (double) m_protocol.m_psize / winSizeY, 0.0);
+    else 
+        glTranslatef(0.0, 0.0, 0.0);
 
     if(m_elementMode == PAINT_POINTS)
     {
@@ -578,14 +566,6 @@ void plotGLWidget::paintGL()
 
         glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_pColTriangles);
         glDrawArrays(GL_POINTS, 0, m_NumElements);
-
-       // GLfloat test[6] = {0.5f, 0.0f, 0.0f, 0.1f, 0.1f, 0.1f};
-       // GLubyte col[8] = {255, 0, 255, 255, 255, 0, 0, 255};
-        //
-        //glVertexPointer(3, GL_FLOAT, 0, &test);
-        //glColorPointer(4, GL_UNSIGNED_BYTE, 0, &col);
-        //
-        //glDrawArrays(GL_POINTS, 0, 2);
     }
     else
     {
@@ -610,21 +590,20 @@ void plotGLWidget::paintGL()
 
     threeDAxis();
 
-    glMatrixMode(GL_PROJECTION);
+//    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-//	glViewport(0, 0, this->width(), this->height());				//Window resizen
     gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
-    glMatrixMode(GL_MODELVIEW);
+//    glMatrixMode(GL_MODELVIEW);
 
     if (m_drawTitle)
-    {	/* noobjinfo */
+    {	// noobjinfo
 //		setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
         //int yused;
         int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
     }
 
-    if(m_protocol.show) /* protocol */
+    if(m_protocol.show) // protocol
     {
 //		setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
         //DrawProtocol(dd, dd->gy1, fo->args[27].s, (int)fo->args[28].d);

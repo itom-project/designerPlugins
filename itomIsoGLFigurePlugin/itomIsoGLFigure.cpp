@@ -25,6 +25,7 @@
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qimagewriter.h>
+#include <qfileinfo.h>
 
 //#include <GV_plot_renderer.h>
 
@@ -93,17 +94,18 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     //m_pContent->setFocus();
 
     //m_actHome
-    m_actHome = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/home.png"), tr("Home"), this);
+    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     m_actHome->setObjectName("actHome");
     m_actHome->setToolTip(tr("Reset original view"));
 
 	//m_actSave
-    m_actSave = new QAction(QIcon(":/itom2DQwtFigurePlugin/icons/filesave.png"), tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip(tr("Export current view"));
+    m_actSave->setVisible(true);
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/itomDesignerPlugins/general/icons/autoscal.png"), tr("Scale Settings"), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
     m_actScaleSetting->setToolTip(tr("Set the ranges and offsets oif this view"));
 
@@ -119,7 +121,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
 
     //m_actZoomToRect
     /*
-    m_actZoomToRect = new QAction(QIcon(":/matplotlibFigure/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
@@ -127,30 +129,30 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     */
     //m_actMarker
     /*
-    m_actMarker = new QAction(QIcon(":/matplotlibFigure/icons/marker.png"), tr("marker"), this);
+    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
     */
     //m_actLineCut
     /*
-    m_actLineCut = new QAction(QIcon(":/plots/icons/itom_icons/pntline.png"), tr("Linecut"), this);
+    m_actLineCut = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Linecut"), this);
     m_actLineCut->setCheckable(true);
     m_actLineCut->setObjectName("LineCut");
     m_actLineCut->setToolTip(tr("Show a in plane line cut"));
     */
     //m_actPalette
-    m_actPalette = new QAction(QIcon(":/plots/icons/itom_icons/color.png"), tr("Palette"), this);
+    m_actPalette = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"), tr("Palette"), this);
     m_actPalette->setObjectName("TogglePalette");
     m_actPalette->setToolTip(tr("Switch between color palettes"));
 
     //m_actToggleColorBar
-    m_actToggleColorBar = new QAction(QIcon(":/plots/icons/itom_icons/colorbar.png"), tr("Show Colorbar"), this);
+    m_actToggleColorBar = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"), tr("Show Colorbar"), this);
     m_actToggleColorBar->setObjectName("ShowColorBar");
     m_actToggleColorBar->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
 
     //m_actChangeBGColor
-    m_actChangeBGColor = new QAction(QIcon(":/plots/icons/itom_icons/blkorwht.png"), tr("Change Background Color"), this);
+    m_actChangeBGColor = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/blkorwht.png"), tr("Change Background Color"), this);
     m_actChangeBGColor->setObjectName("Change Background Color");
     m_actChangeBGColor->setToolTip(tr("Switch between the different background colors"));
 
@@ -211,8 +213,9 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actCmplxSwitch->setMenu(m_mnuCmplxSwitch);
     m_actCmplxSwitch->setVisible(false);
 
+    //m_actSave
     bool test;
-    test = connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
+    test = connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuActSave()));
     test = connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
 
     //test = connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
@@ -249,6 +252,8 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     contextMenu->addAction(toolbar->toggleViewAction());
 
     // next block is colorbar
+    toolbar->addAction(m_actSave);
+    toolbar->addAction(m_actHome);
     toolbar->addSeparator();
     toolbar->addAction(m_actPalette);
     toolbar->addAction(m_actToggleColorBar);
@@ -296,7 +301,6 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
 #endif
 
     m_pEventFilter = NULL;
-
     m_pEventFilter = new GL3DEFilter(this);
     installEventFilter(m_pEventFilter);
 
@@ -464,10 +468,10 @@ void ItomIsoGLWidget::mnuPalette()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomIsoGLWidget::mnuExport()
+void ItomIsoGLWidget::mnuActSave()
 {
 #ifndef QT_NO_PRINTER
-    QString fileName = "bode.pdf";
+    QString fileName = "bode.jpg";
 #else
     QString fileName = "bode.png";
 #endif
@@ -477,13 +481,13 @@ void ItomIsoGLWidget::mnuExport()
         QImageWriter::supportedImageFormats();
 
     QStringList filter;
-    filter += tr("PDF Documents (*.pdf)");
+//    filter += tr("PDF Documents (*.pdf)");
 #ifndef GV_NO_SVG
 #ifdef QT_SVG_LIB
     filter += tr("SVG Documents (*.svg)");
 #endif
 #endif
-    filter += tr("Postscript Documents (*.ps)");
+//    filter += tr("Postscript Documents (*.ps)");
 
     if (imageFormats.size() > 0)
     {
@@ -505,18 +509,18 @@ void ItomIsoGLWidget::mnuExport()
         filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
 #endif
 
-/*
+
     if (!fileName.isEmpty())
     {
-        GVPlotRenderer renderer;
+        QImage img = this->m_pContent->grabFrameBuffer();
 
         // flags to make the document look like the widget
-        renderer.setDiscardFlag(GVPlotRenderer::DiscardBackground, false);
-        renderer.setLayoutFlag(GVPlotRenderer::KeepFrames, true);
+//        renderer.setDiscardFlag(GVPlotRenderer::DiscardBackground, false);
+//        renderer.setLayoutFlag(GVPlotRenderer::KeepFrames, true);
 
-        renderer.renderDocument(((plotGLWidget*)m_pContent), fileName, QSizeF(300, 200), 85);
+//        renderer.renderDocument(((plotGLWidget*)m_pContent), fileName, QSizeF(300, 200), 85);
+        img.save(fileName, QFileInfo(fileName).completeSuffix().toAscii().data(), 100);
     }
-*/
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
