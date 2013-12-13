@@ -508,22 +508,29 @@ void plotGLWidget::paintGL()
 
     if (m_colorMode == 0 && m_elementMode == PAINT_TRIANG)
     {
-        GLfloat ambient[4]={0.0, 0.0, 0.0, 1.0};
-        GLfloat diffuse[4]={1.0, 1.0, 1.0, 1.0};
-        GLfloat specular[4]={1.0, 1.0, 1.0, 1.0};
-        GLfloat emission[4]={0.0, 0.0, 0.0, 1.0};
-        GLfloat position[4]={1.0, 1.0, 1.0, 0.0};
+        GLfloat ambientLS[4] = {0.2f, 0.2f, 0.2f, 1.0f};
+        GLfloat diffuseLS[4] = {0.3f, 0.3f, 0.3f, 1.0f};
+        GLfloat specularLS[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+        GLfloat positionLS[4] = {1.0f, 1.0f, 1.0f, 0.0f};
+        GLfloat directionLS[3] = {0.0f, 0.0f, 1.0f};
+
+        GLfloat diffuseObj[4]={0.8f, 0.8f, 0.8f, 1.0f};
+        GLfloat specularObj[4]={0.03f, 0.03f, 0.03f, 1.0f};
+        GLfloat emissionObj[4]={0.0f, 0.0f, 0.0f, 1.0f};
         double norm;
 
-        position[0] = cos(lighDirAngles[0]);
-        position[1] = sin(lighDirAngles[0]);
-        position[2] = tan(lighDirAngles[1]);
+        positionLS[0] = cos(lighDirAngles[0]);
+        positionLS[1] = sin(lighDirAngles[0]);
+        positionLS[2] = tan(lighDirAngles[1]);
 
-        norm = sqrt((position[0]*position[0]) + (position[1]*position[1]) + (position[2]*position[2]));
-        position[0] /= norm * 1;
-        position[1] /= norm * 1;
-        position[2] /= norm * -20;
+        norm = sqrt((positionLS[0] * positionLS[0]) + (positionLS[1] * positionLS[1]) + (positionLS[2] * positionLS[2]));
+        positionLS[0] /= norm * 1;
+        positionLS[1] /= norm * 1;
+        positionLS[2] /= norm * -20;
 //		position[2] *= 10;
+        directionLS[0] = 1.0f * positionLS[0];
+        directionLS[1] = 1.0f * positionLS[1];
+        directionLS[2] = 1.0f * positionLS[2];
 
         glEnable(GL_LIGHT0);
         glEnable(GL_LIGHTING);
@@ -531,14 +538,16 @@ void plotGLWidget::paintGL()
         glEnable(GL_COLOR_MATERIAL);
         glEnable(GL_NORMALIZE);
 
-        glLightfv(GL_LIGHT0, GL_POSITION, position);
-//		glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, position);
-        glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+        glLightfv(GL_LIGHT0, GL_POSITION, positionLS);
+    	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, directionLS);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLS);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLS);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specularLS);
 
-//		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission);
+        //glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emissionObj);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuseObj);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularObj);
 
         glEnableClientState(GL_NORMAL_ARRAY);
     }
@@ -572,7 +581,8 @@ void plotGLWidget::paintGL()
         glVertexPointer(3, GL_FLOAT, 0, m_pTriangles);
         glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_pColTriangles);
 
-        if (m_colorMode == 0) glNormalPointer (GL_FLOAT, 0, m_pNormales);
+        if (m_colorMode == 0) 
+            glNormalPointer (GL_FLOAT, 0, m_pNormales);
         glDrawArrays(GL_TRIANGLES, 0, m_NumElements * 3);
     }
 
@@ -1000,9 +1010,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     ito::float64 Schwelle = 1.0;
     ito::float64 ZScale = 1.0;
 
-    ito::float64 *ptrScaledTopo = NULL;
-    ito::float64 *ptrScaledTopoNext = NULL;
-
     if (m_pColTriangles != NULL)
     {
         free(m_pColTriangles);
@@ -1112,6 +1119,9 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     GLfloat Vec1[3];
     GLfloat Vec2[3];
 
+    ito::float64 *ptrScaledTopo = NULL;
+    ito::float64 *ptrScaledTopoNext = NULL;
+
     if(!retVal.containsError())
     {
         if(m_elementMode == PAINT_POINTS)
@@ -1148,14 +1158,14 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
         }
         else
         {
-            ptrScaledTopoNext = (ito::float64*)scaledTopo.ptr(0);
+            //ptrScaledTopoNext = (ito::float64*)scaledTopo.ptr(0);
 
             #if (USEOMP)
             #pragma omp for schedule(guided)
             #endif
             for (cntY = 0; cntY < ysizeObj -1; cntY++)
             {
-                ptrScaledTopo = ptrScaledTopoNext;
+                ptrScaledTopo = (ito::float64*)scaledTopo.ptr(cntY);
                 ptrScaledTopoNext = (ito::float64*)scaledTopo.ptr(cntY+1);
 
                 for (cntX = 0; cntX < xsizeObj - 1; cntX++)
@@ -1188,6 +1198,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                         #if (USEOMP)
                         }
                         #endif
+
                         m_pTriangles[count * 9] = ((double)(cntX) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
                         m_pTriangles[count * 9 + 2] = ZScale * dpixel1 - zshift;
@@ -1200,7 +1211,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                         m_pTriangles[count * 9 + 7] = ((double)(cntY) * m_windowYScale - yshift);
                         m_pTriangles[count * 9 + 8] = ZScale * dpixel3 - zshift;
 
-                        for (int n=0;n<3;n++)
+                        for (int n = 0; n < 3; n++)
                         {
                             Vec1[n] = m_pTriangles[count * 9 + 3 + n] - m_pTriangles[count * 9 + n];
                             Vec2[n] = m_pTriangles[count * 9 + 6 + n] - m_pTriangles[count * 9 + n];
@@ -1243,6 +1254,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                         #if (USEOMP)
                         }
                         #endif
+
                         m_pTriangles[count * 9] = ((double)(cntX) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
                         m_pTriangles[count * 9 + 2] = ZScale * dpixel1 - zshift;
@@ -1346,8 +1358,6 @@ void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscalei
         #pragma omp parallel num_threads(NTHREADS)
         {
         #endif
-
-        double Vec1[3], Vec2[3];
 
         #if (USEOMP)
         #pragma omp for schedule(guided)
@@ -1800,15 +1810,15 @@ ito::RetVal plotGLWidget::ResetColors()
         {
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColTriangles[count*12+8] = ((m_currentPalette[m_pColIndices[count * 3]]&0xFF0000L)>>16);
+                m_pColTriangles[count*12] = ((m_currentPalette[m_pColIndices[count * 3]]&0xFF0000L)>>16);
                 m_pColTriangles[count*12+4] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0xFF0000L)>>16);
-                m_pColTriangles[count*12] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0xFF0000L)>>16);
-                m_pColTriangles[count*12+9] = ((m_currentPalette[m_pColIndices[count * 3]]&0x00FF00L)>>8);
+                m_pColTriangles[count*12+8] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0xFF0000L)>>16);
+                m_pColTriangles[count*12+1] = ((m_currentPalette[m_pColIndices[count * 3]]&0x00FF00L)>>8);
                 m_pColTriangles[count*12+5] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0x00FF00L)>>8);
-                m_pColTriangles[count*12+1] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x00FF00L)>>8);
-                m_pColTriangles[count*12+10] = ((m_currentPalette[m_pColIndices[count * 3]]&0x0000FFL));
+                m_pColTriangles[count*12+9] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x00FF00L)>>8);
+                m_pColTriangles[count*12+2] = ((m_currentPalette[m_pColIndices[count * 3]]&0x0000FFL));
                 m_pColTriangles[count*12+6] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0x0000FFL));
-                m_pColTriangles[count*12+2] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x0000FFL));
+                m_pColTriangles[count*12+10] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x0000FFL));
                 m_pColTriangles[count*12+11] = m_pColTriangles[count*12+7] = m_pColTriangles[count*12+3] = 255;
             }
         }
@@ -1816,15 +1826,15 @@ ito::RetVal plotGLWidget::ResetColors()
         {
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColIndices[count*12+8] = m_pColIndices[count * 3];
+                m_pColIndices[count*12] = m_pColIndices[count * 3];
                 m_pColIndices[count*12+4] = m_pColIndices[count * 3 + 1];
-                m_pColIndices[count*12] = m_pColIndices[count * 3 + 2];
-                m_pColIndices[count*12+9] = m_pColIndices[count * 3];
+                m_pColIndices[count*12+8] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count*12+1] = m_pColIndices[count * 3];
                 m_pColIndices[count*12+5] = m_pColIndices[count * 3 + 1];
-                m_pColIndices[count*12+1] = m_pColIndices[count * 3 + 2];
-                m_pColIndices[count*12+10] = m_pColIndices[count * 3];
+                m_pColIndices[count*12+9] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count*12+2] = m_pColIndices[count * 3];
                 m_pColIndices[count*12+6] = m_pColIndices[count * 3 + 1];
-                m_pColIndices[count*12+2] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count*12+10] = m_pColIndices[count * 3 + 2];
 
                 m_pColIndices[count*12+11] = m_pColIndices[count*12+7] = m_pColIndices[count*12+3] = 255;
             }
