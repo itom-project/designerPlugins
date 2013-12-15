@@ -135,6 +135,16 @@ class plotGLWidget :  public QGLWidget
         void rotateView(const double deltaA, const double deltaB, const double deltaC){m_RotA +=deltaA; m_RotB += deltaB; m_RotC += deltaC;}
         void moveView(const double deltaX, const double deltaY, const double deltaZ){m_TransX +=deltaX; m_TransY += deltaY; m_TransZ += deltaZ;}
 
+        void setView(const double transX, const double transY, const double transZ, const double rotA, const double rotB, const double rotC)
+        {
+            m_TransX = transX; 
+            m_TransY = transY; 
+            m_TransZ = transZ;
+            m_RotA = rotA; 
+            m_RotB = rotB; 
+            m_RotC = rotC;
+        }
+
         ito::RetVal setColor(const int col);
 
         void enableInit() { if (!(m_isInit & -1)) m_isInit |= 1; }

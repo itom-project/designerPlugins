@@ -24,6 +24,8 @@
 #include "plot/userInteractionPlotPicker.h"
 #include "plot/multiPointPickerMachine.h"
 
+#include "../sharedFiles/dialogExportProperties.h"
+
 #include <qwidgetaction.h>
 #include <qfiledialog.h>
 #include <qimagewriter.h>
@@ -715,13 +717,51 @@ void Itom2dQwtPlot::mnuActSave()
 
     if (!fileName.isEmpty())
     {
+        bool abort = true;
+
+        QSizeF curSize = m_pContent->size();
+        int resolution = 300;
+
+        DialogExportProperties *dlg = new DialogExportProperties("", curSize, this);
+        if (dlg->exec() == QDialog::Accepted)
+        {
+            dlg->getData(curSize, resolution);
+
+            abort = false;
+        }
+
+        delete dlg;
+        dlg = NULL;
+
+        if(abort)
+        {
+            return;
+        }
+
+        QBrush curBrush = m_pContent->canvasBackground();
+
+        QPalette curPalette = m_pContent->palette();
+
+        m_pContent->setAutoFillBackground( true );
+        m_pContent->setPalette( Qt::white );
+        m_pContent->setCanvasBackground(Qt::white);	
+
+        m_pContent->replot();
+
         QwtPlotRenderer renderer;
 
         // flags to make the document look like the widget
         renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
         //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
-        renderer.renderDocument((m_pContent), fileName, QSizeF(300, 200), 85);
+        renderer.renderDocument((m_pContent), fileName, curSize, resolution);
+
+        m_pContent->setPalette( curPalette);
+        m_pContent->setCanvasBackground( curBrush);
+
+        m_pContent->replot();
+
+        
     }
 }
 

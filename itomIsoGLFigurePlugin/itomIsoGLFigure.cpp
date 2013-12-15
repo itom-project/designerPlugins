@@ -893,6 +893,13 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
         {
             switch(((const QKeyEvent *)e)->key())
             {
+                case Qt::Key_H:
+                {
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->setView(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                }
+                return true;
+                case Qt::Key_W:
                 case Qt::Key_Up:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(-0.05, 0.0, 0.0);
@@ -901,6 +908,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 
                 return true;
 
+                case Qt::Key_S:
                 case Qt::Key_Down:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.05, 0.0, 0.0);
@@ -909,6 +917,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 
                 return true;
 
+                case Qt::Key_D:
                 case Qt::Key_Right:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, 0.0, 0.05);
@@ -917,9 +926,22 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 
                 return true;
 
+                case Qt::Key_A:
                 case Qt::Key_Left:
                 {
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0, 0, -0.05);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, 0.0, -0.05);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                }
+
+                case Qt::Key_Q:
+                {
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, -0.05, 0.0);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                }
+
+                case Qt::Key_E:
+                {
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0,  0.05, 0.0);
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
                 }
                 

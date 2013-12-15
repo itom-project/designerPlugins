@@ -87,6 +87,7 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
 	${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.h
@@ -96,6 +97,7 @@ QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
 
 set(designer_ui
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
+     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
 )
 
 QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
@@ -119,6 +121,7 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.cpp
     ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.cpp
