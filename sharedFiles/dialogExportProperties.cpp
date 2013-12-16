@@ -88,10 +88,13 @@ void DialogExportProperties::updateOutPut()
     int index = ui.cB_ExpType->currentIndex();
 
     bool disable = index < 2;
-    ui.sB_destWidth->setEnabled(disable);
     ui.sB_destHeight->setEnabled(disable);
-    ui.dSB_destWidth->setEnabled(disable);
     ui.dSB_destHeight->setEnabled(disable);
+
+
+    disable = index < 1;
+    ui.sB_destWidth->setEnabled(disable);
+    ui.dSB_destWidth->setEnabled(disable);
 
     switch(index)
     {
@@ -198,11 +201,14 @@ void DialogExportProperties::on_dSB_destHeight_valueChanged(double input)
         m_skipMetricX = false;
         return;
     }
-
+    m_skipPixelX = true;
     ui.sB_destHeight->setValue(input * ui.sB_destRolution->value() / 25.4);
 
-    m_skipPixelX = true;
-
+    if(ui.cB_ExpType->currentIndex() == 1)
+    {
+        ui.dSB_destWidth->setValue( ui.dSB_destHeight->value() * m_aspect);
+    }
+    
     return;
 }
 //-----------------------------------------------------------------------------------------------
@@ -213,11 +219,9 @@ void DialogExportProperties::on_dSB_destWidth_valueChanged(double input)
         m_skipMetricY = false;
         return;
     }
-        
+    m_skipPixelY = true;  
     ui.sB_destWidth->setValue(input * ui.sB_destRolution->value() / 25.4);
     
-    m_skipPixelY = true;
-
     return;
 }
 //-----------------------------------------------------------------------------------------------
@@ -228,10 +232,13 @@ void DialogExportProperties::on_sB_destHeight_valueChanged(int input)
         m_skipPixelX = false;
         return;
     }
-
-    ui.dSB_destHeight->setValue((double)input * 25.4 /  ui.sB_destRolution->value());
-
     m_skipMetricX = true;
+    ui.dSB_destHeight->setValue((double)input * 25.4 /  ui.sB_destRolution->value());
+    if(ui.cB_ExpType->currentIndex() == 1)
+    {
+        ui.dSB_destWidth->setValue( ui.dSB_destHeight->value() * m_aspect);
+    }
+
     return;
 }
 //-----------------------------------------------------------------------------------------------
@@ -242,10 +249,9 @@ void DialogExportProperties::on_sB_destWidth_valueChanged(int input)
         m_skipPixelY = false;
         return;
     }
-
+    m_skipMetricY = true;
     ui.dSB_destWidth->setValue((double)input * 25.4 / ui.sB_destRolution->value());
 
-    m_skipMetricY = true;
     return;
 }
 //-----------------------------------------------------------------------------------------------
