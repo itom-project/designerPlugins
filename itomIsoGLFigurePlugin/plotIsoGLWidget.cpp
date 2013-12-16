@@ -478,7 +478,7 @@ void plotGLWidget::paintGL()
     makeCurrent();
 
     glViewport(0, 0, (GLsizei)this->width(), (GLsizei)this->height());				//Window resizen
-    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
+//    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
 
     m_ticklength = (int)(sqrt(winSizeX * winSizeX + winSizeY * winSizeY) * 10/1000); //tut
 
@@ -2068,9 +2068,6 @@ void plotGLWidget::threeDAxis(void)
             signedZAy = -1 * VRX * VRY;
     }
 
-
-
-
     if(m_axisX.show && m_axisY.show)
     {
         paintAxisOGL(xmin, -yb, zmin, xmax, -yb, zmin);
@@ -2233,16 +2230,16 @@ void plotGLWidget::paintLightArrow()
 */
 void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const double z0, const double x1, const double y1, const double z1, const double v0, const double v1, const double VorzX, const double VorzY, const double VorzZ, const std::string &symbol, const std::string &unit, const bool write)
 {
-    double s0,s1,d0,d1,p=0,q=0,v,l,ldv,a;
-    long e,b=0;
+    double s0, s1, d0, d1, p = 0, q = 0, v, l, ldv, a;
+    long e, b = 0;
 
-    double sl1= m_ticklength;
+    double sl1 = m_ticklength;
     double xstart, xend, ystart, yend, phi;
     GLdouble GLModelViewMatrix[16], GLProjectionMatrix[16];
     GLint GLViewport[4];
     GLdouble glx0, gly0, glz0, glx1, gly1, glz1, xpos, ypos, zpos;
     struct axislabel al;
-    double ticklength=0.01;
+    double ticklength = 0.01;
     double VorzXAs, VorzYAs;
     int firstdigit, i;
     std::string label(" ");
@@ -2256,8 +2253,8 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     gluProject(x0, y0, z0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &glx0, &gly0, &glz0);
     gluProject(x1, y1, z1, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &glx1, &gly1, &glz1);
 
-    d0=s0=v0;
-    d1=s1=v1;
+    d0 = s0 = v0;
+    d1 = s1 = v1;
     if (m_linewidth == 0)
         return;
 
@@ -2268,7 +2265,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     else
         glColor3f(1, 1, 1);
 
-    l = sqrt((double)(glx1-glx0)*(glx1-glx0)+(double)(gly1-gly0)*(gly1-gly0));
+    l = sqrt((double)(glx1 - glx0) * (glx1 - glx0) + (double)(gly1 - gly0) * (gly1 - gly0));
 
     if(sl1 >= l || !sl1)
         return;
@@ -2276,7 +2273,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     if(!ito::dObjHelper::isFinite<double>(s0) || !ito::dObjHelper::isFinite<double>(s1) ||s0 >= s1)
         return;
 
-    ldv=log10((s1-s0)*sl1/l);
+    ldv = log10((s1 - s0) * sl1 / l);
 
     e = floor(ldv + .167);
     ldv -= e;
@@ -2302,18 +2299,14 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     if (write)
     {
         al.write = write;
-
         label.reserve(100);
-
         bool alreadyScaled = false;
-
         al.maxlen=0;
-
         firstdigit = floor( log10(fabs(v0) > fabs(v1) ? fabs(v0) : fabs(v1) ) + 10 * DBL_EPSILON );
 
         if(firstdigit >= -15 && firstdigit < 21)
         {
-            al.unitydigit = firstdigit > 0 ? firstdigit / 3 * 3 : -(2-firstdigit) / 3 * 3;
+            al.unitydigit = firstdigit > 0 ? firstdigit / 3 * 3 : -(2 - firstdigit) / 3 * 3;
         }
         else
         {
@@ -2330,17 +2323,19 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         }
         else
         {
-            for(i=0; dont_scale_units[i] != NULL; i++)
+            for(i = 0; dont_scale_units[i] != NULL; i++)
+            {
                 if(0 == unit.compare(dont_scale_units[i]))
                 {
                     al.unitydigit = std::numeric_limits<int>::min();
                     break;
                 }
+            }
         }
 
         if( unit.compare("m") || unit.compare("mm") ? 0 : m_xybase)
         {
-            al.unitydigit = floor(log10(m_xybase)+10*DBL_EPSILON);
+            al.unitydigit = floor(log10(m_xybase) + 10 * DBL_EPSILON);
         }
         else if(!unit.compare("mm"))
         {
@@ -2374,7 +2369,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
                 {
                     label.append(" in ");
 
-                    char sign[2] ={("afpnµm-kMGTPE"[al.unitydigit/3+6]), 0};
+                    char sign[2] = {("afpnµm-kMGTPE"[al.unitydigit / 3 + 6]), 0};
                     label.append(sign);
 
                     if(alreadyScaled)
@@ -2402,7 +2397,6 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
                     sprintf(temp,"[%.0e]", al.unity);
                     label.append(temp);
                 }
-
             }
         }
         else
@@ -2422,7 +2416,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         GLViewport[3] = 2;
         gluProject(x0, y0, z0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xstart, &ystart, &zpos);
         gluProject(x1, y1, z1, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xend, &yend, &zpos);
-        phi=atan2((yend-ystart),(xend-xstart));
+        phi = atan2((yend - ystart), (xend - xstart));
 
         al.dx = VorzX * 0.05 * fabs(sin(phi));
         al.dy = VorzY * 0.1 * fabs(cos(phi));
@@ -2430,39 +2424,49 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         al.maxlen=0;
     }
 
-    v=s0;
-    v=ceil(e>0?v/p/b:v*p/b);
-    v=e>0?v*b*p:v*b/p;
-    while(v<=s1)
+    v = s0;
+    v = ceil(e > 0 ? v / p / b : v * p / b);
+    v = e > 0 ? v * b * p : v * b / p;
+    while(v <= s1)
     {
-        a=(v-d0)/(d1-d0);
+        a = (v - d0) / (d1 - d0);
         glBegin(GL_LINES);
-            glVertex3f(x0+a*(x1-x0), y0+a*(y1-y0), z0+a*(z1-z0));
+            glVertex3f(x0 + a * (x1 - x0), y0 + a * (y1 - y0), z0 + a * (z1 - z0));
             if (write)
-                glVertex3f(x0+a*(x1-x0)+VorzXAs*ticklength*1.7, y0+a*(y1-y0)+VorzYAs*ticklength*1.7, z0+a*(z1-z0)-ticklength*1.7);
+                glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength * 1.7, 
+                    y0 + a * (y1 - y0) + VorzYAs * ticklength * 1.7, 
+                    z0 + a * (z1 - z0) - ticklength * 1.7);
             else
-                glVertex3f(x0+a*(x1-x0)+VorzXAs*ticklength, y0+a*(y1-y0)+VorzYAs*ticklength, z0+a*(z1-z0)-ticklength);
+                glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength, 
+                    y0 + a * (y1 - y0) + VorzYAs * ticklength, 
+                    z0 + a * (z1 - z0) - ticklength);
         glEnd();
 
         if (write)
         {
-            gluProject(x0+a*(x1-x0), y0+a*(y1-y0), z0+a*(z1-z0), GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+            gluProject(x0 + a * (x1 - x0), y0 + a * (y1 - y0), 
+                z0 + a * (z1 - z0), GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+
 //			dreidogl_AxisLabel(fo, (void*)&al, xpos*1.1, ypos*1.1, v);
             //paintAxisLabelOGL((void*)&al, xpos*(1+0.07 * m_windowXScale * internalObj.getSize(internalObj.getDims()-1,false)), ypos*(1+0.03 * m_windowYScale * internalObj.getSize(internalObj.getDims()-2,false)), v);
-            paintAxisLabelOGL((void*)&al, xpos*(1+0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), ypos*(1+0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
+            paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
+                ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
         }
 
-        v=v*(v>0?1+4*DBL_EPSILON:1-4*DBL_EPSILON);
-        v=ceil((e>0?v/p/b:v*p/b)+.5);
-        v=e>0?v*b*p:v*b/p;
+        v = v * (v > 0 ? 1 + 4 * DBL_EPSILON : 1 - 4 * DBL_EPSILON);
+        v = ceil((e > 0 ? v / p / b : v * p / b) + .5);
+        v = e > 0 ? v * b * p : v * b / p;
     }
 
     if (write)
     {
-        gluProject(x0+(x1-x0)/2.0, y0+(y1-y0)/2.0, z0+(z1-z0)/2.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+        gluProject(x0 + (x1 - x0) / 2.0, y0 + (y1 - y0) / 2.0, 
+            z0 + (z1 - z0) / 2.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
-        al.dx = VorzX * (0.15*m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
-        al.dy = VorzY * (0.25*m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
+//        al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
+//        al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
+        al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
+        al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
 
 // Tut  al.dx = VorzX * (0.15*m_windowXScale*internalObj.getSize(internalObj.getDims()-1,false)) * fabs(sin(phi));
 // TUT  al.dy = VorzY * (0.25*m_windowYScale*internalObj.getSize(internalObj.getDims()-2,false)) * fabs(cos(phi));
