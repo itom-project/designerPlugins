@@ -37,6 +37,7 @@
 #include <QLayout>
 #include <iostream>
 //#include <qdebug.h>
+#include <qmetaobject.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 MotorController::MotorController(QWidget *parent /*= 0*/)
@@ -57,7 +58,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_actSetAbsRel(NULL),
     m_actSetAutoUpdate(NULL),
     m_mnuSetAutoUpdate(NULL),
-    m_unit("mm"),
+    m_unit(mm),
     m_hasJoyStick(false),
     m_enableJoyStick(true),
     m_allowJoyStick(true),
@@ -186,14 +187,14 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     connect(m_changePosButtons[5][2], SIGNAL(pressed()), this, SLOT(axis5SmallStepPlus()));
     connect(m_changePosButtons[5][3], SIGNAL(pressed()), this, SLOT(axis5BigStepPlus()));
 
-    QString micron(2, 181);
-    micron[1] = 'm';
+    QString micronString(2, 181);
+    micronString[1] = 'm';
 
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetUnit = new QAction(tr("Toogle Unit"), this);
     m_mnuSetUnit = new QMenu(tr("Unit Switch"));
 	m_mnuSetUnit->addAction("nm");
-	m_mnuSetUnit->addAction(micron);
+	m_mnuSetUnit->addAction(micronString);
 	m_mnuSetUnit->addAction("mm");
 	m_mnuSetUnit->addAction("m");
     m_actSetUnit->setMenu(m_mnuSetUnit);
@@ -232,10 +233,22 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_numAxis = m_posWidgets.length();
     m_numVisAxis = m_posWidgets.length();
 
+    QString unitString;
+
+    if (m_unit != micron)
+    {
+        QMetaEnum me = metaObject()->enumerator( metaObject()->indexOfEnumerator("Unit") );
+        unitString = me.valueToKey(m_unit);
+    }
+    else
+    {
+        unitString = micronString;
+    }
+
     for (int i = 0; i < m_numVisAxis; i++)
     {
         m_posWidgets[i]->setReadOnly(true);
-        m_posWidgets[i]->setSuffix(m_unit);
+        m_posWidgets[i]->setSuffix(unitString);
         m_posWidgets[i]->setButtonSymbols(QAbstractSpinBox::NoButtons);
         m_posWidgets[i]->setMinimum(-9999.999);
         m_posWidgets[i]->setMaximum(9999.999);
@@ -245,14 +258,14 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_posLabels[i]->setReadOnly(true);
         m_posLabels[i]->setMaximumWidth(30);
 
-        m_smallStepWidgets[i]->setSuffix(m_unit);
+        m_smallStepWidgets[i]->setSuffix(unitString);
         m_smallStepWidgets[i]->setButtonSymbols(QAbstractSpinBox::PlusMinus);
         m_smallStepWidgets[i]->setMinimum(0.00);
         m_smallStepWidgets[i]->setMaximum(999.999);
         m_smallStepWidgets[i]->setDecimals(3);
         m_smallStepWidgets[i]->setKeyboardTracking(false);
 
-        m_largeStepWidgets[i]->setSuffix(m_unit);
+        m_largeStepWidgets[i]->setSuffix(unitString);
         m_largeStepWidgets[i]->setButtonSymbols(QAbstractSpinBox::PlusMinus);
         m_largeStepWidgets[i]->setMinimum(0.00);
         m_largeStepWidgets[i]->setMaximum(999.999);
@@ -723,33 +736,43 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MotorController::setUnit(const QString unit)
+void MotorController::setUnit(const Unit unit)
 {
     double oldScale = m_baseScale;
-    QString micron(2, 181);
-    micron[1] = 'm';
-    if (unit == "mm")
+
+    switch(unit)
     {
+    case mm:
         m_baseScale = 1.0;
-    }
-    else if (unit == micron)
-    {
+        break;
+    case micron:
         m_baseScale = 1000.0;
-    }
-    else if (unit == "m")
-    {
-        m_baseScale = 0.001;
-    }
-    else if (unit == "km")
-    {
-        m_baseScale = 0.000001;
-    }
-    else if (unit == "nm")
-    {
+        break;
+    case nm:
         m_baseScale = 1000000.0;
+        break;
+    case m:
+        m_baseScale = 0.001;
+        break;
+    case km:
+        m_baseScale = 0.000001;
+        break;
+    default:
+        return;
+    }
+
+    QString unitString;
+
+    if (unit != micron)
+    {
+        QMetaEnum me = metaObject()->enumerator( metaObject()->indexOfEnumerator("Unit") );
+        unitString = me.valueToKey(unit);
     }
     else
-        return;
+    {
+        unitString = QString(2, 181);
+        unitString[1] = 'm';
+    }
 
     m_unit = unit;
 
@@ -766,10 +789,10 @@ void MotorController::setUnit(const QString unit)
         {
             m_posWidgets[i]->setValue(m_curAbsPos[i]);    
         }
-        m_posWidgets[i]->setSuffix(unit);
-        m_smallStepWidgets[i]->setSuffix(unit);
+        m_posWidgets[i]->setSuffix(unitString);
+        m_smallStepWidgets[i]->setSuffix(unitString);
         m_smallStepWidgets[i]->setValue(m_smallStep * m_baseScale);
-        m_largeStepWidgets[i]->setSuffix(unit);
+        m_largeStepWidgets[i]->setSuffix(unitString);
         m_largeStepWidgets[i]->setValue(m_bigStep * m_baseScale);
     }
 
@@ -802,7 +825,14 @@ void MotorController::setReadOnly(const bool value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::mnuSetUnit(QAction* inputAction)
 {
-    setUnit(inputAction->text());
+    const QMetaObject *mo = this->metaObject();
+    QMetaEnum me = mo->enumerator( mo->indexOfEnumerator("Unit") );
+    int unit = me.keyToValue(inputAction->text().toAscii().data());
+
+    if (unit >= 0)
+    {
+        setUnit((Unit)unit);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

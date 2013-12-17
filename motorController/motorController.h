@@ -76,7 +76,7 @@ class MotorController : public QGroupBox
 
     Q_PROPERTY(QPointer<ito::AddInActuator> actuator READ getActuator WRITE setActuator DESIGNABLE false);
     Q_PROPERTY(int numberOfAxis READ getNumAxis WRITE setNumAxis DESIGNABLE true);
-    Q_PROPERTY(QString unit READ getUnit WRITE setUnit DESIGNABLE true);
+    Q_PROPERTY(Unit unit READ getUnit WRITE setUnit DESIGNABLE true);
     Q_PROPERTY(bool readOnly READ getReadOnly WRITE setReadOnly DESIGNABLE true);
     Q_PROPERTY(bool autoUpdate READ getAutoUpdate WRITE setAutoUpdate DESIGNABLE true);
     Q_PROPERTY(double smallStep READ getSmallStep WRITE setSmallStep DESIGNABLE true);
@@ -85,8 +85,11 @@ class MotorController : public QGroupBox
     Q_PROPERTY(bool allowJoyStick READ getAllowJoyStick WRITE setAllowJoyStick DESIGNABLE true);
     //Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
 
+    Q_ENUMS(Unit);
 
 public:
+    enum Unit { nm, micron, mm, m, km };
+
     //! Constructor for the class
     MotorController(QWidget *parent = 0);
 
@@ -100,10 +103,10 @@ public:
     QPointer<ito::AddInActuator> getActuator() const {return QPointer<ito::AddInActuator>(NULL);};
 
     //! Set the metrical unit of the display
-    void setUnit(const QString unit);
+    void setUnit(const Unit unit);
 
     //! Read out the metrical unit of the display
-    QString getUnit() const {return m_unit;};
+    Unit getUnit() const {return m_unit;};
 
     //! Set the number of axis to be displayed
     void setNumAxis(const int numAxis);
@@ -252,7 +255,7 @@ private:
     double m_bigStep;
 
     //! Current display unit
-    QString m_unit;
+    Unit m_unit;
 
     QAction  *m_actSetUnit;
     QAction  *m_actUpdatePos;
