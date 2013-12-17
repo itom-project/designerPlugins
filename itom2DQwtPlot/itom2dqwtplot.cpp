@@ -1163,10 +1163,11 @@ void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
         default:
             m_pContent->userInteractionStart(0, false, 0);
             break;
+        case PlotCanvas::tMultiPointPick:
         case PlotCanvas::tPoint:
-            m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+            //m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pContent->userInteractionStart(type, start, maxNrOfPoints);
-            m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
+            //m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
         break;
 
         case PlotCanvas::tLine:
