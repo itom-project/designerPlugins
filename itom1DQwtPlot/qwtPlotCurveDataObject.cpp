@@ -71,7 +71,7 @@ void QwtPlotCurveDataObject::drawCurve( QPainter *painter, int style, const QwtS
                 // we always need the complete
                 // curve for fitting
                 from = 0;
-                to = dataSize() - 1;
+                to = (int)dataSize() - 1;
             }
             drawLines( painter, xMap, yMap, canvasRect, from, to );
             break;
@@ -96,9 +96,9 @@ void QwtPlotCurveDataObject::drawSeries( QPainter *painter, const QwtScaleMap &x
         return;
 
     if ( to < 0 )
-        to = dataSize() - 1;
+        to = (int)dataSize() - 1;
 
-    if ( verifyRange( dataSize(), from, to ) > 0 )
+    if ( verifyRange( (int)dataSize(), from, to ) > 0 )
     {
         painter->save();
         painter->setPen( pen() );

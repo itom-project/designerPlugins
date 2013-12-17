@@ -1848,7 +1848,7 @@ ito::RetVal plotGLWidget::ResetColors()
 void plotGLWidget::ProtocolSize()
 {
     int res = 1;
-    int length = m_protocol.text.length()-1;
+    int length = (int)m_protocol.text.length()-1;
     for(int i = 0; i < length; i++)
     {
         if(m_protocol.text[i]=='\n')
@@ -2550,7 +2550,7 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
     }
   }
 
-  l=strlen(buffer);
+  l = (long)strlen(buffer);
   if(l>al->maxlen)
     al->maxlen=l;
   if(!al->write)
@@ -2591,7 +2591,7 @@ int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double
 
     glRasterPos2f(xpos, ypos);
     glListBase(m_myCharBitmapBuffer);					// Sets The Base Character to 0
-    glCallLists(strlen(buffer), GL_UNSIGNED_BYTE, buffer);	// Draws The Display List Text
+    glCallLists((GLsizei)strlen(buffer), GL_UNSIGNED_BYTE, buffer);	// Draws The Display List Text
 
     glPopAttrib();						// Pops The Display List Bits
 

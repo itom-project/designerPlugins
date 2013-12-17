@@ -77,7 +77,7 @@ QByteArray DataObjRasterData::calcHash(const ito::DataObject *dObj)
         ba.append( dims );
         ba.append( m_pInternalData->m_cmplxType );
         ba.append( m_pInternalData->m_yaxisFlipped );
-        ba.append( m_D.m_planeIdx );
+        ba.append( (char)m_D.m_planeIdx );
 
         if( dims > 0 )
         {
@@ -155,7 +155,7 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
             deleteCache();
 
             m_dataObj = *dataObj;
-            m_plane = m_dataObj.getDims() > 1 ? (cv::Mat*)(m_dataObj.get_mdata()[ m_dataObj.seekMat( m_D.m_planeIdx )]) : NULL;
+            m_plane = m_dataObj.getDims() > 1 ? (cv::Mat*)(m_dataObj.get_mdata()[ m_dataObj.seekMat( (int)m_D.m_planeIdx )]) : NULL;
 
             if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
             {
@@ -165,7 +165,7 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
 
             if (m_dataObj.getDims() > 2)
             {
-                size_t sizes[2] = { m_D.m_ySize, m_D.m_xSize };
+                int sizes[2] = { m_D.m_ySize, m_D.m_xSize };
                 m_dataObjPlane = new ito::DataObject( 2, sizes, m_dataObj.getType(), m_plane, 1);
                 m_dataObj.copyTagMapTo( *m_dataObjPlane );
 

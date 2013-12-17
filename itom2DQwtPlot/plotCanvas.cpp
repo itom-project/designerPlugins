@@ -1201,7 +1201,7 @@ void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
 ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
 {
     ito::RetVal retval;
-    size_t limits[] = {2,8,0,99999};
+    int limits[] = {2,8,0,99999};
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
 
     QwtSymbol::Style symStyle = QwtSymbol::XCross;

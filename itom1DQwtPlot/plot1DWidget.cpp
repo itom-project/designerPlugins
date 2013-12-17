@@ -1216,7 +1216,7 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
     if(!qIsFinite(xScaleStart)) xScaleStart = m->item->xValue();
 
     int thisIdx = data->getPosToPix(xScaleStart);
-    int s = data->size();
+    int s = (int)data->size();
     QPointF p;
     bool found = false;
     bool d = true;
@@ -1329,7 +1329,7 @@ void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int 
     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[curveIdx]->data());
 
     int thisIdx = idx;
-    int s = data->size();
+    int s = (int)data->size();
     QPointF p;
     bool found = false;
     bool d = true;
@@ -2312,7 +2312,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
 {
     ito::RetVal retval;
-    size_t limits[] = {2,8,0,99999};
+    int limits[] = {2,8,0,99999};
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
 
     QwtSymbol::Style symStyle = QwtSymbol::XCross;

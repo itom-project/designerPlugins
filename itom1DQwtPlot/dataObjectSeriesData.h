@@ -49,21 +49,21 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
                 yPx[0] = 0; yPx[1] = 0;
                 weights[0] = 0; weights[1] = 0; weights[2] = 0; weights[3] = 0;
             }
-            size_t xPx[2];
-            size_t yPx[2];
+            int xPx[2];
+            int yPx[2];
             float weights[4]; // weights are for (xPx[0],yPx[0]),(xPx[1],yPx[0]),(xPx[0],yPx[1]),(xPx[1],yPx[1])
         };
 
         struct LineData {
             LineData() : nrPoints(0), startPhys(0.0), stepSizePhys(0.0), matOffset(0), matStepSize(1), valid(0) {}
             Direction dir;
-            size_t nrPoints;
+            int nrPoints;
             float startPhys;
             float stepSizePhys; //xRight = xLeft + xStepSize * (m_numPts - 1)
             QPoint startPx;
             QSize stepSizePx;
-            size_t matOffset; //in bytes
-            size_t matStepSize; //in bytes
+            int matOffset; //in bytes
+            int matStepSize; //in bytes
             QVector<PtsWeighted> points; //only for dirXY, else size=0
             QVector<int> matSteps; //only for dirXY, else size=0 (fast mode)
             bool valid;

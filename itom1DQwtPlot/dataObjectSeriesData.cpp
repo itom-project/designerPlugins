@@ -210,8 +210,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setWidth(0);
                         m_d.stepSizePx.setHeight(1);
 
-                        m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[0] ; //step in y-direction (in bytes)
+                        m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                        m_d.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
                     }
                     else
                     {
@@ -225,8 +225,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setWidth(0);
                         m_d.stepSizePx.setHeight(1);
 
-                        m_d.matOffset = mat->step[0] * pxY2 + mat->step[1] * pxX1; //(&mat->at<char>(pxY2,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[0] ; //step in y-direction (in bytes)
+                        m_d.matOffset = (int)mat->step[0] * pxY2 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY2,pxX1) - &mat->at<char>(0,0));
+                        m_d.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
                     }
 
                     description = dataObj->getAxisDescription(dims-2,_unused);
@@ -268,8 +268,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setWidth(1);
                         m_d.stepSizePx.setHeight(0);
 
-                        m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[1] ; //step in x-direction (in bytes)
+                        m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                        m_d.matStepSize= (int)mat->step[1] ; //step in x-direction (in bytes)
                     }
                     else
                     {
@@ -283,8 +283,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setWidth(1);
                         m_d.stepSizePx.setHeight(0);
 
-                        m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX2; //(&mat->at<char>(pxY1,pxX2) - &mat->at<char>(0,0));
-                        m_d.matStepSize= mat->step[1] ; //step in x-direction (in bytes)
+                        m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX2; //(&mat->at<char>(pxY1,pxX2) - &mat->at<char>(0,0));
+                        m_d.matStepSize= (int)mat->step[1] ; //step in x-direction (in bytes)
                     }
 
                     description = dataObj->getAxisDescription(dims-1,_unused);
@@ -345,7 +345,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setWidth(incx);
                         m_d.stepSizePx.setHeight(incy);
 
-                        m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                        m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
                         m_d.matStepSize= 0 ; 
 
                         int pdx, pdy, ddx, ddy, es, el;
@@ -372,12 +372,12 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         int x = 0; //pxX1;
                         int y = 0; //pxY1;
 
-                        m_d.matSteps.resize(m_d.nrPoints);
+                        m_d.matSteps.resize((int)m_d.nrPoints);
 
-                        for(unsigned int n = 0; n < m_d.nrPoints; n++)
+                        for(unsigned int n = 0; n < (unsigned int)m_d.nrPoints; n++)
                         {  /* loop */
                             //setPixel(x,y)
-                            m_d.matSteps[n] = mat->step[0] * y + mat->step[1] * x;
+                            m_d.matSteps[n] = (int)mat->step[0] * y + (int)mat->step[1] * x;
 
                             err -= es;
                             if(err < 0)
@@ -566,7 +566,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                 m_d.stepSizePx.setHeight(0);
 
                 mat = (cv::Mat*)dataObj->get_mdata()[ dataObj->seekMat(0) ]; //first plane in ROI
-                m_d.matOffset = mat->step[0] * pxY1 + mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
                 m_d.matStepSize= 0 ; //step in x-direction (in bytes)
 
                 description = dataObj->getAxisDescription(dims - 3, _unused);
@@ -824,14 +824,14 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                 break;
 
                 case dirZ:
-                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(n) ]);
+                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat((int)n) ]);
                     ptr[0] = (mat->data + m_d.matOffset);
                     fPos = m_d.startPhys + m_d.stepSizePhys * n;
                 break;
 
                 case dirXY:
                     mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(0) ]);
-                    ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[n]);
+                    ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
                     fPos = m_d.startPhys + m_d.stepSizePhys * n;
                 break;
             }
@@ -1716,7 +1716,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
     case DataObjectSeriesData::dirY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val = *(reinterpret_cast<_Tp*>(ptr));
             ptr += d.matStepSize;
@@ -1730,7 +1730,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
     case DataObjectSeriesData::dirXY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
             ptr += d.matStepSize;
@@ -1742,7 +1742,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
         break;
     case DataObjectSeriesData::dirZ:
 
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
             ptr = (mat->data + d.matOffset);
@@ -1771,7 +1771,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
     case DataObjectSeriesData::dirY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val = *(reinterpret_cast<float32*>(ptr));
             ptr += d.matStepSize;
@@ -1790,7 +1790,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
     case DataObjectSeriesData::dirXY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val = *(reinterpret_cast<float32*>(ptr + d.matSteps[i]));
 
@@ -1806,7 +1806,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
         break;
     case DataObjectSeriesData::dirZ:
 
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
             ptr = (mat->data + d.matOffset);
@@ -1840,7 +1840,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
     case DataObjectSeriesData::dirY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val = *(reinterpret_cast<float64*>(ptr));
             ptr += d.matStepSize;
@@ -1859,7 +1859,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
     case DataObjectSeriesData::dirXY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val = *(reinterpret_cast<float64*>(ptr + d.matSteps[i]));
 
@@ -1876,7 +1876,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
 
     case DataObjectSeriesData::dirZ:
 
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
             ptr = (mat->data + d.matOffset);
@@ -1911,7 +1911,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
     case DataObjectSeriesData::dirY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val_ = *(reinterpret_cast<complex64*>(ptr));
             switch(cmplxState)
@@ -1946,7 +1946,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
     case DataObjectSeriesData::dirXY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val_ = *(reinterpret_cast<complex64*>(ptr + d.matSteps[i]));
             switch(cmplxState)
@@ -1978,7 +1978,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
 
     case DataObjectSeriesData::dirZ:
 
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
             ptr = (mat->data + d.matOffset);
@@ -2028,7 +2028,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
     case DataObjectSeriesData::dirY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val_ = *(reinterpret_cast<complex128*>(ptr));
             switch(cmplxState)
@@ -2062,7 +2062,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
     case DataObjectSeriesData::dirXY:
         mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
         ptr = (mat->data + d.matOffset);
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             val_ = *(reinterpret_cast<complex128*>(ptr + d.matSteps[i]));
             switch(cmplxState)
@@ -2094,7 +2094,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
 
     case DataObjectSeriesData::dirZ:
 
-        for(size_t i = 0 ; i < d.nrPoints ; i++)
+        for(int i = 0 ; i < d.nrPoints ; i++)
         {
             mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
             ptr = (mat->data + d.matOffset);
