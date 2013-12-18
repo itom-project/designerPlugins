@@ -52,7 +52,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
-    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount WRITE setGeometricElementsCount DESIGNABLE false)
+    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
     Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker)
@@ -109,7 +109,6 @@ public:
     void resetValueLabel();
 
     int getGeometricElementsCount() const { return m_data.m_pDrawItems.size();}
-    void setGeometricElementsCount(const int value){ return;}
 
     bool getyAxisFlipped() const;
     void setyAxisFlipped(const bool &value);

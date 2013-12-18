@@ -171,10 +171,10 @@ void Itom2dQwtPlot::createActions()
 
     //m_pActClearDrawings
     m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("clear Marker"), this);
-    a->setObjectName("actClearMarker");
+    a->setObjectName("actClearGeometrics");
     a->setCheckable(false);
     a->setChecked(false);
-    a->setToolTip(tr("Clear all existing marker"));
+    a->setToolTip(tr("Clear all existing geometric elements"));
     connect(a, SIGNAL(triggered()), this, SLOT(clearGeometricElements()));
 
     //m_actApectRatio
@@ -1317,6 +1317,253 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
 {
 
+    QList<int> keys = m_data.m_pDrawItems.keys();
+    ito::RetVal retVal = ito::retOk;
+
+    for(int i = 0; i < keys.size(); i++)
+    {
+        retVal += m_pContent->deleteMarkers(keys[i]);
+    }
+    emit plotItemsDeleted();
+
+    if(geometricElements.isNull() || 
+       geometricElements->getDims() != 2 || 
+       (geometricElements->getType() != ito::tFloat32 && geometricElements->getType() != ito::tFloat64) ||
+       geometricElements->getSize(1) < PRIM_ELEMENTLENGTH)
+    {
+        m_pContent->statusBarMessage(tr("Element container did not match criteria, 2 dims, elements x 11, floating point value"), 600 );
+        plotItemsFinished(0, true);
+        return;
+    }
+
+    if(geometricElements->getSize(0) == 0)
+    {
+        m_pContent->statusBarMessage(tr("Deleted element, new element list was empty"), 600 );
+        m_pContent->replot();
+        return;
+    }
+
+    int ysize = geometricElements->getSize(0);
+    int xsize = PRIM_ELEMENTLENGTH;
+    int type = geometricElements->getType();
+
+    int rowStepDst = 8;
+    ito::DataObject coords(2, rowStepDst, ysize, ito::tFloat32);
+
+    ito::float32 *ids = (ito::float32*)coords.rowPtr(0, 0);            
+    ito::float32 *types = (ito::float32*)coords.rowPtr(0, 1);
+    ito::float32 *xCoords0 = (ito::float32*)coords.rowPtr(0, 2);
+    ito::float32 *yCoords0 = (ito::float32*)coords.rowPtr(0, 3);
+    ito::float32 *xCoords1 = (ito::float32*)coords.rowPtr(0, 4);
+    ito::float32 *yCoords1 = (ito::float32*)coords.rowPtr(0, 5);
+
+    ito::float32* ptrScr32 = NULL;
+    ito::float64* ptrScr64 = NULL;
+        
+    int rowStep = static_cast<int>(((cv::Mat*)(geometricElements->get_mdata()[geometricElements->seekMat(0)]))->step[0]);
+
+    if(type == ito::tFloat64)
+    {
+        rowStep /= sizeof(ito::float64);
+        ptrScr64 = ((cv::Mat*)(geometricElements->get_mdata()[geometricElements->seekMat(0)]))->ptr<ito::float64>(0);
+    }
+    else
+    {
+        rowStep /= sizeof(ito::float32);
+        ptrScr32 = ((cv::Mat*)(geometricElements->get_mdata()[geometricElements->seekMat(0)]))->ptr<ito::float32>(0);
+    }
+
+    ito::float32* ptrCurScr32 = NULL;
+    ito::float64* ptrCurScr64 = NULL;
+
+    for(int geoElement = 0; geoElement < ysize; geoElement++)
+    {
+        int type = 0;
+
+        if(type == ito::tFloat64)
+        {
+            ptrCurScr64 =  &(ptrScr64[geoElement * rowStep]);
+            type = static_cast<ito::int32>(ptrCurScr64[1]) & 0x0000FFFF;
+        }
+        else
+        {
+            ptrCurScr32 =  &(ptrScr32[geoElement * rowStep]);
+            type = static_cast<ito::int32>(ptrCurScr32[1]) & 0x0000FFFF;
+        }
+
+        types[geoElement + rowStepDst] = (ito::float32) type;
+
+        switch (type)
+        {
+            case ito::PrimitiveContainer::tPoint:
+            {     
+                if(type == ito::tFloat64) // idx, type, x0, y0, z0
+                {
+                    ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
+                    xCoords0[geoElement+ 2 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yCoords0[geoElement+ 3 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[3]);
+                }
+                else
+                {
+                    ids[geoElement]                       = ptrCurScr32[0];
+                    xCoords0[geoElement + 2 * rowStepDst] = ptrCurScr32[2];
+                    yCoords0[geoElement + 3 * rowStepDst] = ptrCurScr32[3];
+                }
+
+            }
+            break;
+
+            case ito::PrimitiveContainer::tLine:
+            {
+                if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
+                {
+                    ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
+                    xCoords0[geoElement+ 2 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yCoords0[geoElement+ 3 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[3]);
+                    xCoords1[geoElement+ 4 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[5]);
+                    yCoords1[geoElement+ 5 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[6]);
+                }
+                else
+                {
+                    ids[geoElement]                       = ptrCurScr32[0];
+                    xCoords0[geoElement + 2 * rowStepDst] = ptrCurScr32[2];
+                    yCoords0[geoElement + 3 * rowStepDst] = ptrCurScr32[3];
+                    xCoords1[geoElement + 4 * rowStepDst] = ptrCurScr32[5];
+                    yCoords1[geoElement + 5 * rowStepDst] = ptrCurScr32[6];
+                }
+
+            }
+            break;
+
+            case ito::PrimitiveContainer::tRectangle:
+            {
+
+                if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
+                {
+                    ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
+                    xCoords0[geoElement+ 2 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yCoords0[geoElement+ 3 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[3]);
+                    xCoords1[geoElement+ 4 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[5]);
+                    yCoords1[geoElement+ 5 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[6]);
+                }
+                else
+                {
+                    ids[geoElement]                       = ptrCurScr32[0];
+                    xCoords0[geoElement + 2 * rowStepDst] = ptrCurScr32[2];
+                    yCoords0[geoElement + 3 * rowStepDst] = ptrCurScr32[3];
+                    xCoords1[geoElement + 4 * rowStepDst] = ptrCurScr32[5];
+                    yCoords1[geoElement + 5 * rowStepDst] = ptrCurScr32[6];
+                }
+
+            }
+            break;
+
+            case ito::PrimitiveContainer::tSquare:
+            {
+                types[geoElement + rowStepDst] = (ito::float32) ito::PrimitiveContainer::tRectangle;
+
+                ito::float32 xC, yC, a;
+
+                if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a
+                {
+                    ids[geoElement] = static_cast<ito::float32>(ptrCurScr64[0]);
+                    xC              = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yC              = static_cast<ito::float64>(ptrCurScr64[3]);
+                    a               = static_cast<ito::float64>(ptrCurScr64[5]);
+                }
+                else
+                {
+                    ids[geoElement] = ptrCurScr32[0];
+                    xC              = ptrCurScr32[2];
+                    yC              = ptrCurScr32[3];
+                    a               = ptrCurScr32[5];
+                }
+
+                xCoords0[geoElement + 2 * rowStepDst] = xC - a / 2.0;
+                yCoords0[geoElement + 3 * rowStepDst] = yC - a / 2.0;
+                xCoords1[geoElement + 4 * rowStepDst] = xC + a / 2.0;
+                yCoords1[geoElement + 5 * rowStepDst] = yC + a / 2.0;
+
+            }
+            break;
+
+            case ito::PrimitiveContainer::tEllipse:
+            {
+                ito::float32 xC, yC, r1, r2;
+
+                if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a
+                {
+                    ids[geoElement] = static_cast<ito::float32>(ptrCurScr64[0]);
+                    xC              = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yC              = static_cast<ito::float64>(ptrCurScr64[3]);
+                    r1              = static_cast<ito::float64>(ptrCurScr64[5]);
+                    r2              = static_cast<ito::float64>(ptrCurScr64[6]);
+                }
+                else
+                {
+                    ids[geoElement] = ptrCurScr32[0];
+                    xC              = ptrCurScr32[2];
+                    yC              = ptrCurScr32[3];
+                    r1              = ptrCurScr32[5];
+                    r2              = ptrCurScr32[6];
+                }
+
+                xCoords0[geoElement + 2 * rowStepDst] = xC - r1;
+                yCoords0[geoElement + 3 * rowStepDst] = yC - r2;
+                xCoords1[geoElement + 4 * rowStepDst] = xC + r1;
+                yCoords1[geoElement + 5 * rowStepDst] = yC + r2;
+
+            }
+            break;
+
+            case ito::PrimitiveContainer::tCircle:
+            {
+                types[geoElement + rowStepDst] = (ito::float32) ito::PrimitiveContainer::tEllipse;
+                ito::float32 xC, yC, r;
+
+                if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a
+                {
+                    ids[geoElement] = static_cast<ito::float32>(ptrCurScr64[0]);
+                    xC              = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yC              = static_cast<ito::float64>(ptrCurScr64[3]);
+                    r              = static_cast<ito::float64>(ptrCurScr64[5]);
+                }
+                else
+                {
+                    ids[geoElement] = ptrCurScr32[0];
+                    xC              = ptrCurScr32[2];
+                    yC              = ptrCurScr32[3];
+                    r              = ptrCurScr32[5];
+                }
+
+                xCoords0[geoElement + 2 * rowStepDst] = xC - r;
+                yCoords0[geoElement + 3 * rowStepDst] = yC - r;
+                xCoords1[geoElement + 4 * rowStepDst] = xC + r;
+                yCoords1[geoElement + 5 * rowStepDst] = yC + r;
+
+            }
+            break;
+
+            default:
+                plotItemsFinished(0, true);
+                m_pContent->statusBarMessage(tr("Could not convert elements, type undefined"), 600 );
+                return;    
+        }
+
+    }
+
+    ito::RetVal retval = m_pContent->plotMarkers(&coords, "a", "a", 0);
+
+    m_pContent->replot();
+
+    if(retval.containsError())
+    {
+        m_pContent->statusBarMessage(tr("Could not set elements"), 600 );
+        plotItemsFinished(0, true);
+        return;    
+    }
+
+    plotItemsFinished(0, false);
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------

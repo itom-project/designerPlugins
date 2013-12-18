@@ -59,7 +59,7 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     // Properties related with geometric elements
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
-    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount WRITE setGeometricElementsCount DESIGNABLE false)
+    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
     Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
     Q_PROPERTY(int selectedGeometrie READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
