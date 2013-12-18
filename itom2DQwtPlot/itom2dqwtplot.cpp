@@ -1348,7 +1348,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     int type = geometricElements->getType();
 
     int rowStepDst = 8;
-    ito::DataObject coords(2, rowStepDst, ysize, ito::tFloat32);
+    ito::DataObject coords(rowStepDst, ysize, ito::tFloat32);
 
     ito::float32 *ids = (ito::float32*)coords.rowPtr(0, 0);            
     ito::float32 *types = (ito::float32*)coords.rowPtr(0, 1);
@@ -1391,7 +1391,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
             type = static_cast<ito::int32>(ptrCurScr32[1]) & 0x0000FFFF;
         }
 
-        types[geoElement + rowStepDst] = (ito::float32) type;
+        types[geoElement] = (ito::float32) type;
 
         switch (type)
         {
@@ -1400,14 +1400,14 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                 if(type == ito::tFloat64) // idx, type, x0, y0, z0
                 {
                     ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
-                    xCoords0[geoElement+ 2 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[2]);
-                    yCoords0[geoElement+ 3 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[3]);
+                    xCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[3]);
                 }
                 else
                 {
                     ids[geoElement]                       = ptrCurScr32[0];
-                    xCoords0[geoElement + 2 * rowStepDst] = ptrCurScr32[2];
-                    yCoords0[geoElement + 3 * rowStepDst] = ptrCurScr32[3];
+                    xCoords0[geoElement] = ptrCurScr32[2];
+                    yCoords0[geoElement] = ptrCurScr32[3];
                 }
 
             }
@@ -1418,18 +1418,18 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                 if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
                 {
                     ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
-                    xCoords0[geoElement+ 2 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[2]);
-                    yCoords0[geoElement+ 3 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[3]);
-                    xCoords1[geoElement+ 4 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[5]);
-                    yCoords1[geoElement+ 5 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[6]);
+                    xCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[3]);
+                    xCoords1[geoElement] = static_cast<ito::float64>(ptrCurScr64[5]);
+                    yCoords1[geoElement] = static_cast<ito::float64>(ptrCurScr64[6]);
                 }
                 else
                 {
-                    ids[geoElement]                       = ptrCurScr32[0];
-                    xCoords0[geoElement + 2 * rowStepDst] = ptrCurScr32[2];
-                    yCoords0[geoElement + 3 * rowStepDst] = ptrCurScr32[3];
-                    xCoords1[geoElement + 4 * rowStepDst] = ptrCurScr32[5];
-                    yCoords1[geoElement + 5 * rowStepDst] = ptrCurScr32[6];
+                    ids[geoElement]      = ptrCurScr32[0];
+                    xCoords0[geoElement] = ptrCurScr32[2];
+                    yCoords0[geoElement] = ptrCurScr32[3];
+                    xCoords1[geoElement] = ptrCurScr32[5];
+                    yCoords1[geoElement] = ptrCurScr32[6];
                 }
 
             }
@@ -1441,18 +1441,18 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                 if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
                 {
                     ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
-                    xCoords0[geoElement+ 2 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[2]);
-                    yCoords0[geoElement+ 3 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[3]);
-                    xCoords1[geoElement+ 4 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[5]);
-                    yCoords1[geoElement+ 5 * rowStepDst] = static_cast<ito::float64>(ptrCurScr64[6]);
+                    xCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[2]);
+                    yCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[3]);
+                    xCoords1[geoElement] = static_cast<ito::float64>(ptrCurScr64[5]);
+                    yCoords1[geoElement] = static_cast<ito::float64>(ptrCurScr64[6]);
                 }
                 else
                 {
-                    ids[geoElement]                       = ptrCurScr32[0];
-                    xCoords0[geoElement + 2 * rowStepDst] = ptrCurScr32[2];
-                    yCoords0[geoElement + 3 * rowStepDst] = ptrCurScr32[3];
-                    xCoords1[geoElement + 4 * rowStepDst] = ptrCurScr32[5];
-                    yCoords1[geoElement + 5 * rowStepDst] = ptrCurScr32[6];
+                    ids[geoElement]      = ptrCurScr32[0];
+                    xCoords0[geoElement] = ptrCurScr32[2];
+                    yCoords0[geoElement] = ptrCurScr32[3];
+                    xCoords1[geoElement] = ptrCurScr32[5];
+                    yCoords1[geoElement] = ptrCurScr32[6];
                 }
 
             }
@@ -1460,7 +1460,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 
             case ito::PrimitiveContainer::tSquare:
             {
-                types[geoElement + rowStepDst] = (ito::float32) ito::PrimitiveContainer::tRectangle;
+                types[geoElement] = (ito::float32) ito::PrimitiveContainer::tRectangle;
 
                 ito::float32 xC, yC, a;
 
@@ -1479,10 +1479,10 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                     a               = ptrCurScr32[5];
                 }
 
-                xCoords0[geoElement + 2 * rowStepDst] = xC - a / 2.0;
-                yCoords0[geoElement + 3 * rowStepDst] = yC - a / 2.0;
-                xCoords1[geoElement + 4 * rowStepDst] = xC + a / 2.0;
-                yCoords1[geoElement + 5 * rowStepDst] = yC + a / 2.0;
+                xCoords0[geoElement] = xC - a / 2.0;
+                yCoords0[geoElement] = yC - a / 2.0;
+                xCoords1[geoElement] = xC + a / 2.0;
+                yCoords1[geoElement] = yC + a / 2.0;
 
             }
             break;
@@ -1508,17 +1508,17 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                     r2              = ptrCurScr32[6];
                 }
 
-                xCoords0[geoElement + 2 * rowStepDst] = xC - r1;
-                yCoords0[geoElement + 3 * rowStepDst] = yC - r2;
-                xCoords1[geoElement + 4 * rowStepDst] = xC + r1;
-                yCoords1[geoElement + 5 * rowStepDst] = yC + r2;
+                xCoords0[geoElement] = xC - r1;
+                yCoords0[geoElement] = yC - r2;
+                xCoords1[geoElement] = xC + r1;
+                yCoords1[geoElement] = yC + r2;
 
             }
             break;
 
             case ito::PrimitiveContainer::tCircle:
             {
-                types[geoElement + rowStepDst] = (ito::float32) ito::PrimitiveContainer::tEllipse;
+                types[geoElement] = (ito::float32) ito::PrimitiveContainer::tEllipse;
                 ito::float32 xC, yC, r;
 
                 if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a
@@ -1536,10 +1536,10 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                     r              = ptrCurScr32[5];
                 }
 
-                xCoords0[geoElement + 2 * rowStepDst] = xC - r;
-                yCoords0[geoElement + 3 * rowStepDst] = yC - r;
-                xCoords1[geoElement + 4 * rowStepDst] = xC + r;
-                yCoords1[geoElement + 5 * rowStepDst] = yC + r;
+                xCoords0[geoElement] = xC - r;
+                yCoords0[geoElement] = yC - r;
+                xCoords1[geoElement] = xC + r;
+                yCoords1[geoElement] = yC + r;
 
             }
             break;
@@ -1552,7 +1552,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 
     }
 
-    ito::RetVal retval = m_pContent->plotMarkers(&coords, "a", "a", 0);
+    ito::RetVal retval = m_pContent->plotMarkers(&coords, "b", "", 0);
 
     m_pContent->replot();
 
