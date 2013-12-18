@@ -961,7 +961,7 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
             dataObjectOut = ito::DataObject(1, (int)seriesData->size(), ito::tFloat64);
             ito::float64* rowPtr = ((cv::Mat*)dataObjectOut.get_mdata()[0])->ptr<ito::float64>();
             QPointF curPos;
-            for(int i = 0; i < seriesData->size(); i++)
+            for(size_t i = 0; i < seriesData->size(); i++)
             {
                 curPos = seriesData->sample(i);
                 length += curPos.x();
@@ -973,7 +973,7 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
             dataObjectOut = ito::DataObject(1, (int)seriesData->size(), ito::tInt32);
             ito::int32* rowPtr = ((cv::Mat*)dataObjectOut.get_mdata()[0])->ptr<ito::int32>();
             QPointF curPos;            
-            for(int i = 0; i < seriesData->size(); i++)
+            for(size_t i = 0; i < seriesData->size(); i++)
             {
                 curPos = seriesData->sample(i);
                 length += curPos.x();
