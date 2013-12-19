@@ -186,7 +186,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     //prepare color bar
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
     rightAxis->setColorBarEnabled(true);
-    rightAxis->setColorBarWidth(30);
+    rightAxis->setColorBarWidth(15);
 
     //rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     rightAxis->setFont(QFont("Verdana",8,1,true));
