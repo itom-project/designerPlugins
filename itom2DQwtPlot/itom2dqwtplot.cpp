@@ -89,7 +89,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_data.m_xaxisVisible = true;
     m_data.m_yaxisVisible = true;
     m_data.m_colorBarVisible = false;
-    m_data.m_cmplxType = PlotCanvas::Real;
+    m_data.m_cmplxType = PlotCanvas::Abs;
     m_data.m_yaxisFlipped = false;
     m_data.m_pConstOutput = &m_pOutput;
     m_data.m_state = PlotCanvas::tIdle;
