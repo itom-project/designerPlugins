@@ -242,6 +242,9 @@ public slots:
 
     QSharedPointer<ito::DataObject> getDisplayed(void);
 
+    //this can be invoked by python to trigger a lineplot
+    ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
+
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);
     void plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);

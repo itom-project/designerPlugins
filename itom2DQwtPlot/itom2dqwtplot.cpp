@@ -1684,3 +1684,28 @@ void Itom2dQwtPlot::setSelectedElement(const int idx)
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const double x1, const double y1, const int /*destID*/)
+{
+    if(m_pActLineCut->isCheckable() && m_pActLineCut->isEnabled())
+    {
+        m_pActLineCut->setChecked(true);
+        mnuActLineCut(true);
+    }
+    else
+    {
+        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toAscii().data());
+    }
+
+    if(m_pContent)
+    {
+        QPoint first(m_pContent->transform(QwtPlot::xBottom, x0), m_pContent->transform(QwtPlot::yLeft, y0));
+        QPoint second(m_pContent->transform(QwtPlot::xBottom, x1), m_pContent->transform(QwtPlot::yLeft, y1));
+        m_pContent->lineCutAppended(first);
+        m_pContent->lineCutMoved(second);
+    }
+    else
+    {
+        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Widget not ready.").toAscii().data());
+    }
+    return ito::retOk;
+}

@@ -2289,8 +2289,8 @@ void PlotCanvas::mousePressEvent ( QMouseEvent * event )
             int canypos = event->y() - canvas()->y();
             double x = it.value()->x1;
             double y = it.value()->y1;
-            double xx = transform(QwtPlot::xBottom, it.value()->x1);
-            double yy = transform(QwtPlot::xBottom, it.value()->y1);
+            //double xx = transform(QwtPlot::xBottom, it.value()->x1);
+            //double yy = transform(QwtPlot::yLeft, it.value()->y1);
             if (fabs(transform(QwtPlot::xBottom, it.value()->x1) - canxpos) < 10
                 && fabs(transform(QwtPlot::yLeft, it.value()->y1) - canypos) < 10)
             {
