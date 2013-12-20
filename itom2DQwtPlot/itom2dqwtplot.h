@@ -56,7 +56,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker)
-    Q_PROPERTY(int selectedGeometrie READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
+    Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
