@@ -249,7 +249,7 @@ void Itom2dQwtPlot::createActions()
 
     //m_actDrawMode
     m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Switch Draw Mode, Point, Line, Rectangle, Ellipse"), this);
-    m_pMnuDrawMode = new QMenu("Draw Mode");
+    m_pMnuDrawMode = new QMenu("Draw Mode", this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
     a = m_pDrawModeActGroup->addAction(tr("Point"));
