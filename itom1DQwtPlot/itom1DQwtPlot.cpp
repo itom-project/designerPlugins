@@ -64,7 +64,8 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActClearDrawings(NULL),
     m_pActDrawMode(NULL),
     m_pMnuDrawMode(NULL),
-    m_pDrawModeActGroup(NULL)
+    m_pDrawModeActGroup(NULL),
+	m_pActProperties(NULL)
 {
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
     
@@ -139,6 +140,32 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     setFocus();
     setCentralWidget(m_pContent);
     m_pContent->setFocus();
+
+	QMenu *menuView = new QMenu(tr("View"), this);
+    menuView->addAction(m_pActHome);
+    menuView->addAction(m_pActPan);
+    menuView->addAction(m_pActZoomToRect);
+	menuView->addAction(m_pActAspectRatio);
+    menuView->addSeparator();
+	menuView->addAction(m_pActScaleSetting);
+	menuView->addAction(m_pRescaleParent);
+	menuView->addSeparator();
+    menuView->addAction(m_pActCmplxSwitch);
+	menuView->addSeparator();
+	menuView->addAction(m_pActProperties);
+	addMenu(menuView); //AbstractFigure takes care of the menu
+
+	QMenu *menuTools = new QMenu(tr("Tools"), this);
+	menuTools->addAction(m_pActSave);
+    menuTools->addSeparator();
+    menuTools->addAction(m_pActMarker);
+    menuTools->addAction(m_pActSetMarker);
+    menuTools->addSeparator();
+    menuTools->addAction(m_pActDrawMode);
+    menuTools->addAction(m_pActClearDrawings);
+	addMenu(menuTools); //AbstractFigure takes care of the menu
+
+	setPropertyObservedObject(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -295,6 +322,9 @@ void Itom1DQwtPlot::createActions()
     m_pLblMarkerOffsets->setAlignment(Qt::AlignRight | Qt::AlignTop);
     m_pLblMarkerOffsets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
     m_pLblMarkerOffsets->setObjectName(tr("Marker Offsets"));
+
+	m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
+    connect(m_pActProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
 
 }
 

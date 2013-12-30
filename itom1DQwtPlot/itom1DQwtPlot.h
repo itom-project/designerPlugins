@@ -50,18 +50,18 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 {
     Q_OBJECT
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
-    Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
-    Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel)
-    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
-    Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
-    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
-    Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
+    Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)
+    Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel USER true)
+    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel USER true)
+    Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
+    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
+    Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
 
     // Properties related with geometric elements
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
-    Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
-    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
+    Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio USER true)
+    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -172,6 +172,8 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction *m_pActClearDrawings;
         QAction* m_pActDrawMode;
         QMenu *m_pMnuDrawMode;
+
+		QAction *m_pActProperties;
 
         ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
 

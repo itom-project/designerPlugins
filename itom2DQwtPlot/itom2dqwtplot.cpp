@@ -129,7 +129,36 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
     mainTb->addAction(m_pActCoordinates);
-    
+
+	QMenu *menuView = new QMenu(tr("View"), this);
+    menuView->addAction(m_pActHome);
+    menuView->addAction(m_pActPan);
+    menuView->addAction(m_pActZoom);
+	menuView->addAction(m_pActAspectRatio);
+	menuView->addSeparator();
+	menuView->addAction(m_pActToggleColorBar);
+    menuView->addAction(m_pActColorPalette);
+    menuView->addSeparator();
+	menuView->addAction(m_pActScaleSettings);
+	menuView->addSeparator();
+    menuView->addAction(m_pActCmplxSwitch);
+	menuView->addSeparator();
+	menuView->addAction(m_pActProperties);
+	addMenu(menuView); //AbstractFigure takes care of the menu
+
+	QMenu *menuTools = new QMenu(tr("Tools"), this);
+	menuTools->addAction(m_pActSave);
+    menuTools->addSeparator();
+    menuTools->addAction(m_pActValuePicker);
+    menuTools->addAction(m_pActCntrMarker);
+    menuTools->addAction(m_pActLineCut);
+    menuTools->addAction(m_pActStackCut);
+    menuTools->addSeparator();
+    menuTools->addAction(m_pActDrawMode);
+    menuTools->addAction(m_pActClearDrawings);
+	addMenu(menuTools); //AbstractFigure takes care of the menu
+
+	setPropertyObservedObject(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -162,7 +191,7 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActHome()));
 
     //m_actPan
-    m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
+    m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
     a->setObjectName("actPan");
     a->setCheckable(true);
     a->setChecked(false);
@@ -170,7 +199,7 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActPan(bool)));
 
     //m_pActClearDrawings
-    m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("clear Marker"), this);
+    m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear markers"), this);
     a->setObjectName("actClearGeometrics");
     a->setCheckable(false);
     a->setChecked(false);
@@ -178,7 +207,7 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered()), this, SLOT(clearGeometricElements()));
 
     //m_actApectRatio
-    m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("lock aspect ratio"), this);
+    m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("Lock aspect ratio"), this);
     a->setObjectName("actRatio");
     a->setCheckable(true);
     a->setChecked(false);
@@ -186,7 +215,7 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
     //m_actZoom
-    m_pActZoom = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
+    m_pActZoom = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("Zoom to rectangle"), this);
     a->setObjectName("actZoom");
     a->setCheckable(true);
     a->setChecked(false);
@@ -213,7 +242,7 @@ void Itom2dQwtPlot::createActions()
     connect(a,SIGNAL(toggled(bool)),this,SLOT(mnuActToggleColorBar(bool)));
 
     //m_actMarker
-    m_pActValuePicker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
+    m_pActValuePicker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("Marker"), this);
     a->setObjectName("actValuePicker");
     a->setCheckable(true);
     a->setChecked(false);
@@ -280,7 +309,7 @@ void Itom2dQwtPlot::createActions()
     connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
 
     //m_pActCntrMarker
-    m_pActCntrMarker = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"), tr("center marker"), this);
+    m_pActCntrMarker = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"), tr("Center marker"), this);
     a->setObjectName("actCenterMarker");
     a->setToolTip(tr("Show a marker at data object center"));
     a->setCheckable(true);
@@ -327,6 +356,9 @@ void Itom2dQwtPlot::createActions()
     m_pActCoordinates = new QWidgetAction(this);
     m_pActCoordinates->setDefaultWidget(m_pCoordinates);
     m_pActCoordinates->setVisible(false);
+
+	m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
+    connect(m_pActProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

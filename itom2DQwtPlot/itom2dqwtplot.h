@@ -39,23 +39,23 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle)
-    Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel RESET resetxAxisLabel)
-    Q_PROPERTY(bool xAxisVisible READ getxAxisVisible WRITE setxAxisVisible)
-    Q_PROPERTY(QString yAxisLabel READ getyAxisLabel WRITE setyAxisLabel RESET resetyAxisLabel)
-    Q_PROPERTY(bool yAxisVisible READ getyAxisVisible WRITE setyAxisVisible)
-    Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped)
-    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel)
-    Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true)
-    Q_PROPERTY(QString colorMap READ getColorMap WRITE setColorMap DESIGNABLE true)
-    Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont)
-    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont)
-    Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont)
+    Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)
+    Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel RESET resetxAxisLabel USER true)
+    Q_PROPERTY(bool xAxisVisible READ getxAxisVisible WRITE setxAxisVisible USER true)
+    Q_PROPERTY(QString yAxisLabel READ getyAxisLabel WRITE setyAxisLabel RESET resetyAxisLabel USER true)
+    Q_PROPERTY(bool yAxisVisible READ getyAxisVisible WRITE setyAxisVisible USER true)
+    Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped USER true)
+    Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel USER true)
+    Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true USER true)
+    Q_PROPERTY(QString colorMap READ getColorMap WRITE setColorMap DESIGNABLE true USER true)
+    Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
+    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
+    Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
-    Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio)
-    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting)
-    Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker)
+    Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio USER true)
+    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
+    Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -75,7 +75,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
     Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
-    Q_CLASSINFO("prop://selectedGeometrie", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
+    Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
 
 public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -186,6 +186,7 @@ private:
     QWidgetAction *m_pActPlaneSelector;
     QActionGroup *m_pDrawModeActGroup;
     QAction *m_pActClearDrawings;
+	QAction *m_pActProperties;
 
     QLabel *m_pCoordinates;
     QWidgetAction *m_pActCoordinates;
