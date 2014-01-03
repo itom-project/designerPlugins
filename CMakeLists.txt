@@ -9,7 +9,7 @@ SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 
 ADD_SUBDIRECTORY(qwt)
 ADD_SUBDIRECTORY(itom1DQwtPlot)
-ADD_SUBDIRECTORY(itom2DGVFigurePlugin)
+ADD_SUBDIRECTORY(itom2DGraphicView)
 ADD_SUBDIRECTORY(itom2DQwtPlot)
 ADD_SUBDIRECTORY(itomIsoGLFigurePlugin)
 ADD_SUBDIRECTORY(matplotlibPlot)
