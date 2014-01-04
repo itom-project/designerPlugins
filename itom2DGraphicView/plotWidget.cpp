@@ -797,7 +797,7 @@ void PlotWidget::updatePointTracker()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::enableMarker(const bool enabled)
 {
-    m_pValuePicker->setVisible(enabled);
+    m_pValuePicker->setShown(enabled);
 
     if (!enabled) m_trackerIsSampling = false;
 
@@ -939,7 +939,7 @@ void PlotWidget::refreshStyles()
     {
         m_pValuePicker = new QGraphicsViewValuePicker("[0.0; 0.0]\n 0.0", m_pContent);
         m_pValuePicker->setColor(m_pData->m_inverseColor0);
-        m_pValuePicker->setVisible(false);
+        m_pValuePicker->setShown(false);
     }
     else
     {

@@ -46,80 +46,48 @@
 #include "common/apiFunctionsGraphInc.h"
 //#include "valuepicker2d.h"
 
-class QGraphicsViewValuePicker : public QGraphicsItem
+class QGraphicsViewValuePicker : public QGraphicsSimpleTextItem
 {
     public:
         QGraphicsViewValuePicker(const QString text, QGraphicsScene* scene, QGraphicsItem* parent = NULL)
-            :QGraphicsItem(NULL, scene)
+            :QGraphicsSimpleTextItem(text, NULL, scene), m_showMarker(false), m_Pen(Qt::red) //, m_textPen(Qt::red)
         {
-            m_pointTracker = new QGraphicsTextItem(text, NULL, scene);
-            m_pointTracker->setPos(0.0, 0.0);
-            m_pointTracker->setVisible(false);
-
-            m_pointMarker  = new QGraphicsEllipseItem(-1.0, -1.0, 2.0, 2.0, NULL, scene);
-            m_pointMarker->setVisible(false);
+             m_Pen.setWidthF(0.5);
         }
         ~QGraphicsViewValuePicker()
         {
-            /*
-            if(m_pointTracker)
+
+        }
+
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+        {
+            if(m_showMarker)
             {
-                delete m_pointTracker;
-                m_pointTracker = NULL;
+                painter->setBrush(QColor(128, 128, 128, 128));
+                painter->setPen(QColor(0, 0, 0, 0));
+                painter->drawRect(this->boundingRect());
+                painter->setBrush(QColor(0, 0, 0, 0));
+                painter->setPen(m_Pen);
+                painter->drawEllipse(this->boundingRect().topLeft(), 1, 1);
+                //painter->setPen(m_textPen);
+                QGraphicsSimpleTextItem::paint(painter, option, widget);
             }
-            if(m_pointMarker)
-            {
-                delete m_pointMarker;
-                m_pointMarker = NULL;
-            }
-            */
         }
 
-         QRectF boundingRect() const
-         {
-             return QRectF(0.0, 0.0, 1.0, 1.0);
-         }
+        bool isShown() const {return m_showMarker;}
+        void setShown(const bool show) {m_showMarker = show;}
 
-         void paint(QPainter* /*painter*/, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
-         {
-         }
-
-        void setVisible(const bool visibility)
+        void setColor(const QColor color)
         {
-            m_pointTracker->setVisible(visibility);
-            m_pointMarker->setVisible(visibility);
+            m_Pen.setColor(color);
+            //m_textPen.setColor(color);
+            //setPen(m_textPen);
         }
-
-        void setText(const char *txt)
-        {
-            m_pointTracker->setPlainText(txt);
-        }
-
-        bool isVisible() const {return m_pointMarker->isVisible() || m_pointTracker->isVisible();}
-
-        void setColor(const QColor newColor)
-        {
-            m_pointMarker->setPen(QPen(newColor));
-            m_pointTracker->setDefaultTextColor(newColor);        
-        }
-
-        /* Set center of the marker Ellipse */
-        void setPos(const QPointF pos)
-        {
-            m_outDated = false;
-            m_pointMarker->setPos(pos - QPointF(1.0, 1.0));
-            m_pointTracker->setPos(pos);
-        }
-
-        /* Center of the marker Ellipse */
-        QPointF pos() const {return m_pointMarker->pos() + QPointF(1.0, 1.0);}
-        double x() const {return m_pointMarker->x() + 1.0;}
-        double y() const {return m_pointMarker->y() + 1.0;}
 
     private:
-        bool m_outDated;
-        QGraphicsTextItem *m_pointTracker;
-        QGraphicsEllipseItem *m_pointMarker;
+        bool m_showMarker;
+        QPen m_Pen;
+        //QPen m_textPen;
         
 };
 
