@@ -46,6 +46,83 @@
 #include "common/apiFunctionsGraphInc.h"
 //#include "valuepicker2d.h"
 
+class QGraphicsViewValuePicker : public QGraphicsItem
+{
+    public:
+        QGraphicsViewValuePicker(const QString text, QGraphicsScene* scene, QGraphicsItem* parent = NULL)
+            :QGraphicsItem(NULL, scene)
+        {
+            m_pointTracker = new QGraphicsTextItem(text, NULL, scene);
+            m_pointTracker->setPos(0.0, 0.0);
+            m_pointTracker->setVisible(false);
+
+            m_pointMarker  = new QGraphicsEllipseItem(-1.0, -1.0, 2.0, 2.0, NULL, scene);
+            m_pointMarker->setVisible(false);
+        }
+        ~QGraphicsViewValuePicker()
+        {
+            /*
+            if(m_pointTracker)
+            {
+                delete m_pointTracker;
+                m_pointTracker = NULL;
+            }
+            if(m_pointMarker)
+            {
+                delete m_pointMarker;
+                m_pointMarker = NULL;
+            }
+            */
+        }
+
+         QRectF boundingRect() const
+         {
+             return QRectF(0.0, 0.0, 1.0, 1.0);
+         }
+
+         void paint(QPainter* /*painter*/, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
+         {
+         }
+
+        void setVisible(const bool visibility)
+        {
+            m_pointTracker->setVisible(visibility);
+            m_pointMarker->setVisible(visibility);
+        }
+
+        void setText(const char *txt)
+        {
+            m_pointTracker->setPlainText(txt);
+        }
+
+        bool isVisible() const {return m_pointMarker->isVisible() || m_pointTracker->isVisible();}
+
+        void setColor(const QColor newColor)
+        {
+            m_pointMarker->setPen(QPen(newColor));
+            m_pointTracker->setDefaultTextColor(newColor);        
+        }
+
+        /* Set center of the marker Ellipse */
+        void setPos(const QPointF pos)
+        {
+            m_outDated = false;
+            m_pointMarker->setPos(pos - QPointF(1.0, 1.0));
+            m_pointTracker->setPos(pos);
+        }
+
+        /* Center of the marker Ellipse */
+        QPointF pos() const {return m_pointMarker->pos() + QPointF(1.0, 1.0);}
+        double x() const {return m_pointMarker->x() + 1.0;}
+        double y() const {return m_pointMarker->y() + 1.0;}
+
+    private:
+        bool m_outDated;
+        QGraphicsTextItem *m_pointTracker;
+        QGraphicsEllipseItem *m_pointMarker;
+        
+};
+
 class GraphicViewPlot;
 struct InternalData;
 
@@ -81,7 +158,8 @@ class PlotWidget :  public QGraphicsView
         { 
             tIdle = 0, 
             tZoom = 1, 
-            tValuePicker = 2, 
+            tValuePicker = 2,
+            tPan = 3,
             tLineCut = 4, 
             tStackCut = 5, 
         };
@@ -111,6 +189,7 @@ class PlotWidget :  public QGraphicsView
 
         void enableAxis(const int axis, const bool value);
         QPointF calcInterval(const int axis) const;
+        void setState( tState state);
 
     private:
         
@@ -131,8 +210,7 @@ class PlotWidget :  public QGraphicsView
         QGraphicsPixmapItem *m_pItem;
 
         QGraphicsLineItem *m_pLineCut;
-        QGraphicsTextItem *m_pointTracker;
-        QGraphicsEllipseItem *m_pointMarker;
+        QGraphicsViewValuePicker *m_pValuePicker;
 
 //        ItoPlotSpectrogram *m_pContent; //content-element, added to canvas when first valid data object becomes available
 

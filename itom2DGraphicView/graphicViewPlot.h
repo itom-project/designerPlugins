@@ -93,7 +93,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
             delete pointArr;
         }
 
-        void setLinePlotCoordinates(const QVector<QPointF> pts);
+        void setCoordinates(const QVector<QPointF> pts, const bool visible);
 
 	    //properties (setter/getter)
         void setContextMenuEnabled(bool show); 
@@ -176,7 +176,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
        
         QAction  *m_pActPan;
         QAction  *m_pActZoomToRect;
-        QAction  *m_pActMarker;
+        QAction  *m_pActValuePicker;
         QAction  *m_pActLineCut;
 
         QAction  *m_pActPalette;

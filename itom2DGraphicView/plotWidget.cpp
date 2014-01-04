@@ -48,20 +48,33 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
         m_lineIsSampling(false),
         m_trackerIsSampling(false),
         m_stateMoveAligned(false),
-        m_pointTracker(NULL),
-        m_pointMarker(NULL)
+        m_pValuePicker(NULL)
 {
-    //this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
-
     m_pContent = new QGraphicsScene(this);
     setScene(m_pContent);
+    m_pContent->clear();
+    m_pixMap.fromImage(QImage(30, 30, QImage::Format_Indexed8));
+
+    m_pItem = new QGraphicsPixmapItem(m_pixMap);
+    m_pContent->clear();
+    m_pContent->addItem((QGraphicsItem*)m_pItem);
+    fitInView(m_pItem, Qt::KeepAspectRatio);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotWidget::~PlotWidget()
 {
-    delete m_ObjectContainer;
-    m_ObjectContainer = NULL;
+    if(m_pContent)
+    {
+        m_pContent->deleteLater();
+        m_pContent = NULL;
+    }
+
+    if(m_ObjectContainer)
+    {
+        delete m_ObjectContainer;
+        m_ObjectContainer = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -72,7 +85,7 @@ void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
     int button = 0;
     QPointF scenePos = mapToScene(event->pos());
     
-    if (!m_pContent || !m_pItem || !m_pLineCut || !m_pointMarker)
+    if (!m_pContent || !m_pItem || !m_pLineCut || !m_pValuePicker)
         return;
 
     switch(type)
@@ -89,7 +102,7 @@ void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
                     }
                     else if (m_pData->m_state == tValuePicker)
                     {
-                        m_pointMarker->setPos(scenePos - QPointF(1.0, 1.0));
+                        m_pValuePicker->setPos(scenePos);
                         updatePointTracker();
                         m_trackerIsSampling  = true;
                     }
@@ -135,17 +148,19 @@ void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
             {
                 if (m_stateMoveAligned)
                 {
-                    if (abs(scenePos.x() - m_pointMarker->pos().x()) > abs(scenePos.y() - m_pointMarker->pos().y()))
+                    double x = m_pValuePicker->x();
+                    double y = m_pValuePicker->y();
+                    if (abs(scenePos.x() - x) > abs(scenePos.y() - y))
                     {
-                        scenePos.setY(m_pointMarker->pos().y() + 1.0);
+                        scenePos.setY(y + 1.0);
                     }
                     else
                     {
-                        scenePos.setX(m_pointMarker->pos().x() + 1.0);
+                        scenePos.setX(x + 1.0);
                     }
                 }
 
-                m_pointMarker->setPos(scenePos - QPointF(1.0, 1.0));
+                m_pValuePicker->setPos(scenePos);
                 updatePointTracker();          
             }
         }
@@ -207,47 +222,11 @@ void PlotWidget::refreshPlot(ito::ParamBase *param)
             }
 
             m_pixMap.convertFromImage(m_ObjectContainer->convert2QImage(m_pData));               
-            
-            if (!m_pItem)
+            m_pItem->setPixmap(m_pixMap);
+
+            if (m_pValuePicker &&  m_pValuePicker->isVisible())
             {
-                m_pItem = new QGraphicsPixmapItem(m_pixMap);
-                m_pContent->clear();
-                m_pContent->addItem((QGraphicsItem*)m_pItem);
-                fitInView(m_pItem, Qt::KeepAspectRatio);
-            }
-            else
-                m_pItem->setPixmap(m_pixMap);
-
-            if (!m_pLineCut)
-            {
-                m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
-                m_pLineCut->setVisible(false);
-                m_lineIsSampling = false;
-
-                m_pLineCut->setPen(QPen(QColor(m_pData->m_inverseColor0)));
-            }
-
-            if (!m_pointMarker)
-            {
-                m_pointMarker = new QGraphicsEllipseItem(0.0, 0.0, 2.0, 2.0, NULL, m_pContent);
-                m_pointMarker->setVisible(false);
-
-                m_pointMarker->setPen(QPen(m_pData->m_inverseColor0));
-            }
-
-            if (!m_pointTracker)
-            {
-                m_pointTracker = new QGraphicsTextItem("[0.0; 0.0]\n 0.0", NULL, m_pContent);
-
-                m_pointTracker->setDefaultTextColor(m_pData->m_inverseColor0);
-                m_pointTracker->setVisible(false);
-            }
-            else
-            {
-                if (m_pointMarker->isVisible())
-                {
-                    updatePointTracker();
-                }
+                updatePointTracker();
             }
 
             repaint();
@@ -299,29 +278,29 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
         return;
     }
 
-    if (!m_pContent || !m_pItem || !m_pLineCut || !m_pointMarker)
+    if (!m_pContent || !m_pItem || !m_pLineCut || !m_pValuePicker)
     {
         return;
     }
 
-    if (!m_ObjectContainer || !(m_pLineCut->isVisible() || m_pointMarker->isVisible()))
+    if (!m_ObjectContainer)
     {
         return;
-    }
+    }    
 
     switch(((const QKeyEvent *)event)->key())
     {
         case Qt::Key_Up:
         { 
-            if (m_pointMarker->isVisible())   // doing the linecut
+            if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
-                QPointF scenePos = m_pointMarker->pos() - QPointF(0.0, 1.0);
+                QPointF scenePos = m_pValuePicker->pos() - QPointF(0.0, 1.0);
                 if (scenePos.y() < -1.0) scenePos.setY(-1.0);
 
-                m_pointMarker->setPos(scenePos);
+                m_pValuePicker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if (m_pLineCut->isVisible())
+            else if (m_pData->m_state == tLineCut)
             {
                 QPointF pt1 = m_pLineCut->line().p1() - QPointF(0.0, 1.0);
                 QPointF pt2 = m_pLineCut->line().p2() - QPointF(0.0, 1.0);
@@ -340,15 +319,15 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
             int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
             int y1 = m_ObjectContainer->getDataObject()->getSize(dims-2) - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
        
-            if (m_pointMarker->isVisible())   // doing the linecut
+            if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
-                QPointF scenePos = m_pointMarker->pos() + QPointF(0.0, 1.0);
+                QPointF scenePos = m_pValuePicker->pos() + QPointF(0.0, 1.0);
                 if (scenePos.y() > (y1 - 1)) scenePos.setY(y1 - 1);
 
-                m_pointMarker->setPos(scenePos);
+                m_pValuePicker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if (m_pLineCut->isVisible())
+            else if (m_pData->m_state == tLineCut)
             {
                 QPointF pt1 = m_pLineCut->line().p1() + QPointF(0.0, 1.0);
                 QPointF pt2 = m_pLineCut->line().p2() + QPointF(0.0, 1.0);
@@ -367,15 +346,15 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
             int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
             int x1 = m_ObjectContainer->getDataObject()->getSize(dims-1) - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
  
-            if (m_pointMarker->isVisible())   // doing the linecut
+            if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
-                QPointF scenePos = m_pointMarker->pos() + QPointF(1.0, 0.0);
-                if (scenePos.x() > (x1-1.0)) scenePos.setX(x1-1.0);
+                QPointF scenePos = m_pValuePicker->pos() + QPointF(1.0, 0.0);
+                if (scenePos.x() < x1) scenePos.setX(scenePos.x() - 1.0);
 
-                m_pointMarker->setPos(scenePos);
+                m_pValuePicker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if (m_pLineCut->isVisible())
+            else if (m_pData->m_state == tLineCut)
             {
                 QPointF pt1 = m_pLineCut->line().p1() + QPointF(1.0, 0.0);
                 QPointF pt2 = m_pLineCut->line().p2() + QPointF(1.0, 0.0);
@@ -391,15 +370,15 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
 
         case Qt::Key_Left:
         {
-            if (m_pointMarker->isVisible())   // doing the linecut
+            if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
-                QPointF scenePos = m_pointMarker->pos() - QPointF(1.0, 0.0);
-                if (scenePos.x() < -1.0) scenePos.setX(-1.0);
+                QPointF scenePos = m_pValuePicker->pos() - QPointF(1.0, 0.0);
+                if (scenePos.x() < 0.0) scenePos.setX(0.0);
 
-                m_pointMarker->setPos(scenePos);
+                m_pValuePicker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if (m_pLineCut->isVisible())
+            else if (m_pData->m_state == tLineCut)
             {
                 QPointF pt1 = m_pLineCut->line().p1() - QPointF(1.0, 0.0);
                 QPointF pt2 = m_pLineCut->line().p2() - QPointF(1.0, 0.0);
@@ -424,16 +403,16 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
             double xMin = 0.0;
             double xMax = m_ObjectContainer->getDataObject()->getSize(dims-1) - 1;
 
-            if (m_pointMarker->isVisible())   // doing the linecut
+            if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
-                QPointF scenePos = m_pointMarker->pos();
-                scenePos.setY(yCenter - 1.0);
-                if (scenePos.y() < -1.0) scenePos.setY(-1.0);
+                QPointF scenePos = m_pValuePicker->pos();
+                scenePos.setY(yCenter);
+                if (scenePos.y() < 0.0) scenePos.setY(0.0);
 
-                m_pointMarker->setPos(scenePos);
+                m_pValuePicker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if (m_pLineCut->isVisible())
+            else if (m_pData->m_state == tLineCut)
             {
                 QPointF pt(xMin, yCenter);
                 trackerAppended(pt);
@@ -453,16 +432,16 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
             double yMin = 0.0;
             double yMax = m_ObjectContainer->getDataObject()->getSize(dims-2) - 1;
 
-            if (m_pointMarker->isVisible())   // doing the linecut
+            if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
-                QPointF scenePos = m_pointMarker->pos();
-                scenePos.setX(xCenter - 1.0);
-                if (scenePos.x() < -1.0) scenePos.setX(-1.0);
+                QPointF scenePos = m_pValuePicker->pos();
+                scenePos.setX(xCenter);
+                if (scenePos.x() < 0.0) scenePos.setX(0.0);
 
-                m_pointMarker->setPos(scenePos);
+                m_pValuePicker->setPos(scenePos);
                 updatePointTracker();
             }
-            else if (m_pLineCut->isVisible())
+            else if (m_pData->m_state == tLineCut)
             {
                 QPointF pt(xCenter, yMin);
                 trackerAppended(pt);
@@ -741,10 +720,10 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::updatePointTracker()
 {
-    if (!m_ObjectContainer || !m_pointTracker || !m_pointMarker)
+    if (!m_ObjectContainer || !m_pValuePicker)
         return;
 
-    char buf[50] = {0};
+    char buf[60] = {0};
 
     int y1 = m_ObjectContainer->getDataObjHeight() - 1;
     int x1 = m_ObjectContainer->getDataObjWidth() - 1;
@@ -752,7 +731,7 @@ void PlotWidget::updatePointTracker()
     if (x1 < 0 || y1 < 0)
         return;
 
-    QPointF cursorPos = m_pointMarker->pos() + QPointF(1.0, 1.0);
+    QPointF cursorPos = m_pValuePicker->pos();
     
 
     if (cursorPos.x() < 0)
@@ -773,7 +752,7 @@ void PlotWidget::updatePointTracker()
         cursorPos.setY(y1);
     }
 
-    m_pointMarker->setPos(cursorPos - QPointF(1.0, 1.0));
+    m_pValuePicker->setPos(cursorPos);
 
     bool isInt = false;
 
@@ -794,7 +773,7 @@ void PlotWidget::updatePointTracker()
         {
             sprintf(buf, "[%i; %i]\n %i, %i, %i, %i", (int)cursorPos.x(), (int)cursorPos.y(), A, R, G, B);
         }
-        m_pointMarker->setPen(QPen(QColor(255-R, 255-G, 255-B)));
+        //m_pointMarker->setPen(QPen(QColor(255-R, 255-G, 255-B)));
     }
     else
     {
@@ -810,16 +789,15 @@ void PlotWidget::updatePointTracker()
         }
     }
     //m_pointTracker->setHtml("<div style=\"background:#ff8800;\">html item</p>");
-    m_pointTracker->setPlainText(buf);
-    m_pointTracker->setPos(cursorPos);
+    m_pValuePicker->setText(buf);
+    m_pValuePicker->setPos(cursorPos);
     return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::enableMarker(const bool enabled)
 {
-    m_pointTracker->setVisible(enabled);
-    m_pointMarker->setVisible(enabled);
+    m_pValuePicker->setVisible(enabled);
 
     if (!enabled) m_trackerIsSampling = false;
 
@@ -944,11 +922,29 @@ void PlotWidget::refreshStyles()
     m_pZoomer->setTrackerPen(trackerPen);
     */
 
-    m_pointTracker->setDefaultTextColor(m_pData->m_inverseColor0);
-    m_pointTracker->setFont(trackerFont);
-    m_pointMarker->setPen(trackerPen);
+    if (!m_pLineCut)
+    {
+        m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
+        m_pLineCut->setVisible(false);
+        m_lineIsSampling = false;
 
-    m_pLineCut->setPen(trackerPen);
+        m_pLineCut->setPen(trackerPen);
+    }
+    else
+    {
+        m_pLineCut->setPen(trackerPen);    
+    }
+
+    if (!m_pValuePicker)
+    {
+        m_pValuePicker = new QGraphicsViewValuePicker("[0.0; 0.0]\n 0.0", m_pContent);
+        m_pValuePicker->setColor(m_pData->m_inverseColor0);
+        m_pValuePicker->setVisible(false);
+    }
+    else
+    {
+        m_pValuePicker->setColor(m_pData->m_inverseColor0);
+    }
 
     //m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7) ));
     
@@ -969,7 +965,7 @@ void PlotWidget::refreshStyles()
 //    t = axisWidget(QwtPlot::yRight)->title();
 //    t.setFont(labelFont);
 //    axisWidget(QwtPlot::yRight)->setTitle(t);
-
+    repaint();
 }
 void PlotWidget::updateLabels()
 {
@@ -1012,5 +1008,108 @@ QPointF PlotWidget::calcInterval(const int axis) const
             ito::dObjHelper::minMaxValue(m_ObjectContainer->getDataObject().data(), z0, loc0, z1, loc1, true, m_pData->m_cmplxType);
             return QPointF(z0, z1);
         }
-    } 
+    }
+    return QPointF(0.0, 1.0);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotWidget::setState( tState state)
+{
+    GraphicViewPlot *p = (GraphicViewPlot*)(this->parent());
+
+    /*
+    m_pCenterMarker->setVisible(m_pData->m_showCenterMarker);
+    if(m_pData->m_showCenterMarker && m_dObjPtr)
+    {
+        if(m_dObjPtr->getDims() > 1)
+        {
+            bool valid;
+            m_pCenterMarker->setXValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-1, (m_dObjPtr->getSize(m_dObjPtr->getDims()-1) - 1) / 2.0, valid));
+            m_pCenterMarker->setYValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-2, (m_dObjPtr->getSize(m_dObjPtr->getDims()-2) - 1) / 2.0, valid));
+        }
+        
+    }
+    */
+    if (m_pData->m_state != state)
+    {
+
+        /*
+        if ((m_pData->m_state == tMultiPointPick || m_pData->m_state == tPoint
+            || m_pData->m_state == tLine || m_pData->m_state == tRect || m_pData->m_state == tEllipse) && state != tIdle)
+        {
+            return; //multiPointPick needs to go back to idle
+        }
+        */
+
+        //if (m_pZoomer) m_pZoomer->setEnabled( state == tZoom );
+        //if (m_pPanner) m_pPanner->setEnabled( state == tPan );
+
+        if (m_pValuePicker) enableMarker( state == tValuePicker );
+        if (m_pLineCut) enableLinePointer( state == tLineCut );
+
+        //if (m_pStackPicker) m_pStackPicker->setEnabled( state == tStackCut );
+        
+        //if (m_pMultiPointPicker) m_pMultiPointPicker->setEnabled( state == tMultiPointPick );
+
+        
+        if (/*state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
+            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || */ state == tIdle)
+        {
+            if (p)
+            {
+                //p->m_pActZoom->setEnabled(state == tIdle);
+                p->m_pActPan->setEnabled(state == tIdle);
+                p->m_pActLineCut->setEnabled(state == tIdle);
+                //p->m_pActStackCut->setEnabled(state == tIdle);
+                p->m_pActValuePicker->setEnabled(state == tIdle);
+            }
+        }
+
+        if (/*state == tZoom || state == tPan || state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
+            || m_pData->m_state == tRect || m_pData->m_state == tEllipse ||*/ state == tValuePicker || state == tIdle)
+        {
+            if (p)
+            {
+                p->setCoordinates(QVector<QPointF>(),false);
+            }
+        }
+
+        switch (state)
+        {
+            default:
+            case tIdle:
+                setCursor( Qt::ArrowCursor );
+            break;
+            /*
+            case tZoom:
+                setCursor( Qt::CrossCursor );
+            break;
+
+            case tPan:
+                setCursor( Qt::OpenHandCursor );
+            break;
+            */
+            case tValuePicker:
+                setCursor( Qt::CrossCursor );
+            break;
+
+            case tStackCut:
+                setCursor( Qt::CrossCursor );
+            break;
+            /*
+            case tMultiPointPick:
+                setCursor( Qt::CrossCursor );
+            break;
+            
+            case tPoint:
+            case tLine:
+            case tRect:
+            case tEllipse:
+                setCursor( Qt::CrossCursor );
+            break;
+            */
+        }
+
+        m_pData->m_state = state;
+    }
+    repaint();
 }

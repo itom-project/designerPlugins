@@ -41,7 +41,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_pActScaleSetting(NULL),
     m_pActPan(NULL),
     m_pActZoomToRect(NULL),
-    m_pActMarker(NULL),
+    m_pActValuePicker(NULL),
     m_pActLineCut(NULL),
     m_pActPalette(NULL),
     m_pActToggleColorBar(NULL),
@@ -78,7 +78,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
 
     // next block get pixel-Info
     toolbar->addSeparator();
-    toolbar->addAction(m_pActMarker);
+    toolbar->addAction(m_pActValuePicker);
     toolbar->addAction(m_pActLineCut);
 
     m_lblCoordinates = new QLabel(" [0.000; 0.000]\n [0.000; 0.000]", this);
@@ -132,7 +132,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
 	QMenu *menuTools = new QMenu(tr("Tools"), this);
 	menuTools->addAction(m_pActSave);
     menuTools->addSeparator();
-    menuTools->addAction(m_pActMarker);
+    menuTools->addAction(m_pActValuePicker);
     //menuTools->addAction(m_pActCntrMarker);
     menuTools->addAction(m_pActLineCut);
     //menuTools->addAction(m_pActStackCut);
@@ -147,7 +147,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     contextMenu->addSeparator();
     contextMenu->addAction(m_pActPan);
     contextMenu->addAction(m_pActZoomToRect);
-    contextMenu->addAction(m_pActMarker);
+    contextMenu->addAction(m_pActValuePicker);
     contextMenu->addSeparator();
     contextMenu->addAction(toolbar->toggleViewAction());
 
@@ -207,13 +207,13 @@ void GraphicViewPlot::createActions()
     connect(m_pActZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
 
 
-    //m_pActMarker
-    m_pActMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
-    m_pActMarker->setObjectName("actionMarker");
-    m_pActMarker->setCheckable(true);
-    m_pActMarker->setChecked(false);
-    m_pActMarker->setToolTip(tr("Show a point marker"));
-    connect(m_pActMarker, SIGNAL(toggled(bool)), this, SLOT(mnuValuePicker(bool)));
+    //m_pActValuePicker
+    m_pActValuePicker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
+    m_pActValuePicker->setObjectName("actionMarker");
+    m_pActValuePicker->setCheckable(true);
+    m_pActValuePicker->setChecked(false);
+    m_pActValuePicker->setToolTip(tr("Show a point marker"));
+    connect(m_pActValuePicker, SIGNAL(toggled(bool)), this, SLOT(mnuValuePicker(bool)));
 
     //m_pActLineCut
     m_pActLineCut = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("linecut"),this);
@@ -308,9 +308,9 @@ GraphicViewPlot::~GraphicViewPlot()
         m_pActZoomToRect->deleteLater();
     }
 
-    if (m_pActMarker)
+    if (m_pActValuePicker)
     {
-        m_pActMarker->deleteLater();
+        m_pActValuePicker->deleteLater();
     }
 
     if (m_pActLineCut)
@@ -440,7 +440,7 @@ ito::RetVal GraphicViewPlot::displayLineCut(QVector<QPointF> bounds, ito::uint32
     QWidget *lineCutObj = NULL;
 
     setOutpBounds(bounds);
-    setLinePlotCoordinates(bounds);
+    setCoordinates(bounds, true);
 
     retval += apiGetFigure("DObjLiveLine","",newUniqueID,&lineCutObj,this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
 
@@ -484,14 +484,10 @@ void GraphicViewPlot::mnuPanner(bool checked)
         m_pActAScan->setChecked(false);
         m_pActZoomToRect->setChecked(false);
         m_pActLineCut->setChecked(false);
-        m_pActMarker->setChecked(false);
-//        ((PlotWidget*)m_pContent)->m_pPanner->setEnabled(true);
+        m_pActValuePicker->setChecked(false);
     }
-    else
-    {
-        m_pActPan->setChecked(false);
-//        ((PlotWidget*)m_pContent)->m_pPanner->setEnabled(false);
-    }
+
+    m_pContent->setState(checked ? PlotWidget::tPan : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -501,34 +497,25 @@ void GraphicViewPlot::mnuZoomer(bool checked)
     {
         m_pActAScan->setChecked(false);
         m_pActLineCut->setChecked(false);
-        m_pActMarker->setChecked(false);
-        m_pActPan->setChecked(false);
-//        ((PlotWidget*)m_pContent)->m_pValuePicker->setEnabled(true);        
+        m_pActValuePicker->setChecked(false);
+        m_pActPan->setChecked(false);      
     }
-    else
-    {
-        m_pActZoomToRect->setChecked(false);
-//        ((PlotWidget*)m_pContent)->m_pValuePicker->setEnabled(false);
-    }
+
+    m_pContent->setState(checked ? PlotWidget::tZoom : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::mnuValuePicker(bool checked)
 {
-
     if (checked)
     {
         m_pActAScan->setChecked(false);
         m_pActZoomToRect->setChecked(false);
         m_pActLineCut->setChecked(false);
-        m_pActPan->setChecked(false);
-        ((PlotWidget*)m_pContent)->enableMarker(true);
+        m_pActPan->setChecked(false);      
     }
-    else
-    {
-        m_pActMarker->setChecked(false);
-        ((PlotWidget*)m_pContent)->enableMarker(false);
-    }
+
+    m_pContent->setState(checked ? PlotWidget::tValuePicker : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -545,16 +532,10 @@ void GraphicViewPlot::mnuAScanPicker(bool checked)
         m_pActPan->setChecked(false);
         m_pActZoomToRect->setChecked(false);
         m_pActLineCut->setChecked(false);
-        m_pActMarker->setChecked(false);
-//        ((PlotWidget*)m_pContent)->m_pAScanPicker->setEnabled(true);
-//        ((PlotWidget*)m_pContent)->m_pAScanMarker->setVisible(true);
+        m_pActValuePicker->setChecked(false);
     }
-    else
-    {
-        m_pActAScan->setChecked(false);
-        //((PlotWidget*)m_pContent)->m_pAScanPicker->setEnabled(false);
-        //((PlotWidget*)m_pContent)->m_pAScanMarker->setVisible(false);
-    }
+
+    m_pContent->setState(checked ? PlotWidget::tStackCut : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -565,14 +546,10 @@ void GraphicViewPlot::mnuLinePicker(bool checked)
         m_pActPan->setChecked(false);
         m_pActZoomToRect->setChecked(false);
         m_pActAScan->setChecked(false);
-        m_pActMarker->setChecked(false);
-        ((PlotWidget*)m_pContent)->enableLinePointer(true);
+        m_pActValuePicker->setChecked(false);
     }
-    else
-    {
-        m_pActLineCut->setChecked(false);
-        ((PlotWidget*)m_pContent)->enableLinePointer(false);
-    }
+
+    m_pContent->setState(checked ? PlotWidget::tLineCut : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -864,7 +841,7 @@ void GraphicViewPlot::enableZStackGUI(const bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void GraphicViewPlot::setLinePlotCoordinates(const QVector<QPointF> pts)
+void GraphicViewPlot::setCoordinates(const QVector<QPointF> pts, const bool visible)
 {
     char buf[60] = {0};
     if (pts.size() > 1)
@@ -880,6 +857,7 @@ void GraphicViewPlot::setLinePlotCoordinates(const QVector<QPointF> pts)
         sprintf(buf, "[ - ; - ]\n[ - ; - ]");
     }
     m_lblCoordinates->setText(buf);
+    m_lblCoordinates->setVisible(visible);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1250,8 +1228,9 @@ QFont GraphicViewPlot::getAxisFont(void) const
     {
         return m_pContent->axisFont(QwtPlot::xBottom);
     }
-    return QFont();
     */
+    return QFont();
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
