@@ -56,7 +56,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
     //Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
     //Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
 
-    Q_CLASSINFO("prop://colorMode", "Defines whether the color bar should be visible.")
+    Q_CLASSINFO("prop://colorMode", "Defines color handling.")
     Q_CLASSINFO("prop://colorBarVisible", "Defines whether the color bar should be visible.")
     Q_CLASSINFO("prop://colorMap", "Defines which color map should be used [e.g. grayMarked, hotIron].")
     //Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")

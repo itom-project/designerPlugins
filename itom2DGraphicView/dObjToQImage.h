@@ -57,10 +57,11 @@ class RasterToQImageObj : QObject
         bool getPixelARGB(const QPointF &coords, unsigned char &AValue, unsigned char &RValue, unsigned char &GValue, unsigned char &BValue);
         
         enum tValueType{
-            ColorIndex8Scaled   = 0,
-            ColorIndex8Bitshift = 1,
-            ColorRGB24          = 2,
-            ColorRGB32          = 3
+            ColorAutoSelect     = 0,
+            ColorIndex8Scaled   = 1,
+            ColorIndex8Bitshift = 2,
+            ColorRGB24          = 3,
+            ColorRGB32          = 4
         };
 
     protected:

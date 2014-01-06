@@ -155,6 +155,10 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_pContent = new PlotWidget(&m_data, contextMenu, this);
     m_pContent->setObjectName("canvasWidget");
     setCentralWidget(m_pContent);
+
+    connect(m_pContent, SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+
     m_pContent->setFocus();
     resize(600,400);
 
@@ -1042,6 +1046,7 @@ QPointF GraphicViewPlot::getXAxisInterval(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setXAxisInterval(QPointF point)
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     /*
     if (m_pContent)
     {
@@ -1064,6 +1069,7 @@ QPointF GraphicViewPlot::getYAxisInterval(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setYAxisInterval(QPointF point)
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     /*
     if (m_pContent)
     {
@@ -1133,7 +1139,7 @@ void GraphicViewPlot::setZAxisInterval(QPointF point)
                 m_data.m_numBits = 16;
                 return;
             default:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Scaled;
+                m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
         }
 
     }
@@ -1170,6 +1176,7 @@ void GraphicViewPlot::setColorMap(const QString &name)
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont GraphicViewPlot::getTitleFont(void) const
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     if (m_pContent)
     {
         //return m_pContent->titleLabel()->font();
@@ -1180,6 +1187,7 @@ QFont GraphicViewPlot::getTitleFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setTitleFont(const QFont &font)
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     if (m_pContent)
     {
         //m_pContent->titleLabel()->setFont(font);
@@ -1190,6 +1198,7 @@ void GraphicViewPlot::setTitleFont(const QFont &font)
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont GraphicViewPlot::getLabelFont(void) const
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     if (m_pContent)
     {
         //QwtText t = m_pContent->axisWidget(QwtPlot::xBottom)->title();
@@ -1201,6 +1210,7 @@ QFont GraphicViewPlot::getLabelFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setLabelFont(const QFont &font)
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     /*
     if (m_pContent)
     {
@@ -1223,6 +1233,7 @@ void GraphicViewPlot::setLabelFont(const QFont &font)
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont GraphicViewPlot::getAxisFont(void) const
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     /*
     if (m_pContent)
     {
@@ -1236,6 +1247,7 @@ QFont GraphicViewPlot::getAxisFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setAxisFont(const QFont &font)
 {
+    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     /*
     if (m_pContent)
     {
@@ -1251,11 +1263,13 @@ void GraphicViewPlot::setColorMode(const int type)
 {
     if(type < 0)
     {
-    
+        emit m_pContent->statusBarMessage( tr("Specified color type out of range [0, 4]."), 2000 );
+        return;
     }
-    if(type > 3)
+    if(type > 4)
     {
-    
+        emit m_pContent->statusBarMessage( tr("Specified color type out of range [0, 4]."), 2000 );
+        return;
     }
 
     m_data.m_colorMode = (RasterToQImageObj::tValueType)type;
@@ -1265,5 +1279,5 @@ void GraphicViewPlot::setColorMode(const int type)
 }
 void GraphicViewPlot::resetColorMode(void)
 {
-    m_data.m_colorMode = RasterToQImageObj::ColorIndex8Scaled;
+    m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
 }

@@ -74,8 +74,14 @@ class QGraphicsViewValuePicker : public QGraphicsSimpleTextItem
             }
         }
 
-        bool isShown() const {return m_showMarker;}
-        void setShown(const bool show) {m_showMarker = show;}
+        bool isShown() const 
+        {
+            return m_showMarker;
+        }
+        void setShown(const bool show)
+        {
+            m_showMarker = show;
+        }
 
         void setColor(const QColor color)
         {
@@ -266,7 +272,7 @@ struct InternalData
         m_state = PlotWidget::tIdle;
         m_zoomLevel = PlotWidget::RatioOff;
 
-        m_colorMode = RasterToQImageObj::ColorIndex8Scaled;
+        m_colorMode = RasterToQImageObj::ColorAutoSelect;
 
         m_colorTable.clear();
         m_colorTable.resize(256);

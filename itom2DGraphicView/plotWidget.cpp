@@ -53,12 +53,20 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
     m_pContent = new QGraphicsScene(this);
     setScene(m_pContent);
     m_pContent->clear();
-    m_pixMap.fromImage(QImage(30, 30, QImage::Format_Indexed8));
 
-    m_pItem = new QGraphicsPixmapItem(m_pixMap);
-    m_pContent->clear();
-    m_pContent->addItem((QGraphicsItem*)m_pItem);
-    fitInView(m_pItem, Qt::KeepAspectRatio);
+    m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
+    m_pLineCut->setVisible(false);
+    m_pLineCut->setZValue(1.0);
+    m_lineIsSampling = false;
+    m_pLineCut->setPen(m_pData->m_inverseColor0);
+
+    m_pValuePicker = new QGraphicsViewValuePicker("[0.0; 0.0]\n 0.0", m_pContent);
+    m_pValuePicker->setColor(m_pData->m_inverseColor0);
+    m_pValuePicker->setZValue(1.0);
+    m_pValuePicker->setShown(false);
+
+
+    repaint();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -66,6 +74,7 @@ PlotWidget::~PlotWidget()
 {
     if(m_pContent)
     {
+        m_pContent->clear();
         m_pContent->deleteLater();
         m_pContent = NULL;
     }
@@ -190,7 +199,11 @@ void PlotWidget::refreshPlot(ito::ParamBase *param)
         ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
         int dims = dataObj->getDims();
         if (dims > 1)
-        {            
+        {         
+            if(m_pData->m_colorMode == RasterToQImageObj::ColorAutoSelect && dataObj->getType() == ito::tRGBA32)
+            {
+                ((GraphicViewPlot*)m_pParent)->setColorMode(RasterToQImageObj::ColorRGB32);
+            }
             //if (m_pItem)
             //    delete m_pItem;
             
@@ -222,9 +235,19 @@ void PlotWidget::refreshPlot(ito::ParamBase *param)
             }
 
             m_pixMap.convertFromImage(m_ObjectContainer->convert2QImage(m_pData));               
-            m_pItem->setPixmap(m_pixMap);
 
-            if (m_pValuePicker &&  m_pValuePicker->isVisible())
+            if (!m_pItem)
+            {
+                m_pItem = new QGraphicsPixmapItem(m_pixMap);
+                m_pItem->setZValue(0.0);
+                m_pContent->addItem((QGraphicsItem*)m_pItem);
+                fitInView(m_pItem, Qt::KeepAspectRatio);
+            }
+            else
+            {
+                m_pItem->setPixmap(m_pixMap);
+            }
+            if (m_pValuePicker &&  m_pValuePicker->isShown())
             {
                 updatePointTracker();
             }
@@ -239,7 +262,6 @@ void PlotWidget::refreshPlot(ito::ParamBase *param)
         if (!m_pItem)
         {
             m_pItem = new QGraphicsPixmapItem(m_pixMap);
-            m_pContent->clear();
             m_pContent->addItem((QGraphicsItem*)m_pItem);
             fitInView(m_pItem, Qt::KeepAspectRatio);
         }
@@ -713,7 +735,7 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
             break;
     }
 
-    repaint();
+    if(m_pItem) repaint();  // has an image to paint
     return ito::retError;
 }
 
@@ -922,29 +944,8 @@ void PlotWidget::refreshStyles()
     m_pZoomer->setTrackerPen(trackerPen);
     */
 
-    if (!m_pLineCut)
-    {
-        m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
-        m_pLineCut->setVisible(false);
-        m_lineIsSampling = false;
-
-        m_pLineCut->setPen(trackerPen);
-    }
-    else
-    {
-        m_pLineCut->setPen(trackerPen);    
-    }
-
-    if (!m_pValuePicker)
-    {
-        m_pValuePicker = new QGraphicsViewValuePicker("[0.0; 0.0]\n 0.0", m_pContent);
-        m_pValuePicker->setColor(m_pData->m_inverseColor0);
-        m_pValuePicker->setShown(false);
-    }
-    else
-    {
-        m_pValuePicker->setColor(m_pData->m_inverseColor0);
-    }
+    m_pLineCut->setPen(trackerPen);
+    m_pValuePicker->setColor(m_pData->m_inverseColor0);
 
     //m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7) ));
     
@@ -965,15 +966,15 @@ void PlotWidget::refreshStyles()
 //    t = axisWidget(QwtPlot::yRight)->title();
 //    t.setFont(labelFont);
 //    axisWidget(QwtPlot::yRight)->setTitle(t);
-    repaint();
+    if(m_pItem) repaint();  // has an image to paint
 }
 void PlotWidget::updateLabels()
 {
-
+    emit statusBarMessage( tr("Not implemented yet."), 2000 );
 }
 void PlotWidget::enableAxis(const int axis, const bool value)
 {
-
+    emit statusBarMessage( tr("Not implemented yet."), 2000 );
 }
 
 QPointF PlotWidget::calcInterval(const int axis) const
@@ -1009,6 +1010,7 @@ QPointF PlotWidget::calcInterval(const int axis) const
             return QPointF(z0, z1);
         }
     }
+
     return QPointF(0.0, 1.0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1111,5 +1113,5 @@ void PlotWidget::setState( tState state)
 
         m_pData->m_state = state;
     }
-    repaint();
+    if(m_pItem) repaint();  // has an image to paint
 }
