@@ -181,8 +181,6 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
 
         QAction  *m_pActPalette;
         QAction  *m_pActToggleColorBar;
-        QAction  *m_pActColorDisplay;
-        QAction  *m_pActGrayDisplay;
 
         QAction  *m_pActAScan;
         QAction  *m_pActForward;
@@ -192,6 +190,9 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
 
 	    QAction  *m_pActAspectSwitch;
 	    QMenu    *m_pMnuAspectSwitch;
+
+	    QAction  *m_pActColorSwitch;
+	    QMenu    *m_pMnuColorSwitch;
 
         QLabel   *m_pPaletteRep;
         QAction  *m_curPalette; 

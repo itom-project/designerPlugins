@@ -32,6 +32,8 @@
         <file>icons/polygon.png</file>
         <file>icons/markerCntr.png</file>
         <file>icons/blkorwht.png</file>
+        <file>icons/falseColor.png</file>
+        <file>icons/rgba.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>

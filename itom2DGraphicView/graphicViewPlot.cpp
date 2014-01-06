@@ -45,8 +45,6 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_pActLineCut(NULL),
     m_pActPalette(NULL),
     m_pActToggleColorBar(NULL),
-    m_pActColorDisplay(NULL),
-    m_pActGrayDisplay(NULL),
     m_pActAScan(NULL),
     m_pActForward(NULL),
     m_pActBack(NULL),
@@ -54,6 +52,8 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
 	m_pMnuCmplxSwitch(NULL),
 	m_pActAspectSwitch(NULL),
 	m_pMnuAspectSwitch(NULL),
+	m_pActColorSwitch(NULL),
+	m_pMnuColorSwitch(NULL),
     m_pPaletteRep(NULL),
     m_curPalette(NULL),
 	m_lblCoordinates(NULL),
@@ -91,6 +91,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
 
     // next block is colorbar
     toolbar->addSeparator();
+    toolbar->addAction(m_pActColorSwitch);
     toolbar->addAction(m_pActPalette);
     toolbar->addAction(m_pActToggleColorBar);
 
@@ -119,8 +120,9 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     //menuView->addAction(m_pActZoom);
 	menuView->addAction(m_pActZoomToRect);
 	menuView->addSeparator();
-	menuView->addAction(m_pActToggleColorBar);
+	menuView->addAction(m_pActPalette);
     menuView->addAction(m_pActToggleColorBar);
+    menuView->addAction(m_pActColorSwitch);
     menuView->addSeparator();
 	//menuView->addAction(m_pActScaleSettings);
 	//menuView->addSeparator();
@@ -286,6 +288,18 @@ void GraphicViewPlot::createActions()
     m_pActCmplxSwitch->setToolTip(tr("Switch imaginary, real, absolute, phase"));
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
+    //m_pActColorSwitch
+    m_pActColorSwitch = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/falseColor.png"), tr("color switch"), this);
+	m_pMnuColorSwitch = new QMenu(tr("Color Switch"), this);
+	m_pMnuColorSwitch->addAction(tr("autoColor"));
+	m_pMnuColorSwitch->addAction(tr("falseColor, bitshift"));
+	m_pMnuColorSwitch->addAction(tr("falseColor, scaled"));
+	m_pMnuColorSwitch->addAction(tr("Color, 24-Bit"));
+    m_pMnuColorSwitch->addAction(tr("Color, 32-Bit"));
+	m_pActColorSwitch->setMenu(m_pMnuColorSwitch);
+    m_pActColorSwitch->setToolTip(tr("Switch index and direct color mode"));
+    connect(m_pMnuColorSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuSwitchColorMode(QAction*)));
+
 	m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
     connect(m_pActProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
 }
@@ -332,16 +346,6 @@ GraphicViewPlot::~GraphicViewPlot()
         m_pActToggleColorBar->deleteLater();
     }
 
-    if (m_pActColorDisplay)
-    {
-        m_pActColorDisplay->deleteLater();
-    }
-
-    if (m_pActGrayDisplay)
-    {
-        m_pActGrayDisplay->deleteLater();
-    }
-
     if (m_pActAScan)
     {
         m_pActAScan->deleteLater();
@@ -366,6 +370,17 @@ GraphicViewPlot::~GraphicViewPlot()
     {
         m_pMnuCmplxSwitch->clear();
         m_pMnuCmplxSwitch->deleteLater();
+    }
+
+    if (m_pActColorSwitch)
+    {
+        m_pActColorSwitch->deleteLater();
+    }
+
+    if (m_pMnuColorSwitch)
+    {
+        m_pMnuColorSwitch->clear();
+        m_pMnuColorSwitch->deleteLater();
     }
 
     if (m_pActAspectSwitch)
@@ -740,7 +755,30 @@ void GraphicViewPlot::mnuCmplxSwitch(QAction *action)
         ((PlotWidget*)m_pContent)->refreshPlot(NULL);
 	}
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void GraphicViewPlot::mnuSwitchColorMode(QAction *action)
+{
+    if (action->text() == tr("falseColor, bitshift"))
+    {
+        setColorMode(RasterToQImageObj::ColorIndex8Bitshift);
+    }
+	else if (action->text() == tr("falseColor, scaled"))
+    {
+        setColorMode(RasterToQImageObj::ColorIndex8Scaled);
+    }
+	else if (action->text() == tr("Color, 24-Bit"))
+    {
+        setColorMode(RasterToQImageObj::ColorRGB24);
+    }
+	else if (action->text() == tr("Color, 32-Bit"))
+    {
+		setColorMode(RasterToQImageObj::ColorRGB32);
+    }
+    else
+    {
+        setColorMode(RasterToQImageObj::ColorAutoSelect);
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::mnuAspectSwitch(QAction *action)
 {
@@ -804,26 +842,6 @@ void GraphicViewPlot::mnuAspectSwitch(QAction *action)
         }
 	}
 
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void GraphicViewPlot::mnuSwitchColorMode(QAction *action)
-{
-	if (m_pContent)
-	{
-        if (action->text() == QString("RGB"))
-        {
-
-        }
-		else if (action->text() == QString("Index8"))
-        {
-
-        }
-		else if (action->text() == QString("Idx8"))
-        {
-
-        }
-	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1274,9 +1292,29 @@ void GraphicViewPlot::setColorMode(const int type)
 
     m_data.m_colorMode = (RasterToQImageObj::tValueType)type;
 
-    m_pContent->refreshPlot(NULL);
-    
+    switch(m_data.m_colorMode)
+    {
+        default:
+        case RasterToQImageObj::ColorIndex8Scaled:
+        case RasterToQImageObj::ColorIndex8Bitshift:
+        case RasterToQImageObj::ColorAutoSelect:
+            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/falseColor.png"));
+            m_pActToggleColorBar->setVisible(true);
+            m_pActPalette->setVisible(true);
+            
+            break;
+        case RasterToQImageObj::ColorRGB24:
+        case RasterToQImageObj::ColorRGB32:
+            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rgba.png"));
+            m_pActToggleColorBar->setVisible(false);
+            m_pActPalette->setVisible(false);
+            if(m_pActToggleColorBar->isCheckable()) m_pActToggleColorBar->setChecked(false);
+            break;
+    }
+
+    if(m_pContent) m_pContent->refreshPlot(NULL);  
 }
+//----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::resetColorMode(void)
 {
     m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
