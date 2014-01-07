@@ -65,13 +65,19 @@ class QGraphicsViewValuePicker : public QGraphicsSimpleTextItem
             {
                 painter->setBrush(QColor(128, 128, 128, 128));
                 painter->setPen(QColor(0, 0, 0, 0));
-                painter->drawRect(this->boundingRect());
+                painter->drawRect(QGraphicsSimpleTextItem::boundingRect());
                 painter->setBrush(QColor(0, 0, 0, 0));
                 painter->setPen(m_Pen);
-                painter->drawEllipse(this->boundingRect().topLeft(), 1, 1);
+                painter->drawEllipse(QGraphicsSimpleTextItem::boundingRect().topLeft(), 1, 1);
                 //painter->setPen(m_textPen);
                 QGraphicsSimpleTextItem::paint(painter, option, widget);
             }
+        }
+
+        QRectF boundingRect() const
+        {
+            QRectF rect(-2.0, -2.0, QGraphicsSimpleTextItem::boundingRect().width() + 2.0, QGraphicsSimpleTextItem::boundingRect().height() + 2.0);
+            return rect;
         }
 
         bool isShown() const 
@@ -108,7 +114,7 @@ class PlotWidget :  public QGraphicsView
         ~PlotWidget();
 
         bool m_showContextMenu;
-        void refreshPlot(ito::ParamBase *dataObj);
+        void refreshPlot(const ito::DataObject *dObj, int plane = -1);
 
         friend class GraphicViewPlot;
 
@@ -164,10 +170,11 @@ class PlotWidget :  public QGraphicsView
         void enableAxis(const int axis, const bool value);
         QPointF calcInterval(const int axis) const;
         void setState( tState state);
-
+        void changePlane(int plane);
+        void internalDataUpdated();
     private:
         
-
+        const ito::DataObject *m_dObjPtr;
         InternalData* m_pData;
 
         void trackerMoved(const QPointF &pt);
@@ -268,7 +275,7 @@ struct InternalData
         m_paletteNum = 0;
         m_numBits = 8;
 
-        m_cmplxType = PlotWidget::tAbsolute;
+        m_cmplxType = RasterToQImageObj::tAbsolute;
         m_state = PlotWidget::tIdle;
         m_zoomLevel = PlotWidget::RatioOff;
 
@@ -331,7 +338,7 @@ struct InternalData
     int m_paletteNum;
     unsigned char m_numBits;
 
-    PlotWidget::ComplexType m_cmplxType;
+    RasterToQImageObj::ComplexType m_cmplxType;
     PlotWidget::tState m_state;
     PlotWidget::tZoomRatio m_zoomLevel;
     RasterToQImageObj::tValueType m_colorMode;

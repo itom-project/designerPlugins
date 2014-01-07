@@ -32,6 +32,7 @@
 #include <qrect.h>
 #include <qsharedpointer.h>
 #include <qelapsedtimer.h>
+#include <qcryptographichash.h>
 
 //using namespace ito;
 
@@ -41,21 +42,29 @@ struct InternalData;
 class RasterToQImageObj : QObject
 {
     public:
-        explicit RasterToQImageObj(QSharedPointer<ito::DataObject> dataObj, bool replotPending);
+        explicit RasterToQImageObj(InternalData *m_internalData);
         ~RasterToQImageObj();
 
-        QImage convert2QImage(const InternalData *pData);
+        QImage convert2QImage();
 
-        void updateDataObject(QSharedPointer<ito::DataObject> dataObj);
+        bool updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
 
-		inline QSharedPointer<ito::DataObject> getDataObject(void) { return m_dataObj; };
+		inline ito::DataObject* getDataObject(void) { return m_dataObjPlane; };
 
-		inline int getDataObjWidth() { return m_DataObjectWidth; };
-		inline int getDataObjHeight() { return m_DataObjectHeight; };
+		inline int getDataObjWidth() { return m_D.m_xSize; };
+		inline int getDataObjHeight() { return m_D.m_ySize; };
         
         ito::float64 getPixel(const QPointF &coords, bool &isInt, const int &cmplxState);
         bool getPixelARGB(const QPointF &coords, unsigned char &AValue, unsigned char &RValue, unsigned char &GValue, unsigned char &BValue);
         
+        enum ComplexType 
+        { 
+            tAbsolute = 0, 
+            tImag = 1, 
+            tReal = 2, 
+            tPhase = 3 
+        }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
+
         enum tValueType{
             ColorAutoSelect     = 0,
             ColorIndex8Scaled   = 1,
@@ -68,83 +77,143 @@ class RasterToQImageObj : QObject
 
     private:
 
-        QSharedPointer<ito::DataObject> m_dataObj;               /*!< borrowed reference, do not delete here */
-        QSharedPointer<ito::DataObject> m_dataObjWhileRastering;
+        void deleteCache(void);
+        QByteArray calcHash(const ito::DataObject *dObj);
 
-        bool m_replotPending;
+        QByteArray m_hash;
 
-        int m_DataObjectWidth;
-        int m_DataObjectHeight;
+        ito::DataObject m_dataObj; //the source data object (unchanged)
+        ito::DataObject *m_dataObjPlane; //pointer to the source data object (<=2D) or a shallow copy to the depicted plane (>=3D)
 
-        template<typename _Type> inline QImage rescaleByScale(const int &ySize, const int &xSize, const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
+        bool m_validData;
+        QByteArray m_dataHash;
+        QCryptographicHash m_hashGenerator;
+
+        struct DataParam {
+            DataParam() : m_dataPtr(NULL), m_planeIdx(0), m_yScaling(1), m_xScaling(1),
+                m_yOffset(0), m_xOffset(0), m_ySize(0), m_xSize(0), m_yaxisFlipped(0), m_hasROI(false) {}
+
+            int** m_dataPtr; //only for comparison
+            size_t m_planeIdx;
+            double m_yScaling;
+            double m_xScaling;
+            double m_yOffset;
+            double m_xOffset;
+            int m_ySize;
+            int m_xSize;
+            bool m_yaxisFlipped;
+            bool m_hasROI;
+        };
+
+        DataParam m_D;
+        cv::Mat *m_plane;
+        InternalData *m_pInternalData;
+
+        template<typename _Type> inline QImage rescaleByScale(const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
         {
-            QImage retImage(xSize, ySize, QImage::Format_Indexed8);
+            QImage retImage(m_D.m_xSize, m_D.m_ySize, QImage::Format_Indexed8);
             retImage.setColorTable(colorTable);
 
-            int pixelCnt = xSize * ySize;
-            _Type *srcPtr = ((cv::Mat*)m_dataObjWhileRastering->get_mdata()[0])->ptr<_Type>();
             unsigned char *dstPtr = retImage.bits();
 
             double scaling = 1.0;
+
 
             if(ito::dObjHelper::isNotZero(zMax-zMin))
             {
                 scaling = 255.0 / (zMax - zMin);
             }
-            for(int i = 0; i < pixelCnt; i++)
+
+            _Type *srcPtr = m_plane->ptr<_Type>();
+            size_t nextRow = (size_t)((m_plane->step[0] - m_D.m_xSize * m_plane->step[1]) / sizeof(_Type));
+            
+            size_t nextDstRow = m_D.m_xSize % 4;
+            if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
+
+            for(int y = 0; y < m_D.m_ySize; y++)
             {
-                *dstPtr = cv::saturate_cast<ito::uint8>((*srcPtr - zMin)*(scaling));
-                dstPtr++;
-                srcPtr++;
+                for(int x = 0; x < m_D.m_xSize; x++)
+                {
+                    *dstPtr = cv::saturate_cast<ito::uint8>((*srcPtr - zMin)*(scaling));
+                    dstPtr++;
+                    srcPtr++;
+                }
+                srcPtr += nextRow;
+                dstPtr += nextDstRow;
             }
+
 
             return retImage;        
         }
 
-        template<> inline QImage rescaleByScale<ito::complex64>(const int &ySize, const int &xSize, const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
+        template<> inline QImage rescaleByScale<ito::complex64>(const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
         {
-            QImage retImage(xSize, ySize, QImage::Format_Indexed8);
+            QImage retImage(m_D.m_xSize, m_D.m_ySize, QImage::Format_Indexed8);
             retImage.setColorTable(colorTable);
 
-            int pixelCnt = xSize * ySize;
-            ito::complex64 *srcPtr = ((cv::Mat*)m_dataObjWhileRastering->get_mdata()[0])->ptr<ito::complex64>();
+            ito::complex64 *srcPtr = m_plane->ptr<ito::complex64>();
             unsigned char *dstPtr = retImage.bits();
+
+            size_t nextRow = (size_t)((m_plane->step[0] - m_D.m_xSize * m_plane->step[1]) / sizeof(ito::complex64));
+            
+            size_t nextDstRow = m_D.m_xSize % 4;
+            if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
 
             double scaling = 255.0 / (zMax - zMin);
 			switch (cmplxState)
 			{
 				default:
 
-				case 0:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tAbsolute:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
-				case 2:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tReal:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>(((*srcPtr).real() - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((real(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
-				case 1:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tImag:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>(((*srcPtr).imag() - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((imag(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
-				case 3:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tPhase:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
 			}
@@ -152,54 +221,76 @@ class RasterToQImageObj : QObject
             return retImage;        
         }
         
-        template<> inline QImage rescaleByScale<ito::complex128>(const int &ySize, const int &xSize, const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
+        template<> inline QImage rescaleByScale<ito::complex128>(const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
         {
-            QImage retImage(xSize, ySize, QImage::Format_Indexed8);
+            QImage retImage(m_D.m_xSize, m_D.m_ySize, QImage::Format_Indexed8);
             retImage.setColorTable(colorTable);
 
-            int pixelCnt = xSize * ySize;
-            ito::complex128 *srcPtr = ((cv::Mat*)m_dataObjWhileRastering->get_mdata()[0])->ptr<ito::complex128>();
+            ito::complex128 *srcPtr = m_plane->ptr<ito::complex128>();
             unsigned char *dstPtr = retImage.bits();
 
+            size_t nextRow = (size_t)((m_plane->step[0] - m_D.m_xSize * m_plane->step[1]) / sizeof(ito::complex128));
+            size_t nextDstRow = m_D.m_xSize % 4;
+            if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
+
             double scaling = 255.0 / (zMax - zMin);
-			switch (cmplxState)
+            switch (cmplxState)
 			{
 				default:
-				case 0:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tAbsolute:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
-				case 2:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tReal:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>(((*srcPtr).real() - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((real(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
-				case 1:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tImag:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>(((*srcPtr).imag() - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((imag(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
-				case 3:
-                    for(int i = 0; i < pixelCnt; i++)
+				case tPhase:
+                    for(int y = 0; y < m_D.m_ySize; y++)
                     {
-                        *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
-                        dstPtr++;
-                        srcPtr++;
+                        for(int x = 0; x < m_D.m_xSize; x++)
+                        {
+                            *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
+                            dstPtr++;
+                            srcPtr++;
+                        }
+                        srcPtr += nextRow;
+                        dstPtr += nextDstRow;
                     }
 				break;
-			}
-
-            return retImage;        
+            }
+            return retImage;      
         }
 };
 

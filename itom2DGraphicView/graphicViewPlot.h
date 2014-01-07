@@ -33,7 +33,7 @@
 #include <qpainter.h>
 #include <qaction.h>
 #include <qwidget.h>
-
+#include <qwidgetaction.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
@@ -168,7 +168,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
 
     private:
         void createActions();
-
+        
         QAction  *m_pActScaleSetting;
 
 		QAction  *m_pActSave;
@@ -183,8 +183,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
         QAction  *m_pActToggleColorBar;
 
         QAction  *m_pActAScan;
-        QAction  *m_pActForward;
-        QAction  *m_pActBack;
+        QWidgetAction  *m_pActPlaneSelector;
 	    QAction  *m_pActCmplxSwitch;
 	    QMenu    *m_pMnuCmplxSwitch;
 
@@ -223,6 +222,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
         void mnuZoomer(bool checked);
         void mnuExport();
         void mnuSwitchColorMode(QAction *action);
+        void mnuActPlaneSelector(int plane);
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

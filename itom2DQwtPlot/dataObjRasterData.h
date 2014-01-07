@@ -70,7 +70,6 @@ class DataObjRasterData : public QwtRasterData
         void deleteCache();
 
         QByteArray m_hash;
-        bool m_validHash;
 
         ito::DataObject m_dataObj; //the source data object (unchanged)
         ito::DataObject *m_dataObjPlane; //pointer to the source data object (<=2D) or a shallow copy to the depicted plane (>=3D)

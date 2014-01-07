@@ -26,6 +26,7 @@
 #include <qfiledialog.h>
 #include <qimagewriter.h>
 
+
 //#include <GV_plot_renderer.h>
 
 #include "DataObject/dataObjectFuncs.h"
@@ -46,8 +47,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_pActPalette(NULL),
     m_pActToggleColorBar(NULL),
     m_pActAScan(NULL),
-    m_pActForward(NULL),
-    m_pActBack(NULL),
+    m_pActPlaneSelector(NULL),
 	m_pActCmplxSwitch(NULL),
 	m_pMnuCmplxSwitch(NULL),
 	m_pActAspectSwitch(NULL),
@@ -110,8 +110,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     // next block is for complex and stacks
     toolbar->addSeparator();
     toolbar->addAction(m_pActAScan);
-    toolbar->addAction(m_pActBack);
-    toolbar->addAction(m_pActForward);
+    toolbar->addAction(m_pActPlaneSelector);
     toolbar->addAction(m_pActCmplxSwitch);   
 
 	QMenu *menuView = new QMenu(tr("View"), this);
@@ -263,18 +262,19 @@ void GraphicViewPlot::createActions()
     m_pActAScan->setVisible(false);
     connect(m_pActAScan, SIGNAL(toggled(bool)), this, SLOT(mnuAScanPicker(bool)));
 	
-
-    //m_pActForward
-    m_pActForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
-    m_pActForward->setObjectName("actionForward");
-    m_pActForward->setVisible(false);
-    m_pActForward->setToolTip(tr("Forward to next plane"));
-
-    //m_pActBack
-    m_pActBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
-    m_pActBack->setObjectName("actionBack");
-    m_pActBack->setVisible(false);
-    m_pActBack->setToolTip(tr("Back to previous plane"));
+    //m_pActPlaneSelector
+    QSpinBox *planeSelector = new QSpinBox(this);
+    planeSelector->setMinimum(0);
+    planeSelector->setMaximum(0);
+    planeSelector->setValue(0);
+    planeSelector->setKeyboardTracking(false);
+    planeSelector->setToolTip(tr("Select image plane"));
+    QWidgetAction *wa = new QWidgetAction(this);
+    wa->setDefaultWidget(planeSelector);
+    m_pActPlaneSelector = wa;
+    wa->setObjectName("planeSelector");
+    wa->setVisible(false);
+    connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
     
     //m_pActCmplxSwitch
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("complex switch"), this);
@@ -351,14 +351,9 @@ GraphicViewPlot::~GraphicViewPlot()
         m_pActAScan->deleteLater();
     }
 
-    if (m_pActForward)
+    if (m_pActPlaneSelector)
     {
-        m_pActForward->deleteLater();
-    }
-
-    if (m_pActBack)
-    {
-        m_pActBack->deleteLater();
+        m_pActPlaneSelector->deleteLater();
     }
 
     if (m_pActCmplxSwitch)
@@ -414,7 +409,11 @@ GraphicViewPlot::~GraphicViewPlot()
 ito::RetVal GraphicViewPlot::applyUpdate()
 {
     m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
-    ((PlotWidget*)m_pContent)->refreshPlot(m_pOutput["displayed"]); //push the displayed DataObj into the actual plot widget for displaying
+
+    if(m_pOutput["displayed"]->getType() & ito::ParamBase::DObjPtr)
+        ((PlotWidget*)m_pContent)->refreshPlot(m_pOutput["displayed"]->getVal<ito::DataObject*>()); //push the displayed DataObj into the actual plot widget for displaying
+    else
+        ((PlotWidget*)m_pContent)->refreshPlot(NULL); //push the displayed DataObj into the actual plot widget for displaying
 
     return ito::retOk;
 }
@@ -734,22 +733,22 @@ void GraphicViewPlot::mnuCmplxSwitch(QAction *action)
 
 		if (action->text() == tr("imaginary"))
         {
-			m_data.m_cmplxType = PlotWidget::tImag;
+			m_data.m_cmplxType = RasterToQImageObj::tImag;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
         }
 		else if (action->text() == tr("real"))
         {
-			m_data.m_cmplxType = PlotWidget::tReal;
+			m_data.m_cmplxType = RasterToQImageObj::tReal;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
         }
 		else if (action->text() == tr("phase"))
         {
-			m_data.m_cmplxType = PlotWidget::tPhase;
+			m_data.m_cmplxType = RasterToQImageObj::tPhase;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
         }
 		else
         {
-			m_data.m_cmplxType = PlotWidget::tAbsolute;
+			m_data.m_cmplxType = RasterToQImageObj::tAbsolute;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
         }
         ((PlotWidget*)m_pContent)->refreshPlot(NULL);
@@ -854,10 +853,8 @@ void GraphicViewPlot::enableComplexGUI(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::enableZStackGUI(const bool checked)
 {
-    m_pActBack->setEnabled(checked);
-    m_pActBack->setVisible(checked);
-    m_pActForward->setEnabled(checked);
-    m_pActForward->setVisible(checked);
+    m_pActPlaneSelector->setEnabled(checked);
+    m_pActPlaneSelector->setVisible(checked);
     m_pActAScan->setEnabled(checked);
     m_pActAScan->setVisible(checked);
 }
@@ -1318,4 +1315,32 @@ void GraphicViewPlot::setColorMode(const int type)
 void GraphicViewPlot::resetColorMode(void)
 {
     m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void GraphicViewPlot::setPlaneRange(int min, int max)
+{
+    if (m_pActPlaneSelector)
+    {
+        QSpinBox *spinBox = qobject_cast<QSpinBox*>(m_pActPlaneSelector->defaultWidget());
+        if (spinBox)
+        {
+            int value = spinBox->value();
+            value = std::max(min, value);
+            value = std::min(max, value);
+            spinBox->setMinimum(min);
+            spinBox->setMaximum(max);
+            spinBox->setValue(value);
+        }
+        m_pActPlaneSelector->setVisible((max-min) > 0);
+        m_pActAScan->setVisible((max-min) > 0);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void GraphicViewPlot::mnuActPlaneSelector(int plane)
+{
+    if (m_pContent) m_pContent->changePlane(plane);
+
+    QStringList paramNames;
+    paramNames << "displayed";
+    updateChannels(paramNames);
 }

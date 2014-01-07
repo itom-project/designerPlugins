@@ -41,6 +41,7 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
         m_pParent(parent),
         m_lineplotUID(0),
         m_pItem(NULL),
+        m_dObjPtr(NULL),
         m_pLineCut(NULL),
         //m_pTracker(NULL),
         m_pContent(NULL),
@@ -53,6 +54,12 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
     m_pContent = new QGraphicsScene(this);
     setScene(m_pContent);
     m_pContent->clear();
+
+
+    m_pItem = new QGraphicsPixmapItem();
+    m_pItem->setZValue(0.0);
+    m_pContent->addItem((QGraphicsItem*)m_pItem);   
+
 
     m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
     m_pLineCut->setVisible(false);
@@ -189,85 +196,85 @@ void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotWidget::refreshPlot(ito::ParamBase *param)
+void PlotWidget::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 {
     bool newObjectContainer = false;
+    int dOldObjType = m_pData->m_dataType;
 
-    if ((param != NULL) && (param->getType() == (ito::Param::DObjPtr & ito::paramTypeMask)))
+    m_dObjPtr = dObj;
+
+    if (m_dObjPtr)
     {
         //check dataObj
-        ito::DataObject *dataObj = (ito::DataObject*)param->getVal<char*>();
-        int dims = dataObj->getDims();
+        int dims = m_dObjPtr->getDims();
         if (dims > 1)
         {         
-            if(m_pData->m_colorMode == RasterToQImageObj::ColorAutoSelect && dataObj->getType() == ito::tRGBA32)
+            m_pData->m_dataType = (ito::tDataType)(m_dObjPtr->getType());
+
+            if (m_ObjectContainer == NULL)
             {
-                ((GraphicViewPlot*)m_pParent)->setColorMode(RasterToQImageObj::ColorRGB32);
+                m_ObjectContainer = new RasterToQImageObj(m_pData); 
             }
-            //if (m_pItem)
-            //    delete m_pItem;
-            
-            if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
+
+            newObjectContainer = m_ObjectContainer->updateDataObject(m_dObjPtr, plane);
+        }
+    }
+     
+
+    if(newObjectContainer)
+    {
+
+        GraphicViewPlot *p = (GraphicViewPlot*)(this->parent());
+        if (p)
+        {
+            if(m_pData->m_colorMode == RasterToQImageObj::ColorAutoSelect && m_pData->m_dataType == ito::tRGBA32)
             {
-                if (m_pData->m_dataType != ito::tComplex128 && m_pData->m_dataType != ito::tComplex64)
+                p->setColorMode(RasterToQImageObj::ColorRGB32);
+            }
+            else if (m_pData->m_dataType == ito::tComplex128 || m_pData->m_dataType == ito::tComplex64)
+            {
+                if (dOldObjType != ito::tComplex128 && dOldObjType != ito::tComplex64)
                 {
-                    ((GraphicViewPlot*)m_pParent)->enableComplexGUI(true);
+                    p->enableComplexGUI(true);
                 }             
             }
             else
             {
-                if (m_pData->m_dataType == ito::tComplex128 && m_pData->m_dataType == ito::tComplex64)
+                if (dOldObjType == ito::tComplex128 && dOldObjType == ito::tComplex64)
                 {
-                    ((GraphicViewPlot*)m_pParent)->enableComplexGUI(false);
+                    p->enableComplexGUI(false);
                 }            
             }
 
-            m_pData->m_dataType = (ito::tDataType)(dataObj->getType());
-
-            if (m_ObjectContainer == NULL)
+            if(m_pData->m_zoomLevel == PlotWidget::RatioOff)
             {
-                m_ObjectContainer = new RasterToQImageObj(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), 1); 
-                newObjectContainer = true;
-            }
-            else
-            {
-                m_ObjectContainer->updateDataObject(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)));
-            }
-
-            m_pixMap.convertFromImage(m_ObjectContainer->convert2QImage(m_pData));               
-
-            if (!m_pItem)
-            {
-                m_pItem = new QGraphicsPixmapItem(m_pixMap);
-                m_pItem->setZValue(0.0);
-                m_pContent->addItem((QGraphicsItem*)m_pItem);
                 fitInView(m_pItem, Qt::KeepAspectRatio);
             }
             else
             {
-                m_pItem->setPixmap(m_pixMap);
-            }
-            if (m_pValuePicker &&  m_pValuePicker->isShown())
-            {
-                updatePointTracker();
+                centerOn(m_pItem);
             }
 
-            repaint();
+            int maxPlane = 0;
+            if (dObj->getDims() > 2)
+            {
+                maxPlane = dObj->calcNumMats() - 1;
+            }
+
+            p->setPlaneRange(0, maxPlane);
         }
     }
-    else if (m_ObjectContainer != NULL)
+
+    if (m_ObjectContainer != NULL)
     {
-        m_pixMap.convertFromImage(m_ObjectContainer->convert2QImage(m_pData));              
+        m_pixMap.convertFromImage(m_ObjectContainer->convert2QImage());              
 
-        if (!m_pItem)
+        m_pItem->setPixmap(m_pixMap);
+
+        if (m_pValuePicker &&  m_pValuePicker->isShown())
         {
-            m_pItem = new QGraphicsPixmapItem(m_pixMap);
-            m_pContent->addItem((QGraphicsItem*)m_pItem);
-            fitInView(m_pItem, Qt::KeepAspectRatio);
+            updatePointTracker();
         }
-        else
-            m_pItem->setPixmap(m_pixMap);
-
         repaint();
     }
 }
@@ -338,8 +345,7 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
 
         case Qt::Key_Down:
         {
-            int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
-            int y1 = m_ObjectContainer->getDataObject()->getSize(dims-2) - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
+            int y1 = m_ObjectContainer->getDataObjHeight() - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
        
             if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
@@ -365,13 +371,12 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
 
         case Qt::Key_Right:
         {
-            int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
-            int x1 = m_ObjectContainer->getDataObject()->getSize(dims-1) - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
+            int x1 = m_ObjectContainer->getDataObjWidth() - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
  
             if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
                 QPointF scenePos = m_pValuePicker->pos() + QPointF(1.0, 0.0);
-                if (scenePos.x() < x1) scenePos.setX(scenePos.x() - 1.0);
+                if (scenePos.x() > x1) scenePos.setX(x1);
 
                 m_pValuePicker->setPos(scenePos);
                 updatePointTracker();
@@ -418,12 +423,10 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
 
         case Qt::Key_H:
         {
-            int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
-
             bool test = true;
-            double yCenter = m_ObjectContainer->getDataObject()->getSize(dims-2) / 2.0;
+            double yCenter = m_ObjectContainer->getDataObjHeight()  / 2.0;
             double xMin = 0.0;
-            double xMax = m_ObjectContainer->getDataObject()->getSize(dims-1) - 1;
+            double xMax = m_ObjectContainer->getDataObjWidth()  - 1;
 
             if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
@@ -450,9 +453,9 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
             int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
 
             bool test = true;
-            double xCenter = m_ObjectContainer->getDataObject()->getSize(dims-1) / 2.0;
+            double xCenter = m_ObjectContainer->getDataObjWidth()  / 2.0;
             double yMin = 0.0;
-            double yMax = m_ObjectContainer->getDataObject()->getSize(dims-2) - 1;
+            double yMax = m_ObjectContainer->getDataObjHeight()  - 1;
 
             if (m_pData->m_state == tValuePicker)   // doing the linecut
             {
@@ -980,7 +983,7 @@ void PlotWidget::enableAxis(const int axis, const bool value)
 QPointF PlotWidget::calcInterval(const int axis) const
 {
 
-    if (!m_ObjectContainer || m_ObjectContainer->getDataObject().isNull())
+    if (!m_ObjectContainer && !m_ObjectContainer->getDataObject())
         return QPointF(0.0, 1.0);
 
     switch(axis)
@@ -1006,7 +1009,7 @@ QPointF PlotWidget::calcInterval(const int axis) const
             ito::float64 z0 = 0.0;
             ito::float64 z1 = 1.0;
             ito::uint32 loc0[3], loc1[3];
-            ito::dObjHelper::minMaxValue(m_ObjectContainer->getDataObject().data(), z0, loc0, z1, loc1, true, m_pData->m_cmplxType);
+            ito::dObjHelper::minMaxValue(m_ObjectContainer->getDataObject(), z0, loc0, z1, loc1, true, m_pData->m_cmplxType);
             return QPointF(z0, z1);
         }
     }
@@ -1114,4 +1117,15 @@ void PlotWidget::setState( tState state)
         m_pData->m_state = state;
     }
     if(m_pItem) repaint();  // has an image to paint
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotWidget::changePlane(int plane)
+{
+    refreshPlot(m_dObjPtr, plane);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotWidget::internalDataUpdated()
+{
+    refreshPlot(m_dObjPtr, -1);
 }
