@@ -163,8 +163,8 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         QAction  *m_actToggleColorBar;
         QAction  *m_actChangeBGColor;
 
-		QAction *m_actSave;
-		QAction *m_actHome;
+        QAction *m_actSave;
+        QAction *m_actHome;
 
         QAction  *m_toggleIllumination;
         QAction  *m_toggleIlluminationRotation;
@@ -177,14 +177,14 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         QAction  *m_actForward;
         QAction  *m_actBack;
 */
-	    QAction  *m_actCmplxSwitch;
+        QAction  *m_actCmplxSwitch;
 
-	    QMenu    *m_mnuCmplxSwitch;
+        QMenu    *m_mnuCmplxSwitch;
 
         QAction  *m_actTringModeSwitch;
-	    QMenu    *m_mnuTringModeSwitch;
+        QMenu    *m_mnuTringModeSwitch;
 
-		QLabel *m_lblCoordinates;
+        QLabel *m_lblCoordinates;
 
         void riseZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->riseZAmplifierer(value);};
         void reduceZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->reduceZAmplifierer(value);};
@@ -211,7 +211,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         void mnuToggleBPColor();
         void mnutoggleIllumination(const bool checked);
         void mnutoggleIlluminationRotation(const bool checked);
-		void mnuCmplxSwitch(QAction *action);
+        void mnuCmplxSwitch(QAction *action);
         void mnuTringModeSwitch(QAction *action);
         //void mnuZoomer(bool checked);
         void mnuActSave();

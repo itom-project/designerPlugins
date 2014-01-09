@@ -69,7 +69,7 @@ class Plot1DWidget : public QwtPlot
             statePanner = 1, 
             stateZoomer = 2, 
             statePicker = 3,             
-			tPoint = ito::PrimitiveContainer::tPoint, 
+            tPoint = ito::PrimitiveContainer::tPoint, 
             tLine = ito::PrimitiveContainer::tLine, 
             tRect = ito::PrimitiveContainer::tRectangle, 
 //            tSquare = ito::PrimitiveContainer::tSquare,
@@ -171,7 +171,7 @@ class Plot1DWidget : public QwtPlot
 
         QList<Marker> m_markers;
 
-		QMenu *m_pCmplxMenu;
+        QMenu *m_pCmplxMenu;
 
         QColor m_inverseColor0, m_inverseColor1;
         int m_activeDrawItem;

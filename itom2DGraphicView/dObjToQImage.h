@@ -49,10 +49,10 @@ class RasterToQImageObj : QObject
 
         bool updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
 
-		inline ito::DataObject* getDataObject(void) { return m_dataObjPlane; };
+        inline ito::DataObject* getDataObject(void) { return m_dataObjPlane; };
 
-		inline int getDataObjWidth() { return m_D.m_xSize; };
-		inline int getDataObjHeight() { return m_D.m_ySize; };
+        inline int getDataObjWidth() { return m_D.m_xSize; };
+        inline int getDataObjHeight() { return m_D.m_ySize; };
         
         ito::float64 getPixel(const QPointF &coords, bool &isInt, const int &cmplxState);
         bool getPixelARGB(const QPointF &coords, unsigned char &AValue, unsigned char &RValue, unsigned char &GValue, unsigned char &BValue);
@@ -160,11 +160,11 @@ class RasterToQImageObj : QObject
             if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
 
             double scaling = 255.0 / (zMax - zMin);
-			switch (cmplxState)
-			{
-				default:
+            switch (cmplxState)
+            {
+                default:
 
-				case tAbsolute:
+                case tAbsolute:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -176,8 +176,8 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
-				case tReal:
+                break;
+                case tReal:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -189,8 +189,8 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
-				case tImag:
+                break;
+                case tImag:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -202,8 +202,8 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
-				case tPhase:
+                break;
+                case tPhase:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -215,8 +215,8 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
-			}
+                break;
+            }
 
             return retImage;        
         }
@@ -235,9 +235,9 @@ class RasterToQImageObj : QObject
 
             double scaling = 255.0 / (zMax - zMin);
             switch (cmplxState)
-			{
-				default:
-				case tAbsolute:
+            {
+                default:
+                case tAbsolute:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -249,8 +249,8 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
-				case tReal:
+                break;
+                case tReal:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -262,8 +262,8 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
-				case tImag:
+                break;
+                case tImag:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -275,8 +275,8 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
-				case tPhase:
+                break;
+                case tPhase:
                     for(int y = 0; y < m_D.m_ySize; y++)
                     {
                         for(int x = 0; x < m_D.m_xSize; x++)
@@ -288,7 +288,7 @@ class RasterToQImageObj : QObject
                         srcPtr += nextRow;
                         dstPtr += nextDstRow;
                     }
-				break;
+                break;
             }
             return retImage;      
         }

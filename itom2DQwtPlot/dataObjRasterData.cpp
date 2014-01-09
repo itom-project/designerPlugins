@@ -204,46 +204,46 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
         {
             ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
 
-			if (min == std::numeric_limits<ito::float64>::max()) min = -10.0;
-			if (max == -std::numeric_limits<ito::float64>::max()) max = 10.0;
+            if (min == std::numeric_limits<ito::float64>::max()) min = -10.0;
+            if (max == -std::numeric_limits<ito::float64>::max()) max = 10.0;
 
-			if ((max-min) < std::numeric_limits<double>::epsilon()) //the data object only contains the same value, then make the min-max range a little bit bigger in order to ensure a nice colorbar
-			{
-				switch (m_pInternalData->m_dataType)
-				{
-				case ito::tUInt8:
-				case ito::tInt8:
-				case ito::tUInt16:
-				case ito::tInt16:
-				case ito::tUInt32:
-				case ito::tInt32:
+            if ((max-min) < std::numeric_limits<double>::epsilon()) //the data object only contains the same value, then make the min-max range a little bit bigger in order to ensure a nice colorbar
+            {
+                switch (m_pInternalData->m_dataType)
+                {
+                case ito::tUInt8:
+                case ito::tInt8:
+                case ito::tUInt16:
+                case ito::tInt16:
+                case ito::tUInt32:
+                case ito::tInt32:
                 case ito::tRGBA32:
-					min -= 1;
-					max += 1;
-					break;
-				case ito::tFloat32:
-				case ito::tFloat64:
-				case ito::tComplex64:
-				case ito::tComplex128:
-				default:
-					if (min > 10.0)
-					{
-						min *= 0.99;
-						max *= 1.01;
-					}
-					else if(min < -10.0)
-					{
-						min *= 1.01;
-						max *= 0.99;
-					}
-					else
-					{
-						min -= 0.1;
-						max += 0.1;
-					}
-					break;
-				}
-			}
+                    min -= 1;
+                    max += 1;
+                    break;
+                case ito::tFloat32:
+                case ito::tFloat64:
+                case ito::tComplex64:
+                case ito::tComplex128:
+                default:
+                    if (min > 10.0)
+                    {
+                        min *= 0.99;
+                        max *= 1.01;
+                    }
+                    else if(min < -10.0)
+                    {
+                        min *= 1.01;
+                        max *= 0.99;
+                    }
+                    else
+                    {
+                        min -= 0.1;
+                        max += 0.1;
+                    }
+                    break;
+                }
+            }
             setInterval(Qt::ZAxis, QwtInterval(min,max));
         }
         else

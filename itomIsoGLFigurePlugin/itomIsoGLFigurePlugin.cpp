@@ -78,7 +78,7 @@ QString ItomIsoGLWidgetPlugin::group() const
 
 QIcon ItomIsoGLWidgetPlugin::icon() const
 {
-	return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
+    return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
 
 QString ItomIsoGLWidgetPlugin::toolTip() const
@@ -89,7 +89,7 @@ QString ItomIsoGLWidgetPlugin::toolTip() const
 QString ItomIsoGLWidgetPlugin::whatsThis() const
 {
     //return m_description;
-	return QString("itom widget for 2D DataObjects.");
+    return QString("itom widget for 2D DataObjects.");
 }
 
 bool ItomIsoGLWidgetPlugin::isContainer() const

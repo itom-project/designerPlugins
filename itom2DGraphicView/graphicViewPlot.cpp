@@ -48,15 +48,15 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_pActToggleColorBar(NULL),
     m_pActAScan(NULL),
     m_pActPlaneSelector(NULL),
-	m_pActCmplxSwitch(NULL),
-	m_pMnuCmplxSwitch(NULL),
-	m_pActAspectSwitch(NULL),
-	m_pMnuAspectSwitch(NULL),
-	m_pActColorSwitch(NULL),
-	m_pMnuColorSwitch(NULL),
+    m_pActCmplxSwitch(NULL),
+    m_pMnuCmplxSwitch(NULL),
+    m_pActAspectSwitch(NULL),
+    m_pMnuAspectSwitch(NULL),
+    m_pActColorSwitch(NULL),
+    m_pMnuColorSwitch(NULL),
     m_pPaletteRep(NULL),
     m_curPalette(NULL),
-	m_lblCoordinates(NULL),
+    m_lblCoordinates(NULL),
     m_pActProperties(NULL)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toAscii().data()));
@@ -68,8 +68,8 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
 
     //init internal data
 
-	QToolBar *toolbar = new QToolBar(tr("plotting tools"), this);
-	addToolBar(toolbar, "mainToolBar");
+    QToolBar *toolbar = new QToolBar(tr("plotting tools"), this);
+    addToolBar(toolbar, "mainToolBar");
 
     // first block is zoom, scale settings, home
     toolbar->addAction(m_pActScaleSetting);
@@ -113,25 +113,25 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     toolbar->addAction(m_pActPlaneSelector);
     toolbar->addAction(m_pActCmplxSwitch);   
 
-	QMenu *menuView = new QMenu(tr("View"), this);
+    QMenu *menuView = new QMenu(tr("View"), this);
     //menuView->addAction(m_pActHome);
     //menuView->addAction(m_pActPan);
     //menuView->addAction(m_pActZoom);
-	menuView->addAction(m_pActZoomToRect);
-	menuView->addSeparator();
-	menuView->addAction(m_pActPalette);
+    menuView->addAction(m_pActZoomToRect);
+    menuView->addSeparator();
+    menuView->addAction(m_pActPalette);
     menuView->addAction(m_pActToggleColorBar);
     menuView->addAction(m_pActColorSwitch);
     menuView->addSeparator();
-	//menuView->addAction(m_pActScaleSettings);
-	//menuView->addSeparator();
+    //menuView->addAction(m_pActScaleSettings);
+    //menuView->addSeparator();
     menuView->addAction(m_pActCmplxSwitch);
-	menuView->addSeparator();
-	menuView->addAction(m_pActProperties);
-	addMenu(menuView); //AbstractFigure takes care of the menu
+    menuView->addSeparator();
+    menuView->addAction(m_pActProperties);
+    addMenu(menuView); //AbstractFigure takes care of the menu
 
-	QMenu *menuTools = new QMenu(tr("Tools"), this);
-	menuTools->addAction(m_pActSave);
+    QMenu *menuTools = new QMenu(tr("Tools"), this);
+    menuTools->addAction(m_pActSave);
     menuTools->addSeparator();
     menuTools->addAction(m_pActValuePicker);
     //menuTools->addAction(m_pActCntrMarker);
@@ -140,7 +140,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     menuTools->addSeparator();
     addMenu(menuTools); //AbstractFigure takes care of the menu
 
-	QMenu *contextMenu = new QMenu(tr("plot2D"), this);
+    QMenu *contextMenu = new QMenu(tr("plot2D"), this);
     contextMenu->addAction(m_pActSave);
     contextMenu->addSeparator();
     contextMenu->addAction(m_pActHome);
@@ -177,7 +177,7 @@ void GraphicViewPlot::createActions()
     m_pActHome->setVisible(false);
     connect(m_pActHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
 
-	//m_pActSave
+    //m_pActSave
     m_pActSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save"), this);
     m_pActSave->setObjectName("actSave");
     m_pActSave->setToolTip(tr("Export current view"));
@@ -243,14 +243,14 @@ void GraphicViewPlot::createActions()
 
     //m_pActAspectSwitch
     m_pActAspectSwitch = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/off.png"), tr("zoom level"), this);
-	m_pMnuAspectSwitch = new QMenu(tr("zoom level"), this);
+    m_pMnuAspectSwitch = new QMenu(tr("zoom level"), this);
     m_pMnuAspectSwitch->addAction(tr("off"));
     m_pMnuAspectSwitch->addAction("1:4");
-	m_pMnuAspectSwitch->addAction("1:2");
-	m_pMnuAspectSwitch->addAction("1:1");
-	m_pMnuAspectSwitch->addAction("2:1");
-	m_pMnuAspectSwitch->addAction("4:1");
-	m_pActAspectSwitch->setMenu(m_pMnuAspectSwitch);
+    m_pMnuAspectSwitch->addAction("1:2");
+    m_pMnuAspectSwitch->addAction("1:1");
+    m_pMnuAspectSwitch->addAction("2:1");
+    m_pMnuAspectSwitch->addAction("4:1");
+    m_pActAspectSwitch->setMenu(m_pMnuAspectSwitch);
     m_pActAspectSwitch->setToolTip(tr("Switch between different zoom levels with fixed aspect ration"));
     connect(m_pMnuAspectSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuAspectSwitch(QAction*)));
 
@@ -261,7 +261,7 @@ void GraphicViewPlot::createActions()
     m_pActAScan->setCheckable(true);
     m_pActAScan->setVisible(false);
     connect(m_pActAScan, SIGNAL(toggled(bool)), this, SLOT(mnuAScanPicker(bool)));
-	
+    
     //m_pActPlaneSelector
     QSpinBox *planeSelector = new QSpinBox(this);
     planeSelector->setMinimum(0);
@@ -278,29 +278,29 @@ void GraphicViewPlot::createActions()
     
     //m_pActCmplxSwitch
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("complex switch"), this);
-	m_pMnuCmplxSwitch = new QMenu(tr("Complex Switch"), this);
-	m_pMnuCmplxSwitch->addAction(tr("imaginary"));
-	m_pMnuCmplxSwitch->addAction(tr("real"));
-	m_pMnuCmplxSwitch->addAction(tr("absolute"));
-	m_pMnuCmplxSwitch->addAction(tr("phase"));
-	m_pActCmplxSwitch->setMenu(m_pMnuCmplxSwitch);
+    m_pMnuCmplxSwitch = new QMenu(tr("Complex Switch"), this);
+    m_pMnuCmplxSwitch->addAction(tr("imaginary"));
+    m_pMnuCmplxSwitch->addAction(tr("real"));
+    m_pMnuCmplxSwitch->addAction(tr("absolute"));
+    m_pMnuCmplxSwitch->addAction(tr("phase"));
+    m_pActCmplxSwitch->setMenu(m_pMnuCmplxSwitch);
     m_pActCmplxSwitch->setVisible(false);
     m_pActCmplxSwitch->setToolTip(tr("Switch imaginary, real, absolute, phase"));
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
     //m_pActColorSwitch
     m_pActColorSwitch = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/falseColor.png"), tr("color switch"), this);
-	m_pMnuColorSwitch = new QMenu(tr("Color Switch"), this);
-	m_pMnuColorSwitch->addAction(tr("autoColor"));
-	m_pMnuColorSwitch->addAction(tr("falseColor, bitshift"));
-	m_pMnuColorSwitch->addAction(tr("falseColor, scaled"));
-	m_pMnuColorSwitch->addAction(tr("Color, 24-Bit"));
+    m_pMnuColorSwitch = new QMenu(tr("Color Switch"), this);
+    m_pMnuColorSwitch->addAction(tr("autoColor"));
+    m_pMnuColorSwitch->addAction(tr("falseColor, bitshift"));
+    m_pMnuColorSwitch->addAction(tr("falseColor, scaled"));
+    m_pMnuColorSwitch->addAction(tr("Color, 24-Bit"));
     m_pMnuColorSwitch->addAction(tr("Color, 32-Bit"));
-	m_pActColorSwitch->setMenu(m_pMnuColorSwitch);
+    m_pActColorSwitch->setMenu(m_pMnuColorSwitch);
     m_pActColorSwitch->setToolTip(tr("Switch index and direct color mode"));
     connect(m_pMnuColorSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuSwitchColorMode(QAction*)));
 
-	m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
+    m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
     connect(m_pActProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -727,32 +727,32 @@ void GraphicViewPlot::mnuCmplxSwitch(QAction *action)
     //GVScaleWidget *rightAxis = axisWidget(GVPlot::yRight);
     //enableAxis(GVPlot::yRight, checked);
 
-	if (m_pContent)
-	{
-		RasterToQImageObj* rasterData = static_cast<RasterToQImageObj*>(((PlotWidget*)m_pContent)->m_ObjectContainer);
+    if (m_pContent)
+    {
+        RasterToQImageObj* rasterData = static_cast<RasterToQImageObj*>(((PlotWidget*)m_pContent)->m_ObjectContainer);
 
-		if (action->text() == tr("imaginary"))
+        if (action->text() == tr("imaginary"))
         {
-			m_data.m_cmplxType = RasterToQImageObj::tImag;
+            m_data.m_cmplxType = RasterToQImageObj::tImag;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
         }
-		else if (action->text() == tr("real"))
+        else if (action->text() == tr("real"))
         {
-			m_data.m_cmplxType = RasterToQImageObj::tReal;
+            m_data.m_cmplxType = RasterToQImageObj::tReal;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
         }
-		else if (action->text() == tr("phase"))
+        else if (action->text() == tr("phase"))
         {
-			m_data.m_cmplxType = RasterToQImageObj::tPhase;
+            m_data.m_cmplxType = RasterToQImageObj::tPhase;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
         }
-		else
+        else
         {
-			m_data.m_cmplxType = RasterToQImageObj::tAbsolute;
+            m_data.m_cmplxType = RasterToQImageObj::tAbsolute;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
         }
         ((PlotWidget*)m_pContent)->refreshPlot(NULL);
-	}
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::mnuSwitchColorMode(QAction *action)
@@ -761,17 +761,17 @@ void GraphicViewPlot::mnuSwitchColorMode(QAction *action)
     {
         setColorMode(RasterToQImageObj::ColorIndex8Bitshift);
     }
-	else if (action->text() == tr("falseColor, scaled"))
+    else if (action->text() == tr("falseColor, scaled"))
     {
         setColorMode(RasterToQImageObj::ColorIndex8Scaled);
     }
-	else if (action->text() == tr("Color, 24-Bit"))
+    else if (action->text() == tr("Color, 24-Bit"))
     {
         setColorMode(RasterToQImageObj::ColorRGB24);
     }
-	else if (action->text() == tr("Color, 32-Bit"))
+    else if (action->text() == tr("Color, 32-Bit"))
     {
-		setColorMode(RasterToQImageObj::ColorRGB32);
+        setColorMode(RasterToQImageObj::ColorRGB32);
     }
     else
     {
@@ -784,8 +784,8 @@ void GraphicViewPlot::mnuAspectSwitch(QAction *action)
     //GVScaleWidget *rightAxis = axisWidget(GVPlot::yRight);
     //enableAxis(GVPlot::yRight, checked);
 
-	if (m_pContent)
-	{
+    if (m_pContent)
+    {
         if (action->text() == QString("4:1"))
         {
             m_pActPan->setEnabled(true);
@@ -795,51 +795,51 @@ void GraphicViewPlot::mnuAspectSwitch(QAction *action)
             m_pActAspectSwitch->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio41.png"));
             ((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio4_1);
         }
-		else if (action->text() == QString("2:1"))
+        else if (action->text() == QString("2:1"))
         {
             m_pActPan->setEnabled(true);
             mnuZoomer(false);
             m_pActZoomToRect->setEnabled(false);
 
             m_pActAspectSwitch->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio21.png"));
-			((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio2_1);
+            ((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio2_1);
         }
-		else if (action->text() == QString("1:1"))
+        else if (action->text() == QString("1:1"))
         {
             m_pActPan->setEnabled(true);
             mnuZoomer(false);
             m_pActZoomToRect->setEnabled(false);
 
             m_pActAspectSwitch->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
-			((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio1_1);
+            ((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio1_1);
         }
-		else if (action->text() == QString("1:2"))
+        else if (action->text() == QString("1:2"))
         {
             m_pActPan->setEnabled(true);
             mnuZoomer(false);
             m_pActZoomToRect->setEnabled(false);
 
             m_pActAspectSwitch->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio12.png"));
-			((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio1_2);
+            ((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio1_2);
         }
-		else if (action->text() == QString("1:4"))
+        else if (action->text() == QString("1:4"))
         {
             m_pActPan->setEnabled(true);
             mnuZoomer(false);
             m_pActZoomToRect->setEnabled(false);
 
             m_pActAspectSwitch->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio14.png"));
-			((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio1_4);
+            ((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::Ratio1_4);
         }
-		else
+        else
         {
             m_pActPan->setEnabled(false);
             m_pActZoomToRect->setEnabled(true);
 
             m_pActAspectSwitch->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/off.png"));
-			((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::RatioOff);
+            ((PlotWidget*)m_pContent)->setCanvasZoom(PlotWidget::RatioOff);
         }
-	}
+    }
 
 }
 

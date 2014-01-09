@@ -44,10 +44,10 @@ public:
     QString whatsThis() const;
     QWidget *createWidget(QWidget *parent);
     QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
-	void initialize(QDesignerFormEditorInterface *core);
+    void initialize(QDesignerFormEditorInterface *core);
 
 private:
-	bool initialized;
+    bool initialized;
 };
 
 #endif // ITOM2DQWTPLOTPLUGIN_H

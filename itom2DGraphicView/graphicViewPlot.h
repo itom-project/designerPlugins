@@ -95,7 +95,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
 
         void setCoordinates(const QVector<QPointF> pts, const bool visible);
 
-	    //properties (setter/getter)
+        //properties (setter/getter)
         void setContextMenuEnabled(bool show); 
         bool getContextMenuEnabled() const;
 
@@ -171,8 +171,8 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
         
         QAction  *m_pActScaleSetting;
 
-		QAction  *m_pActSave;
-		QAction  *m_pActHome;
+        QAction  *m_pActSave;
+        QAction  *m_pActHome;
        
         QAction  *m_pActPan;
         QAction  *m_pActZoomToRect;
@@ -184,21 +184,21 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
 
         QAction  *m_pActAScan;
         QWidgetAction  *m_pActPlaneSelector;
-	    QAction  *m_pActCmplxSwitch;
-	    QMenu    *m_pMnuCmplxSwitch;
+        QAction  *m_pActCmplxSwitch;
+        QMenu    *m_pMnuCmplxSwitch;
 
-	    QAction  *m_pActAspectSwitch;
-	    QMenu    *m_pMnuAspectSwitch;
+        QAction  *m_pActAspectSwitch;
+        QMenu    *m_pMnuAspectSwitch;
 
-	    QAction  *m_pActColorSwitch;
-	    QMenu    *m_pMnuColorSwitch;
+        QAction  *m_pActColorSwitch;
+        QMenu    *m_pMnuColorSwitch;
 
         QLabel   *m_pPaletteRep;
         QAction  *m_curPalette; 
 
         QPixmap  m_pixMap;
 
-		QLabel *m_lblCoordinates;
+        QLabel *m_lblCoordinates;
 
         QAction *m_pActProperties;
 
@@ -217,7 +217,7 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
         void mnuLinePicker(bool checked);
         void mnuScaleSetting();
         void mnuColorBar(bool checked);
-		void mnuCmplxSwitch(QAction *action);
+        void mnuCmplxSwitch(QAction *action);
         void mnuAspectSwitch(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();

@@ -671,7 +671,7 @@ void PlotWidget::trackerAScanMoved(const QPoint &pt)
         pts[0].setY(invTransform(this->m_pContent->yAxis(), pt.y()));
         pts[0].setX(invTransform(this->m_pContent->xAxis(), pt.x()));
     }
-	m_pAScanMarker->setValue(pts[0]);
+    m_pAScanMarker->setValue(pts[0]);
     m_lineCut.setSamples(pts);
 
     replot();

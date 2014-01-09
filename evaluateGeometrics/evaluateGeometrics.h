@@ -207,7 +207,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         InternalInfo m_info;
 
         QAction *m_actSetting;
-		QAction *m_actSave;
+        QAction *m_actSave;
         QAction *m_actAddRel;
         QAction *m_actRemoveRel;
         QAction *m_actUpdate;

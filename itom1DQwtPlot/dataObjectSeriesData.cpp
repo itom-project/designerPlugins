@@ -885,23 +885,23 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                 break;
                 case ito::tComplex128:
                 {
-	                ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
-	                switch (m_cmplxState)
-	                {
-		                default:
+                    ito::complex128 val = *(reinterpret_cast<const ito::complex128*>(ptr[0]));
+                    switch (m_cmplxState)
+                    {
+                        default:
                         case cmplxAbs:
-			                return QPointF(fPos, abs(val));
-		                break;
-		                case cmplxReal:
-			                return QPointF(fPos, val.real());
-		                break;
-		                case cmplxImag:
-			                return QPointF(fPos, val.imag());
-		                break;
-		                case cmplxArg:
-			                return QPointF(fPos, arg(val));
-		                break;
-	                }
+                            return QPointF(fPos, abs(val));
+                        break;
+                        case cmplxReal:
+                            return QPointF(fPos, val.real());
+                        break;
+                        case cmplxImag:
+                            return QPointF(fPos, val.imag());
+                        break;
+                        case cmplxArg:
+                            return QPointF(fPos, arg(val));
+                        break;
+                    }
                 }
                 break;
                 case ito::tRGBA32:
@@ -957,44 +957,44 @@ QPointF DataObjectSeriesData::sample(size_t n) const
     //                    return QPointF(fPos, m_pDataObj->at<double>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]));
     //                break;
     //                case ito::tComplex64:
-				//    {
-				//	    switch (m_cmplxState)
-				//	    {
-				//		    default:
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
     //                        case cmplxAbs:
-				//			    return QPointF(fPos, abs(m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		    break;
-				//		    case cmplxReal:
-				//			    return QPointF(fPos, (m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
-				//		    break;
-				//		    case cmplxImag:
-				//			    return QPointF(fPos, (m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
-				//		    break;
-				//		    case cmplxArg:
-				//			    return QPointF(fPos, arg(m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		    break;
-				//	    }
-				//    }
+                //                return QPointF(fPos, abs(m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //            case cmplxReal:
+                //                return QPointF(fPos, (m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
+                //            break;
+                //            case cmplxImag:
+                //                return QPointF(fPos, (m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
+                //            break;
+                //            case cmplxArg:
+                //                return QPointF(fPos, arg(m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //        }
+                //    }
     //                break;
     //                case ito::tComplex128:
-				//    {
-				//	    switch (m_cmplxState)
-				//	    {
-				//		    default:
-				//		    case cmplxAbs:
-				//			    return QPointF(fPos, abs(m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		    break;
-				//		    case cmplxReal:
-				//			    return QPointF(fPos, (m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
-				//		    break;
-				//		    case cmplxImag:
-				//			    return QPointF(fPos, (m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
-				//		    break;
-				//		    case cmplxArg:
-				//			    return QPointF(fPos, arg(m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		    break;
-				//	    }
-				//    }
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
+                //            case cmplxAbs:
+                //                return QPointF(fPos, abs(m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //            case cmplxReal:
+                //                return QPointF(fPos, (m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
+                //            break;
+                //            case cmplxImag:
+                //                return QPointF(fPos, (m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
+                //            break;
+                //            case cmplxArg:
+                //                return QPointF(fPos, arg(m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //        }
+                //    }
     //                break;
     //            }
     //        }
@@ -1053,88 +1053,88 @@ QPointF DataObjectSeriesData::sample(size_t n) const
     //                        m_pDataObj->at<double>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]) * m_plotPts[n].weights[3];
     //                break;
     //                case ito::tComplex64:
-				//    {
-				//	    switch (m_cmplxState)
-				//	    {
-				//		    default:
-				//		    case cmplxAbs:
-				//			    rVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//			    iVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//			    val = sqrt(rVal * rVal + iVal * iVal);
-				//		    break;
-				//		    case cmplxReal:
-				//			    val = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//		    break;
-				//		    case cmplxImag:
-				//			    val = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//		    break;
-				//		    case cmplxArg:
-				//			    rVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//			    iVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//			    val = atan2(iVal, rVal);
-				//		    break;
-				//	    }
-				//    }
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
+                //            case cmplxAbs:
+                //                rVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = sqrt(rVal * rVal + iVal * iVal);
+                //            break;
+                //            case cmplxReal:
+                //                val = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //            break;
+                //            case cmplxImag:
+                //                val = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //            break;
+                //            case cmplxArg:
+                //                rVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = atan2(iVal, rVal);
+                //            break;
+                //        }
+                //    }
     //                break;
     //                case ito::tComplex128:
-				//    {
-				//	    switch (m_cmplxState)
-				//	    {
-				//		    default:
-				//		    case cmplxAbs:
-				//			    rVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//			    iVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//			    val = sqrt(rVal * rVal + iVal * iVal);
-				//		    break;
-				//		    case cmplxReal:
-				//			    val = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//		    break;
-				//		    case cmplxImag:
-				//			    val = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//		    break;
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
+                //            case cmplxAbs:
+                //                rVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = sqrt(rVal * rVal + iVal * iVal);
+                //            break;
+                //            case cmplxReal:
+                //                val = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //            break;
+                //            case cmplxImag:
+                //                val = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //            break;
     //                        case cmplxArg:
-				//			    rVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//			    iVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//				    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//			    val = atan2(iVal, rVal);
-				//		    break;
-				//	    }
-				//    }
+                //                rVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    m_pDataObj->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = atan2(iVal, rVal);
+                //            break;
+                //        }
+                //    }
     //                break;
     //            }
     //            return QPointF(fPos, val);
@@ -1189,44 +1189,44 @@ QPointF DataObjectSeriesData::sample(size_t n) const
     //                return QPointF(fPos, curPlane->at<double>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]));
     //            break;
     //            case ito::tComplex64:
-				//{
-				//	switch (m_cmplxState)
-				//	{
-				//		default:
-				//		case cmplxAbs:
-				//			return QPointF(fPos, abs(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		break;
-				//		case cmplxReal:
-				//			return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
-				//		break;
-				//		case cmplxImag:
-				//			return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
-				//		break;
-				//		case cmplxArg:
-				//			return QPointF(fPos, arg(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		break;
-				//	}
-				//}
+                //{
+                //    switch (m_cmplxState)
+                //    {
+                //        default:
+                //        case cmplxAbs:
+                //            return QPointF(fPos, abs(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //        break;
+                //        case cmplxReal:
+                //            return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
+                //        break;
+                //        case cmplxImag:
+                //            return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
+                //        break;
+                //        case cmplxArg:
+                //            return QPointF(fPos, arg(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //        break;
+                //    }
+                //}
     //            break;
     //            case ito::tComplex128:
-				//{
-				//	switch (m_cmplxState)
-				//	{
-				//		default:
-				//		case cmplxAbs:
-				//			return QPointF(fPos, abs(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		break;
-				//		case cmplxReal:
-				//			return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
-				//		break;
-				//		case cmplxImag:
-				//			return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
-				//		break;
-				//		case cmplxArg:
-				//			return QPointF(fPos, arg(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//		break;
-				//	}
-				//}
+                //{
+                //    switch (m_cmplxState)
+                //    {
+                //        default:
+                //        case cmplxAbs:
+                //            return QPointF(fPos, abs(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //        break;
+                //        case cmplxReal:
+                //            return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
+                //        break;
+                //        case cmplxImag:
+                //            return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
+                //        break;
+                //        case cmplxArg:
+                //            return QPointF(fPos, arg(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //        break;
+                //    }
+                //}
     //            break;
     //        }
     //        return QPointF();
@@ -1267,46 +1267,46 @@ QPointF DataObjectSeriesData::sample(size_t n) const
     //                case ito::tFloat64:
     //                    return QPointF(fPos, curPlane->at<double>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]));
     //                break;
-				//	case ito::tComplex64:
-				//	{
-				//		switch (m_cmplxState)
-				//		{
-				//			default:
-				//			case cmplxAbs:
-				//				return QPointF(fPos, abs(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//			break;
-				//			case cmplxReal:
-				//				return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
-				//			break;
-				//			case cmplxImag:
-				//				return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
-				//			break;
-				//			case cmplxArg:
-				//				return QPointF(fPos, arg(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//			break;
-				//		}
-				//	}
-				//	break;
-				//	case ito::tComplex128:
-				//	{
-				//		switch (m_cmplxState)
-				//		{
-				//			default:
-				//			case cmplxAbs:
-				//				return QPointF(fPos, abs(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//			break;
-				//			case cmplxReal:
-				//				return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
-				//			break;
-				//			case cmplxImag:
-				//				return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
-				//			break;
-				//			case cmplxArg:
-				//				return QPointF(fPos, arg(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
-				//			break;
-				//		}
-				//	}
-				//	break;
+                //    case ito::tComplex64:
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
+                //            case cmplxAbs:
+                //                return QPointF(fPos, abs(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //            case cmplxReal:
+                //                return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
+                //            break;
+                //            case cmplxImag:
+                //                return QPointF(fPos, (curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
+                //            break;
+                //            case cmplxArg:
+                //                return QPointF(fPos, arg(curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //        }
+                //    }
+                //    break;
+                //    case ito::tComplex128:
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
+                //            case cmplxAbs:
+                //                return QPointF(fPos, abs(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //            case cmplxReal:
+                //                return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real()));
+                //            break;
+                //            case cmplxImag:
+                //                return QPointF(fPos, (curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag()));
+                //            break;
+                //            case cmplxArg:
+                //                return QPointF(fPos, arg(curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0])));
+                //            break;
+                //        }
+                //    }
+                //    break;
     //            }
     //        } // if m_fast
     //        else
@@ -1363,90 +1363,90 @@ QPointF DataObjectSeriesData::sample(size_t n) const
     //                        curPlane->at<double>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]) * m_plotPts[n].weights[2] +
     //                        curPlane->at<double>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]) * m_plotPts[n].weights[3];
     //                break;
-				//	case ito::tComplex64:
-				//	{
-				//		switch (m_cmplxState)
-				//		{
-				//			default:
-				//			case cmplxAbs:
-				//				rVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//				iVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//				val = sqrt(rVal * rVal + iVal * iVal);
-				//			break;
-				//			case cmplxReal:
-				//				val = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//			break;
-				//			case cmplxImag:
-				//				val = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//			break;
-				//			case cmplxArg:
-				//				rVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//				iVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//				val = atan2(iVal, rVal);
-				//			break;
-				//		}
-				//	}
-				//	break;
-				//	case ito::tComplex128:
-				//	{
-				//		switch (m_cmplxState)
-				//		{
-				//			default:
-				//			case cmplxAbs:
-				//				rVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//				iVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//				val = sqrt(rVal * rVal + iVal * iVal);
-				//			break;
-				//			case cmplxReal:
-				//				val = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//			break;
-				//			case cmplxImag:
-				//				val = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//			break;
-				//			case cmplxArg:
-				//				rVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
-				//				iVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
-				//					curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
-				//				val = atan2(iVal, rVal);
-				//			break;
-				//		}
-				//	}
-				//	break;
+                //    case ito::tComplex64:
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
+                //            case cmplxAbs:
+                //                rVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = sqrt(rVal * rVal + iVal * iVal);
+                //            break;
+                //            case cmplxReal:
+                //                val = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //            break;
+                //            case cmplxImag:
+                //                val = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //            break;
+                //            case cmplxArg:
+                //                rVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex64>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = atan2(iVal, rVal);
+                //            break;
+                //        }
+                //    }
+                //    break;
+                //    case ito::tComplex128:
+                //    {
+                //        switch (m_cmplxState)
+                //        {
+                //            default:
+                //            case cmplxAbs:
+                //                rVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = sqrt(rVal * rVal + iVal * iVal);
+                //            break;
+                //            case cmplxReal:
+                //                val = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //            break;
+                //            case cmplxImag:
+                //                val = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //            break;
+                //            case cmplxArg:
+                //                rVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).real() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).real() * m_plotPts[n].weights[3];
+                //                iVal = curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[0] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[0]).imag() * m_plotPts[n].weights[1] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[1], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[2] +
+                //                    curPlane->at<ito::complex128>(m_plotPts[n].rangeY[0], m_plotPts[n].rangeX[1]).imag() * m_plotPts[n].weights[3];
+                //                val = atan2(iVal, rVal);
+                //            break;
+                //        }
+                //    }
+                //    break;
     //            }
     //            return QPointF(fPos, val);
     //        }
@@ -1621,10 +1621,10 @@ ito::DataObject DataObjectSeriesData::getResampledDataObject()
 //                    case ito::tFloat64:
 //                        findMinMax<float64>(mat, m_plotPts, m_fast, min, max);
 //                    break;
-//					case ito::tComplex64:
+//                    case ito::tComplex64:
 //                        findMinMax<complex64>(mat, m_plotPts, m_fast, min, max, m_cmplxState);
 //                    break;
-//					case ito::tComplex128:
+//                    case ito::tComplex128:
 //                        findMinMax<complex128>(mat, m_plotPts, m_fast, min, max, m_cmplxState);
 //                    break;
 //                }            
@@ -2199,77 +2199,77 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
 //    double val;
 //    cv::Mat *mat;
 //
-//	switch (cmplxState)
-//	{
-//		default:
+//    switch (cmplxState)
+//    {
+//        default:
 //        case DataObjectSeriesData::cmplxAbs:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = abs( mat->at<ito::complex64>(y, x) );
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = abs( mat->at<ito::complex64>(y, x) );
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
 //
-//		case DataObjectSeriesData::cmplxReal:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = (mat->at<ito::complex64>(y, x)).real();
+//        case DataObjectSeriesData::cmplxReal:
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = (mat->at<ito::complex64>(y, x)).real();
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
 //
-//		case DataObjectSeriesData::cmplxImag:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = (mat->at<ito::complex64>(y, x)).imag();
+//        case DataObjectSeriesData::cmplxImag:
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = (mat->at<ito::complex64>(y, x)).imag();
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
 //
-//		case DataObjectSeriesData::cmplxArg:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = arg(mat->at<ito::complex64>(y, x));
+//        case DataObjectSeriesData::cmplxArg:
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = arg(mat->at<ito::complex64>(y, x));
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
-//	}
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
+//    }
 //}
 //
 ////----------------------------------------------------------------------------------------------------------------------------------
@@ -2301,77 +2301,77 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
 //    double val;
 //    cv::Mat *mat;
 //
-//	switch (cmplxState)
-//	{
-//		default:
-//		case DataObjectSeriesData::cmplxAbs:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = abs(mat->at<ito::complex64>(y, x));
+//    switch (cmplxState)
+//    {
+//        default:
+//        case DataObjectSeriesData::cmplxAbs:
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = abs(mat->at<ito::complex64>(y, x));
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
 //
 //        case DataObjectSeriesData::cmplxReal:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = (mat->at<ito::complex64>(y, x)).real();
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = (mat->at<ito::complex64>(y, x)).real();
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
 //
-//		case DataObjectSeriesData::cmplxImag:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = (mat->at<ito::complex64>(y, x)).imag();
+//        case DataObjectSeriesData::cmplxImag:
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = (mat->at<ito::complex64>(y, x)).imag();
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
 //
 //        case DataObjectSeriesData::cmplxArg:
-//		{
-//			for (int n = 0; n < sizeZ; n++)
-//			{
-//				mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//				val = arg(mat->at<ito::complex64>(y, x));
+//        {
+//            for (int n = 0; n < sizeZ; n++)
+//            {
+//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
+//                val = arg(mat->at<ito::complex64>(y, x));
 //
-//				if (!qIsFinite(val))
-//					continue;
-//				if (val > max)
-//					max = val;
-//				if (val < min)
-//					min = val;
-//			}
-//		}
-//		break;
-//	}
+//                if (!qIsFinite(val))
+//                    continue;
+//                if (val > max)
+//                    max = val;
+//                if (val < min)
+//                    min = val;
+//            }
+//        }
+//        break;
+//    }
 //}
 //
 //
@@ -2477,21 +2477,21 @@ QRectF DataObjectSeriesData::boundingRect() const
 
         if( (max-min) < std::numeric_limits<double>::epsilon() )
         {
-			if (min > 10.0)
-			{
-				min *= 0.99;
-				max *= 1.01;
-			}
-			else if(min < -10.0)
-			{
-				min *= 1.01;
-				max *= 0.99;
-			}
-			else
-			{
-				min -= 0.1;
-				max += 0.1;
-			}
+            if (min > 10.0)
+            {
+                min *= 0.99;
+                max *= 1.01;
+            }
+            else if(min < -10.0)
+            {
+                min *= 1.01;
+                max *= 0.99;
+            }
+            else
+            {
+                min -= 0.1;
+                max += 0.1;
+            }
         }
         
 

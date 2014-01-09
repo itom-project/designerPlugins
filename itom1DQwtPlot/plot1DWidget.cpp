@@ -78,8 +78,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     this->setMouseTracking(false);
 
     //this is the border between the canvas and the axes and the overall mainwindow
-	setContentsMargins(5,5,5,5);
-	
+    setContentsMargins(5,5,5,5);
+    
     m_inverseColor0 = Qt::green;
     m_inverseColor1 = Qt::blue;
     
@@ -93,10 +93,10 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_pMultiPointPicker->setRubberBandPen( QPen(QBrush(Qt::green, Qt::SolidPattern),2) );
     connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
 
-	//canvas() is the real plotting area, where the plot is printed (without axes...)
-	//canvas()->setFrameShadow(QFrame::Plain); //deprecated in qwt 6.1.0
-	//canvas()->setFrameShape(QFrame::NoFrame); //deprecated in qwt 6.1.0
-	canvas()->setStyleSheet("border: 0px;");
+    //canvas() is the real plotting area, where the plot is printed (without axes...)
+    //canvas()->setFrameShadow(QFrame::Plain); //deprecated in qwt 6.1.0
+    //canvas()->setFrameShape(QFrame::NoFrame); //deprecated in qwt 6.1.0
+    canvas()->setStyleSheet("border: 0px;");
     canvas()->setCursor( Qt::ArrowCursor );
 
     m_colorList.reserve(12);
@@ -2324,7 +2324,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
     QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
     if (rgexp.indexIn(style) != -1)
     {
-//		QString s = rgexp.cap(1);
+//        QString s = rgexp.cap(1);
         char s = rgexp.cap(1).toAscii()[0];
 
         if (s == 'b') symPen.setColor( Qt::blue );

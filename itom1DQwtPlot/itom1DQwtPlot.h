@@ -153,8 +153,8 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QAction *m_pActAspectRatio;
 
-		QAction *m_pActSave;
-		QAction *m_pActHome;
+        QAction *m_pActSave;
+        QAction *m_pActHome;
 
         QMenu    *m_pMnuSetMarker;
         QAction  *m_pActSetMarker;
@@ -162,18 +162,18 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction *m_pActForward;
         QAction *m_pActBack;
         
-	    QAction* m_pActCmplxSwitch;
-	    QMenu *m_pMnuCmplxSwitch;
+        QAction* m_pActCmplxSwitch;
+        QMenu *m_pMnuCmplxSwitch;
 
         QLabel *m_pLblMarkerOffsets;
-		QLabel *m_pLblMarkerCoords;
+        QLabel *m_pLblMarkerCoords;
 
         QActionGroup *m_pDrawModeActGroup;
         QAction *m_pActClearDrawings;
         QAction* m_pActDrawMode;
         QMenu *m_pMnuDrawMode;
 
-		QAction *m_pActProperties;
+        QAction *m_pActProperties;
 
         ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
 
@@ -194,7 +194,7 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuPanner(bool checked);
         void mnuScaleSetting();
         void mnuParentScaleSetting();
-		void mnuCmplxSwitch(QAction *action);
+        void mnuCmplxSwitch(QAction *action);
         void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();

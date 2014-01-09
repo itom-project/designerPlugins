@@ -24,12 +24,12 @@
 * \file motorController.cpp
 * \brief In this file the functions of the MotorController-Class are defined
 *
-*	The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
+*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorControllerFactory.h
 *\author ITO
-*\date	2013
+*\date    2013
 */
 
 #include "motorController.h"
@@ -193,20 +193,20 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetUnit = new QAction(tr("Toogle Unit"), this);
     m_mnuSetUnit = new QMenu(tr("Unit Switch"));
-	m_mnuSetUnit->addAction("nm");
-	m_mnuSetUnit->addAction(micronString);
-	m_mnuSetUnit->addAction("mm");
-	m_mnuSetUnit->addAction("m");
+    m_mnuSetUnit->addAction("nm");
+    m_mnuSetUnit->addAction(micronString);
+    m_mnuSetUnit->addAction("mm");
+    m_mnuSetUnit->addAction("m");
     m_actSetUnit->setMenu(m_mnuSetUnit);
     
     m_actUpdatePos = new QAction(tr("Update"), this);
     
     m_actSetAbsRel = new QAction(tr("Toogle Abs/Rel"), this);
     m_mnuSetAbsRel = new QMenu(tr("AbsRel-Switch"));
-	m_mnuSetAbsRel->addAction(tr("abs"));
-	m_mnuSetAbsRel->addAction(tr("rel"));
-	m_mnuSetAbsRel->addSeparator();
-	m_mnuSetAbsRel->addAction(tr("origin"));
+    m_mnuSetAbsRel->addAction(tr("abs"));
+    m_mnuSetAbsRel->addAction(tr("rel"));
+    m_mnuSetAbsRel->addSeparator();
+    m_mnuSetAbsRel->addAction(tr("origin"));
     m_actSetAbsRel->setMenu(m_mnuSetAbsRel);
 
     connect(m_mnuSetAbsRel, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAbsRel(QAction*)));
@@ -217,8 +217,8 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetAutoUpdate = new QAction(tr("Toogle Update (off)"), this);
     m_mnuSetAutoUpdate = new QMenu(tr("Update Switch"));
-	m_mnuSetAutoUpdate->addAction(tr("on"));
-	m_mnuSetAutoUpdate->addAction(tr("off"));
+    m_mnuSetAutoUpdate->addAction(tr("on"));
+    m_mnuSetAutoUpdate->addAction(tr("off"));
     m_actSetAutoUpdate->setMenu(m_mnuSetAutoUpdate);
 
     connect(m_mnuSetAutoUpdate, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAutoUpdate(QAction*)));
@@ -1055,12 +1055,12 @@ bool MotorController::winEvent(MSG * message, long * result)
            
             case  SI_BUTTON_EVENT:
             
-            if ((num = SiButtonPressed (&pEvent)) != SI_NO_BUTTON)	
+            if ((num = SiButtonPressed (&pEvent)) != SI_NO_BUTTON)    
             {
                 m_joyModeFast = m_joyModeFast ? false : true; 
             }
             /*
-            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)	
+            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)    
             {
             SbButtonReleaseEvent(num);   // process 3D mouse button event
             }

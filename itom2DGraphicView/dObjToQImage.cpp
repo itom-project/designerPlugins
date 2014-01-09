@@ -467,44 +467,44 @@ ito::float64 RasterToQImageObj::getPixel(const QPointF &coords, bool &isInt, con
         case ito::tComplex64:
         {
             ito::complex64 retTemp = (ito::complex64)m_dataObjPlane->at<ito::complex64>(index);
-			switch (cmplxState)
-			{
-				default:
+            switch (cmplxState)
+            {
+                default:
                 case PlotWidget::tAbsolute:
-					ret = abs(retTemp);
-				break;
-				case PlotWidget::tReal:
-					ret = retTemp.real();
-				break;
-				case PlotWidget::tImag:
-					ret = retTemp.imag();
-				break;
-				case PlotWidget::tPhase:
-					ret = arg(retTemp);
-				break;
-			}
+                    ret = abs(retTemp);
+                break;
+                case PlotWidget::tReal:
+                    ret = retTemp.real();
+                break;
+                case PlotWidget::tImag:
+                    ret = retTemp.imag();
+                break;
+                case PlotWidget::tPhase:
+                    ret = arg(retTemp);
+                break;
+            }
             isInt = false;
             break;
         }
         case ito::tComplex128:
         {
             ito::complex128 retTemp = (ito::complex128)m_dataObjPlane->at<ito::complex128>(index);
-			switch (cmplxState)
-			{
-				default:
+            switch (cmplxState)
+            {
+                default:
                 case PlotWidget::tAbsolute:
-					ret = abs(retTemp);
-				break;
-				case PlotWidget::tReal:
-					ret = retTemp.real();
-				break;
-				case PlotWidget::tImag:
-					ret = retTemp.imag();
-				break;
-				case PlotWidget::tPhase:
-					ret = arg(retTemp);
-				break;
-			}
+                    ret = abs(retTemp);
+                break;
+                case PlotWidget::tReal:
+                    ret = retTemp.real();
+                break;
+                case PlotWidget::tImag:
+                    ret = retTemp.imag();
+                break;
+                case PlotWidget::tPhase:
+                    ret = arg(retTemp);
+                break;
+            }
             isInt = false;
             break;
         }

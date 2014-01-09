@@ -85,7 +85,7 @@ public:
 
     ito::RetVal applyUpdate();  //!> does the real update work
 
-	//properties (setter/getter)
+    //properties (setter/getter)
     void setContextMenuEnabled(bool show) {}
     bool getContextMenuEnabled() const { return false; }
 
@@ -169,7 +169,7 @@ protected:
 
 private:
 
-    PlotCanvas *m_pContent;	
+    PlotCanvas *m_pContent;    
     InternalData m_data;
 
     QAction *m_pActSave;
@@ -186,7 +186,7 @@ private:
     QWidgetAction *m_pActPlaneSelector;
     QActionGroup *m_pDrawModeActGroup;
     QAction *m_pActClearDrawings;
-	QAction *m_pActProperties;
+    QAction *m_pActProperties;
 
     QLabel *m_pCoordinates;
     QWidgetAction *m_pActCoordinates;

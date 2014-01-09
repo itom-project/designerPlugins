@@ -24,12 +24,12 @@
 * \file motorControllerFactory.h
 * \brief In this file of the factory for the MotorController-Widget is declared
 *
-*	The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
+*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorController.h
 *\author ITO
-*\date	2013
+*\date    2013
 */
 
 #ifndef MCFACTORY_H

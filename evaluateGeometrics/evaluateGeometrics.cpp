@@ -40,7 +40,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actSetting(NULL),
-	m_actSave(NULL),
+    m_actSave(NULL),
     m_actAddRel(NULL),
     m_actRemoveRel(NULL),
     m_actUpdate(NULL),
@@ -53,17 +53,17 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
-	//m_actSave
+    //m_actSave
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save as table, tree, xml"), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip(tr("Export current data"));
 
-	m_mnuSaveSwitch = new QMenu("Save Switch", this);
-	m_mnuSaveSwitch->addAction(tr("table"));
-	m_mnuSaveSwitch->addAction(tr("tree"));
-	m_mnuSaveSwitch->addAction(tr("list"));
+    m_mnuSaveSwitch = new QMenu("Save Switch", this);
+    m_mnuSaveSwitch->addAction(tr("table"));
+    m_mnuSaveSwitch->addAction(tr("tree"));
+    m_mnuSaveSwitch->addAction(tr("list"));
     m_mnuSaveSwitch->addAction(tr("xml"));
-	m_actSave->setMenu(m_mnuSaveSwitch);
+    m_actSave->setMenu(m_mnuSaveSwitch);
 
     //m_actScaleSetting
     m_actSetting = new QAction(QIcon(":/itomDesignerPlugins/general/icons/settings.png"), tr("system settings"), this);
@@ -100,10 +100,10 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     connect(m_actUpdate, SIGNAL(triggered()), this, SLOT(mnuUpdate()));
     connect(m_actAutoFitCols, SIGNAL(triggered()), this, SLOT(mnuAutoFitCols()));
 
-	QToolBar *toolbar = new QToolBar(tr("basic options"), this);
-	addToolBar(toolbar, "mainToolBar");
+    QToolBar *toolbar = new QToolBar(tr("basic options"), this);
+    addToolBar(toolbar, "mainToolBar");
 
-	QMenu *contextMenu = new QMenu(QObject::tr("Calculate"), this);
+    QMenu *contextMenu = new QMenu(QObject::tr("Calculate"), this);
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
     contextMenu->addAction(m_actSetting);
@@ -111,12 +111,12 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     contextMenu->addAction(toolbar->toggleViewAction());
 
     // first block is zoom, scale settings, home
-	toolbar->addAction(m_actSave);
+    toolbar->addAction(m_actSave);
     toolbar->addSeparator();
     toolbar->addAction(m_actSetting);
     toolbar->addAction(m_actAutoFitCols);
     toolbar->addAction(m_actUpdate);
-	toolbar->addSeparator();
+    toolbar->addSeparator();
     toolbar->addAction(m_actAddRel);
     toolbar->addAction(m_actRemoveRel);
 

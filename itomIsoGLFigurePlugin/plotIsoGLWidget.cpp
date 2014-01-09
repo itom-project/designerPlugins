@@ -62,21 +62,21 @@ extern int NTHREADS;
 
 //----------------------------------------------------------------------------------------------------------------------------------
 /** initialize openGL (below version two - i.e. using static pipelines)
-*	@param [in]	width	window width
-*	@param [in] height	window height
-*	@return		zero for no error, openGL error code otherwise
+*    @param [in]    width    window width
+*    @param [in] height    window height
+*    @return        zero for no error, openGL error code otherwise
 */
 int initOGL2(const int width, const int height)
 {
     int ret = 0;
 
-    glShadeModel(GL_SMOOTH);							//Smooth Shading
-    glClearDepth(1.0f);									//Tiefenpuffer setzen
-    glEnable(GL_DEPTH_TEST);							//Tiefenpuffertest aktivieren
-    glDepthFunc(GL_LEQUAL);								//welcher Test
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	//Perspektivenkorrektur an
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);				//Linien Antialiasing
-    glClearColor(255.0f, 255.0f, 255.0f, 0.0f);				//weisser Hintergrund
+    glShadeModel(GL_SMOOTH);                            //Smooth Shading
+    glClearDepth(1.0f);                                    //Tiefenpuffer setzen
+    glEnable(GL_DEPTH_TEST);                            //Tiefenpuffertest aktivieren
+    glDepthFunc(GL_LEQUAL);                                //welcher Test
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);    //Perspektivenkorrektur an
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);                //Linien Antialiasing
+    glClearColor(255.0f, 255.0f, 255.0f, 0.0f);                //weisser Hintergrund
 
     glEnable(GL_TEXTURE_2D);
     ret = glGetError();
@@ -84,9 +84,9 @@ int initOGL2(const int width, const int height)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    glMatrixMode(GL_PROJECTION);					//Projektionsmatrix wählen
+    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix wählen
     glLoadIdentity();
-    glViewport(0, 0, (GLsizei)width, (GLsizei)height);				//Window resizen
+    glViewport(0, 0, (GLsizei)width, (GLsizei)height);                //Window resizen
     gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
 
     glMatrixMode(GL_MODELVIEW);
@@ -333,7 +333,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     glPixelTransferf(GL_ALPHA_BIAS,  1.0);
 
     glPixelTransferi(GL_MAP_COLOR, GL_TRUE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Screen und Tiefenpuffer leeren
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
     glPixelTransferi(GL_MAP_COLOR, GL_FALSE);
 
     int paletteSize = m_currentPalette.size();
@@ -399,7 +399,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     OGLMakeFont(m_fontsize);
 
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Screen und Tiefenpuffer leeren
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
 
     if (ret = glGetError())
     {
@@ -426,7 +426,7 @@ plotGLWidget::~plotGLWidget()
     if (m_myCharBitmapBuffer)
         glDeleteLists(m_myCharBitmapBuffer, 256);
 
-    glDeleteTextures(1, &m_cBarTexture);					// Create The Texture
+    glDeleteTextures(1, &m_cBarTexture);                    // Create The Texture
 
     if(m_myCharBitmapBuffer != 0) glDeleteLists(m_myCharBitmapBuffer, 256);
 
@@ -477,20 +477,20 @@ void plotGLWidget::paintGL()
 
     makeCurrent();
 
-    glViewport(0, 0, (GLsizei)this->width(), (GLsizei)this->height());				//Window resizen
+    glViewport(0, 0, (GLsizei)this->width(), (GLsizei)this->height());                //Window resizen
 //    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
 
     m_ticklength = (int)(sqrt(winSizeX * winSizeX + winSizeY * winSizeY) * 10/1000); //tut
 
-    glMatrixMode(GL_MODELVIEW);					//Projektionsmatrix wählen
+    glMatrixMode(GL_MODELVIEW);                    //Projektionsmatrix wählen
     glLoadIdentity();
 
     if (!m_backgnd)
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				//schwarzer Hintergrund
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                //schwarzer Hintergrund
     else
-        glClearColor(255.0f, 255.0f, 255.0f, 0.0f);				//weisser Hintergrund
+        glClearColor(255.0f, 255.0f, 255.0f, 0.0f);                //weisser Hintergrund
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Screen und Tiefenpuffer leeren
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
 
     if ( ( ((m_pTriangles == NULL) && (m_elementMode == PAINT_TRIANG)) && ((m_pPoints == NULL) && (m_elementMode == PAINT_POINTS)) ) || (m_pColTriangles == NULL) || (m_NumElements == 0))
     {
@@ -527,7 +527,7 @@ void plotGLWidget::paintGL()
         positionLS[0] /= norm * 1;
         positionLS[1] /= norm * 1;
         positionLS[2] /= norm * -20;
-//		position[2] *= 10;
+//        position[2] *= 10;
         directionLS[0] = 1.0f * positionLS[0];
         directionLS[1] = 1.0f * positionLS[1];
         directionLS[2] = 1.0f * positionLS[2];
@@ -539,7 +539,7 @@ void plotGLWidget::paintGL()
         glEnable(GL_NORMALIZE);
 
         glLightfv(GL_LIGHT0, GL_POSITION, positionLS);
-    	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, directionLS);
+        glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, directionLS);
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLS);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLS);
         glLightfv(GL_LIGHT0, GL_SPECULAR, specularLS);
@@ -606,8 +606,8 @@ void plotGLWidget::paintGL()
 //    glMatrixMode(GL_MODELVIEW);
 
     if (m_drawTitle)
-    {	// noobjinfo
-//		setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
+    {    // noobjinfo
+//        setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
         //int yused;
         int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
@@ -615,7 +615,7 @@ void plotGLWidget::paintGL()
 
     if(m_protocol.show) // protocol
     {
-//		setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
+//        setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
         //DrawProtocol(dd, dd->gy1, fo->args[27].s, (int)fo->args[28].d);
     }
 
@@ -1736,15 +1736,15 @@ void plotGLWidget::resizeEvent(QResizeEvent *pevent)
     QSize newSize = pevent->size();
     resize(newSize.width(), newSize.height());
 
-    glViewport(0, 0, newSize.width(), newSize.height());			//Window resizen
+    glViewport(0, 0, newSize.width(), newSize.height());            //Window resizen
 
     glLoadIdentity();
-    glMatrixMode(GL_PROJECTION);					//Projektionsmatrix wählen
+    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix wählen
     glLoadIdentity();
 
     gluPerspective(45.0f, (GLfloat)newSize.width()/(GLfloat) newSize.height(), 0.1f, 100.0f);//Perspektive einstellen
-//	glOrtho(0,width,0,height,-1,1);
-//	gluOrtho2D(0, width, 0, height);
+//    glOrtho(0,width,0,height,-1,1);
+//    gluOrtho2D(0, width, 0, height);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -2447,7 +2447,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
             gluProject(x0 + a * (x1 - x0), y0 + a * (y1 - y0), 
                 z0 + a * (z1 - z0), GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
-//			dreidogl_AxisLabel(fo, (void*)&al, xpos*1.1, ypos*1.1, v);
+//            dreidogl_AxisLabel(fo, (void*)&al, xpos*1.1, ypos*1.1, v);
             //paintAxisLabelOGL((void*)&al, xpos*(1+0.07 * m_windowXScale * internalObj.getSize(internalObj.getDims()-1,false)), ypos*(1+0.03 * m_windowYScale * internalObj.getSize(internalObj.getDims()-2,false)), v);
             paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
                 ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
@@ -2581,7 +2581,7 @@ int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double
 {
     makeCurrent();
 
-    glPushAttrib(GL_LIST_BIT);				// Pushes The Display List Bits
+    glPushAttrib(GL_LIST_BIT);                // Pushes The Display List Bits
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -2590,14 +2590,14 @@ int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double
     glLoadIdentity();
 
     glRasterPos2f(xpos, ypos);
-    glListBase(m_myCharBitmapBuffer);					// Sets The Base Character to 0
-    glCallLists((GLsizei)strlen(buffer), GL_UNSIGNED_BYTE, buffer);	// Draws The Display List Text
+    glListBase(m_myCharBitmapBuffer);                    // Sets The Base Character to 0
+    glCallLists((GLsizei)strlen(buffer), GL_UNSIGNED_BYTE, buffer);    // Draws The Display List Text
 
-    glPopAttrib();						// Pops The Display List Bits
+    glPopAttrib();                        // Pops The Display List Bits
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
-//	gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
+//    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 
@@ -2617,11 +2617,11 @@ void plotGLWidget::OGLMakeFont(int size)
     this->setFont(myFont);
 
     if(m_myCharBitmapBuffer != 0) glDeleteLists(m_myCharBitmapBuffer, 256);
-    m_myCharBitmapBuffer = glGenLists(256);			// Storage For 256 Characters
+    m_myCharBitmapBuffer = glGenLists(256);            // Storage For 256 Characters
 #if (defined linux)
 
 #elif (defined Q_OS_WIN32 || defined(Q_OS_WIN64))
-    wglUseFontBitmaps(this->getDC(), 0, 255, m_myCharBitmapBuffer);			// Builds 96 Characters Starting At Character 32
+    wglUseFontBitmaps(this->getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
 #endif
 
     this->setFont(oldFont);
@@ -2693,7 +2693,7 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
         }
     }
 
-    glBindTexture(GL_TEXTURE_2D, m_cBarTexture);				// Select Our Texture
+    glBindTexture(GL_TEXTURE_2D, m_cBarTexture);                // Select Our Texture
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -2750,7 +2750,7 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
-//	gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
+//    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 
@@ -2967,7 +2967,7 @@ void plotGLWidget::setColorMap(QString palette)
 
     glPixelTransferi(GL_MAP_COLOR, GL_TRUE);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Screen und Tiefenpuffer leeren
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
 
     glPixelTransferi(GL_MAP_COLOR, GL_FALSE);
 

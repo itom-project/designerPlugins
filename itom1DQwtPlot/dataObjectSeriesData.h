@@ -145,7 +145,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         bool m_autoScaleX;
         double m_minX;
         double m_maxX;
-		ComplexType m_cmplxState;
+        ComplexType m_cmplxState;
 
         /*double m_startPhys;
         double m_scale;*/

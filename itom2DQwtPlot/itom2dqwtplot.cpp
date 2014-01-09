@@ -130,24 +130,24 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActCmplxSwitch);
     mainTb->addAction(m_pActCoordinates);
 
-	QMenu *menuView = new QMenu(tr("View"), this);
+    QMenu *menuView = new QMenu(tr("View"), this);
     menuView->addAction(m_pActHome);
     menuView->addAction(m_pActPan);
     menuView->addAction(m_pActZoom);
-	menuView->addAction(m_pActAspectRatio);
-	menuView->addSeparator();
-	menuView->addAction(m_pActToggleColorBar);
+    menuView->addAction(m_pActAspectRatio);
+    menuView->addSeparator();
+    menuView->addAction(m_pActToggleColorBar);
     menuView->addAction(m_pActColorPalette);
     menuView->addSeparator();
-	menuView->addAction(m_pActScaleSettings);
-	menuView->addSeparator();
+    menuView->addAction(m_pActScaleSettings);
+    menuView->addSeparator();
     menuView->addAction(m_pActCmplxSwitch);
-	menuView->addSeparator();
-	menuView->addAction(m_pActProperties);
-	addMenu(menuView); //AbstractFigure takes care of the menu
+    menuView->addSeparator();
+    menuView->addAction(m_pActProperties);
+    addMenu(menuView); //AbstractFigure takes care of the menu
 
-	QMenu *menuTools = new QMenu(tr("Tools"), this);
-	menuTools->addAction(m_pActSave);
+    QMenu *menuTools = new QMenu(tr("Tools"), this);
+    menuTools->addAction(m_pActSave);
     menuTools->addSeparator();
     menuTools->addAction(m_pActValuePicker);
     menuTools->addAction(m_pActCntrMarker);
@@ -156,9 +156,9 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     menuTools->addSeparator();
     menuTools->addAction(m_pActDrawMode);
     menuTools->addAction(m_pActClearDrawings);
-	addMenu(menuTools); //AbstractFigure takes care of the menu
+    addMenu(menuTools); //AbstractFigure takes care of the menu
 
-	setPropertyObservedObject(this);
+    setPropertyObservedObject(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -357,7 +357,7 @@ void Itom2dQwtPlot::createActions()
     m_pActCoordinates->setDefaultWidget(m_pCoordinates);
     m_pActCoordinates->setVisible(false);
 
-	m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
+    m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
     connect(m_pActProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
 }
 
@@ -776,7 +776,7 @@ void Itom2dQwtPlot::mnuActSave()
 
         m_pContent->setAutoFillBackground( true );
         m_pContent->setPalette( Qt::white );
-        m_pContent->setCanvasBackground(Qt::white);	
+        m_pContent->setCanvasBackground(Qt::white);    
 
         m_pContent->replot();
 

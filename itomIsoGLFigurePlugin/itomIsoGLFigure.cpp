@@ -62,7 +62,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actTringModeSwitch(NULL),
     m_mnuTringModeSwitch(NULL),
     m_toggleInfoText(NULL),
-	m_lblCoordinates(NULL)
+    m_lblCoordinates(NULL)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
 
@@ -98,7 +98,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actHome->setObjectName("actHome");
     m_actHome->setToolTip(tr("Reset original view"));
 
-	//m_actSave
+    //m_actSave
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip(tr("Export current view"));
@@ -236,8 +236,8 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     test = connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
     test = connect(m_mnuTringModeSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuTringModeSwitch(QAction*)));
 
-	QToolBar *toolbar = new QToolBar(tr("Iso Toolbar"), this);
-	addToolBar(toolbar, "mainToolBar", Qt::TopToolBarArea, 1);
+    QToolBar *toolbar = new QToolBar(tr("Iso Toolbar"), this);
+    addToolBar(toolbar, "mainToolBar", Qt::TopToolBarArea, 1);
 
     contextMenu->addAction(m_actSave);
     contextMenu->addSeparator();
@@ -1023,11 +1023,11 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
            
             case  SI_BUTTON_EVENT:
             /*
-            if ((num = SiButtonPressed (&Event)) != SI_NO_BUTTON)	
+            if ((num = SiButtonPressed (&Event)) != SI_NO_BUTTON)    
             {
             SbButtonPressEvent(num);     // process 3D mouse button event
             }
-            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)	
+            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)    
             {
             SbButtonReleaseEvent(num);   // process 3D mouse button event
             }

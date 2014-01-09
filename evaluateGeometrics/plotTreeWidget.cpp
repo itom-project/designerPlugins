@@ -45,7 +45,7 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
 {
     m_pData = data;
     //this is the border between the canvas and the axes and the overall mainwindow
-	setContentsMargins(2,2,2,2);
+    setContentsMargins(2,2,2,2);
 
     setColumnCount(5);
 

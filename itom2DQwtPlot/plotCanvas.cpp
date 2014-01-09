@@ -1213,7 +1213,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
     QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
     if (rgexp.indexIn(style) != -1)
     {
-//		QString s = rgexp.cap(1);
+//        QString s = rgexp.cap(1);
         char s = rgexp.cap(1).toAscii()[0];
 
         if (s == 'b') symPen.setColor( Qt::blue );

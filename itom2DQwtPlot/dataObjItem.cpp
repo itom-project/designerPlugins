@@ -80,8 +80,8 @@ QImage DataObjItem::renderImage(
 
     DataObjRasterData *dObjRasterData = (DataObjRasterData*)(data());
 
-	if (dObjRasterData->getSize().isNull() )
-		return QImage();
+    if (dObjRasterData->getSize().isNull() )
+        return QImage();
 
     const QwtInterval intensityRange = dObjRasterData->interval( Qt::ZAxis );
     if ( !intensityRange.isValid() )
@@ -169,7 +169,7 @@ void DataObjItem::renderTile(
     DataObjRasterData *dataObjRasterData = (DataObjRasterData*)data();
 
     const QwtInterval range = dataObjRasterData->interval( Qt::ZAxis );
-	//ito::DataObject* source = (d_data->data->getDataObj().data());
+    //ito::DataObject* source = (d_data->data->getDataObj().data());
     if ( !range.isValid() )
         return;
 
