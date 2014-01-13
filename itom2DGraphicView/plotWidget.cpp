@@ -51,6 +51,7 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
         m_stateMoveAligned(false),
         m_pValuePicker(NULL)
 {
+    
     m_pContent = new QGraphicsScene(this);
     setScene(m_pContent);
     m_pContent->clear();
@@ -60,7 +61,7 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
     m_pItem->setZValue(0.0);
     m_pContent->addItem((QGraphicsItem*)m_pItem);   
 
-
+    
     m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
     m_pLineCut->setVisible(false);
     m_pLineCut->setZValue(1.0);
@@ -71,7 +72,7 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
     m_pValuePicker->setColor(m_pData->m_inverseColor0);
     m_pValuePicker->setZValue(1.0);
     m_pValuePicker->setShown(false);
-
+    
 
     repaint();
 }
@@ -79,6 +80,7 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotWidget::~PlotWidget()
 {
+    
     if(m_pContent)
     {
         m_pContent->clear();
@@ -91,11 +93,13 @@ PlotWidget::~PlotWidget()
         delete m_ObjectContainer;
         m_ObjectContainer = NULL;
     }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
 {
+    
     Qt::MouseButton btn = event->button();
     Qt::MouseButtons btns = event->buttons();
     int button = 0;
@@ -193,13 +197,20 @@ void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
 
         break;
     }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 {
+    
     bool newObjectContainer = false;
     int dOldObjType = m_pData->m_dataType;
+
+    if(!m_pItem)
+    {
+        return;
+    }
 
     m_dObjPtr = dObj;
 
@@ -219,7 +230,7 @@ void PlotWidget::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             newObjectContainer = m_ObjectContainer->updateDataObject(m_dObjPtr, plane);
         }
     }
-     
+    
 
     if(newObjectContainer)
     {
@@ -277,11 +288,13 @@ void PlotWidget::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         }
         repaint();
     }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::keyReleaseEvent (QKeyEvent * event)
 {
+    
     if (!hasFocus())
     {
         return;
@@ -297,11 +310,13 @@ void PlotWidget::keyReleaseEvent (QKeyEvent * event)
         break;
     }
     return;
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::keyPressEvent (QKeyEvent * event) 
 {
+    
     if (!hasFocus())
     {
         return;
@@ -485,43 +500,51 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
         break;
     }
     return;
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::mouseMoveEvent (QMouseEvent * event)
 {
+    
     if (!hasFocus())
     {
         return;
     }
     handleMouseEvent(2, event);
     event->accept();
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::mousePressEvent (QMouseEvent * event)
 {
+    
     if (!hasFocus())
     {
         return;
     }
     handleMouseEvent(0, event);
     event->accept();
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::mouseReleaseEvent (QMouseEvent * event)
 {
+    
     if (!hasFocus())
         return;
     QApplication::restoreOverrideCursor();
     handleMouseEvent(3, event);
     event->accept();
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::contextMenuEvent(QContextMenuEvent * event)
 {
+    
     if (m_showContextMenu)
     {
         event->accept();
@@ -531,11 +554,13 @@ void PlotWidget::contextMenuEvent(QContextMenuEvent * event)
     {
         event->ignore();
     }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::resizeEvent(QResizeEvent * event)
 {
+    
     if (m_pItem)
     {
         if (m_pData->m_zoomLevel == RatioOff)
@@ -552,11 +577,13 @@ void PlotWidget::resizeEvent(QResizeEvent * event)
             }
         }
     }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::trackerAppended(const QPointF &pt)
 {
+    
     if (!m_pLineCut) return;
 
     int ymax = m_ObjectContainer->getDataObjHeight() - 1;
@@ -591,11 +618,13 @@ void PlotWidget::trackerAppended(const QPointF &pt)
     repaint();
 
     ((GraphicViewPlot*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::trackerMoved(const QPointF &pt)
 {
+    
     if (!m_pLineCut) return;
 
     int ymax = m_ObjectContainer->getDataObjHeight() - 1;
@@ -631,6 +660,7 @@ void PlotWidget::trackerMoved(const QPointF &pt)
     repaint();
 
     ((GraphicViewPlot*)m_pParent)->displayLineCut(pts, m_lineplotUID);
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -681,6 +711,7 @@ void PlotWidget::trackerAScanMoved(const QPoint &pt)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
 {
+    
     int xsize = 1;
     int ysize = 1;
 
@@ -739,12 +770,14 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
     }
 
     if(m_pItem) repaint();  // has an image to paint
+    
     return ito::retError;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::updatePointTracker()
 {
+    
     if (!m_ObjectContainer || !m_pValuePicker)
         return;
 
@@ -817,28 +850,36 @@ void PlotWidget::updatePointTracker()
     m_pValuePicker->setText(buf);
     m_pValuePicker->setPos(cursorPos);
     return;
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::enableMarker(const bool enabled)
 {
-    m_pValuePicker->setShown(enabled);
+    
+    if(m_pValuePicker) m_pValuePicker->setShown(enabled);
+    else return;
 
     if (!enabled) m_trackerIsSampling = false;
 
     updatePointTracker();
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::enableLinePointer(const bool enabled)
 {
+    
+    if(!m_pLineCut) return;
     m_pLineCut->setVisible(enabled);
     if (!enabled) m_lineIsSampling = false;
     return;
+    
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotWidget::init()
 {
+    
     if (!setColorMap("__first__"))
     {
         refreshStyles();
@@ -847,15 +888,19 @@ ito::RetVal PlotWidget::init()
     {
         //refreshStyles is implicitely called by setColorMap
     }
-
+    
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotWidget::setColorMap(QString colormap /*= "__next__"*/)
 {
+    
     ito::ItomPalette newPalette;
     ito::RetVal retval(ito::retOk);
     int numPalettes = 1;
+
+    if(ito::ITOM_API_FUNCS_GRAPH == NULL)
+        return false;
 
     retval += apiPaletteGetNumberOfColorBars(numPalettes);
 
@@ -925,6 +970,10 @@ bool PlotWidget::setColorMap(QString colormap /*= "__next__"*/)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::refreshStyles()
 {
+    
+    if(ito::ITOM_API_FUNCS_GRAPH == NULL)
+        return;
+
     //QPen rubberBandPen = apiGetFigureSetting(m_pParent, "zoomRubberBandPen", QPen(QBrush(Qt::red),1,Qt::DashLine),NULL).value<QPen>();
     QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
     QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
@@ -939,6 +988,7 @@ void PlotWidget::refreshStyles()
     //rubberBandPen.setColor(m_pData->m_inverseColor1);
 
     //selectionPen.setColor(m_pData->m_inverseColor0);
+
     trackerPen.setColor(m_pData->m_inverseColor0);
 
     /*
@@ -947,8 +997,8 @@ void PlotWidget::refreshStyles()
     m_pZoomer->setTrackerPen(trackerPen);
     */
 
-    m_pLineCut->setPen(trackerPen);
-    m_pValuePicker->setColor(m_pData->m_inverseColor0);
+    if(m_pLineCut) m_pLineCut->setPen(trackerPen);
+    if(m_pValuePicker) m_pValuePicker->setColor(m_pData->m_inverseColor0);
 
     //m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7) ));
     
@@ -982,8 +1032,8 @@ void PlotWidget::enableAxis(const int axis, const bool value)
 
 QPointF PlotWidget::calcInterval(const int axis) const
 {
-
-    if (!m_ObjectContainer && !m_ObjectContainer->getDataObject())
+    
+    if (!m_ObjectContainer || !m_ObjectContainer->getDataObject())
         return QPointF(0.0, 1.0);
 
     switch(axis)
@@ -1019,31 +1069,32 @@ QPointF PlotWidget::calcInterval(const int axis) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::setState( tState state)
 {
+    
     GraphicViewPlot *p = (GraphicViewPlot*)(this->parent());
 
-    /*
-    m_pCenterMarker->setVisible(m_pData->m_showCenterMarker);
-    if(m_pData->m_showCenterMarker && m_dObjPtr)
-    {
-        if(m_dObjPtr->getDims() > 1)
-        {
-            bool valid;
-            m_pCenterMarker->setXValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-1, (m_dObjPtr->getSize(m_dObjPtr->getDims()-1) - 1) / 2.0, valid));
-            m_pCenterMarker->setYValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-2, (m_dObjPtr->getSize(m_dObjPtr->getDims()-2) - 1) / 2.0, valid));
-        }
-        
-    }
-    */
+    
+    //m_pCenterMarker->setVisible(m_pData->m_showCenterMarker);
+    //if(m_pData->m_showCenterMarker && m_dObjPtr)
+    //{
+    //    if(m_dObjPtr->getDims() > 1)
+    //    {
+    //        bool valid;
+    //        m_pCenterMarker->setXValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-1, (m_dObjPtr->getSize(m_dObjPtr->getDims()-1) - 1) / 2.0, valid));
+    //        m_pCenterMarker->setYValue(m_dObjPtr->getPixToPhys( m_dObjPtr->getDims()-2, (m_dObjPtr->getSize(m_dObjPtr->getDims()-2) - 1) / 2.0, valid));
+    //    }
+    //    
+    //}
+    
     if (m_pData->m_state != state)
     {
 
-        /*
-        if ((m_pData->m_state == tMultiPointPick || m_pData->m_state == tPoint
-            || m_pData->m_state == tLine || m_pData->m_state == tRect || m_pData->m_state == tEllipse) && state != tIdle)
-        {
-            return; //multiPointPick needs to go back to idle
-        }
-        */
+        
+        //if ((m_pData->m_state == tMultiPointPick || m_pData->m_state == tPoint
+        //    || m_pData->m_state == tLine || m_pData->m_state == tRect || m_pData->m_state == tEllipse) && state != tIdle)
+        //{
+        //    return; //multiPointPick needs to go back to idle
+        //}
+        
 
         //if (m_pZoomer) m_pZoomer->setEnabled( state == tZoom );
         //if (m_pPanner) m_pPanner->setEnabled( state == tPan );
@@ -1056,8 +1107,9 @@ void PlotWidget::setState( tState state)
         //if (m_pMultiPointPicker) m_pMultiPointPicker->setEnabled( state == tMultiPointPick );
 
         
-        if (/*state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
-            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || */ state == tIdle)
+        //if (state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
+        //    || m_pData->m_state == tRect || m_pData->m_state == tEllipse ||  state == tIdle)
+        if(state == tIdle)
         {
             if (p)
             {
@@ -1069,8 +1121,9 @@ void PlotWidget::setState( tState state)
             }
         }
 
-        if (/*state == tZoom || state == tPan || state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
-            || m_pData->m_state == tRect || m_pData->m_state == tEllipse ||*/ state == tValuePicker || state == tIdle)
+        //if (state == tZoom || state == tPan || state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
+        //    || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == tValuePicker || state == tIdle)
+        if ( state == tValuePicker || state == tIdle)
         {
             if (p)
             {
@@ -1084,39 +1137,40 @@ void PlotWidget::setState( tState state)
             case tIdle:
                 setCursor( Qt::ArrowCursor );
             break;
-            /*
-            case tZoom:
-                setCursor( Qt::CrossCursor );
-            break;
+            
+            //case tZoom:
+            //    setCursor( Qt::CrossCursor );
+            //break;
 
-            case tPan:
-                setCursor( Qt::OpenHandCursor );
-            break;
-            */
+            //case tPan:
+            //    setCursor( Qt::OpenHandCursor );
+            //break;
+            
             case tValuePicker:
                 setCursor( Qt::CrossCursor );
             break;
 
-            case tStackCut:
-                setCursor( Qt::CrossCursor );
-            break;
-            /*
-            case tMultiPointPick:
-                setCursor( Qt::CrossCursor );
-            break;
+            //case tStackCut:
+            //    setCursor( Qt::CrossCursor );
+            //break;
+            //
+            //case tMultiPointPick:
+            //    setCursor( Qt::CrossCursor );
+            //break;
+            //
+            //case tPoint:
+            //case tLine:
+            //case tRect:
+            //case tEllipse:
+            //    setCursor( Qt::CrossCursor );
+            //break;
             
-            case tPoint:
-            case tLine:
-            case tRect:
-            case tEllipse:
-                setCursor( Qt::CrossCursor );
-            break;
-            */
         }
 
         m_pData->m_state = state;
     }
     if(m_pItem) repaint();  // has an image to paint
+    
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::changePlane(int plane)

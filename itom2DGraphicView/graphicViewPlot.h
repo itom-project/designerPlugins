@@ -155,7 +155,11 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
         friend class PlotWidget;
 
     protected:
-        ito::RetVal init() { return m_pContent->init(); } //called when api-pointers are transmitted, directly after construction
+        ito::RetVal init() 
+        { 
+            if(!m_pContent) return ito::retError;
+            else return m_pContent->init(); 
+        } //called when api-pointers are transmitted, directly after construction
         PlotWidget *m_pContent;
 
         void enableComplexGUI(const bool checked);

@@ -59,6 +59,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_lblCoordinates(NULL),
     m_pActProperties(NULL)
 {
+    
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toAscii().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
@@ -153,16 +154,17 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     contextMenu->addAction(toolbar->toggleViewAction());
 
     //initialize canvas
+    
     m_pContent = new PlotWidget(&m_data, contextMenu, this);
     m_pContent->setObjectName("canvasWidget");
     setCentralWidget(m_pContent);
 
-    connect(m_pContent, SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
-    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+    //connect(m_pContent, SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
+    //connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
 
-    m_pContent->setFocus();
-    resize(600,400);
-
+    //m_pContent->setFocus();
+    //resize(600,400);
+    
     setPropertyObservedObject(this);
 }
 
@@ -410,6 +412,9 @@ ito::RetVal GraphicViewPlot::applyUpdate()
 {
     m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
 
+    if(!m_pContent)
+        return ito::retError;
+
     if(m_pOutput["displayed"]->getType() & ito::ParamBase::DObjPtr)
         ((PlotWidget*)m_pContent)->refreshPlot(m_pOutput["displayed"]->getVal<ito::DataObject*>()); //push the displayed DataObj into the actual plot widget for displaying
     else
@@ -452,6 +457,9 @@ bool GraphicViewPlot::getContextMenuEnabled() const
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal GraphicViewPlot::displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID)
 {
+    if(ito::ITOM_API_FUNCS_GRAPH == NULL || !m_pContent)
+        return ito::retError;
+
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
     ito::uint32 newUniqueID = uniqueID;
@@ -505,7 +513,7 @@ void GraphicViewPlot::mnuPanner(bool checked)
         m_pActValuePicker->setChecked(false);
     }
 
-    m_pContent->setState(checked ? PlotWidget::tPan : PlotWidget::tIdle);
+    if(m_pContent) m_pContent->setState(checked ? PlotWidget::tPan : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -519,7 +527,7 @@ void GraphicViewPlot::mnuZoomer(bool checked)
         m_pActPan->setChecked(false);      
     }
 
-    m_pContent->setState(checked ? PlotWidget::tZoom : PlotWidget::tIdle);
+    if(m_pContent) m_pContent->setState(checked ? PlotWidget::tZoom : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -533,19 +541,19 @@ void GraphicViewPlot::mnuValuePicker(bool checked)
         m_pActPan->setChecked(false);      
     }
 
-    m_pContent->setState(checked ? PlotWidget::tValuePicker : PlotWidget::tIdle);
+    if(m_pContent) m_pContent->setState(checked ? PlotWidget::tValuePicker : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::mnuPalette()
 {
-    ((PlotWidget*)m_pContent)->setColorMap();
+    if(m_pContent) ((PlotWidget*)m_pContent)->setColorMap();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::mnuAScanPicker(bool checked)
 {
-    if (checked && m_pContent)
+    if (checked)
     {
         m_pActPan->setChecked(false);
         m_pActZoomToRect->setChecked(false);
@@ -553,7 +561,7 @@ void GraphicViewPlot::mnuAScanPicker(bool checked)
         m_pActValuePicker->setChecked(false);
     }
 
-    m_pContent->setState(checked ? PlotWidget::tStackCut : PlotWidget::tIdle);
+    if(m_pContent) m_pContent->setState(checked ? PlotWidget::tStackCut : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -567,7 +575,7 @@ void GraphicViewPlot::mnuLinePicker(bool checked)
         m_pActValuePicker->setChecked(false);
     }
 
-    m_pContent->setState(checked ? PlotWidget::tLineCut : PlotWidget::tIdle);
+    if(m_pContent) m_pContent->setState(checked ? PlotWidget::tLineCut : PlotWidget::tIdle);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1061,13 +1069,11 @@ QPointF GraphicViewPlot::getXAxisInterval(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setXAxisInterval(QPointF point)
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
-    /*
     if (m_pContent)
     {
-        m_pContent->setInterval(Qt::XAxis, point);
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     }
-    */
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1084,13 +1090,11 @@ QPointF GraphicViewPlot::getYAxisInterval(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setYAxisInterval(QPointF point)
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
-    /*
+
     if (m_pContent)
     {
-        m_pContent->setInterval(Qt::YAxis, point);
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
     }
-    */
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1165,7 +1169,7 @@ void GraphicViewPlot::setZAxisInterval(QPointF point)
     m_data.m_valueScaleAuto = false;
     m_data.m_valueMin = point.y();
     m_data.m_valueMax = point.x();
-    m_pContent->refreshPlot(NULL);
+    if (m_pContent) m_pContent->refreshPlot(NULL);
     
 }
 
@@ -1191,9 +1195,10 @@ void GraphicViewPlot::setColorMap(const QString &name)
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont GraphicViewPlot::getTitleFont(void) const
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
+    
     if (m_pContent)
     {
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
         //return m_pContent->titleLabel()->font();
     }
     return QFont();
@@ -1202,9 +1207,10 @@ QFont GraphicViewPlot::getTitleFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setTitleFont(const QFont &font)
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
+    
     if (m_pContent)
     {
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
         //m_pContent->titleLabel()->setFont(font);
         //m_pContent->replot();
     }
@@ -1213,9 +1219,10 @@ void GraphicViewPlot::setTitleFont(const QFont &font)
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont GraphicViewPlot::getLabelFont(void) const
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
+    
     if (m_pContent)
     {
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
         //QwtText t = m_pContent->axisWidget(QwtPlot::xBottom)->title();
         //return t.font();
     }
@@ -1225,10 +1232,12 @@ QFont GraphicViewPlot::getLabelFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setLabelFont(const QFont &font)
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
-    /*
+    
+    
     if (m_pContent)
     {
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
+        /*
         QwtText title;
         title = m_pContent->axisWidget(QwtPlot::xBottom)->title();
         title.setFont(font);
@@ -1241,20 +1250,20 @@ void GraphicViewPlot::setLabelFont(const QFont &font)
         title = m_pContent->axisWidget(QwtPlot::yRight)->title();
         title.setFont(font);
         m_pContent->axisWidget(QwtPlot::yRight)->setTitle(title);
+        */
     }
-    */
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont GraphicViewPlot::getAxisFont(void) const
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
-    /*
+    
     if (m_pContent)
     {
-        return m_pContent->axisFont(QwtPlot::xBottom);
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
+        //return m_pContent->axisFont(QwtPlot::xBottom);
     }
-    */
     return QFont();
     
 }
@@ -1262,20 +1271,24 @@ QFont GraphicViewPlot::getAxisFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setAxisFont(const QFont &font)
 {
-    emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
-    /*
+
     if (m_pContent)
     {
-        m_pContent->setAxisFont(QwtPlot::xBottom, font);
-        m_pContent->setAxisFont(QwtPlot::yLeft, font);
-        m_pContent->setAxisFont(QwtPlot::yRight, font);
+        emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
+        //m_pContent->setAxisFont(QwtPlot::xBottom, font);
+        //m_pContent->setAxisFont(QwtPlot::yLeft, font);
+        //m_pContent->setAxisFont(QwtPlot::yRight, font);
     }
 
-    */
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setColorMode(const int type)
 {
+    if (!m_pContent)
+    {
+        return;
+    }
+
     if(type < 0)
     {
         emit m_pContent->statusBarMessage( tr("Specified color type out of range [0, 4]."), 2000 );

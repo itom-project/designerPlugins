@@ -98,7 +98,7 @@ bool GraphicViewPlugin::isContainer() const
 
 QString GraphicViewPlugin::domXml() const
 {
-    return "<widget class=\"GraphicViewPlot\" name=\"GraphicViewPlot\">\n"
+    return "<widget class=\"GraphicViewPlot\" name=\"graphicViewPlot\">\n"
         " <property name=\"geometry\">\n"
         "  <rect>\n"
         "   <x>0</x>\n"
@@ -115,4 +115,4 @@ QString GraphicViewPlugin::includeFile() const
     return "graphicViewPlot.h";
 }
 
-Q_EXPORT_PLUGIN2(GraphicViewPlugin, GraphicViewPlugin)
+Q_EXPORT_PLUGIN2(graphicViewPlot, GraphicViewPlugin)
