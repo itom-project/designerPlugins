@@ -1983,7 +1983,7 @@ void plotGLWidget::threeDAxis(void)
             signedYAy = -1 * VRX * VRY;
         else
             signedYAy = 1 * VRX * VRY;
-*/
+
 
         if (dyy > 0)
             signedYAx = -1 * VRX * VRY;
@@ -1994,6 +1994,15 @@ void plotGLWidget::threeDAxis(void)
             signedYAy = 1 * VRX * VRY;
         else
             signedYAy = -1 * VRX * VRY;
+*/
+		if (-dyy > 0)
+			signedYAx = -1 * VRX * VRY;
+		else
+			signedYAx = 1 * VRX * VRY;
+		if (dyx > 0)
+			signedYAy = -1 * VRX * VRY;
+		else
+			signedYAy = 1 * VRX * VRY;
 
     }
     else
@@ -2009,7 +2018,7 @@ void plotGLWidget::threeDAxis(void)
             signedYAy = 1 * VRX * VRY;
         else
             signedYAy = -1 * VRX * VRY;
-        */
+        
 
         if (dyy > 0)
             signedYAx = 1 * VRX * VRY;
@@ -2020,6 +2029,17 @@ void plotGLWidget::threeDAxis(void)
             signedYAy = -1 * VRX * VRY;
         else
             signedYAy = 1 * VRX * VRY;
+            */
+
+		if (-dyy > 0)
+			signedYAx = 1 * VRX * VRY;
+		else
+			signedYAx = -1 * VRX * VRY;
+		if (dyx > 0)
+			signedYAy = 1 * VRX * VRY;
+		else
+			signedYAy = -1 * VRX * VRY;
+
     }
 
     if (yb == ymin)
@@ -2092,8 +2112,10 @@ void plotGLWidget::threeDAxis(void)
 
     if(m_axisX.show && m_axisY.show)
     {
+        static double a = -1.0;
+        static double b = -1.0;
         paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin, m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 1 & m_axisX.showTicks);
-        paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
+        paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], a* signedYAx, b* signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
     }
 
     //Damit die Z-Tickes einstellbar werden
@@ -2476,11 +2498,14 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         else
             xpos += al.dx;
 
+        /*
         if (al.dy < 0)
             ypos += al.dy;
         else
             ypos += al.dy;
+            */
 
+        ypos -= fabs(al.dy);
         OGLTextOut(label.data(), xpos, ypos);
     }
 
@@ -2567,12 +2592,14 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
         xpos = x + al->dx - strlen(buffer)*0.015;
     else
         xpos = x + al->dx;
-
+    /*
     if (al->dy < 0)
         ypos = y + al->dy;
     else
         ypos = y + al->dy;
+        */
 
+    ypos = y - fabs(al->dy);
     ret = OGLTextOut(buffer, xpos, ypos);
     return;
 }
