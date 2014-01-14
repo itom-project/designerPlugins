@@ -2599,7 +2599,7 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
     */
 
     ypos = y - fabs(al->dy);
-    ret = OGLTextOut(buffer, xpos, ypos);
+    OGLTextOut(buffer, xpos, ypos);
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
