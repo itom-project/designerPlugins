@@ -260,7 +260,7 @@ void Itom1DQwtFigure::setBounds(QVector<QPointF> bounds)
         pointArr[np * 2 + 1] = bounds[np].y();
     }
     m_pInput["bounds"]->setVal(pointArr, 2 * bounds.size());
-    delete pointArr;
+    delete[] pointArr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -530,7 +530,7 @@ void Itom1DQwtFigure::mnuSetMarker(QAction *action)
 
 		if (action->text() == QString("To Min-Max"))
         {
-            DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
+//            DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
 
             ito::float64 minVal, maxVal;
             int minLoc, maxLoc;

@@ -510,7 +510,7 @@ ito::float64 RasterToQImageObj::getPixel(const QPointF &coords, bool &isInt, con
         }
     };
 
-    delete index;
+    delete[] index;
 
     return ret; 
 }
@@ -557,7 +557,7 @@ bool RasterToQImageObj::getPixelARGB(const QPointF &coords, unsigned char &AValu
     GValue = (unsigned char)((val & 0x0000FF00) >> 8);
     BValue = (unsigned char)(val & 0x000000FF);
 
-    delete index;
+    delete[] index;
 
     return ret; 
 }

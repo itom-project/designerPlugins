@@ -125,7 +125,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
                 pointArr[np * 2 + 1] = bounds[np].y();
             }
             m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
-            delete pointArr;
+            delete[] pointArr;
         }
 
         void enableComplexGUI(const bool checked);

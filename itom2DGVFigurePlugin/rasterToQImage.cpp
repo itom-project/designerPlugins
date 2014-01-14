@@ -173,7 +173,7 @@ void RasterToQImageObj::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, dou
         {
             if(m_dataObj)
             {
-                if(m_hDimIndex >= 0)
+                if(m_hDimIndex == 0)
                 {
                     m_dataObj->lockRead();
                     m_ROI.setLeft(0);
@@ -303,7 +303,7 @@ void RasterToQImageObj::updateDataObject(QSharedPointer<ito::DataObject> dataObj
     {
         m_dataObj->lockRead();
 
-        bool test = true;
+//        bool test = true;
 
         int dimX = dataObj->getDims() - 1;
         int dimY = dataObj->getDims() - 2;
@@ -902,7 +902,7 @@ ito::float64 RasterToQImageObj::getPixel(const QPointF &coords, bool &isInt)
         }
     };
 
-    delete index;
+    delete[] index;
 
     m_dataObj->unlock();
 
@@ -953,7 +953,7 @@ bool RasterToQImageObj::getPixelARGB(const QPointF &coords, unsigned char &AValu
     GValue = (unsigned char)((val & 0x0000FF00) >> 8);
     BValue = (unsigned char)(val & 0x000000FF);
 
-    delete index;
+    delete[] index;
 
     m_dataObj->unlock();
 

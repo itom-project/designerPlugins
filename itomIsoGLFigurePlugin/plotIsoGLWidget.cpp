@@ -291,10 +291,10 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glGenTextures(1, &m_cBarTexture);
-    ret = glGetError();
+//    ret = glGetError();
 
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
-    ret = glGetError();
+//    ret = glGetError();
 
     GLfloat *par, *pag, *pab;
 
@@ -313,11 +313,11 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     //ret = glGetError();
 
     glPixelMapfv(GL_PIXEL_MAP_I_TO_G, 256, pag);
-    ret = glGetError();
+//    ret = glGetError();
     glPixelMapfv(GL_PIXEL_MAP_I_TO_R, 256, par);
-    ret = glGetError();
+//    ret = glGetError();
     glPixelMapfv(GL_PIXEL_MAP_I_TO_B, 256, pab);
-    ret = glGetError();
+//    ret = glGetError();
 
     free(par);
     free(pag);
@@ -461,7 +461,7 @@ void plotGLWidget::paintTimeout()
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::paintGL()
 {
-    static int drawScene = 0;
+//    static int drawScene = 0;
     //bool test;
     double winSizeX = (double)this->width();
     double winSizeY = (double)this->height();
@@ -609,7 +609,7 @@ void plotGLWidget::paintGL()
     {    // noobjinfo
 //        setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
         //int yused;
-        int texty = 1.0;
+//        int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
     }
 
@@ -624,7 +624,7 @@ void plotGLWidget::paintGL()
         DrawObjectInfo();
     }
 
-    int ret = glGetError();
+//    int ret = glGetError();
 
     glFlush();
     //glFinish();
@@ -897,7 +897,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     int xsizeObj = m_axisX.idx[1] - m_axisX.idx[0];
     int ysizeObj = m_axisY.idx[1] - m_axisY.idx[0];
 
-    if(m_pContent && xsizeObj && xsizeObj)
+    if(m_pContent && xsizeObj && ysizeObj)
     {
         m_pContentWhileRastering = m_pContent;
         m_pContentWhileRastering->lockRead();
@@ -1324,16 +1324,16 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     {
         if(m_elementMode == PAINT_POINTS)
         {
-            m_pColIndices = static_cast<unsigned char *>(realloc(m_pColIndices, m_NumElements*sizeof(unsigned char)));
-            m_pPoints = static_cast<GLfloat *>(realloc(m_pPoints, m_NumElements*3*sizeof(GLfloat)));
-            m_pColTriangles = static_cast<GLubyte *>(realloc(m_pColTriangles, m_NumElements*4*sizeof(GLubyte)));
+            realloc(m_pColIndices, m_NumElements*sizeof(unsigned char));
+            realloc(m_pPoints, m_NumElements*3*sizeof(GLfloat));
+            realloc(m_pColTriangles, m_NumElements*4*sizeof(GLubyte));
         }
         else
         {
-            m_pColIndices = static_cast<unsigned char *>(realloc(m_pColIndices, m_NumElements * 3 * sizeof(unsigned char)));
-            m_pTriangles = static_cast<GLfloat *>(realloc(m_pTriangles, m_NumElements*9*sizeof(GLfloat)));
-            m_pColTriangles = static_cast<GLubyte *>(realloc(m_pColTriangles, m_NumElements*12*sizeof(GLubyte)));
-            m_pNormales = static_cast<GLfloat *>(realloc(m_pNormales, m_NumElements*9*sizeof(GLfloat)));
+            realloc(m_pColIndices, m_NumElements * 3 * sizeof(unsigned char));
+            realloc(m_pTriangles, m_NumElements*9*sizeof(GLfloat));
+            realloc(m_pColTriangles, m_NumElements*12*sizeof(GLubyte));
+            realloc(m_pNormales, m_NumElements*9*sizeof(GLfloat));
         }
 
         ResetColors();
@@ -1427,9 +1427,9 @@ void plotGLWidget::paintEvent(QPaintEvent * /*pevent*/)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::refreshPlot(ito::ParamBase *param)
 {
-    int ret = 0;
-    int width = this->width();
-    int height = this->height();
+//    int ret = 0;
+//    int width = this->width();
+//    int height = this->height();
     ito::RetVal retval = ito::retOk;
     ito::float64 Sqrt2Div2 = sqrt(2.0) / 2.0;
     ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0; //, tempVal;
@@ -1442,7 +1442,7 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         return;
     }
 
-    if (m_isInit & IS_RENDERING || m_isInit & IS_RENDERING )
+    if (m_isInit & IS_RENDERING)
     {
         m_errorDisplMsg.clear();
         m_errorDisplMsg.append("Currently rendering");
@@ -1755,8 +1755,7 @@ void plotGLWidget::resizeEvent(QResizeEvent *pevent)
 ito::RetVal plotGLWidget::setColor(const int col)
 {
     ito::RetVal retval = ito::retOk;
-    int ret = 0;
-
+//    int ret = 0;
 
     return retval;
 }
@@ -1863,10 +1862,10 @@ void plotGLWidget::threeDRotationMatrix()
 {
     GLdouble GLModelViewMatrix[16], GLProjectionMatrix[16];
     GLint GLViewport[4];
-    double a,b,c;
+//    double a, b, c;
 
     makeCurrent();
-    a=m_RotA; b=m_RotB; c=m_RotC;
+//    a=m_RotA; b=m_RotB; c=m_RotC;
 
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
@@ -2252,7 +2251,7 @@ void plotGLWidget::paintLightArrow()
 */
 void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const double z0, const double x1, const double y1, const double z1, const double v0, const double v1, const double VorzX, const double VorzY, const double VorzZ, const std::string &symbol, const std::string &unit, const bool write)
 {
-    double s0, s1, d0, d1, p = 0, q = 0, v, l, ldv, a;
+    double s0, s1, d0, d1, p = 0, v, l, ldv, a;
     long e, b = 0;
 
     double sl1 = m_ticklength;
@@ -2526,7 +2525,7 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
  //char *p;
  struct axislabel *al = (struct axislabel *)vd;
  long l;
- int ret;
+// int ret;
 
   if(v==0)
     _snprintf(buffer,sizeof(buffer),"0");
@@ -2571,7 +2570,7 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
     else
     {
         int rest=firstdigit>0?firstdigit%3:2-(2-firstdigit)%3;
-        _snprintf(buffer,sizeof(buffer),"%.0f%c",pow(10.0,rest),"afpnµm-kMGTPE"[(firstdigit-rest)/3+6]);
+        _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpnµm-kMGTPE"[(firstdigit - rest) / 3 + 6]);
     }
   }
 
@@ -2597,7 +2596,7 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
         ypos = y + al->dy;
     else
         ypos = y + al->dy;
-        */
+    */
 
     ypos = y - fabs(al->dy);
     ret = OGLTextOut(buffer, xpos, ypos);
@@ -2781,7 +2780,7 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 
-    int ret = glGetError();
+//    int ret = glGetError();
 
     return;
 }
@@ -2954,7 +2953,7 @@ void plotGLWidget::setColorMap(QString palette)
     makeCurrent();
 
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
-    int ret = glGetError();
+//    int ret = glGetError();
 
     GLfloat *par, *pag, *pab;
 
@@ -2973,11 +2972,11 @@ void plotGLWidget::setColorMap(QString palette)
     //ret = glGetError();
 
     glPixelMapfv(GL_PIXEL_MAP_I_TO_G, 256, pag);
-    ret = glGetError();
+//    ret = glGetError();
     glPixelMapfv(GL_PIXEL_MAP_I_TO_R, 256, par);
-    ret = glGetError();
+//    ret = glGetError();
     glPixelMapfv(GL_PIXEL_MAP_I_TO_B, 256, pab);
-    ret = glGetError();
+//    ret = glGetError();
 
     free(par);
     free(pag);
@@ -3014,7 +3013,7 @@ void plotGLWidget::setColorMap(QString palette)
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 256, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
 
-    delete src;
+    delete[] src;
 
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
 

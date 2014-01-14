@@ -922,7 +922,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
 {
 
     bool changed = false;
-    bool clear = false;
+//    bool clear = false;
     bool identical = false;
     int cols = 0;
     int dims = 0;
@@ -934,7 +934,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
         identical = true;
         if(dataObj->getDims() == 0)
         {
-            clear = true;
+//            clear = true;
             identical = false;
         }
         else if(dataObj->getType() != ito::tFloat32)

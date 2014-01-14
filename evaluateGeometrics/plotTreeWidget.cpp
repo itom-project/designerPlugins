@@ -717,12 +717,8 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
         return false;
     }
 
-    ito::float32 lambda = 0.0;
-
-    lambda = (pointPosVector - linePosVector).dot(lineDirVector) / lineDirVector.dot(lineDirVector);
-    
+    ito::float32 lambda = (pointPosVector - linePosVector).dot(lineDirVector) / lineDirVector.dot(lineDirVector);
     cv::Vec3f temp = pointPosVector - (linePosVector + lambda * lineDirVector);
-
     distance = sqrt(temp.dot(temp));
 
     return true;
@@ -1167,7 +1163,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
         stream.writeAttribute("href", "http://www.ito.uni-stuttgart.de");
         
         QHash<ito::int32, geometricPrimitives >::const_iterator curValue = m_rowHash.constBegin();
-        for(int geo = 0; curValue !=  m_rowHash.end(); curValue++, geo++)
+        for(int geo = 0; curValue !=  m_rowHash.end(); ++curValue, geo++)
         //for(int geo = 0; geo < m_rowHash.size(); geo++)
         {
             stream.writeStartElement(QString::number(geo));
@@ -1301,7 +1297,7 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
     outBuffer.reserve(200);
 
     QHash<ito::int32, geometricPrimitives >::const_iterator curValue = m_rowHash.constBegin();
-    for(int geo = 0; curValue !=  m_rowHash.end(); curValue++, geo++)
+    for(int geo = 0; curValue !=  m_rowHash.end(); ++curValue, geo++)
     //for(int geo = 0; geo < m_rowHash.size(); geo++)
     {
         outBuffer.clear();

@@ -78,7 +78,7 @@ void plot2DWidget::handleMouseEvent(int type, QMouseEvent *event)
 {
     Qt::MouseButton btn = event->button();
     Qt::MouseButtons btns = event->buttons();
-    int button = 0;
+//    int button = 0;
     QPointF scenePos = mapToScene(event->pos());
     
     if (!m_pContent || !m_pItem || !m_pLineCut || !m_pointMarker)
@@ -176,7 +176,7 @@ void plot2DWidget::handleMouseEvent(int type, QMouseEvent *event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plot2DWidget::refreshPlot(ito::ParamBase *param)
 {
-    bool newObjectContainer = false;
+//    bool newObjectContainer = false;
 
     if ((param != NULL) && (param->getType() == (ito::Param::DObjPtr & ito::paramTypeMask)))
     {
@@ -203,7 +203,7 @@ void plot2DWidget::refreshPlot(ito::ParamBase *param)
             {
                 QRect ROI(0, 0, dataObj->getSize(dims - 1), dataObj->getSize(dims - 2));
                 m_ObjectContainer = new RasterToQImageObj(QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj)), ROI, /*dims -1, dims-2,*/ 1); 
-                newObjectContainer = true;
+//                newObjectContainer = true;
 
                 if (m_startScaledZ) m_ObjectContainer->setIntervalRange(Qt::ZAxis, false, m_startRangeZ.x(), m_startRangeZ.y());
                 if (m_startScaledY) m_ObjectContainer->setIntervalRange(Qt::YAxis, false, m_startRangeY.x(), m_startRangeY.y());
@@ -443,7 +443,7 @@ void plot2DWidget::keyPressEvent (QKeyEvent * event)
         {
             int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
 
-            bool test = true;
+//            bool test = true;
             double yCenter = m_ObjectContainer->getDataObject()->getSize(dims-2) / 2.0;
             double xMin = 0.0;
             double xMax = m_ObjectContainer->getDataObject()->getSize(dims-1) - 1;
@@ -472,7 +472,7 @@ void plot2DWidget::keyPressEvent (QKeyEvent * event)
         {
             int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
 
-            bool test = true;
+//            bool test = true;
             double xCenter = m_ObjectContainer->getDataObject()->getSize(dims-1) / 2.0;
             double yMin = 0.0;
             double yMax = m_ObjectContainer->getDataObject()->getSize(dims-2) - 1;

@@ -737,7 +737,7 @@ void GraphicViewPlot::mnuCmplxSwitch(QAction *action)
 
     if (m_pContent)
     {
-        RasterToQImageObj* rasterData = static_cast<RasterToQImageObj*>(((PlotWidget*)m_pContent)->m_ObjectContainer);
+//        RasterToQImageObj* rasterData = static_cast<RasterToQImageObj*>(((PlotWidget*)m_pContent)->m_ObjectContainer);
 
         if (action->text() == tr("imaginary"))
         {

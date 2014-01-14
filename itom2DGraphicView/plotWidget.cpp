@@ -102,7 +102,7 @@ void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
     
     Qt::MouseButton btn = event->button();
     Qt::MouseButtons btns = event->buttons();
-    int button = 0;
+//    int button = 0;
     QPointF scenePos = mapToScene(event->pos());
     
     if (!m_pContent || !m_pItem || !m_pLineCut || !m_pValuePicker)
@@ -438,7 +438,7 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
 
         case Qt::Key_H:
         {
-            bool test = true;
+//            bool test = true;
             double yCenter = m_ObjectContainer->getDataObjHeight()  / 2.0;
             double xMin = 0.0;
             double xMax = m_ObjectContainer->getDataObjWidth()  - 1;
@@ -465,9 +465,8 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
 
         case Qt::Key_V:
         {
-            int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
-
-            bool test = true;
+//            int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
+//            bool test = true;
             double xCenter = m_ObjectContainer->getDataObjWidth()  / 2.0;
             double yMin = 0.0;
             double yMax = m_ObjectContainer->getDataObjHeight()  - 1;

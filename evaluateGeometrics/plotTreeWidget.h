@@ -52,6 +52,9 @@ class EvaluateGeomatricsFigure;
 
 struct relationsShip
 {
+    relationsShip() : firstElementIdx(0), type(0), secondElementIdx(0), myWidget(NULL), extValue(0) {}
+    ~relationsShip() {}
+
     ito::int32 firstElementIdx;     /*!< The index of the first geometric element. The relations will be a child of this element.  */
     ito::uint32 type;               /*!< The type of the relations as defiend by PlotTreeWidget::tMeasurementType.  */
     ito::int32 secondElementIdx;    /*!< The index of the second geometric element. For some measurement types, this is ignored  */
@@ -100,14 +103,11 @@ struct InternalInfo
         m_primitivNames.insert(ito::PrimitiveContainer::tSquare, QObject::tr("square"));
         m_primitivNames.insert(ito::PrimitiveContainer::tPolygon, QObject::tr("polygon"));
 
-static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};
+        static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};
 
         m_relationsList.clear();
     }
-    ~InternalInfo()
-    {
-        
-    }
+    ~InternalInfo() { }
 
     bool m_autoTitle;                               /*!< If true, the table will get a title one day */
     QString m_title;                                /*!< If m_autoTitle == false, this title will be used one day.  */

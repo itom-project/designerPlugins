@@ -376,7 +376,7 @@ void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds)
         pointArr[np * 2 + 1] = bounds[np].y();
     }
     m_pInput["bounds"]->setVal(pointArr, 2 * bounds.size());
-    delete pointArr;
+    delete[] pointArr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -811,7 +811,7 @@ void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 
         if (action->text() == QString(tr("To Min-Max")))
         {
-            DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
+//            DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
 
             ito::float64 minVal, maxVal;
             int minLoc, maxLoc;
@@ -1194,7 +1194,7 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     }
 
     int ysize = geometricElements->getSize(0);
-    int xsize = PRIM_ELEMENTLENGTH;
+//    int xsize = PRIM_ELEMENTLENGTH;
     int type = geometricElements->getType();
 
     int rowStepDst = 8;
@@ -1420,7 +1420,7 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 int Itom1DQwtPlot::getSelectedElement(void)const
 {
     QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
-    for (;it != m_data.m_pDrawItems.end(); it++)        
+    for (;it != m_data.m_pDrawItems.end(); ++it)        
     {
         if(it.value() != NULL && it.value()->selected() != 0)
         { 
@@ -1435,7 +1435,7 @@ void Itom1DQwtPlot::setSelectedElement(const int idx)
     bool replot = false;
     bool failed = idx == -1 ? false : true;
     QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
-    for (;it != m_data.m_pDrawItems.end(); it++)        
+    for (;it != m_data.m_pDrawItems.end(); ++it)        
     {
         if(it.value() != NULL && it.value()->m_idx == idx)
         {

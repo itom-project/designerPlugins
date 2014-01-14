@@ -1049,7 +1049,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         pointArr[np * 2 + 1] = bounds[np].y();
     }
     m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
-    delete pointArr;
+    delete[] pointArr;
     //setOutpBounds(bounds);
     //setLinePlotCoordinates(bounds);
 
@@ -1376,7 +1376,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     }
 
     int ysize = geometricElements->getSize(0);
-    int xsize = PRIM_ELEMENTLENGTH;
+//    int xsize = PRIM_ELEMENTLENGTH;
     int type = geometricElements->getType();
 
     int rowStepDst = 8;
@@ -1675,7 +1675,7 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
 int Itom2dQwtPlot::getSelectedElement(void)const
 {
     QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
-    for (;it != m_data.m_pDrawItems.end(); it++)        
+    for (;it != m_data.m_pDrawItems.end(); ++it)        
     {
         if(it.value() != NULL && it.value()->selected() != 0)
         { 
@@ -1690,7 +1690,7 @@ void Itom2dQwtPlot::setSelectedElement(const int idx)
     bool replot = false;
     bool failed = idx == -1 ? false : true;
     QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
-    for (;it != m_data.m_pDrawItems.end(); it++)        
+    for (;it != m_data.m_pDrawItems.end(); ++it)        
     {
         if(it.value() != NULL && it.value()->m_idx == idx)
         {

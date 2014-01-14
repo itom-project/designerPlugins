@@ -335,14 +335,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtPlotCurve *curve = NULL;
     QwtPlotCurveDataObject *dObjCurve = NULL;
     bool _unused;
-
-    bool gotNewObject = false;
-
+//    bool gotNewObject = false;
     //QString valueLabel, axisLabel, title;
 
     if (dataObj)
     {
-        gotNewObject = true;
+//        gotNewObject = true;
         int dims = dataObj->getDims();
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dataObj->getSize(dims - 2) : 1;
@@ -703,7 +701,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
     {
         //int n;
         QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
-        for (;it != m_pData->m_pDrawItems.end(); it++)
+        for (;it != m_pData->m_pDrawItems.end(); ++it)
 //        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
 
@@ -714,8 +712,8 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 
             int canxpos = event->x() - canvas()->x();
             int canypos = event->y() - canvas()->y();
-            double x = it.value()->x1;
-            double y = it.value()->y1;
+//            double x = it.value()->x1;
+//            double y = it.value()->y1;
             //double xx = transform(QwtPlot::xBottom, it.value()->x1);
             //double yy = transform(QwtPlot::xBottom, it.value()->y1);
             if (fabs(transform(QwtPlot::xBottom, it.value()->x1) - canxpos) < 10
@@ -725,7 +723,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
                 m_activeDrawItem = it.value()->m_idx;
                 it.value()->setActive(1);
                 it.value()->setSelected(true);
-                it++;
+                ++it;
                 break;
             }
             else if (fabs(transform(QwtPlot::xBottom, it.value()->x2) - canxpos) < 10
@@ -735,7 +733,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
                 m_activeDrawItem = it.value()->m_idx;
                 it.value()->setActive(2);
                 it.value()->setSelected(true);
-                it++;
+                ++it;
                 break;
             }
             else
@@ -745,7 +743,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
             }
         }
 //        for (n++; n < m_pData->m_pDrawItems.size(); n++)
-        for (;it != m_pData->m_pDrawItems.end(); it++)
+        for (;it != m_pData->m_pDrawItems.end(); ++it)
         {
 
             if(it.value() == NULL)
@@ -762,8 +760,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
         double xScale = invTransform( xBottom, xPx );
-        double yScale = invTransform( yLeft, yPx );
-
+//        double yScale = invTransform( yLeft, yPx );
         bool closeToMarker = false;
 
         if(event->button() == Qt::LeftButton)
@@ -813,14 +810,14 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
 {
-    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+//    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 
     if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
-        int yPx = m_pValuePicker->trackerPosition().y();
+//        int yPx = m_pValuePicker->trackerPosition().y();
         double xScale = invTransform( xBottom, xPx );
-        double yScale = invTransform( yLeft, yPx );
+//        double yScale = invTransform( yLeft, yPx );
 
         if (event->buttons() & Qt::LeftButton)
         {
@@ -1056,7 +1053,7 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
         || m_pData->m_state == tPoint || m_pData->m_state == stateIdle)
     {
         QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
-        for (;it != m_pData->m_pDrawItems.end(); it++)        
+        for (;it != m_pData->m_pDrawItems.end(); ++it)        
 //        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
             if(it.value() != NULL && it.value()->m_active != 0 && p)
@@ -1142,11 +1139,10 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
     else if(m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
-        int yPx = m_pValuePicker->trackerPosition().y();
+//        int yPx = m_pValuePicker->trackerPosition().y();
         double xScale = invTransform( xBottom, xPx );
-        double yScale = invTransform( yLeft, yPx );
-
-        bool closeToMarker = false;
+//        double yScale = invTransform( yLeft, yPx );
+//        bool closeToMarker = false;
 
         if(event->button() == Qt::LeftButton)
         {
@@ -1952,360 +1948,359 @@ void Plot1DWidget::setState( tState state)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::multiPointActivated (bool on)
 {
-    switch(m_pData->m_state)
-    {
-        case tPoint:
-            if (!on)
-            {
-                QPolygon polygon = m_pMultiPointPicker->selection();
+	if (m_pData)
+	{
+		switch(m_pData->m_state)
+		{
+			case tPoint:
+				if (!on)
+				{
+					QPolygon polygon = m_pMultiPointPicker->selection();
 
-                QPolygonF polygonScale;
-                bool aborted = false;
+					QPolygonF polygonScale;
+					bool aborted = false;
 
-                if (polygon.size() == 0)
-                {
-                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
-                    aborted = true;
-                }
-                else
-                {
-                    QPointF pt;
+					if (polygon.size() == 0)
+					{
+						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						aborted = true;
+					}
+					else
+					{
+						QPointF pt;
 
-                    for (int i = 0; i < polygon.size() - 1; ++i)
-                    {
-                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-                        polygonScale.append( pt );
-                    }
+						for (int i = 0; i < polygon.size() - 1; ++i)
+						{
+							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+							polygonScale.append( pt );
+						}
 
-                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
-                }
+						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+					}
 
-                if (!aborted && polygonScale.size() > 0)
-                {
-                    for(int i = 0; i < polygonScale.size(); i++)
-                    {
-                        QPainterPath *path = new QPainterPath();
-                        DrawItem *newItem = NULL;
-                        newItem = new DrawItem(this, tPoint);
-                        path->moveTo(polygonScale[i].x(), polygonScale[i].y());
-                        path->lineTo(polygonScale[i].x(), polygonScale[i].y());
+					if (!aborted && polygonScale.size() > 0)
+					{
+						for(int i = 0; i < polygonScale.size(); i++)
+						{
+							QPainterPath *path = new QPainterPath();
+							DrawItem *newItem = NULL;
+							newItem = new DrawItem(this, tPoint);
+							path->moveTo(polygonScale[i].x(), polygonScale[i].y());
+							path->lineTo(polygonScale[i].x(), polygonScale[i].y());
 
-                        newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+							newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
 
-                        if(this->m_inverseColor0.isValid())
-                        {
-                            newItem->setPen(QPen(m_inverseColor0));
-                            //newItem->setBrush(QBrush(m_inverseColor0));
-                        }
-                        else newItem->setPen(QPen(Qt::green));
+							if(this->m_inverseColor0.isValid())
+							{
+								newItem->setPen(QPen(m_inverseColor0));
+								//newItem->setBrush(QBrush(m_inverseColor0));
+							}
+							else newItem->setPen(QPen(Qt::green));
 
-                        newItem->setVisible(true);
-                        newItem->show();
-                        newItem->attach(this);
-                        newItem->setSelected(true);
-                        
-    //                m_pData->m_pDrawItems.append(newItem);
-                        m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
-                    }
-                    replot();
-                }
+							newItem->setVisible(true);
+							newItem->show();
+							newItem->attach(this);
+							newItem->setSelected(true);
+							
+		//                m_pData->m_pDrawItems.append(newItem);
+							m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+						}
+						replot();
+					}
 
-                Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
-                if (p)
-                {
+					Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+					if (p)
+					{
 
-                    emit p->userInteractionDone(ito::PrimitiveContainer::tPoint, aborted, polygonScale);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tPoint, aborted);
-                }
+						emit p->userInteractionDone(ito::PrimitiveContainer::tPoint, aborted, polygonScale);
+						emit p->plotItemsFinished(ito::PrimitiveContainer::tPoint, aborted);
+					}
 
-                setState(stateIdle);
-                m_pMultiPointPicker->setEnabled(false);
-            }
-        break;
+					setState(stateIdle);
+					m_pMultiPointPicker->setEnabled(false);
+				}
+			break;
 
-        case tLine:
-            if (!on)
-            {
-                QPolygon polygon = m_pMultiPointPicker->selection();
+			case tLine:
+				if (!on)
+				{
+					QPolygon polygon = m_pMultiPointPicker->selection();
 
-                QPolygonF polygonScale;
-                bool aborted = false;
+					QPolygonF polygonScale;
+					bool aborted = false;
 
-                if (polygon.size() == 0)
-                {
-                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
-                    aborted = true;
-                    m_drawedIemsIndexes.clear();
-                }
-                else
-                {
-                    QPointF pt;
+					if (polygon.size() == 0)
+					{
+						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						aborted = true;
+						m_drawedIemsIndexes.clear();
+					}
+					else
+					{
+						QPointF pt;
 
-                    for (int i = 0; i < polygon.size(); ++i)
-                    {
-                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-                        polygonScale.append( pt );
-                    }
+						for (int i = 0; i < polygon.size(); ++i)
+						{
+							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+							polygonScale.append( pt );
+						}
 
-                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
 
-                    QPainterPath *path = new QPainterPath();
-                    DrawItem *newItem = NULL;
-                    newItem = new DrawItem(this, tLine);
-                    path->moveTo(polygonScale[0].x(), polygonScale[0].y());
-                    path->lineTo(polygonScale[1].x(), polygonScale[1].y());
+						QPainterPath *path = new QPainterPath();
+						DrawItem *newItem = NULL;
+						newItem = new DrawItem(this, tLine);
+						path->moveTo(polygonScale[0].x(), polygonScale[0].y());
+						path->lineTo(polygonScale[1].x(), polygonScale[1].y());
 
-                    newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+						newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
 
-                    newItem->setVisible(true);
-                    newItem->show();
-                    newItem->attach(this);
-                    newItem->setSelected(true);
-                    replot();
-                    m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);                
-    //                m_pData->m_pDrawItems.append(newItem);
+						newItem->setVisible(true);
+						newItem->show();
+						newItem->attach(this);
+						newItem->setSelected(true);
+						replot();
+						m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);                
+		//                m_pData->m_pDrawItems.append(newItem);
 
-                    m_drawedIemsIndexes.append(newItem->m_idx);
-                }
+						m_drawedIemsIndexes.append(newItem->m_idx);
+					}
 
-                // if further elements are needed reset the plot engine and go ahead else finish editing
-                if(m_pData && (m_pData->m_elementsToPick > 1))
-                {
-                    m_pData->m_elementsToPick--;
-                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                    if (m)
-                    {
-                        m->setMaxNrItems( 2 );
-                        m_pMultiPointPicker->setEnabled(true);
+					// if further elements are needed reset the plot engine and go ahead else finish editing
+					if(m_pData->m_elementsToPick > 1)
+					{
+						m_pData->m_elementsToPick--;
+						MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+						if (m)
+						{
+							m->setMaxNrItems( 2 );
+							m_pMultiPointPicker->setEnabled(true);
 
-                        if(!aborted)
-                        {
-                            if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 lines or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-                            else emit statusBarMessage( tr("Please draw one line or press Space to quit earlier. Esc aborts the selection."));
-                        }
-                    }
-                    return;
-                }
-                else
-                {
-                    m_pData->m_elementsToPick = 0;
-                    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
-                    if (p)
-                    {
-                        QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
-                        for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
-                        {
-                            if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                            destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tLine));
-                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
-                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
-                            destPolygon.append(QPointF(0.0, 0.0));
-                        }
-                        m_drawedIemsIndexes.clear();
-                        emit p->userInteractionDone(ito::PrimitiveContainer::tLine, aborted, destPolygon);
-                        emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
+							if(!aborted)
+							{
+								if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 lines or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+								else emit statusBarMessage( tr("Please draw one line or press Space to quit earlier. Esc aborts the selection."));
+							}
+						}
+						return;
+					}
+					else
+					{
+						m_pData->m_elementsToPick = 0;
+						Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+						if (p)
+						{
+							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
+							for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
+							{
+								if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
+								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tLine));
+								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
+								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
+								destPolygon.append(QPointF(0.0, 0.0));
+							}
+							m_drawedIemsIndexes.clear();
+							emit p->userInteractionDone(ito::PrimitiveContainer::tLine, aborted, destPolygon);
+							emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
 
-                        
-                    }
-                    setState(stateIdle);
-                    m_pMultiPointPicker->setEnabled(false);
-                }
+							
+						}
+						setState(stateIdle);
+						m_pMultiPointPicker->setEnabled(false);
+					}
 
-            }
-        break;
+				}
+			break;
 
-        case tRect:
-            if (!on)
-            {
-                
+			case tRect:
+				if (!on)
+				{
+					QPolygon polygon = m_pMultiPointPicker->selection();
+					QPolygonF polygonScale;
+					bool aborted = false;
 
-                QPolygon polygon = m_pMultiPointPicker->selection();
+					if (polygon.size() == 0)
+					{
+						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						aborted = true;
+						m_drawedIemsIndexes.clear();
+					}
+					else
+					{
+						QPointF pt;
 
-                QPolygonF polygonScale;
-                bool aborted = false;
+						for (int i = 0; i < polygon.size(); ++i)
+						{
+							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+							polygonScale.append( pt );
+						}
 
-                if (polygon.size() == 0)
-                {
-                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
-                    aborted = true;
-                    m_drawedIemsIndexes.clear();
-                }
-                else
-                {
-                    QPointF pt;
+						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
 
-                    for (int i = 0; i < polygon.size(); ++i)
-                    {
-                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-                        polygonScale.append( pt );
-                    }
+						QPainterPath *path = new QPainterPath();
+						DrawItem *newItem = NULL;
+						newItem = new DrawItem(this, tRect);
+						path->addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
+									  polygonScale[1].y() - polygonScale[0].y());
 
-                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+						newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+					
+						newItem->setVisible(true);
+						newItem->show();
+						newItem->attach(this);
+						newItem->setSelected(true);
+						replot();
+						m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+		//                m_pData->m_pDrawItems.append(newItem);
 
-                    QPainterPath *path = new QPainterPath();
-                    DrawItem *newItem = NULL;
-                    newItem = new DrawItem(this, tRect);
-                    path->addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
-                                  polygonScale[1].y() - polygonScale[0].y());
+						m_drawedIemsIndexes.append(newItem->m_idx);
+					}
 
-                    newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
-                
-                    newItem->setVisible(true);
-                    newItem->show();
-                    newItem->attach(this);
-                    newItem->setSelected(true);
-                    replot();
-                    m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
-    //                m_pData->m_pDrawItems.append(newItem);
+					// if further elements are needed reset the plot engine and go ahead else finish editing
+					if(m_pData->m_elementsToPick > 1)
+					{
+						m_pData->m_elementsToPick--;
+						MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+						if (m)
+						{
+							//m->setMaxNrItems( 2 );
+							m_pMultiPointPicker->setEnabled(true);
 
-                    m_drawedIemsIndexes.append(newItem->m_idx);
-                }
+							if(!aborted)
+							{
+								if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 rectangles or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+								else emit statusBarMessage( tr("Please draw one rectangle or press Space to quit earlier. Esc aborts the selection."));
+							}
+						}
+						return;
+					}
+					else
+					{
+						m_pData->m_elementsToPick = 0;
+						Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+						if (p)
+						{
+							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
+							for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
+							{
+								if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
+								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tRectangle));
+								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
+								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
+								destPolygon.append(QPointF(0.0, 0.0));
+							}
+							m_drawedIemsIndexes.clear();
 
-                // if further elements are needed reset the plot engine and go ahead else finish editing
-                if(m_pData && (m_pData->m_elementsToPick > 1))
-                {
-                    m_pData->m_elementsToPick--;
-                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                    if (m)
-                    {
-                        //m->setMaxNrItems( 2 );
-                        m_pMultiPointPicker->setEnabled(true);
+							emit p->userInteractionDone(ito::PrimitiveContainer::tRectangle, aborted, destPolygon);
+							emit p->plotItemsFinished(ito::PrimitiveContainer::tRectangle, aborted);
+						}
+						setState(stateIdle);
+						m_pMultiPointPicker->setEnabled(false);
+					}
+				}
+			break;
 
-                        if(!aborted)
-                        {
-                            if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 rectangles or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-                            else emit statusBarMessage( tr("Please draw one rectangle or press Space to quit earlier. Esc aborts the selection."));
-                        }
-                    }
-                    return;
-                }
-                else
-                {
-                    m_pData->m_elementsToPick = 0;
-                    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
-                    if (p)
-                    {
-                        QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
-                        for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
-                        {
-                            if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                            destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tRectangle));
-                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
-                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
-                            destPolygon.append(QPointF(0.0, 0.0));
-                        }
-                        m_drawedIemsIndexes.clear();
+			case tEllipse:
+				if (!on)
+				{
+					QPolygon polygon = m_pMultiPointPicker->selection();
 
-                        emit p->userInteractionDone(ito::PrimitiveContainer::tRectangle, aborted, destPolygon);
-                        emit p->plotItemsFinished(ito::PrimitiveContainer::tRectangle, aborted);
-                    }
-                    setState(stateIdle);
-                    m_pMultiPointPicker->setEnabled(false);
-                }
-            }
-        break;
+					QPolygonF polygonScale;
+					bool aborted = false;
 
-        case tEllipse:
-            if (!on)
-            {
-                QPolygon polygon = m_pMultiPointPicker->selection();
+					if (polygon.size() == 0)
+					{
+						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						aborted = true;
+						m_drawedIemsIndexes.clear();
+					}
+					else
+					{
+						QPointF pt;
 
-                QPolygonF polygonScale;
-                bool aborted = false;
+						for (int i = 0; i < polygon.size(); ++i)
+						{
+							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
+							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
+							polygonScale.append( pt );
+						}
 
-                if (polygon.size() == 0)
-                {
-                    emit statusBarMessage( tr("Selection has been aborted."), 2000 );
-                    aborted = true;
-                    m_drawedIemsIndexes.clear();
-                }
-                else
-                {
-                    QPointF pt;
+						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
 
-                    for (int i = 0; i < polygon.size(); ++i)
-                    {
-                        pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-                        pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-                        polygonScale.append( pt );
-                    }
+						QPainterPath *path = new QPainterPath();
+						DrawItem *newItem = NULL;
+						newItem = new DrawItem(this, tEllipse);
+						path->addEllipse(polygonScale[0].x(), polygonScale[0].y(),
+								(polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
-                    emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+						newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+					
+						if(this->m_inverseColor0.isValid())
+						{
+							newItem->setPen(QPen(m_inverseColor0));
+							//newItem->setBrush(QBrush(m_inverseColor0));
+						}
+						else newItem->setPen(QPen(Qt::green));
 
-                    QPainterPath *path = new QPainterPath();
-                    DrawItem *newItem = NULL;
-                    newItem = new DrawItem(this, tEllipse);
-                    path->addEllipse(polygonScale[0].x(), polygonScale[0].y(),
-                            (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
+						newItem->setVisible(true);
+						newItem->show();
+						newItem->attach(this);
+						newItem->setSelected(true);
+						replot();
+						m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
+		//                m_pData->m_pDrawItems.append(newItem);
 
-                    newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
-                
-                    if(this->m_inverseColor0.isValid())
-                    {
-                        newItem->setPen(QPen(m_inverseColor0));
-                        //newItem->setBrush(QBrush(m_inverseColor0));
-                    }
-                    else newItem->setPen(QPen(Qt::green));
+						m_drawedIemsIndexes.append(newItem->m_idx);
+					}
 
-                    newItem->setVisible(true);
-                    newItem->show();
-                    newItem->attach(this);
-                    newItem->setSelected(true);
-                    replot();
-                    m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
-    //                m_pData->m_pDrawItems.append(newItem);
+					// if further elements are needed reset the plot engine and go ahead else finish editing
+					if(m_pData->m_elementsToPick > 1)
+					{
+						m_pData->m_elementsToPick--;
+						MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+						if (m)
+						{
+							//m->setMaxNrItems( 2 );
+							m_pMultiPointPicker->setEnabled(true);
 
-                    m_drawedIemsIndexes.append(newItem->m_idx);
-                }
+							if(!aborted)
+							{
+								if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 ellipses or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+								else emit statusBarMessage( tr("Please draw one ellipse or press Space to quit earlier. Esc aborts the selection."));
+							}
+						}
+						return;
+					}
+					else
+					{
+						m_pData->m_elementsToPick = 0;
+						Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+						if (p)
+						{
+							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
+							for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
+							{
+								if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
+								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tEllipse));
+								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
+								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
+								destPolygon.append(QPointF(0.0, 0.0));
+							}
+							m_drawedIemsIndexes.clear();
 
-                // if further elements are needed reset the plot engine and go ahead else finish editing
-                if(m_pData && (m_pData->m_elementsToPick > 1))
-                {
-                    m_pData->m_elementsToPick--;
-                    MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                    if (m)
-                    {
-                        //m->setMaxNrItems( 2 );
-                        m_pMultiPointPicker->setEnabled(true);
-
-                        if(!aborted)
-                        {
-                            if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 ellipses or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-                            else emit statusBarMessage( tr("Please draw one ellipse or press Space to quit earlier. Esc aborts the selection."));
-                        }
-                    }
-                    return;
-                }
-                else
-                {
-                    m_pData->m_elementsToPick = 0;
-                    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
-                    if (p)
-                    {
-                        QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
-                        for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
-                        {
-                            if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                            destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tEllipse));
-                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
-                            destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
-                            destPolygon.append(QPointF(0.0, 0.0));
-                        }
-                        m_drawedIemsIndexes.clear();
-
-                        emit p->userInteractionDone(ito::PrimitiveContainer::tEllipse, aborted, destPolygon);
-                        emit p->plotItemsFinished(ito::PrimitiveContainer::tEllipse, aborted);
-                    }
-                    setState(stateIdle);
-                    m_pMultiPointPicker->setEnabled(false);
-                }
-            }
-        break;
-
-    }
+							emit p->userInteractionDone(ito::PrimitiveContainer::tEllipse, aborted, destPolygon);
+							emit p->plotItemsFinished(ito::PrimitiveContainer::tEllipse, aborted);
+						}
+						setState(stateIdle);
+						m_pMultiPointPicker->setEnabled(false);
+					}
+				}
+			break;
+		}
+	} // if m_pData
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2369,7 +2364,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
     {
         if (dObj->getSize(0) >= 8)
         {
-            QwtPlotMarker *marker = NULL;
+//            QwtPlotMarker *marker = NULL;
             int nrOfMarkers = dObj->getSize(1);
             
             if (id == "") id = "unknown";

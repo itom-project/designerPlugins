@@ -695,7 +695,7 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
     if (status.size() != positions.size())
     return;
 
-    bool running = false;
+//    bool running = false;
     QString style;
     unsigned char size = status.size();
     size = size > 6 ? 6 : size;
@@ -705,7 +705,7 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
         if (status[i] & ito::actuatorMoving)
         {
             style = "background-color: yellow";
-            running = true;
+//            running = true;
         }
         else if (status[i] & ito::actuatorInterrupted)
         {

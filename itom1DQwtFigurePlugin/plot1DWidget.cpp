@@ -622,7 +622,7 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
         double xScale = invTransform( xBottom, xPx );
-        double yScale = invTransform( yLeft, yPx );
+//        double yScale = invTransform( yLeft, yPx );
 
         bool closeToMarker = false;
 

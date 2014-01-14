@@ -517,7 +517,7 @@ void DataObjectDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     const DataObjectModel *model = qobject_cast<const DataObjectModel*>(index.model());
     int type = model->getType();
 
-    QWidget *result = NULL;
+//    QWidget *result = NULL;
 
     switch(type)
     {
@@ -568,7 +568,7 @@ void DataObjectDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     const DataObjectModel *model2 = qobject_cast<DataObjectModel*>(model);
     int type = model2->getType();
 
-    QWidget *result = NULL;
+//    QWidget *result = NULL;
 
     switch(type)
     {

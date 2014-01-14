@@ -632,8 +632,8 @@ void itom2DQwtFigure::mnuScaleSetting()
                         curPlane += curPlane + offsets[cntPlane] * wholeSize[cntPlane - 1];
                     }
                 }
-                delete wholeSize;
-                delete offsets;
+                delete[] wholeSize;
+                delete[] offsets;
             }
 
         }

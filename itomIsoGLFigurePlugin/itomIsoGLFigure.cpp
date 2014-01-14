@@ -214,27 +214,26 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actCmplxSwitch->setVisible(false);
 
     //m_actSave
-    bool test;
-    test = connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuActSave()));
-    test = connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
+    connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuActSave()));
+    connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
 
-    //test = connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
-    //test = connect(m_actPan, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
-    //test = connect(m_actZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
-    //test = connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuValuePicker(bool)));
-    //test = connect(m_actLineCut, SIGNAL(toggled(bool)), this, SLOT(mnuLinePicker(bool)));
+    //connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
+    //connect(m_actPan, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
+    //connect(m_actZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
+    //connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuValuePicker(bool)));
+    //connect(m_actLineCut, SIGNAL(toggled(bool)), this, SLOT(mnuLinePicker(bool)));
 
-    test = connect(m_actPalette, SIGNAL(triggered()), this, SLOT(mnuPalette()));
-    test = connect(m_actToggleColorBar, SIGNAL(triggered()), this, SLOT(mnuColorBar()));
-    test = connect(m_actChangeBGColor, SIGNAL(triggered()), this, SLOT(mnuToggleBPColor()));
-    test = connect(m_toggleIllumination, SIGNAL(toggled(bool)), this, SLOT(mnutoggleIllumination(bool)));
-    test = connect(m_toggleIlluminationRotation, SIGNAL(toggled(bool)), this, SLOT(mnutoggleIlluminationRotation(bool)));
+    connect(m_actPalette, SIGNAL(triggered()), this, SLOT(mnuPalette()));
+    connect(m_actToggleColorBar, SIGNAL(triggered()), this, SLOT(mnuColorBar()));
+    connect(m_actChangeBGColor, SIGNAL(triggered()), this, SLOT(mnuToggleBPColor()));
+    connect(m_toggleIllumination, SIGNAL(toggled(bool)), this, SLOT(mnutoggleIllumination(bool)));
+    connect(m_toggleIlluminationRotation, SIGNAL(toggled(bool)), this, SLOT(mnutoggleIlluminationRotation(bool)));
 
-    test = connect(m_toggleInfoText, SIGNAL(toggled(bool)), m_pContent, SLOT(toogleObjectInfoText(bool)));
+    connect(m_toggleInfoText, SIGNAL(toggled(bool)), m_pContent, SLOT(toogleObjectInfoText(bool)));
 
-    //test = connect(m_actAScan, SIGNAL(toggled(bool)), this, SLOT(mnuAScanPicker(bool)));
-    test = connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
-    test = connect(m_mnuTringModeSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuTringModeSwitch(QAction*)));
+    //connect(m_actAScan, SIGNAL(toggled(bool)), this, SLOT(mnuAScanPicker(bool)));
+    connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
+    connect(m_mnuTringModeSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuTringModeSwitch(QAction*)));
 
     QToolBar *toolbar = new QToolBar(tr("Iso Toolbar"), this);
     addToolBar(toolbar, "mainToolBar", Qt::TopToolBarArea, 1);
@@ -814,7 +813,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
     if (e->type() == QEvent::Destroy)
         return false;
 
-    if (!m_plotObj || m_plotObj == NULL|| ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent) == NULL)
+    if (m_plotObj == NULL || ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent) == NULL)
         return false;
 
     switch(e->type())
