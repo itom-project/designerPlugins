@@ -109,191 +109,199 @@ class RasterToQImageObj : QObject
         cv::Mat *m_plane;
         InternalData *m_pInternalData;
 
-        template<typename _Type> inline QImage rescaleByScale(const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
-        {
-            QImage retImage(m_D.m_xSize, m_D.m_ySize, QImage::Format_Indexed8);
-            retImage.setColorTable(colorTable);
-
-            unsigned char *dstPtr = retImage.bits();
-
-            double scaling = 1.0;
-
-
-            if(ito::dObjHelper::isNotZero(zMax-zMin))
-            {
-                scaling = 255.0 / (zMax - zMin);
-            }
-
-            _Type *srcPtr = m_plane->ptr<_Type>();
-            size_t nextRow = (size_t)((m_plane->step[0] - m_D.m_xSize * m_plane->step[1]) / sizeof(_Type));
-            
-            size_t nextDstRow = m_D.m_xSize % 4;
-            if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
-
-            for(int y = 0; y < m_D.m_ySize; y++)
-            {
-                for(int x = 0; x < m_D.m_xSize; x++)
-                {
-                    *dstPtr = cv::saturate_cast<ito::uint8>((*srcPtr - zMin)*(scaling));
-                    dstPtr++;
-                    srcPtr++;
-                }
-                srcPtr += nextRow;
-                dstPtr += nextDstRow;
-            }
-
-
-            return retImage;        
-        }
-
-        template<> inline QImage rescaleByScale<ito::complex64>(const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
-        {
-            QImage retImage(m_D.m_xSize, m_D.m_ySize, QImage::Format_Indexed8);
-            retImage.setColorTable(colorTable);
-
-            ito::complex64 *srcPtr = m_plane->ptr<ito::complex64>();
-            unsigned char *dstPtr = retImage.bits();
-
-            size_t nextRow = (size_t)((m_plane->step[0] - m_D.m_xSize * m_plane->step[1]) / sizeof(ito::complex64));
-            
-            size_t nextDstRow = m_D.m_xSize % 4;
-            if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
-
-            double scaling = 255.0 / (zMax - zMin);
-            switch (cmplxState)
-            {
-                default:
-
-                case tAbsolute:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-                case tReal:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((real(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-                case tImag:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((imag(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-                case tPhase:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-            }
-
-            return retImage;        
-        }
-        
-        template<> inline QImage rescaleByScale<ito::complex128>(const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
-        {
-            QImage retImage(m_D.m_xSize, m_D.m_ySize, QImage::Format_Indexed8);
-            retImage.setColorTable(colorTable);
-
-            ito::complex128 *srcPtr = m_plane->ptr<ito::complex128>();
-            unsigned char *dstPtr = retImage.bits();
-
-            size_t nextRow = (size_t)((m_plane->step[0] - m_D.m_xSize * m_plane->step[1]) / sizeof(ito::complex128));
-            size_t nextDstRow = m_D.m_xSize % 4;
-            if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
-
-            double scaling = 255.0 / (zMax - zMin);
-            switch (cmplxState)
-            {
-                default:
-                case tAbsolute:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-                case tReal:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((real(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-                case tImag:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((imag(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-                case tPhase:
-                    for(int y = 0; y < m_D.m_ySize; y++)
-                    {
-                        for(int x = 0; x < m_D.m_xSize; x++)
-                        {
-                            *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
-                            dstPtr++;
-                            srcPtr++;
-                        }
-                        srcPtr += nextRow;
-                        dstPtr += nextDstRow;
-                    }
-                break;
-            }
-            return retImage;      
-        }
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
+
+
+namespace graphicViewHelper
+{
+    template<typename _Type> inline QImage rescaleByScale(const cv::Mat *m_plane, const int &xSize, const int &ySize, const int &step0, const int &step1, const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
+    {
+        QImage retImage(xSize, ySize, QImage::Format_Indexed8);
+        retImage.setColorTable(colorTable);
+
+        unsigned char *dstPtr = retImage.bits();
+
+        double scaling = 1.0;
+
+
+        if(ito::dObjHelper::isNotZero(zMax-zMin))
+        {
+            scaling = 255.0 / (zMax - zMin);
+        }
+
+        const _Type *srcPtr = m_plane->ptr<_Type>();
+        size_t nextRow = (size_t)((step0 - xSize * step1) / sizeof(_Type));
+            
+        size_t nextDstRow = xSize % 4;
+        if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
+
+        for(int y = 0; y < ySize; y++)
+        {
+            for(int x = 0; x < xSize; x++)
+            {
+                *dstPtr = cv::saturate_cast<ito::uint8>((*srcPtr - zMin)*(scaling));
+                dstPtr++;
+                srcPtr++;
+            }
+            srcPtr += nextRow;
+            dstPtr += nextDstRow;
+        }
+
+
+        return retImage;        
+    }
+
+    template<> inline QImage rescaleByScale<ito::complex64>(const cv::Mat *m_plane, const int &xSize, const int &ySize, const int &step0, const int &step1, const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
+    {
+        QImage retImage(xSize, ySize, QImage::Format_Indexed8);
+        retImage.setColorTable(colorTable);
+
+        const ito::complex64 *srcPtr = m_plane->ptr<ito::complex64>();
+        unsigned char *dstPtr = retImage.bits();
+
+        size_t nextRow = (size_t)((step0 - xSize * step1) / sizeof(ito::complex64));
+            
+        size_t nextDstRow = xSize % 4;
+        if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
+
+        double scaling = 255.0 / (zMax - zMin);
+        switch (cmplxState)
+        {
+            default:
+
+        case RasterToQImageObj::tAbsolute:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+            case RasterToQImageObj::tReal:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((real(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+            case RasterToQImageObj::tImag:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((imag(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+            case RasterToQImageObj::tPhase:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+        }
+
+        return retImage;        
+    }
+        
+    template<> inline QImage rescaleByScale<ito::complex128>(const cv::Mat *m_plane, const int &xSize, const int &ySize, const int &step0, const int &step1, const QVector<ito::uint32> &colorTable, const ito::float64 zMin, const ito::float64 zMax, const int cmplxState)
+    {
+        QImage retImage(xSize, ySize, QImage::Format_Indexed8);
+        retImage.setColorTable(colorTable);
+
+        const ito::complex128 *srcPtr = m_plane->ptr<ito::complex128>();
+        unsigned char *dstPtr = retImage.bits();
+
+        size_t nextRow = (size_t)((step0 - xSize * step1) / sizeof(ito::complex128));
+            
+        size_t nextDstRow = xSize % 4;
+        if(nextDstRow > 0) nextDstRow = 4 - nextDstRow;
+
+        double scaling = 255.0 / (zMax - zMin);
+        switch (cmplxState)
+        {
+            default:
+            case RasterToQImageObj::tAbsolute:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((abs(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+            case RasterToQImageObj::tReal:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((real(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+            case RasterToQImageObj::tImag:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((imag(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+            case RasterToQImageObj::tPhase:
+                for(int y = 0; y < ySize; y++)
+                {
+                    for(int x = 0; x < xSize; x++)
+                    {
+                        *dstPtr = cv::saturate_cast<ito::uint8>((arg(*srcPtr) - zMin)*(scaling));
+                        dstPtr++;
+                        srcPtr++;
+                    }
+                    srcPtr += nextRow;
+                    dstPtr += nextDstRow;
+                }
+            break;
+        }
+        return retImage;      
+    }
+
+}
+
 
 #endif

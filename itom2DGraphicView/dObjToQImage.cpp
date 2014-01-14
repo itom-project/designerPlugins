@@ -385,25 +385,25 @@ QImage RasterToQImageObj::convert2QImage()
         switch(type)
         {
             case ito::tUInt8:
-                return rescaleByScale<ito::uint8>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::uint8>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tInt8:
-                return rescaleByScale<ito::int8>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::int8>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tUInt16:
-                return rescaleByScale<ito::uint16>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::uint16>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tInt16:
-                return rescaleByScale<ito::int16>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::int16>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tUInt32:
-                return rescaleByScale<ito::uint32>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::uint32>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tInt32:
-                return rescaleByScale<ito::int32>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::int32>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tFloat32:
-                return rescaleByScale<ito::float32>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::float32>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tFloat64:
-                return rescaleByScale<ito::float64>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::float64>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tComplex64:
-                return rescaleByScale<ito::complex64>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::complex64>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tComplex128:
-                return rescaleByScale<ito::complex128>(m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::complex128>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             default:
             {
                 QImage temp(100, 100, QImage::Format_ARGB32);
