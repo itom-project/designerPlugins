@@ -1324,16 +1324,16 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     {
         if(m_elementMode == PAINT_POINTS)
         {
-            realloc(m_pColIndices, m_NumElements*sizeof(unsigned char));
-            realloc(m_pPoints, m_NumElements*3*sizeof(GLfloat));
-            realloc(m_pColTriangles, m_NumElements*4*sizeof(GLubyte));
+            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements*sizeof(unsigned char));
+            m_pPoints = (GLfloat*)realloc(m_pPoints, m_NumElements*3*sizeof(GLfloat));
+            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements*4*sizeof(GLubyte));
         }
         else
         {
-            realloc(m_pColIndices, m_NumElements * 3 * sizeof(unsigned char));
-            realloc(m_pTriangles, m_NumElements*9*sizeof(GLfloat));
-            realloc(m_pColTriangles, m_NumElements*12*sizeof(GLubyte));
-            realloc(m_pNormales, m_NumElements*9*sizeof(GLfloat));
+             m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 3 * sizeof(unsigned char));
+             m_pTriangles = (GLfloat*)realloc(m_pTriangles, m_NumElements*9*sizeof(GLfloat));
+             m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements*12*sizeof(GLubyte));
+             m_pNormales = (GLfloat*)realloc(m_pNormales, m_NumElements*9*sizeof(GLfloat));
         }
 
         ResetColors();
