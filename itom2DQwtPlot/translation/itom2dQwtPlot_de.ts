@@ -6,42 +6,42 @@
     <message>
         <location filename="../dialog2DScale.ui"/>
         <source>Interval Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Interval-Einstellungen</translation>
     </message>
     <message>
         <location/>
         <source>x-range</source>
-        <translation type="unfinished"></translation>
+        <translation>X-Anzeige</translation>
     </message>
     <message>
         <location/>
         <source>auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatische Berechnung</translation>
     </message>
     <message>
         <location/>
         <source>manual adjustment:</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuelle Ausrichtung:</translation>
     </message>
     <message>
         <location/>
         <source>from</source>
-        <translation type="unfinished"></translation>
+        <translation>von</translation>
     </message>
     <message>
         <location/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>bis</translation>
     </message>
     <message>
         <location/>
         <source>y-range</source>
-        <translation type="unfinished"></translation>
+        <translation>Y-Anzeige</translation>
     </message>
     <message>
         <location/>
         <source>values</source>
-        <translation type="unfinished"></translation>
+        <translation>Werte</translation>
     </message>
 </context>
 <context>
@@ -49,47 +49,47 @@
     <message>
         <location filename="../../sharedFiles/dialogExportProperties.ui"/>
         <source>Export Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Export-Einstellungen</translation>
     </message>
     <message>
         <location/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Breite</translation>
     </message>
     <message>
         <location/>
         <source>px</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Höhe</translation>
     </message>
     <message>
         <location/>
         <source>Export to</source>
-        <translation type="unfinished"></translation>
+        <translation>Export nach</translation>
     </message>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Auflösung</translation>
     </message>
     <message>
         <location/>
         <source>dpi</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>User definitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzerdefinitionen</translation>
     </message>
     <message>
         <location/>
         <source>mm</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -97,52 +97,52 @@
     <message>
         <location filename="../../sharedFiles/dialogExportProperties.cpp" line="+51"/>
         <source>user defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzerdefiniert</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>user defined (keep aspect)</source>
-        <translation type="unfinished"></translation>
+        <source>user defined (keep aspect ratio)</source>
+        <translation>Benutzerdefiniert (Seitenverhältnis beibehalten)</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>A4 landscape</source>
-        <translation type="unfinished"></translation>
+        <translation>A4 Querformat</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A4 portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>A4 Hochformat</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A4 landscape (fitting)</source>
-        <translation type="unfinished"></translation>
+        <translation>A4 Querformat (angepasst)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A4 portrait (fitting)</source>
-        <translation type="unfinished"></translation>
+        <translation>A4 Hochformat (angepasst)</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>A5 landscape</source>
-        <translation type="unfinished"></translation>
+        <translation>A5 Querformat</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A5 portrait</source>
-        <translation type="unfinished"></translation>
+        <translation>A5 Hochformat</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A5 landscape (fitting)</source>
-        <translation type="unfinished"></translation>
+        <translation>A5 Querformat (angepasst)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A5 portrait (fitting)</source>
-        <translation type="unfinished"></translation>
+        <translation>A5 Hochformat (angepasst)</translation>
     </message>
 </context>
 <context>
@@ -150,7 +150,7 @@
     <message>
         <location filename="../itom2dqwtplot.cpp" line="+182"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -181,7 +181,7 @@
     <message>
         <location line="+4"/>
         <source>Scale Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Skaleneinstellungen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -191,7 +191,7 @@
     <message>
         <location line="+4"/>
         <source>Palette</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
@@ -211,12 +211,12 @@
     <message>
         <location line="-108"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation>Ansicht</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Werkzeuge</translation>
     </message>
     <message>
         <location line="+45"/>
@@ -246,12 +246,12 @@
     <message>
         <location line="+31"/>
         <source>Marker</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Linecut</source>
-        <translation type="unfinished"></translation>
+        <translation>Linienschnitt</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -286,17 +286,17 @@
     <message>
         <location line="+6"/>
         <source>Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Linie</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechteck</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Ellipse</source>
-        <translation type="unfinished"></translation>
+        <translation>Ellipse</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -336,27 +336,27 @@
     <message>
         <location line="+381"/>
         <source>PDF Documents (*.pdf)</source>
-        <translation type="unfinished"></translation>
+        <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>SVG Documents (*.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>SVG-Dokumente (*.svg)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Postscript Documents (*.ps)</source>
-        <translation type="unfinished"></translation>
+        <translation>Postscript-Dateien (*.ps)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Images (</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilddateien (</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Export File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateiname exportieren</translation>
     </message>
     <message>
         <location line="+326"/>
@@ -404,18 +404,18 @@
     <message>
         <location filename="../plotCanvas.cpp" line="+496"/>
         <source>No color maps defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Selected color map has less than two points.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
         <location line="+792"/>
         <location line="+29"/>
         <source>invalid marker type</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger Marker-Typ</translation>
     </message>
     <message>
         <location line="+127"/>
@@ -604,7 +604,7 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="-146"/>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Eigenschaften</translation>
     </message>
 </context>
 </TS>

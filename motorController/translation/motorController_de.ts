@@ -6,7 +6,7 @@
     <message>
         <location filename="../motorController.cpp" line="+194"/>
         <source>Toogle Unit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Symbolleiste</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -61,13 +61,13 @@
         <location line="+1"/>
         <location line="+771"/>
         <source>on</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ein</translation>
     </message>
     <message>
         <location line="-770"/>
         <location line="+774"/>
         <source>off</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">aus</translation>
     </message>
     <message>
         <location line="-425"/>

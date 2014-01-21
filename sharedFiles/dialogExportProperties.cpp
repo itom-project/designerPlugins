@@ -49,7 +49,7 @@ DialogExportProperties::DialogExportProperties(const QString &type, const QSizeF
     m_items.clear();
 
     m_items << tr("user defined");
-    m_items << tr("user defined (keep aspect)");
+    m_items << tr("user defined (keep aspect ratio)");
 
     m_items << tr("A4 landscape");
     m_items << tr("A4 portrait");
@@ -101,7 +101,7 @@ void DialogExportProperties::updateOutPut()
         default:
         case 0: // user defined
             break;
-        case 1: // user defined (keep aspect)
+        case 1: // user defined (keep aspect ratio)
             ui.dSB_destWidth->setValue( ui.dSB_destHeight->value() * m_aspect);
             break;
 

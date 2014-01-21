@@ -16,7 +16,7 @@
     <message>
         <location line="+2"/>
         <source>forward</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vorwärts</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -26,7 +26,7 @@
     <message>
         <location line="+2"/>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zurück</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -56,7 +56,7 @@
     <message>
         <location line="+2"/>
         <source>marker</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Marker</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -71,12 +71,12 @@
     <message>
         <location line="+2"/>
         <source>save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Speichern</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Save the figure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Figure Speichern</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -107,47 +107,47 @@
     <message>
         <location filename="../matplotlibSubfigConfig.ui"/>
         <source>Subplot Configuration Tool</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Subplot Konfiguartionswerkzeug</translation>
     </message>
     <message>
         <location/>
         <source>Margins</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rand</translation>
     </message>
     <message>
         <location/>
         <source>left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Links</translation>
     </message>
     <message>
         <location/>
         <source>top</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Oben</translation>
     </message>
     <message>
         <location/>
         <source>bottom</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unten</translation>
     </message>
     <message>
         <location/>
         <source>right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rechts</translation>
     </message>
     <message>
         <location/>
         <source>Spacing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abstand</translation>
     </message>
     <message>
         <location/>
         <source>hspace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Horizontal</translation>
     </message>
     <message>
         <location/>
         <source>wspace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vertikal</translation>
     </message>
 </context>
 </TS>

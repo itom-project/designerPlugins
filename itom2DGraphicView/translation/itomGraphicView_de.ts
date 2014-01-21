@@ -6,47 +6,47 @@
     <message>
         <location filename="../dialog2DScale.ui"/>
         <source>Plot Interval Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Plot Interval Einstellungen</translation>
     </message>
     <message>
         <location/>
         <source>x-range</source>
-        <translation type="unfinished"></translation>
+        <translation>X-Anzeige</translation>
     </message>
     <message>
         <location/>
         <source>auto calc once</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatische Berechnung</translation>
     </message>
     <message>
         <location/>
         <source>manual adjustment:</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuelle Ausrichtung:</translation>
     </message>
     <message>
         <location/>
         <source>from</source>
-        <translation type="unfinished"></translation>
+        <translation>von</translation>
     </message>
     <message>
         <location/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>bis</translation>
     </message>
     <message>
         <location/>
         <source>y-range</source>
-        <translation type="unfinished"></translation>
+        <translation>Y-Anzeige</translation>
     </message>
     <message>
         <location/>
         <source>z-range</source>
-        <translation type="unfinished"></translation>
+        <translation>Z-Anzeige</translation>
     </message>
     <message>
         <location/>
         <source>current plane</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Ebene</translation>
     </message>
 </context>
 <context>
@@ -451,7 +451,7 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="-146"/>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Eigenschaften</translation>
     </message>
 </context>
 </TS>
