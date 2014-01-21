@@ -2,48 +2,108 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de">
 <context>
-    <name>EvaluateGeometricsFigure</name>
+    <name>Dialog2DScale</name>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="+52"/>
-        <source>Points for line plots from 2d objects</source>
+        <location filename="../dialog2DScale.ui"/>
+        <source>Plot Interval Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Save as table, tree, xml</source>
+        <location/>
+        <source>x-range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>auto calc once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>manual adjustment:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>y-range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>z-range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>current plane</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GraphicViewPlot</name>
+    <message>
+        <location filename="../graphicViewPlot.cpp" line="+63"/>
+        <source>Points for line plots from 2D objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>plotting tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>-     NOIMAGE     -</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>plot2D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Export current data</source>
+        <source>Reset original view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <location line="+272"/>
-        <source>table</source>
+        <location line="+5"/>
+        <source>save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-271"/>
-        <source>tree</source>
+        <location line="+2"/>
+        <source>Export current view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+279"/>
-        <source>list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-278"/>
-        <location line="+273"/>
-        <source>xml</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-269"/>
-        <source>system settings</source>
+        <location line="+4"/>
+        <source>scale settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -52,141 +112,238 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>add relation</source>
+        <location line="+6"/>
+        <source>move</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Add a further relation to this table or fix a defect one.</source>
+        <location line="+5"/>
+        <source>Pan axes with left mouse, zoom with right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>remove relation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Remove a relation from the table.</source>
+        <location line="+6"/>
+        <source>rectangle zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>update relation</source>
+        <source>Zoom to rectangle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Force update of this table.</source>
+        <location line="+6"/>
+        <source>marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Show a point marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>linecut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>auto-scale columns</source>
+        <source>Show a in plane line cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>color palettes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Adapts columns to idle width.</source>
+        <source>Switch between color palettes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>basic options</source>
+        <location line="+4"/>
+        <source>color bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+625"/>
-        <source>add relation name failed: relation as one of the restricted relations</source>
+        <location line="+4"/>
+        <source>Toggle visibility of the color bar name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+1"/>
+        <source>zoom level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Switch between different zoom levels with fixed aspect ration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>slice in z-direction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Show a slice through z-Stack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
-        <source>add relation name exited with warning: relation already existed</source>
+        <source>Select image plane</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-390"/>
-        <location line="+45"/>
-        <source>select destination file</source>
+        <location line="+9"/>
+        <source>complex switch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+178"/>
-        <source>imported data was Null-pointer</source>
+        <location line="+1"/>
+        <source>Complex Switch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>imported data not initialized</source>
+        <location line="+1"/>
+        <location line="+458"/>
+        <source>imaginary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>imported data has more than one plane</source>
+        <location line="-457"/>
+        <location line="+462"/>
+        <source>real</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-461"/>
+        <source>absolute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+465"/>
+        <source>phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-462"/>
+        <source>Switch imaginary, real, absolute, phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>color switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Color Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>autoColor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+471"/>
+        <source>falseColor, bitshift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-470"/>
+        <location line="+474"/>
+        <source>falseColor, scaled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-473"/>
+        <location line="+477"/>
+        <source>Color, 24-Bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-476"/>
+        <location line="+480"/>
+        <source>Color, 32-Bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-478"/>
+        <source>Switch index and direct color mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+293"/>
+        <source>PDF Documents (*.pdf)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>SVG Documents (*.svg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Postscript Documents (*.ps)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Images (</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>imported data has more than one row</source>
+        <source>Export File Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+455"/>
+        <location line="+22"/>
+        <location line="+105"/>
+        <location line="+12"/>
+        <location line="+12"/>
+        <location line="+14"/>
+        <location line="+25"/>
+        <location line="+13"/>
+        <source>Not implemented yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
         <location line="+5"/>
-        <source>tried to access index below zero</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>addressed relation outside current relation list range (idx = %1, range = 0..%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+68"/>
-        <source>set relation failed due to invalud object dims</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-86"/>
-        <location line="+91"/>
-        <source>set relation failed due to invalud object type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-49"/>
-        <location line="+74"/>
-        <source>set relation failed due to empty vector</source>
+        <source>Specified color type out of range [0, 4].</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>PlotTreeWidget</name>
+    <name>PlotWidget</name>
     <message>
-        <location filename="../plotTreeWidget.cpp" line="+105"/>
-        <source>notype %1</source>
+        <location filename="../plotWidget.cpp" line="+908"/>
+        <source>No color maps defined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1"/>
-        <source>%1 %2</source>
+        <location line="+6"/>
+        <source>Can not toogle colorbar while using RGB-Colors.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+799"/>
-        <source>DataObject must be ito::float32</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>DataObject has not enough columns</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+163"/>
-        <location line="+76"/>
-        <location line="+142"/>
-        <source>could not write csv-data to file %1</source>
+        <location line="+111"/>
+        <location line="+4"/>
+        <source>Not implemented yet.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -266,154 +423,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="-598"/>
-        <source>Calculate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../evaluateGeometricsPlugin.cpp" line="+42"/>
-        <source>itom measurement widget</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>The evaluate geometrics plugin can be used to evaluate geometric parameters of primitives drawn in itom plots.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>LGPL 2.0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plotTreeWidget.h" line="+89"/>
-        <source>radius (own)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>angle to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>distance to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>intersection with</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>length (own)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>area</source>
+        <location filename="../graphicViewPlugin.cpp" line="+37"/>
+        <source>ITOM widget for 2D DataObjects based on qGraphicView.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>line</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>ellipse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>circle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>rectangle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>square</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>polygon</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>UIDialogRelation</name>
-    <message>
-        <location filename="../dialogRelation.ui"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select relation type and the corresponding partners</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>relation type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>first element</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>second element</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>UIDialogSettings</name>
-    <message>
-        <location filename="../dialogSettings.ui"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>relations:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>value unit:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>number of digits:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>geometric elements:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>consider only 2D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>relation names:</source>
+        <source>LGPL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

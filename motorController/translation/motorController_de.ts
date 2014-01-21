@@ -4,7 +4,7 @@
 <context>
     <name>MotorController</name>
     <message>
-        <location filename="../motorController.cpp" line="+193"/>
+        <location filename="../motorController.cpp" line="+194"/>
         <source>Toogle Unit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -30,53 +30,53 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+606"/>
+        <location line="+635"/>
         <source>abs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-605"/>
-        <location line="+609"/>
+        <location line="-634"/>
+        <location line="+638"/>
         <source>rel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-607"/>
-        <location line="+611"/>
+        <location line="-636"/>
+        <location line="+640"/>
         <source>origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-602"/>
-        <location line="+735"/>
+        <location line="-631"/>
+        <location line="+764"/>
         <source>Toogle Update (off)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-734"/>
+        <location line="-763"/>
         <source>Update Switch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+742"/>
+        <location line="+771"/>
         <source>on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-741"/>
-        <location line="+745"/>
+        <location line="-770"/>
+        <location line="+774"/>
         <source>off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-408"/>
+        <location line="-425"/>
         <location line="+37"/>
         <source>timeout while getting numaxis parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+353"/>
+        <location line="+370"/>
         <source>Toogle Update (on)</source>
         <translation type="unfinished"></translation>
     </message>

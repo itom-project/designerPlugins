@@ -4,7 +4,7 @@
 <context>
     <name>ItomIsoGLWidget</name>
     <message>
-        <location filename="../itomIsoGLFigure.cpp" line="+64"/>
+        <location filename="../itomIsoGLFigure.cpp" line="+67"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -34,7 +34,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Scale Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -151,22 +151,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+242"/>
-        <source>PDF Documents (*.pdf)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+248"/>
         <source>SVG Documents (*.svg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Postscript Documents (*.ps)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Images (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -189,7 +179,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+104"/>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+192"/>
         <location line="+46"/>
         <source>duplicate Channel, in addChannel</source>
         <translation type="unfinished"></translation>
@@ -265,8 +255,21 @@
 <context>
     <name>ito::AbstractDObjFigure</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.cpp" line="+225"/>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.cpp" line="+114"/>
+        <source>Function &apos;spawnLinePlot&apos; not supported from this plot widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+120"/>
         <source>Figure does not contain an input slot for live sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ito::AbstractFigure</name>
+    <message>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="-146"/>
+        <source>Properties</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

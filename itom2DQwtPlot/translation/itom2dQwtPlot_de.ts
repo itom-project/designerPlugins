@@ -45,9 +45,110 @@
     </message>
 </context>
 <context>
+    <name>DialogExport2File</name>
+    <message>
+        <location filename="../../sharedFiles/dialogExportProperties.ui"/>
+        <source>Export Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>px</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Export to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Resolution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>dpi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>User definitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DialogExportProperties</name>
+    <message>
+        <location filename="../../sharedFiles/dialogExportProperties.cpp" line="+51"/>
+        <source>user defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>user defined (keep aspect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A4 landscape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A4 portrait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A4 landscape (fitting)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A4 portrait (fitting)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A5 landscape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A5 portrait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A5 landscape (fitting)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A5 portrait (fitting)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+140"/>
+        <location filename="../itom2dqwtplot.cpp" line="+182"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -67,21 +168,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>move</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>zoom to rectangle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+        <location line="+20"/>
         <location line="+4"/>
         <source>Zoom to rectangle</source>
         <translation type="unfinished"></translation>
@@ -117,8 +209,43 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="-108"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Move</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Clear markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+4"/>
-        <source>marker</source>
+        <source>Clear all existing geometric elements</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Lock aspect ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Toogle fixed / variable aspect ration between axis x and y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Marker</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -172,7 +299,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+12"/>
+        <source>Center marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Show a marker at data object center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Switch Imag, Real, Abs, Pha</source>
         <translation type="unfinished"></translation>
     </message>
@@ -197,7 +334,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+378"/>
+        <location line="+381"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -222,15 +359,50 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+288"/>
+        <location line="+326"/>
         <source>the opened figure is not inherited from ito::AbstractDObjFigure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+294"/>
+        <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Deleted element, new element list was empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+208"/>
+        <source>Could not convert elements, type undefined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Could not set elements</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+121"/>
+        <source>Could not set active element, index out of range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Set lineCut coordinates failed. Could not activate lineCut.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Set lineCut coordinates failed. Widget not ready.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+436"/>
+        <location filename="../plotCanvas.cpp" line="+496"/>
         <source>No color maps defined.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -241,6 +413,12 @@
     </message>
     <message>
         <location line="+792"/>
+        <location line="+29"/>
+        <source>invalid marker type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+127"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -250,35 +428,64 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location line="+40"/>
-        <location line="+42"/>
-        <location line="+42"/>
+        <location line="+13"/>
+        <location line="+44"/>
+        <location line="+44"/>
+        <location line="+44"/>
         <source>Selection has been interrupted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-92"/>
-        <location line="+42"/>
-        <location line="+42"/>
-        <source>Please select 2 points or press Space to quit earlier. Esc aborts the selection.</source>
+        <location line="-96"/>
+        <location line="+308"/>
+        <source>Please draw %1 lines or press Space to quit earlier. Esc aborts the selection.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="-307"/>
+        <location line="+308"/>
+        <source>Please draw one line or press Space to quit earlier. Esc aborts the selection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-266"/>
+        <location line="+355"/>
+        <source>Please draw %1 rectangles or press Space to quit earlier. Esc aborts the selection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-354"/>
+        <location line="+355"/>
+        <source>Please draw one rectangle or press Space to quit earlier. Esc aborts the selection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-312"/>
+        <location line="+399"/>
+        <source>Please draw %1 ellipses or press Space to quit earlier. Esc aborts the selection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-398"/>
+        <location line="+399"/>
+        <source>Please draw one ellipse or press Space to quit earlier. Esc aborts the selection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-341"/>
         <location line="+54"/>
-        <location line="+39"/>
-        <location line="+69"/>
-        <location line="+68"/>
+        <location line="+61"/>
+        <location line="+91"/>
+        <location line="+88"/>
         <source>Selection has been aborted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-216"/>
+        <location line="-280"/>
         <location line="+54"/>
-        <location line="+39"/>
-        <location line="+69"/>
-        <location line="+68"/>
+        <location line="+62"/>
+        <location line="+91"/>
+        <location line="+88"/>
         <source>%1 points have been selected.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -296,7 +503,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+104"/>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+192"/>
         <location line="+46"/>
         <source>duplicate Channel, in addChannel</source>
         <translation type="unfinished"></translation>
@@ -359,7 +566,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-903"/>
+        <location filename="../itom2dqwtplot.cpp" line="-1670"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -382,8 +589,21 @@
 <context>
     <name>ito::AbstractDObjFigure</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.cpp" line="+225"/>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.cpp" line="+114"/>
+        <source>Function &apos;spawnLinePlot&apos; not supported from this plot widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+120"/>
         <source>Figure does not contain an input slot for live sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ito::AbstractFigure</name>
+    <message>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="-146"/>
+        <source>Properties</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
