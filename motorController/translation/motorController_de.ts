@@ -61,13 +61,13 @@
         <location line="+1"/>
         <location line="+771"/>
         <source>on</source>
-        <translation type="unfinished">ein</translation>
+        <translation>ein</translation>
     </message>
     <message>
         <location line="-770"/>
         <location line="+774"/>
         <source>off</source>
-        <translation type="unfinished">aus</translation>
+        <translation>aus</translation>
     </message>
     <message>
         <location line="-425"/>

@@ -6,91 +6,91 @@
     <message>
         <location filename="../matplotlibplot.cpp" line="+20"/>
         <source>home</source>
-        <translation type="unfinished"></translation>
+        <translation>Ansicht zurücksetzen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Reset original view</source>
-        <translation type="unfinished"></translation>
+        <translation>Ursprüngliche Ansicht wiederherstellen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>forward</source>
-        <translation type="unfinished">Vorwärts</translation>
+        <translation>Weiter</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Forward to next view</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur nächsten Abbildung wechseln</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>back</source>
-        <translation type="unfinished">Zurück</translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Back to previous view</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur vorherigen Abbildung zurück</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>move</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschieben</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Pan axes with left mouse, zoom with right</source>
-        <translation type="unfinished"></translation>
+        <translation>Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>zoom to rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom in Rechteck</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Zoom to rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom in Rechteck</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>marker</source>
-        <translation type="unfinished">Marker</translation>
+        <translation>Positionsanzeiger</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>subplot configuration</source>
-        <translation type="unfinished"></translation>
+        <source>subplot configuration...</source>
+        <translation>Subplot-Konfiguration...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Configure subplots</source>
-        <translation type="unfinished"></translation>
+        <source>Configure subplots...</source>
+        <translation>Subplot-Konfiguration...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>save...</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Save the figure...</source>
+        <translation>Abbildung speichern...</translation>
     </message>
     <message>
         <source>save</source>
         <translation type="obsolete">Speichern</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Save the figure</source>
-        <translation type="unfinished">Figure Speichern</translation>
-    </message>
-    <message>
         <location line="+7"/>
         <source>MatPlotLib toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolleiste MatPlotLib</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Matplotlib</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -98,12 +98,12 @@
     <message>
         <location filename="../matplotlibplotfactory.cpp" line="+12"/>
         <source>itom widget for matplotlib plots.</source>
-        <translation type="unfinished"></translation>
+        <translation>itom-Widget für matplotlib-Abbildungen.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>LGPL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -111,47 +111,47 @@
     <message>
         <location filename="../matplotlibSubfigConfig.ui"/>
         <source>Subplot Configuration Tool</source>
-        <translation type="unfinished">Subplot Konfiguartionswerkzeug</translation>
+        <translation>Subplot-Konfiguration</translation>
     </message>
     <message>
         <location/>
         <source>Margins</source>
-        <translation type="unfinished">Rand</translation>
+        <translation>Rand</translation>
     </message>
     <message>
         <location/>
         <source>left</source>
-        <translation type="unfinished">Links</translation>
+        <translation>Links</translation>
     </message>
     <message>
         <location/>
         <source>top</source>
-        <translation type="unfinished">Oben</translation>
+        <translation>Oben</translation>
     </message>
     <message>
         <location/>
         <source>bottom</source>
-        <translation type="unfinished">Unten</translation>
+        <translation>Unten</translation>
     </message>
     <message>
         <location/>
         <source>right</source>
-        <translation type="unfinished">Rechts</translation>
+        <translation>Rechts</translation>
     </message>
     <message>
         <location/>
         <source>Spacing</source>
-        <translation type="unfinished">Abstand</translation>
+        <translation>Abstand</translation>
     </message>
     <message>
         <location/>
         <source>hspace</source>
-        <translation type="unfinished">Horizontal</translation>
+        <translation>Horizontal</translation>
     </message>
     <message>
         <location/>
         <source>wspace</source>
-        <translation type="unfinished">Vertikal</translation>
+        <translation>Vertikal</translation>
     </message>
 </context>
 </TS>

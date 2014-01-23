@@ -283,7 +283,7 @@
     <message>
         <location line="+3"/>
         <source>LGPL 2.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../plotTreeWidget.h" line="+89"/>
@@ -425,7 +425,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+120"/>
+        <location line="+122"/>
         <source>Figure does not contain an input slot for live sources</source>
         <translation type="unfinished"></translation>
     </message>

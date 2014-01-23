@@ -47,13 +47,13 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     m_actMarker->setChecked(false);
     m_actMarker->connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
 
-    m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("subplot configuration"), this);
+    m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("subplot configuration..."), this);
     m_actSubplotConfig->setObjectName("actionSubplotConfig");
-    m_actSubplotConfig->setToolTip(tr("Configure subplots"));
+    m_actSubplotConfig->setToolTip(tr("Configure subplots..."));
 
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save..."), this);
     m_actSave->setObjectName("actionSave");
-    m_actSave->setToolTip(tr("Save the figure"));
+    m_actSave->setToolTip(tr("Save the figure..."));
 
     m_lblCoordinates = new QLabel("",this);
     m_lblCoordinates->setAlignment(Qt::AlignRight | Qt::AlignTop);

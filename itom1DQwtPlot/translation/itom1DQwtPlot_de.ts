@@ -574,7 +574,7 @@
         <translation>Die Funktion &apos;spawnLinePlot&apos; wird von diesem Widget nicht unterstützt</translation>
     </message>
     <message>
-        <location line="+120"/>
+        <location line="+122"/>
         <source>Figure does not contain an input slot for live sources</source>
         <translation>Die Abbildung hat keine Schnittstelle für Livebilder</translation>
     </message>

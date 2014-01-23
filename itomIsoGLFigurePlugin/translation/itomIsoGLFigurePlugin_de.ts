@@ -26,7 +26,7 @@
     <message>
         <location line="+3"/>
         <source>Save...</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -260,7 +260,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+120"/>
+        <location line="+122"/>
         <source>Figure does not contain an input slot for live sources</source>
         <translation type="unfinished"></translation>
     </message>

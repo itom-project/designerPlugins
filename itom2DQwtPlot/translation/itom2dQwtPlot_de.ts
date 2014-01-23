@@ -417,7 +417,7 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+496"/>
+        <location filename="../plotCanvas.cpp" line="+490"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
@@ -427,13 +427,28 @@
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="+792"/>
+        <location line="+718"/>
+        <source>The style tag does not correspond to the required format</source>
+        <translation>Das Tag-Format stimmt nicht mit dem benötigten Format überein</translation>
+    </message>
+    <message>
+        <location line="+69"/>
         <location line="+29"/>
         <source>invalid marker type</source>
         <translation>Ungültiger Marker-Typ</translation>
     </message>
     <message>
-        <location line="+127"/>
+        <location line="+55"/>
+        <source>No marker with id &apos;%1&apos; found.</source>
+        <translation>Der Marker mit der ID &apos;%1&apos; wurde nicht gefunden.</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>No marker with id &apos;%d&apos; found.</source>
+        <translation>Der Marker mit der ID &apos;%d&apos; wurde nicht gefunden.</translation>
+    </message>
+    <message>
+        <location line="+36"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation>%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
@@ -444,7 +459,7 @@
     </message>
     <message>
         <location line="+13"/>
-        <location line="+44"/>
+        <location line="+43"/>
         <location line="+44"/>
         <location line="+44"/>
         <source>Selection has been interrupted.</source>
@@ -452,57 +467,62 @@
     </message>
     <message>
         <location line="-96"/>
-        <location line="+308"/>
+        <location line="+307"/>
         <source>Please draw %1 lines. Esc aborts the selection.</source>
         <translation>%1 Linien einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-307"/>
-        <location line="+308"/>
+        <location line="-306"/>
+        <location line="+307"/>
         <source>Please draw one line. Esc aborts the selection.</source>
         <translation>Eine Linie einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-266"/>
-        <location line="+355"/>
+        <location line="-265"/>
+        <location line="+352"/>
         <source>Please draw %1 rectangles. Esc aborts the selection.</source>
         <translation>%1 Rechtecke einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-354"/>
-        <location line="+355"/>
+        <location line="-351"/>
+        <location line="+352"/>
         <source>Please draw one rectangle. Esc aborts the selection.</source>
         <translation>Ein Rechteck einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-312"/>
-        <location line="+399"/>
+        <location line="-309"/>
+        <location line="+396"/>
         <source>Please draw %1 ellipses. Esc aborts the selection.</source>
         <translation>%1 Ellipsen einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-398"/>
-        <location line="+399"/>
+        <location line="-395"/>
+        <location line="+396"/>
         <source>Please draw one ellipse. Esc aborts the selection.</source>
         <translation>Eine Ellipse einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-341"/>
+        <location line="-362"/>
+        <source>Unknown type for userInteractionStart</source>
+        <translation>Ungültiger Typ für &apos;userInteractionStart&apos;</translation>
+    </message>
+    <message>
+        <location line="+23"/>
         <location line="+54"/>
         <location line="+61"/>
-        <location line="+91"/>
+        <location line="+89"/>
         <location line="+88"/>
         <source>Selection has been aborted.</source>
         <translation>Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
-        <location line="-280"/>
+        <location line="-278"/>
         <location line="+54"/>
         <location line="+62"/>
-        <location line="+91"/>
+        <location line="+89"/>
         <location line="+88"/>
         <source>%1 points have been selected.</source>
-        <translation type="unfinished">%1 Punkt(e) wurden ausgewählt.</translation>
+        <translation>%1 Punkt(e) wurden ausgewählt.</translation>
     </message>
 </context>
 <context>
@@ -609,7 +629,7 @@
         <translation>Die Funktion &apos;spawnLinePlot&apos; wird von diesem Widget nicht unterstützt</translation>
     </message>
     <message>
-        <location line="+120"/>
+        <location line="+122"/>
         <source>Figure does not contain an input slot for live sources</source>
         <translation>Die Abbildung hat keine Schnittstelle für Livebilder</translation>
     </message>
