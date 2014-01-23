@@ -93,7 +93,7 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>save</source>
+        <source>save...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

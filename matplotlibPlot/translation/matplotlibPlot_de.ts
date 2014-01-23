@@ -70,8 +70,12 @@
     </message>
     <message>
         <location line="+2"/>
+        <source>save...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>save</source>
-        <translation type="unfinished">Speichern</translation>
+        <translation type="obsolete">Speichern</translation>
     </message>
     <message>
         <location line="+2"/>

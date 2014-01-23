@@ -87,17 +87,17 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
     m_pMultiPointPicker->setEnabled(false);
-    m_pMultiPointPicker->setRubberBand( QwtPicker::UserRubberBand ); //user is cross here
+    m_pMultiPointPicker->setRubberBand(QwtPicker::UserRubberBand); //user is cross here
     //m_pMultiPointPicker->setStateMachine(new QwtPickerClickPointMachine);
     m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine);
-    m_pMultiPointPicker->setRubberBandPen( QPen(QBrush(Qt::green, Qt::SolidPattern),2) );
+    m_pMultiPointPicker->setRubberBandPen(QPen(QBrush(Qt::green, Qt::SolidPattern),2));
     connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
 
     //canvas() is the real plotting area, where the plot is printed (without axes...)
     //canvas()->setFrameShadow(QFrame::Plain); //deprecated in qwt 6.1.0
     //canvas()->setFrameShape(QFrame::NoFrame); //deprecated in qwt 6.1.0
     canvas()->setStyleSheet("border: 0px;");
-    canvas()->setCursor( Qt::ArrowCursor );
+    canvas()->setCursor(Qt::ArrowCursor);
 
     m_colorList.reserve(12);
     m_colorList.append("blue");
@@ -138,34 +138,34 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 //----------------------------------------------------------------------------------------------------------------------------------
 Plot1DWidget::~Plot1DWidget()
 {
-    foreach( QwtPlotCurve* c, m_plotCurveItems)
+    foreach(QwtPlotCurve* c, m_plotCurveItems)
     {
         c->detach();
         delete c;
     }
     m_plotCurveItems.clear();
 
-    foreach(Marker m, m_markers)
+    foreach (Marker m, m_markers)
     {
         m.item->detach();
         delete m.item;
     }
     m_markers.clear();
 
-    if(m_pPlotGrid)
+    if (m_pPlotGrid)
     {
         m_pPlotGrid->detach();
         delete m_pPlotGrid;
         m_pPlotGrid = NULL;
     }
 
-    if(m_pRescaler != NULL)
+    if (m_pRescaler != NULL)
     {
         m_pRescaler->deleteLater();
         m_pRescaler = NULL;
     }
 
-    if(m_pMultiPointPicker != NULL) m_pMultiPointPicker->deleteLater();
+    if (m_pMultiPointPicker != NULL) m_pMultiPointPicker->deleteLater();
     m_pMultiPointPicker = NULL;
 }
 
@@ -211,7 +211,7 @@ ito::RetVal Plot1DWidget::init()
 //    DataObjectSeriesData *data = NULL;
 //    if (m_plotCurveItems.size() > 0)
 //    {
-//        /*if(m_pCurserEnable && m_pContent[0])
+//        /*if (m_pCurserEnable && m_pContent[0])
 //        {
 //            QVector<QPointF> pts(3);
 //
@@ -257,7 +257,7 @@ void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, co
 {
     QwtText t;
     t = axisTitle(QwtPlot::yLeft);
-    if(m_pData->m_autoValueLabel)
+    if (m_pData->m_autoValueLabel)
     {
         t.setText(valueLabel);
     }
@@ -268,7 +268,7 @@ void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, co
     setAxisTitle(QwtPlot::yLeft, t);
 
     t = axisTitle(QwtPlot::xBottom);
-    if(m_pData->m_autoAxisLabel)
+    if (m_pData->m_autoAxisLabel)
     {
         t.setText(axisLabel);
     }
@@ -278,9 +278,7 @@ void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, co
     }
     setAxisTitle(QwtPlot::xBottom, t);
 
-
-
-    if(m_pData->m_autoTitle)
+    if (m_pData->m_autoTitle)
     {
         setTitle(title);
     }
@@ -295,7 +293,7 @@ void Plot1DWidget::updateLabels()
 {
     QwtText t;
     t = axisTitle(QwtPlot::yLeft);
-    if(m_pData->m_autoValueLabel)
+    if (m_pData->m_autoValueLabel)
     {
         t.setText(m_pData->m_valueLabelDObj);
     }
@@ -306,7 +304,7 @@ void Plot1DWidget::updateLabels()
     setAxisTitle(QwtPlot::yLeft, t);
 
     t = axisTitle(QwtPlot::xBottom);
-    if(m_pData->m_autoAxisLabel)
+    if (m_pData->m_autoAxisLabel)
     {
         t.setText(m_pData->m_axisLabelDObj);
     }
@@ -316,7 +314,7 @@ void Plot1DWidget::updateLabels()
     }
     setAxisTitle(QwtPlot::xBottom, t);
 
-    if(m_pData->m_autoTitle)
+    if (m_pData->m_autoTitle)
     {
         setTitle(m_pData->m_titleDObj);
     }
@@ -345,18 +343,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dataObj->getSize(dims - 2) : 1;
 
-        if(dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
+        if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
         {
-            if(!m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableComplexGUI(true);
+            if (!m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableComplexGUI(true);
             m_cmplxState = true;                
         }
         else
         {
-            if(m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableComplexGUI(false);
+            if (m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableComplexGUI(false);
             m_cmplxState = false;                
         }
 
-        if(bounds.size() == 0)
+        if (bounds.size() == 0)
         {
             switch (m_multiLine)
             {
@@ -378,14 +376,14 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
 
         //check if current number of curves does not correspond to height. If so, adjust the number of curves to the required number
-        while(m_plotCurveItems.size() > numCurves)
+        while (m_plotCurveItems.size() > numCurves)
         {
             curve = m_plotCurveItems.takeLast();
             curve->detach();
             delete curve;
         }
 
-        while(m_plotCurveItems.size() < numCurves)
+        while (m_plotCurveItems.size() < numCurves)
         {
             dObjCurve = new QwtPlotCurveDataObject("");
             dObjCurve->setData(NULL);
@@ -398,7 +396,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             m_plotCurveItems.append(dObjCurve);
         }
 
-        if( bounds.size() == 0)
+        if (bounds.size() == 0)
         {
             QVector<QPointF> pts(2);
 
@@ -406,14 +404,14 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             {
             case FirstCol:
             case MultiCols:
-                pts[0].setY( dataObj->getPixToPhys(dims-2, 0, _unused) );
-                pts[1].setY( dataObj->getPixToPhys(dims-2, height-1, _unused) ); 
+                pts[0].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
+                pts[1].setY(dataObj->getPixToPhys(dims-2, height-1, _unused)); 
 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setX( dataObj->getPixToPhys(dims-1, n, _unused) );
-                    pts[1].setX( dataObj->getPixToPhys(dims-1, n, _unused) );
+                    pts[0].setX(dataObj->getPixToPhys(dims-1, n, _unused));
+                    pts[1].setX(dataObj->getPixToPhys(dims-1, n, _unused));
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
@@ -426,7 +424,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     }
                 }
 
-                if(numCurves > 0)
+                if (numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
                     m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
@@ -436,14 +434,14 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
             case FirstRow:
             case MultiRows:
-                pts[0].setX( dataObj->getPixToPhys(dims-1, 0, _unused) );
-                pts[1].setX( dataObj->getPixToPhys(dims-1, width-1, _unused) );
+                pts[0].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
+                pts[1].setX(dataObj->getPixToPhys(dims-1, width-1, _unused));
 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setY( dataObj->getPixToPhys(dims-2, n, _unused) );
-                    pts[1].setY( dataObj->getPixToPhys(dims-2, n, _unused) );
+                    pts[0].setY(dataObj->getPixToPhys(dims-2, n, _unused));
+                    pts[1].setY(dataObj->getPixToPhys(dims-2, n, _unused));
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
@@ -456,7 +454,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     }
                 }
 
-                if(numCurves > 0)
+                if (numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
                     m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
@@ -465,7 +463,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 break;
             }
         }
-        else if(bounds.size() == 2) //boundaries given ->line plot
+        else if (bounds.size() == 2) //boundaries given ->line plot
         {
             seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
             if (seriesData && seriesData->isDobjInit())
@@ -482,7 +480,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
             m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
         }
-        else if(bounds.size() == 1) //point in third dimension
+        else if (bounds.size() == 1) //point in third dimension
         {
             seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
             if (seriesData && seriesData->isDobjInit())
@@ -509,18 +507,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
     updateLabels();
 
-
-
-    if(seriesData)
+    if (seriesData)
     {
         QByteArray hash = seriesData->getHash();
 
-        if(hash != m_hash)
+        if (hash != m_hash)
         {
             updateMarkerPosition(true);
 
             QRectF rect = seriesData->boundingRect();
-            if(m_pData->m_valueScaleAuto)
+            if (m_pData->m_valueScaleAuto)
             {
                 if (qIsFinite(rect.height()))
                 {
@@ -534,7 +530,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
             }
 
-            if(m_pData->m_axisScaleAuto)
+            if (m_pData->m_axisScaleAuto)
             {
                 m_pData->m_axisMin = rect.left();
                 m_pData->m_axisMax = rect.right();
@@ -542,21 +538,21 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
             updateScaleValues(); //replot is done here
 
-            m_pZoomer->setZoomBase( true );
+            m_pZoomer->setZoomBase(true);
         }
-        else if( m_pData->m_forceValueParsing)
+        else if (m_pData->m_forceValueParsing)
         {
             updateMarkerPosition(true);
 
 
             QRectF rect = seriesData->boundingRect();
-            if(m_pData->m_valueScaleAuto)
+            if (m_pData->m_valueScaleAuto)
             {
                 m_pData->m_valueMin = rect.top();
                 m_pData->m_valueMax = rect.bottom();
             }
 
-            if(m_pData->m_axisScaleAuto)
+            if (m_pData->m_axisScaleAuto)
             {
                 m_pData->m_axisMin = rect.left();
                 m_pData->m_axisMax = rect.right();
@@ -579,59 +575,58 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     {
         replot();
     }
-       
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
+void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 {
     Marker *m;
     int curves = m_plotCurveItems.size();
 
-    if(m_pData->m_state == statePicker)
+    if (m_pData->m_state == statePicker)
     {
         switch(event->key())
         {
         case Qt::Key_Left:
-            for(int i = 0 ; i < m_markers.size() ; i++)
+            for (int i = 0 ; i < m_markers.size() ; i++)
             {
                 m = &(m_markers[i]);
-                if(m->active)
+                if (m->active)
                 {
                     stickMarkerToXPx(m, m->item->xValue(), -1);
                 }
             }
             break;
         case Qt::Key_Right:
-            for(int i = 0 ; i < m_markers.size() ; i++)
+            for (int i = 0 ; i < m_markers.size() ; i++)
             {
                 m = &(m_markers[i]);
-                if(m->active)
+                if (m->active)
                 {
                      stickMarkerToXPx(m, m->item->xValue(), 1);
                 }
             }
             break;
         case Qt::Key_Up:
-            for(int i = 0 ; i < m_markers.size() ; i++)
+            for (int i = 0 ; i < m_markers.size() ; i++)
             {
                 m = &(m_markers[i]);
-                if(m->active)
+                if (m->active)
                 {
                     m->curveIdx++;
-                    if(m->curveIdx >= curves) m->curveIdx = 0;
+                    if (m->curveIdx >= curves) m->curveIdx = 0;
                     stickMarkerToXPx(m, m->item->xValue(), 0);
                 }
             }
             break;
         case Qt::Key_Down:
-            for(int i = 0 ; i < m_markers.size() ; i++)
+            for (int i = 0 ; i < m_markers.size() ; i++)
             {
                 m = &(m_markers[i]);
-                if(m->active)
+                if (m->active)
                 {
                     m->curveIdx--;
-                    if(m->curveIdx <= 0) m->curveIdx = curves-1;
+                    if (m->curveIdx <= 0) m->curveIdx = curves-1;
                     stickMarkerToXPx(m, m->item->xValue(), 0);
                 }
             }
@@ -640,9 +635,9 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
         {
             QList<Marker>::iterator it = m_markers.begin();
 
-            while(it != m_markers.end())
+            while (it != m_markers.end())
             {
-                if(it->active)
+                if (it->active)
                 {
                     it->item->detach();
                     delete it->item;
@@ -682,7 +677,7 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
             break;
     }
 
-    if(m_Curser[0] > m_Curser[1])
+    if (m_Curser[0] > m_Curser[1])
     {
         int temp = m_Curser[0];
         m_Curser[0] = m_Curser[1];
@@ -695,7 +690,7 @@ void Plot1DWidget::keyPressEvent ( QKeyEvent * event )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
+void Plot1DWidget::mousePressEvent (QMouseEvent * event)
 {
     if (m_pData->m_state == stateIdle)
     {
@@ -704,8 +699,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
         for (;it != m_pData->m_pDrawItems.end(); ++it)
 //        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
-
-            if(it.value() == NULL)
+            if (it.value() == NULL)
             {
                 continue;
             }
@@ -745,8 +739,7 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
 //        for (n++; n < m_pData->m_pDrawItems.size(); n++)
         for (;it != m_pData->m_pDrawItems.end(); ++it)
         {
-
-            if(it.value() == NULL)
+            if (it.value() == NULL)
             {
                 continue;
             }
@@ -755,39 +748,39 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
         }
         replot();
     }
-    else if(m_pData->m_state == statePicker)
+    else if (m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
-        double xScale = invTransform( xBottom, xPx );
-//        double yScale = invTransform( yLeft, yPx );
+        double xScale = invTransform(xBottom, xPx);
+//        double yScale = invTransform(yLeft, yPx);
         bool closeToMarker = false;
 
-        if(event->button() == Qt::LeftButton)
+        if (event->button() == Qt::LeftButton)
         {
-            for(int i = 0 ; i < m_markers.size() ; i++)
+            for (int i = 0 ; i < m_markers.size() ; i++)
             {
-                if( abs( transform(xBottom, m_markers[i].item->xValue()) - xPx) < 20 && abs(transform(yLeft, m_markers[i].item->yValue()) - yPx) < 20 )
+                if (abs(transform(xBottom, m_markers[i].item->xValue()) - xPx) < 20 && abs(transform(yLeft, m_markers[i].item->yValue()) - yPx) < 20)
                 {
                     closeToMarker = true;
                     m_markers[i].active = true;
                     
                 }
-                else if( (event->modifiers() & Qt::ControlModifier) == false && m_markers[i].active)
+                else if ((event->modifiers() & Qt::ControlModifier) == false && m_markers[i].active)
                 {
                     m_markers[i].active = false;
-                    //m_markers[i].item->setSymbol( new QwtSymbol(QwtSymbol::Diamond, m_markers[i].color, QPen(m_markers[i].color,1), QSize(6,6) ));
+                    //m_markers[i].item->setSymbol(new QwtSymbol(QwtSymbol::Diamond, m_markers[i].color, QPen(m_markers[i].color,1), QSize(6,6)));
                 }
             }
 
-            if(!closeToMarker && m_plotCurveItems.size() > 0)
+            if (!closeToMarker && m_plotCurveItems.size() > 0)
             {
                 Marker marker;
                 marker.item = new QwtPlotMarker();
                 marker.item->attach(this);
                 marker.active = true;
                 //marker.color = Qt::darkGreen;
-                //marker.item->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::white), QPen(marker.color,1),  QSize(8,8) ));
+                //marker.item->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::white), QPen(marker.color,1),  QSize(8,8)));
                 
                 marker.curveIdx = 0;
                 stickMarkerToXPx(&marker, xScale, 0);
@@ -795,33 +788,30 @@ void Plot1DWidget::mousePressEvent ( QMouseEvent * event )
                 marker.item->setVisible(true);
                 
                 m_markers.append(marker);
-
             }
 
             updateMarkerPosition(false,false);
 
             replot();
-
         }
-
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
+void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 {
 //    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 
-    if(m_pData->m_state == statePicker)
+    if (m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
 //        int yPx = m_pValuePicker->trackerPosition().y();
-        double xScale = invTransform( xBottom, xPx );
-//        double yScale = invTransform( yLeft, yPx );
+        double xScale = invTransform(xBottom, xPx);
+//        double yScale = invTransform(yLeft, yPx);
 
         if (event->buttons() & Qt::LeftButton)
         {
-            for(int i = 0 ; i < m_markers.size() ; i++)
+            for (int i = 0 ; i < m_markers.size() ; i++)
             {
                 if (m_markers[i].active == true)
                 {
@@ -844,7 +834,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
         {
 //            if (m_pData->m_pDrawItems[n]->m_active == 1)
 
-            if(it.value() == NULL)
+            if (it.value() == NULL)
             {
                 continue;
             }
@@ -982,7 +972,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
 
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
-                        //if(p) emit p->plotItemChanged(n);
+                        //if (p) emit p->plotItemChanged(n);
                         replot();
                     break;
 
@@ -1009,7 +999,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                             canypos - it.value()->y1);
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
-                        //if(p) emit p->plotItemChanged(n);
+                        //if (p) emit p->plotItemChanged(n);
                         replot();
                     break;
 
@@ -1034,10 +1024,9 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
                             canypos - it.value()->y1),
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
-                        //if(p) emit p->plotItemChanged(n);
+                        //if (p) emit p->plotItemChanged(n);
                         replot();
                     break;
-
                 }
                 break;
             }
@@ -1046,7 +1035,7 @@ void Plot1DWidget::mouseMoveEvent ( QMouseEvent * event )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
+void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 {
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
     if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
@@ -1056,7 +1045,7 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
         for (;it != m_pData->m_pDrawItems.end(); ++it)        
 //        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
-            if(it.value() != NULL && it.value()->m_active != 0 && p)
+            if (it.value() != NULL && it.value()->m_active != 0 && p)
             {
                 int type = 0;
                 QVector<ito::float32> values;
@@ -1127,26 +1116,25 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
                 }
 
                 emit p->plotItemChanged(it.value()->m_idx, type, values);
-
             }
-            if(it.value())
+            if (it.value())
             {
                 it.value()->m_active = 0;
                 it.value()->setActive(0);
             }
         }
     }
-    else if(m_pData->m_state == statePicker)
+    else if (m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
 //        int yPx = m_pValuePicker->trackerPosition().y();
-        double xScale = invTransform( xBottom, xPx );
-//        double yScale = invTransform( yLeft, yPx );
+        double xScale = invTransform(xBottom, xPx);
+//        double yScale = invTransform(yLeft, yPx);
 //        bool closeToMarker = false;
 
-        if(event->button() == Qt::LeftButton)
+        if (event->button() == Qt::LeftButton)
         {
-            for(int i = 0 ; i < m_markers.size() ; i++)
+            for (int i = 0 ; i < m_markers.size() ; i++)
             {
                 if (m_markers[i].active == true)
                 {
@@ -1157,9 +1145,7 @@ void Plot1DWidget::mouseReleaseEvent ( QMouseEvent * event )
             updateMarkerPosition(false,false);
 
             replot();
-
         }
-
     }
 }
 
@@ -1185,19 +1171,18 @@ void Plot1DWidget::setMainMarkersToIndex(int idx1, int idx2, int curveIdx)
         if (i == 0)
         {
             m_markers[0].active = true;
-            stickMarkerToSampleIdx( &(m_markers[0]), idx1, curveIdx, 0 );
+            stickMarkerToSampleIdx(&(m_markers[0]), idx1, curveIdx, 0);
         }
         else if (i == 1)
         {
             m_markers[1].active = false;
-            stickMarkerToSampleIdx( &(m_markers[1]), idx2, curveIdx, 0 );
+            stickMarkerToSampleIdx(&(m_markers[1]), idx2, curveIdx, 0);
         }
         else
         {
             m_markers[i].active = false;
         }
     }
-
 
     updateMarkerPosition(false,false);
 
@@ -1209,7 +1194,7 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
 {
     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
 
-    if(!qIsFinite(xScaleStart)) xScaleStart = m->item->xValue();
+    if (!qIsFinite(xScaleStart)) xScaleStart = m->item->xValue();
 
     int thisIdx = data->getPosToPix(xScaleStart);
     int s = (int)data->size();
@@ -1217,7 +1202,7 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
     bool found = false;
     bool d = true;
 
-    if(dir == 0)
+    if (dir == 0)
     {
         if (thisIdx < 0)
         {
@@ -1228,12 +1213,12 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
             thisIdx = s-1;
         }
 
-        while(!found)
+        while (!found)
         {
             if (thisIdx >= 0 && thisIdx < s)
             {
                 p = data->sample(thisIdx);
-                if(qIsFinite(p.ry()))
+                if (qIsFinite(p.ry()))
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
@@ -1257,7 +1242,7 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
             }
         }
     }
-    if(dir == -1)
+    if (dir == -1)
     {
         if (thisIdx <= 0)
         {
@@ -1268,13 +1253,13 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
             thisIdx = s;
         }
 
-        while(!found)
+        while (!found)
         {
             thisIdx -= 1;
-            if( thisIdx >= 0)
+            if (thisIdx >= 0)
             {
                 p = data->sample(thisIdx);
-                if(qIsFinite(p.ry()))
+                if (qIsFinite(p.ry()))
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
@@ -1298,13 +1283,13 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
             thisIdx = s-2;
         }
 
-        while(!found)
+        while (!found)
         {
             thisIdx += 1;
-            if(thisIdx >= 0 && thisIdx < s)
+            if (thisIdx >= 0 && thisIdx < s)
             {
                 p = data->sample(thisIdx);
-                if(qIsFinite(p.ry()))
+                if (qIsFinite(p.ry()))
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
@@ -1330,14 +1315,14 @@ void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int 
     bool found = false;
     bool d = true;
 
-    if(dir == 0)
+    if (dir == 0)
     {
-        while(!found)
+        while (!found)
         {
-            if(thisIdx >= 0 && thisIdx < s)
+            if (thisIdx >= 0 && thisIdx < s)
             {
                 p = data->sample(thisIdx);
-                if(qIsFinite(p.ry()))
+                if (qIsFinite(p.ry()))
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
@@ -1349,7 +1334,7 @@ void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int 
                 break;
             }
 
-            if(d)
+            if (d)
             {
                 thisIdx = -thisIdx + 1;
                 d = !d;
@@ -1361,15 +1346,15 @@ void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int 
             }
         }
     }
-    if(dir == -1)
+    if (dir == -1)
     {
-        while(!found)
+        while (!found)
         {
             thisIdx -= 1;
-            if( thisIdx >= 0)
+            if (thisIdx >= 0)
             {
                 p = data->sample(thisIdx);
-                if(qIsFinite(p.ry()))
+                if (qIsFinite(p.ry()))
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
@@ -1384,13 +1369,13 @@ void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int 
     }
     else //dir > 0
     {
-        while(!found)
+        while (!found)
         {
             thisIdx += 1;
-            if(thisIdx >= 0 && thisIdx < s)
+            if (thisIdx >= 0 && thisIdx < s)
             {
                 p = data->sample(thisIdx);
-                if(qIsFinite(p.ry()))
+                if (qIsFinite(p.ry()))
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
@@ -1408,7 +1393,7 @@ void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::contextMenuEvent(QContextMenuEvent * event)
 {
-    if(m_showContextMenu && m_pPanner->isEnabled() == false)
+    if (m_showContextMenu && m_pPanner->isEnabled() == false)
     {
         event->accept();
         m_contextMenu->exec(event->globalPos());
@@ -1426,7 +1411,7 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
     switch(axis)
     {
         case Qt::YAxis:
-            if(autoCalcLimits) 
+            if (autoCalcLimits) 
             {
                 m_pData->m_valueScaleAuto = true;
                 recalculateBoundaries = true;
@@ -1439,7 +1424,7 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
             }
         break;
         case Qt::XAxis:
-            if(autoCalcLimits) 
+            if (autoCalcLimits) 
             {
                 m_pData->m_axisScaleAuto = true;
                 recalculateBoundaries = true;
@@ -1461,7 +1446,7 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setZoomerEnable(const bool checked)
 {
-    if(checked)
+    if (checked)
     {
         setPickerEnable(false);
         setPannerEnable(false);
@@ -1472,23 +1457,23 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
 
         DataObjectSeriesData *data = NULL;
 
-        foreach( QwtPlotCurve *curve, m_plotCurveItems)
+        foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
             data = (DataObjectSeriesData *)curve->data();
             m_pZoomer->setZoomBase(data->boundingRect());
         }
 
         m_pZoomer->setEnabled(true);
-        canvas()->setCursor( Qt::CrossCursor );
+        canvas()->setCursor(Qt::CrossCursor);
     }
     else
     {
         m_pData->m_state = stateIdle;
 
         m_pZoomer->setEnabled(false);
-        canvas()->setCursor( Qt::ArrowCursor );
+        canvas()->setCursor(Qt::ArrowCursor);
 
-        foreach( QwtPlotCurve *curve, m_plotCurveItems)
+        foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
             setAxisAutoScale(curve->xAxis(),true);
             setAxisAutoScale(curve->yAxis(),true);
@@ -1499,20 +1484,20 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setPickerEnable(const bool checked)
 {
-    if(checked)
+    if (checked)
     {   
         setZoomerEnable(false);
         setPannerEnable(false);
 
         m_pData->m_state = statePicker;
         m_pValuePicker->setEnabled(true);
-        canvas()->setCursor( Qt::CrossCursor );
+        canvas()->setCursor(Qt::CrossCursor);
     }
     else
     {
         m_pData->m_state = stateIdle;
         m_pValuePicker->setEnabled(false);
-        canvas()->setCursor( Qt::ArrowCursor );
+        canvas()->setCursor(Qt::ArrowCursor);
 
         /*foreach(Marker m, m_markers)
         {
@@ -1526,17 +1511,17 @@ void Plot1DWidget::setPickerEnable(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setPannerEnable(const bool checked)
 {
-    if(checked)
+    if (checked)
     {
         setZoomerEnable(false);
         setPickerEnable(false);
         m_pData->m_state = statePanner;
-        canvas()->setCursor( Qt::OpenHandCursor);
+        canvas()->setCursor(Qt::OpenHandCursor);
     }
     else
     {
         m_pData->m_state = stateIdle;
-        canvas()->setCursor( Qt::ArrowCursor );
+        canvas()->setCursor(Qt::ArrowCursor);
     }
     m_pPanner->setEnabled(checked);
 }
@@ -1548,29 +1533,28 @@ void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
     {
         QRectF rect;
 
-        foreach( QwtPlotCurve *curve, m_plotCurveItems)
+        foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
             QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
             if (qIsFinite(tmpRect.height()))
-                rect = rect.unite( ((DataObjectSeriesData *)curve->data())->boundingRect() );
+                rect = rect.unite(((DataObjectSeriesData *)curve->data())->boundingRect());
         }
 
-        if(m_pData->m_valueScaleAuto)
+        if (m_pData->m_valueScaleAuto)
         {
             m_pData->m_valueMin = rect.top();
             m_pData->m_valueMax = rect.bottom();
         }
 
-        if(m_pData->m_axisScaleAuto)
+        if (m_pData->m_axisScaleAuto)
         {
             m_pData->m_axisMin = rect.left();
             m_pData->m_axisMax = rect.right();
         }
     }
 
-    setAxisScale( QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax );
-    
-    setAxisScale( QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax );
+    setAxisScale(QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax);
+    setAxisScale(QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax);
 
     replot();
 }
@@ -1578,7 +1562,7 @@ void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = false*/)
 {
-    if(clear)
+    if (clear)
     {
         foreach(Marker m, m_markers)
         {
@@ -1593,52 +1577,52 @@ void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = fal
     Marker *m;
     QVector<QPointF> points;
 
-    for(int i = 0 ; i < m_markers.size() ; i++)
+    for (int i = 0 ; i < m_markers.size() ; i++)
     {
         m = &(m_markers[i]);
-        if(updatePositions)
+        if (updatePositions)
         {
             stickMarkerToXPx(m, std::numeric_limits<double>::signaling_NaN() ,0);
         }
 
-        if(m->active)
+        if (m->active)
         {
-            m_markers[i].item->setSymbol( new QwtSymbol(QwtSymbol::Diamond, Qt::white, QPen(colors[cur],2), QSize(8,8) ));
+            m_markers[i].item->setSymbol(new QwtSymbol(QwtSymbol::Diamond, Qt::white, QPen(colors[cur],2), QSize(8,8)));
         }
         else
         {
-            m_markers[i].item->setSymbol( new QwtSymbol(QwtSymbol::Diamond, colors[cur], QPen(colors[cur],2), QSize(6,6) ));
+            m_markers[i].item->setSymbol(new QwtSymbol(QwtSymbol::Diamond, colors[cur], QPen(colors[cur],2), QSize(6,6)));
         }
 
-        if(cur < 2) cur++;
-        points << QPointF(m_markers[i].item->xValue(), m_markers[i].item->yValue());
-            
+        if (cur < 2) cur++;
+        points << QPointF(m_markers[i].item->xValue(), m_markers[i].item->yValue());       
     }
 
     QString coords, offsets;
-    if(points.size() > 1)
+    if (points.size() > 1)
     {
-        coords = QString("[%1; %2]\n [%3; %4]").arg( points[0].rx(),0,'g',4 ).arg( points[0].ry(),0,'g',4  ).arg( points[1].rx(),0,'g',4  ).arg( points[1].ry(),0,'g',4  );
-        offsets = QString("dx = %1\n dy = %2").arg( points[1].rx() - points[0].rx(),0,'g',4).arg( points[1].ry() - points[0].ry(), 0, 'g', 4 );
+        coords = QString("[%1; %2]\n [%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4 ).arg(points[1].rx(),0,'g',4 ).arg(points[1].ry(),0,'g',4 );
+        offsets = QString("dx = %1\n dy = %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
     }
-    else if(points.size() == 1)
+    else if (points.size() == 1)
     {
-        coords = QString("[%1; %2]\n      ").arg( points[0].rx(),0,'g',4 ).arg( points[0].ry(),0,'g',4  );
+        coords = QString("[%1; %2]\n      ").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4 );
     }
 
     emit setMarkerText(coords,offsets);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::configRescaler(void)
 {
-    if(m_pData->m_keepAspect)
+    if (m_pData->m_keepAspect)
     {
         //int height = plotLayout()->canvasRect().height();
         //int width = plotLayout()->canvasRect().width();
 
         int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
         
-        if(m_pRescaler == NULL)
+        if (m_pRescaler == NULL)
         {
             QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
             QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
@@ -1660,7 +1644,7 @@ void Plot1DWidget::configRescaler(void)
     }
     else
     {
-        if(m_pRescaler != NULL)
+        if (m_pRescaler != NULL)
         {
             m_pRescaler->setEnabled(false);
             //m_pRescaler->deleteLater();
@@ -1668,12 +1652,13 @@ void Plot1DWidget::configRescaler(void)
         }
         
     }
-    if(m_pRescaler != NULL && m_pData->m_keepAspect)
+    if (m_pRescaler != NULL && m_pData->m_keepAspect)
     {
         m_pRescaler->rescale();
     }
     //replot();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOfPoints)
 {
@@ -1692,24 +1677,24 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
 
             if (m)
             {
-                if(m_pData)
+                if (m_pData)
                 {
                     m_pData->m_elementsToPick = 1;
                 }
-                m->setMaxNrItems( maxNrOfPoints );
+                m->setMaxNrItems(maxNrOfPoints);
                 m_pMultiPointPicker->setEnabled(true);
 
                 if (maxNrOfPoints > 0)
                 {
-                    emit statusBarMessage( tr("Please select %1 points or press Space to quit earlier. Esc aborts the selection.").arg( maxNrOfPoints ) );
+                    emit statusBarMessage(tr("Please select %1 points or press Space to quit earlier. Esc aborts the selection.").arg(maxNrOfPoints));
                 }
                 else
                 {
-                    emit statusBarMessage( tr("Please select points and press Space to end the selection. Esc aborts the selection.") );
+                    emit statusBarMessage(tr("Please select points and press Space to end the selection. Esc aborts the selection."));
                 }
 
                 //QKeyEvent evt(QEvent::KeyPress, Qt::Key_M, Qt::NoModifier);
-                //m_pMultiPointPicker->eventFilter( m_pMultiPointPicker->parent(), &evt); //starts the process
+                //m_pMultiPointPicker->eventFilter(m_pMultiPointPicker->parent(), &evt); //starts the process
             }
             setState((Plot1DWidget::tState)type);
         }
@@ -1717,9 +1702,9 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
         {
             m_pMultiPointPicker->setEnabled(false);
 
-            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+            emit statusBarMessage(tr("Selection has been interrupted."), 2000);
 
-            if(m_pData)
+            if (m_pData)
             {
                 m_pData->m_elementsToPick = 0;
             }
@@ -1744,16 +1729,16 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
 
             if (m)
             {
-                if(m_pData)
+                if (m_pData)
                 {
                     m_pData->m_elementsToPick = (maxNrOfPoints / 2);
                 }
 
-                m->setMaxNrItems( 2 );
+                m->setMaxNrItems(2);
                 m_pMultiPointPicker->setEnabled(true);
 
-                if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 lines or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-                else emit statusBarMessage( tr("Please draw one line or press Space to quit earlier. Esc aborts the selection."));
+                if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
             }
             setState(tLine);
         }
@@ -1761,9 +1746,9 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
         {
             m_pMultiPointPicker->setEnabled(false);
 
-            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+            emit statusBarMessage(tr("Selection has been interrupted."), 2000);
 
-            if(m_pData)
+            if (m_pData)
             {
                 m_pData->m_elementsToPick = 0;
             }
@@ -1789,15 +1774,15 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
 
 //            if (m)
             {
-                if(m_pData)
+                if (m_pData)
                 {
                     m_pData->m_elementsToPick = (maxNrOfPoints / 2);
                 }
-//                m->setMaxNrItems( 2 );
+//                m->setMaxNrItems(2);
                 m_pMultiPointPicker->setEnabled(true);
 
-                if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 rectangles or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-                else emit statusBarMessage( tr("Please draw one rectangle or press Space to quit earlier. Esc aborts the selection."));
+                if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
             }
             setState(tRect);
         }
@@ -1805,9 +1790,9 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
         {
             m_pMultiPointPicker->setEnabled(false);
 
-            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+            emit statusBarMessage(tr("Selection has been interrupted."), 2000);
 
-            if(m_pData)
+            if (m_pData)
             {
                 m_pData->m_elementsToPick = 0;
             }
@@ -1833,15 +1818,15 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
 
 //            if (m)
             {
-                if(m_pData)
+                if (m_pData)
                 {
                     m_pData->m_elementsToPick = (maxNrOfPoints / 2);
                 }
-//                m->setMaxNrItems( 2 );
+//                m->setMaxNrItems(2);
                 m_pMultiPointPicker->setEnabled(true);
 
-                if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 ellipses or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-                else emit statusBarMessage( tr("Please draw one ellipse or press Space to quit earlier. Esc aborts the selection."));
+                if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
             }
             setState(tEllipse);
         }
@@ -1849,9 +1834,9 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
         {
             m_pMultiPointPicker->setEnabled(false);
 
-            emit statusBarMessage( tr("Selection has been interrupted."), 2000 );
+            emit statusBarMessage(tr("Selection has been interrupted."), 2000);
 
-            if(m_pData)
+            if (m_pData)
             {
                 m_pData->m_elementsToPick = 0;
             }
@@ -1865,7 +1850,6 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             setState(stateIdle);
         }
     }
-
     else
     {
         Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
@@ -1882,7 +1866,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setState( tState state)
+void Plot1DWidget::setState(tState state)
 {
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(parent());
 
@@ -1897,13 +1881,13 @@ void Plot1DWidget::setState( tState state)
 
         if (m_pZoomer)
         {
-            m_pZoomer->setEnabled( state == stateZoomer );
+            m_pZoomer->setEnabled(state == stateZoomer);
             this->setZoomerEnable(state == stateZoomer);
         }
-        if (m_pPanner) m_pPanner->setEnabled( state == statePanner );
-        if (m_pValuePicker) m_pValuePicker->setEnabled( state == statePicker );
+        if (m_pPanner) m_pPanner->setEnabled(state == statePanner);
+        if (m_pValuePicker) m_pValuePicker->setEnabled(state == statePicker);
 
-        if ( m_pData->m_state == tPoint || m_pData->m_state == tLine
+        if (m_pData->m_state == tPoint || m_pData->m_state == tLine
             || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == stateIdle)
         {
             if (p)
@@ -1919,32 +1903,33 @@ void Plot1DWidget::setState( tState state)
         {
             default:
             case stateIdle:
-                canvas()->setCursor( Qt::ArrowCursor );
+                canvas()->setCursor(Qt::ArrowCursor);
             break;
 
             case stateZoomer:
-                canvas()->setCursor( Qt::CrossCursor );
+                canvas()->setCursor(Qt::CrossCursor);
             break;
 
             case statePanner:
-                canvas()->setCursor( Qt::OpenHandCursor );
+                canvas()->setCursor(Qt::OpenHandCursor);
             break;
 
             case statePicker:
-                canvas()->setCursor( Qt::CrossCursor );
+                canvas()->setCursor(Qt::CrossCursor);
             break;
 
             case tPoint:
             case tLine:
             case tRect:
             case tEllipse:
-                canvas()->setCursor( Qt::CrossCursor );
+                canvas()->setCursor(Qt::CrossCursor);
             break;
         }
 
         m_pData->m_state = state;
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::multiPointActivated (bool on)
 {
@@ -1962,7 +1947,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 					if (polygon.size() == 0)
 					{
-						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
 					}
 					else
@@ -1973,15 +1958,15 @@ void Plot1DWidget::multiPointActivated (bool on)
 						{
 							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
 							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append( pt );
+							polygonScale.append(pt);
 						}
 
-						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
 					}
 
 					if (!aborted && polygonScale.size() > 0)
 					{
-						for(int i = 0; i < polygonScale.size(); i++)
+						for (int i = 0; i < polygonScale.size(); i++)
 						{
 							QPainterPath *path = new QPainterPath();
 							DrawItem *newItem = NULL;
@@ -1991,7 +1976,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 							newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
 
-							if(this->m_inverseColor0.isValid())
+							if (this->m_inverseColor0.isValid())
 							{
 								newItem->setPen(QPen(m_inverseColor0));
 								//newItem->setBrush(QBrush(m_inverseColor0));
@@ -2032,7 +2017,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 					if (polygon.size() == 0)
 					{
-						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
 						m_drawedIemsIndexes.clear();
 					}
@@ -2044,10 +2029,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 						{
 							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
 							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append( pt );
+							polygonScale.append(pt);
 						}
 
-						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
 
 						QPainterPath *path = new QPainterPath();
 						DrawItem *newItem = NULL;
@@ -2069,19 +2054,19 @@ void Plot1DWidget::multiPointActivated (bool on)
 					}
 
 					// if further elements are needed reset the plot engine and go ahead else finish editing
-					if(m_pData->m_elementsToPick > 1)
+					if (m_pData->m_elementsToPick > 1)
 					{
 						m_pData->m_elementsToPick--;
 						MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 						if (m)
 						{
-							m->setMaxNrItems( 2 );
+							m->setMaxNrItems(2);
 							m_pMultiPointPicker->setEnabled(true);
 
-							if(!aborted)
+							if (!aborted)
 							{
-								if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 lines or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-								else emit statusBarMessage( tr("Please draw one line or press Space to quit earlier. Esc aborts the selection."));
+								if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+								else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
 							}
 						}
 						return;
@@ -2093,9 +2078,9 @@ void Plot1DWidget::multiPointActivated (bool on)
 						if (p)
 						{
 							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
-							for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
+							for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
 							{
-								if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
+								if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
 								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tLine));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
@@ -2110,7 +2095,6 @@ void Plot1DWidget::multiPointActivated (bool on)
 						setState(stateIdle);
 						m_pMultiPointPicker->setEnabled(false);
 					}
-
 				}
 			break;
 
@@ -2123,7 +2107,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 					if (polygon.size() == 0)
 					{
-						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
 						m_drawedIemsIndexes.clear();
 					}
@@ -2135,10 +2119,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 						{
 							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
 							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append( pt );
+							polygonScale.append(pt);
 						}
 
-						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
 
 						QPainterPath *path = new QPainterPath();
 						DrawItem *newItem = NULL;
@@ -2160,19 +2144,19 @@ void Plot1DWidget::multiPointActivated (bool on)
 					}
 
 					// if further elements are needed reset the plot engine and go ahead else finish editing
-					if(m_pData->m_elementsToPick > 1)
+					if (m_pData->m_elementsToPick > 1)
 					{
 						m_pData->m_elementsToPick--;
 						MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 						if (m)
 						{
-							//m->setMaxNrItems( 2 );
+							//m->setMaxNrItems(2);
 							m_pMultiPointPicker->setEnabled(true);
 
-							if(!aborted)
+							if (!aborted)
 							{
-								if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 rectangles or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-								else emit statusBarMessage( tr("Please draw one rectangle or press Space to quit earlier. Esc aborts the selection."));
+								if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+								else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
 							}
 						}
 						return;
@@ -2184,9 +2168,9 @@ void Plot1DWidget::multiPointActivated (bool on)
 						if (p)
 						{
 							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
-							for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
+							for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
 							{
-								if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
+								if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
 								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tRectangle));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
@@ -2213,7 +2197,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 					if (polygon.size() == 0)
 					{
-						emit statusBarMessage( tr("Selection has been aborted."), 2000 );
+						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
 						m_drawedIemsIndexes.clear();
 					}
@@ -2225,10 +2209,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 						{
 							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
 							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append( pt );
+							polygonScale.append(pt);
 						}
 
-						emit statusBarMessage( tr("%1 points have been selected.").arg(polygon.size()-1), 2000 );
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
 
 						QPainterPath *path = new QPainterPath();
 						DrawItem *newItem = NULL;
@@ -2238,7 +2222,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 						newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
 					
-						if(this->m_inverseColor0.isValid())
+						if (this->m_inverseColor0.isValid())
 						{
 							newItem->setPen(QPen(m_inverseColor0));
 							//newItem->setBrush(QBrush(m_inverseColor0));
@@ -2257,19 +2241,19 @@ void Plot1DWidget::multiPointActivated (bool on)
 					}
 
 					// if further elements are needed reset the plot engine and go ahead else finish editing
-					if(m_pData->m_elementsToPick > 1)
+					if (m_pData->m_elementsToPick > 1)
 					{
 						m_pData->m_elementsToPick--;
 						MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 						if (m)
 						{
-							//m->setMaxNrItems( 2 );
+							//m->setMaxNrItems(2);
 							m_pMultiPointPicker->setEnabled(true);
 
-							if(!aborted)
+							if (!aborted)
 							{
-								if(m_pData->m_elementsToPick > 1) emit statusBarMessage( tr("Please draw %1 ellipses or press Space to quit earlier. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
-								else emit statusBarMessage( tr("Please draw one ellipse or press Space to quit earlier. Esc aborts the selection."));
+								if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
+								else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
 							}
 						}
 						return;
@@ -2281,9 +2265,9 @@ void Plot1DWidget::multiPointActivated (bool on)
 						if (p)
 						{
 							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
-							for(int i = 0; i < m_drawedIemsIndexes.size(); i++)
+							for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
 							{
-								if(!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
+								if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
 								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::PrimitiveContainer::tEllipse));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
@@ -2315,21 +2299,20 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
     QBrush symBrush(Qt::NoBrush);
     QPen symPen(Qt::red);
 
-
     QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
     if (rgexp.indexIn(style) != -1)
     {
 //        QString s = rgexp.cap(1);
         char s = rgexp.cap(1).toAscii()[0];
 
-        if (s == 'b') symPen.setColor( Qt::blue );
-        else if (s == 'g') symPen.setColor( Qt::green );
-        else if (s == 'r') symPen.setColor( Qt::red );
-        else if (s == 'c') symPen.setColor( Qt::cyan );
-        else if (s == 'm') symPen.setColor( Qt::magenta );
-        else if (s == 'y') symPen.setColor( Qt::yellow );
-        else if (s == 'k') symPen.setColor( Qt::black );
-        else if (s == 'w') symPen.setColor( Qt::white );
+        if (s == 'b') symPen.setColor(Qt::blue);
+        else if (s == 'g') symPen.setColor(Qt::green);
+        else if (s == 'r') symPen.setColor(Qt::red);
+        else if (s == 'c') symPen.setColor(Qt::cyan);
+        else if (s == 'm') symPen.setColor(Qt::magenta);
+        else if (s == 'y') symPen.setColor(Qt::yellow);
+        else if (s == 'k') symPen.setColor(Qt::black);
+        else if (s == 'w') symPen.setColor(Qt::white);
 
         s = rgexp.cap(2).toAscii()[0];
         bool ok;
@@ -2358,7 +2341,6 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
     {
         retval += ito::RetVal(ito::retError,0,"The style tag does not correspond to the required format");
     }
-
 
     if (!retval.containsError())
     {
@@ -2452,7 +2434,10 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
         replot();
     }
 
-    if (dObj) delete dObj;
+    if (dObj)
+    {
+        delete dObj;
+    }
 
     return retval;
 }
@@ -2476,7 +2461,7 @@ ito::RetVal Plot1DWidget::deleteMarkers(const int id)
         found = true;
     }
     
-    if(m_pData->m_pDrawItems.size() == 0)
+    if (m_pData->m_pDrawItems.size() == 0)
     {
        m_pData->m_pDrawItems.clear(); 
     }
@@ -2497,14 +2482,14 @@ ito::RetVal Plot1DWidget::deleteMarkers(const int id)
 //void Itom1DQwtFigure::setMarkerCoordinates(const QVector<QPointF> pts)
 //{
 //    char buf[60] = {0};
-//    if(pts.size() > 1)
+//    if (pts.size() > 1)
 //    {
 //        sprintf(buf, " [%.4g; %.4g]\n [%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
 //    }
 //
 //    m_lblCoordinates->setText(buf);
 //
-//    if(pts.size() > 2)
+//    if (pts.size() > 2)
 //    {
 //        sprintf(buf, " dx = %.4g\n dy = %.4g", pts[2].x(), pts[2].y());
 //    }

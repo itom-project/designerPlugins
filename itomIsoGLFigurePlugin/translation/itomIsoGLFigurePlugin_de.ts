@@ -25,7 +25,7 @@
     </message>
     <message>
         <location line="+3"/>
-        <source>Save</source>
+        <source>Save...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>Scale Settings</source>
+        <source>Scale Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

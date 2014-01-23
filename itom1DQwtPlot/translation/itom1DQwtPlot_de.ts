@@ -6,7 +6,7 @@
     <message>
         <location filename="../dialog1DScale.ui"/>
         <source>Interval Settings</source>
-        <translation>Interval-Einstellungen</translation>
+        <translation>Skaleneinstellungen</translation>
     </message>
     <message>
         <location/>
@@ -16,7 +16,7 @@
     <message>
         <location/>
         <source>auto</source>
-        <translation>Automatische Berechnung</translation>
+        <translation>Automatisch</translation>
     </message>
     <message>
         <location/>
@@ -145,12 +145,12 @@
     <message>
         <location filename="../itom1DQwtPlot.cpp" line="+70"/>
         <source>Points for line plots from 2d objects</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkte für Linien-Plots von 2D-Objekten</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>1D plotting toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolleiste 1D-Abbildung</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -165,52 +165,46 @@
     <message>
         <location line="+31"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Ansicht zurücksetzen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Reset original view</source>
-        <translation type="unfinished"></translation>
+        <translation>Ursprüngliche Ansicht wiederherstellen</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Save</source>
-        <translation>Speichern</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Export current view</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Abbildung exportieren</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Scale Settings</source>
-        <translation>Skaleneinstellungen</translation>
+        <translation type="obsolete">Skaleneinstellungen</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Set the ranges and offsets of this view</source>
-        <translation type="unfinished">Bereich und Offset für dieses Bild setzen</translation>
+        <translation>Einstellungen der Skalen</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Parent Scale Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Skaleneinstellungen Ursprungsabbildung</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Set the value-range of the parent view according to this plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Skaleneinstellungen auch für die ursprüngliche Abbildung übernehmen</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>forward</source>
-        <translation>Vorwärts</translation>
+        <translation>Weiter</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Forward to next line</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur nächsten Linie wechseln</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -220,89 +214,84 @@
     <message>
         <location line="+3"/>
         <source>Back to previous line</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur vorherigen Linie zurück</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>move</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschieben</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Pan axes with left mouse, zoom with right</source>
-        <translation type="unfinished"></translation>
+        <translation>Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>zoom to rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom in Rechteck</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Zoom to rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom in Rechteck</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>lock aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Seitenverhältnis beibehalten</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Toogle fixed / variable aspect ration between axis x and y</source>
-        <translation type="unfinished"></translation>
+        <translation>Vollbild oder Seitenverhältnis beibehalten</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>marker</source>
-        <translation>Marker</translation>
+        <translation>Positionsanzeiger</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Set Markers to</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeige setzen</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+553"/>
         <source>To Min-Max</source>
-        <translation type="unfinished"></translation>
+        <translation>Min-Max</translation>
     </message>
     <message>
         <location line="-548"/>
         <source>Switch Imag, Real, Abs, Pha</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildmodus</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+634"/>
         <source>Imag</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-633"/>
         <location line="+638"/>
         <source>Real</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-637"/>
         <source>Abs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+641"/>
         <source>Pha</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location line="-635"/>
-        <source>Switch Draw Mode, Point, Line, Rectangle, Ellipse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location line="-631"/>
         <source>Point</source>
         <translation>Punkt</translation>
     </message>
@@ -319,90 +308,105 @@
     <message>
         <location line="+5"/>
         <source>Ellipse</source>
-        <translation></translation>
+        <translation>Ellipse</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>clear Marker</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Marker löschen</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Clear all existing geometric elements</source>
-        <translation type="unfinished"></translation>
+        <translation>Löscht alle gesetzen Marker</translation>
     </message>
     <message>
         <location line="+872"/>
         <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
-        <translation type="unfinished"></translation>
+        <translation>Objekt entspricht nicht den Kriterien: Zweidimensional, Objekte x 11, Fließkommewerte</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Deleted element, new element list was empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelöschtes Objekt. Neue Objektliste ist leer</translation>
     </message>
     <message>
         <location line="+208"/>
         <source>Could not convert elements, type undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>Objekt kann nicht konvertiert werden: Unbekannter Typ</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Could not set elements</source>
-        <translation type="unfinished"></translation>
+        <translation>Element konnte nicht gesetzt werden</translation>
     </message>
     <message>
         <location line="+48"/>
         <source>Could not set active element, index out of range.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
     </message>
     <message>
         <location line="-1140"/>
         <source>Marker Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Positionsanzeiger</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-124"/>
+        <source>Save...</source>
+        <translation>Speichern...</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Scale Settings...</source>
+        <translation>Skaleneinstellungen...</translation>
+    </message>
+    <message>
+        <location line="+74"/>
+        <source>Switch Draw Mode</source>
+        <translation>Markermodus</translation>
+    </message>
+    <message>
+        <location line="+49"/>
         <source>Marker Offsets</source>
-        <translation type="unfinished"></translation>
+        <translation>Offset Anzeige</translation>
     </message>
     <message>
         <location line="+354"/>
         <source>PDF Documents (*.pdf)</source>
-        <translation type="unfinished"></translation>
+        <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>SVG Documents (*.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>SVG-Dokumente (*.svg)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Postscript Documents (*.ps)</source>
-        <translation type="unfinished"></translation>
+        <translation>Postscript-Dateien (*.ps)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Images (</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilddateien (</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Export File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern unter</translation>
     </message>
 </context>
 <context>
     <name>Plot1DWidget</name>
     <message>
-        <location filename="../plot1DWidget.cpp" line="+1704"/>
+        <location filename="../plot1DWidget.cpp" line="+1689"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Please select points and press Space to end the selection. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkte auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -410,65 +414,65 @@
         <location line="+44"/>
         <location line="+44"/>
         <source>Selection has been interrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
         <location line="-97"/>
         <location line="+328"/>
-        <source>Please draw %1 lines or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <source>Please draw %1 lines. Esc aborts the selection.</source>
+        <translation>%1 Linien einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
         <location line="-327"/>
         <location line="+328"/>
-        <source>Please draw one line or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <source>Please draw one line. Esc aborts the selection.</source>
+        <translation>Eine Linie einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
         <location line="-285"/>
-        <location line="+375"/>
-        <source>Please draw %1 rectangles or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <location line="+374"/>
+        <source>Please draw %1 rectangles. Esc aborts the selection.</source>
+        <translation>%1 Rechtecke einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-374"/>
-        <location line="+375"/>
-        <source>Please draw one rectangle or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <location line="-373"/>
+        <location line="+374"/>
+        <source>Please draw one rectangle. Esc aborts the selection.</source>
+        <translation>Ein Rechteck einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-332"/>
-        <location line="+428"/>
-        <source>Please draw %1 ellipses or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <location line="-331"/>
+        <location line="+427"/>
+        <source>Please draw %1 ellipses. Esc aborts the selection.</source>
+        <translation>%1 Ellipsen einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-427"/>
-        <location line="+428"/>
-        <source>Please draw one ellipse or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="unfinished"></translation>
+        <location line="-426"/>
+        <location line="+427"/>
+        <source>Please draw one ellipse. Esc aborts the selection.</source>
+        <translation>Eine Ellipse einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-307"/>
+        <location line="-306"/>
         <location line="+70"/>
-        <location line="+91"/>
+        <location line="+90"/>
         <location line="+90"/>
         <source>Selection has been aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
-        <location line="-237"/>
+        <location line="-236"/>
         <location line="+71"/>
-        <location line="+91"/>
+        <location line="+90"/>
         <location line="+90"/>
         <source>%1 points have been selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Punkt(e) wurden ausgewählt.</translation>
     </message>
     <message>
-        <location line="+174"/>
+        <location line="+172"/>
         <location line="+28"/>
         <source>invalid marker type</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger Marker-Typ</translation>
     </message>
 </context>
 <context>
@@ -476,90 +480,90 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+66"/>
         <source>Source data for plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Quelldaten für die Abbildung</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Actual output data of plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Ausgabedaten der Abbildung</translation>
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+192"/>
         <location line="+46"/>
         <source>duplicate Channel, in addChannel</source>
-        <translation type="unfinished"></translation>
+        <translation>Doppelte Verbindung (in addChannel)</translation>
     </message>
     <message>
         <location line="-38"/>
         <location line="+7"/>
         <source>parameters incompatible, while adding channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht kompatible Parameter (in adding channel)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>undefined channel direction, while adding channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Undefinierte Verbindungsrichtung (in adding channel)</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>invalid child pointer, in addChannel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger child pointer (in addChannel)</translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+27"/>
         <source>channel does not exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung existiert nicht</translation>
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.cpp" line="+105"/>
         <source>Parameter: does not exist in updateParam</source>
-        <translation type="unfinished"></translation>
+        <translation>Parameter gibt es in updateParam nicht</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Running update on a locked input channel, i.e. updatePending flag is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Versuch eine gelockte Verbindung zu aktualisieren. Vielleicht wurde das updatePending-Flag nicht gesetzt</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Channel is already updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung wurde bereits aktualisiert</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>parameters in list could not be found in channels, in updateChannels</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Parameter der Liste wurden in &apos;channels&apos; nicht gefunden (in updateChannels)</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>channel is not a sender in setUpdatePending</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung kann nicht als Quelle genutzt werden (in setUpdatePending)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>unknown channel in setUpdatePending</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+209"/>
         <source>Live data source for plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
         <location filename="../itom1DQwtPlot.cpp" line="-622"/>
         <source>plot1D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../itom1DQwtPlotPlugin.cpp" line="+15"/>
         <source>itom widget for 1D DataObjects based on QWT.</source>
-        <translation type="unfinished"></translation>
+        <translation>itom-Widget für die Abbildung von 1D-Datenobjekten basierend auf QWT.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>LGPL, for Qwt see Qwt License</source>
-        <translation type="unfinished"></translation>
+        <translation>LGPL, für Qwt siehe Qwt-Lizenz</translation>
     </message>
 </context>
 <context>
@@ -567,12 +571,12 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.cpp" line="+114"/>
         <source>Function &apos;spawnLinePlot&apos; not supported from this plot widget</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Funktion &apos;spawnLinePlot&apos; wird von diesem Widget nicht unterstützt</translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Figure does not contain an input slot for live sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Abbildung hat keine Schnittstelle für Livebilder</translation>
     </message>
 </context>
 <context>

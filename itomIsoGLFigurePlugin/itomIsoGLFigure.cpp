@@ -99,13 +99,13 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_actHome->setToolTip(tr("Reset original view"));
 
     //m_actSave
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
     m_actSave->setObjectName("actSave");
     m_actSave->setToolTip(tr("Export current view"));
     m_actSave->setVisible(true);
 
     //m_actScaleSetting
-    m_actScaleSetting = new QAction(QIcon(":/itomDesignerPlugins/general/icons/autoscal.png"), tr("Scale Settings"), this);
+    m_actScaleSetting = new QAction(QIcon(":/itomDesignerPlugins/general/icons/autoscal.png"), tr("Scale Settings..."), this);
     m_actScaleSetting->setObjectName("actScaleSetting");
     m_actScaleSetting->setToolTip(tr("Set the ranges and offsets oif this view"));
 

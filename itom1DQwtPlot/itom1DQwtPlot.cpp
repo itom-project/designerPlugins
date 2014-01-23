@@ -192,13 +192,13 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(triggered()), this, SLOT(mnuHome()));
  
     //m_actSave
-    m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
+    m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuExport()));
 
     //m_actScaleSetting
-    m_pActScaleSetting = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings"), this);
+    m_pActScaleSetting = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings..."), this);
     a->setObjectName("actScaleSetting");
     a->setToolTip(tr("Set the ranges and offsets of this view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
@@ -272,7 +272,7 @@ void Itom1DQwtPlot::createActions()
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
 
     //m_actDrawMode
-    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Switch Draw Mode, Point, Line, Rectangle, Ellipse"), this);
+    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
     m_pMnuDrawMode = new QMenu("Draw Mode", this);
 
     m_pDrawModeActGroup = new QActionGroup(this);

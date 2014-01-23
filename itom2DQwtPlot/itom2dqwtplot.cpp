@@ -68,7 +68,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pDrawModeActGroup(NULL)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
-    m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy pass through of input source object").toAscii().data()));
+    m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toAscii().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
@@ -104,7 +104,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     setCentralWidget(m_pContent);
 
     //initialize actions
-    QToolBar *mainTb = new QToolBar("plotting tools",this);
+    QToolBar *mainTb = new QToolBar(tr("plotting tools"), this);
     addToolBar(mainTb, "mainToolBar");
 
     mainTb->addAction(m_pActSave);
@@ -179,7 +179,7 @@ void Itom2dQwtPlot::createActions()
     QAction *a = NULL;
 
     //m_actSave
-    m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save"), this);
+    m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
@@ -223,7 +223,7 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActZoom(bool)));
 
     //m_actScaleSetting
-    m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings"), this);
+    m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings..."), this);
     a->setObjectName("actScaleSetting");
     a->setToolTip(tr("Set the ranges and offsets of this view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActScaleSettings()));
@@ -277,8 +277,8 @@ void Itom2dQwtPlot::createActions()
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
 
     //m_actDrawMode
-    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Switch Draw Mode, Point, Line, Rectangle, Ellipse"), this);
-    m_pMnuDrawMode = new QMenu("Draw Mode", this);
+    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+    m_pMnuDrawMode = new QMenu(tr("Draw Mode"), this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
     a = m_pDrawModeActGroup->addAction(tr("Point"));
@@ -319,7 +319,7 @@ void Itom2dQwtPlot::createActions()
     
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
-    m_mnuCmplxSwitch = new QMenu("Complex Switch");
+    m_mnuCmplxSwitch = new QMenu(tr("Complex Switch"));
 
     QActionGroup *m_pCmplxActGroup = new QActionGroup(this);
     a = m_pCmplxActGroup->addAction(tr("Real"));

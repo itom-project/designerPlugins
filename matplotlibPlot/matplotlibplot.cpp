@@ -51,7 +51,7 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     m_actSubplotConfig->setObjectName("actionSubplotConfig");
     m_actSubplotConfig->setToolTip(tr("Configure subplots"));
 
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save"), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save..."), this);
     m_actSave->setObjectName("actionSave");
     m_actSave->setToolTip(tr("Save the figure"));
 

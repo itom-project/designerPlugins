@@ -6,7 +6,7 @@
     <message>
         <location filename="../dObMetaDataTablefactory.cpp" line="+75"/>
         <source>itom widget to interprete a dataObject as a table.</source>
-        <translation type="unfinished"></translation>
+        <translation>itom-Widget um ein Datenobjekt als Tabelle zu interpretieren.</translation>
     </message>
 </context>
 <context>
@@ -16,38 +16,38 @@
         <location line="+73"/>
         <location line="+43"/>
         <source>no preview available</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Vorschau verfügbar</translation>
     </message>
     <message>
         <location line="-115"/>
         <location line="+120"/>
         <source>header</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadaten</translation>
     </message>
     <message>
         <location line="-119"/>
         <source>tag Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Tags</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>Protokoll</translation>
     </message>
     <message>
         <location line="+106"/>
         <source>preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorschau</translation>
     </message>
     <message>
         <location line="+133"/>
         <source>Tag Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Tags</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>Protokoll</translation>
     </message>
 </context>
 </TS>

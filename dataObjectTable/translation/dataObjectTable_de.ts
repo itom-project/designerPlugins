@@ -6,7 +6,7 @@
     <message>
         <location filename="../dataobjecttablefactory.cpp" line="+75"/>
         <source>itom widget to interprete a dataObject as a table.</source>
-        <translation type="unfinished"></translation>
+        <translation>itom-Widget um ein Datenobjekt als Tabelle zu interpretieren.</translation>
     </message>
 </context>
 </TS>

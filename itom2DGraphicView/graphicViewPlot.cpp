@@ -180,7 +180,7 @@ void GraphicViewPlot::createActions()
     connect(m_pActHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
 
     //m_pActSave
-    m_pActSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save"), this);
+    m_pActSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save..."), this);
     m_pActSave->setObjectName("actSave");
     m_pActSave->setToolTip(tr("Export current view"));
     connect(m_pActSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
