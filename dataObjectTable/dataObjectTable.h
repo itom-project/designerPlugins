@@ -112,8 +112,19 @@ class DataObjectTable : public QTableView
     Q_PROPERTY(int decimals READ getDecimals WRITE setDecimals DESIGNABLE true);
     Q_PROPERTY(int defaultCols READ getDefaultCols WRITE setDefaultCols DESIGNABLE true);
     Q_PROPERTY(int defaultRows READ getDefaultRows WRITE setDefaultRows DESIGNABLE true);
-    Q_PROPERTY(QStringList verticalLabels READ getVerticalLabels WRITE setVerticalLabels DESIGNABLE true);
     Q_PROPERTY(QStringList horizontalLabels READ getHorizontalLabels WRITE setHorizontalLabels DESIGNABLE true);
+    Q_PROPERTY(QStringList verticalLabels READ getVerticalLabels WRITE setVerticalLabels DESIGNABLE true);
+    
+
+    Q_CLASSINFO("prop://data", "the dataObject to be shown");
+    Q_CLASSINFO("prop://readOnly", "enable write protection");
+    Q_CLASSINFO("prop://min", "get/set minimum value");
+    Q_CLASSINFO("prop://max", "get/set maximum value");
+    Q_CLASSINFO("prop://decimals", "number of decimals to be shown within each cell");
+    Q_CLASSINFO("prop://defaultCols", "number of column to be shown");
+    Q_CLASSINFO("prop://defaultRows", "number of rows to be shown");
+    Q_CLASSINFO("prop://horizontalLabels", "list with labels for each column row");
+    Q_CLASSINFO("prop://verticalLabels", "list with labels for each shown row");
 
 public:
     DataObjectTable(QWidget *parent = 0);

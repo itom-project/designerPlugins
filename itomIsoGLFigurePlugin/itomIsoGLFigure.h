@@ -195,7 +195,6 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
     
     private slots:
 
-    public slots:
         void mnuHome();
         
         /*
@@ -216,6 +215,8 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         //void mnuZoomer(bool checked);
         void mnuActSave();
         //void mnuSwitchColorMode(QAction *action);
+
+    public slots:
 
 /*
 #if CONNEXION_ENABLE

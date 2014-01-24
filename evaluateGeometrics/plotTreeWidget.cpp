@@ -1075,7 +1075,7 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx,const ito::int32&flags,const QVector<ito::float32> &values)
+ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx,const ito::int32 &flags,const QVector<ito::float32> &values)
 {
     if (m_rowHash.contains(idx))
     {        

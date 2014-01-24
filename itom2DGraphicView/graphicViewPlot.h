@@ -211,8 +211,6 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
     signals:
     
     private slots:
-
-    public slots:
         void mnuHome();
         void mnuPanner(bool checked);
         void mnuPalette();
@@ -227,6 +225,9 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
         void mnuExport();
         void mnuSwitchColorMode(QAction *action);
         void mnuActPlaneSelector(int plane);
+
+    public slots:
+
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

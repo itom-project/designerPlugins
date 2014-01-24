@@ -85,6 +85,16 @@ class MotorController : public QGroupBox
     Q_PROPERTY(bool allowJoyStick READ getAllowJoyStick WRITE setAllowJoyStick DESIGNABLE true);
     //Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
 
+    Q_CLASSINFO("prop://actuator", "Handle to the actuator to be used, not DESIGNABLE");
+    Q_CLASSINFO("prop://numberOfAxis", "Number of axis to be visible");
+    Q_CLASSINFO("prop://unit", "Base unit for spinboxes and movements, e.g. nm, micron, mm, m, km");
+    Q_CLASSINFO("prop://readOnly", "Toogle read only");
+    Q_CLASSINFO("prop://autoUpdate", "Toogle automatic motorposition update");
+    Q_CLASSINFO("prop://smallStep", "Distances for the small step button, same value for plus and minus");
+    Q_CLASSINFO("prop://bigStep", "Distances for the large step button, same value for plus and minus");
+    Q_CLASSINFO("prop://absRel", "Toogle between absolut or relative position display. Origin can be set via context menu.");
+    Q_CLASSINFO("prop://allowJoyStick", "Allow a software joystick, e.g. usb or gameport, not implemented yet.");
+
     Q_ENUMS(Unit);
 
 public:
@@ -273,6 +283,9 @@ public slots:
     void triggerActuatorStep(const int axisNo, const bool smallBig, const bool forward);
     void actuatorStatusChanged(QVector<int> status, QVector<double> actPosition);
     void triggerUpdatePosition(void);
+
+private slots:
+    void mnuSetAutoUpdate(QAction* inputAction);
     void mnuSetUnit(QAction* inputAction);
     void mnuSetAbsRel(QAction* inputAction);
 
@@ -308,7 +321,6 @@ public slots:
 
     void guiChangedSmallStep(double value);
     void guiChangedLargeStep(double value);
-    void mnuSetAutoUpdate(QAction* inputAction);
 
 signals:
     void RequestStatusAndPosition(bool sendActPosition, bool sendTargetPos);

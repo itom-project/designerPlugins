@@ -76,6 +76,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions (toDo).")
     Q_CLASSINFO("prop://relations", "Get or set geometric elements via N x 11 dataObject of type float32.")
     Q_CLASSINFO("prop://destinationFolder", "Set a default export directory.")
+    Q_CLASSINFO("prop://relationNames", "A string list with the names of possible relation. The first elements [N.A., radius, angle to, distance to, intersection with, length and area] are read only and are calculated with these widget. For external calculated values you can define custom names e.g. roughness.")
     Q_CLASSINFO("prop://lastAddedRelation", "Get the index of the last added relation.")
     Q_CLASSINFO("prop://considerOnly2D",    "If true, only the x & y coordinates are considered.")
 
@@ -87,7 +88,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         void setData(QSharedPointer<ito::DataObject> dataObj) 
         {
-            if (m_pContent != NULL)
+            if(m_pContent != NULL)
             {
                 m_pContent->refreshPlot(dataObj.data());
             }
@@ -124,25 +125,25 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         void setRelationNames(const QStringList input)
         {
-            if (input.size() < 7)
+            if(input.size() < 7)
             {
                 return;
             }
 
-            if (m_info.m_relationNames.length() < input.size())
+            if(m_info.m_relationNames.length() < input.size())
             {
                 m_info.m_relationNames.reserve(input.length());
             }
 
-            for (int i = 6; i < input.length(); i++)
+            for( int i = 6; i < input.length(); i++)
             {
                 int idx = m_info.m_relationNames.indexOf(input[i]);
-                if (idx < 7 && idx != -1)
+                if(idx < 7 && idx != -1)
                 {
                     continue;
                 }
 
-                if (m_info.m_relationNames.length() > i)
+                if(m_info.m_relationNames.length() > i)
                 {
                     m_info.m_relationNames[i] = input[i];
                 }
@@ -164,7 +165,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         QSharedPointer<ito::DataObject> getRelations(void) const;
 
         //QSharedPointer<ito::DataObject> readLastRelation(void) {return QSharedPointer<ito::DataObject>(new ito::DataObject());}
-
+        
         enum exportFlags
         {
             exportCSVTree  = 0x00,
@@ -216,12 +217,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         int m_lastAddedRelation;
 
     public slots:
-        void mnuSetting();
-        void mnuExport(QAction* action);
-        void mnuAddRelation();
-        void mnuDeleteRelation();
-        void mnuUpdate();
-        void mnuAutoFitCols();
+
 
         ito::RetVal addRelation(QSharedPointer<ito::DataObject> importedData);
         ito::RetVal modifyRelation(const int idx, QSharedPointer<ito::DataObject> relation);
@@ -234,6 +230,13 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         ito::RetVal clearAll(void);
 
     private slots:
+        void mnuSetting();
+        void mnuExport(QAction* action);
+        void mnuAddRelation();
+        void mnuDeleteRelation();
+        void mnuUpdate();
+        void mnuAutoFitCols();
+
         void mnuHome();
 };
 
