@@ -16,22 +16,22 @@
     <message>
         <location line="+2"/>
         <source>forward</source>
-        <translation>Weiter</translation>
+        <translation>Wiederholen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Forward to next view</source>
-        <translation>Zur nächsten Abbildung wechseln</translation>
+        <translation>Wiederholen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>back</source>
-        <translation>Zurück</translation>
+        <translation>Rückgängig</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Back to previous view</source>
-        <translation>Zur vorherigen Abbildung zurück</translation>
+        <translation>Rückgängig</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -61,12 +61,12 @@
     <message>
         <location line="+6"/>
         <source>subplot configuration...</source>
-        <translation>Subplot-Konfiguration...</translation>
+        <translation>Einstellungen...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Configure subplots...</source>
-        <translation>Subplot-Konfiguration...</translation>
+        <translation>Einstellungen...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -96,7 +96,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../matplotlibplotfactory.cpp" line="+12"/>
+        <location filename="../matplotlibplotfactory.cpp" line="+13"/>
         <source>itom widget for matplotlib plots.</source>
         <translation>itom-Widget für matplotlib-Abbildungen.</translation>
     </message>
@@ -111,7 +111,7 @@
     <message>
         <location filename="../matplotlibSubfigConfig.ui"/>
         <source>Subplot Configuration Tool</source>
-        <translation>Subplot-Konfiguration</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location/>

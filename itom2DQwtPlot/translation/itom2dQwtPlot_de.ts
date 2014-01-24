@@ -148,12 +148,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+184"/>
-        <source>Export current view</source>
-        <translation>Aktuelle Abbildung exportieren</translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location filename="../itom2dqwtplot.cpp" line="+188"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -219,7 +214,12 @@
         <translation>Speichern...</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+2"/>
+        <source>Export current view...</source>
+        <translation>Aktuelle Abbildung exportieren...</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Move</source>
         <translation>Verschieben</translation>
     </message>
@@ -530,12 +530,12 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+66"/>
         <source>Source data for plot</source>
-        <translation>Quelldaten für die Abbildung</translation>
+        <translation>Quelldaten der Abbildung</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Actual output data of plot</source>
-        <translation>Aktuelle Ausgabedaten der Abbildung</translation>
+        <translation>Quelldaten der Abbildung</translation>
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+192"/>

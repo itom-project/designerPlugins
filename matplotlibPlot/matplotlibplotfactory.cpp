@@ -5,6 +5,7 @@
 #include "matplotlibplotfactory.h"
 
 
+//----------------------------------------------------------------------------------------------------------------------------------
 MatplotlibPlotFactory::MatplotlibPlotFactory(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
@@ -18,59 +19,72 @@ MatplotlibPlotFactory::MatplotlibPlotFactory(QObject *parent)
     initialized = false;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlotFactory::initialize(QDesignerFormEditorInterface * /*core*/)
 {
     if (initialized)
+    {
         return;
+    }
 
     initialized = true;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 bool MatplotlibPlotFactory::isInitialized() const
 {
     return initialized;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QWidget *MatplotlibPlotFactory::createWidget(QWidget *parent)
 {
     return new MatplotlibPlot(parent);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QWidget *MatplotlibPlotFactory::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
 {
     return new MatplotlibPlot(parent);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QString MatplotlibPlotFactory::name() const
 {
     return "MatplotlibPlot";
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QString MatplotlibPlotFactory::group() const
 {
     return "itom Plugins";
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QIcon MatplotlibPlotFactory::icon() const
 {
     return QIcon(":/itomDesignerPlugins/itom/icons/q_itoM32.png");
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QString MatplotlibPlotFactory::toolTip() const
 {
     return QString("Use this widget in your UI to plot matplotlib-figures in this widget's canvas.");
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QString MatplotlibPlotFactory::whatsThis() const
 {
     return m_description;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 bool MatplotlibPlotFactory::isContainer() const
 {
     return false;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QString MatplotlibPlotFactory::domXml() const
 {
     return "<widget class=\"MatplotlibPlot\" name=\"matplotlibPlot\">\n"
@@ -85,6 +99,7 @@ QString MatplotlibPlotFactory::domXml() const
         "</widget>\n";
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 QString MatplotlibPlotFactory::includeFile() const
 {
     return "matplotlibplot.h";

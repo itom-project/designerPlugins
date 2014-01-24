@@ -11,51 +11,51 @@
     <message>
         <location line="+1"/>
         <source>Unit Switch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Einheitenschalter</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisieren</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Toogle Abs/Rel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abs/Rel-Schalter</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>AbsRel-Switch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abs/Rel-Schalter</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+635"/>
         <source>abs</source>
-        <translation type="unfinished"></translation>
+        <translation>Absolut</translation>
     </message>
     <message>
         <location line="-634"/>
         <location line="+638"/>
         <source>rel</source>
-        <translation type="unfinished"></translation>
+        <translation>Relativ</translation>
     </message>
     <message>
         <location line="-636"/>
         <location line="+640"/>
         <source>origin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nullposition</translation>
     </message>
     <message>
         <location line="-631"/>
         <location line="+764"/>
         <source>Toogle Update (off)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktualisierung aus</translation>
     </message>
     <message>
         <location line="-763"/>
         <source>Update Switch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktualisierungsschalter</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -73,12 +73,12 @@
         <location line="-425"/>
         <location line="+37"/>
         <source>timeout while getting numaxis parameter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zeitüberschreitung bei der Ermittlung der Anzahl der Achsen</translation>
     </message>
     <message>
         <location line="+370"/>
         <source>Toogle Update (on)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktualisierung ein</translation>
     </message>
 </context>
 <context>
@@ -86,7 +86,7 @@
     <message>
         <location filename="../motorControllerfactory.cpp" line="+87"/>
         <source>ITOM widget to show current axis positions of a motor.</source>
-        <translation type="unfinished"></translation>
+        <translation>itom-Widget zur Darstellung der Achsenposition(en) des aktuellen Motors.</translation>
     </message>
 </context>
 </TS>

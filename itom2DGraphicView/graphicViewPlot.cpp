@@ -182,13 +182,13 @@ void GraphicViewPlot::createActions()
     //m_pActSave
     m_pActSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save..."), this);
     m_pActSave->setObjectName("actSave");
-    m_pActSave->setToolTip(tr("Export current view"));
+    m_pActSave->setToolTip(tr("Export current view..."));
     connect(m_pActSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
     
     //m_pActScaleSetting
-    m_pActScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("scale settings"), this);
+    m_pActScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("scale settings..."), this);
     m_pActScaleSetting->setObjectName("actScaleSetting");
-    m_pActScaleSetting->setToolTip(tr("Set the ranges and offsets of this view"));
+    m_pActScaleSetting->setToolTip(tr("Set the ranges and offsets of this view..."));
     m_pActScaleSetting->setVisible(false);
     connect(m_pActScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
 

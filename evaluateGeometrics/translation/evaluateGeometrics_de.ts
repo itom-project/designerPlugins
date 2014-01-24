@@ -6,188 +6,188 @@
     <message>
         <location filename="../evaluateGeometrics.cpp" line="+52"/>
         <source>Points for line plots from 2d objects</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Punkte für Linienplot von 2D-Objekten</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Save as table, tree, xml</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Export current data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <location line="+272"/>
+        <location line="+10"/>
+        <location line="+275"/>
         <source>table</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tabelle</translation>
     </message>
     <message>
-        <location line="-271"/>
+        <location line="-274"/>
         <source>tree</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Baum</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+279"/>
+        <location line="+282"/>
         <source>list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Liste</translation>
     </message>
     <message>
-        <location line="-278"/>
-        <location line="+273"/>
+        <location line="-281"/>
+        <location line="+276"/>
         <source>xml</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">XML</translation>
     </message>
     <message>
-        <location line="-269"/>
+        <location line="-272"/>
         <source>system settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Systemeinstellungen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Set the ranges and offsets of this view</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abbildungseinstellungen ändern</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>add relation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verknüpfung hinzufügen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Add a further relation to this table or fix a defect one.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fügt eine weiter Verknüpfung zur Tabelle oder repariert eine defekte.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>remove relation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verknüpfung löschen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Remove a relation from the table.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Löscht eine Verknüpfung von der Tabelle.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>update relation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verknüpfung aktualisieren</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Force update of this table.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erzwingt eine Aktualisierung der Tabelle.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>auto-scale columns</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auto-Skalierung der Spalten</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Adapts columns to idle width.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Passt die Spaltenbreite an deren Inhalt an.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>basic options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grundeinstellungen</translation>
     </message>
     <message>
-        <location line="+625"/>
+        <location line="+483"/>
+        <location line="+90"/>
+        <source>set relation failed due to invalid object type</source>
+        <translation type="unfinished">Unzulässiger Datentyp der Verknüpfung</translation>
+    </message>
+    <message>
+        <location line="-73"/>
+        <source>addressed relation outside current relation list range (idx = %1, range = 0..%2)</source>
+        <translation type="unfinished">Adressierte Verknüpfung liegt außerhalb des Bereichs der Verknüpfungsliste (Index = %1, Bereich = 0..%2)</translation>
+    </message>
+    <message>
+        <location line="+68"/>
+        <source>set relation failed due to invalid object dims</source>
+        <translation type="unfinished">Unzulässigen Anzahl von Dimensionen der Verknüpfung</translation>
+    </message>
+    <message>
+        <location line="+55"/>
         <source>add relation name failed: relation as one of the restricted relations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das Hinzufügen der Verknüpfung schlug fehl: Verknüpfung als eine der eingeschränkten Verknüpfungen</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>add relation name exited with warning: relation already existed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das Hinzufügen der Verknüpfung wurde mit einer Warnung beendet: Verknüpfung existiert bereits</translation>
     </message>
     <message>
-        <location line="-390"/>
+        <location line="-385"/>
         <location line="+45"/>
         <source>select destination file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Speichern unter</translation>
     </message>
     <message>
-        <location line="+178"/>
+        <location line="-340"/>
+        <source>Save...</source>
+        <translation type="unfinished">Speichern...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Export current data as table, tree, xml...</source>
+        <translation type="unfinished">Export der aktuellen Daten als Tabelle, Baum, XML...</translation>
+    </message>
+    <message>
+        <location line="+512"/>
         <source>imported data was Null-pointer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Es wurde ein Null-Pointer übergeben</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>imported data not initialized</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importiertes Datenobjekt wurden nicht inizialisiert</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>imported data has more than one plane</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importiertes Datenobjekt hat mehr als eine Ebene</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+12"/>
         <source>imported data has more than one row</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importiertes Datenobjekt mehr als eine Zeile</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>tried to access index below zero</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Es wurde versucht auf einen Index kleiner Null zuzugreifen</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>addressed relation outside current relation list range (idx = %1, range = 0..%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+68"/>
-        <source>set relation failed due to invalud object dims</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-86"/>
-        <location line="+91"/>
-        <source>set relation failed due to invalud object type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-49"/>
+        <location line="+29"/>
         <location line="+74"/>
         <source>set relation failed due to empty vector</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leerer Vektor der Verknüpfung</translation>
     </message>
 </context>
 <context>
     <name>PlotTreeWidget</name>
     <message>
-        <location filename="../plotTreeWidget.cpp" line="+105"/>
+        <location filename="../plotTreeWidget.cpp" line="+107"/>
         <source>notype %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kein Typ %1</translation>
     </message>
     <message>
-        <location line="-1"/>
+        <location line="-4"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location line="+799"/>
+        <location line="+829"/>
         <source>DataObject must be ito::float32</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Datenobjekt muss vom Typ  ito::float32 sein</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>DataObject has not enough columns</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Datentyp hat nicht genug Spalten</translation>
     </message>
     <message>
-        <location line="+163"/>
-        <location line="+76"/>
-        <location line="+142"/>
+        <location line="+161"/>
+        <location line="+73"/>
+        <location line="+149"/>
         <source>could not write csv-data to file %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Schreiben der CSV-Daten nach &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -195,90 +195,90 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+66"/>
         <source>Source data for plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Quelldaten der Abbildung</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Actual output data of plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Ausgabedaten der Abbildung</translation>
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+192"/>
         <location line="+46"/>
         <source>duplicate Channel, in addChannel</source>
-        <translation type="unfinished"></translation>
+        <translation>Doppelte Verbindung (in addChannel)</translation>
     </message>
     <message>
         <location line="-38"/>
         <location line="+7"/>
         <source>parameters incompatible, while adding channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht kompatible Parameter (in adding channel)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>undefined channel direction, while adding channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Undefinierte Verbindungsrichtung (in adding channel)</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>invalid child pointer, in addChannel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger child pointer (in addChannel)</translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+27"/>
         <source>channel does not exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung existiert nicht</translation>
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.cpp" line="+105"/>
         <source>Parameter: does not exist in updateParam</source>
-        <translation type="unfinished"></translation>
+        <translation>Parameter gibt es in updateParam nicht</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Running update on a locked input channel, i.e. updatePending flag is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Versuch eine gelockte Verbindung zu aktualisieren. Vielleicht wurde das updatePending-Flag nicht gesetzt</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Channel is already updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung wurde bereits aktualisiert</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>parameters in list could not be found in channels, in updateChannels</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Parameter der Liste wurden in &apos;channels&apos; nicht gefunden (in updateChannels)</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>channel is not a sender in setUpdatePending</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung kann nicht als Quelle genutzt werden (in setUpdatePending)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>unknown channel in setUpdatePending</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+209"/>
         <source>Live data source for plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="-598"/>
+        <location filename="../evaluateGeometrics.cpp" line="-595"/>
         <source>Calculate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rechner</translation>
     </message>
     <message>
         <location filename="../evaluateGeometricsPlugin.cpp" line="+42"/>
         <source>itom measurement widget</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">itom Mess-Widget</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The evaluate geometrics plugin can be used to evaluate geometric parameters of primitives drawn in itom plots.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das EvaluateGeometrics-Plugin kann zum Auswerten geometrischer Parameter durch einfaches Erstellen von itom-Abbildungen genutzt werden.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -286,7 +286,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../plotTreeWidget.h" line="+89"/>
+        <location filename="../plotTreeWidget.h" line="+88"/>
+        <source>N.A.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>radius (own)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -355,66 +360,66 @@
     <name>UIDialogRelation</name>
     <message>
         <location filename="../dialogRelation.ui"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Select relation type and the corresponding partners</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verknüpfungstyp und Abhängigkeiten auswählen</translation>
     </message>
     <message>
         <location/>
         <source>relation type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verknüpfungstyp</translation>
     </message>
     <message>
         <location/>
         <source>first element</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erstes Element</translation>
     </message>
     <message>
         <location/>
         <source>second element</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zweites Element</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Relation</source>
+        <translation type="unfinished">Verknüpfung</translation>
     </message>
 </context>
 <context>
     <name>UIDialogSettings</name>
     <message>
         <location filename="../dialogSettings.ui"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>relations:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Beziehungen:</translation>
     </message>
     <message>
         <location/>
         <source>value unit:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elementwert:</translation>
     </message>
     <message>
         <location/>
         <source>number of digits:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anzahl Stellen:</translation>
     </message>
     <message>
         <location/>
         <source>geometric elements:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Geometische Elemente:</translation>
     </message>
     <message>
         <location/>
         <source>consider only 2D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nur 2D berücksichtigen</translation>
     </message>
     <message>
         <location/>
         <source>relation names:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Beziehungsnamen:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Settings</source>
+        <translation type="unfinished">Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -422,12 +427,12 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.cpp" line="+114"/>
         <source>Function &apos;spawnLinePlot&apos; not supported from this plot widget</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Funktion &apos;spawnLinePlot&apos; wird von diesem Widget nicht unterstützt</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>Figure does not contain an input slot for live sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Abbildung hat keine Schnittstelle für Livebilder</translation>
     </message>
 </context>
 <context>
@@ -435,7 +440,7 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="-146"/>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Eigenschaften</translation>
     </message>
 </context>
 </TS>

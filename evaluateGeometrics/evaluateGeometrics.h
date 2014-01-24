@@ -87,7 +87,7 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         void setData(QSharedPointer<ito::DataObject> dataObj) 
         {
-            if(m_pContent != NULL)
+            if (m_pContent != NULL)
             {
                 m_pContent->refreshPlot(dataObj.data());
             }
@@ -124,25 +124,25 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         void setRelationNames(const QStringList input)
         {
-            if(input.size() < 7)
+            if (input.size() < 7)
             {
                 return;
             }
 
-            if(m_info.m_relationNames.length() < input.size())
+            if (m_info.m_relationNames.length() < input.size())
             {
                 m_info.m_relationNames.reserve(input.length());
             }
 
-            for( int i = 6; i < input.length(); i++)
+            for (int i = 6; i < input.length(); i++)
             {
                 int idx = m_info.m_relationNames.indexOf(input[i]);
-                if(idx < 7 && idx != -1)
+                if (idx < 7 && idx != -1)
                 {
                     continue;
                 }
 
-                if(m_info.m_relationNames.length() > i)
+                if (m_info.m_relationNames.length() > i)
                 {
                     m_info.m_relationNames[i] = input[i];
                 }
@@ -159,13 +159,11 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
             return;
         }
 
-
         void setRelations(QSharedPointer<ito::DataObject> relations);
 
         QSharedPointer<ito::DataObject> getRelations(void) const;
 
         //QSharedPointer<ito::DataObject> readLastRelation(void) {return QSharedPointer<ito::DataObject>(new ito::DataObject());}
-        
 
         enum exportFlags
         {
@@ -203,7 +201,6 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         PlotTreeWidget *m_pContent;
 
     private:
-
         InternalInfo m_info;
 
         QAction *m_actSetting;
@@ -235,8 +232,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         ito::RetVal plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);
         ito::RetVal clearAll(void);
+
     private slots:
-        
         void mnuHome();
 };
 

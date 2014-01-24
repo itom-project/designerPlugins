@@ -101,7 +101,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     //m_actSave
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
     m_actSave->setObjectName("actSave");
-    m_actSave->setToolTip(tr("Export current view"));
+    m_actSave->setToolTip(tr("Export current view..."));
     m_actSave->setVisible(true);
 
     //m_actScaleSetting

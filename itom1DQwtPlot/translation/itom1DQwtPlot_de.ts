@@ -173,16 +173,11 @@
         <translation>Ursprüngliche Ansicht wiederherstellen</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Export current view</source>
-        <translation>Aktuelle Abbildung exportieren</translation>
-    </message>
-    <message>
         <source>Scale Settings</source>
         <translation type="obsolete">Skaleneinstellungen</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+12"/>
         <source>Set the ranges and offsets of this view</source>
         <translation>Einstellungen der Skalen</translation>
     </message>
@@ -356,7 +351,12 @@
         <translation>Speichern...</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+2"/>
+        <source>Export current view...</source>
+        <translation>Aktuelle Abbildung exportieren...</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Scale Settings...</source>
         <translation>Skaleneinstellungen...</translation>
     </message>
@@ -480,7 +480,7 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+66"/>
         <source>Source data for plot</source>
-        <translation>Quelldaten für die Abbildung</translation>
+        <translation>Quelldaten der Abbildung</translation>
     </message>
     <message>
         <location line="+1"/>

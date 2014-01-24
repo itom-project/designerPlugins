@@ -181,7 +181,7 @@ void Itom2dQwtPlot::createActions()
     //m_actSave
     m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
     a->setObjectName("actSave");
-    a->setToolTip(tr("Export current view"));
+    a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
 
     //m_actHome

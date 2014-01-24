@@ -85,7 +85,7 @@ struct InternalInfo
 
         //m_info.m_rowHash.clear();
         m_relationNames.clear();
-        m_relationNames.append("N.A.");
+        m_relationNames.append(QObject::tr("N.A."));
         m_relationNames.append(QObject::tr("radius (own)"));
         m_relationNames.append(QObject::tr("angle to"));
         m_relationNames.append(QObject::tr("distance to"));

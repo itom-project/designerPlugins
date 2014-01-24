@@ -30,7 +30,6 @@ public:
 
     void resizeCanvas(int width, int height);
    
-
 private:
     QAction *m_actHome;
     QAction *m_actForward;
@@ -53,16 +52,15 @@ private slots:
     void mnuMarkerClick(bool /*checked*/);
     inline void mnuShowToolbar(bool /*checked*/) { setToolbarVisible(true); }
 
-    void subplotConfigSliderLeftChanged(int value) { emit subplotConfigSliderChanged(0, value); }
-    void subplotConfigSliderTopChanged(int value) { emit subplotConfigSliderChanged(1, value); }
-    void subplotConfigSliderRightChanged(int value) { emit subplotConfigSliderChanged(2, value); }
-    void subplotConfigSliderBottomChanged(int value) { emit subplotConfigSliderChanged(3, value); }
-    void subplotConfigSliderWSpaceChanged(int value) { emit subplotConfigSliderChanged(4, value); }
-    void subplotConfigSliderHSpaceChanged(int value) { emit subplotConfigSliderChanged(5, value); }
+    void subplotConfigSliderLeftChanged(int value);
+    void subplotConfigSliderTopChanged(int value);
+    void subplotConfigSliderRightChanged(int value);
+    void subplotConfigSliderBottomChanged(int value);
+    void subplotConfigSliderWSpaceChanged(int value);
+    void subplotConfigSliderHSpaceChanged(int value);
 
 public slots:
     void showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace);
-
 
 };
 

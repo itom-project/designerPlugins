@@ -30,10 +30,13 @@
       <item row="0" column="1">
        <widget class="QSlider" name="sliderLeft">
         <property name="maximum">
-         <number>1000</number>
+         <number>999</number>
         </property>
         <property name="singleStep">
          <number>5</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -50,10 +53,13 @@
       <item row="1" column="1">
        <widget class="QSlider" name="sliderTop">
         <property name="maximum">
-         <number>1000</number>
+         <number>999</number>
         </property>
         <property name="singleStep">
          <number>5</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -69,11 +75,17 @@
       </item>
       <item row="2" column="1">
        <widget class="QSlider" name="sliderBottom">
+        <property name="minimum">
+         <number>1</number>
+        </property>
         <property name="maximum">
          <number>1000</number>
         </property>
         <property name="singleStep">
          <number>5</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -89,11 +101,23 @@
       </item>
       <item row="3" column="1">
        <widget class="QSlider" name="sliderRight">
+        <property name="minimum">
+         <number>1</number>
+        </property>
         <property name="maximum">
          <number>1000</number>
         </property>
         <property name="singleStep">
          <number>5</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+        <property name="sliderPosition">
+         <number>1</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -124,6 +148,9 @@
         <property name="singleStep">
          <number>5</number>
         </property>
+        <property name="tracking">
+         <bool>false</bool>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -143,6 +170,9 @@
         </property>
         <property name="singleStep">
          <number>5</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
