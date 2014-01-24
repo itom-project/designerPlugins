@@ -192,7 +192,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetUnit = new QAction(tr("Toogle Unit"), this);
-    m_mnuSetUnit = new QMenu(tr("Unit Switch"));
+    m_mnuSetUnit = new QMenu(tr("Unit Switch"), this);
     m_mnuSetUnit->addAction("nm");
     m_mnuSetUnit->addAction(micronString);
     m_mnuSetUnit->addAction("mm");
@@ -202,7 +202,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_actUpdatePos = new QAction(tr("Update"), this);
     
     m_actSetAbsRel = new QAction(tr("Toogle Abs/Rel"), this);
-    m_mnuSetAbsRel = new QMenu(tr("AbsRel-Switch"));
+    m_mnuSetAbsRel = new QMenu(tr("AbsRel-Switch"), this);
     m_mnuSetAbsRel->addAction(tr("abs"));
     m_mnuSetAbsRel->addAction(tr("rel"));
     m_mnuSetAbsRel->addSeparator();
@@ -216,7 +216,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetAutoUpdate = new QAction(tr("Toogle Update (off)"), this);
-    m_mnuSetAutoUpdate = new QMenu(tr("Update Switch"));
+    m_mnuSetAutoUpdate = new QMenu(tr("Update Switch"), this);
     m_mnuSetAutoUpdate->addAction(tr("on"));
     m_mnuSetAutoUpdate->addAction(tr("off"));
     m_actSetAutoUpdate->setMenu(m_mnuSetAutoUpdate);

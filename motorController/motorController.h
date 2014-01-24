@@ -142,7 +142,7 @@ public:
     void setBigStep(const double value);
 
     //! Retrive absolute or relative display status
-    bool getAbsRel() const {return m_numVisAxis;};
+    bool getAbsRel() const {return m_absRelPosition;};
 
     //! Toggle between absolute display and relative to a virtual coordinate display mode
     void setAbsRel(const bool absRel);
