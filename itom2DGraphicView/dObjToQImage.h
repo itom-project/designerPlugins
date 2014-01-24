@@ -26,6 +26,7 @@
 //#include "../../Qitom/global.h"
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
+#include "DataObject/dataObjectFuncs.h"
 
 #include <qimage.h>
 #include <qlist.h>
