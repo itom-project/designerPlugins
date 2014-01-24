@@ -85,13 +85,20 @@ struct InternalInfo
 
         //m_info.m_rowHash.clear();
         m_relationNames.clear();
-        m_relationNames.append(QObject::tr("N.A."));
+        m_relationNames.append("N.A.");
+        m_relationNames.append("radius (own)");
+        m_relationNames.append("angle to");
+        m_relationNames.append("distance to");
+        m_relationNames.append("intersection with");
+        m_relationNames.append("length (own)");
+        m_relationNames.append("area");
+/*        m_relationNames.append(QObject::tr("N.A."));
         m_relationNames.append(QObject::tr("radius (own)"));
         m_relationNames.append(QObject::tr("angle to"));
         m_relationNames.append(QObject::tr("distance to"));
         m_relationNames.append(QObject::tr("intersection with"));
         m_relationNames.append(QObject::tr("length (own)"));
-        m_relationNames.append(QObject::tr("area"));
+        m_relationNames.append(QObject::tr("area"));*/
 
         m_primitivNames.clear();
         m_primitivNames.insert(0, "none");
