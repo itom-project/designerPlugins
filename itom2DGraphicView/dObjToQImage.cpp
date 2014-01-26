@@ -401,9 +401,9 @@ QImage RasterToQImageObj::convert2QImage()
             case ito::tFloat64:
                 return graphicViewHelper::rescaleByScale<ito::float64>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
             case ito::tComplex64:
-                return graphicViewHelper::rescaleByScale<ito::complex64>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::complex64>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, m_pInternalData->m_cmplxType);
             case ito::tComplex128:
-                return graphicViewHelper::rescaleByScale<ito::complex128>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, 0);
+                return graphicViewHelper::rescaleByScale<ito::complex128>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, m_pInternalData->m_cmplxType);
             default:
             {
                 QImage temp(100, 100, QImage::Format_ARGB32);

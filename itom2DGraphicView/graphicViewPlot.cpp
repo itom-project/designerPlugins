@@ -759,7 +759,19 @@ void GraphicViewPlot::mnuCmplxSwitch(QAction *action)
             m_data.m_cmplxType = RasterToQImageObj::tAbsolute;
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
         }
-        ((PlotWidget*)m_pContent)->refreshPlot(NULL);
+        if(m_pContent)
+        {
+            if(m_data.m_valueScaleAuto)
+            {
+            
+                QPointF val = m_pContent->calcInterval(Qt::ZAxis);
+                m_data.m_valueMin = val.x();
+                m_data.m_valueMax = val.y();
+            }
+            
+            ((PlotWidget*)m_pContent)->internalDataUpdated();
+            //((PlotWidget*)m_pContent)->refreshPlot(NULL);
+        }
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1169,7 +1181,8 @@ void GraphicViewPlot::setZAxisInterval(QPointF point)
     m_data.m_valueScaleAuto = false;
     m_data.m_valueMin = point.y();
     m_data.m_valueMax = point.x();
-    if (m_pContent) m_pContent->refreshPlot(NULL);
+    if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
+    //if (m_pContent) m_pContent->refreshPlot(NULL);
     
 }
 
@@ -1308,26 +1321,47 @@ void GraphicViewPlot::setColorMode(const int type)
         case RasterToQImageObj::ColorIndex8Scaled:
         case RasterToQImageObj::ColorIndex8Bitshift:
         case RasterToQImageObj::ColorAutoSelect:
-            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/falseColor.png"));
+        {
+            if(m_data.m_valueScaleAuto)
+            {
+            
+                QPointF val = m_pContent->calcInterval(Qt::ZAxis);
+                m_data.m_valueMin = val.x();
+                m_data.m_valueMax = val.y();
+            }
+
+            m_pActColorSwitch->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/falseColor.png"));
             m_pActToggleColorBar->setVisible(true);
             m_pActPalette->setVisible(true);
-            
-            break;
+        }
+        break;
         case RasterToQImageObj::ColorRGB24:
         case RasterToQImageObj::ColorRGB32:
-            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rgba.png"));
+            m_pActColorSwitch->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rgba.png"));
             m_pActToggleColorBar->setVisible(false);
             m_pActPalette->setVisible(false);
             if(m_pActToggleColorBar->isCheckable()) m_pActToggleColorBar->setChecked(false);
             break;
     }
-
-    if(m_pContent) m_pContent->refreshPlot(NULL);  
+    if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
+    //if(m_pContent) m_pContent->refreshPlot(NULL);  
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::resetColorMode(void)
 {
     m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
+    if(m_pContent)
+    {
+        if(m_data.m_valueScaleAuto)
+        {
+            
+            QPointF val = m_pContent->calcInterval(Qt::ZAxis);
+            m_data.m_valueMin = val.x();
+            m_data.m_valueMax = val.y();
+        }
+        if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
+        //m_pContent->refreshPlot(NULL); 
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setPlaneRange(int min, int max)
@@ -1345,7 +1379,7 @@ void GraphicViewPlot::setPlaneRange(int min, int max)
             spinBox->setValue(value);
         }
         m_pActPlaneSelector->setVisible((max-min) > 0);
-        m_pActAScan->setVisible((max-min) > 0);
+        //m_pActAScan->setVisible((max-min) > 0);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------

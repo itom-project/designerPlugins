@@ -925,7 +925,8 @@ bool PlotWidget::setColorMap(QString colormap /*= "__next__"*/)
 
     refreshStyles();
 
-    refreshPlot(NULL);
+    internalDataUpdated();
+    //refreshPlot(NULL);
     return true;
 }
 
