@@ -6,158 +6,158 @@
     <message>
         <location filename="../evaluateGeometrics.cpp" line="+52"/>
         <source>Points for line plots from 2d objects</source>
-        <translation type="unfinished">Punkte für Linienplot von 2D-Objekten</translation>
+        <translation>Punkte für Linienplot von 2D-Objekten</translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+275"/>
         <source>table</source>
-        <translation type="unfinished">Tabelle</translation>
+        <translation>Tabelle</translation>
     </message>
     <message>
         <location line="-274"/>
         <source>tree</source>
-        <translation type="unfinished">Baum</translation>
+        <translation>Baum</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+282"/>
         <source>list</source>
-        <translation type="unfinished">Liste</translation>
+        <translation>Liste</translation>
     </message>
     <message>
         <location line="-281"/>
         <location line="+276"/>
         <source>xml</source>
-        <translation type="unfinished">XML</translation>
+        <translation>XML</translation>
     </message>
     <message>
         <location line="-272"/>
         <source>system settings</source>
-        <translation type="unfinished">Systemeinstellungen</translation>
+        <translation>Systemeinstellungen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Set the ranges and offsets of this view</source>
-        <translation type="unfinished">Abbildungseinstellungen ändern</translation>
+        <translation>Abbildungseinstellungen ändern</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>add relation</source>
-        <translation type="unfinished">Verknüpfung hinzufügen</translation>
+        <translation>Geometrische Verknüpfung hinzufügen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Add a further relation to this table or fix a defect one.</source>
-        <translation type="unfinished">Fügt eine weiter Verknüpfung zur Tabelle oder repariert eine defekte.</translation>
+        <translation>Fügt eine weiter Verknüpfung zur Tabelle oder repariert eine defekte Verknüpfung.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>remove relation</source>
-        <translation type="unfinished">Verknüpfung löschen</translation>
+        <translation>Verknüpfung löschen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Remove a relation from the table.</source>
-        <translation type="unfinished">Löscht eine Verknüpfung von der Tabelle.</translation>
+        <translation>Löscht eine Verknüpfung von der Tabelle.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>update relation</source>
-        <translation type="unfinished">Verknüpfung aktualisieren</translation>
+        <translation>Verknüpfung aktualisieren</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Force update of this table.</source>
-        <translation type="unfinished">Erzwingt eine Aktualisierung der Tabelle.</translation>
+        <translation>Erzwingt eine Aktualisierung der Tabelle.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>auto-scale columns</source>
-        <translation type="unfinished">Auto-Skalierung der Spalten</translation>
+        <translation>Auto-Skalierung der Spalten</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Adapts columns to idle width.</source>
-        <translation type="unfinished">Passt die Spaltenbreite an deren Inhalt an.</translation>
+        <translation>Passt die Spaltenbreite an deren Inhalt an.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>basic options</source>
-        <translation type="unfinished">Grundeinstellungen</translation>
+        <translation>Grundeinstellungen</translation>
     </message>
     <message>
         <location line="+483"/>
         <location line="+90"/>
         <source>set relation failed due to invalid object type</source>
-        <translation type="unfinished">Unzulässiger Datentyp der Verknüpfung</translation>
+        <translation>Setzen einer Verknüpfung wegen eines unzulässigen Datentyps gescheitert</translation>
     </message>
     <message>
         <location line="-73"/>
         <source>addressed relation outside current relation list range (idx = %1, range = 0..%2)</source>
-        <translation type="unfinished">Adressierte Verknüpfung liegt außerhalb des Bereichs der Verknüpfungsliste (Index = %1, Bereich = 0..%2)</translation>
+        <translation>Adressierte Verknüpfung liegt außerhalb des Bereichs der Verknüpfungsliste (Index = %1, Bereich = 0..%2)</translation>
     </message>
     <message>
         <location line="+68"/>
         <source>set relation failed due to invalid object dims</source>
-        <translation type="unfinished">Unzulässigen Anzahl von Dimensionen der Verknüpfung</translation>
+        <translation>Unzulässigen Anzahl von Dimensionen der Verknüpfung</translation>
     </message>
     <message>
         <location line="+55"/>
         <source>add relation name failed: relation as one of the restricted relations</source>
-        <translation type="unfinished">Das Hinzufügen der Verknüpfung schlug fehl: Verknüpfung als eine der eingeschränkten Verknüpfungen</translation>
+        <translation>Das Hinzufügen eines neuen Verknüpfungtyps schlug fehl: Verknüpfungtyp als einer der eingeschränkten Verknüpfungstypen bereits vorhanden.</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>add relation name exited with warning: relation already existed</source>
-        <translation type="unfinished">Das Hinzufügen der Verknüpfung wurde mit einer Warnung beendet: Verknüpfung existiert bereits</translation>
+        <translation>Das Hinzufügen des Verknüpfungstypen wurde mit einer Warnung beendet: Verknüpfungstyp existiert bereits</translation>
     </message>
     <message>
         <location line="-385"/>
         <location line="+45"/>
         <source>select destination file</source>
-        <translation type="unfinished">Speichern unter</translation>
+        <translation>Speichern unter</translation>
     </message>
     <message>
         <location line="-340"/>
         <source>Save...</source>
-        <translation type="unfinished">Speichern...</translation>
+        <translation>Speichern...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Export current data as table, tree, xml...</source>
-        <translation type="unfinished">Export der aktuellen Daten als Tabelle, Baum, XML...</translation>
+        <translation>Export der aktuellen Daten als Tabelle, Baum, XML...</translation>
     </message>
     <message>
         <location line="+512"/>
         <source>imported data was Null-pointer</source>
-        <translation type="unfinished">Es wurde ein Null-Pointer übergeben</translation>
+        <translation>Es wurde ein Null-Pointer übergeben</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>imported data not initialized</source>
-        <translation type="unfinished">Importiertes Datenobjekt wurden nicht inizialisiert</translation>
+        <translation>Importiertes Datenobjekt wurden nicht inizialisiert</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>imported data has more than one plane</source>
-        <translation type="unfinished">Importiertes Datenobjekt hat mehr als eine Ebene</translation>
+        <translation>Importiertes Datenobjekt hat mehr als eine Ebene</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>imported data has more than one row</source>
-        <translation type="unfinished">Importiertes Datenobjekt mehr als eine Zeile</translation>
+        <translation>Importiertes Datenobjekt mehr als eine Zeile</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>tried to access index below zero</source>
-        <translation type="unfinished">Es wurde versucht auf einen Index kleiner Null zuzugreifen</translation>
+        <translation>Es wurde versucht auf einen Index kleiner Null zuzugreifen</translation>
     </message>
     <message>
         <location line="+29"/>
         <location line="+74"/>
         <source>set relation failed due to empty vector</source>
-        <translation type="unfinished">Leerer Vektor der Verknüpfung</translation>
+        <translation>Leerer Vektor der Verknüpfung</translation>
     </message>
 </context>
 <context>
@@ -165,7 +165,7 @@
     <message>
         <location filename="../plotTreeWidget.cpp" line="+107"/>
         <source>notype %1</source>
-        <translation type="unfinished">Kein Typ %1</translation>
+        <translation>Kein Typ %1</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -175,19 +175,19 @@
     <message>
         <location line="+829"/>
         <source>DataObject must be ito::float32</source>
-        <translation type="unfinished">Datenobjekt muss vom Typ  ito::float32 sein</translation>
+        <translation>Datenobjekt muss vom Typ  ito::float32 sein</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>DataObject has not enough columns</source>
-        <translation type="unfinished">Datentyp hat nicht genug Spalten</translation>
+        <translation>Datentyp hat nicht genug Spalten</translation>
     </message>
     <message>
         <location line="+161"/>
         <location line="+73"/>
         <location line="+149"/>
         <source>could not write csv-data to file %1</source>
-        <translation type="unfinished">Fehler beim Schreiben der CSV-Daten nach &apos;%1&apos;</translation>
+        <translation>Fehler beim Schreiben der CSV-Daten nach &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -268,17 +268,17 @@
     <message>
         <location filename="../evaluateGeometrics.cpp" line="-595"/>
         <source>Calculate</source>
-        <translation type="unfinished">Rechner</translation>
+        <translation>Betrechne</translation>
     </message>
     <message>
         <location filename="../evaluateGeometricsPlugin.cpp" line="+42"/>
         <source>itom measurement widget</source>
-        <translation type="unfinished">itom Mess-Widget</translation>
+        <translation>itom Mess-Widget</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The evaluate geometrics plugin can be used to evaluate geometric parameters of primitives drawn in itom plots.</source>
-        <translation type="unfinished">Das EvaluateGeometrics-Plugin kann zum Auswerten geometrischer Parameter durch einfaches Erstellen von itom-Abbildungen genutzt werden.</translation>
+        <translation>Das EvaluateGeometrics-Plugin kann zum Auswerten geometrischer Parameter aus itom-Abbildungen genutzt werden.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -288,37 +288,37 @@
     <message>
         <location filename="../plotTreeWidget.h" line="+105"/>
         <source>point</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkt</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>line</source>
-        <translation type="unfinished"></translation>
+        <translation>Linie</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>ellipse</source>
-        <translation type="unfinished"></translation>
+        <translation>Ellipse</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>circle</source>
-        <translation type="unfinished"></translation>
+        <translation>Kreis</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechteck</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>square</source>
-        <translation type="unfinished"></translation>
+        <translation>Quadrat</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>polygon</source>
-        <translation type="unfinished"></translation>
+        <translation>Polygonzug</translation>
     </message>
 </context>
 <context>
@@ -326,27 +326,27 @@
     <message>
         <location filename="../dialogRelation.ui"/>
         <source>Select relation type and the corresponding partners</source>
-        <translation type="unfinished">Verknüpfungstyp und Abhängigkeiten auswählen</translation>
+        <translation>Verknüpfungstyp und Abhängigkeiten auswählen</translation>
     </message>
     <message>
         <location/>
         <source>relation type</source>
-        <translation type="unfinished">Verknüpfungstyp</translation>
+        <translation>Verknüpfungstyp</translation>
     </message>
     <message>
         <location/>
         <source>first element</source>
-        <translation type="unfinished">Erstes Element</translation>
+        <translation>Erstes Element</translation>
     </message>
     <message>
         <location/>
         <source>second element</source>
-        <translation type="unfinished">Zweites Element</translation>
+        <translation>Zweites Element</translation>
     </message>
     <message>
         <location/>
         <source>Relation</source>
-        <translation type="unfinished">Verknüpfung</translation>
+        <translation>Verknüpfung</translation>
     </message>
 </context>
 <context>
@@ -354,37 +354,37 @@
     <message>
         <location filename="../dialogSettings.ui"/>
         <source>relations:</source>
-        <translation type="unfinished">Beziehungen:</translation>
+        <translation>Beziehungen:</translation>
     </message>
     <message>
         <location/>
         <source>value unit:</source>
-        <translation type="unfinished">Elementwert:</translation>
+        <translation>Elementwert:</translation>
     </message>
     <message>
         <location/>
         <source>number of digits:</source>
-        <translation type="unfinished">Anzahl Stellen:</translation>
+        <translation>Anzahl Stellen:</translation>
     </message>
     <message>
         <location/>
         <source>geometric elements:</source>
-        <translation type="unfinished">Geometische Elemente:</translation>
+        <translation>Geometische Elemente:</translation>
     </message>
     <message>
         <location/>
         <source>consider only 2D</source>
-        <translation type="unfinished">Nur 2D berücksichtigen</translation>
+        <translation>Nur 2D berücksichtigen</translation>
     </message>
     <message>
         <location/>
         <source>relation names:</source>
-        <translation type="unfinished">Beziehungsnamen:</translation>
+        <translation>Beziehungsnamen:</translation>
     </message>
     <message>
         <location/>
         <source>Settings</source>
-        <translation type="unfinished">Einstellungen</translation>
+        <translation>Einstellungen</translation>
     </message>
 </context>
 <context>
