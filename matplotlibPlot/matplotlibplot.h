@@ -1,15 +1,17 @@
 #ifndef MATPLOTLIBPLOT_H
 #define MATPLOTLIBPLOT_H
 
+#include <QtCore/QtGlobal>
 #include <qmainwindow.h>
 #include <qaction.h>
 #include <qtoolbar.h>
 #include <qlabel.h>
 
+#include "plot/AbstractItomDesignerPlugin.h"
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
 
-class MatplotlibPlot : public QMainWindow
+class ITOMSHAREDDESIGNER_EXPORT MatplotlibPlot : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(bool toolbarVisible READ getToolbarVisible WRITE setToolbarVisible DESIGNABLE true)
@@ -42,8 +44,10 @@ private:
     QLabel *m_lblCoordinates;
     QToolBar *m_toolbar;
     QMenu *m_contextMenu;
-    MatplotlibWidget *m_pContent;
-    MatplotlibSubfigConfig *m_pMatplotlibSubfigConfig;
+//    MatplotlibWidget *m_pContent;
+//    MatplotlibSubfigConfig *m_pMatplotlibSubfigConfig;
+    void *m_pContent;
+    void *m_pMatplotlibSubfigConfig;
 
 signals:
     void subplotConfigSliderChanged(int type, int value);

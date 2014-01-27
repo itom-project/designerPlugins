@@ -55,7 +55,6 @@
 #include "plot/drawItem.h"
 
 class Itom1DQwtPlot;
-
 struct InternalData;
 
 class Plot1DWidget : public QwtPlot
@@ -226,8 +225,9 @@ struct InternalData
         m_pDrawItems.clear();    
     }
     ito::tDataType m_dataType;
-
-    Plot1DWidget::tState m_state;
+     
+//    Plot1DWidget::tState m_state;
+    int m_state;
 
     QString m_title;
     QString m_axisLabel;

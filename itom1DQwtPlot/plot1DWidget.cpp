@@ -132,7 +132,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_drawedIemsIndexes.clear();
     m_drawedIemsIndexes.reserve(10);
 
-    setState(m_pData->m_state);
+    setState((Plot1DWidget::tState)m_pData->m_state);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -821,7 +821,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
             updateMarkerPosition(false,false);
 
             replot();
-        }
+        } 
     }
     else if (m_pData->m_state == stateIdle)
     {

@@ -25,28 +25,19 @@
 
 #include "plot/AbstractDObjFigure.h"
 
-#include "plot1DWidget.h"
+//#include "plot1DWidget.h"
 
-#include <qwt_plot.h>
-#include <qgridlayout.h>
+#include <qaction.h>
+#include <qsharedpointer.h>
+#include <qwidget.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qpainter.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_panner.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
-
-
-#include <qaction.h>
-
-#include <qsharedpointer.h>
-#include <qwidget.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
 
-class Itom1DQwtPlot : public ito::AbstractDObjFigure
+class ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 {
     Q_OBJECT
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
@@ -78,6 +69,7 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 
 
     public:
+        Itom1DQwtPlot(QWidget *parent = 0);
         Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         virtual ~Itom1DQwtPlot();
 
@@ -118,16 +110,16 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         void setSource(QSharedPointer<ito::DataObject> source);
     
-        int getGeometricElementsCount() const { return m_data.m_pDrawItems.size();}
+        int getGeometricElementsCount() const;
         void setGeometricElementsCount(const int value){ return;}
 
-        bool getkeepAspectRatio(void) const {return this->m_data.m_keepAspect;}
+        bool getkeepAspectRatio(void) const;
         void setkeepAspectRatio(const bool &keepAspectEnable);
 
         QSharedPointer< ito::DataObject > getGeometricElements();
         void setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
 
-        bool getEnabledPlotting(void) const {return m_data.m_enablePlotting;}
+        bool getEnabledPlotting(void) const;
         void setEnabledPlotting(const bool &enabled);
 
         int getSelectedElement(void) const;
@@ -137,13 +129,15 @@ class Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     protected:
         void createActions();
-        ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
+        ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
-        Plot1DWidget *m_pContent;
-        InternalData m_data;
+//        Plot1DWidget *m_pContent;
+        void *m_pContent;
+//        InternalData m_data;
+        void *m_data;
 
     private:
-
+        void constructor();
         QAction* m_pActScaleSetting;
         QAction* m_pRescaleParent;
 
