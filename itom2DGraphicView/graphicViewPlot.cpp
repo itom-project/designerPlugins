@@ -875,8 +875,9 @@ void GraphicViewPlot::enableZStackGUI(const bool checked)
 {
     m_pActPlaneSelector->setEnabled(checked);
     m_pActPlaneSelector->setVisible(checked);
-    m_pActAScan->setEnabled(checked);
-    m_pActAScan->setVisible(checked);
+    //m_pActAScan->setEnabled(checked);
+    //m_pActAScan->setVisible(checked);
+    m_pActLineCut->setVisible(!checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1380,6 +1381,7 @@ void GraphicViewPlot::setPlaneRange(int min, int max)
         }
         m_pActPlaneSelector->setVisible((max-min) > 0);
         //m_pActAScan->setVisible((max-min) > 0);
+        m_pActLineCut->setVisible((max-min) < 2);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
