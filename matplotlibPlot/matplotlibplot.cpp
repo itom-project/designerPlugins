@@ -196,10 +196,10 @@ ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::showSubplotConfig(int valLeft, in
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::subplotConfigSliderLeftChanged(int value)
 {
-    int sliderRightValue = m_pMatplotlibSubfigConfig->sliderRight()->sliderPosition() - 1;
+    int sliderRightValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderRight()->sliderPosition() - 1;
     if (value > sliderRightValue)
     {
-        m_pMatplotlibSubfigConfig->sliderLeft()->setValue(sliderRightValue);
+        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderLeft()->setValue(sliderRightValue);
     }
     else
     {
@@ -210,10 +210,10 @@ void MatplotlibPlot::subplotConfigSliderLeftChanged(int value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::subplotConfigSliderTopChanged(int value)
 {
-    int sliderBottomValue = m_pMatplotlibSubfigConfig->sliderBottom()->sliderPosition() + 1;
+    int sliderBottomValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderBottom()->sliderPosition() + 1;
     if (value < sliderBottomValue)
     {
-        m_pMatplotlibSubfigConfig->sliderTop()->setValue(sliderBottomValue);
+        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderTop()->setValue(sliderBottomValue);
     }
     else
     {
@@ -224,10 +224,10 @@ void MatplotlibPlot::subplotConfigSliderTopChanged(int value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::subplotConfigSliderRightChanged(int value)
 {
-    int sliderLeftValue = m_pMatplotlibSubfigConfig->sliderLeft()->sliderPosition() + 1;
+    int sliderLeftValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderLeft()->sliderPosition() + 1;
     if (value < sliderLeftValue)
     {
-        m_pMatplotlibSubfigConfig->sliderRight()->setValue(sliderLeftValue);
+        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderRight()->setValue(sliderLeftValue);
     }
     else
     {
@@ -238,10 +238,10 @@ void MatplotlibPlot::subplotConfigSliderRightChanged(int value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::subplotConfigSliderBottomChanged(int value)
 {
-    int sliderTopValue = m_pMatplotlibSubfigConfig->sliderTop()->sliderPosition() - 1;
+    int sliderTopValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderTop()->sliderPosition() - 1;
     if (value > sliderTopValue)
     {
-        m_pMatplotlibSubfigConfig->sliderBottom()->setValue(sliderTopValue);
+        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderBottom()->setValue(sliderTopValue);
     }
     else
     {
