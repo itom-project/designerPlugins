@@ -61,7 +61,7 @@ class Plot1DWidget : public QwtPlot
 {
     Q_OBJECT
     public:
-        enum MultiLineMode { FirstRow, FirstCol, MultiRows, MultiCols };
+        enum MultiLineMode { Auto, FirstRow, FirstCol, MultiRows, MultiCols };
         enum tState
         { 
             stateIdle   = 0, 

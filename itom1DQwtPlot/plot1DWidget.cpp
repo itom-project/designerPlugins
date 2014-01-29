@@ -64,7 +64,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 //        m_startScaledY(false),
         m_xDirect(false),
         m_yDirect(false),
-        m_multiLine(MultiRows),
+        m_multiLine(Auto),
         m_autoLineColIndex(0),
         m_lineCol(0),
         m_lineStyle(1),
@@ -358,16 +358,29 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         {
             switch (m_multiLine)
             {
-            case FirstRow:
-            case FirstCol:
-                numCurves = 1;
-                break;
-            case MultiRows:
-                numCurves = height;
-                break;
-            case MultiCols:
-                numCurves = width;
-                break;
+                case FirstRow:
+                case FirstCol:
+                    numCurves = 1;
+                    break;
+                case MultiRows:
+                    numCurves = height;
+                    break;
+                case MultiCols:
+                    numCurves = width;
+                    break;
+                default:
+                {
+                    if (width > height)
+                    {
+                        numCurves = height;
+                        m_multiLine = MultiRows;
+                    }
+                    else
+                    {
+                        numCurves = width;
+                        m_multiLine = MultiCols;
+                    }
+                }
             }
         }
         else //if there are boundaries, only plot one curve from bounds[0] to bounds[1]

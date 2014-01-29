@@ -9,8 +9,8 @@ Itom1DQwtPlotPlugin::Itom1DQwtPlotPlugin(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
     m_plotDataFormats = ito::Format_Gray8 | ito::Format_Gray16 | ito::Format_Gray32 | ito::Format_Float32 | ito::Format_Float64 | ito::Format_Complex;
-    m_plotDataTypes = ito::DataObjLine;
-    m_plotFeatures = ito::Live | ito::Static | ito::PlotLine | ito::Cartesian;
+    m_plotDataTypes = ito::DataObjLine | ito::DataObjPlane;
+    m_plotFeatures = ito::Live | ito::Static |  ito::PlotImage | ito::PlotLine | ito::Cartesian;
 
     m_description = QObject::tr("itom widget for 1D DataObjects based on QWT.");
     m_detaildescription = QObject::tr("");
