@@ -176,7 +176,7 @@ class Plot1DWidget : public QwtPlot
         int m_activeDrawItem;
 
         UserInteractionPlotPicker *m_pMultiPointPicker;
-
+        bool m_ignoreNextMouseEvent;
     signals:
 
         void statusBarClear();

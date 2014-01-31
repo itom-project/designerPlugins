@@ -2083,8 +2083,8 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x2;
                             dy = it.value()->y2 - canypos;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 0.000000001 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -0.000000001 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
                             if (fabs(dx) > fabs(dy))
                             {
@@ -2113,8 +2113,8 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = it.value()->x2 - canxpos;
                             dy = canypos - it.value()->y2;
 
-                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
-                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
                             if (fabs(dx) < fabs(dy))
                             {
@@ -2154,8 +2154,8 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = it.value()->x2 - canxpos;
                             dy = canypos - it.value()->y2;
 
-                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
-                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
                             if (fabs(dx) < fabs(dy))
                             {
@@ -2233,8 +2233,8 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x1;
                             dy = it.value()->y1 - canypos;
 
-                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
-                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
                             if (fabs(dx) < fabs(dy))
                             {
@@ -2272,8 +2272,8 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x1;
                             dy = it.value()->y1 - canypos;
 
-                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
-                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
                             if (fabs(dx) < fabs(dy))
                             {

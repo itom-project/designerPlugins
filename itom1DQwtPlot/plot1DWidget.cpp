@@ -73,7 +73,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_cmplxState(false),
         m_pData(data),
         m_activeDrawItem(1),
-        m_pRescaler(NULL)
+        m_pRescaler(NULL),
+        m_ignoreNextMouseEvent(false)
 {
     this->setMouseTracking(false);
 
@@ -815,6 +816,12 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 {
 //    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 
+    if(m_ignoreNextMouseEvent)
+    {
+        m_ignoreNextMouseEvent = false;
+        return;
+    }
+
     if (m_pData->m_state == statePicker)
     {
         int xPx = m_pValuePicker->trackerPosition().x();
@@ -873,8 +880,8 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x2;
                             dy = it.value()->y2 - canypos;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
                             if (fabs(dx) > fabs(dy))
                             {
@@ -900,53 +907,81 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                     case tRect:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - it.value()->x2;
-                            dy = it.value()->y2 - canypos;
+                            dx = it.value()->x2 - canxpos;
+                            dy = canypos - it.value()->y2;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                            if (fabs(dx) > fabs(dy))
+                            if (fabs(dx) < fabs(dy))
                             {
-                                canypos = it.value()->y2 - dx;
+                                //canypos = it.value()->x2 - dx;
+                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
                             }
                             else
                             {
-                                canxpos = it.value()->x2 - dy;
+                                //canxpos = it.value()->x2 - dy;
+                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
                             }
+
+                            m_ignoreNextMouseEvent = true;
                         }
+
                         path->addRect(canxpos, canypos,
                             it.value()->x2 - canxpos,
                             it.value()->y2 - canypos);
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
+
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
 
                     case tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - it.value()->x2;
-                            dy = it.value()->y2 - canypos;
+                            dx = it.value()->x2 - canxpos;
+                            dy = canypos - it.value()->y2;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                            if (fabs(dx) > fabs(dy))
+                            if (fabs(dx) < fabs(dy))
                             {
-                                canypos = it.value()->y2 - dx * abs(dy) / dy;
+                                //canypos = it.value()->x2 - dx;
+                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
                             }
                             else
                             {
-                                canxpos = it.value()->x2 - dy * abs(dx) / dx;
+                                //canxpos = it.value()->x2 - dy;
+                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
                             }
+                            m_ignoreNextMouseEvent = true;
                         }
                         path->addEllipse(canxpos,
-                             canypos,
+                            canypos,
                              it.value()->x2 - canxpos,
                              it.value()->y2 - canypos);
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
+
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
                 }
@@ -995,17 +1030,20 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x1;
                             dy = it.value()->y1 - canypos;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                            if (fabs(dx) > fabs(dy))
+                            if (fabs(dx) < fabs(dy))
                             {
-                                canypos = it.value()->y1 + dx * abs(dy) / dy;
+                                //canypos = it.value()->y1 + dx;
+                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
                             }
                             else
                             {
-                                canxpos = it.value()->x1 + dy * abs(dx) / dx;
+                                //canypos = it.value()->x1 + dy;
+                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
                             }
+                            m_ignoreNextMouseEvent = true;
                         }
                         path->addRect(it.value()->x1, it.value()->y1,
                             canxpos - it.value()->x1,
@@ -1013,6 +1051,15 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
 
@@ -1021,23 +1068,39 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         {
                             dx = canxpos - it.value()->x1;
                             dy = it.value()->y1 - canypos;
-                            
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
 
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                            if (fabs(dx) > fabs(dy))
-                                canypos = it.value()->y1 + dx * abs(dy) / dy;
+                            if (fabs(dx) < fabs(dy))
+                            {
+                                //canypos = it.value()->y1 + dx;
+                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
+                            }
                             else
-                                canxpos = it.value()->x1 + dy * abs(dx) / dx;
+                            {
+                                //canypos = it.value()->x1 + dy;
+                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
+                            }
+                            m_ignoreNextMouseEvent = true;
+                            
                         }
                         path->addEllipse(it.value()->x1,
                             it.value()->y1,
-                            canxpos- it.value()->x1,
+                            canxpos - it.value()->x1,
                             canypos - it.value()->y1),
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
                 }
