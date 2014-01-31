@@ -176,6 +176,7 @@ class PlotCanvas : public QwtPlot
         int m_activeDrawItem;
 
         QVector<ito::uint16> m_drawedIemsIndexes;
+        bool m_ignoreNextMouseEvent;
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);

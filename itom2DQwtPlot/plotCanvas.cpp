@@ -75,7 +75,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_pLineCutLine(NULL),
         m_pMultiPointPicker(NULL),
         m_pRescaler(NULL),
-        m_activeDrawItem(-1)
+        m_activeDrawItem(-1),
+        m_ignoreNextMouseEvent(false)
         
 {
     setMouseTracking(false);
@@ -2038,6 +2039,12 @@ void PlotCanvas::multiPointActivated (bool on)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
 {
+    if(m_ignoreNextMouseEvent)
+    {
+        m_ignoreNextMouseEvent = false;
+        return;
+    }
+
 //    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     if (m_pData->m_state == tIdle)
     {
@@ -2076,8 +2083,8 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x2;
                             dy = it.value()->y2 - canypos;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 0.000000001 : dx;
+                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -0.000000001 : dy;
 
                             if (fabs(dx) > fabs(dy))
                             {
@@ -2103,20 +2110,24 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                     case tRect:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - it.value()->x2;
-                            dy = it.value()->y2 - canypos;
-                            
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = it.value()->x2 - canxpos;
+                            dy = canypos - it.value()->y2;
 
-                            if (fabs(dx) > fabs(dy))
+                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
+                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
+
+                            if (fabs(dx) < fabs(dy))
                             {
-                                canypos = it.value()->y2 - dx;
+                                //canypos = it.value()->x2 - dx;
+                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
                             }
                             else
                             {
-                                canxpos = it.value()->x2 - dy;
+                                //canxpos = it.value()->x2 - dy;
+                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
                             }
+
+                            m_ignoreNextMouseEvent = true;
                         }
 
                         path->addRect(canxpos, canypos,
@@ -2124,26 +2135,39 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             it.value()->y2 - canypos);
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
+
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
 
                     case tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
-                            dx = canxpos - it.value()->x2;
-                            dy = it.value()->y2 - canypos;
+                            dx = it.value()->x2 - canxpos;
+                            dy = canypos - it.value()->y2;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
+                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
 
-                            if (fabs(dx) > fabs(dy))
+                            if (fabs(dx) < fabs(dy))
                             {
-                                canypos = it.value()->y2 - dx;
+                                //canypos = it.value()->x2 - dx;
+                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
                             }
                             else
                             {
-                                canxpos = it.value()->x2 - dy;
+                                //canxpos = it.value()->x2 - dy;
+                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
                             }
+                            m_ignoreNextMouseEvent = true;
                         }
                         path->addEllipse(canxpos,
                             canypos,
@@ -2151,6 +2175,16 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                              it.value()->y2 - canypos);
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
+
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
                 }
@@ -2199,17 +2233,20 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x1;
                             dy = it.value()->y1 - canypos;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
+                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
 
-                            if (fabs(dx) > fabs(dy))
+                            if (fabs(dx) < fabs(dy))
                             {
-                                canypos = it.value()->y1 + dx;
+                                //canypos = it.value()->y1 + dx;
+                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
                             }
                             else
                             {
-                                canxpos = it.value()->x1 + dy;
+                                //canypos = it.value()->x1 + dy;
+                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
                             }
+                            m_ignoreNextMouseEvent = true;
                         }
                         path->addRect(it.value()->x1, it.value()->y1,
                             canxpos - it.value()->x1,
@@ -2217,6 +2254,15 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
 
@@ -2226,17 +2272,21 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             dx = canxpos - it.value()->x1;
                             dy = it.value()->y1 - canypos;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? 1 : dy;
+                            dx = fabs(dx) <= 0.000001 ? 0.000001 : dx;
+                            dy = fabs(dy) <= 0.000001 ? -0.000001 : dy;
 
-                            if (fabs(dx) > fabs(dy))
+                            if (fabs(dx) < fabs(dy))
                             {
-                                canypos = it.value()->y1 + dx;
+                                //canypos = it.value()->y1 + dx;
+                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
                             }
                             else
                             {
-                                canxpos = it.value()->x1 + dy;
+                                //canypos = it.value()->x1 + dy;
+                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
                             }
+                            m_ignoreNextMouseEvent = true;
+                            
                         }
                         path->addEllipse(it.value()->x1,
                             it.value()->y1,
@@ -2245,6 +2295,15 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                         it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
+                        if(m_ignoreNextMouseEvent)
+                        {
+                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                            this->cursor().setPos(dst);
+                        }
                         replot();
                     break;
                 }
