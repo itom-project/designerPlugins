@@ -1,4 +1,3 @@
-
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
@@ -21,6 +20,8 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+#define ITOM_IMPORT_API
+#define ITOM_IMPORT_PLOTAPI
 #include "graphicViewPlugin.h"
 #include "pluginVersion.h"
 

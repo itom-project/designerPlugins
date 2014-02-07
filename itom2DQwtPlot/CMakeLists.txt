@@ -94,9 +94,9 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
 
 )
 
@@ -114,13 +114,6 @@ set(designer_rcc
 )
 
 set(designer_SOURCES 
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresPrimitives.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjItem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.cpp
@@ -129,9 +122,9 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
@@ -150,7 +143,7 @@ file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS_MOC} ${designer_HEADERS} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc)
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)
