@@ -65,6 +65,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 //        m_pStackCut(NULL),
         m_dObjItem(NULL),
         m_rasterData(NULL),
+        m_dOverlayItem(NULL),
         m_pData(m_pData),
         m_curColorMapIndex(0),
         m_pValuePicker(NULL),
@@ -79,6 +80,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_ignoreNextMouseEvent(false)
         
 {
+
     setMouseTracking(false);
 
     //this is the border between the canvas and the axes and the overall mainwindow
@@ -95,10 +97,19 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_dObjItem = new DataObjItem("Data Object");
     m_dObjItem->setRenderThreadCount(0);
     //m_dObjItem->setColorMap(new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
-
     m_rasterData = new DataObjRasterData(m_pData);
     m_dObjItem->setData(m_rasterData);
     m_dObjItem->attach(this);
+
+    //overlayobject ttem on canvas -> the data object
+    m_dOverlayItem = new DataObjItem("Overlay Object");
+    m_dOverlayItem->setRenderThreadCount(0);
+    m_rasterOverlayData = new DataObjRasterData(m_pData, false);
+    m_dOverlayItem->setData(m_rasterOverlayData);
+    m_dOverlayItem->attach(this);
+    m_dOverlayItem->setAlpha(m_pData->m_alpha);
+    m_dOverlayItem->setColorMap(new QwtLinearColorMap(Qt::black, Qt::white, QwtColorMap::Indexed));
+    m_dOverlayItem->setVisible(false);
 
     //zoom tool
     m_pZoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
@@ -211,6 +222,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::~PlotCanvas()
 {
+
     m_pLineCutLine->detach();
     delete m_pLineCutLine;
     m_pLineCutLine = NULL;
@@ -2553,6 +2565,30 @@ QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)
 
     return m_rasterData->rasterToObject(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft));
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setOverlayObject(ito::DataObject* newOverlay)
+{
+    m_dOverlayItem->setAlpha(m_pData->m_alpha);
+    m_rasterOverlayData->updateDataObject(newOverlay);
+
+    m_dOverlayItem->setVisible(m_rasterOverlayData->isInit() && m_pData->m_alpha > 0);
+
+    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+    p->enableOverlaySlider(m_rasterOverlayData->isInit());
+    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::alphaChanged()
+{
+    m_dOverlayItem->setVisible(m_pData->m_alpha > 0 && m_rasterOverlayData->isInit());
+    m_dOverlayItem->setAlpha(m_pData->m_alpha);
+    m_dObjItem->setVisible(m_pData->m_alpha < 255);
+
+    replot();
+}
+
 
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void PlotCanvas::multiPointSelected (const QPolygon &polygon)

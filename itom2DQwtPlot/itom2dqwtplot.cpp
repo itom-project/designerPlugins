@@ -65,7 +65,9 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pMnuDrawMode(NULL),
     m_pActCntrMarker(NULL),
     m_pActAspectRatio(NULL),
-    m_pDrawModeActGroup(NULL)
+    m_pDrawModeActGroup(NULL),
+    m_pOverlaySlider(NULL),
+    m_pActOverlaySlider(NULL)
 {
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toAscii().data()));
@@ -113,6 +115,7 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
     mainTb->addAction(m_pActAspectRatio);
+    mainTb->addAction(m_pActOverlaySlider);
     mainTb->addSeparator();
     mainTb->addAction(m_pActScaleSettings);
     mainTb->addAction(m_pActToggleColorBar);
@@ -255,6 +258,22 @@ void Itom2dQwtPlot::createActions()
     a->setToolTip(tr("Show a in plane line cut"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActLineCut(bool)));
 
+    //m_pOverlaySlider
+    m_pOverlaySlider = new QSlider(Qt::Horizontal, this);
+    m_pOverlaySlider->setMinimum(0);
+    m_pOverlaySlider->setMaximum(255);
+    m_pOverlaySlider->setValue(0);
+    m_pOverlaySlider->setWhatsThis(tr("Control alpha-value of overlay image"));
+    m_pOverlaySlider->setToolTip(tr("Set alpha for overlay"));
+    
+    QWidgetAction *wa = new QWidgetAction(this);
+    wa->setDefaultWidget(m_pOverlaySlider);
+    m_pActOverlaySlider = wa;
+    wa->setObjectName("overlaySlider");
+    wa->setVisible(false);
+    connect(m_pOverlaySlider, SIGNAL(valueChanged(int)), this, SLOT(mnuOverlaySliderChanged(int)));
+    
+
     //m_actStackCut
     m_pActStackCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"), tr("Slice in z-direction"), this);
     a->setObjectName("actStackCut");
@@ -269,7 +288,7 @@ void Itom2dQwtPlot::createActions()
     planeSelector->setValue(0);
     planeSelector->setKeyboardTracking(false);
     planeSelector->setToolTip(tr("Select image plane"));
-    QWidgetAction *wa = new QWidgetAction(this);
+    wa = new QWidgetAction(this);
     wa->setDefaultWidget(planeSelector);
     m_pActPlaneSelector = wa;
     wa->setObjectName("planeSelector");
@@ -1740,4 +1759,12 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
         return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Widget not ready.").toAscii().data());
     }
     return ito::retOk;
+}
+void Itom2dQwtPlot::mnuOverlaySliderChanged(int value)
+{
+    if(value != m_data.m_alpha)
+    {
+        m_data.m_alpha = value;
+        if(m_pContent) m_pContent->alphaChanged();
+    }
 }
