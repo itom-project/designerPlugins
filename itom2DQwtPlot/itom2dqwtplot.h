@@ -59,7 +59,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
-    Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage DESIGNABLE false)
+    Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -173,7 +173,7 @@ public:
         this->m_pOverlaySlider->setValue(m_data.m_alpha);
     }
 
-    void resetAlpha ()
+    void resetAlpha(void)
     {
         setAlpha(0);
     }
@@ -184,6 +184,13 @@ public:
         if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
         
     }
+
+    void resetOverlayImage(void)
+    {
+        if(m_pContent) m_pContent->setOverlayObject(NULL);
+        
+    }
+    
 
     void enableOverlaySlider(bool enabled) {m_pActOverlaySlider->setVisible(enabled);}
 
@@ -278,6 +285,8 @@ public slots:
 
     //this can be invoked by python to trigger a lineplot
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
+
+    void removeOverlayImage(void) { return resetOverlayImage();}
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);
