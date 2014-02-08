@@ -29,6 +29,7 @@
 class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Itom2dQwtPlotPlugin")
 
 public:
     Itom2dQwtPlotPlugin(QObject *parent = 0);

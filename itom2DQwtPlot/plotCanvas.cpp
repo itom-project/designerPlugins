@@ -1217,7 +1217,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
     if (rgexp.indexIn(style) != -1)
     {
 //        QString s = rgexp.cap(1);
-        char s = rgexp.cap(1).toAscii()[0];
+        char s = rgexp.cap(1).toLatin1()[0];
 
         if (s == 'b') symPen.setColor(Qt::blue);
         else if (s == 'g') symPen.setColor(Qt::green);
@@ -1228,7 +1228,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
         else if (s == 'k') symPen.setColor(Qt::black);
         else if (s == 'w') symPen.setColor(Qt::white);
 
-        s = rgexp.cap(2).toAscii()[0];
+        s = rgexp.cap(2).toLatin1()[0];
         bool ok;
 
         if (s == '.') symStyle = QwtSymbol::Ellipse;
@@ -1253,7 +1253,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
     }
     else
     {
-        retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format").toAscii().data());
+        retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format").toLatin1().data());
     }
 
     if (!retval.containsError())
@@ -1322,7 +1322,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                     break;
                     
                     default:
-                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
+                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
                     break;
                 }                    
                 if (m_pData->m_pDrawItems.contains((int)ids[i]))
@@ -1351,7 +1351,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                         break;
                         
                         default:
-                            retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
+                            retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
                         break;                        
                     }
                     if (newItem)
@@ -1406,7 +1406,7 @@ ito::RetVal PlotCanvas::deleteMarkers(const QString &id)
 
     if (!found && id != "")
     {
-        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(id).toAscii().data());
+        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(id).toLatin1().data());
     }
     else
     {
@@ -1442,7 +1442,7 @@ ito::RetVal PlotCanvas::deleteMarkers(const int id)
 
     if (!found)
     {
-        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%d' found.").toAscii().data(), id);
+        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%d' found.").toLatin1().data(), id);
     }
     else
     {
@@ -1652,7 +1652,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             emit p->userInteractionDone(type, true, polygonScale);
         }
         setState(tIdle);
-        retval += ito::RetVal(ito::retError, 0, tr("Unknown type for userInteractionStart").toAscii().data());
+        retval += ito::RetVal(ito::retError, 0, tr("Unknown type for userInteractionStart").toLatin1().data());
     }
 
     return retval;

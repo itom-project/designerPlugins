@@ -20,7 +20,7 @@
 #if QT_VERSION >= 0x040400
 #include <qthread.h>
 #include <qfuture.h>
-#include <qtconcurrentrun.h>
+#include <QtConcurrent/qtconcurrentrun.h>
 #endif
 
 class QwtPlotSpectrogram::PrivateData

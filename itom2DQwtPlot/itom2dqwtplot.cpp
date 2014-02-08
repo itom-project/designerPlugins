@@ -69,8 +69,8 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pOverlaySlider(NULL),
     m_pActOverlaySlider(NULL)
 {
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toAscii().data()));
-    m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toAscii().data()));
+    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
+    m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
@@ -100,9 +100,9 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 
     //initialize canvas
     m_pContent = new PlotCanvas(&m_data, this);
-    connect(m_pContent, SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
-    connect(m_pContent, SIGNAL(statusBarMessage(QString)), statusBar(), SLOT(showMessage(QString)));
-    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+    connect(m_pContent, SIGNAL(statusBarClear()), (QObject*)(statusBar()), SLOT(clearMessage()));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString)), (QObject*)(statusBar()), SLOT(showMessage(QString)));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
     setCentralWidget(m_pContent);
 
     //initialize actions
@@ -1088,7 +1088,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             }
             else
             {
-                return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toAscii().data());
+                return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
             }
 
             retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
@@ -1744,7 +1744,7 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
     }
     else
     {
-        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
     }
 
     if(m_pContent)
@@ -1756,7 +1756,7 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
     }
     else
     {
-        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Widget not ready.").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Widget not ready.").toLatin1().data());
     }
     return ito::retOk;
 }
