@@ -99,6 +99,8 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
+    DESIGNER_PLUGIN_ITOM_API
+
     public:
         friend class GL3DEFilter;
 

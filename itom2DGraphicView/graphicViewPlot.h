@@ -23,6 +23,12 @@
 #ifndef ITOMFIGURE_H
 #define ITOMFIGURE_H
 
+#if defined(ITOMSHAREDDESIGNER)
+    #define ITOMGVPLOT_EXPORT Q_DECL_EXPORT
+#else
+    #define ITOMGVPLOT_EXPORT Q_DECL_IMPORT
+#endif
+
 #include "plot/AbstractDObjFigure.h"
 #include "plotWidget.h"
 
@@ -37,7 +43,7 @@
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
-class GraphicViewPlot : public ito::AbstractDObjFigure
+class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
@@ -68,6 +74,8 @@ class GraphicViewPlot : public ito::AbstractDObjFigure
     //Q_CLASSINFO("prop://titleFont", "Font for title.")
     //Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     //Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
+
+    DESIGNER_PLUGIN_ITOM_API
 
     public:
         GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);

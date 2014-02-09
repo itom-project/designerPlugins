@@ -21,8 +21,8 @@
 *********************************************************************** */
 
 #include "itom2dqwtplot.h"
-#include "plot/userInteractionPlotPicker.h"
-#include "plot/multiPointPickerMachine.h"
+#include "../sharedFiles/userInteractionPlotPicker.h"
+#include "../sharedFiles/multiPointPickerMachine.h"
 
 #include "../sharedFiles/dialogExportProperties.h"
 

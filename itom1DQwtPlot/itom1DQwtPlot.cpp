@@ -154,7 +154,7 @@ void Itom1DQwtPlot::constructor()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_pActScaleSetting(NULL),
@@ -183,7 +183,7 @@ ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettin
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
+Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
     AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
     m_pContent(NULL),
     m_pActScaleSetting(NULL),
@@ -212,7 +212,7 @@ ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot::~Itom1DQwtPlot()
+Itom1DQwtPlot::~Itom1DQwtPlot()
 {
     if (m_pMnuCmplxSwitch != NULL)
     {
@@ -233,25 +233,25 @@ ito::RetVal Itom1DQwtPlot::init()
 } //called when api-pointers are transmitted, directly after construction
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT int Itom1DQwtPlot::getGeometricElementsCount() const 
+int Itom1DQwtPlot::getGeometricElementsCount() const 
 { 
     return ((InternalData*)m_data)->m_pDrawItems.size();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT bool Itom1DQwtPlot::getkeepAspectRatio(void) const 
+bool Itom1DQwtPlot::getkeepAspectRatio(void) const 
 {
     return ((InternalData*)m_data)->m_keepAspect;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT bool Itom1DQwtPlot::getEnabledPlotting(void) const 
+bool Itom1DQwtPlot::getEnabledPlotting(void) const 
 {
     return ((InternalData*)m_data)->m_enablePlotting;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::createActions()
+void Itom1DQwtPlot::createActions()
 {
     QAction *a = NULL;
 
@@ -399,7 +399,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::createActions()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::applyUpdate()
+ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
@@ -417,27 +417,27 @@ ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::applyUpdate()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
+void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 {
     ((InternalData*)m_data)->m_forceValueParsing = true; //recalculate boundaries since content of data object may have changed
     AbstractDObjFigure::setSource(source);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT bool Itom1DQwtPlot::getContextMenuEnabled() const
+bool Itom1DQwtPlot::getContextMenuEnabled() const
 {
     if (((Plot1DWidget *)m_pContent)) return (((Plot1DWidget *)m_pContent))->m_showContextMenu;
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setContextMenuEnabled(bool show)
+void Itom1DQwtPlot::setContextMenuEnabled(bool show)
 {
     if (((Plot1DWidget *)m_pContent)) (((Plot1DWidget *)m_pContent))->m_showContextMenu = show;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds) 
+void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds) 
 { 
     double *pointArr = new double[2 * bounds.size()];
     for (int np = 0; np < bounds.size(); np++)
@@ -450,7 +450,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QVector<QPointF> Itom1DQwtPlot::getBounds(void) 
+QVector<QPointF> Itom1DQwtPlot::getBounds(void) 
 { 
     int numPts = m_pInput["bounds"]->getLen();
     QVector<QPointF> boundsVec;
@@ -468,7 +468,7 @@ ITOMSHAREDDESIGNER_EXPORT QVector<QPointF> Itom1DQwtPlot::getBounds(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QString Itom1DQwtPlot::getTitle() const
+QString Itom1DQwtPlot::getTitle() const
 {
     if (((InternalData*)m_data)->m_autoTitle)
     {
@@ -478,7 +478,7 @@ ITOMSHAREDDESIGNER_EXPORT QString Itom1DQwtPlot::getTitle() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setTitle(const QString &title)
+void Itom1DQwtPlot::setTitle(const QString &title)
 {
     if (title == "<auto>")
     {
@@ -494,14 +494,14 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setTitle(const QString &title)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::resetTitle()
+void Itom1DQwtPlot::resetTitle()
 {
     ((InternalData*)m_data)->m_autoTitle = true;
     if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QString Itom1DQwtPlot::getAxisLabel() const
+QString Itom1DQwtPlot::getAxisLabel() const
 {
     if (((InternalData*)m_data)->m_autoAxisLabel)
     {
@@ -511,7 +511,7 @@ ITOMSHAREDDESIGNER_EXPORT QString Itom1DQwtPlot::getAxisLabel() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setAxisLabel(const QString &label)
+void Itom1DQwtPlot::setAxisLabel(const QString &label)
 {
     if (label == "<auto>")
     {
@@ -526,14 +526,14 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setAxisLabel(const QString &label)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::resetAxisLabel()
+void Itom1DQwtPlot::resetAxisLabel()
 {
     ((InternalData*)m_data)->m_autoAxisLabel = true;
     if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QString Itom1DQwtPlot::getValueLabel() const
+QString Itom1DQwtPlot::getValueLabel() const
 {
     if (((InternalData*)m_data)->m_autoValueLabel)
     {
@@ -543,7 +543,7 @@ ITOMSHAREDDESIGNER_EXPORT QString Itom1DQwtPlot::getValueLabel() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setValueLabel(const QString &label)
+void Itom1DQwtPlot::setValueLabel(const QString &label)
 {
     if (label == "<auto>")
     {
@@ -558,14 +558,14 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setValueLabel(const QString &label
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::resetValueLabel()
+void Itom1DQwtPlot::resetValueLabel()
 {
     ((InternalData*)m_data)->m_autoValueLabel = true;
     if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QFont Itom1DQwtPlot::getTitleFont(void) const
+QFont Itom1DQwtPlot::getTitleFont(void) const
 {
     if (((Plot1DWidget *)m_pContent))
     {
@@ -575,7 +575,7 @@ ITOMSHAREDDESIGNER_EXPORT QFont Itom1DQwtPlot::getTitleFont(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setTitleFont(const QFont &font)
+void Itom1DQwtPlot::setTitleFont(const QFont &font)
 {
     if (((Plot1DWidget *)m_pContent))
     {
@@ -585,7 +585,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setTitleFont(const QFont &font)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QFont Itom1DQwtPlot::getLabelFont(void) const
+QFont Itom1DQwtPlot::getLabelFont(void) const
 {
     if (((Plot1DWidget *)m_pContent))
     {
@@ -596,7 +596,7 @@ ITOMSHAREDDESIGNER_EXPORT QFont Itom1DQwtPlot::getLabelFont(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setLabelFont(const QFont &font)
+void Itom1DQwtPlot::setLabelFont(const QFont &font)
 {
     if (((Plot1DWidget *)m_pContent))
     {
@@ -612,7 +612,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setLabelFont(const QFont &font)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QFont Itom1DQwtPlot::getAxisFont(void) const
+QFont Itom1DQwtPlot::getAxisFont(void) const
 {
     if (((Plot1DWidget *)m_pContent))
     {
@@ -622,7 +622,7 @@ ITOMSHAREDDESIGNER_EXPORT QFont Itom1DQwtPlot::getAxisFont(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setAxisFont(const QFont &font)
+void Itom1DQwtPlot::setAxisFont(const QFont &font)
 {
     if (((Plot1DWidget *)m_pContent))
     {
@@ -633,7 +633,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setAxisFont(const QFont &font)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuPanner(bool checked)
+void Itom1DQwtPlot::mnuPanner(bool checked)
 {
     if (checked)
     {
@@ -650,7 +650,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuPanner(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuZoomer(bool checked)
+void Itom1DQwtPlot::mnuZoomer(bool checked)
 {
     if (checked)
     {
@@ -667,7 +667,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuZoomer(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuMarkerClick(bool checked)
+void Itom1DQwtPlot::mnuMarkerClick(bool checked)
 {
     if (checked)
     {
@@ -680,7 +680,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuMarkerClick(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuDrawMode(bool checked)
+void Itom1DQwtPlot::mnuDrawMode(bool checked)
 {
     if (checked)
     {
@@ -694,7 +694,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuDrawMode(bool checked)
 //    ((Plot1DWidget *)m_pContent)->setState(checked ? PlotCanvas::tDraw : PlotCanvas::stateIdle);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuDrawMode(QAction *action)
+void Itom1DQwtPlot::mnuDrawMode(QAction *action)
 {
     m_pActPan->setChecked(false);
     m_pActZoomToRect->setChecked(false);
@@ -732,7 +732,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuDrawMode(QAction *action)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuExport()
+void Itom1DQwtPlot::mnuExport()
 {
 #ifndef QT_NO_PRINTER
     QString fileName = "plot1D.pdf";
@@ -823,7 +823,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuExport()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuScaleSetting()
+void Itom1DQwtPlot::mnuScaleSetting()
 {
     Dialog1DScale *dlg = new Dialog1DScale(*((InternalData*)m_data), this);
     if (dlg->exec() == QDialog::Accepted)
@@ -845,7 +845,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuScaleSetting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuParentScaleSetting()
+void Itom1DQwtPlot::mnuParentScaleSetting()
 {
     if (((Plot1DWidget *)m_pContent) && ((Plot1DWidget *)m_pContent)->m_plotCurveItems.size() > 0)
     {
@@ -873,7 +873,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuParentScaleSetting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuSetMarker(QAction *action)
+void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 {
     if (((Plot1DWidget *)m_pContent) && ((Plot1DWidget *)m_pContent)->m_plotCurveItems.size() > 0)
     {
@@ -900,13 +900,13 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuSetMarker(QAction *action)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
+ito::RetVal Itom1DQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
     return ((Plot1DWidget *)m_pContent)->plotMarkers(&coords, style, id, plane);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::deleteMarkers(int id)
+ito::RetVal Itom1DQwtPlot::deleteMarkers(int id)
 {
     ito::RetVal retVal = ((Plot1DWidget *)m_pContent)->deleteMarkers(id);
     if(!retVal.containsWarningOrError()) emit plotItemDeleted(id);
@@ -914,7 +914,7 @@ ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::deleteMarkers(int id)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::clearGeometricElements(void)
+ito::RetVal Itom1DQwtPlot::clearGeometricElements(void)
 {
     QList<int> keys = ((InternalData*)m_data)->m_pDrawItems.keys();
     ito::RetVal retVal = ito::retOk;
@@ -928,7 +928,7 @@ ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::clearGeometricElements(void
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints /*= -1*/)
+void Itom1DQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints /*= -1*/)
 {
     m_pActPan->setChecked(false);
     m_pActZoomToRect->setChecked(false);
@@ -958,7 +958,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::userInteractionStart(int type, boo
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
+void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
 {
     DataObjectSeriesData *seriesData;
     if (((Plot1DWidget *)m_pContent))
@@ -997,14 +997,14 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QPointF Itom1DQwtPlot::getYAxisInterval(void) const
+QPointF Itom1DQwtPlot::getYAxisInterval(void) const
 { 
     QPointF interval(((InternalData*)m_data)->m_valueMin, ((InternalData*)m_data)->m_valueMax);
     return interval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setYAxisInterval(QPointF interval) 
+void Itom1DQwtPlot::setYAxisInterval(QPointF interval) 
 { 
     if (interval.isNull())
     {
@@ -1018,26 +1018,26 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setYAxisInterval(QPointF interval)
 }   
 
 //----------------------------------------------------------------------------------------------------------------------------------   
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setMarkerText(const QString &coords, const QString &offsets)
+void Itom1DQwtPlot::setMarkerText(const QString &coords, const QString &offsets)
 {
     m_pLblMarkerCoords->setText(coords);
     m_pLblMarkerOffsets->setText(offsets);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::enableComplexGUI(const bool checked)
+void Itom1DQwtPlot::enableComplexGUI(const bool checked)
 { 
     m_pActCmplxSwitch->setEnabled(checked);
     m_pActCmplxSwitch->setVisible(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuHome()
+void Itom1DQwtPlot::mnuHome()
 {
     ((Plot1DWidget *)m_pContent)->m_pZoomer->zoom(0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
+QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
 {
     if(!((Plot1DWidget *)m_pContent))
     {
@@ -1092,7 +1092,7 @@ ITOMSHAREDDESIGNER_EXPORT QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisp
     return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
+void Itom1DQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 {
     if (m_pActAspectRatio) //if property is set in designer or by python, the action should represent the current status, too
     {
@@ -1101,7 +1101,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setkeepAspectRatio(const bool &kee
     mnuActRatio(keepAspectEnable);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuActRatio(bool checked)
+void Itom1DQwtPlot::mnuActRatio(bool checked)
 {
     ((InternalData*)m_data)->m_keepAspect = checked;
     if(((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->configRescaler();
@@ -1120,13 +1120,13 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::mnuActRatio(bool checked)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )
+void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )
 {
     //resizeEvent(event);
     if(((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->configRescaler();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setEnabledPlotting(const bool &enabled)
+void Itom1DQwtPlot::setEnabledPlotting(const bool &enabled)
 {
     ((InternalData*)m_data)->m_enablePlotting = enabled;
     m_pActClearDrawings->setEnabled(enabled);
@@ -1136,7 +1136,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setEnabledPlotting(const bool &ena
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT QSharedPointer< ito::DataObject > Itom1DQwtPlot::getGeometricElements()
+QSharedPointer< ito::DataObject > Itom1DQwtPlot::getGeometricElements()
 {
     int ysize = ((InternalData*)m_data)->m_pDrawItems.size();
     int xsize = PRIM_ELEMENTLENGTH;
@@ -1153,7 +1153,7 @@ ITOMSHAREDDESIGNER_EXPORT QSharedPointer< ito::DataObject > Itom1DQwtPlot::getGe
     return exportItem;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
+ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 {
     int ysize = dstObject->getSize(0);
 
@@ -1236,7 +1236,7 @@ ITOMSHAREDDESIGNER_EXPORT ito::RetVal Itom1DQwtPlot::qvector2DataObject(const it
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
+void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
 {
     QList<int> keys = ((InternalData*)m_data)->m_pDrawItems.keys();
     ito::RetVal retVal = ito::retOk;
@@ -1488,7 +1488,7 @@ ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setGeometricElements(QSharedPointe
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT int Itom1DQwtPlot::getSelectedElement(void)const
+int Itom1DQwtPlot::getSelectedElement(void)const
 {
     QHash<int, DrawItem*>::const_iterator it = ((InternalData*)m_data)->m_pDrawItems.begin();
     for (;it != ((InternalData*)m_data)->m_pDrawItems.end(); ++it)        
@@ -1501,7 +1501,7 @@ ITOMSHAREDDESIGNER_EXPORT int Itom1DQwtPlot::getSelectedElement(void)const
     return -1;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void Itom1DQwtPlot::setSelectedElement(const int idx)
+void Itom1DQwtPlot::setSelectedElement(const int idx)
 {
     bool replot = false;
     bool failed = idx == -1 ? false : true;

@@ -51,8 +51,8 @@
 
 #include "valuepicker1d.h"
 
-#include "plot/userInteractionPlotPicker.h"
-#include "plot/drawItem.h"
+#include "../sharedFiles/userInteractionPlotPicker.h"
+#include "../sharedFiles/drawItem.h"
 
 class Itom1DQwtPlot;
 struct InternalData;
