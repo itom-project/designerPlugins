@@ -38,6 +38,7 @@
 #include <qwidgetaction.h>
 #include <qspinbox.h>
 #include <qwt_plot_shapeitem.h>
+#include <qslider.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
@@ -64,6 +65,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
+    Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
+    Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -83,9 +87,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
     Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
 
-    DESIGNER_PLUGIN_ITOM_API
-
-public:
+    Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
+    Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        DESIGNER_PLUGIN_ITOM_API
+    public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
 
@@ -166,6 +170,35 @@ public:
     int getSelectedElement(void) const;
     void setSelectedElement(const int idx);
 
+    int getAlpha () const {return this->m_data.m_alpha;}
+    void setAlpha (const int alpha)
+    {
+        this->m_data.m_alpha = alpha > 0 && alpha < 255 ? alpha : this->m_data.m_alpha;
+        if(m_pContent) m_pContent->alphaChanged();
+        this->m_pOverlaySlider->setValue(m_data.m_alpha);
+    }
+
+    void resetAlpha(void)
+    {
+        setAlpha(0);
+    }
+
+    QSharedPointer< ito::DataObject > getOverlayImage() const {return QSharedPointer< ito::DataObject >(NULL); }
+    void setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
+    {
+        if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
+        
+    }
+
+    void resetOverlayImage(void)
+    {
+        if(m_pContent) m_pContent->setOverlayObject(NULL);
+        
+    }
+    
+
+    void enableOverlaySlider(bool enabled) {m_pActOverlaySlider->setVisible(enabled);}
+
     friend class PlotCanvas;
 
 protected:
@@ -207,6 +240,9 @@ private:
 
     QAction* m_pActCntrMarker;
 
+    QSlider* m_pOverlaySlider;
+    QWidgetAction *m_pActOverlaySlider;
+
     QHash<QObject*,ito::uint32> m_childFigures;
 
     ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
@@ -226,6 +262,7 @@ private slots:
     void mnuActPlaneSelector(int plane);
     void mnuDrawMode(QAction *action);
     void mnuDrawMode(bool checked);
+    void mnuOverlaySliderChanged(int value);
 
     void mnuActCenterMarker(bool checked);
 
@@ -253,6 +290,8 @@ public slots:
 
     //this can be invoked by python to trigger a lineplot
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
+
+    void removeOverlayImage(void) { return resetOverlayImage();}
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);

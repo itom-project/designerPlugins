@@ -141,8 +141,12 @@ class PlotCanvas : public QwtPlot
 
         void configRescaler(void);
         
+        void setOverlayObject(ito::DataObject* newOverlay);
+        void alphaChanged();
     private:
         QwtPlotRescaler* m_pRescaler;
+
+        ito::DataObject randImg;
 
         QwtPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
@@ -161,9 +165,13 @@ class PlotCanvas : public QwtPlot
         QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
 
         int m_curColorMapIndex;
+        
         DataObjItem *m_dObjItem;
-        DataObjRasterData *m_rasterData;
+        DataObjItem *m_dOverlayItem;
 
+        DataObjRasterData *m_rasterData;
+        DataObjRasterData *m_rasterOverlayData;
+        
         ito::uint32 m_zstackCutUID;
         ito::uint32 m_lineCutUID;
 
@@ -238,6 +246,7 @@ struct InternalData
         m_keepAspect = false;
         m_enablePlotting = true;
         m_showCenterMarker = false;
+        m_alpha = 0;
     }
     ~InternalData()
     {
@@ -292,6 +301,7 @@ struct InternalData
     bool m_colorBarVisible;
 
     int m_elementsToPick;
+    unsigned char m_alpha;
 
     bool m_enablePlotting;
     bool m_showCenterMarker;

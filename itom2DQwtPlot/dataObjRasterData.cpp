@@ -28,7 +28,7 @@
 #include <qdebug.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DataObjRasterData::DataObjRasterData(const InternalData *m_internalData) :
+DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const bool overlay) :
     QwtRasterData(),
     m_validData(false),
     m_dataHash(),
@@ -37,7 +37,8 @@ DataObjRasterData::DataObjRasterData(const InternalData *m_internalData) :
     m_plane(NULL),
     m_hashGenerator(QCryptographicHash::Md5),
     m_dataObjPlane(NULL),
-    m_pInternalData(m_internalData)
+    m_pInternalData(m_internalData),
+    m_notOverlay(overlay)
 {
     m_D.m_planeIdx = 0;
     m_D.m_yScaling = 1.0;
@@ -187,8 +188,11 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
                 m_dataObjPlane = &m_dataObj;
             }
 
-            m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>((void*)&m_dataObj);
-            m_pInternalData->m_pConstOutput->operator[]("displayed")->setVal<void*>((void*)m_dataObjPlane);
+            if(m_notOverlay)
+            {
+                m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>((void*)&m_dataObj);
+                m_pInternalData->m_pConstOutput->operator[]("displayed")->setVal<void*>((void*)m_dataObjPlane);
+            }
 
             //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
             setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
@@ -260,9 +264,11 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
 
         m_dataObjPlane = NULL;
         m_dataObj = ito::DataObject();
-        m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>(NULL);
-        m_pInternalData->m_pConstOutput->operator[]("output")->setVal<void*>(NULL);
-
+        if(m_notOverlay)
+        {
+            m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>(NULL);
+            m_pInternalData->m_pConstOutput->operator[]("output")->setVal<void*>(NULL);
+        }
         m_plane = NULL;
 
         m_D.m_dataPtr = NULL;

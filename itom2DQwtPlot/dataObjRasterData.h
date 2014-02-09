@@ -39,8 +39,8 @@ struct InternalData;
 class DataObjRasterData : public QwtRasterData
 {
     public:
-        explicit DataObjRasterData(const InternalData *m_internalData);
-        explicit DataObjRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending);
+        explicit DataObjRasterData(const InternalData *m_internalData, const bool overlay = true);
+        explicit DataObjRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending, const bool overlay = true);
         ~DataObjRasterData();
 
         double value2(int m, int n) const;
@@ -59,6 +59,8 @@ class DataObjRasterData : public QwtRasterData
        
         ito::int32 getCurrentPlane() const {return (ito::int32)m_D.m_planeIdx;}
         QSharedPointer<ito::DataObject> rasterToObject(const QwtInterval &xInterval, const QwtInterval &yInterval);
+
+        bool isInit() const {return m_dataObj.getDims() > 0 && m_dataObjPlane != NULL;}
 
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
@@ -109,6 +111,8 @@ class DataObjRasterData : public QwtRasterData
         unsigned int nrOfRendering;
 
         const InternalData *m_pInternalData;
+
+        bool m_notOverlay;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
