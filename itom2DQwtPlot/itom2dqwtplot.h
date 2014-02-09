@@ -87,6 +87,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
     Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
 
+    DESIGNER_PLUGIN_ITOM_API
+
     Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        DESIGNER_PLUGIN_ITOM_API
     public:
