@@ -23,9 +23,7 @@ ENDIF(UNIX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 #find_package(Qt4 REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5UiTools REQUIRED)
+find_package(Qt5 COMPONENTS WIDGETS UITOOLS PRINTSUPPORT REQUIRED)
 find_package(ITOM_SDK REQUIRED)
 find_package(VisualLeakDetector QUIET)
 

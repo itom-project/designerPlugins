@@ -21,16 +21,17 @@ ELSE(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
-set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTOMOC ON)
   # As moc files are generated in the binary dir, tell CMake
   # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 #find_package(Qt4 REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5UiTools REQUIRED)
-find_package(Qt5Designer REQUIRED)
+#find_package(Qt5Core REQUIRED)
+find_package(Qt5 COMPONENTS CORE WIDGETS DESIGNER UITOOLS PRINTSUPPORT REQUIRED)
+#find_package(Qt5UiTools REQUIRED)
+#find_package(Qt5Widgets REQUIRED)
+
 find_package(OpenCV REQUIRED COMPONENTS core)
 #find_package(Glew REQUIRED)
 #find_package(Glut REQUIRED)
@@ -85,6 +86,7 @@ LINK_DIRECTORIES(
 message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
 set(designer_HEADERS
+    ${ITOM_SDK_INCLUDE_DIR}/common/addInInterface.h
     ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsGraphInc.h
     ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsInc.h
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
@@ -125,6 +127,7 @@ set(designer_rcc
 )
 
 set(designer_SOURCES 
+    ${ITOM_SDK_INCLUDE_DIR}/common/addInInterface.cpp
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
