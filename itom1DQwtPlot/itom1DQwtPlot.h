@@ -23,6 +23,13 @@
 #ifndef ITOM1DPLOT_H
 #define ITOM1DPLOT_H
 
+#if defined(ITOMSHAREDDESIGNER)
+    #define ITOM1DPLOT_EXPORT Q_DECL_EXPORT
+#else
+    #define ITOM1DPLOT_EXPORT Q_DECL_IMPORT
+#endif
+
+
 #include "plot/AbstractDObjFigure.h"
 
 //#include "plot1DWidget.h"
@@ -37,7 +44,7 @@
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
 
-class ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
+class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 {
     Q_OBJECT
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
@@ -68,6 +75,7 @@ class ITOMSHAREDDESIGNER_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
     Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
 
+    DESIGNER_PLUGIN_ITOM_API
 
     public:
         Itom1DQwtPlot(QWidget *parent = 0);

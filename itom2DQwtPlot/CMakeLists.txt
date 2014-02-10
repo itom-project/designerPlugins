@@ -17,7 +17,7 @@ SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR
 
 IF(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE SHARED)
-ELSE(BUILD_SHARED_LIBS)
+ELSE(BUILD_SHARED_LIBS) 
     SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
@@ -107,9 +107,9 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
 
 )
 
@@ -128,13 +128,6 @@ set(designer_rcc
 
 set(designer_SOURCES 
     ${ITOM_SDK_INCLUDE_DIR}/common/addInInterface.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresPrimitives.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjItem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.cpp
@@ -143,9 +136,9 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
@@ -166,7 +159,7 @@ ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADER
 
 qt5_use_modules(${target_name} Gui PrintSupport UiTools Widgets Svg Designer)
 
-TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc)
+TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)

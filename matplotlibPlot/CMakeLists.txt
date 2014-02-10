@@ -93,9 +93,6 @@ set(designer_rcc
 )
 
 set(designer_SOURCES
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
-	${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
-	${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplotfactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibWidget.cpp
@@ -117,7 +114,7 @@ file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
 QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES})
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)

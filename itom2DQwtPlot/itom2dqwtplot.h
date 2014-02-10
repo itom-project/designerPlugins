@@ -23,6 +23,12 @@
 #ifndef ITOM2DQWTPLOT_H
 #define ITOM2DQWTPLOT_H
 
+#if defined(ITOMSHAREDDESIGNER)
+    #define ITOM2DPLOT_EXPORT Q_DECL_EXPORT
+#else
+    #define ITOM2DPLOT_EXPORT Q_DECL_IMPORT
+#endif
+
 #include "plot/AbstractDObjFigure.h"
 #include "plot/AbstractNode.h"
 
@@ -36,7 +42,7 @@
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
-class Itom2dQwtPlot : public ito::AbstractDObjFigure
+class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
@@ -59,7 +65,7 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
-    Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage DESIGNABLE false)
+    Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -82,9 +88,10 @@ class Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
 
     Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
-    Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")
-
-public:
+    Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
+    
+    DESIGNER_PLUGIN_ITOM_API
+    public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
 
@@ -173,7 +180,7 @@ public:
         this->m_pOverlaySlider->setValue(m_data.m_alpha);
     }
 
-    void resetAlpha ()
+    void resetAlpha(void)
     {
         setAlpha(0);
     }
@@ -184,6 +191,13 @@ public:
         if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
         
     }
+
+    void resetOverlayImage(void)
+    {
+        if(m_pContent) m_pContent->setOverlayObject(NULL);
+        
+    }
+    
 
     void enableOverlaySlider(bool enabled) {m_pActOverlaySlider->setVisible(enabled);}
 
@@ -278,6 +292,8 @@ public slots:
 
     //this can be invoked by python to trigger a lineplot
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
+
+    void removeOverlayImage(void) { return resetOverlayImage();}
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);

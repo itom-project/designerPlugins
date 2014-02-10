@@ -29,8 +29,8 @@
 #include "DataObject/dataobj.h"
 
 #include "dataObjItem.h"
-#include "plot/userInteractionPlotPicker.h"
-#include "plot/drawItem.h"
+#include "../sharedFiles/userInteractionPlotPicker.h"
+#include "../sharedFiles/drawItem.h"
 
 
 #include <qwidget.h>

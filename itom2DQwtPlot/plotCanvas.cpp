@@ -29,9 +29,7 @@
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
 #include "valuePicker2d.h"
-#include "plot/multiPointPickerMachine.h"
-#include "plot/userInteractionPlotPicker.h"
-#include "plot/drawItem.h"
+#include "../sharedFiles/multiPointPickerMachine.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -363,7 +361,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             ito::DataObjectTagType tag;
             std::string descr, unit;
             tag = dObj->getTag("title", valid);
-            m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
+            m_pData->m_titleDObj = valid ? tag.getVal_ToString().data() : "";
             m_pData->m_dataType = (ito::tDataType)dObj->getType();
 
             descr = dObj->getValueDescription();
