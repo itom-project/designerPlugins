@@ -29,7 +29,7 @@
 #include "qnumeric.h"
 
 #include "common/sharedStructuresPrimitives.h"
-#include "../sharedFiles/multiPointPickerMachine.h"
+#include "plot/multiPointPickerMachine.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -515,7 +515,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         bool valid;
         ito::DataObjectTagType tag;
         tag = dataObj->getTag("title", valid);
-        m_pData->m_titleDObj = valid? tag.getVal_ToString().data() : "";
+        m_pData->m_titleDObj = valid? QString::fromStdString(tag.getVal_ToString()) : "";
 
     } 
 

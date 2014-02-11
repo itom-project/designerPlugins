@@ -29,7 +29,11 @@
 #if QT_VERSION >= 0x040400
 #include <qthread.h>
 #include <qfuture.h>
-#include <qtconcurrent/qtconcurrentrun.h>
+#if QT5
+    #include <QtConcurrent/qtconcurrentrun.h>
+#else
+    #include <qtconcurrentrun.h>
+#endif
 #endif
 
 #include "dataObjRasterData.h"

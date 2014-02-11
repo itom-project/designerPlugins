@@ -116,4 +116,6 @@ QString Itom2dQwtPlotPlugin::includeFile() const
     return "itom2dqwtplot.h";
 }
 
-//Q_EXPORT_PLUGIN2(itom2dqwtplot, Itom2dQwtPlotPlugin)
+#ifndef QT5
+    Q_EXPORT_PLUGIN2(itom2dqwtplot, Itom2dQwtPlotPlugin)
+#endif

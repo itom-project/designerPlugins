@@ -80,7 +80,7 @@ struct protocol
 
     bool show;
     double m_psize;
-    ito::ByteArray text;
+    std::string text;
 };
 
 struct objectInfo

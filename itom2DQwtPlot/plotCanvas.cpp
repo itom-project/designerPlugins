@@ -23,8 +23,8 @@
 #include "plotCanvas.h"
 #include "common/sharedStructuresGraphics.h"
 #include "DataObject/dataObjectFuncs.h"
-//#include "common/apiFunctionsGraphInc.h"
-//#include "common/apiFunctionsInc.h"
+#include "common/apiFunctionsGraphInc.h"
+#include "common/apiFunctionsInc.h"
 
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"

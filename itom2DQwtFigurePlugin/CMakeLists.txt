@@ -101,12 +101,12 @@ set(designer_rcc
 )
 
 set(designer_SOURCES 
-
-
-
-
-
-
+    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
+    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectRasterData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2DQwtFigure.cpp

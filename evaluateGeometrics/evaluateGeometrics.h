@@ -80,8 +80,6 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://lastAddedRelation", "Get the index of the last added relation.")
     Q_CLASSINFO("prop://considerOnly2D",    "If true, only the x & y coordinates are considered.")
 
-    DESIGNER_PLUGIN_ITOM_API
-
     public:
         EvaluateGeometricsFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         virtual ~EvaluateGeometricsFigure();
