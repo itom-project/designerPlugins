@@ -19,8 +19,11 @@ IF(BUILD_SHARED_LIBS)
 ELSE(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
+cmake_policy(SET CMP0020 NEW)
 
-find_package(Qt4 REQUIRED)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+find_package(Qt5 COMPONENTS CORE WIDGETS DESIGNER UITOOLS REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core)
 #find_package(Glut REQUIRED)
 find_package(ITOM_SDK REQUIRED)
@@ -40,7 +43,7 @@ ENDIF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
 
 # enable some qt stuff
 #SET (QT_USE_QTOPENGL TRUE)
-SET (QT_USE_QTXML TRUE)
+#SET (QT_USE_QTXML TRUE)
 
 # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
 IF (DEFINED CMAKE_BUILD_TYPE)
@@ -54,7 +57,7 @@ message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${QT_QTCORE_INCLUDE_DIR}
+#    ${QT_QTCORE_INCLUDE_DIR}
     ${OpenCV_DIR}/include
     ${ITOM_SDK_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
@@ -68,7 +71,7 @@ LINK_DIRECTORIES(
 #    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdParty/glew/lib
 )
 
-INCLUDE(${QT_USE_FILE})
+#INCLUDE(${QT_USE_FILE})
 
 set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsGraphInc.h
@@ -89,13 +92,13 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
-QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
+QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
 
 set(designer_ui
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
 )
 
-QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
+QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
 
 set(designer_rcc
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
@@ -128,21 +131,23 @@ set (TRANSLATIONS_FILES)
 file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
 #handle translations END STEP 1
 
-QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
+qt5_use_modules(${target_name} Designer PrintSupport UiTools Widgets Svg)
+
+TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)
-    QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+    #QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
     
     add_custom_target (_${target_name}_translation DEPENDS ${TRANSLATION_OUTPUT_FILES})
     add_dependencies(${target_name} _${target_name}_translation)
     
-    QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
+    #QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
 else (UPDATE_TRANSLATIONS)
-    QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
+    #QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
 endif (UPDATE_TRANSLATIONS)
 #handle translations END STEP 2
 

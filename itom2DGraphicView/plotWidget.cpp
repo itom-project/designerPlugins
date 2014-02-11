@@ -58,13 +58,13 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
     m_pItem->setZValue(0.0);
     m_pContent->addItem((QGraphicsItem*)m_pItem);   
 
-    
-    m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
+/*    
+    m_pLineCut = new QGraphicsLineItem((QGraphicsItem*)m_pContent);
     m_pLineCut->setVisible(false);
     m_pLineCut->setZValue(1.0);
     m_lineIsSampling = false;
     m_pLineCut->setPen(m_pData->m_inverseColor0);
-
+*/
     m_pValuePicker = new QGraphicsViewValuePicker("[0.0; 0.0]\n 0.0", m_pContent);
     m_pValuePicker->setColor(m_pData->m_inverseColor0);
     m_pValuePicker->setZValue(1.0);

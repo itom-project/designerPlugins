@@ -116,4 +116,4 @@ QString GraphicViewPlugin::includeFile() const
     return "graphicViewPlot.h";
 }
 
-Q_EXPORT_PLUGIN2(graphicViewPlot, GraphicViewPlugin)
+//Q_EXPORT_PLUGIN2(graphicViewPlot, GraphicViewPlugin)

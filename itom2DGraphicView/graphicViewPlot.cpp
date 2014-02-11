@@ -60,7 +60,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_pActProperties(NULL)
 {
     
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toAscii().data()));
+    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toLatin1().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 

@@ -23,7 +23,7 @@
 #ifndef PlotWidget_H
 #define PlotWidget_H
 
-#include <QtGui/QGraphicsView>
+#include <QGraphicsView>
 
 #include <qgraphicsitem.h>
 #include <QGraphicsLineItem>
@@ -38,6 +38,7 @@
 #include <qapplication.h>
 #include <qqueue.h>
 #include <qmenu.h>
+#include <QGraphicsSimpleTextItem>
 
 #include "dObjToQImage.h"
 
@@ -50,7 +51,7 @@ class QGraphicsViewValuePicker : public QGraphicsSimpleTextItem
 {
     public:
         QGraphicsViewValuePicker(const QString text, QGraphicsScene* scene, QGraphicsItem* parent = NULL)
-            :QGraphicsSimpleTextItem(text, NULL, scene), m_showMarker(false), m_Pen(Qt::red) //, m_textPen(Qt::red)
+            :QGraphicsSimpleTextItem(text, NULL), m_showMarker(false), m_Pen(Qt::red) //, m_textPen(Qt::red)
         {
              m_Pen.setWidthF(0.5);
         }
