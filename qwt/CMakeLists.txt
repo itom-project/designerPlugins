@@ -22,8 +22,12 @@ ENDIF(UNIX)
   # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#find_package(Qt4 REQUIRED)
-find_package(Qt5 COMPONENTS WIDGETS UITOOLS PRINTSUPPORT REQUIRED)
+if (USE_QT5)
+    find_package(Qt5 COMPONENTS WIDGETS UITOOLS PRINTSUPPORT REQUIRED)
+else (USE_QT5)
+    find_package(Qt4 REQUIRED)
+endif (USE_QT5)
+
 find_package(ITOM_SDK REQUIRED)
 find_package(VisualLeakDetector QUIET)
 
@@ -62,7 +66,9 @@ LINK_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-#INCLUDE(${QT_USE_FILE})
+if (NOT USE_QT5)
+    INCLUDE(${QT_USE_FILE})
+endif (NOT USE_QT5)
 
 message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -167,13 +173,21 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.h
 )
 
-QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
+if (USE_QT5)
+    QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
+else (USE_QT5)
+    QT4_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
+endif (USE_QT5)
 
 #set(designer_ui
 #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
 #)
 
-QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
+if (USE_QT5)
+    QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
+else (USE_QT5)
+    QT4_WRAP_UI(designer_ui_MOC ${designer_ui})
+endif (USE_QT5)
 
 #set(designer_rcc
 #    ${CMAKE_CURRENT_SOURCE_DIR}/qwt.qrc
@@ -277,9 +291,19 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.cpp
 )
 
-QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+if (USE_QT5)
+    QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+else (USE_QT5)
+    QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+endif (USE_QT5)
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
-TARGET_LINK_LIBRARIES(${target_name} ${VISUALLEAKDETECTOR_LIBRARIES})
+if (USE_QT5)
+    TARGET_LINK_LIBRARIES(${target_name} ${VISUALLEAKDETECTOR_LIBRARIES})
+else (USE_QT5)
+    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES})
+endif (USE_QT5)
 
-qt5_use_modules(${target_name} PrintSupport UiTools Widgets Svg)
+if (USE_QT5)
+    qt5_use_modules(${target_name} PrintSupport UiTools Widgets Svg)
+endif (USE_QT5)

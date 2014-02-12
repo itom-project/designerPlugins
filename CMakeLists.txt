@@ -10,9 +10,6 @@ SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 
 IF (USE_QT5)
     cmake_policy(SET CMP0020 NEW)
-ENDIF (USE_QT5)
-
-if (USE_QT5)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQT5")
 endif (USE_QT5)
 
