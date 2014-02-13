@@ -1658,7 +1658,7 @@ void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = fal
         m = &(m_markers[i]);
         if (updatePositions)
         {
-            stickMarkerToXPx(m, std::numeric_limits<double>::signaling_NaN() ,0);
+            stickMarkerToXPx(m, std::numeric_limits<double>::quiet_NaN() ,0);
         }
 
         if (m->active)

@@ -178,6 +178,7 @@ class PlotTreeWidget : public QTreeWidget
         void clearRelation(const bool apply);                                         /*! clear the relations list and be happy */
 
     protected:
+        static double quietNaN;
         /*
         void keyPressEvent ( QKeyEvent * event );
         void mousePressEvent ( QMouseEvent * event );
@@ -195,10 +196,10 @@ class PlotTreeWidget : public QTreeWidget
         void updateRelationShips(const bool fastUpdate);                              /*! force an update of all relation ships. */
         void setPrimitivElement(const int row, const bool update, ito::float32 *val); /*! Set a primitiv element in row number row */
 
-        bool calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle);       /*! calculate the angle between to elements */
-        bool calculateDistance(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &distance); /*! calculate the distance between to elements */
-        bool calculateRadius(ito::float32 *first, ito::float32 &radius);                                              /*! calculate the radius of a sigle circle or ellipse */
-        bool calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length);                           /*! calculate the length of a line */
+        bool calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle);         /*! calculate the angle between to elements */
+        bool calculateDistance(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &distance);   /*! calculate the distance between to elements */
+        bool calculateRadius(ito::float32 *first, ito::float32 &radius);                                                /*! calculate the radius of a sigle circle or ellipse */
+        bool calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length);                             /*! calculate the length of a line */
         //bool calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point);  /*! calculate the intersection point of two lines */
         bool calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area);                                 /*! calculate the area of a geometric element */
         bool calculateCircumference(ito::float32 *first, ito::float32 &length);                                         /*! calculate the circumference of a circle, rectangle or square */
