@@ -1560,37 +1560,22 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
         if(m_axisZ.autoScale)
         {
+            
             switch(m_pContent->getType())
             {
                 case ito::tUInt8:
-                    ito::dObjHelper::minMaxValueFunc<ito::uint8>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                break;
                 case ito::tInt8:
-                    ito::dObjHelper::minMaxValueFunc<ito::int8>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                break;
                 case ito::tUInt16:
-                    ito::dObjHelper::minMaxValueFunc<ito::uint16>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                break;
                 case ito::tInt16:
-                    ito::dObjHelper::minMaxValueFunc<ito::int16>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                break;
                 case ito::tUInt32:
-                    ito::dObjHelper::minMaxValueFunc<ito::uint32>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                break;
                 case ito::tInt32:
-                    ito::dObjHelper::minMaxValueFunc<ito::int32>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                break;
                 case ito::tFloat32:
-                    ito::dObjHelper::minMaxValueFunc<ito::float32>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                break;
                 case ito::tFloat64:
-                    ito::dObjHelper::minMaxValueFunc<ito::float64>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
+                    ito::dObjHelper::minMaxValue(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
                 break;
                 case ito::tComplex64:
-                    ito::dObjHelper::minMaxValueFunc<ito::complex64>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true, m_cmplxMode);
-                break;
                 case ito::tComplex128:
-                    ito::dObjHelper::minMaxValueFunc<ito::complex128>(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true, m_cmplxMode);
+                    ito::dObjHelper::minMaxValue(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true, m_cmplxMode);
                 break;
                 default:
                     retval == ito::retError;

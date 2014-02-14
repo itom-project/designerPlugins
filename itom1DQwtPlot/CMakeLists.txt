@@ -11,6 +11,8 @@ OPTION(UPDATE_TRANSLATIONS "Update source translation translation/*.ts files (WA
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 SET (ITOM_LANGUAGES "de" CACHE STRING "semicolon separated list of languages that should be created (en must not be given since it is the default)")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+cmake_policy(SET CMP0020 NEW)
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
 
@@ -20,7 +22,14 @@ ELSE(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
-find_package(Qt4 REQUIRED)
+set(QT5_INSTALLED FALSE)
+find_package(Qt5 COMPONENTS Widgets Designer UiTools Svg OpenGL Xml LinguistTools)
+if (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
+    set(QT5_INSTALLED TRUE)
+endif (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
+if (NOT QT5_INSTALLED)
+    find_package(Qt4 REQUIRED)
+endif (NOT QT5_INSTALLED)
 find_package(OpenCV REQUIRED COMPONENTS core)
 #find_package(Glut REQUIRED)
 find_package(ITOM_SDK REQUIRED)
@@ -39,7 +48,7 @@ IF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
 ENDIF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
 
 # enable some qt stuff
-SET (QT_USE_QTXML TRUE)
+#SET (QT_USE_QTXML TRUE)
 
 # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
 IF (DEFINED CMAKE_BUILD_TYPE)
@@ -66,7 +75,9 @@ LINK_DIRECTORIES(
     ${OpenCV_DIR}/lib
 )
 
-INCLUDE(${QT_USE_FILE})
+if (NOT QT5_INSTALLED)
+    INCLUDE(${QT_USE_FILE})
+endif (NOT QT5_INSTALLED)
 
 set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
@@ -88,19 +99,27 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
 )
 
-QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
+if (QT5_INSTALLED)
+    QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
+else (QT5_INSTALLED)
+    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
+endif (QT5_INSTALLED)
 
 set(designer_ui
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
      ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
 )
 
-QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
+if (QT5_INSTALLED)
+    QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
+else (QT5_INSTALLED)
+    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
+endif (QT5_INSTALLED)
 
 set(designer_HEADERS_COPY
 	${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.h
@@ -112,12 +131,6 @@ set(designer_rcc
 )
 
 set(designer_SOURCES 
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.cpp
@@ -126,9 +139,9 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/multiPointPickerMachine.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/userInteractionPlotPicker.cpp
-    ${ITOM_SDK_INCLUDE_DIR}/plot/drawItem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
@@ -144,21 +157,42 @@ set (TRANSLATIONS_FILES)
 file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
 #handle translations END STEP 1
 
-QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+if (QT5_INSTALLED)
+    QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+else (QT5_INSTALLED)
+    QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+endif (QT5_INSTALLED)
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc) #glu32 opengl32 qwtsrc)
+if (QT5_INSTALLED)
+    TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
+    qt5_use_modules(${target_name} Widgets Designer UiTools Xml Svg OpenGL)
+else (QT5_INSTALLED)
+    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
+endif (QT5_INSTALLED)
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)
-    QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+    if (QT5_INSTALLED)
+        QT5_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})    
+    else (QT5_INSTALLED)
+        QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+    endif (QT5_INSTALLED)
     
     add_custom_target (_${target_name}_translation DEPENDS ${TRANSLATION_OUTPUT_FILES})
     add_dependencies(${target_name} _${target_name}_translation)
     
-    QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
+    if (QT5_INSTALLED)
+        QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})    
+    else (QT5_INSTALLED)    
+        QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
+    endif (QT5_INSTALLED)
 else (UPDATE_TRANSLATIONS)
-    QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
+    if (QT5_INSTALLED)
+        QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})    
+    else (QT5_INSTALLED)
+        QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
+    endif (QT5_INSTALLED)
 endif (UPDATE_TRANSLATIONS)
 #handle translations END STEP 2
 

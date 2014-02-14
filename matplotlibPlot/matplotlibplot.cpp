@@ -3,7 +3,7 @@
 #include "matplotlibSubfigConfig.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT MatplotlibPlot::MatplotlibPlot(QWidget *parent)
+MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     : QMainWindow(parent),
     m_actHome(NULL),
     m_actForward(NULL),
@@ -98,7 +98,7 @@ ITOMSHAREDDESIGNER_EXPORT MatplotlibPlot::MatplotlibPlot(QWidget *parent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT MatplotlibPlot::~MatplotlibPlot()
+MatplotlibPlot::~MatplotlibPlot()
 {
     if (m_pMatplotlibSubfigConfig)
     {
@@ -108,7 +108,7 @@ ITOMSHAREDDESIGNER_EXPORT MatplotlibPlot::~MatplotlibPlot()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::resizeCanvas(int width, int height)
+void MatplotlibPlot::resizeCanvas(int width, int height)
 {
     if (m_toolbar->isVisible() && m_toolbar->isFloating() == false)
     {
@@ -128,7 +128,7 @@ ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::resizeCanvas(int width, int heigh
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::setToolbarVisible(bool visible)
+void MatplotlibPlot::setToolbarVisible(bool visible)
 {
     if (m_toolbar)
     {
@@ -137,7 +137,7 @@ ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::setToolbarVisible(bool visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT bool MatplotlibPlot::getToolbarVisible() const 
+bool MatplotlibPlot::getToolbarVisible() const 
 { 
     if (m_toolbar)
     {
@@ -147,7 +147,7 @@ ITOMSHAREDDESIGNER_EXPORT bool MatplotlibPlot::getToolbarVisible() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::mnuMarkerClick(bool checked)
+void MatplotlibPlot::mnuMarkerClick(bool checked)
 {
     if (m_pContent)
     {
@@ -157,7 +157,7 @@ ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::mnuMarkerClick(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::setContextMenuEnabled(bool show)
+void MatplotlibPlot::setContextMenuEnabled(bool show)
 {
     if (m_pContent) 
     {
@@ -166,7 +166,7 @@ ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::setContextMenuEnabled(bool show)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT bool MatplotlibPlot::getContextMenuEnabled() const
+bool MatplotlibPlot::getContextMenuEnabled() const
 {
     if (m_pContent)
     {
@@ -176,7 +176,7 @@ ITOMSHAREDDESIGNER_EXPORT bool MatplotlibPlot::getContextMenuEnabled() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ITOMSHAREDDESIGNER_EXPORT void MatplotlibPlot::showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace)
+void MatplotlibPlot::showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace)
 {
     if (m_pMatplotlibSubfigConfig == NULL)
     {

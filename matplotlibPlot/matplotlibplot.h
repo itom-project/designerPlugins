@@ -1,6 +1,12 @@
 #ifndef MATPLOTLIBPLOT_H
 #define MATPLOTLIBPLOT_H
 
+#if defined(ITOMSHAREDDESIGNER)
+    #define ITOMMATPLOTLIB_EXPORT Q_DECL_EXPORT
+#else
+    #define ITOMMATPLOTLIB_EXPORT Q_DECL_IMPORT
+#endif
+
 #include <QtCore/QtGlobal>
 #include <qmainwindow.h>
 #include <qaction.h>
@@ -11,7 +17,7 @@
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
 
-class ITOMSHAREDDESIGNER_EXPORT MatplotlibPlot : public QMainWindow
+class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(bool toolbarVisible READ getToolbarVisible WRITE setToolbarVisible DESIGNABLE true)
