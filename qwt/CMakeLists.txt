@@ -22,11 +22,13 @@ ENDIF(UNIX)
   # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if (USE_QT5)
-    find_package(Qt5 COMPONENTS WIDGETS UITOOLS PRINTSUPPORT REQUIRED)
-else (USE_QT5)
+find_package(Qt5 COMPONENTS Widgets UiTools PrintSupport Concurrent Svg)
+if (NOT ${Qt5_DIR} STREQUAL "") 
+    set(QT5_INSTALLED TRUE)
+endif (NOT ${Qt5_DIR} STREQUAL "") 
+if (NOT QT5_INSTALLED)
     find_package(Qt4 REQUIRED)
-endif (USE_QT5)
+endif (NOT QT5_INSTALLED)
 
 find_package(ITOM_SDK REQUIRED)
 find_package(VisualLeakDetector QUIET)
@@ -61,19 +63,19 @@ INCLUDE_DIRECTORIES(
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
 )
 
-IF(NOT USE_QT5)
+IF(NOT QT5_INSTALLED)
     INCLUDE_DIRECTORIES(
         ${QT_QTSVG_INCLUDE_DIR}
     )
-ENDIF(NOT USE_QT5)
+ENDIF(NOT QT5_INSTALLED)
 
 LINK_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-if (NOT USE_QT5)
+if (NOT QT5_INSTALLED)
     INCLUDE(${QT_USE_FILE})
-endif (NOT USE_QT5)
+endif (NOT QT5_INSTALLED)
 
 message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -178,21 +180,21 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.h
 )
 
-if (USE_QT5)
+if (QT5_INSTALLED)
     QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
-else (USE_QT5)
+else (QT5_INSTALLED)
     QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
 #set(designer_ui
 #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
 #)
 
-if (USE_QT5)
+if (QT5_INSTALLED)
     QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
-else (USE_QT5)
+else (QT5_INSTALLED)
     QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
 #set(designer_rcc
 #    ${CMAKE_CURRENT_SOURCE_DIR}/qwt.qrc
@@ -296,19 +298,19 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.cpp
 )
 
-if (USE_QT5)
+if (QT5_INSTALLED)
     QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-else (USE_QT5)
+else (QT5_INSTALLED)
     QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
-if (USE_QT5)
+if (QT5_INSTALLED)
     TARGET_LINK_LIBRARIES(${target_name} ${VISUALLEAKDETECTOR_LIBRARIES})
-else (USE_QT5)
+else (QT5_INSTALLED)
     TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
-if (USE_QT5)
-    qt5_use_modules(${target_name} PrintSupport UiTools Widgets Svg)
-endif (USE_QT5)
+if (QT5_INSTALLED)
+    qt5_use_modules(${target_name} PrintSupport Concurrent UiTools Widgets Svg)
+endif (QT5_INSTALLED)

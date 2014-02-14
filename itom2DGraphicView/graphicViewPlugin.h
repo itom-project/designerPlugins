@@ -28,8 +28,8 @@
 class GraphicViewPlugin : public ito::AbstractItomDesignerPlugin
 {
     Q_OBJECT
-#if QT_VERSION >= 0x050000
-        Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" )
+#if QT_VERSION >=  QT_VERSION_CHECK(5,0,0)
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" )
 #endif
 
 public:

@@ -18,7 +18,7 @@
 #if QT_VERSION >= 0x040400
 #include <qthread.h>
 #include <qfuture.h>
-#ifdef QT5
+#if (QT_VERSION >= 0x050000)
     #include <QtConcurrent/qtconcurrentrun.h>
 #else
     #include <qtconcurrentrun.h>

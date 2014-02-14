@@ -116,6 +116,6 @@ QString GraphicViewPlugin::includeFile() const
     return "graphicViewPlot.h";
 }
 
-#ifndef QT5
+#if (QT_VERSION < 0x050000)
     Q_EXPORT_PLUGIN2(graphicViewPlot, GraphicViewPlugin)
 #endif

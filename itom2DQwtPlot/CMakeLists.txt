@@ -12,12 +12,9 @@ SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 SET (ITOM_LANGUAGES "de" CACHE STRING "semicolon separated list of languages that should be created (en must not be given since it is the default)")
 
-IF (USE_QT5)
-    cmake_policy(SET CMP0020 NEW)
-ENDIF (USE_QT5)
-
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+cmake_policy(SET CMP0020 NEW)
 
 IF(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE SHARED)
@@ -25,11 +22,13 @@ ELSE(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
-if (USE_QT5)
-    find_package(Qt5 COMPONENTS CORE GUI DESIGNER REQUIRED)
-else (USE_QT5)
+find_package(Qt5 COMPONENTS Widgets Designer LinguistTools)
+if (NOT ${Qt5_DIR} STREQUAL "") 
+    set(QT5_INSTALLED TRUE)
+endif (NOT ${Qt5_DIR} STREQUAL "") 
+if (NOT QT5_INSTALLED)
     find_package(Qt4 REQUIRED)
-endif (USE_QT5)
+endif (NOT QT5_INSTALLED)
 find_package(OpenCV REQUIRED COMPONENTS core)
 #find_package(Glew REQUIRED)
 #find_package(Glut REQUIRED)
@@ -78,9 +77,9 @@ LINK_DIRECTORIES(
     ${OpenCV_DIR}/lib
 )
 
-if (NOT USE_QT5)
+if (NOT QT5_INSTALLED)
     INCLUDE(${QT_USE_FILE})
-endif (NOT USE_QT5)
+endif (NOT QT5_INSTALLED)
 
 message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -111,22 +110,22 @@ set(designer_HEADERS
 
 )
 
-if (USE_QT5)
+if (QT5_INSTALLED)
     QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
-else (USE_QT5)
+else (QT5_INSTALLED)
     QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
 set(designer_ui
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
 )
 
-if (USE_QT5)
+if (QT5_INSTALLED)
     QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
-else (USE_QT5)
+else (QT5_INSTALLED)
     QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
 set(designer_rcc
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
@@ -159,44 +158,44 @@ set (TRANSLATIONS_FILES)
 file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
 #handle translations END STEP 1
 
-if (USE_QT5)
+if (QT5_INSTALLED)
     QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-else (USE_QT5)
+else (QT5_INSTALLED)
     QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS_MOC} ${designer_HEADERS} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-if (USE_QT5)
+if (QT5_INSTALLED)
     TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
     
-    qt5_use_modules(${target_name} Widgets Gui Designer)
-else (USE_QT5)
+    qt5_use_modules(${target_name} Widgets Designer)
+else (QT5_INSTALLED)
     TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
-endif (USE_QT5)
+endif (QT5_INSTALLED)
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)
-    if (USE_QT5)
+    if (QT5_INSTALLED)
         QT5_CREATE_TRANSLATION(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})    
-    else (USE_QT5)
+    else (QT5_INSTALLED)
         QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
-    endif (USE_QT5)
+    endif (QT5_INSTALLED)
     
     add_custom_target (_${target_name}_translation DEPENDS ${TRANSLATION_OUTPUT_FILES})
     add_dependencies(${target_name} _${target_name}_translation)
     
-    if (USE_QT5)
+    if (QT5_INSTALLED)
         QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
-    else (USE_QT5)
+    else (QT5_INSTALLED)
         QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
-    endif (USE_QT5)
+    endif (QT5_INSTALLED)
 else (UPDATE_TRANSLATIONS)
-    if (USE_QT5)
+    if (QT5_INSTALLED)
         QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})    
-    else (USE_QT5)
+    else (QT5_INSTALLED)
         QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
-    endif (USE_QT5)
+    endif (QT5_INSTALLED)
 endif (UPDATE_TRANSLATIONS)
 #handle translations END STEP 2
 
@@ -204,5 +203,5 @@ endif (UPDATE_TRANSLATIONS)
 set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")
 ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
-ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
+#ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
 POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
