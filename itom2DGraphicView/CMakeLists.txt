@@ -23,10 +23,11 @@ ENDIF(BUILD_SHARED_LIBS)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(QT5_INSTALLED FALSE)
 find_package(Qt5 COMPONENTS Widgets Designer UiTools PrintSupport Svg LinguistTools)
-if (NOT ${Qt5_DIR} STREQUAL "") 
+if (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
     set(QT5_INSTALLED TRUE)
-endif (NOT ${Qt5_DIR} STREQUAL "") 
+endif (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
 if (NOT QT5_INSTALLED)
     find_package(Qt4 REQUIRED)
 endif (NOT QT5_INSTALLED)
