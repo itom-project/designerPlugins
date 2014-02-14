@@ -29,6 +29,9 @@
 class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
 {
     Q_OBJECT
+#if QT_VERSION >= 0x050000
+        Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" )
+#endif
 
 public:
     Itom2dQwtPlotPlugin(QObject *parent = 0);

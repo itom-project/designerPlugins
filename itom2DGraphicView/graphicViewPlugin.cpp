@@ -116,8 +116,6 @@ QString GraphicViewPlugin::includeFile() const
     return "graphicViewPlot.h";
 }
 
-#ifdef QT5
-    Q_PLUGIN_METADATA(IID "GraphicViewPlugin")
-#else
+#ifndef QT5
     Q_EXPORT_PLUGIN2(graphicViewPlot, GraphicViewPlugin)
 #endif
