@@ -35,6 +35,9 @@
 #include <QCoreApplication>
 
 #define GEO_PI 3.14159265358979323846
+
+double PlotTreeWidget::quietNaN = std::numeric_limits<double>::quiet_NaN();
+
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget * parent) :
     QTreeWidget(parent),
@@ -647,12 +650,12 @@ bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, c
 
     if (typeOne != ito::PrimitiveContainer::tLine)
     {
-        angle = std::numeric_limits<ito::float32>::signaling_NaN();
+        angle = quietNaN;
         return false;
     }
     if (typeTwo != ito::PrimitiveContainer::tLine)
     {
-        angle = std::numeric_limits<ito::float32>::signaling_NaN();
+        angle = quietNaN;
         return false;
     }
 
@@ -672,7 +675,7 @@ bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, c
         angle = acos(firstVector.dot(secondVector) / abs) * 180 / GEO_PI;
         return true;    
     }
-    angle = std::numeric_limits<ito::float32>::signaling_NaN();
+    angle = quietNaN;
     return false;
 }
 
@@ -720,7 +723,7 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     }
     else
     {
-        distance = std::numeric_limits<ito::float32>::signaling_NaN();
+        distance = quietNaN;
         return false;
     }
 
@@ -733,7 +736,7 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
 
     if (!ito::dObjHelper::isNotZero(lineDirVector[0]) && !ito::dObjHelper::isNotZero(lineDirVector[1]) && !ito::dObjHelper::isNotZero(lineDirVector[2]))
     {
-        distance = std::numeric_limits<ito::float32>::signaling_NaN();
+        distance = quietNaN;
         return false;
     }
 
@@ -758,7 +761,7 @@ bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
             radius = (first[5] +  first[6])/2;   
             return true;
         default:
-            radius = std::numeric_limits<ito::float32>::signaling_NaN();
+            radius = quietNaN;
             return false;
     }
     return false;
@@ -769,7 +772,7 @@ bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito
 {
     if (((ito::uint32)(first[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine)
     {
-        length = std::numeric_limits<ito::float32>::signaling_NaN();
+        length = quietNaN;
         return false;
     }
 
@@ -805,7 +808,7 @@ bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::
             area = (first[5] * first[6])* GEO_PI;
             return true;
         default:
-            area = std::numeric_limits<ito::float32>::signaling_NaN();
+            area = quietNaN;
             return false;
     }
 
@@ -829,7 +832,7 @@ bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &l
             length =  2 * first[5] * GEO_PI;
             return true;
         default:
-            length = std::numeric_limits<ito::float32>::signaling_NaN();
+            length = quietNaN;
             return false;
     }
     return false;
@@ -842,9 +845,9 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
 
     if (((ito::uint32)(first[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine || ((ito::uint32)(second[1]) & 0x0000FFFF) != ito::PrimitiveContainer::tLine)
     {
-        point[0] = std::numeric_limits<ito::float32>::signaling_NaN();
-        point[1] = std::numeric_limits<ito::float32>::signaling_NaN();
-        point[2] = std::numeric_limits<ito::float32>::signaling_NaN();
+        point[0] = quietNaN;
+        point[1] = quietNaN;
+        point[2] = quietNaN;
         return false;
     }
 
@@ -858,9 +861,9 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
 
     if (!ito::dObjHelper::isNotZero(absFst) ||  !ito::dObjHelper::isNotZero(absSec))
     {
-        point[0] = std::numeric_limits<ito::float32>::signaling_NaN();
-        point[1] = std::numeric_limits<ito::float32>::signaling_NaN();
-        point[2] = std::numeric_limits<ito::float32>::signaling_NaN();
+        point[0] = quietNaN;
+        point[1] = quietNaN;
+        point[2] = quietNaN;
         return false;
     }
 
@@ -886,9 +889,9 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
         }
         else
         {
-            point[0] = std::numeric_limits<ito::float32>::signaling_NaN();
-            point[1] = std::numeric_limits<ito::float32>::signaling_NaN();
-            point[2] = std::numeric_limits<ito::float32>::signaling_NaN();
+            point[0] = quietNaN;
+            point[1] = quietNaN;
+            point[2] = quietNaN;
             return true;
         }
     }
@@ -1000,7 +1003,7 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
                     {
                         if (hashKeys[dcnt] == (ito::int32)srcPtr[0])
                         {
-                            std::fill(m_rowHash[hashKeys[dcnt]].cells, m_rowHash[hashKeys[dcnt]].cells + PRIM_ELEMENTLENGTH, std::numeric_limits<ito::float32>::signaling_NaN());
+                            std::fill(m_rowHash[hashKeys[dcnt]].cells, m_rowHash[hashKeys[dcnt]].cells + PRIM_ELEMENTLENGTH, quietNaN);
                             memcpy(m_rowHash[hashKeys[dcnt]].cells, srcPtr, sizeof(ito::float32) * cols);
                             found = true;
                             break;

@@ -68,6 +68,7 @@ class DataObjRasterData : public QwtRasterData
         inline double scaleToPxCoords(double coord, double offset, double scaling) { return (coord / scaling) + offset; }
 
     private:
+        static double quietNaN;
 
         void deleteCache();
 

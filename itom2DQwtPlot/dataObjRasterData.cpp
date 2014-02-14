@@ -27,6 +27,8 @@
 
 #include <qdebug.h>
 
+double DataObjRasterData::quietNaN = std::numeric_limits<double>::quiet_NaN();
+
 //----------------------------------------------------------------------------------------------------------------------------------
 DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const bool overlay) :
     QwtRasterData(),
@@ -390,12 +392,12 @@ double DataObjRasterData::value(double x, double y) const
                         return m_plane->at<ito::Rgba32>(m,n).gray();
                     }
                 default:
-                    return std::numeric_limits<double>::signaling_NaN();
+                    return quietNaN;
                 }
             }
         }
     }
-    return std::numeric_limits<double>::signaling_NaN();
+    return quietNaN;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -408,55 +410,55 @@ double DataObjRasterData::value2(int m, int n) const
         case ito::tInt8:
             {
                 ito::int8 *line = (ito::int8*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt8:
             {
                 ito::uint8 *line = (ito::uint8*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tInt16:
             {
                 ito::int16 *line = (ito::int16*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt16:
             {
                 ito::uint16 *line = (ito::uint16*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tInt32:
             {
                 ito::int32 *line = (ito::int32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt32:
             {
                 ito::uint32 *line = (ito::uint32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tFloat32:
             {
                 ito::float32 *line = (ito::float32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tFloat64:
             {
                 ito::float64 *line = (ito::float64*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tComplex64:
             {
                 ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 ito::complex64 i = line[ m_xIndizes[n] ];
 
                 if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
@@ -479,7 +481,7 @@ double DataObjRasterData::value2(int m, int n) const
         case ito::tComplex128:
             {
                 ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 ito::complex128 i = line[ m_xIndizes[n] ];
                 
                 if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
@@ -502,16 +504,16 @@ double DataObjRasterData::value2(int m, int n) const
         case ito::tRGBA32:
             {
                 ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ].gray();
             }
         default:
-            return std::numeric_limits<double>::signaling_NaN();
+            return quietNaN;
         }
     }
     else
     {
-        return std::numeric_limits<double>::signaling_NaN();
+        return quietNaN;
     }
 }
 
@@ -527,55 +529,55 @@ double DataObjRasterData::value2_yinv(int m, int n) const
         case ito::tInt8:
             {
                 ito::int8 *line = (ito::int8*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt8:
             {
                 ito::uint8 *line = (ito::uint8*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tInt16:
             {
                 ito::int16 *line = (ito::int16*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt16:
             {
                 ito::uint16 *line = (ito::uint16*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tInt32:
             {
                 ito::int32 *line = (ito::int32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt32:
             {
                 ito::uint32 *line = (ito::uint32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tFloat32:
             {
                 ito::float32 *line = (ito::float32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tFloat64:
             {
                 ito::float64 *line = (ito::float64*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tComplex64:
             {
                 ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 ito::complex64 i = line[ m_xIndizes[n] ];
 
                 if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
@@ -598,7 +600,7 @@ double DataObjRasterData::value2_yinv(int m, int n) const
         case ito::tComplex128:
             {
                 ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 ito::complex128 i = line[ m_xIndizes[n] ];
                 
                 if (m_pInternalData->m_cmplxType == PlotCanvas::Real)
@@ -621,16 +623,16 @@ double DataObjRasterData::value2_yinv(int m, int n) const
         case ito::tRGBA32:
             {
                 ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
-                if(!line) return std::numeric_limits<double>::signaling_NaN();
+                if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ].gray();
             }
         default:
-            return std::numeric_limits<double>::signaling_NaN();
+            return quietNaN;
         }
     }
     else
     {
-        return std::numeric_limits<double>::signaling_NaN();
+        return quietNaN;
     }
 }
 
