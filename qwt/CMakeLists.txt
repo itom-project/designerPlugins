@@ -181,7 +181,7 @@ set(designer_HEADERS
 if (USE_QT5)
     QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
 else (USE_QT5)
-    QT4_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
+    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
 endif (USE_QT5)
 
 #set(designer_ui
@@ -191,7 +191,7 @@ endif (USE_QT5)
 if (USE_QT5)
     QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
 else (USE_QT5)
-    QT4_WRAP_UI(designer_ui_MOC ${designer_ui})
+    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
 endif (USE_QT5)
 
 #set(designer_rcc

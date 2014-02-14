@@ -28,9 +28,6 @@
 class GraphicViewPlugin : public ito::AbstractItomDesignerPlugin
 {
     Q_OBJECT
-#ifdef QT5
-    Q_PLUGIN_METADATA(IID "GraphicViewPlugin")
-#endif
 
 public:
     GraphicViewPlugin(QObject *parent = 0);

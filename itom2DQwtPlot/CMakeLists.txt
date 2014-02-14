@@ -114,7 +114,7 @@ set(designer_HEADERS
 if (USE_QT5)
     QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
 else (USE_QT5)
-    QT4_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
+    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
 endif (USE_QT5)
 
 set(designer_ui
@@ -125,7 +125,7 @@ set(designer_ui
 if (USE_QT5)
     QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
 else (USE_QT5)
-    QT4_WRAP_UI(designer_ui_MOC ${designer_ui})
+    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
 endif (USE_QT5)
 
 set(designer_rcc
@@ -177,14 +177,26 @@ endif (USE_QT5)
 
 #handle translations BEGIN STEP 2
 if (UPDATE_TRANSLATIONS)
-    #QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+    if (USE_QT5)
+        QT5_CREATE_TRANSLATION(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})    
+    else (USE_QT5)
+        QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
+    endif (USE_QT5)
     
     add_custom_target (_${target_name}_translation DEPENDS ${TRANSLATION_OUTPUT_FILES})
     add_dependencies(${target_name} _${target_name}_translation)
     
-    #QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
+    if (USE_QT5)
+        QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
+    else (USE_QT5)
+        QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
+    endif (USE_QT5)
 else (UPDATE_TRANSLATIONS)
-    #QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
+    if (USE_QT5)
+        QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})    
+    else (USE_QT5)
+        QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
+    endif (USE_QT5)
 endif (UPDATE_TRANSLATIONS)
 #handle translations END STEP 2
 
