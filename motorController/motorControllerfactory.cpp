@@ -111,5 +111,7 @@ QString MotorControllerFactory::includeFile() const
     return "motorController.h";
 }
 //-----------------------------------------------------------------------------------------------
-Q_EXPORT_PLUGIN2(MotorController, MotorControllerFactory)
+#if QT_VERSION <= 0x050000
+    Q_EXPORT_PLUGIN2(MotorController, MotorControllerFactory)
+#endif
 //-----------------------------------------------------------------------------------------------

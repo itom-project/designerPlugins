@@ -117,4 +117,7 @@ QString Itom1DQwtPlotPlugin::includeFile() const
     return "itom1DQwtPlot.h";
 }
 
-Q_EXPORT_PLUGIN2(Itom1DQwtPlot, Itom1DQwtPlotPlugin)
+#if QT_VERSION <  QT_VERSION_CHECK(5,0,0)
+//    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" )
+    Q_EXPORT_PLUGIN2(Itom1DQwtPlot, Itom1DQwtPlotPlugin)
+#endif

@@ -49,7 +49,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_lastFolder(""),
     m_lastAddedRelation(-1)
 {
-    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
     
     //int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
@@ -568,39 +568,39 @@ ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPoint
 
     if (relation.isNull())
     {
-        return ito::RetVal(ito::retError, 0, tr("imported data was Null-pointer").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("imported data was Null-pointer").toLatin1().data());
     }
 
     if ((dims = relation->getDims()) == 0)
     {
-        return ito::RetVal(ito::retError, 0, tr("imported data not initialized").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("imported data not initialized").toLatin1().data());
     }
 
     if (relation->calcNumMats() > 1)
     {
-        return ito::RetVal(ito::retError, 0, tr("imported data has more than one plane").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("imported data has more than one plane").toLatin1().data());
     }
 
     if ((relation->getType() != ito::tFloat32 && relation->getType() != ito::tFloat64))
     {
-        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalid object type").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalid object type").toLatin1().data());
     }
 
     int rows = relation->getSize(dims-2);
 
     if (rows > 1)
     {
-        return ito::RetVal(ito::retError, 0, tr("imported data has more than one row").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("imported data has more than one row").toLatin1().data());
     }
 
     if (idx < 0)
     {
-        return ito::RetVal(ito::retError, 0, tr("tried to access index below zero").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("tried to access index below zero").toLatin1().data());
     }
 
     if (idx < m_info.m_relationsList.size() - 1)
     {
-        return ito::RetVal(ito::retError, 0, tr("addressed relation outside current relation list range (idx = %1, range = 0..%2)").arg(idx).arg(m_info.m_relationsList.size() - 1).toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("addressed relation outside current relation list range (idx = %1, range = 0..%2)").arg(idx).arg(m_info.m_relationsList.size() - 1).toLatin1().data());
     }
 
     relationsShip newRelation;
@@ -624,7 +624,7 @@ ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPoint
             else newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float64>(0,0));
         break;
         case 0:
-            return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toAscii().data());
+            return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toLatin1().data());
     }
 
     m_info.m_relationsList[idx] = newRelation;
@@ -668,12 +668,12 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
             
     if (relation.isNull() || relation->getDims() != 2 || relation->getSize(0) != 1)
     {
-        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalid object dims").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalid object dims").toLatin1().data());
     }
 
     if ((relation->getType() != ito::tFloat32 && relation->getType() != ito::tFloat64))
     {
-        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalid object type").toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("set relation failed due to invalid object type").toLatin1().data());
     }
 
 //    newRelation.secondElementRow = -1;
@@ -698,7 +698,7 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
             else newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float64>(0,0));
         break;
         case 0:
-            return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toAscii().data());
+            return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toLatin1().data());
     }
 
     m_info.m_relationsList.append(newRelation);
@@ -723,7 +723,7 @@ ito::RetVal EvaluateGeometricsFigure::addRelationName(const QString newName)
 
     if (idx < 7 && idx != -1)
     {
-        retval = ito::RetVal(ito::retError, 0, tr("add relation name failed: relation as one of the restricted relations").toAscii().data());
+        retval = ito::RetVal(ito::retError, 0, tr("add relation name failed: relation as one of the restricted relations").toLatin1().data());
         return retval;
     }
 
@@ -734,7 +734,7 @@ ito::RetVal EvaluateGeometricsFigure::addRelationName(const QString newName)
     else
     {
         m_info.m_relationNames[idx] = newName;
-        retval = ito::RetVal(ito::retWarning, 0, tr("add relation name exited with warning: relation already existed").toAscii().data());
+        retval = ito::RetVal(ito::retWarning, 0, tr("add relation name exited with warning: relation already existed").toLatin1().data());
     }
     return retval;
 }

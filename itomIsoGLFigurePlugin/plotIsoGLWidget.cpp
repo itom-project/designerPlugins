@@ -20,6 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+#include "GL/glew.h"
 #if linux
     #include <unistd.h>
 #endif

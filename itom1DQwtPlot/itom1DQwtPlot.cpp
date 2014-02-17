@@ -51,7 +51,7 @@ using namespace ito;
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::constructor()
 {
-    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
     
     
     createActions();
@@ -115,8 +115,8 @@ void Itom1DQwtPlot::constructor()
 
     m_pContent = new Plot1DWidget(contextMenu, (InternalData*)m_data, this);
 
-    connect(((Plot1DWidget *)m_pContent), SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
-    connect(((Plot1DWidget *)m_pContent), SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+    connect(((Plot1DWidget *)m_pContent), SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
+    connect(((Plot1DWidget *)m_pContent), SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
 
     ((Plot1DWidget *)m_pContent)->setObjectName("canvasWidget");
 
@@ -1084,8 +1084,8 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
 
         dataObjectOut.setAxisScale(1, length / (seriesData->size() - 1));
 
-        dataObjectOut.setAxisUnit(1, seriesData->getDObjAxisLabel().toAscii().data());
-        dataObjectOut.setValueUnit(seriesData->getDObjValueLabel().toAscii().data());
+        dataObjectOut.setAxisUnit(1, seriesData->getDObjAxisLabel().toLatin1().data());
+        dataObjectOut.setValueUnit(seriesData->getDObjValueLabel().toLatin1().data());
 
     }
 

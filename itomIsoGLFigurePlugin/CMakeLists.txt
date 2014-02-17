@@ -27,6 +27,7 @@ set(QT5_INSTALLED FALSE)
 find_package(Qt5 COMPONENTS Widgets Designer UiTools Svg OpenGL Xml LinguistTools)
 if (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
     set(QT5_INSTALLED TRUE)
+    set(CMAKE_AUTOMOC ON)
 endif (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
 if (NOT QT5_INSTALLED)
     find_package(Qt4 REQUIRED)
@@ -92,7 +93,9 @@ IF(GLEW_FOUND)
         ${3DCONNEXION_LIBRARIES}
     )
 
-    INCLUDE(${QT_USE_FILE})
+    if (NOT QT5_INSTALLED)
+        INCLUDE(${QT_USE_FILE})
+    endif (NOT QT5_INSTALLED)
 
     set(designer_HEADERS
         ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsGraphInc.h
@@ -131,7 +134,7 @@ IF(GLEW_FOUND)
     endif(MSVC) 
     
     if (QT5_INSTALLED)
-        QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
+#        QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
         QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
     else (QT5_INSTALLED)
         QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})

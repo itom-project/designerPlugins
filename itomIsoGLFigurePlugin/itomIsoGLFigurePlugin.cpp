@@ -118,4 +118,6 @@ QString ItomIsoGLWidgetPlugin::includeFile() const
     return "ItomIsoGLWidget.h";
 }
 
-Q_EXPORT_PLUGIN2(ItomIsoGLWidgetPlugin, ItomIsoGLWidgetPlugin)
+#if QT_VERSION <  QT_VERSION_CHECK(5,0,0)
+    Q_EXPORT_PLUGIN2(ItomIsoGLWidgetPlugin, ItomIsoGLWidgetPlugin)
+#endif

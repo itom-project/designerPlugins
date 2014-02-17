@@ -64,7 +64,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     m_toggleInfoText(NULL),
     m_lblCoordinates(NULL)
 {
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toAscii().data()));
+    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
@@ -518,7 +518,7 @@ void ItomIsoGLWidget::mnuActSave()
 //        renderer.setLayoutFlag(GVPlotRenderer::KeepFrames, true);
 
 //        renderer.renderDocument(((plotGLWidget*)m_pContent), fileName, QSizeF(300, 200), 85);
-        img.save(fileName, QFileInfo(fileName).completeSuffix().toAscii().data(), 100);
+        img.save(fileName, QFileInfo(fileName).completeSuffix().toLatin1().data(), 100);
     }
 }
 

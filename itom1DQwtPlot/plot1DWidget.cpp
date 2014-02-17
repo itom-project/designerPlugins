@@ -1613,7 +1613,13 @@ void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
         {
             QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
             if (qIsFinite(tmpRect.height()))
+            {
+#if QT_VERSION >= 0x050000
+                rect = rect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
+#else
                 rect = rect.unite(((DataObjectSeriesData *)curve->data())->boundingRect());
+#endif
+            }
         }
 
         if (m_pData->m_valueScaleAuto)
@@ -2379,7 +2385,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
     if (rgexp.indexIn(style) != -1)
     {
 //        QString s = rgexp.cap(1);
-        char s = rgexp.cap(1).toAscii()[0];
+        char s = rgexp.cap(1).toLatin1()[0];
 
         if (s == 'b') symPen.setColor(Qt::blue);
         else if (s == 'g') symPen.setColor(Qt::green);
@@ -2390,7 +2396,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
         else if (s == 'k') symPen.setColor(Qt::black);
         else if (s == 'w') symPen.setColor(Qt::white);
 
-        s = rgexp.cap(2).toAscii()[0];
+        s = rgexp.cap(2).toLatin1()[0];
         bool ok;
 
         if (s == '.') symStyle = QwtSymbol::Ellipse;
@@ -2460,7 +2466,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
                     break;
                     
                     default:
-                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
+                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
                     break;
                 }                    
                 if (m_pData->m_pDrawItems.contains((int)ids[i]))
@@ -2488,7 +2494,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
                         break;
                         
                         default:
-                            retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toAscii().data());
+                            retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
                         break;                        
                     }
                     if (newItem)

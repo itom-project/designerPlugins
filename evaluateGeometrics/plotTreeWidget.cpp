@@ -932,12 +932,12 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
         }
         else if (dataObj->getType() != ito::tFloat32)
         {
-            m_lastRetVal = ito::RetVal(ito::retError, 0,tr("DataObject must be ito::float32").toAscii().data());
+            m_lastRetVal = ito::RetVal(ito::retError, 0,tr("DataObject must be ito::float32").toLatin1().data());
             identical = false;            
         }
         else if (dataObj->getSize(dims-1) < 2)
         {
-            m_lastRetVal = ito::RetVal(ito::retError, 0,tr("DataObject has not enough columns").toAscii().data());
+            m_lastRetVal = ito::RetVal(ito::retError, 0,tr("DataObject has not enough columns").toLatin1().data());
             identical = false;
         }
         else
@@ -1098,7 +1098,7 @@ ito::RetVal PlotTreeWidget::writeToCSV(const QFileInfo &fileName, const bool asT
 {
     if (fileName.exists() && !fileName.isWritable())
     {
-        return ito::RetVal(ito::retError, 0, tr("could not write csv-data to file %1").arg(fileName.fileName()).toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("could not write csv-data to file %1").arg(fileName.fileName()).toLatin1().data());
     }
 
     QFile saveFile(fileName.filePath());
@@ -1171,7 +1171,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
 {
     if (fileName.exists() && !fileName.isWritable())
     {
-        return ito::RetVal(ito::retError, 0, tr("could not write csv-data to file %1").arg(fileName.fileName()).toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("could not write csv-data to file %1").arg(fileName.fileName()).toLatin1().data());
     }
 
     QFile saveFile(fileName.filePath());
@@ -1320,7 +1320,7 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
 {
     if (fileName.exists() && !fileName.isWritable())
     {
-        return ito::RetVal(ito::retError, 0, tr("could not write csv-data to file %1").arg(fileName.fileName()).toAscii().data());
+        return ito::RetVal(ito::retError, 0, tr("could not write csv-data to file %1").arg(fileName.fileName()).toLatin1().data());
     }
 
     QFile saveFile(fileName.filePath());

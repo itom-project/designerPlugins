@@ -23,8 +23,7 @@
 #ifndef plotGLWidget_H
 #define plotGLWidget_H
 
-#include "GL/glew.h"
-
+#define QT_NO_OPENGL_ES_2
 #include <QtOpenGL/qgl.h>
 
 #include <qwidget.h>

@@ -567,7 +567,7 @@ void MotorController::triggerUpdatePosition(void)
 
         while (!locker.getSemaphore()->wait(500))
         {
-            retval += ito::RetVal(ito::retError, 0, tr("timeout while getting numaxis parameter").toAscii().data());
+            retval += ito::RetVal(ito::retError, 0, tr("timeout while getting numaxis parameter").toLatin1().data());
             break;
         }
 
@@ -604,7 +604,7 @@ void MotorController::triggerUpdatePosition(void)
 
             while (!posLocker.getSemaphore()->wait(5000))
             {
-                retval += ito::RetVal(ito::retError, 0, tr("timeout while getting numaxis parameter").toAscii().data());
+                retval += ito::RetVal(ito::retError, 0, tr("timeout while getting numaxis parameter").toLatin1().data());
                 break;
             }
 
@@ -827,7 +827,7 @@ void MotorController::mnuSetUnit(QAction* inputAction)
 {
     const QMetaObject *mo = this->metaObject();
     QMetaEnum me = mo->enumerator( mo->indexOfEnumerator("Unit") );
-    int unit = me.keyToValue(inputAction->text().toAscii().data());
+    int unit = me.keyToValue(inputAction->text().toLatin1().data());
 
     if (unit >= 0)
     {
