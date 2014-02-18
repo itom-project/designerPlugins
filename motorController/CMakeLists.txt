@@ -12,7 +12,6 @@ OPTION(UPDATE_TRANSLATIONS "Update source translation translation/*.ts files (WA
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 SET (ITOM_LANGUAGES "de" CACHE STRING "semicolon separated list of languages that should be created (en must not be given since it is the default)")
-cmake_policy(SET CMP0020 NEW)
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
 
@@ -25,11 +24,13 @@ ENDIF(BUILD_SHARED_LIBS)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(QT5_INSTALLED FALSE)
-find_package(Qt5 COMPONENTS Widgets UiTools Designer Xml Svg)
-if (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
+find_package(Qt5 COMPONENTS Widgets UiTools Designer Xml Svg QUIET)
+if (QT5_FOUND) 
+    cmake_policy(SET CMP0020 NEW)
     set(QT5_INSTALLED TRUE)
     set(CMAKE_AUTOMOC ON)
-endif (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
+endif (QT5_FOUND)
+ 
 if (NOT QT5_INSTALLED)
     find_package(Qt4 REQUIRED)
 endif (NOT QT5_INSTALLED)
