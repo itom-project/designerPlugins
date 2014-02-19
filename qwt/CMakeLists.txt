@@ -11,7 +11,6 @@ SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
 SET (LIBRARY_TYPE STATIC)
-cmake_policy(SET CMP0020 NEW)
 
 #if qwt is static, add -fPIC as compiler flag for linux
 IF(UNIX)
@@ -22,15 +21,25 @@ ENDIF(UNIX)
   # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(QT5_INSTALLED FALSE)
-find_package(Qt5 COMPONENTS Widgets UiTools PrintSupport Concurrent Svg OpenGL)
-if (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
-    set(QT5_INSTALLED TRUE)
-    set(CMAKE_AUTOMOC ON)
-endif (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
-if (NOT QT5_INSTALLED)
+set (QT5_FOUND FALSE)
+if (CMAKE_VERSION VERSION_GREATER 2.8.7)
+    cmake_policy(SET CMP0020 NEW)
+    if (WIN32)
+        find_package(WindowsSDK REQUIRED)
+        set (CMAKE_PREFIX_PATH "${WINDOWSSDK_PREFERRED_DIR}/Lib/")
+        set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${WINDOWSSDK_PREFERRED_DIR}/Lib/)
+    endif (WIN32)
+    find_package(Qt5 COMPONENTS Widgets UiTools PrintSupport Network Sql Xml OpenGL LinguistTools QUIET)
+
+    if (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
+        set(QT5_FOUND TRUE)
+    cmake_policy(SET CMP0020 NEW)
+        set(CMAKE_AUTOMOC ON)
+    endif (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
+endif (CMAKE_VERSION VERSION_GREATER 2.8.7)
+if (NOT QT5_FOUND)
     find_package(Qt4 REQUIRED)
-endif (NOT QT5_INSTALLED)
+endif (NOT QT5_FOUND)
 
 find_package(ITOM_SDK REQUIRED)
 find_package(VisualLeakDetector QUIET)
@@ -65,19 +74,19 @@ INCLUDE_DIRECTORIES(
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
 )
 
-IF(NOT QT5_INSTALLED)
+IF(NOT QT5_FOUND)
     INCLUDE_DIRECTORIES(
         ${QT_QTSVG_INCLUDE_DIR}
     )
-ENDIF(NOT QT5_INSTALLED)
+ENDIF(NOT QT5_FOUND)
 
 LINK_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-if (NOT QT5_INSTALLED)
+if (NOT QT5_FOUND)
     INCLUDE(${QT_USE_FILE})
-endif (NOT QT5_INSTALLED)
+endif (NOT QT5_FOUND)
 
 message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -182,21 +191,21 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.h
 )
 
-if (QT5_INSTALLED)
+if (QT5_FOUND)
 #    QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
-else (QT5_INSTALLED)
+else (QT5_FOUND)
     QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
-endif (QT5_INSTALLED)
+endif (QT5_FOUND)
 
 #set(designer_ui
 #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
 #)
 
-if (QT5_INSTALLED)
+if (QT5_FOUND)
     QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
-else (QT5_INSTALLED)
+else (QT5_FOUND)
     QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
-endif (QT5_INSTALLED)
+endif (QT5_FOUND)
 
 #set(designer_rcc
 #    ${CMAKE_CURRENT_SOURCE_DIR}/qwt.qrc
@@ -300,19 +309,19 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.cpp
 )
 
-if (QT5_INSTALLED)
+if (QT5_FOUND)
     QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-else (QT5_INSTALLED)
+else (QT5_FOUND)
     QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-endif (QT5_INSTALLED)
+endif (QT5_FOUND)
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
-if (QT5_INSTALLED)
+if (QT5_FOUND)
     TARGET_LINK_LIBRARIES(${target_name} ${VISUALLEAKDETECTOR_LIBRARIES})
-else (QT5_INSTALLED)
+else (QT5_FOUND)
     TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES})
-endif (QT5_INSTALLED)
+endif (QT5_FOUND)
 
-if (QT5_INSTALLED)
+if (QT5_FOUND)
     qt5_use_modules(${target_name} PrintSupport Concurrent UiTools Widgets Svg OpenGL)
-endif (QT5_INSTALLED)
+endif (QT5_FOUND)
