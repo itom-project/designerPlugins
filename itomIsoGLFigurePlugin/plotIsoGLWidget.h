@@ -23,7 +23,6 @@
 #ifndef plotGLWidget_H
 #define plotGLWidget_H
 
-#define QT_NO_OPENGL_ES_2
 #include <QtOpenGL/qgl.h>
 
 #include <qwidget.h>
@@ -319,6 +318,5 @@ class plotGLWidget :  public QGLWidget
 
 
 };
-
 
 #endif

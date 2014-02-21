@@ -19,8 +19,11 @@
    You should have received a copy of the GNU General Public License
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
-
 //#include "GL/glew.h"
+//#include "GL/glew.h"
+#include <QtOpenGL/qtopenglglobal.h>
+#include <QtOpenGLExtensions/qopenglextensions.h>
+#include <GL/glu.h>
 #if linux
     #include <unistd.h>
 #else
@@ -2637,7 +2640,7 @@ void plotGLWidget::OGLMakeFont(int size)
 #if (defined linux)
 
 #elif (defined Q_OS_WIN32 || defined(Q_OS_WIN64))
-    wglUseFontBitmaps(this->getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
+//    wglUseFontBitmaps(this->getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32   
 #endif
 
     this->setFont(oldFont);

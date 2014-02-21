@@ -21,6 +21,7 @@ ENDIF(UNIX)
   # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+<<<<<<< HEAD
 set (QT5_FOUND FALSE)
 if (CMAKE_VERSION VERSION_GREATER 2.8.7)
     cmake_policy(SET CMP0020 NEW)
@@ -38,6 +39,17 @@ if (CMAKE_VERSION VERSION_GREATER 2.8.7)
     endif (NOT ${Qt5_DIR} STREQUAL "Qt5_DIR-NOTFOUND") 
 endif (CMAKE_VERSION VERSION_GREATER 2.8.7)
 if (NOT QT5_FOUND)
+=======
+set(QT5_INSTALLED FALSE)
+find_package(Qt5 COMPONENTS Widgets UiTools PrintSupport Concurrent Svg OpenGL QUIET)
+
+IF(QT5_FOUND)
+    cmake_policy(SET CMP0020 NEW) 
+    set(QT5_INSTALLED TRUE)
+    set(CMAKE_AUTOMOC ON)
+ENDIF(QT5_FOUND) 
+if (NOT QT5_INSTALLED)
+>>>>>>> 4c6df278ddfae257b0deaedb7fa25f2b06fe033f
     find_package(Qt4 REQUIRED)
 endif (NOT QT5_FOUND)
 
