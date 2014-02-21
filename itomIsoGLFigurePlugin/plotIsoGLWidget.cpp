@@ -20,15 +20,13 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 //#include "GL/glew.h"
-//#include "GL/glew.h"
-#include <QtOpenGL/qtopenglglobal.h>
-#include <QtOpenGLExtensions/qopenglextensions.h>
-#include <GL/glu.h>
 #if linux
     #include <unistd.h>
 #else
+    #if QT_VERSION < 0x050000
     #define GL_BGR        0x813F
     #define GL_BGRA       0x814F
+    #endif
 #endif
 #include "itomIsoGLFigure.h"
 #include "plotIsoGLWidget.h"
@@ -74,7 +72,7 @@ extern int NTHREADS;
 *    @param [in] height    window height
 *    @return        zero for no error, openGL error code otherwise
 */
-int initOGL2(const int width, const int height)
+int plotGLWidget::initOGL2(const int width, const int height)
 {
     int ret = 0;
 
@@ -158,21 +156,6 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_timer.setSingleShot(true);
     QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(paintTimeout()));
 
-    fmt.setOverlay(0);
-    if (fmt.swapInterval() != -1)
-        fmt.setSwapInterval(0);
-    fmt.setProfile(QGLFormat::CoreProfile);
-
-    int glVer = QGLFormat::openGLVersionFlags();
-
-    if (glVer >= 32)
-    {
-        fmt.setVersion(2,0);
-    }
-
-    move(0, 0);
-    resize(100, 100);
-    fmt.setDepth(0);
     m_myCharBitmapBuffer = 0;
     int ret = 0;
 
@@ -246,10 +229,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_objectInfo.divVal = 0;
     m_objectInfo.meanVal = 0;
 
-    //m_currentPalette.resize(256);
-
     m_currentPalette.clear();
-
     if(ITOM_API_FUNCS_GRAPH != NULL && *ITOM_API_FUNCS_GRAPH != NULL)
     {
         int numColBars = 0;
@@ -278,8 +258,6 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
             m_currentPalette[i] = i + (i << 8) + (i << 16);
         }
     }
-
-    makeCurrent();
 
     m_errorDisplMsg.clear();
     m_errorDisplMsg.append("No Data");
@@ -316,9 +294,6 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
         pag[i] = (GLfloat)((m_currentPalette[i] & 0xFF00L)>>8)/255.0;
         pab[i] = (GLfloat)(m_currentPalette[i] & 0xFFL)/255.0;
     }
-
-    //glGetIntegerv(GL_MAX_PIXEL_MAP_TABLE, &glval);
-    //ret = glGetError();
 
     glPixelMapfv(GL_PIXEL_MAP_I_TO_G, 256, pag);
 //    ret = glGetError();
@@ -372,26 +347,6 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
             src[8 * i + 5] = ptrPal[4*paletteSize - 4 * i - 3];
             src[8 * i + 6] = ptrPal[4*paletteSize - 4 * i - 2];
             src[8 * i + 7] = 255;
-/*
-            src[8*i] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
-            src[8*i+1] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
-            src[8*i+2] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-            src[8*i+3] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 3];
-            src[8*i+4] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
-            src[8*i+5] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
-            src[8*i+6] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-            src[8*i+7] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 3];
-
-            src[8*i]   = (m_currentPalette[paletteSize - i - 1])  & 0x000000FF;
-            src[8*i+1] = ((m_currentPalette[paletteSize - i - 1]) & 0x0000FF00) >> 8;
-            src[8*i+2] = ((m_currentPalette[paletteSize - i - 1]) & 0x00FF0000) >> 16;
-            src[8*i+3] = 0xFF000000;
-            src[8*i+4] = (m_currentPalette[paletteSize - i - 1])  & 0x000000FF;
-            src[8*i+5] = ((m_currentPalette[paletteSize - i - 1]) & 0x0000FF00) >> 8;
-            src[8*i+6] = ((m_currentPalette[paletteSize - i - 1]) & 0x00FF0000) >> 16;
-            src[8*i+7] = 0xFF000000;
-*/
-
         }
         #if (USEOMP)
         }
@@ -399,13 +354,10 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     }
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, paletteSize, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
-
     delete[] src;
 
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
-
     OGLMakeFont(m_fontsize);
-
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
 
@@ -414,14 +366,9 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
         std::cerr << "error setting up openGLWindow window: " << ret << "\n";
     }
 
-
-    doneCurrent();
-
     m_pContent = QSharedPointer<ito::DataObject>(new ito::DataObject());
-    m_pContent->ones(3,3,ito::tFloat32);
 
     refreshPlot(NULL);
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -463,14 +410,11 @@ plotGLWidget::~plotGLWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::paintTimeout()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::paintGL()
 {
-//    static int drawScene = 0;
-    //bool test;
     double winSizeX = (double)this->width();
     double winSizeY = (double)this->height();
     ito::RetVal retval = ito::retOk;
@@ -482,12 +426,6 @@ void plotGLWidget::paintGL()
         return;
 
     m_isInit |= IS_RENDERING;
-
-    makeCurrent();
-
-    glViewport(0, 0, (GLsizei)this->width(), (GLsizei)this->height());                //Window resizen
-//    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
-
     m_ticklength = (int)(sqrt(winSizeX * winSizeX + winSizeY * winSizeY) * 10/1000); //tut
 
     glMatrixMode(GL_MODELVIEW);                    //Projektionsmatrix wählen
@@ -499,7 +437,6 @@ void plotGLWidget::paintGL()
         glClearColor(255.0f, 255.0f, 255.0f, 0.0f);                //weisser Hintergrund
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
-
     if ( ( ((m_pTriangles == NULL) && (m_elementMode == PAINT_TRIANG)) && ((m_pPoints == NULL) && (m_elementMode == PAINT_POINTS)) ) || (m_pColTriangles == NULL) || (m_NumElements == 0))
     {
         doneCurrent();
@@ -568,9 +505,6 @@ void plotGLWidget::paintGL()
         glDisable(GL_NORMALIZE);
     }
 
-//    glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
-
     if(m_protocol.show) 
         glTranslatef(0.0, 0.7 * (double) m_protocol.m_psize / winSizeY, 0.0);
     else 
@@ -608,10 +542,8 @@ void plotGLWidget::paintGL()
 
     threeDAxis();
 
-//    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
-//    glMatrixMode(GL_MODELVIEW);
 
     if (m_drawTitle)
     {    // noobjinfo
@@ -636,9 +568,7 @@ void plotGLWidget::paintGL()
 
     glFlush();
     //glFinish();
-    this->swapBuffers();
-
-    doneCurrent();
+    swapBuffers();
 
     m_isInit &= ~IS_RENDERING;
 
@@ -1855,10 +1785,6 @@ void plotGLWidget::threeDRotationMatrix()
 {
     GLdouble GLModelViewMatrix[16], GLProjectionMatrix[16];
     GLint GLViewport[4];
-//    double a, b, c;
-
-    makeCurrent();
-//    a=m_RotA; b=m_RotB; c=m_RotC;
 
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
@@ -1923,7 +1849,6 @@ void plotGLWidget::threeDAxis(void)
 
     signedZA = 0;
 
-    makeCurrent();
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
     glGetIntegerv(GL_VIEWPORT, GLViewport);
@@ -1965,28 +1890,6 @@ void plotGLWidget::threeDAxis(void)
     //Y-Axis X signed.
     if (xb == xmin)
     {
-/*
-        if (-dyy > 0)
-            signedYAx = -1 * VRX * VRY;
-        else
-            signedYAx = 1 * VRX * VRY;
-
-        if (dyx > 0)
-            signedYAy = -1 * VRX * VRY;
-        else
-            signedYAy = 1 * VRX * VRY;
-
-
-        if (dyy > 0)
-            signedYAx = -1 * VRX * VRY;
-        else
-            signedYAx = 1 * VRX * VRY;
-
-        if (dyx > 0)
-            signedYAy = 1 * VRX * VRY;
-        else
-            signedYAy = -1 * VRX * VRY;
-*/
 		if (-dyy > 0)
 			signedYAx = -1 * VRX * VRY;
 		else
@@ -1999,30 +1902,6 @@ void plotGLWidget::threeDAxis(void)
     }
     else
     {
-        /*
-        if (-dyy > 0)
-            signedYAx = 1 * VRX * VRY;
-        else
-            signedYAx = -1 * VRX * VRY;
-
-
-        if (dyx > 0)
-            signedYAy = 1 * VRX * VRY;
-        else
-            signedYAy = -1 * VRX * VRY;
-        
-
-        if (dyy > 0)
-            signedYAx = 1 * VRX * VRY;
-        else
-            signedYAx = -1 * VRX * VRY;
-
-        if (dyx > 0)
-            signedYAy = -1 * VRX * VRY;
-        else
-            signedYAy = 1 * VRX * VRY;
-            */
-
 		if (-dyy > 0)
 			signedYAx = 1 * VRX * VRY;
 		else
@@ -2149,8 +2028,6 @@ void plotGLWidget::threeDAxis(void)
 */
 void plotGLWidget::paintAxisOGL(double x0, double y0, double z0, double x1, double y1, double z1)
 {
-    makeCurrent();
-
     if (m_linewidth == 0)
         return;
 
@@ -2183,8 +2060,6 @@ void plotGLWidget::paintLightArrow()
 {
     GLfloat position1[3];
     double norm1;
-
-    makeCurrent();
 
     glPushMatrix();
     glLoadIdentity();
@@ -2257,8 +2132,6 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     double VorzXAs, VorzYAs;
     int firstdigit, i;
     std::string label(" ");
-
-    makeCurrent();
 
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
@@ -2461,8 +2334,6 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
             gluProject(x0 + a * (x1 - x0), y0 + a * (y1 - y0), 
                 z0 + a * (z1 - z0), GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
-//            dreidogl_AxisLabel(fo, (void*)&al, xpos*1.1, ypos*1.1, v);
-            //paintAxisLabelOGL((void*)&al, xpos*(1+0.07 * m_windowXScale * internalObj.getSize(internalObj.getDims()-1,false)), ypos*(1+0.03 * m_windowYScale * internalObj.getSize(internalObj.getDims()-2,false)), v);
             paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
                 ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
         }
@@ -2477,25 +2348,13 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         gluProject(x0 + (x1 - x0) / 2.0, y0 + (y1 - y0) / 2.0, 
             z0 + (z1 - z0) / 2.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
-//        al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
-//        al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
         al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
         al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
-
-// Tut  al.dx = VorzX * (0.15*m_windowXScale*internalObj.getSize(internalObj.getDims()-1,false)) * fabs(sin(phi));
-// TUT  al.dy = VorzY * (0.25*m_windowYScale*internalObj.getSize(internalObj.getDims()-2,false)) * fabs(cos(phi));
 
         if (al.dx < 0)
             xpos += al.dx - label.length() * 0.015;
         else
             xpos += al.dx;
-
-        /*
-        if (al.dy < 0)
-            ypos += al.dy;
-        else
-            ypos += al.dy;
-            */
 
         ypos -= fabs(al.dy);
         OGLTextOut(label.data(), xpos, ypos);
@@ -2513,83 +2372,68 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 */
 void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const double y, const double v)
 {
- char buffer[300];
- //char decimal;
- //char *p;
- struct axislabel *al = (struct axislabel *)vd;
- long l;
-// int ret;
+    char buffer[300];
+    struct axislabel *al = (struct axislabel *)vd;
+    long l;
 
-  if(v==0)
-    _snprintf(buffer,sizeof(buffer),"0");
-  else if(al->unitydigit>=al->lastdigit)
-  {
-    _snprintf(buffer,sizeof(buffer),"%.*f",al->unitydigit-al->lastdigit,v/al->unity);
-  }
-  else
-  {
-    int firstdigit=floor(log10(fabs(v))+10*DBL_EPSILON);
-    if(al->unitydigit==INT_MIN&&al->lastdigit!=INT_MAX)
+    if(v==0)
+        _snprintf(buffer,sizeof(buffer),"0");
+    else if(al->unitydigit>=al->lastdigit)
     {
-        if (al->lastdigit>=0)
-        {
-            //CK 09.08.2006 anti-Killer-Objekt Hack:
-            //ist darzustellende Zahl länger als 8 Ziffern, dann machs in Exp-Darstellung
-            if (fabs(v) >= 1.0E8)
-                _snprintf(buffer, sizeof(buffer), "%g", v);
-            else
-                _snprintf(buffer, sizeof(buffer), "%.0f", v);
-        }
-        else if(firstdigit>=-3&&firstdigit<3)
-            _snprintf(buffer,sizeof(buffer),"%.*f",(firstdigit>0?firstdigit:0)-al->lastdigit,v);
-        else
-        {double v1, mant;
-         int expo;
-
-            v1 = fabs(v);
-            mant = pow(10.0, log10(v1)-floor(log10(v1)));
-            expo = floor(log10(v1));
-            _snprintf(buffer,sizeof(buffer),"%s%.*fE%d", v<0?"-":"", firstdigit-al->lastdigit, mant, expo);
-        }
-    }
-    else if(firstdigit>=0&&firstdigit<3)
-        _snprintf(buffer,sizeof(buffer),"%.0f",v);
-    else if(firstdigit>=21||firstdigit<-18||al->unitydigit==INT_MIN)
-    {
-        double v1 = fabs(v);
-        _snprintf(buffer,sizeof(buffer),"%s%.0fE%d", v<0?"-":"", pow(10.0, log10(v1)-floor(log10(v1))),
-        (int)floor(log10(v1)));
+        _snprintf(buffer,sizeof(buffer),"%.*f",al->unitydigit-al->lastdigit,v/al->unity);
     }
     else
     {
-        int rest=firstdigit>0?firstdigit%3:2-(2-firstdigit)%3;
-        _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpnµm-kMGTPE"[(firstdigit - rest) / 3 + 6]);
+        int firstdigit=floor(log10(fabs(v))+10*DBL_EPSILON);
+        if(al->unitydigit==INT_MIN&&al->lastdigit!=INT_MAX)
+        {
+            if (al->lastdigit>=0)
+            {
+                //CK 09.08.2006 anti-Killer-Objekt Hack:
+                //ist darzustellende Zahl länger als 8 Ziffern, dann machs in Exp-Darstellung
+                if (fabs(v) >= 1.0E8)
+                    _snprintf(buffer, sizeof(buffer), "%g", v);
+                else
+                    _snprintf(buffer, sizeof(buffer), "%.0f", v);
+            }
+            else if(firstdigit>=-3&&firstdigit<3)
+                _snprintf(buffer,sizeof(buffer),"%.*f",(firstdigit>0?firstdigit:0)-al->lastdigit,v);
+            else
+            {double v1, mant;
+             int expo;
+
+                v1 = fabs(v);
+                mant = pow(10.0, log10(v1)-floor(log10(v1)));
+                expo = floor(log10(v1));
+                _snprintf(buffer,sizeof(buffer),"%s%.*fE%d", v<0?"-":"", firstdigit-al->lastdigit, mant, expo);
+            }
+        }
+        else if(firstdigit>=0&&firstdigit<3)
+            _snprintf(buffer,sizeof(buffer),"%.0f",v);
+        else if(firstdigit>=21||firstdigit<-18||al->unitydigit==INT_MIN)
+        {
+            double v1 = fabs(v);
+            _snprintf(buffer,sizeof(buffer),"%s%.0fE%d", v<0?"-":"", pow(10.0, log10(v1)-floor(log10(v1))),
+            (int)floor(log10(v1)));
+        }
+        else
+        {
+            int rest=firstdigit>0?firstdigit%3:2-(2-firstdigit)%3;
+            _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpnµm-kMGTPE"[(firstdigit - rest) / 3 + 6]);
+        }
     }
-  }
 
-  l = (long)strlen(buffer);
-  if(l>al->maxlen)
-    al->maxlen=l;
-  if(!al->write)
-    return;
-/*
-  (void)GetDecimalChar(&decimal);
-  if (decimal != '.')
-        while (NULL!=(p=strchr(buffer, '.')))
-            *p = decimal;
-*/
+    l = (long)strlen(buffer);
+    if(l>al->maxlen)
+        al->maxlen=l;
+    if(!al->write)
+        return;
+
     double xpos, ypos;
-
     if (al->dx < 0)
         xpos = x + al->dx - strlen(buffer)*0.015;
     else
         xpos = x + al->dx;
-    /*
-    if (al->dy < 0)
-        ypos = y + al->dy;
-    else
-        ypos = y + al->dy;
-    */
 
     ypos = y - fabs(al->dy);
     OGLTextOut(buffer, xpos, ypos);
@@ -2598,8 +2442,6 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
 //----------------------------------------------------------------------------------------------------------------------------------
 int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double ypos)
 {
-    makeCurrent();
-
     glPushAttrib(GL_LIST_BIT);                // Pushes The Display List Bits
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -2616,26 +2458,22 @@ int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
-//    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 
-    int ret = glGetError();
-
-    return ret;
+    return glGetError();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
 void plotGLWidget::OGLMakeFont(int size)
 {
-
     QFont oldFont = this->font();
-
     QFont myFont("Arial", -size, QFont::Light & QFont::OpenGLCompatible & QFont::PreferBitmap);
     this->setFont(myFont);
 
-    if(m_myCharBitmapBuffer != 0) glDeleteLists(m_myCharBitmapBuffer, 256);
+    if(m_myCharBitmapBuffer != 0) 
+        glDeleteLists(m_myCharBitmapBuffer, 256);
     m_myCharBitmapBuffer = glGenLists(256);            // Storage For 256 Characters
 #if (defined linux)
 
@@ -2684,8 +2522,6 @@ void plotGLWidget::DrawObjectInfo(void)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat dX, const GLfloat dY, const GLfloat zMin, const GLfloat zMax)
 {
-    makeCurrent();
-
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -2717,10 +2553,8 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //glPixelTransferi(GL_MAP_COLOR, GL_TRUE);
 
     glColor3f(255.0, 255.0, 255.0);
-
     glBegin(GL_QUADS);
         glTexCoord2f(0.0, 1.0); glVertex3f(x0, y0, -1.0);
         glTexCoord2f(1.0, 1.0); glVertex3f(x0 + dX, y0, -1.0);
@@ -2761,7 +2595,6 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
     char buf[50] = {0};
 
     sprintf(buf, "%g", zMin);
-
     OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 - m_fontsize / (double)height() / 2.0);
 
     sprintf(buf, "%g", zMax);
@@ -2769,17 +2602,13 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
-//    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
-
-//    int ret = glGetError();
 
     return;
 }
 
 //-----------------------------------------------------------------------------------------------
-//int DrawTitle(struct graf *win, TagSpace *tags, int texty, int *yused)
 void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &yused)
 {
     int i = 0;
@@ -2787,8 +2616,7 @@ void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &y
     double y0 = 0.98 - (double)(++i * 2.0 * 1.67 * m_fontsize) / this->height();
 
     /* Titel Objekt etc. */
-
-    OGLMakeFont(1.67*m_fontsize);
+    OGLMakeFont(1.67 * m_fontsize);
     if(myTitle.length())
         OGLTextOut((char*)myTitle.data(), x0, y0);
 /*
@@ -2836,8 +2664,6 @@ void plotGLWidget::riseZAmplifierer(const double value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::togglePaletteMode()
 {
-    //m_colorBarMode = (m_colorBarMode + 1) % 4;
-
     switch(m_colorBarMode)
     {
         default:
@@ -2928,7 +2754,6 @@ void plotGLWidget::setColorMap(QString palette)
         //    return;
 
         retval += apiPaletteGetColorBarIdx(m_paletteNum, newPalette);
-
     }
     else
     {
@@ -2944,10 +2769,7 @@ void plotGLWidget::setColorMap(QString palette)
     m_currentPalette = newPalette.colorVector256;
 
     makeCurrent();
-
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
-//    int ret = glGetError();
-
     GLfloat *par, *pag, *pab;
 
     par = (GLfloat*)calloc(255, sizeof(GLfloat));
@@ -2960,9 +2782,6 @@ void plotGLWidget::setColorMap(QString palette)
         pag[i] = (GLfloat)((m_currentPalette[i] & 0xFF00L)>>8)/255.0;
         pab[i] = (GLfloat)(m_currentPalette[i] & 0xFFL)/255.0;
     }
-
-    //glGetIntegerv(GL_MAX_PIXEL_MAP_TABLE, &glval);
-    //ret = glGetError();
 
     glPixelMapfv(GL_PIXEL_MAP_I_TO_G, 256, pag);
 //    ret = glGetError();
@@ -2985,13 +2804,10 @@ void plotGLWidget::setColorMap(QString palette)
     glPixelTransferf(GL_ALPHA_BIAS,  1.0);
 
     glPixelTransferi(GL_MAP_COLOR, GL_TRUE);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
-
     glPixelTransferi(GL_MAP_COLOR, GL_FALSE);
 
     unsigned char * src = new unsigned char[m_currentPalette.size() * 4 *2];
-
     for(int i = 0; i < m_currentPalette.size(); i++)
     {
         src[8*i]   = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
@@ -3003,11 +2819,8 @@ void plotGLWidget::setColorMap(QString palette)
         src[8*i+6] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
         src[8*i+7] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
     }
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 256, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
-
     delete[] src;
-
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
 
     doneCurrent();
@@ -3086,18 +2899,18 @@ void plotGLWidget::setCurrentVisMode(const int mode)
     {
         default:
         case PAINT_TRIANG:
-                m_elementMode = PAINT_TRIANG;
-                m_axisZ.show = true;
-                if(!m_cmplxState) ((ItomIsoGLWidget*)m_pParent)->enableIlluGUI(true);
-            break;
+            m_elementMode = PAINT_TRIANG;
+            m_axisZ.show = true;
+            if(!m_cmplxState) ((ItomIsoGLWidget*)m_pParent)->enableIlluGUI(true);
+        break;
         case PAINT_POINTS:
-                toogleObjectInfoText(true);
-                m_colorMode = 1;
-                m_backgnd = false;
-                m_axisZ.show = false;
-                m_elementMode = PAINT_POINTS;
-                if(!m_cmplxState) ((ItomIsoGLWidget*)m_pParent)->enableIlluGUI(false);
-            break;
+            toogleObjectInfoText(true);
+            m_colorMode = 1;
+            m_backgnd = false;
+            m_axisZ.show = false;
+            m_elementMode = PAINT_POINTS;
+            if(!m_cmplxState) ((ItomIsoGLWidget*)m_pParent)->enableIlluGUI(false);
+        break;
     }
 
     m_forceReplot = true;
@@ -3188,7 +3001,6 @@ inline void plotGLWidget::generateObjectInfoText()
         sprintf(buf, "Dev:  %.4g", m_objectInfo.divVal);
         m_objectInfo.DevText = buf;
     }
-
-
+    
     return;
 }

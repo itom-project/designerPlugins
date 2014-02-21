@@ -56,13 +56,6 @@
 #include <qaction.h>
 #include <qwidget.h>
 #include <qtimer.h>
-/*
-#include <GV_plot.h>
-#include <GV_plot_zoomer.h>
-#include <GV_plot_panner.h>
-#include <GV_plot_curve.h>
-#include <GV_plot_marker.h>
-*/
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 

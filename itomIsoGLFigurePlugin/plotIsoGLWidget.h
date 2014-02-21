@@ -24,7 +24,6 @@
 #define plotGLWidget_H
 
 #include <QtOpenGL/qgl.h>
-
 #include <qwidget.h>
 #include <qstring.h>
 #include <qevent.h>
@@ -39,8 +38,6 @@
 #include "DataObject/dataobj.h"
 #include "DataObject/dataObjectFuncs.h"
 #include "common/sharedStructures.h"
-
-//#include "valuepicker2d.h"
 
 #ifdef USEOPENMP
     #define USEOMP 1
@@ -104,36 +101,28 @@ class plotGLWidget :  public QGLWidget
 {
     Q_OBJECT
     public:
+        friend class ItomIsoGLWidget;
 
         plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent = 0, const QGLWidget *shareWidget = 0);
         ~plotGLWidget();
 
-        bool m_showContextMenu;
         void refreshPlot(ito::ParamBase *dataObj);
-
-        friend class ItomIsoGLWidget;
-
         ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);
         ito::RetVal setCanvasZoom(const int zoolLevel);
-
-        inline void setStackStatus(const int value){ m_stackState = value  % 4; m_forceReplot = true;}
-        inline void setCmplxMode(const int cmplxMode){m_cmplxMode = cmplxMode % 4; m_forceReplot = true;}
-
-        inline bool getStackStatus(){return m_stackState;}
-        inline bool getCmplxStatus(){return m_cmplxState;}
-
-        inline void setBGColor(const int color){m_backgnd = color % 2; paintGL();}
-        inline int getBGColor(){return m_backgnd;}
-
+        inline void setStackStatus(const int value) { m_stackState = value  % 4; m_forceReplot = true; }
+        inline void setCmplxMode(const int cmplxMode) {m_cmplxMode = cmplxMode % 4; m_forceReplot = true; }
+        inline bool getStackStatus() { return m_stackState; }
+        inline bool getCmplxStatus() { return m_cmplxState; }
+        inline void setBGColor(const int color) { m_backgnd = color % 2; paintGL(); }
+        inline int getBGColor() { return m_backgnd; }
+        inline int getCurrentVisMode(){ return m_elementMode; }
         void setCurrentVisMode(const int mode);
-        inline int getCurrentVisMode(){return m_elementMode;}
-
 
         void rotateLightArrow(const double deltaA, const double deltaB, const double deltaC){lighDirAngles[0] +=deltaA; lighDirAngles[1] += deltaC;}
         void rotateView(const double deltaA, const double deltaB, const double deltaC){m_RotA +=deltaA; m_RotB += deltaB; m_RotC += deltaC;}
         void moveView(const double deltaX, const double deltaY, const double deltaZ){m_TransX +=deltaX; m_TransY += deltaY; m_TransZ += deltaZ;}
 
-        void setView(const double transX, const double transY, const double transZ, const double rotA, const double rotB, const double rotC)
+        inline void setView(const double transX, const double transY, const double transZ, const double rotA, const double rotB, const double rotC)
         {
             m_TransX = transX; 
             m_TransY = transY; 
@@ -144,97 +133,77 @@ class plotGLWidget :  public QGLWidget
         }
 
         ito::RetVal setColor(const int col);
-
         void enableInit() { if (!(m_isInit & -1)) m_isInit |= 1; }
         void disableInit() { m_isInit &= ~1; }
-
         bool lightArrowEnabled();
-
         void paintGL();
         void paintEvent(QPaintEvent *pevent);
         void resizeEvent(QResizeEvent *pevent);
 
+        bool m_showContextMenu;
+
     protected:
 
-
     private:
-
-        ito::RetVal GLSetTriangles(int &mode);
-        template<typename _Type> inline ito::RetVal NormalizeObj(cv::Mat &scaledTopo, ito::float64 &normedInvalid);
-
-        inline void generateObjectInfoText();
-
         QTimer m_timer;
         ito::uint32 m_lineplotUID;
         QMenu *m_contextMenu;
-
         QSharedPointer<ito::DataObject> m_pContent;               /*!< borrowed reference, do not delete here */
         QSharedPointer<ito::DataObject> m_pContentWhileRastering;
-
         unsigned char m_colorMode;
         ito::float64 m_invalid;
-
         axisProperties m_axisX;
         axisProperties m_axisY;
         axisProperties m_axisZ;
-
         double m_windowXScale;
         double m_windowYScale;
         double m_windowZScale;
-
         double m_zAmpl;
         double m_xybase;
-
         protocol m_protocol;
         objectInfo m_objectInfo;
-
         int m_paletteNum;
-        //int m_linePlotID;
-
         int m_elementMode;
-
         QWidget *m_pParent;
-
         bool m_cmplxState;
         int m_cmplxMode;
-
         bool m_stackState;
-
         int m_isInit;
         int m_currentColor;
-
         double m_TransX, m_TransY, m_TransZ, m_RotA, m_RotB, m_RotC;
-
         double m_xAxisVector[3], m_yAxisVector[3], m_zAxisVector[3];
         double m_lightAxisVector[3];
         double lighDirAngles[2];
-
         int m_fontsize;
         char m_colorBarMode;
-
         QVector<ito::uint32> m_currentPalette;
-
         int m_linewidth;
         bool m_forceReplot;
         bool m_backgnd;
         bool m_forceCubicVoxel;
         bool m_drawTitle;
-
         bool m_drawLightDir;
-
         double m_ticklength;
         double m_z_tickmulti;
-
         GLuint m_cBarTexture;
-
         double m_gamma;
         int m_glVer;
+        std::string m_errorDisplMsg;
+        GLuint m_myCharBitmapBuffer;
+        GLfloat       m_NumElements;
+        GLfloat       *m_pTriangles;
+        GLubyte       *m_pColTriangles;
+        GLfloat       *m_pNormales;
+        GLfloat       *m_pPoints;
+        unsigned char *m_pColIndices;
 
+        int initOGL2(const int width, const int height);
+        ito::RetVal GLSetTriangles(int &mode);
+        void generateObjectInfoText();
+        template<typename _Type> inline ito::RetVal NormalizeObj(cv::Mat &scaledTopo, ito::float64 &normedInvalid);
         void OGLMakeFont(int fsize);
         ito::RetVal DrawProtocol(const int y, const char *buffer, const int charsperline);
-
         void paintLightArrow();
-
         void paintAxisTicksOGL(const double x0, const double y0, const double z0, const double x1, const double y1, const double z1, const double v0, const double v1, const double VorzX, const double VorzY, const double VorzZ, const std::string &symbol, const std::string &unit, const bool write);
         void paintAxisOGL(const double x0, const double y0, const double z0, const double x1, const double y1, const double z1);
         void paintAxisLabelOGL(const void *vd, const double x, const double y, const double v);
@@ -245,11 +214,8 @@ class plotGLWidget :  public QGLWidget
         void DrawColorBar(const char xPos, const char yPos, const GLfloat dX, const GLfloat dY, const GLfloat zMin, const GLfloat zMax);
         void DrawObjectInfo(void);
         void ProtocolSize(void);
-
         int OGLTextOut(const char *buffer, const double xpos, const double ypos);
         ito::RetVal ResetColors();
-
-        std::string m_errorDisplMsg;
 
         enum elementModeEnum
         {
@@ -275,33 +241,19 @@ class plotGLWidget :  public QGLWidget
             IS_CALCTRIANG = 0x20
         };
 
-        GLuint m_myCharBitmapBuffer;
-
-        GLfloat       m_NumElements;
-        GLfloat       *m_pTriangles;
-        GLubyte       *m_pColTriangles;
-        GLfloat       *m_pNormales;
-        GLfloat       *m_pPoints;
-        unsigned char *m_pColIndices;
 
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
     public slots:
-//        void setSize(int sizex, int sizey);
-//        void setPos(int xpos, int ypos);
-
         void setZAmplifierer(double value);
         void reduceZAmplifierer(double value);
         void riseZAmplifierer(const double value);
-
         void togglePaletteMode();
         void homeView();
-
         void toggleIllumination(const bool checked);
         void toggleIlluminationRotation(const bool checked);
-
         void paintTimeout();
         void stopTimer()
         {
@@ -315,7 +267,6 @@ class plotGLWidget :  public QGLWidget
 #else
         void setColorMap(QString colormap = QString::QString(""));
 #endif
-
 
 };
 
