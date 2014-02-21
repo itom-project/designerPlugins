@@ -20,22 +20,26 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#include "GL/glew.h"
+//#include "GL/glew.h"
 #if linux
     #include <unistd.h>
+#else
+    #define GL_BGR        0x813F
+    #define GL_BGRA       0x814F
 #endif
 #include "itomIsoGLFigure.h"
 #include "plotIsoGLWidget.h"
 
 #include "common/sharedStructuresGraphics.h"
-
 #include "DataObject/dataObjectFuncs.h"
-
 
 #include <qimage.h>
 #include <qpixmap.h>
 #include <qdebug.h>
 #include <qmessagebox.h>
+
+#include <gl/GL.h>
+#include <gl/GLU.h>
 
 #define _USE_MATH_DEFINES  // needs to be defined to enable standard declartions of PI constant
 #include "math.h"
