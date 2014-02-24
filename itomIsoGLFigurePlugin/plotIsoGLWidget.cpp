@@ -160,8 +160,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_colorMode(1),
     m_pContent(NULL),
     m_pContentWhileRastering(NULL),
-    m_invalid(1.6e308),
-    m_glf(NULL)
+    m_invalid(1.6e308)
 {
     this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
 
@@ -284,8 +283,6 @@ plotGLWidget::~plotGLWidget()
         free(m_pNormales);
     if (m_pPoints != NULL)
         free(m_pPoints);
-    if (m_glf)
-        delete m_glf;
 
     if(m_pContentWhileRastering)
     {

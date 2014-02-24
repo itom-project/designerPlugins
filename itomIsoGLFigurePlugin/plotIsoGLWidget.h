@@ -198,7 +198,6 @@ class plotGLWidget : public QGLWidget
         GLfloat       *m_pNormales;
         GLfloat       *m_pPoints;
         unsigned char *m_pColIndices;
-        QGLFunctions *m_glf;
 
 //        int initOGL2(const int width, const int height);
         ito::RetVal GLSetTriangles(int &mode);
