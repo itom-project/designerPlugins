@@ -97,7 +97,7 @@ struct objectInfo
 class ItomIsoGLWidget;
 
 
-class plotGLWidget :  public QGLWidget
+class plotGLWidget : public QGLWidget
 {
     Q_OBJECT
     public:
@@ -137,8 +137,10 @@ class plotGLWidget :  public QGLWidget
         void disableInit() { m_isInit &= ~1; }
         bool lightArrowEnabled();
         void paintGL();
-        void paintEvent(QPaintEvent *pevent);
-        void resizeEvent(QResizeEvent *pevent);
+        void resizeGL(int width, int height);
+//        void paintEvent(QPaintEvent *pevent);
+//        void resizeEvent(QResizeEvent *pevent);
+        void initializeGL();
 
         bool m_showContextMenu;
 
@@ -196,8 +198,9 @@ class plotGLWidget :  public QGLWidget
         GLfloat       *m_pNormales;
         GLfloat       *m_pPoints;
         unsigned char *m_pColIndices;
+        QGLFunctions *m_glf;
 
-        int initOGL2(const int width, const int height);
+//        int initOGL2(const int width, const int height);
         ito::RetVal GLSetTriangles(int &mode);
         void generateObjectInfoText();
         template<typename _Type> inline ito::RetVal NormalizeObj(cv::Mat &scaledTopo, ito::float64 &normedInvalid);
@@ -229,7 +232,6 @@ class plotGLWidget :  public QGLWidget
             COLORBAR_LEFT = 0x01, //* Do not show ColorBar */
             COLORBAR_RIGHT = 0x02,
             COLORBAR_UPPER_RIGHT = 0x04
-
         };
 
         enum initStatus
@@ -240,7 +242,6 @@ class plotGLWidget :  public QGLWidget
             IS_RENDERING = 0x10,
             IS_CALCTRIANG = 0x20
         };
-
 
     signals:
         void spawnNewChild(QVector<QPointF>);

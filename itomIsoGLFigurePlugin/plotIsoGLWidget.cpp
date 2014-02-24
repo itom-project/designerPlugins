@@ -20,16 +20,18 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 //#include "GL/glew.h"
+
 #if linux
     #include <unistd.h>
-#else
-    #if QT_VERSION < 0x050000
+#endif
+#include "itomIsoGLFigure.h"
+#include "plotIsoGLWidget.h"
+#ifdef WIN32
+    #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
     #define GL_BGR        0x813F
     #define GL_BGRA       0x814F
     #endif
 #endif
-#include "itomIsoGLFigure.h"
-#include "plotIsoGLWidget.h"
 
 #include "common/sharedStructuresGraphics.h"
 #include "DataObject/dataObjectFuncs.h"
@@ -72,11 +74,20 @@ extern int NTHREADS;
 *    @param [in] height    window height
 *    @return        zero for no error, openGL error code otherwise
 */
+/*
 int plotGLWidget::initOGL2(const int width, const int height)
 {
     int ret = 0;
 
+    //somewhere, only once:
+    QOpenGLFunctions *m_oglFunctions=new QOpenGLFunctions(QOpenGLContext::currentContext());
+    m_oglFunctions->initializeOpenGLFunctions();
+ 
+    //everytime before doing anything OpenGL:
+    m_oglFunctions->glUseProgram(0);
+
     glShadeModel(GL_SMOOTH);                            //Smooth Shading
+    ret = glGetError();
     glClearDepth(1.0f);                                    //Tiefenpuffer setzen
     glEnable(GL_DEPTH_TEST);                            //Tiefenpuffertest aktivieren
     glDepthFunc(GL_LEQUAL);                                //welcher Test
@@ -105,7 +116,7 @@ int plotGLWidget::initOGL2(const int width, const int height)
 
     return ret;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------------------
 plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, const QGLWidget *shareWidget):
@@ -124,7 +135,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_gamma (1),
     m_TransX(0.0),
     m_TransY(0.0),
-    m_TransZ(0.0),
+    m_TransZ(-2.0),
     m_colorBarMode(COLORBAR_NO),
     m_currentColor(1),
     m_fontsize(10),
@@ -149,7 +160,8 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_colorMode(1),
     m_pContent(NULL),
     m_pContentWhileRastering(NULL),
-    m_invalid(1.6e308)
+    m_invalid(1.6e308),
+    m_glf(NULL)
 {
     this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
 
@@ -230,6 +242,72 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_objectInfo.meanVal = 0;
 
     m_currentPalette.clear();
+    m_errorDisplMsg.clear();
+    m_errorDisplMsg.append("No Data");
+
+    /* Basic view coordinates */
+    //RotA0 = -1.4;
+    //RotB0 = -1.5;
+    //RotC0 = 0.0;
+
+    m_RotA = 0.855 + RotA0;
+    m_RotB = 1.571 + RotB0;
+    m_RotC = 1.025 + RotC0;
+
+    m_pContent = QSharedPointer<ito::DataObject>(new ito::DataObject());
+
+//    refreshPlot(NULL);
+    m_isInit = 1;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+plotGLWidget::~plotGLWidget()
+{
+    hide();
+    m_isInit |= ~IS_INIT;
+    Sleep(100);
+
+    if (m_myCharBitmapBuffer)
+        glDeleteLists(m_myCharBitmapBuffer, 256);
+
+    glDeleteTextures(1, &m_cBarTexture);                    // Create The Texture
+
+    if(m_myCharBitmapBuffer != 0) glDeleteLists(m_myCharBitmapBuffer, 256);
+
+    if (m_pColTriangles != NULL)
+        free(m_pColTriangles);
+    if (m_pTriangles != NULL)
+        free(m_pTriangles);
+    if (m_pColIndices != NULL)
+        free(m_pColIndices);
+    if (m_pNormales != NULL)
+        free(m_pNormales);
+    if (m_pPoints != NULL)
+        free(m_pPoints);
+    if (m_glf)
+        delete m_glf;
+
+    if(m_pContentWhileRastering)
+    {
+        m_pContentWhileRastering.clear();
+    }
+
+    if(m_pContent)
+    {
+        m_pContent.clear();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void plotGLWidget::paintTimeout()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void plotGLWidget::initializeGL()
+{
+    int ret = 0;
+
     if(ITOM_API_FUNCS_GRAPH != NULL && *ITOM_API_FUNCS_GRAPH != NULL)
     {
         int numColBars = 0;
@@ -259,21 +337,28 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
         }
     }
 
-    m_errorDisplMsg.clear();
-    m_errorDisplMsg.append("No Data");
+    glShadeModel(GL_SMOOTH);                            //Smooth Shading
+    ret = glGetError();
+    glClearDepth(1.0f);                                 //Tiefenpuffer setzen
+    glEnable(GL_DEPTH_TEST);                            //Tiefenpuffertest aktivieren
+    glDepthFunc(GL_LEQUAL);                             //welcher Test
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  //Perspektivenkorrektur an
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);             //Linien Antialiasing
+    glClearColor(255.0f, 255.0f, 255.0f, 0.0f);         //weisser Hintergrund
 
-    /* Basic view coordinates */
-    //RotA0 = -1.4;
-    //RotB0 = -1.5;
-    //RotC0 = 0.0;
+    glEnable(GL_TEXTURE_2D);
+    ret = glGetError();
 
-    m_RotA = 0.855 + RotA0;
-    m_RotB = 1.571 + RotB0;
-    m_RotC = 1.025 + RotC0;
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
 
-    ret = initOGL2(width(), height());
-    if(!ret)
-        m_isInit = IS_INIT;
+    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix wählen
+    glLoadIdentity();
+    glViewport(0, 0, (GLsizei)width(), (GLsizei)height());                //Window resizen
+    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glGenTextures(1, &m_cBarTexture);
@@ -365,89 +450,47 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     {
         std::cerr << "error setting up openGLWindow window: " << ret << "\n";
     }
-
-    m_pContent = QSharedPointer<ito::DataObject>(new ito::DataObject());
-
-    refreshPlot(NULL);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-plotGLWidget::~plotGLWidget()
-{
-    hide();
-    m_isInit |= ~IS_INIT;
-    Sleep(100);
-
-    if (m_myCharBitmapBuffer)
-        glDeleteLists(m_myCharBitmapBuffer, 256);
-
-    glDeleteTextures(1, &m_cBarTexture);                    // Create The Texture
-
-    if(m_myCharBitmapBuffer != 0) glDeleteLists(m_myCharBitmapBuffer, 256);
-
-    if (m_pColTriangles != NULL)
-        free(m_pColTriangles);
-    if (m_pTriangles != NULL)
-        free(m_pTriangles);
-    if (m_pColIndices != NULL)
-        free(m_pColIndices);
-    if (m_pNormales != NULL)
-        free(m_pNormales);
-    if (m_pPoints != NULL)
-        free(m_pPoints);
-
-    if(m_pContentWhileRastering)
+    else
     {
-        m_pContentWhileRastering.clear();
-    }
-
-    if(m_pContent)
-    {
-        m_pContent.clear();
+        m_isInit = IS_INIT;
+        refreshPlot(NULL);
     }
 }
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void plotGLWidget::paintTimeout()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::paintGL()
 {
-    double winSizeX = (double)this->width();
-    double winSizeY = (double)this->height();
+    double winSizeX = (double)width();
+    double winSizeY = (double)height();
     ito::RetVal retval = ito::retOk;
     ito::float64 Sqrt2Div2 = sqrt(2.0) / 2.0;
-    ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0; //, tempVal;
+    ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0;
     ito::float64 nDims = 0;
 
     if (m_isInit != 3)
         return;
 
-    m_isInit |= IS_RENDERING;
-    m_ticklength = (int)(sqrt(winSizeX * winSizeX + winSizeY * winSizeY) * 10/1000); //tut
+    m_isInit |= IS_RENDERING; 
+    m_ticklength = (int)(sqrt(winSizeX * winSizeX + winSizeY * winSizeY) * 10.0 / 1000.0);
 
-    glMatrixMode(GL_MODELVIEW);                    //Projektionsmatrix wählen
+    glMatrixMode(GL_MODELVIEW);                             // select projection matrix
     glLoadIdentity();
 
     if (!m_backgnd)
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                //schwarzer Hintergrund
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);               // black background
     else
-        glClearColor(255.0f, 255.0f, 255.0f, 0.0f);                //weisser Hintergrund
+        glClearColor(255.0f, 255.0f, 255.0f, 0.0f);         // white background
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    //Screen und Tiefenpuffer leeren
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // clear screen and depth buffer
     if ( ( ((m_pTriangles == NULL) && (m_elementMode == PAINT_TRIANG)) && ((m_pPoints == NULL) && (m_elementMode == PAINT_POINTS)) ) || (m_pColTriangles == NULL) || (m_NumElements == 0))
     {
-        doneCurrent();
         m_isInit &= ~IS_RENDERING;
         return;
     }
 
     glTranslated(m_TransX, m_TransY, m_TransZ);
-    glRotated(m_RotA/PI*180.0, 1.0f, 0.0f, 0.0f);
-    glRotated(m_RotB/PI*180.0, 0.0f, 1.0f, 0.0f);
-    glRotated(m_RotC/PI*180.0, 0.0f, 0.0f, 1.0f);
+    glRotated(m_RotA / PI * 180.0, 1.0f, 0.0f, 0.0f);
+    glRotated(m_RotB / PI * 180.0, 0.0f, 1.0f, 0.0f);
+    glRotated(m_RotC / PI * 180.0, 0.0f, 0.0f, 1.0f);
 
     threeDRotationMatrix();
 
@@ -506,9 +549,9 @@ void plotGLWidget::paintGL()
     }
 
     if(m_protocol.show) 
+    {
         glTranslatef(0.0, 0.7 * (double) m_protocol.m_psize / winSizeY, 0.0);
-    else 
-        glTranslatef(0.0, 0.0, 0.0);
+    }
 
     if(m_elementMode == PAINT_POINTS)
     {
@@ -538,15 +581,17 @@ void plotGLWidget::paintGL()
     }
 
     if (m_drawLightDir)
+    {
         paintLightArrow();
+    }
 
     threeDAxis();
 
-    glLoadIdentity();
-    gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
-
+/*
     if (m_drawTitle)
     {    // noobjinfo
+        glLoadIdentity();
+        gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
 //        setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
         //int yused;
 //        int texty = 1.0;
@@ -555,6 +600,8 @@ void plotGLWidget::paintGL()
 
     if(m_protocol.show) // protocol
     {
+        glLoadIdentity();
+        gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
 //        setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
         //DrawProtocol(dd, dd->gy1, fo->args[27].s, (int)fo->args[28].d);
     }
@@ -563,7 +610,7 @@ void plotGLWidget::paintGL()
     {
         DrawObjectInfo();
     }
-
+*/
 //    int ret = glGetError();
 
     glFlush();
@@ -717,7 +764,7 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
     }
     #endif
 
-    // rescale the invalud value
+    // rescale the invalid value
     normedInvalid = (m_invalid - m_axisZ.phys[0]) / norm;
 
     return retVal;
@@ -821,7 +868,7 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
     }
     #endif
 
-    // rescale the invalud value
+    // rescale the invalid value
     normedInvalid = (m_invalid - m_axisZ.phys[0]) / norm;
 
     return retVal;
@@ -1089,7 +1136,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
                         m_pPoints[count * 3 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
                         m_pPoints[count * 3 + 2] = ZScale * dpixel1 - zshift;
 
-                        m_pColIndices[count] = cv::saturate_cast<unsigned char>(dpixel1*255.0);
+                        m_pColIndices[count] = cv::saturate_cast<unsigned char>(dpixel1 * 255.0);
                     }
                 }
             }
@@ -1262,16 +1309,16 @@ ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
     {
         if(m_elementMode == PAINT_POINTS)
         {
-            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements*sizeof(unsigned char));
-            m_pPoints = (GLfloat*)realloc(m_pPoints, m_NumElements*3*sizeof(GLfloat));
-            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements*4*sizeof(GLubyte));
+            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * sizeof(unsigned char));
+            m_pPoints = (GLfloat*)realloc(m_pPoints, m_NumElements * 3 * sizeof(GLfloat));
+            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 4 * sizeof(GLubyte));
         }
         else
         {
-             m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 3 * sizeof(unsigned char));
-             m_pTriangles = (GLfloat*)realloc(m_pTriangles, m_NumElements*9*sizeof(GLfloat));
-             m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements*12*sizeof(GLubyte));
-             m_pNormales = (GLfloat*)realloc(m_pNormales, m_NumElements*9*sizeof(GLfloat));
+             m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 2 * 3 * sizeof(unsigned char));
+             m_pTriangles = (GLfloat*)realloc(m_pTriangles, m_NumElements * 2 * 9 * sizeof(GLfloat));
+             m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 2 * 12 * sizeof(GLubyte));
+             m_pNormales = (GLfloat*)realloc(m_pNormales, m_NumElements * 2 * 9 * sizeof(GLfloat));
         }
 
         ResetColors();
@@ -1355,19 +1402,10 @@ void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscalei
 
     return;
 }
-//----------------------------------------------------------------------------------------------------------------------------------
-void plotGLWidget::paintEvent(QPaintEvent * /*pevent*/)
-{
-    paintGL();
 
-    return;
-}
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::refreshPlot(ito::ParamBase *param)
 {
-//    int ret = 0;
-//    int width = this->width();
-//    int height = this->height();
     ito::RetVal retval = ito::retOk;
     ito::float64 Sqrt2Div2 = sqrt(2.0) / 2.0;
     ito::float64 xs = 1.0, ys = 1.0, zs = 1.0, maxl = 1.0; //, tempVal;
@@ -1481,14 +1519,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
     if(m_pContent != NULL)
     {
         m_pContent->lockRead();
-
-        //double minXValueold = m_axisX.phys[0];
-        //double maxXValueold = m_axisX.phys[1];
-        //double minZValueold = m_axisZ.phys[0];
-        //double maxZValueold = m_axisZ.phys[1];
-        //double minYValueold = m_axisY.phys[0];
-        //double maxYValueold = m_axisY.phys[1];
-
         double windowXScaleOld = m_windowXScale;
         double windowYScaleOld = m_windowYScale;
         double windowZScaleOld = m_windowZScale;
@@ -1524,29 +1554,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
         if(!retval.containsError())
         {
-            /*
-                if(m_maxXValue < m_minXValue)
-                {
-                    tempVal = m_minXValue;
-                    m_minXValue = m_maxXValue;
-                    m_maxXValue = tempVal;
-                }
-                if(m_maxYValue < m_minYValue)
-                {
-                    tempVal = m_minYValue;
-                    m_minYValue = m_maxYValue;
-                    m_maxYValue = tempVal;
-                }
-                if(m_maxZValue < m_minZValue)
-                {
-                    tempVal = m_minZValue;
-                    m_minZValue = m_maxZValue;
-                    m_maxZValue = tempVal;
-                }
-            */
-
-            if (m_zAmpl < 0.000000001) // Damit auch µm angezeigt werden können
-                m_zAmpl = 0.000000001; // Damit auch µm angezeigt werden können
+            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
+                m_zAmpl = 0.000000001; // make sure µm can be displayed
 
             if(m_axisZ.isMetric) zs = m_axisZ.phys[1] - m_axisZ.phys[0];
 
@@ -1579,14 +1588,14 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
             if ((xs != 1) && (ys != 1))
             {
-                if (this->width() > this->height())
+                if (width() > height())
                 {
-                    m_windowXScale = (double)this->height() / (double)this->width();
+                    m_windowXScale = (double)height() / (double)width();
                     m_windowYScale = 1;
                 }
                 else
                 {
-                    m_windowYScale = (double)this->width() / (double)this->height();
+                    m_windowYScale = (double)width() / (double)height();
                     m_windowXScale= 1;
                 }
             }
@@ -1630,7 +1639,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             }
             else if ((m_windowXScale != windowXScaleOld) || (m_windowYScale != windowYScaleOld) || (m_windowZScale != windowZScaleOld))
                 rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
-
         }
     }
     else
@@ -1654,32 +1662,22 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void plotGLWidget::resizeEvent(QResizeEvent *pevent)
+void plotGLWidget::resizeGL(int width, int height)
 {
-    QSize newSize = pevent->size();
-    resize(newSize.width(), newSize.height());
-
-    glViewport(0, 0, newSize.width(), newSize.height());            //Window resizen
-
+    glViewport(0, 0, width, height);    // resize window
     glLoadIdentity();
-    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix wählen
+    glMatrixMode(GL_PROJECTION);        // select projection matrix
     glLoadIdentity();
-
-    gluPerspective(45.0f, (GLfloat)newSize.width()/(GLfloat) newSize.height(), 0.1f, 100.0f);//Perspektive einstellen
-//    glOrtho(0,width,0,height,-1,1);
-//    gluOrtho2D(0, width, 0, height);
+    gluPerspective(45.0f, (GLfloat)width / (GLfloat) height, 0.1f, 100.0f); // set perspective
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal plotGLWidget::setColor(const int col)
 {
     ito::RetVal retval = ito::retOk;
-//    int ret = 0;
-
     return retval;
 }
 
@@ -1708,21 +1706,21 @@ ito::RetVal plotGLWidget::ResetColors()
         {
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColTriangles[4*count] =   ((m_currentPalette[m_pColIndices[count]]&0xFF0000L)>>16);
-                m_pColTriangles[4*count+1] = ((m_currentPalette[m_pColIndices[count]]&0x00FF00L)>>8);
-                m_pColTriangles[4*count+2] = ((m_currentPalette[m_pColIndices[count]]&0x0000FFL));
-                m_pColTriangles[4*count+3] = 255;
+                m_pColTriangles[4 * count] =   ((m_currentPalette[m_pColIndices[count]] & 0xFF0000L) >> 16);
+                m_pColTriangles[4 * count + 1] = ((m_currentPalette[m_pColIndices[count]] & 0x00FF00L) >> 8);
+                m_pColTriangles[4 * count + 2] = ((m_currentPalette[m_pColIndices[count]] & 0x0000FFL));
+                m_pColTriangles[4 * count + 3] = 255;
             }
         }
         else
         {
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColIndices[4*count]    = m_pColIndices[count];
-                m_pColIndices[4*count +1] = m_pColIndices[count];
-                m_pColIndices[4*count +2] = m_pColIndices[count];
+                m_pColIndices[4 * count]    = m_pColIndices[count];
+                m_pColIndices[4 * count + 1] = m_pColIndices[count];
+                m_pColIndices[4 * count + 2] = m_pColIndices[count];
 
-                m_pColIndices[count +3] = 255;
+                m_pColIndices[count + 3] = 255;
             }
         }
     }
@@ -1732,34 +1730,36 @@ ito::RetVal plotGLWidget::ResetColors()
         {
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColTriangles[count*12] = ((m_currentPalette[m_pColIndices[count * 3]]&0xFF0000L)>>16);
-                m_pColTriangles[count*12+4] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0xFF0000L)>>16);
-                m_pColTriangles[count*12+8] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0xFF0000L)>>16);
-                m_pColTriangles[count*12+1] = ((m_currentPalette[m_pColIndices[count * 3]]&0x00FF00L)>>8);
-                m_pColTriangles[count*12+5] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0x00FF00L)>>8);
-                m_pColTriangles[count*12+9] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x00FF00L)>>8);
-                m_pColTriangles[count*12+2] = ((m_currentPalette[m_pColIndices[count * 3]]&0x0000FFL));
-                m_pColTriangles[count*12+6] = ((m_currentPalette[m_pColIndices[count * 3 + 1]]&0x0000FFL));
-                m_pColTriangles[count*12+10] = ((m_currentPalette[m_pColIndices[count * 3 + 2]]&0x0000FFL));
-                m_pColTriangles[count*12+11] = m_pColTriangles[count*12+7] = m_pColTriangles[count*12+3] = 255;
+                m_pColTriangles[count * 12] = ((m_currentPalette[m_pColIndices[count * 3]] & 0xFF0000L) >> 16);
+                m_pColTriangles[count * 12 + 4] = ((m_currentPalette[m_pColIndices[count * 3 + 1]] & 0xFF0000L) >> 16);
+                m_pColTriangles[count * 12 + 8] = ((m_currentPalette[m_pColIndices[count * 3 + 2]] & 0xFF0000L) >> 16);
+                m_pColTriangles[count * 12 + 1] = ((m_currentPalette[m_pColIndices[count * 3]] & 0x00FF00L) >> 8);
+                m_pColTriangles[count * 12 + 5] = ((m_currentPalette[m_pColIndices[count * 3 + 1]] & 0x00FF00L) >> 8);
+                m_pColTriangles[count * 12 + 9] = ((m_currentPalette[m_pColIndices[count * 3 + 2]] & 0x00FF00L) >> 8);
+                m_pColTriangles[count * 12 + 2] = ((m_currentPalette[m_pColIndices[count * 3]] & 0x0000FFL));
+                m_pColTriangles[count * 12 + 6] = ((m_currentPalette[m_pColIndices[count * 3 + 1]] & 0x0000FFL));
+                m_pColTriangles[count * 12 + 10] = ((m_currentPalette[m_pColIndices[count * 3 + 2]] & 0x0000FFL));
+                m_pColTriangles[count * 12 + 11] = m_pColTriangles[count * 12 + 7] = m_pColTriangles[count * 12 + 3] = 255;
             }
         }
         else
         {
+/*
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColIndices[count*12] = m_pColIndices[count * 3];
-                m_pColIndices[count*12+4] = m_pColIndices[count * 3 + 1];
-                m_pColIndices[count*12+8] = m_pColIndices[count * 3 + 2];
-                m_pColIndices[count*12+1] = m_pColIndices[count * 3];
-                m_pColIndices[count*12+5] = m_pColIndices[count * 3 + 1];
-                m_pColIndices[count*12+9] = m_pColIndices[count * 3 + 2];
-                m_pColIndices[count*12+2] = m_pColIndices[count * 3];
-                m_pColIndices[count*12+6] = m_pColIndices[count * 3 + 1];
-                m_pColIndices[count*12+10] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count * 12] = m_pColIndices[count * 3];
+                m_pColIndices[count * 12 + 4] = m_pColIndices[count * 3 + 1];
+                m_pColIndices[count * 12 + 8] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count * 12 + 1] = m_pColIndices[count * 3];
+                m_pColIndices[count * 12 + 5] = m_pColIndices[count * 3 + 1];
+                m_pColIndices[count * 12 + 9] = m_pColIndices[count * 3 + 2];
+                m_pColIndices[count * 12 + 2] = m_pColIndices[count * 3];
+                m_pColIndices[count * 12 + 6] = m_pColIndices[count * 3 + 1];
+                m_pColIndices[count * 12 + 10] = m_pColIndices[count * 3 + 2];
 
-                m_pColIndices[count*12+11] = m_pColIndices[count*12+7] = m_pColIndices[count*12+3] = 255;
+                m_pColIndices[count * 12 + 11] = m_pColIndices[count * 12 + 7] = m_pColIndices[count * 12 + 3] = 255;
             }
+*/
         }
     }
 
@@ -1837,12 +1837,12 @@ void plotGLWidget::threeDAxis(void)
     zmin = -m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
     zmax = m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
 
-    if ((((ay < az)-0.5)*signedY)>0)
+    if ((((ay < az) - 0.5) * signedY) > 0)
         xb = xmin;
     else
         xb = xmax;
 
-    if ((((ax > az)-0.5)*signedX)>0)
+    if ((((ax > az) - 0.5) * signedX) > 0)
         yb = ymin;
     else
         yb = ymax;
@@ -1898,7 +1898,6 @@ void plotGLWidget::threeDAxis(void)
 			signedYAy = -1 * VRX * VRY;
 		else
 			signedYAy = 1 * VRX * VRY;
-
     }
     else
     {
@@ -1910,7 +1909,6 @@ void plotGLWidget::threeDAxis(void)
 			signedYAy = 1 * VRX * VRY;
 		else
 			signedYAy = -1 * VRX * VRY;
-
     }
 
     if (yb == ymin)
@@ -1970,7 +1968,7 @@ void plotGLWidget::threeDAxis(void)
         paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin,  m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 0);
         paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 0);
     }
-    //Damit die Z-Tickes einstellbar werden
+    // make z-ticks adjustable 
     m_ticklength /= m_z_tickmulti;
 
     if(m_axisZ.show)
@@ -1978,7 +1976,7 @@ void plotGLWidget::threeDAxis(void)
         paintAxisOGL(xb, -yb, zmin, xb, -yb, zmax);
         paintAxisTicksOGL(xb, -yb, zmin, xb, -yb, zmax, m_axisZ.phys[0], m_axisZ.phys[1], signedZAx, signedZAy, signedZA, m_axisZ.label, m_axisZ.unit, 0);
     }
-    //Damit die Z-Tickes einstellbar werden
+    // make z-ticks adjustable 
     m_ticklength *= 10.0*m_z_tickmulti;
 
     if(m_axisX.show && m_axisY.show)
@@ -1989,7 +1987,7 @@ void plotGLWidget::threeDAxis(void)
         paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], a* signedYAx, b* signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
     }
 
-    //Damit die Z-Tickes einstellbar werden
+    // make z-ticks adjustable 
     m_ticklength /= m_z_tickmulti;
 
     if(m_axisZ.show)
@@ -2013,9 +2011,7 @@ void plotGLWidget::threeDAxis(void)
         }
     }
 
-    // Und wieder zurück
-    //dd->ticklength /= 10.0;
-    m_ticklength *= (m_z_tickmulti/10.0);
+    m_ticklength *= (m_z_tickmulti / 10.0);
 
     return;
 }
@@ -2046,7 +2042,6 @@ void plotGLWidget::paintAxisOGL(double x0, double y0, double z0, double x1, doub
 
     return;
 }
-
 
 //-----------------------------------------------------------------------------------------------
 /**
@@ -2389,8 +2384,8 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
         {
             if (al->lastdigit>=0)
             {
-                //CK 09.08.2006 anti-Killer-Objekt Hack:
-                //ist darzustellende Zahl länger als 8 Ziffern, dann machs in Exp-Darstellung
+                // CK 09.08.2006 fix wrecked number displaying:
+                // in case the number is larger than 8 digits use exponential notation
                 if (fabs(v) >= 1.0E8)
                     _snprintf(buffer, sizeof(buffer), "%g", v);
                 else
@@ -2468,7 +2463,7 @@ int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double
 
 void plotGLWidget::OGLMakeFont(int size)
 {
-    QFont oldFont = this->font();
+    QFont oldFont = font();
     QFont myFont("Arial", -size, QFont::Light & QFont::OpenGLCompatible & QFont::PreferBitmap);
     this->setFont(myFont);
 
@@ -2478,7 +2473,12 @@ void plotGLWidget::OGLMakeFont(int size)
 #if (defined linux)
 
 #elif (defined Q_OS_WIN32 || defined(Q_OS_WIN64))
-//    wglUseFontBitmaps(this->getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32   
+#if QT_VERSION >= 0x050000
+    HWND hwnd = (HWND)winId(); 
+    wglUseFontBitmaps(GetDC(hwnd), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32   
+#else
+    wglUseFontBitmaps(getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32   
+#endif
 #endif
 
     this->setFont(oldFont);
@@ -2519,6 +2519,7 @@ void plotGLWidget::DrawObjectInfo(void)
 
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat dX, const GLfloat dY, const GLfloat zMin, const GLfloat zMax)
 {
@@ -2612,10 +2613,10 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
 void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &yused)
 {
     int i = 0;
-    double x0 = -1 * myTitle.length() * 1.67 * m_fontsize * 0.6 / this->width();
-    double y0 = 0.98 - (double)(++i * 2.0 * 1.67 * m_fontsize) / this->height();
+    double x0 = -1 * myTitle.length() * 1.67 * m_fontsize * 0.6 / width();
+    double y0 = 0.98 - (double)(++i * 2.0 * 1.67 * m_fontsize) / height();
 
-    /* Titel Objekt etc. */
+    /* Titel Object etc. */
     OGLMakeFont(1.67 * m_fontsize);
     if(myTitle.length())
         OGLTextOut((char*)myTitle.data(), x0, y0);
@@ -2623,7 +2624,7 @@ void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &y
     OGLMakeFont(1.5*dd->fontsize, dd);
     tags->ReadTagDef(TAG_COMMENT1,(void *)&txt,"");
     if(strlen(txt))
-        OGLTextOut(dd, (char*)txt, (double)x0/this->width()-0.9, (double)(++i*-2.0*1.5*m_fontsize)/this->height()+0.9);
+        OGLTextOut(dd, (char*)txt, (double)x0/width()-0.9, (double)(++i*-2.0*1.5*m_fontsize) / height()+0.9);
 
     tags->ReadTagDef(TAG_COMMENT2,(void *)&txt,"");
     if(strlen(txt))
@@ -2661,6 +2662,7 @@ void plotGLWidget::riseZAmplifierer(const double value)
         m_zAmpl *= value;
     refreshPlot(NULL);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::togglePaletteMode()
 {
@@ -2681,7 +2683,8 @@ void plotGLWidget::togglePaletteMode()
             break;
     }
     paintGL();
-};
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::homeView()
 {
@@ -2694,8 +2697,9 @@ void plotGLWidget::homeView()
     m_RotA = 0.855 + RotA0;
     m_RotB = 1.571 + RotB0;
     m_RotC = 1.025 + RotC0;
-    this->paintGL();
+    paintGL();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::toggleIllumination(const bool checked)
 {
@@ -2711,6 +2715,7 @@ void plotGLWidget::toggleIllumination(const bool checked)
     paintGL();
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::toggleIlluminationRotation(const bool checked)
 {
@@ -2728,11 +2733,13 @@ void plotGLWidget::toggleIlluminationRotation(const bool checked)
     paintGL();
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool plotGLWidget::lightArrowEnabled()
 {
     return m_drawLightDir;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::setColorMap(QString palette)
 {
@@ -2767,8 +2774,6 @@ void plotGLWidget::setColorMap(QString palette)
     }
 
     m_currentPalette = newPalette.colorVector256;
-
-    makeCurrent();
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
     GLfloat *par, *pag, *pab;
 
@@ -2778,9 +2783,9 @@ void plotGLWidget::setColorMap(QString palette)
 
     for (int i=0; i<255; i++)
     {
-        par[i] = (GLfloat)((m_currentPalette[i] & 0xFF0000L)>>16)/255.0;
-        pag[i] = (GLfloat)((m_currentPalette[i] & 0xFF00L)>>8)/255.0;
-        pab[i] = (GLfloat)(m_currentPalette[i] & 0xFFL)/255.0;
+        par[i] = (GLfloat)((m_currentPalette[i] & 0xFF0000L) >> 16) / 255.0;
+        pag[i] = (GLfloat)((m_currentPalette[i] & 0xFF00L) >> 8) / 255.0;
+        pab[i] = (GLfloat)(m_currentPalette[i] & 0xFFL) / 255.0;
     }
 
     glPixelMapfv(GL_PIXEL_MAP_I_TO_G, 256, pag);
@@ -2810,20 +2815,18 @@ void plotGLWidget::setColorMap(QString palette)
     unsigned char * src = new unsigned char[m_currentPalette.size() * 4 *2];
     for(int i = 0; i < m_currentPalette.size(); i++)
     {
-        src[8*i]   = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
-        src[8*i+1] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
-        src[8*i+2] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-        src[8*i+3] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-        src[8*i+4] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i];
-        src[8*i+5] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 1];
-        src[8*i+6] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
-        src[8*i+7] = ((unsigned char*)m_currentPalette.data())[4*m_currentPalette.size() - 4 * i + 2];
+        src[8 * i]   = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i];
+        src[8 * i + 1] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 1];
+        src[8 * i + 2] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
+        src[8 * i + 3] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
+        src[8 * i + 4] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i];
+        src[8 * i + 5] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 1];
+        src[8 * i + 6] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
+        src[8 * i + 7] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 256, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
     delete[] src;
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
-
-    doneCurrent();
 
     m_isInit |= IS_INIT;
     ResetColors();
@@ -2833,7 +2836,7 @@ void plotGLWidget::setColorMap(QString palette)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal plotGLWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
 {
-    /*
+/*
     if(m_pContent)
     {
         m_pContent->setIntervalRange(axis, autoCalcLimits, minValue, maxValue);
@@ -2861,7 +2864,7 @@ ito::RetVal plotGLWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
             break;
         }
     }
-    */
+ */
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2929,6 +2932,7 @@ inline void plotGLWidget::toogleObjectInfoText(const bool enabled)
     m_objectInfo.show = enabled;
     paintGL();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 inline void plotGLWidget::generateObjectInfoText()
 {
@@ -3004,3 +3008,5 @@ inline void plotGLWidget::generateObjectInfoText()
     
     return;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------

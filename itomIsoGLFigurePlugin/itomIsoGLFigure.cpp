@@ -71,21 +71,21 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure
     QMenu *contextMenu = new QMenu(tr("plot2D"), this);
 
     QGLFormat fmt;
-    fmt.setDoubleBuffer(0);
-
     fmt.setOverlay(0);
-    if (fmt.swapInterval() != -1)
-        fmt.setSwapInterval(0);
-    fmt.setProfile(QGLFormat::CoreProfile);
+    fmt.setDepth(1);
+//    fmt.setDoubleBuffer(0);
+//    fmt.setDirectRendering(1);
+//    fmt.setStereo(0);
+//    if (fmt.swapInterval() != -1)
+//        fmt.setSwapInterval(0);
+    fmt.setProfile(QGLFormat::NoProfile);
 
     int glVer = QGLFormat::openGLVersionFlags();
-
     if (glVer >= 32)
     {
-        fmt.setVersion(2,0);
+        fmt.setVersion(1, 5);
     }
-
-    fmt.setDepth(0);
+//    QGLFormat::setDefaultFormat(fmt);
 
     m_pContent = new plotGLWidget(contextMenu, fmt, this, 0);
     m_pContent->setObjectName("canvasWidget");
@@ -818,17 +818,21 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
 
     switch(e->type())
     {
+/*
         case QEvent::FocusIn:
 //            showCursor(true);
+        break;
+
         case QEvent::FocusOut:
 //            showCursor(false);
+        break;
 
         case QEvent::Resize:
         {
          //   m_plotObj->resizeGLWidget(true);
             break;
         }
-
+*/
         case QEvent::Wheel:
         {
             if (((const QWheelEvent *)e)->delta() > 0)
@@ -842,13 +846,13 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
             }
             break;
         }
-
+/*
         case QEvent::Paint:
         {
             QApplication::postEvent(this, new QEvent(QEvent::User));
             break;
         }
-
+*/
         case QEvent::MouseButtonPress:
         {
             rotating = true;
@@ -856,12 +860,14 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
             startPos[0] = QCursor::pos().x();
             startPos[1] = QCursor::pos().y();
 
-            return true;
+            break;
         }
+
         case QEvent::MouseButtonRelease:
         case QEvent::MouseMove:
         {
-            if (!rotating) return true;
+            if (!rotating) 
+                break;
 
             double deltaZ = (QCursor::pos().x() - startPos[0]) / 200.0;
             double deltaX = (QCursor::pos().y() - startPos[1]) / 200.0;
@@ -884,8 +890,9 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 rotating = true;
                 moving = false;
             }
-            ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-            return true;
+//            ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+            ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+            break;
         }
 
         case QEvent::KeyPress:
@@ -895,56 +902,62 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 case Qt::Key_H:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->setView(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+//                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
                 }
-                return true;
+                break;
+
                 case Qt::Key_W:
                 case Qt::Key_Up:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(-0.05, 0.0, 0.0);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+//                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
                 }
-                
-                return true;
+                break;
 
                 case Qt::Key_S:
                 case Qt::Key_Down:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.05, 0.0, 0.0);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+//                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
                 }
-                
-                return true;
+                break;
 
                 case Qt::Key_D:
                 case Qt::Key_Right:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, 0.0, 0.05);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+//                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
                 }
-                
-                return true;
+                break;
 
                 case Qt::Key_A:
                 case Qt::Key_Left:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, 0.0, -0.05);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+//                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
                 }
+                break;
 
                 case Qt::Key_Q:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, -0.05, 0.0);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+//                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
                 }
+                break;
 
                 case Qt::Key_E:
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0,  0.05, 0.0);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+//                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
                 }
-                
-                return true;
+                break;
 
                 // The following keys represent a direction, they are
                 // organized on the keyboard.
@@ -959,7 +972,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 break;
             }
         }
-        default:       
+        default: 
             break;
     }
 
