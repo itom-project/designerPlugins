@@ -34,10 +34,10 @@
 #include <qdebug.h>
 #include <qmessagebox.h>
 
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
-#define _USE_MATH_DEFINES  // needs to be defined to enable standard declartions of PI constant
+#define _USE_MATH_DEFINES  // needs to be defined to enable standard declarations of PI constant
 #include "math.h"
 
 using namespace ito;
