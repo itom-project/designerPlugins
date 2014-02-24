@@ -891,7 +891,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 moving = false;
             }
 //            ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-            ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+            ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
             break;
         }
 
@@ -903,7 +903,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->setView(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 //                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
                 }
                 break;
 
@@ -912,7 +912,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(-0.05, 0.0, 0.0);
 //                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
                 }
                 break;
 
@@ -921,7 +921,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.05, 0.0, 0.0);
 //                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
                 }
                 break;
 
@@ -930,7 +930,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, 0.0, 0.05);
 //                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
                 }
                 break;
 
@@ -939,7 +939,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, 0.0, -0.05);
 //                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
                 }
                 break;
 
@@ -947,7 +947,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0, -0.05, 0.0);
 //                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
                 }
                 break;
 
@@ -955,7 +955,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 {
                     ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->rotateView(0.0,  0.05, 0.0);
 //                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->paintEvent(NULL);
-                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->update();
+                    ((plotGLWidget*)((ItomIsoGLWidget*)m_plotObj)->m_pContent)->repaint();
                 }
                 break;
 

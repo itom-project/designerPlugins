@@ -113,7 +113,7 @@ class plotGLWidget : public QGLWidget
         inline void setCmplxMode(const int cmplxMode) {m_cmplxMode = cmplxMode % 4; m_forceReplot = true; }
         inline bool getStackStatus() { return m_stackState; }
         inline bool getCmplxStatus() { return m_cmplxState; }
-        inline void setBGColor(const int color) { m_backgnd = color % 2; paintGL(); }
+        inline void setBGColor(const int color) { m_backgnd = color % 2; update(); }
         inline int getBGColor() { return m_backgnd; }
         inline int getCurrentVisMode(){ return m_elementMode; }
         void setCurrentVisMode(const int mode);

@@ -26,13 +26,6 @@
 #endif
 #include "itomIsoGLFigure.h"
 #include "plotIsoGLWidget.h"
-#ifdef WIN32
-    #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    #define GL_BGR        0x813F
-    #define GL_BGRA       0x814F
-    #endif
-#endif
-
 #include "common/sharedStructuresGraphics.h"
 #include "DataObject/dataObjectFuncs.h"
 
@@ -135,7 +128,11 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_gamma (1),
     m_TransX(0.0),
     m_TransY(0.0),
+#if QT_VERSION < 0x050000
+    m_TransZ(-3.0),
+#else
     m_TransZ(-2.0),
+#endif
     m_colorBarMode(COLORBAR_NO),
     m_currentColor(1),
     m_fontsize(10),
@@ -335,7 +332,6 @@ void plotGLWidget::initializeGL()
     }
 
     glShadeModel(GL_SMOOTH);                            //Smooth Shading
-    ret = glGetError();
     glClearDepth(1.0f);                                 //Tiefenpuffer setzen
     glEnable(GL_DEPTH_TEST);                            //Tiefenpuffertest aktivieren
     glDepthFunc(GL_LEQUAL);                             //welcher Test
@@ -344,7 +340,6 @@ void plotGLWidget::initializeGL()
     glClearColor(255.0f, 255.0f, 255.0f, 0.0f);         //weisser Hintergrund
 
     glEnable(GL_TEXTURE_2D);
-    ret = glGetError();
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -359,10 +354,8 @@ void plotGLWidget::initializeGL()
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glGenTextures(1, &m_cBarTexture);
-//    ret = glGetError();
 
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
-//    ret = glGetError();
 
     GLfloat *par, *pag, *pab;
 
@@ -435,7 +428,7 @@ void plotGLWidget::initializeGL()
         #endif
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, paletteSize, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, paletteSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, src);
     delete[] src;
 
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
@@ -612,7 +605,8 @@ void plotGLWidget::paintGL()
 
     glFlush();
     //glFinish();
-    swapBuffers();
+//    if (context()->format().doubleBuffer())
+//        swapBuffers();
 
     m_isInit &= ~IS_RENDERING;
 
@@ -1648,7 +1642,7 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
     if (retval == ito::retOk)
     {
         m_isInit |= HAS_TRIANG;
-        paintGL();
+        update();
     }
     else
     {
@@ -2559,7 +2553,6 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
         glTexCoord2f(1.0, 0.0); glVertex3f(x0 + dX, y0 + dY, -1.0);
         glTexCoord2f(0.0, 0.0); glVertex3f(x0, y0 + dY, -1.0);
     glEnd();
-
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glLineWidth(m_linewidth);
@@ -2679,7 +2672,7 @@ void plotGLWidget::togglePaletteMode()
             m_colorBarMode = COLORBAR_NO;
             break;
     }
-    paintGL();
+    update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2694,7 +2687,7 @@ void plotGLWidget::homeView()
     m_RotA = 0.855 + RotA0;
     m_RotB = 1.571 + RotB0;
     m_RotC = 1.025 + RotC0;
-    paintGL();
+    update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2709,7 +2702,7 @@ void plotGLWidget::toggleIllumination(const bool checked)
       m_colorMode = 1;
       m_drawLightDir = false;
     }
-    paintGL();
+    update();
     return;
 }
 
@@ -2727,7 +2720,7 @@ void plotGLWidget::toggleIlluminationRotation(const bool checked)
             m_drawLightDir = true;
         }
     }
-    paintGL();
+    update();
     return;
 }
 
@@ -2812,22 +2805,23 @@ void plotGLWidget::setColorMap(QString palette)
     unsigned char * src = new unsigned char[m_currentPalette.size() * 4 *2];
     for(int i = 0; i < m_currentPalette.size(); i++)
     {
-        src[8 * i]   = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i];
+        src[8 * i]   = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
         src[8 * i + 1] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 1];
-        src[8 * i + 2] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
-        src[8 * i + 3] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
-        src[8 * i + 4] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i];
+        src[8 * i + 2] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i];
+        src[8 * i + 3] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 3];
+        src[8 * i + 4] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
         src[8 * i + 5] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 1];
-        src[8 * i + 6] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
-        src[8 * i + 7] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 2];
+        src[8 * i + 6] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i];
+        src[8 * i + 7] = ((unsigned char*)m_currentPalette.data())[4 * m_currentPalette.size() - 4 * i + 3];
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 256, 0, GL_BGRA, GL_UNSIGNED_BYTE, src);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, src);
+
     delete[] src;
     glBindTexture(GL_TEXTURE_2D, m_cBarTexture);
 
     m_isInit |= IS_INIT;
     ResetColors();
-    paintGL();
+    update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2837,7 +2831,7 @@ ito::RetVal plotGLWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
     if(m_pContent)
     {
         m_pContent->setIntervalRange(axis, autoCalcLimits, minValue, maxValue);
-        repaint();
+        update();
         return ito::retOk;
     }
     else
@@ -2927,7 +2921,7 @@ inline void plotGLWidget::toogleObjectInfoText(const bool enabled)
         generateObjectInfoText();
     }
     m_objectInfo.show = enabled;
-    paintGL();
+    update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
