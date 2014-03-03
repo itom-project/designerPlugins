@@ -1123,53 +1123,56 @@ QPointF GraphicViewPlot::getZAxisInterval(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setZAxisInterval(QPointF point)
 {
-    if(m_data.m_colorMode != RasterToQImageObj::ColorIndex8Scaled && m_data.m_colorMode != RasterToQImageObj::ColorIndex8Bitshift)
+    if(m_data.m_colorMode != RasterToQImageObj::ColorAutoSelect && m_data.m_colorMode != RasterToQImageObj::ColorIndex8Scaled && m_data.m_colorMode != RasterToQImageObj::ColorIndex8Bitshift)
     {
         
         return;
     }
 
-    if(!ito::dObjHelper::isFinite(point.x() || !ito::dObjHelper::isFinite(point.y())))
+    if(!ito::dObjHelper::isFinite(point.x() || !ito::dObjHelper::isFinite(point.y())) ||
+      (!ito::dObjHelper::isNotZero(point.x()) && !ito::dObjHelper::isNotZero(point.y())))
     {
+        m_data.m_valueScaleAuto = true;
+        if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
         return;
     }
 
-    if(!ito::dObjHelper::isNotZero(point.x()))
+    if(!ito::dObjHelper::isNotZero(point.x()) && ito::dObjHelper::isNotZero(point.y()))
     {
-        switch((int)point.x())
+        switch((int)point.y())
         {
             case 255:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 8;
-                return;
+                break;
             case 511:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 9;
-                return;
+                break;
             case 1023:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 10;
-                return;
+                break;
             case 2047:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 11;
-                return;
+                break;
             case 4095:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 12;
-                return;
+                break;
             case 8191:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 13;
-                return;
+                break;
             case 16383:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 14;
-                return;
+                break;
             case 65535:
                 m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 16;
-                return;
+                break;
             default:
                 m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
         }
@@ -1180,8 +1183,8 @@ void GraphicViewPlot::setZAxisInterval(QPointF point)
         m_data.m_colorMode = RasterToQImageObj::ColorIndex8Scaled;
     }
     m_data.m_valueScaleAuto = false;
-    m_data.m_valueMin = point.y();
-    m_data.m_valueMax = point.x();
+    m_data.m_valueMin = point.x();
+    m_data.m_valueMax = point.y();
     if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
     //if (m_pContent) m_pContent->refreshPlot(NULL);
     
@@ -1318,9 +1321,26 @@ void GraphicViewPlot::setColorMode(const int type)
 
     switch(m_data.m_colorMode)
     {
+        case RasterToQImageObj::ColorIndex8Bitshift:
+        {
+            QPointF val = m_pContent->calcInterval(Qt::ZAxis);
+            m_data.m_valueMin = val.x();
+            m_data.m_valueMax = val.y();
+            m_data.m_numBits = 8;
+            int maxval = (int)(m_data.m_valueMax > 255 ? (int)(m_data.m_valueMax + 0.5) : 255);
+            while(maxval > 255)
+            {
+                m_data.m_numBits++;
+                maxval >>= 1;
+            }
+                 
+
+            m_data.m_valueScaleAuto = false;
+            break;
+        }
         default:
         case RasterToQImageObj::ColorIndex8Scaled:
-        case RasterToQImageObj::ColorIndex8Bitshift:
+
         case RasterToQImageObj::ColorAutoSelect:
         {
             if(m_data.m_valueScaleAuto)
