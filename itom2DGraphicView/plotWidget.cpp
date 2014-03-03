@@ -59,7 +59,11 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
     m_pContent->addItem((QGraphicsItem*)m_pItem);   
 
   
-    m_pLineCut = new QGraphicsLineItem(NULL, (QGraphicsScene*)m_pContent);
+#if QT_VERSION < 0x050000
+    m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
+#else
+    m_pLineCut = new QGraphicsLineItem(m_pContent->items().at(0));
+#endif
     m_pLineCut->setVisible(false);
     m_pLineCut->setZValue(1.0);
     m_lineIsSampling = false;
