@@ -21,7 +21,7 @@ ELSE(BUILD_SHARED_LIBS)
 ENDIF(BUILD_SHARED_LIBS)
 
 find_package(Qt4 REQUIRED)
-find_package(OpenCV REQUIRED COMPONENTS core)
+find_package(OpenCV COMPONENTS core REQUIRED)
 #find_package(Glut REQUIRED)
 find_package(ITOM_SDK REQUIRED)
 find_package(VisualLeakDetector QUIET)
