@@ -734,11 +734,18 @@ void Itom1DQwtPlot::mnuDrawMode(QAction *action)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuExport()
 {
+    static QString saveDefaultPath;
+
 #ifndef QT_NO_PRINTER
     QString fileName = "plot1D.pdf";
 #else
     QString fileName = "plot1D.png";
 #endif
+
+    if (saveDefaultPath == "")
+    {
+        saveDefaultPath = QDir::currentPath();
+    }
 
 #ifndef QT_NO_FILEDIALOG
     const QList<QByteArray> imageFormats =
@@ -768,14 +775,14 @@ void Itom1DQwtPlot::mnuExport()
         filter += imageFilter;
     }
 
+    QDir file(saveDefaultPath);
     fileName = QFileDialog::getSaveFileName(
-        this, tr("Export File Name"), fileName,
+        this, tr("Export File Name"), file.absoluteFilePath(fileName),
         filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
 #endif
 
     if (!fileName.isEmpty())
     {
-
         bool abort = true;
 
         QSizeF curSize = ((Plot1DWidget *)m_pContent)->size();
@@ -796,6 +803,9 @@ void Itom1DQwtPlot::mnuExport()
         {
             return;
         }
+
+        QFileInfo fi(fileName);
+        saveDefaultPath = fi.path();
 
         QBrush curBrush = ((Plot1DWidget *)m_pContent)->canvasBackground();
 

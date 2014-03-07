@@ -727,11 +727,20 @@ void Itom2dQwtPlot::setAxisFont(const QFont &font)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActSave()
 {
+    static QString saveDefaultPath;
+
     #ifndef QT_NO_PRINTER
     QString fileName = "plot2D.pdf";
 #else
     QString fileName = "plot2D.png";
 #endif
+
+    if (saveDefaultPath == "")
+    {
+        saveDefaultPath = QDir::currentPath();
+    }
+
+    
 
 #ifndef QT_NO_FILEDIALOG
     const QList<QByteArray> imageFormats =
@@ -761,8 +770,10 @@ void Itom2dQwtPlot::mnuActSave()
         filter += imageFilter;
     }
 
+    QDir file(saveDefaultPath);
+
     fileName = QFileDialog::getSaveFileName(
-        this, tr("Export File Name"), fileName,
+        this, tr("Export File Name"), file.absoluteFilePath(fileName),
         filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
 #endif
 
@@ -788,6 +799,9 @@ void Itom2dQwtPlot::mnuActSave()
         {
             return;
         }
+
+        QFileInfo fi(fileName);
+        saveDefaultPath = fi.path();
 
         QBrush curBrush = m_pContent->canvasBackground();
 
