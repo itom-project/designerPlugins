@@ -224,6 +224,8 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
     m_pContent = NULL;
     if (m_data)
         delete ((InternalData*)m_data);
+    if (m_pMnuSetMarker)
+        delete(m_pMnuSetMarker);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
