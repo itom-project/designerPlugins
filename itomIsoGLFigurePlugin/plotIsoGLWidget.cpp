@@ -44,20 +44,14 @@ using namespace ito;
 
 const char *dont_scale_units[] = {"frame", "frames", "frm", "frms", "digit", "digits", "Bild", "Bilder", "Wert", "-"};
 
-#define PI        3.14159265358979323846
+#define GL_PI         3.14159265358979323846
+#define GL_TWO_PI     6.28318530717958647692
+#define GL_HALF_PI    1.57079632679489661923
+#define GL_RAD_GRAD  57.29577951308232087684
 
 #define RotA0       -1.4
 #define RotB0       -1.5
 #define RotC0       0.0
-
-struct axislabel
-{
-    axislabel() : dx(0), dy(0), write(0), unitydigit(0), lastdigit(0), unity(0), maxlen(0) {}
-    double dx, dy, write;
-    int unitydigit, lastdigit;
-    double unity;
-    long maxlen;
-};
 
 extern int NTHREADS;
 
@@ -179,9 +173,9 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_zAxisVector[0] = 0.0;
     m_zAxisVector[1] = 0.0;
     m_zAxisVector[2] = 0.0;
-    m_lightAxisVector[0] = 0.0;
-    m_lightAxisVector[1] = 0.0;
-    m_lightAxisVector[2] = 0.0;
+    m_baseVector[0] = 0.0;
+    m_baseVector[1] = 0.0;
+    m_baseVector[2] = 0.0;
 
     m_axisX.label = "";
     m_axisX.unit = "";
@@ -228,10 +222,6 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_windowXScale = 1.0;
     m_windowYScale = 1.0;
     m_windowZScale = 1.0;
-
-    m_protocol.show = false;
-    m_protocol.m_psize = 0;
-    m_protocol.text = "";
 
     m_objectInfo.show = false;
     m_objectInfo.divVal = 0;
@@ -478,9 +468,10 @@ void plotGLWidget::paintGL()
     }
 
     glTranslated(m_TransX, m_TransY, m_TransZ);
-    glRotated(m_RotA / PI * 180.0, 1.0f, 0.0f, 0.0f);
-    glRotated(m_RotB / PI * 180.0, 0.0f, 1.0f, 0.0f);
-    glRotated(m_RotC / PI * 180.0, 0.0f, 0.0f, 1.0f);
+    glRotated(m_RotA * GL_RAD_GRAD, 1.0f, 0.0f, 0.0f);
+    glRotated(m_RotB * GL_RAD_GRAD, 0.0f, 1.0f, 0.0f);
+    glRotated(m_RotC * GL_RAD_GRAD, 0.0f, 0.0f, 1.0f);
+    
 
     threeDRotationMatrix();
 
@@ -538,11 +529,6 @@ void plotGLWidget::paintGL()
         glDisable(GL_NORMALIZE);
     }
 
-    if(m_protocol.show) 
-    {
-        glTranslatef(0.0, 0.7 * (double) m_protocol.m_psize / winSizeY, 0.0);
-    }
-
     if(m_elementMode == PAINT_POINTS)
     {
         glPointSize(1.0f);
@@ -570,12 +556,12 @@ void plotGLWidget::paintGL()
         glDisable(GL_NORMALIZE);
     }
 
+    threeDAxis();
+
     if (m_drawLightDir)
     {
         paintLightArrow();
     }
-
-    threeDAxis();
 
 /*
     if (m_drawTitle)
@@ -586,14 +572,6 @@ void plotGLWidget::paintGL()
         //int yused;
 //        int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
-    }
-
-    if(m_protocol.show) // protocol
-    {
-        glLoadIdentity();
-        gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
-//        setcolor(win,dd->backgnd?win->bcolor:win->fcolor);
-        //DrawProtocol(dd, dd->gy1, fo->args[27].s, (int)fo->args[28].d);
     }
 
     if(m_objectInfo.show)
@@ -1478,8 +1456,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
                 m_axisY.phys[1] = tempVal;
             }
 
-            m_protocol.text = m_pContent->getTag("protocol", test).getVal_ToString();
-
             m_axisX.label = m_pContent->getAxisDescription(dims - 1, test);
             m_axisX.unit  = m_pContent->getAxisUnit(dims - 1, test);
             m_axisY.label = m_pContent->getAxisDescription(dims - 2, test);
@@ -1559,13 +1535,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             //    m_drawTitle = false;
             //}
 
-            ProtocolSize();
-
-            if(m_protocol.show)
-            {
-
-            }
-
             // To get cubic voxel in case of metric data
             maxl = xs;
             if ((ys > maxl) && (ys != 1))
@@ -1596,17 +1565,9 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             if (zs!=1 && m_forceCubicVoxel)
                 m_windowZScale *= zs / maxl;
 
-            if (m_protocol.m_psize != 0 && m_protocol.show)
-            {
-                m_windowXScale /= 1.2*fabs((double)(this->height() - m_protocol.m_psize) / (double)this->height());
-                m_windowYScale /= 1.2*fabs((double)(this->height() - m_protocol.m_psize) / (double)this->height());
-            }
-            else
-            {
-                m_windowXScale /= 1.2*fabs((double)(this->height()) / (double)this->height());
-                m_windowYScale /= 1.2*fabs((double)(this->height()) / (double)this->height());
-            }
-
+            m_windowXScale /= 1.2*fabs((double)(this->height()) / (double)this->height());
+            m_windowYScale /= 1.2*fabs((double)(this->height()) / (double)this->height());
+            
 
             if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
             {
@@ -1757,20 +1718,6 @@ ito::RetVal plotGLWidget::ResetColors()
     return ito::retOk;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void plotGLWidget::ProtocolSize()
-{
-    int res = 1;
-    int length = (int)m_protocol.text.length()-1;
-    for(int i = 0; i < length; i++)
-    {
-        if(m_protocol.text[i]=='\n')
-            res++;
-    }
-    m_protocol.m_psize = 3*m_fontsize/2.0*res;
-    return;
-}
-
 //-----------------------------------------------------------------------------------------------
 void plotGLWidget::threeDRotationMatrix()
 {
@@ -1780,8 +1727,10 @@ void plotGLWidget::threeDRotationMatrix()
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
     glGetIntegerv(GL_VIEWPORT, GLViewport);
-
-    gluProject(0, 0, 0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &m_lightAxisVector[0], &m_lightAxisVector[1], &m_lightAxisVector[2]);
+    static double a = 0;
+    static double b = 0;
+    static double c = 0;
+    gluProject(a, b, c, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &m_baseVector[0], &m_baseVector[1], &m_baseVector[2]);
     gluProject(1, 0, 0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &m_xAxisVector[0], &m_xAxisVector[1], &m_xAxisVector[2]);
     gluProject(0, 1, 0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &m_yAxisVector[0], &m_yAxisVector[1], &m_yAxisVector[2]);
     gluProject(0, 0, 1, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &m_zAxisVector[0], &m_zAxisVector[1], &m_zAxisVector[2]);
@@ -1795,29 +1744,41 @@ void plotGLWidget::threeDAxis(void)
     //ito::float64 dt;
     ito::float64 xmin, xmax, ymin, ymax, zmin, zmax, xsizep, ysizep;
     ito::float64 ax, ay, az, xe[6], ye[6], ze[6];
-    ito::float64 signedY=1, signedX=1, signedXAx, signedXAy, signedYAx, signedYAy, signedZAx, signedZAy, signedZA;
+    ito::float64 signedY = 1.0, signedX = 1.0;
+
+    ito::float64 signedXAx, signedXAy, signedYAx, signedYAy, signedZAx, signedZAy, signedZA;
     ito::float64 dxx, dxy, dyx, dyy, dzx, dzy, VRX, VRY;
     GLdouble GLModelViewMatrix[16], GLProjectionMatrix[16];
     GLint GLViewport[4];
 
-    ax = atan((m_xAxisVector[1]-m_lightAxisVector[1]) / (m_xAxisVector[0]-m_lightAxisVector[0]));
-    ay = atan((m_yAxisVector[1]-m_lightAxisVector[1]) / (m_yAxisVector[0]-m_lightAxisVector[0]));
-    az = atan((m_zAxisVector[1]-m_lightAxisVector[1]) / (m_zAxisVector[0]-m_lightAxisVector[0]));
+    ax = atan((m_xAxisVector[1] - m_baseVector[1]) / (m_xAxisVector[0] - m_baseVector[0]));
+    ay = atan((m_yAxisVector[1] - m_baseVector[1]) / (m_yAxisVector[0] - m_baseVector[0]));
+    az = atan((m_zAxisVector[1] - m_baseVector[1]) / (m_zAxisVector[0] - m_baseVector[0]));
 
-    if (cos(fmod(m_RotC, 2.0*PI))<0)
-        signedX = signedX * -1.0;
-    if (sin(fmod(m_RotB, 2.0*PI))<0)
-        signedX = signedX * -1.0;
-    if (cos(fmod(m_RotA, 2.0*PI))<0)
-        signedX = signedX * -1.0;
-
-    if (sin(fmod(m_RotC, 2.0*PI))<0)
-        signedY = signedY * -1.0;
-    if (sin(fmod(m_RotB, 2.0*PI))<0)
-        signedY = signedY * -1.0;
-    if (cos(fmod(m_RotA, 2.0*PI))<0)
-        signedY = signedY * -1.0;
-
+    if (cos(m_RotC) < 0)
+    {
+        signedX *= -1.0;
+    }
+    if (sin(m_RotB) < 0)
+    {
+        signedX *= -1.0;
+    }
+    if (cos(m_RotA) < 0)
+    {
+        signedX *= -1.0;
+    }
+    if (sin(m_RotC) < 0)
+    {
+        signedY *= -1.0;
+    }
+    if (sin(m_RotB) < 0)
+    {
+        signedY *= -1.0;
+    }
+    if (cos(m_RotA) < 0)
+    {
+        signedY *= -1.0;
+    }
     xsizep = (m_axisX.idx[1] - m_axisX.idx[0] + 1.0);
     ysizep = (m_axisY.idx[1] - m_axisY.idx[0] + 1.0);
 
@@ -1828,15 +1789,22 @@ void plotGLWidget::threeDAxis(void)
     zmin = -m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
     zmax = m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
 
-    if ((((ay < az) - 0.5) * signedY) > 0)
+    if ((((ay  < az) - 0.5) * signedY) > 0)
+    {
         xb = xmin;
+    }
     else
+    {
         xb = xmax;
-
+    }
     if ((((ax > az) - 0.5) * signedX) > 0)
+    {
         yb = ymin;
+    }
     else
+    {
         yb = ymax;
+    }
 
     signedZA = 0;
 
@@ -1844,12 +1812,16 @@ void plotGLWidget::threeDAxis(void)
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
     glGetIntegerv(GL_VIEWPORT, GLViewport);
 
-    gluProject(m_axisX.phys[0], m_axisY.phys[0], m_axisZ.phys[0], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[0], &ye[0], &ze[0]);
-    gluProject(m_axisX.phys[0], m_axisY.phys[0], m_axisZ.phys[0], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[1], &ye[1], &ze[1]);
-    gluProject(m_axisX.phys[1], m_axisY.phys[1], m_axisZ.phys[1], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[2], &ye[2], &ze[2]);
-    gluProject(m_axisX.phys[1], m_axisY.phys[1], m_axisZ.phys[1], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[3], &ye[3], &ze[3]);
-    gluProject(xb, -yb, m_axisZ.phys[0], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[4], &ye[4], &ze[4]);
-    gluProject(xb, -yb, m_axisZ.phys[1], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[5], &ye[5], &ze[5]);
+//    gluProject(m_axisX.phys[0], m_axisY.phys[0], m_axisZ.phys[0], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[0], &ye[0], &ze[0]);
+//    gluProject(m_axisX.phys[0], m_axisY.phys[0], m_axisZ.phys[0], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[1], &ye[1], &ze[1]);
+//    gluProject(m_axisX.phys[1], m_axisY.phys[1], m_axisZ.phys[1], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[2], &ye[2], &ze[2]);
+//    gluProject(m_axisX.phys[1], m_axisY.phys[1], m_axisZ.phys[1], GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[3], &ye[3], &ze[3]);
+    gluProject(xmin, ymin, zmin, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[0], &ye[0], &ze[0]);
+    gluProject(xmin, ymax, zmin, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[1], &ye[1], &ze[1]);
+    gluProject(xmax, ymin, zmin, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[2], &ye[2], &ze[2]);
+    gluProject(xmax, ymax, zmin, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[3], &ye[3], &ze[3]);
+    gluProject(xb, -yb, zmin, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[4], &ye[4], &ze[4]);
+    gluProject(xb, -yb, zmax, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xe[5], &ye[5], &ze[5]);
 
     if (xb == xmin)
     {
@@ -1878,76 +1850,171 @@ void plotGLWidget::threeDAxis(void)
 
     VRX = cos(m_RotA) / fabs(cos(m_RotA));
     VRY = cos(m_RotB) / fabs(cos(m_RotB));
+    /*
+    std::cout << "\n";
+    std::cout << "m_RotA: " << m_RotA << "; m_RotB: " << m_RotB <<"m_RotC: " << m_RotC << "\n"; 
+    std::cout << "VRX: " << VRX << "; VRY: " << VRY << "\n";
+    std::cout << "signedX: " << signedX << "; signedY: " << signedY << "\n";
+    std::cout << "xb: " << xb << "; yb: " << yb << "\n";
+    */
     //Y-Axis X signed.
     if (xb == xmin)
-    {
-		if (-dyy > 0)
+    {        
+		if (dyy < 0)
+        {
 			signedYAx = -1 * VRX * VRY;
-		else
-			signedYAx = 1 * VRX * VRY;
-		if (dyx > 0)
-			signedYAy = -1 * VRX * VRY;
-		else
-			signedYAy = 1 * VRX * VRY;
+            //signedYAx = -1;
+        }
+        else
+		{
+            signedYAx = 1 * VRX * VRY;
+            //signedYAx = 1;
+        }
+
+        if (dyx > 0)
+		{
+            signedYAy = -1 * VRX * VRY;
+            //signedYAy = -1;
+        }
+        else
+		{
+            signedYAy = 1 * VRX * VRY;
+            //signedYAy = 1;
+        }
     }
     else
     {
-		if (-dyy > 0)
-			signedYAx = 1 * VRX * VRY;
-		else
-			signedYAx = -1 * VRX * VRY;
-		if (dyx > 0)
-			signedYAy = 1 * VRX * VRY;
-		else
-			signedYAy = -1 * VRX * VRY;
+		if (dyy < 0)
+		{
+            signedYAx = 1 * VRX * VRY;
+            //signedYAx = 1;
+        }
+        else
+		{
+            signedYAx = -1 * VRX * VRY;
+            //signedYAx = -1;
+        }
+        if (dyx > 0)
+		{
+            signedYAy = 1 * VRX * VRY;
+            //signedYAy = 1;
+        }
+        else
+		{
+            signedYAy = -1 * VRX * VRY;
+            //signedYAy = -1;
+        }
     }
 
     if (yb == ymin)
     {
-        if (-dxx > 0)
+        if (dxx < 0)
+        {
             signedXAy = -1 * VRX * VRY;
+            //signedXAy = -1;
+        }
         else
+        {
             signedXAy = 1 * VRX * VRY;
+            //signedXAy = 1;
+        }
+        
         if (dxy > 0)
+        {
             signedXAx = -1 * VRX * VRY;
+            //signedXAx = -1;
+        }
         else
+        {
             signedXAx = 1 * VRX * VRY;
+            //signedXAx = 1;
+        }
     }
     else
     {
-        if (-dxx > 0)
+        if (dxx < 0)
+        {
             signedXAy = 1 * VRX * VRY;
+            //signedXAy = 1;
+        }
         else
+        {
             signedXAy = -1 * VRX * VRY;
+            //signedXAy = -1;
+        }
         if (dxy > 0)
+        {
             signedXAx = 1 * VRX * VRY;
+            //signedXAx = 1;
+        }
         else
+        {
             signedXAx = -1 * VRX * VRY;
+            //signedXAx = -1;
+        }
     }
 
     if (((xb == xmin) && (yb==ymin)) || ((xb != xmin) && (yb!=ymin)))
     {
-        if (-dzy > 0)
+        if (dzy < 0)
+        {
             signedZAx = -1 * VRX * VRY;
+            //signedZAx = -1;
+        }
         else
+        {
             signedZAx = 1 * VRX * VRY;
+            //signedZAx = 1;
+        }
+
+
         if (dzx > 0)
+        {
             signedZAy = -1 * VRX * VRY;
+            //signedZAy = -1;
+        }
         else
+        {
             signedZAy = 1 * VRX * VRY;
+            //signedZAy = 1;
+        }
+
     }
     else
     {
-        if (-dzy > 0)
+        if (dzy < 0)
+        {
             signedZAx = 1 * VRX * VRY;
+            //signedZAx = 1;
+        }
         else
+        {
             signedZAx = -1 * VRX * VRY;
+            //signedZAx = -1;
+        }
+        
         if (dzx > 0)
+        {
             signedZAy = 1 * VRX * VRY;
+            //signedZAy = 1;
+        }
         else
+        {
             signedZAy = -1 * VRX * VRY;
-    }
+            //signedZAy = -1;
+        }
 
+    }
+/*    
+    std::cout << "signedXAx: " << signedXAy << "; signedXAy: " << signedXAy << 
+                 "; signedYAx: " << signedYAy << "; signedYAy: " << signedXAy << 
+                 "; signedZAx: " << signedZAy << "; signedZAy: " << signedZAy << "\n";
+
+    std::cout << "dyy: " << (dyy > 0 ? "true" : "false") << "; dyx: " << (dyx > 0 ? "true" : "false") << 
+                 "; dxy: " << (dxy > 0 ? "true" : "false") << "; dxx: " << (dyx > 0 ? "true" : "false") <<
+                 "; dzy: " << (dzy > 0 ? "true" : "false") << "; dzx: " << (dzx > 0 ? "true" : "false") << "\n";
+                 
+    */
     if(m_axisX.show && m_axisY.show)
     {
         paintAxisOGL(xmin, -yb, zmin, xmax, -yb, zmin);
@@ -1972,10 +2039,10 @@ void plotGLWidget::threeDAxis(void)
 
     if(m_axisX.show && m_axisY.show)
     {
-        static double a = -1.0;
-        static double b = -1.0;
+        //static double a = -1.0;
+        //static double b = -1.0;
         paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin, m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 1 & m_axisX.showTicks);
-        paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], a* signedYAx, b* signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
+        paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
     }
 
     // make z-ticks adjustable 
@@ -2113,11 +2180,16 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     GLdouble GLModelViewMatrix[16], GLProjectionMatrix[16];
     GLint GLViewport[4];
     GLdouble glx0, gly0, glz0, glx1, gly1, glz1, xpos, ypos, zpos;
-    struct axislabel al;
+    struct AxisLabel al;
     double ticklength = 0.01;
-    double VorzXAs, VorzYAs;
+    double VorzXAs, VorzYAs, VorzZAs;
     int firstdigit, i;
     std::string label(" ");
+
+    static double corrX = 0;
+    static double corrY = 0;
+    al.rightAligned = VorzX > 0;
+    al.topAligned = VorzY > 0;
 
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
@@ -2161,20 +2233,38 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 
     al.lastdigit = e;
     if ((x1 == x0) && (z1 == z0))
+    {
         VorzYAs = 0;
+    }
     else
+    {
         VorzYAs = fabs(y0) / y0;
+    }
+
     if ((y1 == y0) && (z1 == z0))
+    {
         VorzXAs = 0;
+    }
     else
+    {
         VorzXAs = fabs(x0) / x0;
+    }
+
+    if ((x1 == x0) && (y1 == y0))
+    {
+        VorzZAs = 0;
+    }
+    else
+    {
+        VorzZAs = 1;
+    }
 
     if (write)
     {
         al.write = write;
         label.reserve(100);
         bool alreadyScaled = false;
-        al.maxlen=0;
+        al.maxlen = 0;
         firstdigit = floor( log10(fabs(v0) > fabs(v1) ? fabs(v0) : fabs(v1) ) + 10 * DBL_EPSILON );
 
         if(firstdigit >= -15 && firstdigit < 21)
@@ -2294,7 +2384,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         al.dx = VorzX * 0.05 * fabs(sin(phi));
         al.dy = VorzY * 0.1 * fabs(cos(phi));
 
-        al.maxlen=0;
+        al.maxlen = 0;
     }
 
     v = s0;
@@ -2308,20 +2398,22 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
             if (write)
                 glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength * 1.7, 
                     y0 + a * (y1 - y0) + VorzYAs * ticklength * 1.7, 
-                    z0 + a * (z1 - z0) - ticklength * 1.7);
+                    z0 + a * (z1 - z0) - VorzZAs * ticklength * 1.7);
             else
                 glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength, 
                     y0 + a * (y1 - y0) + VorzYAs * ticklength, 
-                    z0 + a * (z1 - z0) - ticklength);
+                    z0 + a * (z1 - z0) - VorzZAs * ticklength);
         glEnd();
 
         if (write)
         {
-            gluProject(x0 + a * (x1 - x0), y0 + a * (y1 - y0), 
-                z0 + a * (z1 - z0), GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+            gluProject(x0 + a * (x1 - x0) + VorzXAs * ticklength * 3, y0 + a * (y1 - y0) + VorzYAs * ticklength * 3, 
+                z0 + a * (z1 - z0) - VorzZAs * ticklength, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
-            paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
-                ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
+            //paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
+            //    ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
+
+            paintAxisLabelOGL(al, xpos, ypos, v);
         }
 
         v = v * (v > 0 ? 1 + 4 * DBL_EPSILON : 1 - 4 * DBL_EPSILON);
@@ -2334,16 +2426,16 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         gluProject(x0 + (x1 - x0) / 2.0, y0 + (y1 - y0) / 2.0, 
             z0 + (z1 - z0) / 2.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
-        al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
-        al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
+        //al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
+        //al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
+        //
+        //if (al.dx < 0)
+        //    xpos += al.dx - label.length() * 0.015;
+        //else
+        //    xpos += al.dx;
 
-        if (al.dx < 0)
-            xpos += al.dx - label.length() * 0.015;
-        else
-            xpos += al.dx;
-
-        ypos -= fabs(al.dy);
-        OGLTextOut(label.data(), xpos, ypos);
+        //ypos -= fabs(al.dy);
+        OGLTextOut(label.data(), xpos, ypos, al.rightAligned, al.topAligned);
     }
 
     return;
@@ -2356,24 +2448,25 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 *\return error
 *\ingroup 3DOGLFuncsGroup
 */
-void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const double y, const double v)
+void plotGLWidget::paintAxisLabelOGL(const struct AxisLabel &axisLabel, const double x, const double y, const double v)
 {
     char buffer[300];
-    struct axislabel *al = (struct axislabel *)vd;
-    long l;
+    //long l;
 
-    if(v==0)
-        _snprintf(buffer,sizeof(buffer),"0");
-    else if(al->unitydigit>=al->lastdigit)
+    if(v == 0)
     {
-        _snprintf(buffer,sizeof(buffer),"%.*f",al->unitydigit-al->lastdigit,v/al->unity);
+        _snprintf(buffer,sizeof(buffer),"0");
+    }
+    else if(axisLabel.unitydigit >= axisLabel.lastdigit)
+    {
+        _snprintf(buffer,sizeof(buffer),"%.*f", axisLabel.unitydigit- axisLabel.lastdigit, v / axisLabel.unity);
     }
     else
     {
         int firstdigit=floor(log10(fabs(v))+10*DBL_EPSILON);
-        if(al->unitydigit==INT_MIN&&al->lastdigit!=INT_MAX)
+        if(axisLabel.unitydigit == INT_MIN && axisLabel.lastdigit != INT_MAX)
         {
-            if (al->lastdigit>=0)
+            if (axisLabel.lastdigit >= 0)
             {
                 // CK 09.08.2006 fix wrecked number displaying:
                 // in case the number is larger than 8 digits use exponential notation
@@ -2383,7 +2476,7 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
                     _snprintf(buffer, sizeof(buffer), "%.0f", v);
             }
             else if(firstdigit>=-3&&firstdigit<3)
-                _snprintf(buffer,sizeof(buffer),"%.*f",(firstdigit>0?firstdigit:0)-al->lastdigit,v);
+                _snprintf(buffer,sizeof(buffer),"%.*f",(firstdigit>0?firstdigit:0)- axisLabel.lastdigit , v);
             else
             {double v1, mant;
              int expo;
@@ -2391,12 +2484,12 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
                 v1 = fabs(v);
                 mant = pow(10.0, log10(v1)-floor(log10(v1)));
                 expo = floor(log10(v1));
-                _snprintf(buffer,sizeof(buffer),"%s%.*fE%d", v<0?"-":"", firstdigit-al->lastdigit, mant, expo);
+                _snprintf(buffer,sizeof(buffer),"%s%.*fE%d", v<0?"-":"", firstdigit - axisLabel.lastdigit, mant, expo);
             }
         }
         else if(firstdigit>=0&&firstdigit<3)
             _snprintf(buffer,sizeof(buffer),"%.0f",v);
-        else if(firstdigit>=21||firstdigit<-18||al->unitydigit==INT_MIN)
+        else if(firstdigit >= 21 || firstdigit < -18 || axisLabel.unitydigit == INT_MIN)
         {
             double v1 = fabs(v);
             _snprintf(buffer,sizeof(buffer),"%s%.0fE%d", v<0?"-":"", pow(10.0, log10(v1)-floor(log10(v1))),
@@ -2409,24 +2502,30 @@ void plotGLWidget::paintAxisLabelOGL(const void *vd, const double x, const doubl
         }
     }
 
-    l = (long)strlen(buffer);
-    if(l>al->maxlen)
-        al->maxlen=l;
-    if(!al->write)
+    //l = (long)strlen(buffer);
+    //if(l > axisLabel.maxlen)
+    //{
+    //    axisLabel.maxlen = l;
+    //}
+
+    if(! axisLabel.write)
+    {
         return;
+    }
 
-    double xpos, ypos;
-    if (al->dx < 0)
-        xpos = x + al->dx - strlen(buffer)*0.015;
-    else
-        xpos = x + al->dx;
+    double xpos = x;
+    double ypos = y;
+    //if (axisLabel->dx < 0)
+    //    xpos = x + axisLabel->dx - strlen(buffer)*0.015;
+    //else
+    //    xpos = x + axisLabel->dx;
 
-    ypos = y - fabs(al->dy);
-    OGLTextOut(buffer, xpos, ypos);
+    //ypos = y - fabs(axisLabel->dy);
+    OGLTextOut(buffer, x, y, axisLabel.rightAligned, axisLabel.topAligned);
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double ypos)
+int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const bool rightAligned, const bool topAligned)
 {
     glPushAttrib(GL_LIST_BIT);                // Pushes The Display List Bits
     glMatrixMode(GL_PROJECTION);
@@ -2435,6 +2534,9 @@ int plotGLWidget::OGLTextOut(const char *buffer, const double xpos, const double
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+
+    if(rightAligned) xpos -= (1.7 * strlen(buffer) * m_fontsize) / width();
+    if(topAligned) ypos -= (3.0 * m_fontsize) / height();
 
     glRasterPos2f(xpos, ypos);
     glListBase(m_myCharBitmapBuffer);                    // Sets The Base Character to 0
@@ -2480,15 +2582,15 @@ void plotGLWidget::OGLMakeFont(int size)
 void plotGLWidget::DrawObjectInfo(void)
 {
     double x0 = -1.0 + (double)m_fontsize / width();
-    double y0 = -1.0 + (3 * m_fontsize * 3.0 + (m_protocol.show ? m_protocol.m_psize : 0.0)) / height();
+    double y0 = -1.0 + (3 * m_fontsize * 3.0 ) / height();
 
-    if(m_objectInfo.xLength.length()) OGLTextOut((char*)m_objectInfo.xLength.data(), x0, y0);
-
-    y0 -= 3.0 * m_fontsize/ height();
-    if(m_objectInfo.yLength.length()) OGLTextOut((char*)m_objectInfo.yLength.data(), x0, y0);
+    if(m_objectInfo.xLength.length()) OGLTextOut((char*)m_objectInfo.xLength.data(), x0, y0, false, false);
 
     y0 -= 3.0 * m_fontsize/ height();
-    if(m_objectInfo.matrix.length()) OGLTextOut((char*)m_objectInfo.matrix.data(), x0, y0);
+    if(m_objectInfo.yLength.length()) OGLTextOut((char*)m_objectInfo.yLength.data(), x0, y0, false, false);
+
+    y0 -= 3.0 * m_fontsize/ height();
+    if(m_objectInfo.matrix.length()) OGLTextOut((char*)m_objectInfo.matrix.data(), x0, y0, false, false);
 
     size_t len = m_objectInfo.PeakText.length();
 
@@ -2499,14 +2601,14 @@ void plotGLWidget::DrawObjectInfo(void)
         len = m_objectInfo.DevText.length();
 
     x0 = 1.0 - (double)(1.7 * len * m_fontsize) / width();
-    y0 = -1.0 + (3.0 *m_fontsize * 3.0 + (m_protocol.show ? m_protocol.m_psize : 0.0)) / height();
-    if(m_objectInfo.PeakText.length()) OGLTextOut((char*)m_objectInfo.PeakText.data(), x0, y0);
+    y0 = -1.0 + (3.0 *m_fontsize * 3.0 ) / height();
+    if(m_objectInfo.PeakText.length()) OGLTextOut((char*)m_objectInfo.PeakText.data(), x0, y0, false, false);
 
     y0 -= 3.0 * m_fontsize / height();
-    if(m_objectInfo.MeanText.length()) OGLTextOut((char*)m_objectInfo.MeanText.data(), x0, y0);
+    if(m_objectInfo.MeanText.length()) OGLTextOut((char*)m_objectInfo.MeanText.data(), x0, y0, false, false);
 
     y0 -= 3.0 * m_fontsize / height();
-    if(m_objectInfo.DevText.length()) OGLTextOut((char*)m_objectInfo.DevText.data(), x0, y0);
+    if(m_objectInfo.DevText.length()) OGLTextOut((char*)m_objectInfo.DevText.data(), x0, y0, false, false);
 
     return;
 }
@@ -2586,10 +2688,10 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
     char buf[50] = {0};
 
     sprintf(buf, "%g", zMin);
-    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 - m_fontsize / (double)height() / 2.0);
+    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 - m_fontsize / (double)height() / 2.0, false, false);
 
     sprintf(buf, "%g", zMax);
-    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 + dY - m_fontsize / (double)height() / 2.0);
+    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 + dY - m_fontsize / (double)height() / 2.0, false, false);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -2609,7 +2711,7 @@ void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &y
     /* Titel Object etc. */
     OGLMakeFont(1.67 * m_fontsize);
     if(myTitle.length())
-        OGLTextOut((char*)myTitle.data(), x0, y0);
+        OGLTextOut((char*)myTitle.data(), x0, y0, false, false);
 /*
     OGLMakeFont(1.5*dd->fontsize, dd);
     tags->ReadTagDef(TAG_COMMENT1,(void *)&txt,"");
@@ -2642,6 +2744,10 @@ void plotGLWidget::reduceZAmplifierer(double value)
 {
     if(m_zAmpl > 0.001)
         m_zAmpl *= value;
+
+    if(m_zAmpl < 0.001)
+        m_zAmpl = 0.001;
+
     refreshPlot(NULL);
 }
 
@@ -2650,6 +2756,9 @@ void plotGLWidget::riseZAmplifierer(const double value)
 {
     if(m_zAmpl < 5.0)
         m_zAmpl *= value;
+
+    if(m_zAmpl > 5.0)
+        m_zAmpl = 5.0;
     refreshPlot(NULL);
 }
 
@@ -3000,4 +3109,39 @@ inline void plotGLWidget::generateObjectInfoText()
     return;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void plotGLWidget::rotateLightArrow(const double deltaA, const double deltaB, const double deltaC)
+{
+    lighDirAngles[0] += deltaA; 
+    lighDirAngles[1] += deltaC;
+    lighDirAngles[0] = lighDirAngles[0] < - GL_PI ? GL_PI + fmod(lighDirAngles[0], GL_PI) : (lighDirAngles[0] > GL_PI ? (- GL_PI) + fmod(lighDirAngles[0], GL_PI) : lighDirAngles[0]); 
+    lighDirAngles[1] = lighDirAngles[1] < - GL_PI ? GL_PI + fmod(lighDirAngles[1], GL_PI) : (lighDirAngles[1] > GL_PI ? (- GL_PI) + fmod(lighDirAngles[1], GL_PI) : lighDirAngles[1]);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void plotGLWidget::rotateView(const double deltaA, const double deltaB, const double deltaC)
+{
+    m_RotA += deltaA;
+    m_RotB += deltaB; 
+    m_RotC += deltaC;
+    m_RotA = m_RotA < - GL_PI ? GL_PI + fmod(m_RotA, GL_PI) : (m_RotA > GL_PI ? (- GL_PI) + fmod(m_RotA, GL_PI) : m_RotA); 
+    m_RotB = m_RotB < - GL_PI ? GL_PI + fmod(m_RotB, GL_PI) : (m_RotB > GL_PI ? (- GL_PI) + fmod(m_RotB, GL_PI) : m_RotB); 
+    m_RotC = m_RotC < - GL_PI ? GL_PI + fmod(m_RotC, GL_PI) : (m_RotC > GL_PI ? (- GL_PI) + fmod(m_RotC, GL_PI) : m_RotC);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void plotGLWidget::moveView(const double deltaX, const double deltaY, const double deltaZ)
+{
+    m_TransX += deltaX; 
+    m_TransY += deltaY; 
+    m_TransZ += deltaZ;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void plotGLWidget::setView(const double transX, const double transY, const double transZ, const double rotA, const double rotB, const double rotC)
+{
+    m_TransX = transX; 
+    m_TransY = transY; 
+    m_TransZ = transZ;
+    m_RotA = rotA < - GL_PI ? GL_PI + fmod(rotA, GL_PI) : (rotA > GL_PI ? (- GL_PI) + fmod(rotA, GL_PI) : rotA); 
+    m_RotB = rotB < - GL_PI ? GL_PI + fmod(rotB, GL_PI) : (rotB > GL_PI ? (- GL_PI) + fmod(rotB, GL_PI) : rotB); 
+    m_RotC = rotC < - GL_PI ? GL_PI + fmod(rotC, GL_PI) : (rotC > GL_PI ? (- GL_PI) + fmod(rotC, GL_PI) : rotC);
+}
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -45,9 +45,20 @@
     #define USEOMP 0
 #endif
 
-struct axisProperties
+struct AxisLabel
 {
-    axisProperties(): label(""), unit(""), dimIdx(0), scale(1),
+    AxisLabel() : dx(0), dy(0), write(0), unitydigit(0), lastdigit(0), unity(0), maxlen(0), rightAligned(false), topAligned(false){}
+    double dx, dy, write;
+    int unitydigit, lastdigit;
+    double unity;
+    long maxlen;
+    bool rightAligned;
+    bool topAligned;
+};
+
+struct AxisProperties
+{
+    AxisProperties(): label(""), unit(""), dimIdx(0), scale(1),
         autoScale(1), startScaled(0), isMetric(0), show(1), showTicks(1) 
     {
         idx[0] = 0;
@@ -69,18 +80,9 @@ struct axisProperties
     bool showTicks;
 };
 
-struct protocol
+struct ObjectInfo
 {
-    protocol() : show(0), m_psize(0), text("") {}
-
-    bool show;
-    double m_psize;
-    ito::ByteArray text;
-};
-
-struct objectInfo
-{
-    objectInfo() : show(1), meanVal(0), divVal(0), xLength(""), yLength(""),
+    ObjectInfo() : show(1), meanVal(0), divVal(0), xLength(""), yLength(""),
         PeakText(""), MeanText(""), DevText("") {}
 
     bool show;
@@ -118,19 +120,11 @@ class plotGLWidget : public QGLWidget
         inline int getCurrentVisMode(){ return m_elementMode; }
         void setCurrentVisMode(const int mode);
 
-        void rotateLightArrow(const double deltaA, const double deltaB, const double deltaC){lighDirAngles[0] +=deltaA; lighDirAngles[1] += deltaC;}
-        void rotateView(const double deltaA, const double deltaB, const double deltaC){m_RotA +=deltaA; m_RotB += deltaB; m_RotC += deltaC;}
-        void moveView(const double deltaX, const double deltaY, const double deltaZ){m_TransX +=deltaX; m_TransY += deltaY; m_TransZ += deltaZ;}
+        void rotateLightArrow(const double deltaA, const double deltaB, const double deltaC);
+        void rotateView(const double deltaA, const double deltaB, const double deltaC);
+        void moveView(const double deltaX, const double deltaY, const double deltaZ);
 
-        inline void setView(const double transX, const double transY, const double transZ, const double rotA, const double rotB, const double rotC)
-        {
-            m_TransX = transX; 
-            m_TransY = transY; 
-            m_TransZ = transZ;
-            m_RotA = rotA; 
-            m_RotB = rotB; 
-            m_RotC = rotC;
-        }
+        void setView(const double transX, const double transY, const double transZ, const double rotA, const double rotB, const double rotC);
 
         ito::RetVal setColor(const int col);
         void enableInit() { if (!(m_isInit & -1)) m_isInit |= 1; }
@@ -154,16 +148,15 @@ class plotGLWidget : public QGLWidget
         QSharedPointer<ito::DataObject> m_pContentWhileRastering;
         unsigned char m_colorMode;
         ito::float64 m_invalid;
-        axisProperties m_axisX;
-        axisProperties m_axisY;
-        axisProperties m_axisZ;
+        AxisProperties m_axisX;
+        AxisProperties m_axisY;
+        AxisProperties m_axisZ;
         double m_windowXScale;
         double m_windowYScale;
         double m_windowZScale;
         double m_zAmpl;
         double m_xybase;
-        protocol m_protocol;
-        objectInfo m_objectInfo;
+        ObjectInfo m_objectInfo;
         int m_paletteNum;
         int m_elementMode;
         QWidget *m_pParent;
@@ -174,7 +167,7 @@ class plotGLWidget : public QGLWidget
         int m_currentColor;
         double m_TransX, m_TransY, m_TransZ, m_RotA, m_RotB, m_RotC;
         double m_xAxisVector[3], m_yAxisVector[3], m_zAxisVector[3];
-        double m_lightAxisVector[3];
+        double m_baseVector[3];
         double lighDirAngles[2];
         int m_fontsize;
         char m_colorBarMode;
@@ -204,19 +197,17 @@ class plotGLWidget : public QGLWidget
         void generateObjectInfoText();
         template<typename _Type> inline ito::RetVal NormalizeObj(cv::Mat &scaledTopo, ito::float64 &normedInvalid);
         void OGLMakeFont(int fsize);
-        ito::RetVal DrawProtocol(const int y, const char *buffer, const int charsperline);
         void paintLightArrow();
         void paintAxisTicksOGL(const double x0, const double y0, const double z0, const double x1, const double y1, const double z1, const double v0, const double v1, const double VorzX, const double VorzY, const double VorzZ, const std::string &symbol, const std::string &unit, const bool write);
         void paintAxisOGL(const double x0, const double y0, const double z0, const double x1, const double y1, const double z1);
-        void paintAxisLabelOGL(const void *vd, const double x, const double y, const double v);
+        void paintAxisLabelOGL(const struct AxisLabel &vd, const double x, const double y, const double v);
         void threeDAxis(void);
         void threeDRotationMatrix(void);
         void rescaleTriangles(const double xscaleing, const double yscaleing, const double zscaleing);
         void DrawTitle(const std::string &myTitle, const int texty, int &yused);
         void DrawColorBar(const char xPos, const char yPos, const GLfloat dX, const GLfloat dY, const GLfloat zMin, const GLfloat zMax);
         void DrawObjectInfo(void);
-        void ProtocolSize(void);
-        int OGLTextOut(const char *buffer, const double xpos, const double ypos);
+        int OGLTextOut(const char *buffer, double xpos, double ypos, const bool rightAligned, const bool topAligned);
         ito::RetVal ResetColors();
 
         enum elementModeEnum
