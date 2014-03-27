@@ -200,7 +200,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     void resetOverlayImage(void)
     {
         if(m_pContent) m_pContent->setOverlayObject(NULL);
-        
     }
     
 

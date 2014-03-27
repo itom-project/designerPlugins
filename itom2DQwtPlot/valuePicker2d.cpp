@@ -27,9 +27,11 @@
 #include <qwt_plot_canvas.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData) : 
+ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData, const QwtRasterData* overlayData) : 
     QwtPlotPicker(xAxis, yAxis, parent),
-    m_valueData(valueData)
+    m_valueData(valueData),
+    m_overlayData(overlayData),
+    m_showOverlayInfo(false)
 {
 }
 
@@ -45,7 +47,15 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
     if (m_valueData)
     {
         double value = m_valueData->value(pos.x(), pos.y());
-        text.sprintf("[%.2f, %.2f]\n%.4f", pos.x(), pos.y(), value);
+        if(m_showOverlayInfo && m_overlayData)
+        {
+            double value2 = m_overlayData->value(pos.x(), pos.y());
+            text.sprintf("[%.2f, %.2f]\nL1:%.4f\nL2:%.4f", pos.x(), pos.y(), value, value2);
+        }
+        else
+        {
+            text.sprintf("[%.2f, %.2f]\n%.4f", pos.x(), pos.y(), value);
+        }
     }
     else
     {

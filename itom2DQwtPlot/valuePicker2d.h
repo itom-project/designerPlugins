@@ -34,7 +34,7 @@ class ValuePicker2D : public QwtPlotPicker
     Q_OBJECT
 
 public:
-    explicit ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData);
+    explicit ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData, const QwtRasterData* overlayData);
     virtual ~ValuePicker2D();
 
     virtual QwtText trackerTextF( const QPointF &pos ) const;
@@ -42,12 +42,15 @@ public:
     void drawTracker( QPainter *painter ) const;
     void setBackgroundFillBrush( const QBrush &brush );
 
+    void enableOverlay(const bool enable) {m_showOverlayInfo = enable;}
 
 protected:
 
 private:
     const QwtRasterData *m_valueData;
+    const QwtRasterData *m_overlayData;
     QBrush m_rectFillBrush;
+    bool m_showOverlayInfo;
 
 signals:
 

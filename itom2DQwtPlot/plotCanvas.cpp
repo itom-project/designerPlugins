@@ -127,7 +127,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pMagnifier->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis (color bar)
 
     //value picker
-    m_pValuePicker = new ValuePicker2D(QwtPlot::xBottom, QwtPlot::yLeft, canvas(), m_rasterData);
+    m_pValuePicker = new ValuePicker2D(QwtPlot::xBottom, QwtPlot::yLeft, canvas(), m_rasterData, m_rasterOverlayData);
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
 
@@ -2586,11 +2586,20 @@ QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setOverlayObject(ito::DataObject* newOverlay)
 {
-    m_dOverlayItem->setAlpha(m_pData->m_alpha);
+    if(newOverlay)
+    {
+        m_dObjItem->setVisible(m_pData->m_alpha < 255);
+        m_dOverlayItem->setAlpha(m_pData->m_alpha);
+    }
+    else
+    {
+        m_dObjItem->setVisible(true);
+        m_dOverlayItem->setAlpha(0);
+    }
     m_rasterOverlayData->updateDataObject(newOverlay);
 
     m_dOverlayItem->setVisible(m_rasterOverlayData->isInit() && m_pData->m_alpha > 0);
-
+    if(m_pValuePicker) m_pValuePicker->enableOverlay(m_pData->m_alpha > 0);
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     p->enableOverlaySlider(m_rasterOverlayData->isInit());
     replot();
@@ -2602,7 +2611,7 @@ void PlotCanvas::alphaChanged()
     m_dOverlayItem->setVisible(m_pData->m_alpha > 0 && m_rasterOverlayData->isInit());
     m_dOverlayItem->setAlpha(m_pData->m_alpha);
     m_dObjItem->setVisible(m_pData->m_alpha < 255);
-
+    if(m_pValuePicker) m_pValuePicker->enableOverlay(m_pData->m_alpha > 0);
     replot();
 }
 
