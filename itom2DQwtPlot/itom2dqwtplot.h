@@ -67,6 +67,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
+    Q_PROPERTY(QPointF overlayInterval READ getoverlayInterval WRITE setoverlayInterval DESIGNABLE true USER true)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -89,7 +90,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
-    
+    Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
+
     DESIGNER_PLUGIN_ITOM_API
     public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -147,6 +149,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
         
     virtual QPointF getZAxisInterval(void) const;
     virtual void setZAxisInterval(QPointF point);
+
+    QPointF getoverlayInterval(void) const;
+    void setoverlayInterval(QPointF point);
 
     QFont getTitleFont(void) const;
     void setTitleFont(const QFont &font);

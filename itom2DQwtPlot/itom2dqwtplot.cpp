@@ -634,6 +634,25 @@ void Itom2dQwtPlot::setZAxisInterval(QPointF point)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QPointF Itom2dQwtPlot::getoverlayInterval(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->getOverlayInterval(Qt::ZAxis);
+    }
+    return QPointF();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setoverlayInterval(QPointF point)
+{
+    if (m_pContent)
+    {
+        m_pContent->setOverlayInterval(Qt::ZAxis, point);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QString Itom2dQwtPlot::getColorMap() const
 {
     if (m_pContent)
@@ -1774,6 +1793,7 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
     }
     return ito::retOk;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuOverlaySliderChanged(int value)
 {
     if(value != m_data.m_alpha)

@@ -206,7 +206,7 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
         ito::uint32 firstMax[3];
 
         
-        if (m_pInternalData->m_valueScaleAuto)
+        if ((m_pInternalData->m_valueScaleAuto && m_notOverlay) || (m_pInternalData->m_overlayScaleAuto && !m_notOverlay))
         {
             ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
 
@@ -254,7 +254,8 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
         }
         else
         {
-            setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_valueMin, m_pInternalData->m_valueMax));
+            if(m_notOverlay) setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_valueMin, m_pInternalData->m_valueMax));
+            else setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_overlayMin, m_pInternalData->m_overlayMax));
         }
     }
     else

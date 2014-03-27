@@ -108,7 +108,6 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_dOverlayItem->setAlpha(m_pData->m_alpha);
     m_dOverlayItem->setColorMap(new QwtLinearColorMap(Qt::black, Qt::white, QwtColorMap::Indexed));
     m_dOverlayItem->setVisible(false);
-
     //zoom tool
     m_pZoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
@@ -957,6 +956,26 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
 QPointF PlotCanvas::getInterval(Qt::Axis axis) const
 {
     QwtInterval i = m_rasterData->interval(axis);
+    return QPointF(i.minValue(), i.maxValue());
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setOverlayInterval(Qt::Axis axis, const QPointF &interval)
+{
+    if (axis == Qt::ZAxis)
+    {
+        m_pData->m_overlayScaleAuto = false;
+        m_pData->m_overlayMin = interval.x();
+        m_pData->m_overlayMax = interval.y();
+
+        m_rasterOverlayData->setInterval(Qt::ZAxis, QwtInterval(m_pData->m_overlayMin, m_pData->m_overlayMax));
+    }
+
+    replot();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QPointF PlotCanvas::getOverlayInterval(Qt::Axis axis) const
+{
+    QwtInterval i = m_rasterOverlayData->interval(axis);
     return QPointF(i.minValue(), i.maxValue());
 }
 

@@ -105,6 +105,9 @@ class PlotCanvas : public QwtPlot
         QPointF getInterval(Qt::Axis axis) const;
         void setInterval(Qt::Axis axis, const QPointF &interval);
 
+        QPointF getOverlayInterval(Qt::Axis axis) const;
+        void setOverlayInterval(Qt::Axis axis, const QPointF &interval);
+
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
         ito::RetVal deleteMarkers(const QString &id);
         ito::RetVal deleteMarkers(const int id);
@@ -247,6 +250,10 @@ struct InternalData
         m_enablePlotting = true;
         m_showCenterMarker = false;
         m_alpha = 0;
+
+        m_overlayScaleAuto = 1;
+        m_overlayMin = 0;
+        m_overlayMax = 0;
     }
     ~InternalData()
     {
@@ -286,6 +293,10 @@ struct InternalData
     bool m_valueScaleAuto;
     double m_valueMin;
     double m_valueMax;
+
+    bool m_overlayScaleAuto;
+    double m_overlayMin;
+    double m_overlayMax;
 
     bool m_xaxisScaleAuto;
     double m_xaxisMin;
