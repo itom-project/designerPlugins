@@ -1142,39 +1142,40 @@ void GraphicViewPlot::setZAxisInterval(QPointF point)
         switch((int)point.y())
         {
             case 255:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 8;
                 break;
             case 511:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 9;
                 break;
             case 1023:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 10;
                 break;
             case 2047:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 11;
                 break;
             case 4095:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 12;
                 break;
             case 8191:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 13;
                 break;
             case 16383:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 14;
                 break;
             case 65535:
-                m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
+                //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
                 m_data.m_numBits = 16;
                 break;
             default:
-                m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
+                //m_data.m_colorMode = RasterToQImageObj::ColorAutoSelect;
+                break;
         }
 
     }

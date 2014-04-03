@@ -231,14 +231,16 @@ QImage RasterToQImageObj::convert2QImage()
 {
     if(!m_plane)
     {
-        QImage temp(100, 100, QImage::Format_ARGB32);
-        temp.setText("", "No Image Data");
-        return temp;    
+        QImage temp(300, 200, QImage::Format_ARGB32);
+        QPainter p(&temp);
+        p.setFont(QFont("Helvetica",12));
+        p.drawText(50,50,"wrong image type.");   
+        return temp;
     }
 
     int type = m_dataObjPlane->getType();
 
-    if(m_pInternalData->m_colorMode == ColorIndex8Bitshift)
+    if(m_pInternalData->m_colorMode == ColorIndex8Bitshift || (m_pInternalData->m_colorMode == ColorAutoSelect && (type == ito::tUInt8 || type == ito::tUInt16)))
     {
         switch(type)
         {
@@ -316,19 +318,23 @@ QImage RasterToQImageObj::convert2QImage()
             }
             default:
             {
-                QImage temp(100, 100, QImage::Format_ARGB32);
-                temp.setText("", "Wrong image type");
+                QImage temp(300, 200, QImage::Format_ARGB32);
+                QPainter p(&temp);
+                p.setFont(QFont("Helvetica",12));
+                p.drawText(50,50,"wrong image type.");
                 return temp;         
             }
 
         }    
     }
-    else if(m_pInternalData->m_colorMode == ColorRGB24)
+    else if(m_pInternalData->m_colorMode == ColorRGB24 || (m_pInternalData->m_colorMode == ColorAutoSelect && (type == ito::tRGBA32 || type == ito::tUInt32 || type == ito::tInt32)))
     {
         if (type != ito::tUInt32 && type != ito::tInt32 && type != ito::tRGBA32)
         {
-            QImage temp(100, 100, QImage::Format_ARGB32);
-            temp.setText("", "Wrong image type");
+            QImage temp(300, 200, QImage::Format_ARGB32);
+            QPainter p(&temp);
+            p.setFont(QFont("Helvetica",12));
+            p.drawText(50,50,"wrong image type.");
             return temp;      
         }
 
@@ -356,9 +362,11 @@ QImage RasterToQImageObj::convert2QImage()
     {
         if (type != ito::tUInt32 && type != ito::tInt32 && type != ito::tRGBA32)
         {
-            QImage temp(100, 100, QImage::Format_ARGB32);
-            temp.setText("", "Wrong image type");
-            return temp;      
+            QImage temp(300, 200, QImage::Format_ARGB32);
+            QPainter p(&temp);
+            p.setFont(QFont("Helvetica",12));
+            p.drawText(50,50,"wrong image type.");  
+            return temp;
         }
         if(m_D.m_hasROI)
         {
@@ -406,9 +414,11 @@ QImage RasterToQImageObj::convert2QImage()
                 return graphicViewHelper::rescaleByScale<ito::complex128>(m_plane, m_D.m_xSize, m_D.m_ySize, m_plane->step[0], m_plane->step[1], m_pInternalData->m_colorTable, m_pInternalData->m_valueMin, m_pInternalData->m_valueMax, m_pInternalData->m_cmplxType);
             default:
             {
-                QImage temp(100, 100, QImage::Format_ARGB32);
-                temp.setText("", "Wrong image type");
-                return temp;         
+                QImage temp(300, 200, QImage::Format_ARGB32);
+                QPainter p(&temp);
+                p.setFont(QFont("Helvetica",12));
+                p.drawText(50,50,"wrong image type.");
+                return temp;
             }
 
         }
