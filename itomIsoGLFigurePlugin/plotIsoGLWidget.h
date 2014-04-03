@@ -47,13 +47,12 @@
 
 struct AxisLabel
 {
-    AxisLabel() : dx(0), dy(0), write(0), unitydigit(0), lastdigit(0), unity(0), maxlen(0), rightAligned(false), topAligned(false){}
+    AxisLabel() : dx(0), dy(0), write(0), unitydigit(0), lastdigit(0), unity(0), maxlen(0), alignment(Qt::AlignCenter){}
     double dx, dy, write;
     int unitydigit, lastdigit;
     double unity;
     long maxlen;
-    bool rightAligned;
-    bool topAligned;
+    char alignment;
 };
 
 struct AxisProperties
@@ -207,7 +206,7 @@ class plotGLWidget : public QGLWidget
         void DrawTitle(const std::string &myTitle, const int texty, int &yused);
         void DrawColorBar(const char xPos, const char yPos, const GLfloat dX, const GLfloat dY, const GLfloat zMin, const GLfloat zMax);
         void DrawObjectInfo(void);
-        int OGLTextOut(const char *buffer, double xpos, double ypos, const bool rightAligned, const bool topAligned);
+        int OGLTextOut(const char *buffer, double xpos, double ypos, const char aligned);
         ito::RetVal ResetColors();
 
         enum elementModeEnum

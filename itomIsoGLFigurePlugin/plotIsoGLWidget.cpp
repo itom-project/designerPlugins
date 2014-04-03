@@ -573,12 +573,12 @@ void plotGLWidget::paintGL()
 //        int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
     }
-
+*/
     if(m_objectInfo.show)
     {
         DrawObjectInfo();
     }
-*/
+
 //    int ret = glGetError();
 
     glFlush();
@@ -1742,7 +1742,7 @@ void plotGLWidget::threeDAxis(void)
     ito::float64 Sqrt2div2 = sqrt(2.0) / 2.0;
     ito::float64 xb, yb;
     //ito::float64 dt;
-    ito::float64 xmin, xmax, ymin, ymax, zmin, zmax, xsizep, ysizep;
+    ito::float64 /*zmean,*/ xmin, xmax, ymin, ymax, zmin, zmax, xsizep, ysizep;
     ito::float64 ax, ay, az, xe[6], ye[6], ze[6];
     ito::float64 signedY = 1.0, signedX = 1.0;
 
@@ -1788,7 +1788,7 @@ void plotGLWidget::threeDAxis(void)
     ymax = -m_windowYScale * ysizep / 2.0;
     zmin = -m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
     zmax = m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
-
+    /*zmean = 0.0;*/
     if ((((ay  < az) - 0.5) * signedY) > 0)
     {
         xb = xmin;
@@ -1850,13 +1850,13 @@ void plotGLWidget::threeDAxis(void)
 
     VRX = cos(m_RotA) / fabs(cos(m_RotA));
     VRY = cos(m_RotB) / fabs(cos(m_RotB));
-    /*
+/*    
     std::cout << "\n";
     std::cout << "m_RotA: " << m_RotA << "; m_RotB: " << m_RotB <<"m_RotC: " << m_RotC << "\n"; 
     std::cout << "VRX: " << VRX << "; VRY: " << VRY << "\n";
     std::cout << "signedX: " << signedX << "; signedY: " << signedY << "\n";
     std::cout << "xb: " << xb << "; yb: " << yb << "\n";
-    */
+ */   
     //Y-Axis X signed.
     if (xb == xmin)
     {        
@@ -2005,7 +2005,7 @@ void plotGLWidget::threeDAxis(void)
         }
 
     }
-/*    
+   /*
     std::cout << "signedXAx: " << signedXAy << "; signedXAy: " << signedXAy << 
                  "; signedYAx: " << signedYAy << "; signedYAy: " << signedXAy << 
                  "; signedZAx: " << signedZAy << "; signedZAy: " << signedZAy << "\n";
@@ -2041,6 +2041,8 @@ void plotGLWidget::threeDAxis(void)
     {
         //static double a = -1.0;
         //static double b = -1.0;
+        //paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin, m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 1 & m_axisX.showTicks);
+        //paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
         paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin, m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 1 & m_axisX.showTicks);
         paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
     }
@@ -2186,10 +2188,6 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     int firstdigit, i;
     std::string label(" ");
 
-    static double corrX = 0;
-    static double corrY = 0;
-    al.rightAligned = VorzX > 0;
-    al.topAligned = VorzY > 0;
 
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
@@ -2231,6 +2229,9 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     }
     p = pow(10.0, e > 0 ? e : -e);
 
+    al.alignment = Qt::AlignCenter;
+
+    
     al.lastdigit = e;
     if ((x1 == x0) && (z1 == z0))
     {
@@ -2381,10 +2382,10 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         gluProject(x1, y1, z1, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xend, &yend, &zpos);
         phi = atan2((yend - ystart), (xend - xstart));
 
-        al.dx = VorzX * 0.05 * fabs(sin(phi));
-        al.dy = VorzY * 0.1 * fabs(cos(phi));
+        //al.dx = VorzX * 0.05 * fabs(sin(phi));
+        //al.dy = VorzY * 0.1 * fabs(cos(phi));
 
-        al.maxlen = 0;
+        //al.maxlen = 0;
     }
 
     v = s0;
@@ -2407,8 +2408,8 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 
         if (write)
         {
-            gluProject(x0 + a * (x1 - x0) + VorzXAs * ticklength * 3, y0 + a * (y1 - y0) + VorzYAs * ticklength * 3, 
-                z0 + a * (z1 - z0) - VorzZAs * ticklength, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+            gluProject(x0 + a * (x1 - x0) + VorzXAs * ticklength * 4.0, y0 + a * (y1 - y0) + VorzYAs * ticklength * 4.0, 
+                z0 + a * (z1 - z0) - VorzZAs * ticklength * 4.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
             //paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
             //    ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
@@ -2423,8 +2424,8 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 
     if (write)
     {
-        gluProject(x0 + (x1 - x0) / 2.0, y0 + (y1 - y0) / 2.0, 
-            z0 + (z1 - z0) / 2.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+        gluProject(x0 + (x1 - x0) / 2.0 + VorzXAs * ticklength * 9.0 , y0 + (y1 - y0) / 2.0 + VorzYAs * ticklength * 9.0, 
+            z0 + (z1 - z0) / 2.0 - VorzZAs * ticklength * 9.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
         //al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
         //al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
@@ -2435,7 +2436,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         //    xpos += al.dx;
 
         //ypos -= fabs(al.dy);
-        OGLTextOut(label.data(), xpos, ypos, al.rightAligned, al.topAligned);
+        OGLTextOut(label.data(), xpos, ypos, al.alignment);
     }
 
     return;
@@ -2521,11 +2522,11 @@ void plotGLWidget::paintAxisLabelOGL(const struct AxisLabel &axisLabel, const do
     //    xpos = x + axisLabel->dx;
 
     //ypos = y - fabs(axisLabel->dy);
-    OGLTextOut(buffer, x, y, axisLabel.rightAligned, axisLabel.topAligned);
+    OGLTextOut(buffer, x, y, axisLabel.alignment);
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const bool rightAligned, const bool topAligned)
+int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const char aligned)
 {
     glPushAttrib(GL_LIST_BIT);                // Pushes The Display List Bits
     glMatrixMode(GL_PROJECTION);
@@ -2535,8 +2536,11 @@ int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const
     glPushMatrix();
     glLoadIdentity();
 
-    if(rightAligned) xpos -= (1.7 * strlen(buffer) * m_fontsize) / width();
-    if(topAligned) ypos -= (3.0 * m_fontsize) / height();
+    if(aligned & Qt::AlignRight) xpos -= (1.8 * strlen(buffer) * m_fontsize) / width();
+    else if(aligned & Qt::AlignHCenter) xpos -= (0.8 * strlen(buffer) * m_fontsize) / width();
+
+    if(aligned & Qt::AlignTop) ypos -= m_fontsize / height();
+    else if(aligned & Qt::AlignVCenter) ypos -= 0.5*m_fontsize / height();
 
     glRasterPos2f(xpos, ypos);
     glListBase(m_myCharBitmapBuffer);                    // Sets The Base Character to 0
@@ -2584,13 +2588,13 @@ void plotGLWidget::DrawObjectInfo(void)
     double x0 = -1.0 + (double)m_fontsize / width();
     double y0 = -1.0 + (3 * m_fontsize * 3.0 ) / height();
 
-    if(m_objectInfo.xLength.length()) OGLTextOut((char*)m_objectInfo.xLength.data(), x0, y0, false, false);
+    if(m_objectInfo.xLength.length()) OGLTextOut((char*)m_objectInfo.xLength.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize/ height();
-    if(m_objectInfo.yLength.length()) OGLTextOut((char*)m_objectInfo.yLength.data(), x0, y0, false, false);
+    if(m_objectInfo.yLength.length()) OGLTextOut((char*)m_objectInfo.yLength.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize/ height();
-    if(m_objectInfo.matrix.length()) OGLTextOut((char*)m_objectInfo.matrix.data(), x0, y0, false, false);
+    if(m_objectInfo.matrix.length()) OGLTextOut((char*)m_objectInfo.matrix.data(), x0, y0, Qt::AlignLeft);
 
     size_t len = m_objectInfo.PeakText.length();
 
@@ -2600,15 +2604,15 @@ void plotGLWidget::DrawObjectInfo(void)
     if(len < m_objectInfo.DevText.length())
         len = m_objectInfo.DevText.length();
 
-    x0 = 1.0 - (double)(1.7 * len * m_fontsize) / width();
+    x0 = 1.0 - (double)m_fontsize * len / width() * 1.5;
     y0 = -1.0 + (3.0 *m_fontsize * 3.0 ) / height();
-    if(m_objectInfo.PeakText.length()) OGLTextOut((char*)m_objectInfo.PeakText.data(), x0, y0, false, false);
+    if(m_objectInfo.PeakText.length()) OGLTextOut((char*)m_objectInfo.PeakText.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize / height();
-    if(m_objectInfo.MeanText.length()) OGLTextOut((char*)m_objectInfo.MeanText.data(), x0, y0, false, false);
+    if(m_objectInfo.MeanText.length()) OGLTextOut((char*)m_objectInfo.MeanText.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize / height();
-    if(m_objectInfo.DevText.length()) OGLTextOut((char*)m_objectInfo.DevText.data(), x0, y0, false, false);
+    if(m_objectInfo.DevText.length()) OGLTextOut((char*)m_objectInfo.DevText.data(), x0, y0, Qt::AlignLeft);
 
     return;
 }
@@ -2688,10 +2692,10 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
     char buf[50] = {0};
 
     sprintf(buf, "%g", zMin);
-    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 - m_fontsize / (double)height() / 2.0, false, false);
+    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0, Qt::AlignLeft);
 
     sprintf(buf, "%g", zMax);
-    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 + dY - m_fontsize / (double)height() / 2.0, false, false);
+    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 + dY, Qt::AlignLeft);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -2711,7 +2715,7 @@ void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &y
     /* Titel Object etc. */
     OGLMakeFont(1.67 * m_fontsize);
     if(myTitle.length())
-        OGLTextOut((char*)myTitle.data(), x0, y0, false, false);
+        OGLTextOut((char*)myTitle.data(), x0, y0, Qt::AlignLeft | Qt::AlignTop);
 /*
     OGLMakeFont(1.5*dd->fontsize, dd);
     tags->ReadTagDef(TAG_COMMENT1,(void *)&txt,"");
