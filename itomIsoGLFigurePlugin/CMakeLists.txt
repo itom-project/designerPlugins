@@ -9,7 +9,6 @@ OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
 OPTION(BUILD_ISOGL_3DCONNEXION "If 3DConnexion is installed, support is build into the ISOGL-Widget." OFF)
 OPTION(UPDATE_TRANSLATIONS "Update source translation translation/*.ts files (WARNING: make clean will delete the source .ts files! Danger!)")
-OPTION(BUILD_WITH_PCL "Build itom with PointCloudLibrary support (pointCloud, polygonMesh, point...)" ON)
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 SET (ITOM_LANGUAGES "de" CACHE STRING "semicolon separated list of languages that should be created (en must not be given since it is the default)")
@@ -30,10 +29,6 @@ FIND_PACKAGE_QT(ON Widgets Xml Designer LinguistTools)
 find_package(OpenCV COMPONENTS core REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(VisualLeakDetector QUIET)
-if (BUILD_WITH_PCL)
-    find_package(PCL 1.5.1 REQUIRED COMPONENTS common)
-    ADD_DEFINITIONS(-DUSEPCL -D_USEPCL)
-endif (BUILD_WITH_PCL)
 
 IF(BUILD_ISOGL_3DCONNEXION)
     find_package(3DCONNEXION)
@@ -77,8 +72,6 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
     ${3DCONNEXION_INCLUDE_PATH}
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
-    ${PCL_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIR}
 )
 
 IF(UNIX)
@@ -107,7 +100,7 @@ set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.h
     ${ITOM_SDK_INCLUDE_DIR}/common/typeDefs.h
     ${ITOM_SDK_INCLUDE_DIR}/DataObject/dataObjectFuncs.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjPclFigure.h
+    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractItomDesignerPlugin.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
@@ -168,18 +161,18 @@ IF(3DCONNEXION_FOUND)
     Message(STATUS "3DCONNEXION was found ${3DCONNEXION_SIAPP}.")
     
     if (QT5_FOUND)
-        TARGET_LINK_LIBRARIES(${target_name} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY} ${ITOM_SDK_pointcloud_LIBRARY})
+        TARGET_LINK_LIBRARIES(${target_name} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})        
         qt5_use_modules(${target_name} Widgets Designer Xml Svg UiTools OpenGL)
     else (QT5_FOUND)
-        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY} ${ITOM_SDK_pointcloud_LIBRARY})
+        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
     endif (QT5_FOUND)
 ELSE(3DCONNEXION_FOUND)
     Message(STATUS "WARNING: 3DCONNEXION was not found or disabled.")
     if (QT5_FOUND)
-        TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY} ${ITOM_SDK_pointcloud_LIBRARY})
+        TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
         qt5_use_modules(${target_name} Widgets Designer Xml Svg UiTools OpenGL)
     else (QT5_FOUND)
-        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY} ${ITOM_SDK_pointcloud_LIBRARY})
+        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${ITOM_SDK_dataobject_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
     endif (QT5_FOUND)
 ENDIF(3DCONNEXION_FOUND)
 

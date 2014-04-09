@@ -149,11 +149,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
     // DataObject Vars
     m_colorMode(1),
-    m_pContentDObj(NULL),
-#ifdef USEPCL
-    m_pContentPC(NULL),
-    m_pContentPM(NULL),
-#endif
+    m_pContent(NULL),
     m_pContentWhileRastering(NULL),
     m_invalid(1.6e308)
 {
@@ -244,7 +240,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_RotB = 1.571 + RotB0;
     m_RotC = 1.025 + RotC0;
 
-//    m_pContentDObj = QSharedPointer<ito::DataObject>(new ito::DataObject());
+    m_pContent = QSharedPointer<ito::DataObject>(new ito::DataObject());
 
 //    refreshPlot(NULL);
     m_isInit = 1;
@@ -280,20 +276,10 @@ plotGLWidget::~plotGLWidget()
         m_pContentWhileRastering.clear();
     }
 
-    if(m_pContentDObj)
+    if(m_pContent)
     {
-        m_pContentDObj.clear();
+        m_pContent.clear();
     }
-#ifdef USEPCL
-    if(m_pContentPC)
-    {
-        m_pContentPC.clear();
-    }
-    if(m_pContentPM)
-    {
-        m_pContentPM.clear();
-    }
-#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -587,12 +573,12 @@ void plotGLWidget::paintGL()
 //        int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
     }
-
+*/
     if(m_objectInfo.show)
     {
         DrawObjectInfo();
     }
-*/
+
 //    int ret = glGetError();
 
     glFlush();
@@ -858,137 +844,19 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal plotGLWidget::GLSetPointsPCL(void)
+ito::RetVal plotGLWidget::GLSetTriangles(int &mode)
 {
     ito::RetVal retVal(retOk);
 
-    if (m_pColTriangles != NULL)
+    int xsizeObj = m_axisX.idx[1] - m_axisX.idx[0];
+    int ysizeObj = m_axisY.idx[1] - m_axisY.idx[0];
+
+    if(m_pContent && xsizeObj && ysizeObj)
     {
-        free(m_pColTriangles);
-        m_pColTriangles = NULL;
+        m_pContentWhileRastering = m_pContent;
+        m_pContentWhileRastering->lockRead();
     }
-    if (m_pTriangles != NULL)
-    {
-        free(m_pTriangles);
-        m_pTriangles = NULL;
-    }
-    if (m_pColIndices != NULL)
-    {
-        free(m_pColIndices);
-        m_pColIndices = NULL;
-    }
-    if (m_pNormales != NULL)
-    {
-        free(m_pNormales);
-        m_pNormales = NULL;
-    }
-    if (m_pPoints != NULL)
-    {
-        free(m_pPoints);
-        m_pPoints = NULL;
-    }
-
-    m_NumElements = 0;
-    int totCount = 0;
-#ifdef USEPCL
-    ito::float64 xshift = m_windowXScale * (m_axisX.phys[0] + m_axisX.phys[1]) / 2.0;
-    ito::float64 yshift = m_windowYScale * (m_axisY.phys[0] + m_axisY.phys[1]) / 2.0;
-    ito::float64 zscale = 1.0;
-    ito::float64 zshift = m_windowZScale * (m_axisZ.phys[0] + m_axisZ.phys[1]) / 2.0;
-
-    bool isFinite = false;
-
-    ito::float64 threshold = 1.0;
-    pcl::PointXYZ pt;
-    pcl::PointCloud<pcl::PointXYZ> *pcl = m_pContentPC->toPointXYZ().get();
-    int width = m_pContentPC->width();
-    int height = m_pContentPC->height();
-
-    if (!retVal.containsError())
-    {
-        // If m_elementMode == PAINT_POINTS try to paint points for faster, less memory consuming visualisation
-        if (m_elementMode == PAINT_POINTS)
-        {
-            m_pColTriangles = static_cast<GLubyte *>(calloc(width * height * 4, sizeof(GLubyte)));
-            m_pColIndices = static_cast<unsigned char *>(calloc(width * height * 4, sizeof(unsigned char)));
-            m_pPoints = static_cast<GLfloat *>(calloc(width * height * 3, sizeof(GLfloat)));
-
-            if (m_pColTriangles == NULL || m_pPoints == NULL || m_pColIndices == NULL)
-            {
-                m_isInit &= ~HAS_TRIANG;
-                m_NumElements = 0;
-                retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
-                goto CLEAREXIT;
-            }
-        }
-    }
-
-    #if (USEOMP)
-    #pragma omp parallel num_threads(NTHREADS)
-    {
-    #endif
-    ito::float64 color = 0.0;
-    ito::float64 zsum = 0.0;
-    ito::float64 dpixel1;
-    int count = 0;
-
-    if (!retVal.containsError())
-    {
-        if (m_elementMode == PAINT_POINTS)
-        {
-            #if (USEOMP) 
-            #pragma omp for schedule(guided)
-            #endif
-            for (int npx = 0; npx < width * height; npx++)
-            {
-                pt = pcl->at(npx);
-                if ((fabs(color - pt.z) < threshold) && ito::dObjHelper::isFinite<ito::float64>(pt.z))
-                {
-                    #if (USEOMP)
-                    #pragma omp critical 
-                    {
-                    #endif
-                    count = totCount++;
-                    m_NumElements++;
-                    #if (USEOMP)
-                    }
-                    #endif
-                    m_pPoints[count * 3] = ((double)(pt.x) * m_windowXScale - xshift);
-                    m_pPoints[count * 3 + 1] = ((double)(pt.y) * m_windowYScale - yshift);
-                    m_pPoints[count * 3 + 2] = zscale * pt.z - zshift;
-
-                    m_pColIndices[count * 4] = cv::saturate_cast<unsigned char>(pt.z * 255.0);
-                }
-            }
-        }
-    }
-    #if (USEOMP)
-    }
-    #endif
-
-    if (m_NumElements != 0 || !retVal.containsError())
-    {
-        if(m_elementMode == PAINT_POINTS)
-        {
-            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 4 * sizeof(unsigned char));
-            m_pPoints = (GLfloat*)realloc(m_pPoints, m_NumElements * 3 * sizeof(GLfloat));
-            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 4 * sizeof(GLubyte));
-        }
-        else
-        {
-            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 2 * 3 * sizeof(unsigned char));
-            m_pTriangles = (GLfloat*)realloc(m_pTriangles, m_NumElements * 2 * 9 * sizeof(GLfloat));
-            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 2 * 12 * sizeof(GLubyte));
-            m_pNormales = (GLfloat*)realloc(m_pNormales, m_NumElements * 2 * 9 * sizeof(GLfloat));
-        }
-
-        ResetColors();
-        m_errorDisplMsg.clear();
-        m_isInit &= ~IS_CALCTRIANG;
-    }
-
-CLEAREXIT:
-    if (m_NumElements == 0 || retVal.containsError())
+    else
     {
         m_isInit &= ~HAS_TRIANG;
         if (m_pColTriangles != NULL)
@@ -1016,60 +884,6 @@ CLEAREXIT:
             free(m_pPoints);
             m_pPoints = NULL;
         }
-        m_NumElements = 0;
-        retVal += ito::RetVal(ito::retError, 0, "Error calculating points / triangles");
-        m_isInit &= ~IS_CALCTRIANG;
-    }
-#endif
-    return retVal;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal plotGLWidget::GLSetTriangles(void)
-{
-    ito::RetVal retVal(retOk);
-
-    int xsizeObj = m_axisX.idx[1] - m_axisX.idx[0];
-    int ysizeObj = m_axisY.idx[1] - m_axisY.idx[0];
-
-    if (m_pColTriangles != NULL)
-    {
-        free(m_pColTriangles);
-        m_pColTriangles = NULL;
-    }
-    if (m_pTriangles != NULL)
-    {
-        free(m_pTriangles);
-        m_pTriangles = NULL;
-    }
-    if (m_pColIndices != NULL)
-    {
-        free(m_pColIndices);
-        m_pColIndices = NULL;
-    }
-    if (m_pNormales != NULL)
-    {
-        free(m_pNormales);
-        m_pNormales = NULL;
-    }
-    if (m_pPoints != NULL)
-    {
-        free(m_pPoints);
-        m_pPoints = NULL;
-    }
-
-    if(m_pContentDObj && xsizeObj && ysizeObj)
-    {
-        m_pContentWhileRastering = m_pContentDObj;
-        m_pContentWhileRastering->lockRead();
-    }
-#ifdef USEPCL
-    else if (m_pContentPC == NULL && m_pContentPM == NULL)
-#else
-    else
-#endif
-    {
-        m_isInit &= ~HAS_TRIANG;
         return ito::RetVal(ito::retError, 0, "DataObject empty, calc triangles failed");
     }
 
@@ -1136,6 +950,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
     }
 
     m_NumElements = 0;
+
     int totCount = 0;
 
     ito::float64 xshift = m_windowXScale * xsizeObj / 2.0;
@@ -1146,8 +961,34 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
     int cntX;
     bool isFinite = false;
 
-    ito::float64 threshold = 1.0;
-    ito::float64 zscale = 1.0;
+    ito::float64 Schwelle = 1.0;
+    ito::float64 ZScale = 1.0;
+
+    if (m_pColTriangles != NULL)
+    {
+        free(m_pColTriangles);
+        m_pColTriangles = NULL;
+    }
+    if (m_pTriangles != NULL)
+    {
+        free(m_pTriangles);
+        m_pTriangles = NULL;
+    }
+    if (m_pColIndices != NULL)
+    {
+        free(m_pColIndices);
+        m_pColIndices = NULL;
+    }
+    if (m_pNormales != NULL)
+    {
+        free(m_pNormales);
+        m_pNormales = NULL;
+    }
+    if (m_pPoints != NULL)
+    {
+        free(m_pPoints);
+        m_pPoints = NULL;
+    }
 
     if(!retVal.containsError())
     {
@@ -1161,10 +1002,25 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
             if(m_pColTriangles == NULL || m_pPoints == NULL || m_pColIndices == NULL)
             {
                 m_isInit &= ~HAS_TRIANG;
+                if (m_pColTriangles != NULL)
+                {
+                    free(m_pColTriangles);
+                    m_pColTriangles = NULL;
+                }
+                if (m_pPoints != NULL)
+                {
+                    free(m_pPoints);
+                    m_pTriangles = NULL;
+                }
+                if (m_pColIndices != NULL)
+                {
+                    free(m_pColIndices);
+                    m_pColIndices = NULL;
+                }
                 m_NumElements = 0;
-                retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
-                goto CLEAREXIT;
+                retVal += ito::RetVal(ito::retError, 0, "No data compueted");
             }
+
         }
         else // PAINT_TRIANG
         {
@@ -1177,9 +1033,28 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
             if(m_pColTriangles == NULL || m_pTriangles == NULL || m_pColIndices == NULL || m_pNormales == NULL)
             {
                 m_isInit &= ~HAS_TRIANG;
+                if (m_pColTriangles != NULL)
+                {
+                    free(m_pColTriangles);
+                    m_pColTriangles = NULL;
+                }
+                if (m_pTriangles != NULL)
+                {
+                    free(m_pTriangles);
+                    m_pTriangles = NULL;
+                }
+                if (m_pColIndices != NULL)
+                {
+                    free(m_pColIndices);
+                    m_pColIndices = NULL;
+                }
+                if (m_pNormales != NULL)
+                {
+                    free(m_pNormales);
+                    m_pNormales = NULL;
+                }
                 m_NumElements = 0;
-                retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
-                goto CLEAREXIT;
+                retVal += ito::RetVal(ito::retError, 0, "No data compueted");
             }
         }
     }
@@ -1215,7 +1090,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                 for (cntX = 0; cntX < xsizeObj - 1; cntX++)
                 {
                     dpixel1 = ptrScaledTopoNext[cntX];
-                    if ((fabs(color - dpixel1) < threshold) && ito::dObjHelper::isFinite<ito::float64>(dpixel1) && (dpixel1 != invalidValue))
+                    if ((fabs(color - dpixel1) < Schwelle) && ito::dObjHelper::isFinite<ito::float64>(dpixel1) && (dpixel1 != invalidValue))
                     {
                         #if (USEOMP)
                         #pragma omp critical 
@@ -1228,7 +1103,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                         #endif
                         m_pPoints[count * 3] = ((double)(cntX) * m_windowXScale - xshift);
                         m_pPoints[count * 3 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pPoints[count * 3 + 2] = zscale * dpixel1 - zshift;
+                        m_pPoints[count * 3 + 2] = ZScale * dpixel1 - zshift;
 
                         m_pColIndices[count] = cv::saturate_cast<unsigned char>(dpixel1 * 255.0);
                     }
@@ -1265,7 +1140,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                         isFinite = false;
                     }
 
-                    if ((fabs(color - dpixel1) < threshold) && (fabs(color - dpixel2) < threshold) && (fabs(color - dpixel3) < threshold)
+                    if ((fabs(color - dpixel1) < Schwelle) && (fabs(color - dpixel2) < Schwelle) && (fabs(color - dpixel3) < Schwelle)
                         && /*(fabs(dpixel1) < 1.6e308)*/ isFinite && (dpixel1 != invalidValue) && (dpixel2 != invalidValue) && (dpixel3 != invalidValue))
                     {
                         #if (USEOMP)
@@ -1280,15 +1155,15 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
 
                         m_pTriangles[count * 9] = ((double)(cntX) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pTriangles[count * 9 + 2] = zscale * dpixel1 - zshift;
+                        m_pTriangles[count * 9 + 2] = ZScale * dpixel1 - zshift;
 
                         m_pTriangles[count * 9 + 3] = ((double)(cntX + 1) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 4] = ((double)(cntY) * m_windowYScale - yshift);
-                        m_pTriangles[count * 9 + 5] = zscale * dpixel2 - zshift;
+                        m_pTriangles[count * 9 + 5] = ZScale * dpixel2 - zshift;
 
                         m_pTriangles[count * 9 + 6] = ((double)(cntX) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 7] = ((double)(cntY) * m_windowYScale - yshift);
-                        m_pTriangles[count * 9 + 8] = zscale * dpixel3 - zshift;
+                        m_pTriangles[count * 9 + 8] = ZScale * dpixel3 - zshift;
 
                         for (int n = 0; n < 3; n++)
                         {
@@ -1321,7 +1196,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                         isFinite = false;
                     }
 
-                    if ((fabs(color - dpixel1) < threshold) && (fabs(color - dpixel2) < threshold) && (fabs(color - dpixel3) < threshold)
+                    if ((fabs(color - dpixel1) < Schwelle) && (fabs(color - dpixel2) < Schwelle) && (fabs(color - dpixel3) < Schwelle)
                         && isFinite /*(fabs(dpixel1) < 1.6e308)*/ && (dpixel1 != invalidValue) && (dpixel2 != invalidValue) && (dpixel3 != invalidValue))
                     {
                         #if (USEOMP)
@@ -1336,15 +1211,15 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
 
                         m_pTriangles[count * 9] = ((double)(cntX) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 1] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pTriangles[count * 9 + 2] = zscale * dpixel1 - zshift;
+                        m_pTriangles[count * 9 + 2] = ZScale * dpixel1 - zshift;
 
                         m_pTriangles[count * 9 + 3] = ((double)(cntX + 1) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 4] = ((double)(cntY + 1) * m_windowYScale - yshift);
-                        m_pTriangles[count * 9 + 5] = zscale * dpixel2 - zshift;
+                        m_pTriangles[count * 9 + 5] = ZScale * dpixel2 - zshift;
 
                         m_pTriangles[count * 9 + 6] = ((double)(cntX + 1) * m_windowXScale - xshift);
                         m_pTriangles[count * 9 + 7] = ((double)(cntY) * m_windowYScale - yshift);
-                        m_pTriangles[count * 9 + 8] = zscale * dpixel3 - zshift;
+                        m_pTriangles[count * 9 + 8] = ZScale * dpixel3 - zshift;
 
                         for (int n = 0; n < 3; n++)
                         {
@@ -1367,31 +1242,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
     }
     #endif
 
-    if (m_NumElements != 0 || !retVal.containsError())
-    {
-        if(m_elementMode == PAINT_POINTS)
-        {
-            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * sizeof(unsigned char));
-            m_pPoints = (GLfloat*)realloc(m_pPoints, m_NumElements * 3 * sizeof(GLfloat));
-            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 4 * sizeof(GLubyte));
-        }
-        else
-        {
-            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 2 * 3 * sizeof(unsigned char));
-            m_pTriangles = (GLfloat*)realloc(m_pTriangles, m_NumElements * 2 * 9 * sizeof(GLfloat));
-            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 2 * 12 * sizeof(GLubyte));
-            m_pNormales = (GLfloat*)realloc(m_pNormales, m_NumElements * 2 * 9 * sizeof(GLfloat));
-        }
-
-        ResetColors();
-        m_errorDisplMsg.clear();
-        m_isInit &= ~IS_CALCTRIANG;
-    }
-
-    m_pContentWhileRastering->unlock();
-    m_pContentWhileRastering.clear();
-
-CLEAREXIT:
     if (m_NumElements == 0 || retVal.containsError())
     {
         m_isInit &= ~HAS_TRIANG;
@@ -1421,9 +1271,32 @@ CLEAREXIT:
             m_pPoints = NULL;
         }
         m_NumElements = 0;
-        retVal += ito::RetVal(ito::retError, 0, "Error calculating points / triangles");
+        retVal += ito::RetVal(ito::retError, 0, "No data compueted");
         m_isInit &= ~IS_CALCTRIANG;
     }
+    else
+    {
+        if(m_elementMode == PAINT_POINTS)
+        {
+            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * sizeof(unsigned char));
+            m_pPoints = (GLfloat*)realloc(m_pPoints, m_NumElements * 3 * sizeof(GLfloat));
+            m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 4 * sizeof(GLubyte));
+        }
+        else
+        {
+             m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 2 * 3 * sizeof(unsigned char));
+             m_pTriangles = (GLfloat*)realloc(m_pTriangles, m_NumElements * 2 * 9 * sizeof(GLfloat));
+             m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 2 * 12 * sizeof(GLubyte));
+             m_pNormales = (GLfloat*)realloc(m_pNormales, m_NumElements * 2 * 9 * sizeof(GLfloat));
+        }
+
+        ResetColors();
+        m_errorDisplMsg.clear();
+        m_isInit &= ~IS_CALCTRIANG;
+    }
+
+    m_pContentWhileRastering->unlock();
+    m_pContentWhileRastering.clear();
 
     return retVal;
 }
@@ -1528,8 +1401,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         dims = dataObj->getDims();
         if( dims > 1)
         {
-            m_pContentDObj = QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj));
-            m_pContentDObj->lockRead();
+            m_pContent = QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj));
+            m_pContent->lockRead();
 
             if(dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
             {
@@ -1542,8 +1415,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
                 m_cmplxState = false;
             }
 
-            int x1 = m_pContentDObj->getSize(dims - 1) - 1;
-            int y1 = m_pContentDObj->getSize(dims - 2) - 1;
+            int x1 = m_pContent->getSize(dims - 1) - 1;
+            int y1 = m_pContent->getSize(dims - 2) - 1;
             bool test;
 
             if((m_axisX.autoScale) || ((int)m_axisX.idx[1] > x1) || ((int)m_axisX.dimIdx != dims - 1))
@@ -1560,11 +1433,11 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
                 m_axisY.dimIdx = dims - 2;
             }
 
-            m_axisX.phys[0] = m_pContentDObj->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[0], test);
-            m_axisX.phys[1] = m_pContentDObj->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[1], test);
+            m_axisX.phys[0] = m_pContent->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[0], test);
+            m_axisX.phys[1] = m_pContent->getPixToPhys(m_axisX.dimIdx, (double)m_axisX.idx[1], test);
 
-            m_axisY.phys[0] = m_pContentDObj->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[0], test);
-            m_axisY.phys[1] = m_pContentDObj->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[1], test);
+            m_axisY.phys[0] = m_pContent->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[0], test);
+            m_axisY.phys[1] = m_pContent->getPixToPhys(m_axisY.dimIdx, (double)m_axisY.idx[1], test);
 
             //m_title = internalObj.getTag("title", test).getVal_ToString();
 
@@ -1583,12 +1456,12 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
                 m_axisY.phys[1] = tempVal;
             }
 
-            m_axisX.label = m_pContentDObj->getAxisDescription(dims - 1, test);
-            m_axisX.unit  = m_pContentDObj->getAxisUnit(dims - 1, test);
-            m_axisY.label = m_pContentDObj->getAxisDescription(dims - 2, test);
-            m_axisY.unit  = m_pContentDObj->getAxisUnit(dims - 2, test);
-            m_axisZ.label = m_pContentDObj->getValueDescription();
-            m_axisZ.unit  = m_pContentDObj->getValueUnit();
+            m_axisX.label = m_pContent->getAxisDescription(dims - 1, test);
+            m_axisX.unit  = m_pContent->getAxisUnit(dims - 1, test);
+            m_axisY.label = m_pContent->getAxisDescription(dims - 2, test);
+            m_axisY.unit  = m_pContent->getAxisUnit(dims - 2, test);
+            m_axisZ.label = m_pContent->getValueDescription();
+            m_axisZ.unit  = m_pContent->getValueUnit();
 
             if(!m_axisZ.unit.compare("mm") || !m_axisZ.unit.compare("m"))
                 m_axisZ.isMetric = true;
@@ -1601,233 +1474,126 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
             if(m_objectInfo.show)
             {
-                ito::dObjHelper::devValue(m_pContentDObj.data(), 1, m_objectInfo.meanVal, m_objectInfo.divVal, true);
+                ito::dObjHelper::devValue(m_pContent.data(), 1, m_objectInfo.meanVal, m_objectInfo.divVal, true);
                 generateObjectInfoText();
             }
 
+            m_pContent->unlock();
             m_forceReplot = true;
-
-            double windowXScaleOld = m_windowXScale;
-            double windowYScaleOld = m_windowYScale;
-            double windowZScaleOld = m_windowZScale;
-
-            ito::uint32 firstMin[3];
-            ito::uint32 firstMax[3];
-
-            if(m_axisZ.autoScale)
-            {
-                switch(m_pContentDObj->getType())
-                {
-                    case ito::tUInt8:
-                    case ito::tInt8:
-                    case ito::tUInt16:
-                    case ito::tInt16:
-                    case ito::tUInt32:
-                    case ito::tInt32:
-                    case ito::tFloat32:
-                    case ito::tFloat64:
-                        ito::dObjHelper::minMaxValue(m_pContentDObj.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                    break;
-                    case ito::tComplex64:
-                    case ito::tComplex128:
-                        ito::dObjHelper::minMaxValue(m_pContentDObj.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true, m_cmplxMode);
-                    break;
-                    default:
-                        retval == ito::retError;
-                        m_errorDisplMsg.append("Object has invalid type");
-                }
-            }
-
-            if(!retval.containsError())
-            {
-                if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-                    m_zAmpl = 0.000000001; // make sure µm can be displayed
-
-                if(m_axisZ.isMetric) zs = m_axisZ.phys[1] - m_axisZ.phys[0];
-
-                if(m_axisX.isMetric) xs = m_axisX.phys[1] - m_axisX.phys[0];
-
-                if(m_axisY.isMetric) ys = m_axisY.phys[1] - m_axisY.phys[0];
-
-                //if(m_title.length() == 0)
-                //{
-                //    m_drawTitle = false;
-                //}
-
-                // To get cubic voxel in case of metric data
-                maxl = xs;
-                if ((ys > maxl) && (ys != 1))
-                    maxl = ys;
-                if ((zs > maxl) && (zs != 1))
-                    maxl = zs;
-
-                m_windowXScale = 1.0;
-                m_windowYScale = 1.0;
-                m_windowZScale = 1.0;
-
-                if ((xs != 1) && (ys != 1))
-                {
-                    if (width() > height())
-                    {
-                        m_windowXScale = (double)height() / (double)width();
-                        m_windowYScale = 1;
-                    }
-                    else
-                    {
-                        m_windowYScale = (double)width() / (double)height();
-                        m_windowXScale= 1;
-                    }
-                }
-
-                m_windowXScale *= xs / maxl;
-                m_windowYScale *= ys / maxl;
-                if (zs!=1 && m_forceCubicVoxel)
-                    m_windowZScale *= zs / maxl;
-
-                m_windowXScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
-                m_windowYScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
-
-                if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
-                {
-                    m_windowZScale /= (double)(m_axisZ.phys[1] -  m_axisZ.phys[0]) * m_zAmpl;
-                    //m_windowZScale /= (double)(m_maxZValue - m_minZValue);
-                }
-                else
-                {
-                    m_windowZScale = 1.0;
-                }
-
-                m_windowXScale /= fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0) * Sqrt2Div2;
-                m_windowYScale /= fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0) * Sqrt2Div2;
-
-                m_pContentDObj->unlock();
-
-                if( m_NumElements == 0 || m_forceReplot == true)
-                {
-                    GLSetTriangles();
-                }
-                else if ((m_windowXScale != windowXScaleOld) || (m_windowYScale != windowYScaleOld) || (m_windowZScale != windowZScaleOld))
-                    rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
-            }
         }
     }
-    if ((param != NULL) && (param->getType() == (ito::Param::PointCloudPtr & ito::paramTypeMask)))
+
+    if(m_pContent != NULL)
     {
-#ifdef USEPCL
-        //check pointCloud
-        ito::PCLPointCloud *pc = (ito::PCLPointCloud*)param->getVal<char*>();
-        m_pContentPC = QSharedPointer<ito::PCLPointCloud>(new ito::PCLPointCloud(*pc));
-//        m_pContentPC->lockRead();
-
-        ito::float64 xmin = std::numeric_limits<ito::float64>::max();
-        ito::float64 xmax = std::numeric_limits<ito::float64>::min();
-        ito::float64 ymin = std::numeric_limits<ito::float64>::max();
-        ito::float64 ymax = std::numeric_limits<ito::float64>::min();
-        ito::float64 zmin = std::numeric_limits<ito::float64>::max();
-        ito::float64 zmax = std::numeric_limits<ito::float64>::min();
-        pcl::PointXYZ pt;
-        pcl::PointCloud<pcl::PointXYZ> *pcl = m_pContentPC->toPointXYZ().get();
-        for (int np = 0; np < pc->height() * pc->width(); np++)
-        {
-//            pt = pc->at(np).getPointXYZ();
-            pt = pcl->at(np);
-            if (pt.x < xmin)
-                xmin = pt.x;
-            if (pt.x > xmax)
-                xmax = pt.x;
-            if (pt.y < ymin)
-                ymin = pt.y;
-            if (pt.y > ymax)
-                ymax = pt.y;
-            if (pt.z < zmin)
-                zmin = pt.z;
-            if (pt.z > zmax)
-                zmax = pt.z;
-        }
-        m_axisX.phys[0] = xmin;
-        m_axisX.phys[1] = xmax;
-        m_axisY.phys[0] = ymin;
-        m_axisY.phys[1] = ymax;
-        m_axisZ.phys[0] = zmin;
-        m_axisZ.phys[1] = zmax;
-
-        if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-            m_zAmpl = 0.000000001; // make sure µm can be displayed
-
-        zs = m_axisZ.phys[1] - m_axisZ.phys[0];
-        xs = m_axisX.phys[1] - m_axisX.phys[0];
-        ys = m_axisY.phys[1] - m_axisY.phys[0];
-
-        // To get cubic voxel in case of metric data
-        maxl = xs;
-        if ((ys > maxl) && (ys != 1))
-            maxl = ys;
-        if ((zs > maxl) && (zs != 1))
-            maxl = zs;
-
+        m_pContent->lockRead();
         double windowXScaleOld = m_windowXScale;
         double windowYScaleOld = m_windowYScale;
         double windowZScaleOld = m_windowZScale;
 
-        m_windowXScale = 1.0;
-        m_windowYScale = 1.0;
-        m_windowZScale = 1.0;
+        ito::uint32 firstMin[3];
+        ito::uint32 firstMax[3];
 
-        if ((xs != 1) && (ys != 1))
+        if(m_axisZ.autoScale)
         {
-            if (width() > height())
+            
+            switch(m_pContent->getType())
             {
-                m_windowXScale = (double)height() / (double)width();
-                m_windowYScale = 1;
+                case ito::tUInt8:
+                case ito::tInt8:
+                case ito::tUInt16:
+                case ito::tInt16:
+                case ito::tUInt32:
+                case ito::tInt32:
+                case ito::tFloat32:
+                case ito::tFloat64:
+                    ito::dObjHelper::minMaxValue(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
+                break;
+                case ito::tComplex64:
+                case ito::tComplex128:
+                    ito::dObjHelper::minMaxValue(m_pContent.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true, m_cmplxMode);
+                break;
+                default:
+                    retval == ito::retError;
+                    m_errorDisplMsg.append("Object has invalid type");
+
+            }
+        }
+
+        if(!retval.containsError())
+        {
+            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
+                m_zAmpl = 0.000000001; // make sure µm can be displayed
+
+            if(m_axisZ.isMetric) zs = m_axisZ.phys[1] - m_axisZ.phys[0];
+
+            if(m_axisX.isMetric) xs = m_axisX.phys[1] - m_axisX.phys[0];
+
+            if(m_axisY.isMetric) ys = m_axisY.phys[1] - m_axisY.phys[0];
+
+            //if(m_title.length() == 0)
+            //{
+            //    m_drawTitle = false;
+            //}
+
+            // To get cubic voxel in case of metric data
+            maxl = xs;
+            if ((ys > maxl) && (ys != 1))
+                maxl = ys;
+            if ((zs > maxl) && (zs != 1))
+                maxl = zs;
+
+            m_windowXScale = 1.0;
+            m_windowYScale = 1.0;
+            m_windowZScale = 1.0;
+
+            if ((xs != 1) && (ys != 1))
+            {
+                if (width() > height())
+                {
+                    m_windowXScale = (double)height() / (double)width();
+                    m_windowYScale = 1;
+                }
+                else
+                {
+                    m_windowYScale = (double)width() / (double)height();
+                    m_windowXScale= 1;
+                }
+            }
+
+            m_windowXScale *= xs / maxl;
+            m_windowYScale *= ys / maxl;
+            if (zs!=1 && m_forceCubicVoxel)
+                m_windowZScale *= zs / maxl;
+
+            m_windowXScale /= 1.2*fabs((double)(this->height()) / (double)this->height());
+            m_windowYScale /= 1.2*fabs((double)(this->height()) / (double)this->height());
+            
+
+            if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
+            {
+                m_windowZScale /= (double)(m_axisZ.phys[1] -  m_axisZ.phys[0]) * m_zAmpl;
+                //m_windowZScale /= (double)(m_maxZValue - m_minZValue);
             }
             else
             {
-                m_windowYScale = (double)width() / (double)height();
-                m_windowXScale= 1;
+                m_windowZScale = 1.0;
             }
+
+            m_windowXScale /= fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0) * Sqrt2Div2;
+            m_windowYScale /= fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0) * Sqrt2Div2;
+
+            m_pContent->unlock();
+            int mode = 0;
+
+            if( m_NumElements == 0 || m_forceReplot == true)
+            {
+                GLSetTriangles(mode);
+            }
+            else if ((m_windowXScale != windowXScaleOld) || (m_windowYScale != windowYScaleOld) || (m_windowZScale != windowZScaleOld))
+                rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
         }
-
-        m_windowXScale *= xs / maxl;
-        m_windowYScale *= ys / maxl;
-        if (zs!=1 && m_forceCubicVoxel)
-            m_windowZScale *= zs / maxl;
-
-        m_windowXScale /= 1.2 * fabs((double)(this->width()) / (double)this->width());
-        m_windowYScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
-
-        if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
-        {
-            m_windowZScale /= (double)(m_axisZ.phys[1] -  m_axisZ.phys[0]) * m_zAmpl;
-            //m_windowZScale /= (double)(m_maxZValue - m_minZValue);
-        }
-        else
-        {
-            m_windowZScale = 1.0;
-        }
-
-        m_forceReplot = true;
-        m_elementMode = PAINT_POINTS;
-
-        if( m_NumElements == 0 || m_forceReplot == true)
-        {
-            GLSetPointsPCL();
-        }
-        else if ((m_windowXScale != windowXScaleOld) || (m_windowYScale != windowYScaleOld) || (m_windowZScale != windowZScaleOld))
-            rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
-#else
-        retval += ito::RetVal(ito::retError, 0, tr("compiled without pointCloud support").toLatin1().data());
-#endif // #ifdef USEPCL
     }
-
-    if (m_pContentDObj != NULL)
-    {
-        m_pContentDObj->lockRead();
-    }
-#ifdef USEPCL
-    else if (m_pContentPC == NULL && m_pContentPM == NULL)
-#else
     else
-#endif
     {
         m_errorDisplMsg.clear();
         m_errorDisplMsg.append("Object empty");
@@ -1976,7 +1742,7 @@ void plotGLWidget::threeDAxis(void)
     ito::float64 Sqrt2div2 = sqrt(2.0) / 2.0;
     ito::float64 xb, yb;
     //ito::float64 dt;
-    ito::float64 xmin, xmax, ymin, ymax, zmin, zmax, xsizep, ysizep;
+    ito::float64 /*zmean,*/ xmin, xmax, ymin, ymax, zmin, zmax, xsizep, ysizep;
     ito::float64 ax, ay, az, xe[6], ye[6], ze[6];
     ito::float64 signedY = 1.0, signedX = 1.0;
 
@@ -2022,7 +1788,7 @@ void plotGLWidget::threeDAxis(void)
     ymax = -m_windowYScale * ysizep / 2.0;
     zmin = -m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
     zmax = m_windowZScale * (m_axisZ.phys[1] - m_axisZ.phys[0]) / 2.0;
-
+    /*zmean = 0.0;*/
     if ((((ay  < az) - 0.5) * signedY) > 0)
     {
         xb = xmin;
@@ -2084,13 +1850,13 @@ void plotGLWidget::threeDAxis(void)
 
     VRX = cos(m_RotA) / fabs(cos(m_RotA));
     VRY = cos(m_RotB) / fabs(cos(m_RotB));
-    /*
+/*    
     std::cout << "\n";
     std::cout << "m_RotA: " << m_RotA << "; m_RotB: " << m_RotB <<"m_RotC: " << m_RotC << "\n"; 
     std::cout << "VRX: " << VRX << "; VRY: " << VRY << "\n";
     std::cout << "signedX: " << signedX << "; signedY: " << signedY << "\n";
     std::cout << "xb: " << xb << "; yb: " << yb << "\n";
-    */
+ */   
     //Y-Axis X signed.
     if (xb == xmin)
     {        
@@ -2239,7 +2005,7 @@ void plotGLWidget::threeDAxis(void)
         }
 
     }
-/*    
+   /*
     std::cout << "signedXAx: " << signedXAy << "; signedXAy: " << signedXAy << 
                  "; signedYAx: " << signedYAy << "; signedYAy: " << signedXAy << 
                  "; signedZAx: " << signedZAy << "; signedZAy: " << signedZAy << "\n";
@@ -2275,6 +2041,8 @@ void plotGLWidget::threeDAxis(void)
     {
         //static double a = -1.0;
         //static double b = -1.0;
+        //paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin, m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 1 & m_axisX.showTicks);
+        //paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
         paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin, m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 1 & m_axisX.showTicks);
         paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
     }
@@ -2420,10 +2188,6 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     int firstdigit, i;
     std::string label(" ");
 
-    static double corrX = 0;
-    static double corrY = 0;
-    al.rightAligned = VorzX > 0;
-    al.topAligned = VorzY > 0;
 
     glGetDoublev(GL_MODELVIEW_MATRIX, GLModelViewMatrix);
     glGetDoublev(GL_PROJECTION_MATRIX, GLProjectionMatrix);
@@ -2465,6 +2229,9 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     }
     p = pow(10.0, e > 0 ? e : -e);
 
+    al.alignment = Qt::AlignCenter;
+
+    
     al.lastdigit = e;
     if ((x1 == x0) && (z1 == z0))
     {
@@ -2615,10 +2382,10 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         gluProject(x1, y1, z1, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xend, &yend, &zpos);
         phi = atan2((yend - ystart), (xend - xstart));
 
-        al.dx = VorzX * 0.05 * fabs(sin(phi));
-        al.dy = VorzY * 0.1 * fabs(cos(phi));
+        //al.dx = VorzX * 0.05 * fabs(sin(phi));
+        //al.dy = VorzY * 0.1 * fabs(cos(phi));
 
-        al.maxlen = 0;
+        //al.maxlen = 0;
     }
 
     v = s0;
@@ -2641,8 +2408,8 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 
         if (write)
         {
-            gluProject(x0 + a * (x1 - x0) + VorzXAs * ticklength * 3, y0 + a * (y1 - y0) + VorzYAs * ticklength * 3, 
-                z0 + a * (z1 - z0) - VorzZAs * ticklength, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+            gluProject(x0 + a * (x1 - x0) + VorzXAs * ticklength * 4.0, y0 + a * (y1 - y0) + VorzYAs * ticklength * 4.0, 
+                z0 + a * (z1 - z0) - VorzZAs * ticklength * 4.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
             //paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
             //    ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
@@ -2657,8 +2424,8 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 
     if (write)
     {
-        gluProject(x0 + (x1 - x0) / 2.0, y0 + (y1 - y0) / 2.0, 
-            z0 + (z1 - z0) / 2.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
+        gluProject(x0 + (x1 - x0) / 2.0 + VorzXAs * ticklength * 9.0 , y0 + (y1 - y0) / 2.0 + VorzYAs * ticklength * 9.0, 
+            z0 + (z1 - z0) / 2.0 - VorzZAs * ticklength * 9.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
         //al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
         //al.dy = VorzY * (0.25 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)) * fabs(cos(phi));
@@ -2669,7 +2436,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         //    xpos += al.dx;
 
         //ypos -= fabs(al.dy);
-        OGLTextOut(label.data(), xpos, ypos, al.rightAligned, al.topAligned);
+        OGLTextOut(label.data(), xpos, ypos, al.alignment);
     }
 
     return;
@@ -2755,11 +2522,11 @@ void plotGLWidget::paintAxisLabelOGL(const struct AxisLabel &axisLabel, const do
     //    xpos = x + axisLabel->dx;
 
     //ypos = y - fabs(axisLabel->dy);
-    OGLTextOut(buffer, x, y, axisLabel.rightAligned, axisLabel.topAligned);
+    OGLTextOut(buffer, x, y, axisLabel.alignment);
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const bool rightAligned, const bool topAligned)
+int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const char aligned)
 {
     glPushAttrib(GL_LIST_BIT);                // Pushes The Display List Bits
     glMatrixMode(GL_PROJECTION);
@@ -2769,8 +2536,11 @@ int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const
     glPushMatrix();
     glLoadIdentity();
 
-    if(rightAligned) xpos -= (1.7 * strlen(buffer) * m_fontsize) / width();
-    if(topAligned) ypos -= (3.0 * m_fontsize) / height();
+    if(aligned & Qt::AlignRight) xpos -= (1.8 * strlen(buffer) * m_fontsize) / width();
+    else if(aligned & Qt::AlignHCenter) xpos -= (0.8 * strlen(buffer) * m_fontsize) / width();
+
+    if(aligned & Qt::AlignTop) ypos -= m_fontsize / height();
+    else if(aligned & Qt::AlignVCenter) ypos -= 0.5*m_fontsize / height();
 
     glRasterPos2f(xpos, ypos);
     glListBase(m_myCharBitmapBuffer);                    // Sets The Base Character to 0
@@ -2818,13 +2588,13 @@ void plotGLWidget::DrawObjectInfo(void)
     double x0 = -1.0 + (double)m_fontsize / width();
     double y0 = -1.0 + (3 * m_fontsize * 3.0 ) / height();
 
-    if(m_objectInfo.xLength.length()) OGLTextOut((char*)m_objectInfo.xLength.data(), x0, y0, false, false);
+    if(m_objectInfo.xLength.length()) OGLTextOut((char*)m_objectInfo.xLength.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize/ height();
-    if(m_objectInfo.yLength.length()) OGLTextOut((char*)m_objectInfo.yLength.data(), x0, y0, false, false);
+    if(m_objectInfo.yLength.length()) OGLTextOut((char*)m_objectInfo.yLength.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize/ height();
-    if(m_objectInfo.matrix.length()) OGLTextOut((char*)m_objectInfo.matrix.data(), x0, y0, false, false);
+    if(m_objectInfo.matrix.length()) OGLTextOut((char*)m_objectInfo.matrix.data(), x0, y0, Qt::AlignLeft);
 
     size_t len = m_objectInfo.PeakText.length();
 
@@ -2834,15 +2604,15 @@ void plotGLWidget::DrawObjectInfo(void)
     if(len < m_objectInfo.DevText.length())
         len = m_objectInfo.DevText.length();
 
-    x0 = 1.0 - (double)(1.7 * len * m_fontsize) / width();
+    x0 = 1.0 - (double)m_fontsize * len / width() * 1.5;
     y0 = -1.0 + (3.0 *m_fontsize * 3.0 ) / height();
-    if(m_objectInfo.PeakText.length()) OGLTextOut((char*)m_objectInfo.PeakText.data(), x0, y0, false, false);
+    if(m_objectInfo.PeakText.length()) OGLTextOut((char*)m_objectInfo.PeakText.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize / height();
-    if(m_objectInfo.MeanText.length()) OGLTextOut((char*)m_objectInfo.MeanText.data(), x0, y0, false, false);
+    if(m_objectInfo.MeanText.length()) OGLTextOut((char*)m_objectInfo.MeanText.data(), x0, y0, Qt::AlignLeft);
 
     y0 -= 3.0 * m_fontsize / height();
-    if(m_objectInfo.DevText.length()) OGLTextOut((char*)m_objectInfo.DevText.data(), x0, y0, false, false);
+    if(m_objectInfo.DevText.length()) OGLTextOut((char*)m_objectInfo.DevText.data(), x0, y0, Qt::AlignLeft);
 
     return;
 }
@@ -2922,10 +2692,10 @@ void plotGLWidget::DrawColorBar(const char xPos, const char yPos, const GLfloat 
     char buf[50] = {0};
 
     sprintf(buf, "%g", zMin);
-    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 - m_fontsize / (double)height() / 2.0, false, false);
+    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0, Qt::AlignLeft);
 
     sprintf(buf, "%g", zMax);
-    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 + dY - m_fontsize / (double)height() / 2.0, false, false);
+    OGLTextOut(buf, x0 + dX + 7.0 / (double)width(), y0 + dY, Qt::AlignLeft);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -2945,7 +2715,7 @@ void plotGLWidget::DrawTitle(const std::string &myTitle, const int texty, int &y
     /* Titel Object etc. */
     OGLMakeFont(1.67 * m_fontsize);
     if(myTitle.length())
-        OGLTextOut((char*)myTitle.data(), x0, y0, false, false);
+        OGLTextOut((char*)myTitle.data(), x0, y0, Qt::AlignLeft | Qt::AlignTop);
 /*
     OGLMakeFont(1.5*dd->fontsize, dd);
     tags->ReadTagDef(TAG_COMMENT1,(void *)&txt,"");
@@ -3258,19 +3028,12 @@ void plotGLWidget::setCurrentVisMode(const int mode)
 //----------------------------------------------------------------------------------------------------------------------------------
 inline void plotGLWidget::toogleObjectInfoText(const bool enabled)
 {
-    if (enabled)
+    if(enabled)
     {
-        if (m_pContentDObj)
-        {
-            ito::dObjHelper::devValue(m_pContentDObj.data(), 1, m_objectInfo.meanVal, m_objectInfo.divVal, true);
-            generateObjectInfoText();
-            m_objectInfo.show = 1;
-        }
+        ito::dObjHelper::devValue(m_pContent.data(), 1, m_objectInfo.meanVal, m_objectInfo.divVal, true);
+        generateObjectInfoText();
     }
-    else
-    {
-        m_objectInfo.show = 0;
-    }
+    m_objectInfo.show = enabled;
     update();
 }
 
@@ -3287,9 +3050,9 @@ inline void plotGLWidget::generateObjectInfoText()
     else sprintf(buf, "Width:  %.4g", m_axisX.phys[1] - m_axisX.phys[0]);
     m_objectInfo.yLength = buf;
 
-    if(m_pContentDObj)
+    if(m_pContent)
     {
-        switch(m_pContentDObj->getType())
+        switch(m_pContent->getType())
         {
             case ito::tInt8:
                 sprintf(buf, "Matrix: %i x %i (%s)", m_axisX.idx[1] - m_axisX.idx[0] + 1, m_axisY.idx[1] - m_axisY.idx[0] + 1, "int8");

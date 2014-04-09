@@ -33,8 +33,8 @@ ItomIsoGLWidgetPlugin::ItomIsoGLWidgetPlugin(QObject *parent)
 {
 
     m_plotDataFormats = ito::Format_Gray8 | ito::Format_Gray16 | ito::Format_Gray32 | ito::Format_Float32 | ito::Format_Float64 | ito::Format_Complex;
-    m_plotDataTypes = ito::DataObjPlane | ito::PointCloud | ito::PolygonMesh;
-    m_plotFeatures = ito::Static | ito::PlotImage | ito::Cartesian | ito::Plot3D | ito::PlotISO;
+    m_plotDataTypes = ito::DataObjPlane;
+    m_plotFeatures = ito::Static | ito::PlotImage | ito::Cartesian;
 
     m_description = QObject::tr("ITOM widget for isometric visualisation of 2D DataObjects.");
     m_detaildescription = QObject::tr("");
@@ -60,12 +60,12 @@ bool ItomIsoGLWidgetPlugin::isInitialized() const
 
 QWidget *ItomIsoGLWidgetPlugin::createWidget(QWidget *parent)
 {
-    return new ItomIsoGLWidget(m_itomSettingsFile, ito::ParamBase::DObjPtr, ito::AbstractFigure::ModeStandaloneInUi, parent);
+    return new ItomIsoGLWidget(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
 }
 
 QWidget *ItomIsoGLWidgetPlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
 {
-    return new ItomIsoGLWidget(m_itomSettingsFile, ito::ParamBase::DObjPtr, winMode, parent);
+    return new ItomIsoGLWidget(m_itomSettingsFile, winMode, parent);
 }
 
 QString ItomIsoGLWidgetPlugin::name() const
