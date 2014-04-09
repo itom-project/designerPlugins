@@ -38,6 +38,9 @@
 #include "DataObject/dataobj.h"
 #include "DataObject/dataObjectFuncs.h"
 #include "common/sharedStructures.h"
+#ifdef USEPCL
+    #include "PointCloud/pclStructures.h"
+#endif
 
 #ifdef USEOPENMP
     #define USEOMP 1
@@ -144,7 +147,11 @@ class plotGLWidget : public QGLWidget
         QTimer m_timer;
         ito::uint32 m_lineplotUID;
         QMenu *m_contextMenu;
-        QSharedPointer<ito::DataObject> m_pContent;               /*!< borrowed reference, do not delete here */
+        QSharedPointer<ito::DataObject> m_pContentDObj;               //!< borrowed reference, do not delete here
+#ifdef USEPCL
+        QSharedPointer<ito::PCLPointCloud> m_pContentPC;              //!< borrowed reference, do not delete here
+        QSharedPointer<ito::PCLPolygonMesh> m_pContentPM;             //!< borrowed reference, do not delete here
+#endif
         QSharedPointer<ito::DataObject> m_pContentWhileRastering;
         unsigned char m_colorMode;
         ito::float64 m_invalid;
@@ -193,7 +200,8 @@ class plotGLWidget : public QGLWidget
         unsigned char *m_pColIndices;
 
 //        int initOGL2(const int width, const int height);
-        ito::RetVal GLSetTriangles(int &mode);
+        ito::RetVal GLSetTriangles(void);
+        ito::RetVal GLSetPointsPCL(void);
         void generateObjectInfoText();
         template<typename _Type> inline ito::RetVal NormalizeObj(cv::Mat &scaledTopo, ito::float64 &normedInvalid);
         void OGLMakeFont(int fsize);

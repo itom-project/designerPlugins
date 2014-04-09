@@ -39,8 +39,8 @@ using namespace ito;
 int NTHREADS = 2;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
+ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::ParamBase::Type inpType, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+    AbstractDObjPclFigure(itomSettingsFile, inpType, windowMode, parent),
     m_pContent(NULL),
     m_actScaleSetting(NULL),
    // m_actPan(NULL),
@@ -406,8 +406,22 @@ ItomIsoGLWidget::~ItomIsoGLWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomIsoGLWidget::applyUpdate()
 {
-    m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
-    ((plotGLWidget*)m_pContent)->refreshPlot(m_pOutput["displayed"]); //push the displayed DataObj into the actual plot widget for displaying
+    if (m_inpType == ito::ParamBase::DObjPtr)
+    {
+        ((plotGLWidget*)m_pContent)->refreshPlot(m_pInput["dataObject"]);
+    }
+    else if (m_inpType = ito::ParamBase::PointCloudPtr)
+    {
+        ((plotGLWidget*)m_pContent)->refreshPlot(m_pInput["pointCloud"]);
+    }
+    else if (m_inpType = ito::ParamBase::PolygonMeshPtr)
+    {
+        ((plotGLWidget*)m_pContent)->refreshPlot(m_pInput["polygonMesh"]);
+    }
+    else
+        return ito::retError;
+//    m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
+//    ((plotGLWidget*)m_pContent)->refreshPlot(m_pOutput["displayed"]); //push the displayed DataObj into the actual plot widget for displaying
 
     return ito::retOk;
 }
