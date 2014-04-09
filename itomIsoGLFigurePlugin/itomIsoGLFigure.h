@@ -23,7 +23,7 @@
 #ifndef ITOMFIGURE_H
 #define ITOMFIGURE_H
 
-#include "plot/AbstractDObjFigure.h"
+#include "plot/AbstractDObjPclFigure.h"
 #include "plotIsoGLWidget.h"
 
 #if defined(CONNEXION_FOUND) //&& !_DEBUG
@@ -88,7 +88,7 @@ class GL3DEFilter : public QObject
 
 };
 
-class ItomIsoGLWidget : public ito::AbstractDObjFigure
+class ItomIsoGLWidget : public ito::AbstractDObjPclFigure
 {
     Q_OBJECT
 
@@ -101,7 +101,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjFigure
         SiHdl m_SpwDeviceHandle;
         SiOpenData m_SpwData;
 #endif
-        ItomIsoGLWidget(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
+        ItomIsoGLWidget(const QString &itomSettingsFile, const ito::ParamBase::Type inpType, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         ~ItomIsoGLWidget();
 
         //properties
