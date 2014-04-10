@@ -587,12 +587,12 @@ void plotGLWidget::paintGL()
 //        int texty = 1.0;
         //DrawTitle(m_title, texty, yused);
     }
-
+*/
     if(m_objectInfo.show)
     {
         DrawObjectInfo();
     }
-*/
+
 //    int ret = glGetError();
 
     glFlush();
