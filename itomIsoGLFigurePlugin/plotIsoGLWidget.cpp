@@ -929,7 +929,6 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     #endif
     ito::float64 color = 0.0;
     ito::float64 zsum = 0.0;
-    ito::float64 dpixel1;
     int count = 0;
 
     if (!retVal.containsError())
@@ -1606,109 +1605,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             }
 
             m_forceReplot = true;
-
-            double windowXScaleOld = m_windowXScale;
-            double windowYScaleOld = m_windowYScale;
-            double windowZScaleOld = m_windowZScale;
-
-            ito::uint32 firstMin[3];
-            ito::uint32 firstMax[3];
-
-            if(m_axisZ.autoScale)
-            {
-                switch(m_pContentDObj->getType())
-                {
-                    case ito::tUInt8:
-                    case ito::tInt8:
-                    case ito::tUInt16:
-                    case ito::tInt16:
-                    case ito::tUInt32:
-                    case ito::tInt32:
-                    case ito::tFloat32:
-                    case ito::tFloat64:
-                        ito::dObjHelper::minMaxValue(m_pContentDObj.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
-                    break;
-                    case ito::tComplex64:
-                    case ito::tComplex128:
-                        ito::dObjHelper::minMaxValue(m_pContentDObj.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true, m_cmplxMode);
-                    break;
-                    default:
-                        retval == ito::retError;
-                        m_errorDisplMsg.append("Object has invalid type");
-                }
-            }
-
-            if(!retval.containsError())
-            {
-                if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-                    m_zAmpl = 0.000000001; // make sure µm can be displayed
-
-                if(m_axisZ.isMetric) zs = m_axisZ.phys[1] - m_axisZ.phys[0];
-
-                if(m_axisX.isMetric) xs = m_axisX.phys[1] - m_axisX.phys[0];
-
-                if(m_axisY.isMetric) ys = m_axisY.phys[1] - m_axisY.phys[0];
-
-                //if(m_title.length() == 0)
-                //{
-                //    m_drawTitle = false;
-                //}
-
-                // To get cubic voxel in case of metric data
-                maxl = xs;
-                if ((ys > maxl) && (ys != 1))
-                    maxl = ys;
-                if ((zs > maxl) && (zs != 1))
-                    maxl = zs;
-
-                m_windowXScale = 1.0;
-                m_windowYScale = 1.0;
-                m_windowZScale = 1.0;
-
-                if ((xs != 1) && (ys != 1))
-                {
-                    if (width() > height())
-                    {
-                        m_windowXScale = (double)height() / (double)width();
-                        m_windowYScale = 1;
-                    }
-                    else
-                    {
-                        m_windowYScale = (double)width() / (double)height();
-                        m_windowXScale= 1;
-                    }
-                }
-
-                m_windowXScale *= xs / maxl;
-                m_windowYScale *= ys / maxl;
-                if (zs!=1 && m_forceCubicVoxel)
-                    m_windowZScale *= zs / maxl;
-
-                m_windowXScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
-                m_windowYScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
-
-                if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
-                {
-                    m_windowZScale /= (double)(m_axisZ.phys[1] -  m_axisZ.phys[0]) * m_zAmpl;
-                    //m_windowZScale /= (double)(m_maxZValue - m_minZValue);
-                }
-                else
-                {
-                    m_windowZScale = 1.0;
-                }
-
-                m_windowXScale /= fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0) * Sqrt2Div2;
-                m_windowYScale /= fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0) * Sqrt2Div2;
-
-                m_pContentDObj->unlock();
-
-                if( m_NumElements == 0 || m_forceReplot == true)
-                {
-                    GLSetTriangles();
-                }
-                else if ((m_windowXScale != windowXScaleOld) || (m_windowYScale != windowYScaleOld) || (m_windowZScale != windowZScaleOld))
-                    rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
-            }
         }
     }
     if ((param != NULL) && (param->getType() == (ito::Param::PointCloudPtr & ito::paramTypeMask)))
@@ -1764,7 +1660,119 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             maxl = ys;
         if ((zs > maxl) && (zs != 1))
             maxl = zs;
+#else
+        retval += ito::RetVal(ito::retError, 0, tr("compiled without pointCloud support").toLatin1().data());
+#endif // #ifdef USEPCL
+    }
 
+    if (m_pContentDObj != NULL)
+    {
+        double windowXScaleOld = m_windowXScale;
+        double windowYScaleOld = m_windowYScale;
+        double windowZScaleOld = m_windowZScale;
+
+        ito::uint32 firstMin[3];
+        ito::uint32 firstMax[3];
+
+        if(m_axisZ.autoScale)
+        {
+            switch(m_pContentDObj->getType())
+            {
+                case ito::tUInt8:
+                case ito::tInt8:
+                case ito::tUInt16:
+                case ito::tInt16:
+                case ito::tUInt32:
+                case ito::tInt32:
+                case ito::tFloat32:
+                case ito::tFloat64:
+                    ito::dObjHelper::minMaxValue(m_pContentDObj.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true);
+                break;
+                case ito::tComplex64:
+                case ito::tComplex128:
+                    ito::dObjHelper::minMaxValue(m_pContentDObj.data(), m_axisZ.phys[0], firstMin, m_axisZ.phys[1], firstMax, true, m_cmplxMode);
+                break;
+                default:
+                    retval == ito::retError;
+                    m_errorDisplMsg.append("Object has invalid type");
+            }
+        }
+
+        if(!retval.containsError())
+        {
+            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
+                m_zAmpl = 0.000000001; // make sure µm can be displayed
+
+            if(m_axisZ.isMetric) zs = m_axisZ.phys[1] - m_axisZ.phys[0];
+
+            if(m_axisX.isMetric) xs = m_axisX.phys[1] - m_axisX.phys[0];
+
+            if(m_axisY.isMetric) ys = m_axisY.phys[1] - m_axisY.phys[0];
+
+            //if(m_title.length() == 0)
+            //{
+            //    m_drawTitle = false;
+            //}
+
+            // To get cubic voxel in case of metric data
+            maxl = xs;
+            if ((ys > maxl) && (ys != 1))
+                maxl = ys;
+            if ((zs > maxl) && (zs != 1))
+                maxl = zs;
+
+            m_windowXScale = 1.0;
+            m_windowYScale = 1.0;
+            m_windowZScale = 1.0;
+
+            if ((xs != 1) && (ys != 1))
+            {
+                if (width() > height())
+                {
+                    m_windowXScale = (double)height() / (double)width();
+                    m_windowYScale = 1;
+                }
+                else
+                {
+                    m_windowYScale = (double)width() / (double)height();
+                    m_windowXScale= 1;
+                }
+            }
+
+            m_windowXScale *= xs / maxl;
+            m_windowYScale *= ys / maxl;
+            if (zs!=1 && m_forceCubicVoxel)
+                m_windowZScale *= zs / maxl;
+
+            m_windowXScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
+            m_windowYScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
+
+            if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
+            {
+                m_windowZScale /= (double)(m_axisZ.phys[1] -  m_axisZ.phys[0]) * m_zAmpl;
+                //m_windowZScale /= (double)(m_maxZValue - m_minZValue);
+            }
+            else
+            {
+                m_windowZScale = 1.0;
+            }
+
+            m_windowXScale /= fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0) * Sqrt2Div2;
+            m_windowYScale /= fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0) * Sqrt2Div2;
+
+            m_pContentDObj->unlock();
+
+            if( m_NumElements == 0 || m_forceReplot == true)
+            {
+                GLSetTriangles();
+            }
+            else if ((m_windowXScale != windowXScaleOld) || (m_windowYScale != windowYScaleOld) || (m_windowZScale != windowZScaleOld))
+                rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
+        }
+    }
+    else if (m_pContentPC != NULL)
+    {
+#ifdef USEPCL
         double windowXScaleOld = m_windowXScale;
         double windowYScaleOld = m_windowYScale;
         double windowZScaleOld = m_windowZScale;
@@ -1819,14 +1827,11 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 #endif // #ifdef USEPCL
     }
 
-    if (m_pContentDObj != NULL)
-    {
-        m_pContentDObj->lockRead();
-    }
+    if (m_pContentDObj == NULL)
 #ifdef USEPCL
-    else if (m_pContentPC == NULL && m_pContentPM == NULL)
-#else
-    else
+    if (m_pContentDObj == NULL
+        && m_pContentPC == NULL
+        && m_pContentPM == NULL)
 #endif
     {
         m_errorDisplMsg.clear();
