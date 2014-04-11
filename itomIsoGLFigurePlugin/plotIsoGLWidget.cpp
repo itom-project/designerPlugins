@@ -891,8 +891,12 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     m_NumElements = 0;
     int totCount = 0;
 #ifdef USEPCL
-    ito::float64 xshift = m_windowXScale * (m_axisX.phys[0] + m_axisX.phys[1]) / 2.0;
-    ito::float64 yshift = m_windowYScale * (m_axisY.phys[0] + m_axisY.phys[1]) / 2.0;
+    ito::float64 xscale = 1.0 / (m_axisX.phys[1] - m_axisX.phys[0]);
+    ito::float64 xshift = m_windowXScale * xscale * (m_axisX.phys[0] + m_axisX.phys[1]) / 2.0;
+
+    ito::float64 yscale = 1.0 / (m_axisY.phys[1] - m_axisY.phys[0]);
+    ito::float64 yshift = m_windowYScale * yscale * (m_axisY.phys[0] + m_axisY.phys[1]) / 2.0;
+
     ito::float64 zscale = 1.0;
     ito::float64 zshift = m_windowZScale * (m_axisZ.phys[0] + m_axisZ.phys[1]) / 2.0;
 
@@ -952,9 +956,9 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
                     #if (USEOMP)
                     }
                     #endif
-                    m_pPoints[count * 3] = ((double)(pt.x) * m_windowXScale - xshift);
-                    m_pPoints[count * 3 + 1] = ((double)(pt.y) * m_windowYScale - yshift);
-                    m_pPoints[count * 3 + 2] = zscale * pt.z - zshift;
+                    m_pPoints[count * 3] = ((double)(pt.x) * xscale * m_windowXScale - xshift);
+                    m_pPoints[count * 3 + 1] = ((double)(pt.y) * yscale * m_windowYScale - yshift);
+                    m_pPoints[count * 3 + 2] = pt.z * zscale - zshift;
 
                     m_pColIndices[count * 4] = cv::saturate_cast<unsigned char>(pt.z * 255.0);
                 }
@@ -1744,8 +1748,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             if (zs!=1 && m_forceCubicVoxel)
                 m_windowZScale *= zs / maxl;
 
-            m_windowXScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
-            m_windowYScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
+            m_windowXScale /= 1.2; // * fabs((double)(this->height()) / (double)this->height());
+            m_windowYScale /= 1.2; // * fabs((double)(this->height()) / (double)this->height());
 
             if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
             {
@@ -1800,8 +1804,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         if (zs!=1 && m_forceCubicVoxel)
             m_windowZScale *= zs / maxl;
 
-        m_windowXScale /= 1.2 * fabs((double)(this->width()) / (double)this->width());
-        m_windowYScale /= 1.2 * fabs((double)(this->height()) / (double)this->height());
+        m_windowXScale /= 1.2; // * fabs((double)(this->width()) / (double)this->width());
+        m_windowYScale /= 1.2; // * fabs((double)(this->height()) / (double)this->height());
 
         if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
         {
