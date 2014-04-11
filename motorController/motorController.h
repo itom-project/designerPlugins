@@ -323,7 +323,7 @@ private slots:
     void guiChangedLargeStep(double value);
 
 signals:
-    void RequestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
+    void requestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
     void TriggerSoftJoyStickMovement(QVector<int> axis, QVector<double> vel);
 };
 

@@ -529,7 +529,7 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
             initializeJouStick();
         }
 
-        m_updateBySignal = connect(this, SIGNAL(RequestStatusAndPosition(bool, bool)), m_pActuator, SLOT(RequestStatusAndPosition(bool, bool)));
+        m_updateBySignal = connect(this, SIGNAL(requestStatusAndPosition(bool, bool)), m_pActuator, SLOT(requestStatusAndPosition(bool, bool)));
 
         triggerUpdatePosition();
 
@@ -554,7 +554,7 @@ void MotorController::triggerUpdatePosition(void)
 
     if (m_updateBySignal)
     {
-        emit RequestStatusAndPosition(true, false);
+        emit requestStatusAndPosition(true, false);
     }
     else
     {
