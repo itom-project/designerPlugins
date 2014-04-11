@@ -192,7 +192,7 @@ class plotGLWidget : public QGLWidget
         int m_glVer;
         std::string m_errorDisplMsg;
         GLuint m_myCharBitmapBuffer;
-        GLfloat       m_NumElements;
+        int           m_NumElements;
         GLfloat       *m_pTriangles;
         GLubyte       *m_pColTriangles;
         GLfloat       *m_pNormales;

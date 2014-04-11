@@ -889,7 +889,6 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     }
 
     m_NumElements = 0;
-    int totCount = 0;
 #ifdef USEPCL
     ito::float64 xscale = 1.0 / (m_axisX.phys[1] - m_axisX.phys[0]);
     ito::float64 xshift = m_windowXScale * xscale * (m_axisX.phys[0] + m_axisX.phys[1]) / 2.0;
@@ -903,7 +902,6 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     bool isFinite = false;
 
     ito::float64 threshold = 1.0;
-    pcl::PointXYZ pt;
     pcl::PointCloud<pcl::PointXYZ> *pcl = m_pContentPC->toPointXYZ().get();
     int width = m_pContentPC->width();
     int height = m_pContentPC->height();
@@ -914,7 +912,7 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
         if (m_elementMode == PAINT_POINTS)
         {
             m_pColTriangles = static_cast<GLubyte *>(calloc(width * height * 4, sizeof(GLubyte)));
-            m_pColIndices = static_cast<unsigned char *>(calloc(width * height * 4, sizeof(unsigned char)));
+            m_pColIndices = static_cast<unsigned char *>(calloc(width * height, sizeof(unsigned char)));
             m_pPoints = static_cast<GLfloat *>(calloc(width * height * 3, sizeof(GLfloat)));
 
             if (m_pColTriangles == NULL || m_pPoints == NULL || m_pColIndices == NULL)
@@ -933,12 +931,13 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     #endif
     ito::float64 color = 0.0;
     ito::float64 zsum = 0.0;
-    int count = 0;
 
     if (!retVal.containsError())
     {
         if (m_elementMode == PAINT_POINTS)
         {
+            int count = 0;
+            pcl::PointXYZ pt;
             #if (USEOMP) 
             #pragma omp for schedule(guided)
             #endif
@@ -951,8 +950,7 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
                     #pragma omp critical 
                     {
                     #endif
-                    count = totCount++;
-                    m_NumElements++;
+                    count = m_NumElements++;
                     #if (USEOMP)
                     }
                     #endif
@@ -973,7 +971,7 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     {
         if(m_elementMode == PAINT_POINTS)
         {
-            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * 4 * sizeof(unsigned char));
+            m_pColIndices = (unsigned char*)realloc(m_pColIndices, m_NumElements * sizeof(unsigned char));
             m_pPoints = (GLfloat*)realloc(m_pPoints, m_NumElements * 3 * sizeof(GLfloat));
             m_pColTriangles = (unsigned char*)realloc(m_pColTriangles, m_NumElements * 4 * sizeof(GLubyte));
         }
@@ -1446,7 +1444,7 @@ void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscalei
         #if (USEOMP)
         #pragma omp for schedule(guided)
         #endif
-        for (ito::int32 n = 0; n < (ito::int32)m_NumElements; n++)
+        for (ito::int32 n = 0; n < m_NumElements; n++)
         {
             m_pPoints[n * 3] *= xscaleing;
             m_pPoints[n * 3 + 1] *= yscaleing;
@@ -1471,7 +1469,7 @@ void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscalei
         #if (USEOMP)
         #pragma omp for schedule(guided)
         #endif
-        for (ito::int32 n = 0; n < (ito::int32)(m_NumElements * 3); n++)
+        for (ito::int32 n = 0; n < (m_NumElements * 3); n++)
         {
             m_pTriangles[n * 3] *= xscaleing;
             m_pTriangles[n * 3 + 1] *= yscaleing;
@@ -1481,7 +1479,7 @@ void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscalei
         #if (USEOMP)
         #pragma omp for schedule(guided)
         #endif
-        for (ito::int32 n = 0; n < (ito::int32)m_NumElements; n++)
+        for (ito::int32 n = 0; n < m_NumElements; n++)
         {
             for (ito::int32 m = 0; m < 3; m++)
             {
@@ -1897,8 +1895,10 @@ ito::RetVal plotGLWidget::ResetColors()
 
     if(m_elementMode == PAINT_POINTS)
     {
+/*
         if(m_currentPalette.size() > 255)
         {
+*/
             for (count = 0; count < m_NumElements; count++)
             {
                 m_pColTriangles[4 * count] =   ((m_currentPalette[m_pColIndices[count]] & 0xFF0000L) >> 16);
@@ -1906,6 +1906,7 @@ ito::RetVal plotGLWidget::ResetColors()
                 m_pColTriangles[4 * count + 2] = ((m_currentPalette[m_pColIndices[count]] & 0x0000FFL));
                 m_pColTriangles[4 * count + 3] = 255;
             }
+/*
         }
         else
         {
@@ -1918,6 +1919,7 @@ ito::RetVal plotGLWidget::ResetColors()
                 m_pColIndices[count + 3] = 255;
             }
         }
+*/
     }
     else
     {
