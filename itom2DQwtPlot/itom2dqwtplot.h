@@ -39,6 +39,9 @@
 #include <qspinbox.h>
 #include <qwt_plot_shapeitem.h>
 #include <qslider.h>
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/qlabel.h>
+#endif
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 

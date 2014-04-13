@@ -40,6 +40,9 @@
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qpainter.h>
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/qlabel.h>
+#endif
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
