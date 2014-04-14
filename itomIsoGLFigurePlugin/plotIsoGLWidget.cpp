@@ -1772,9 +1772,10 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
                 rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
         }
     }
+#ifdef USEPCL
     else if (m_pContentPC != NULL)
     {
-#ifdef USEPCL
+
         double windowXScaleOld = m_windowXScale;
         double windowYScaleOld = m_windowYScale;
         double windowZScaleOld = m_windowZScale;
@@ -1824,10 +1825,14 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         }
         else if ((m_windowXScale != windowXScaleOld) || (m_windowYScale != windowYScaleOld) || (m_windowZScale != windowZScaleOld))
             rescaleTriangles(m_windowXScale / windowXScaleOld, m_windowYScale / windowYScaleOld, m_windowZScale / windowZScaleOld);
-#else
-        retval += ito::RetVal(ito::retError, 0, tr("compiled without pointCloud support").toLatin1().data());
-#endif // #ifdef USEPCL
     }
+#else
+    else
+    {
+        retval += ito::RetVal(ito::retError, 0, tr("DataObject-Container empty and compiled without pointCloud support").toLatin1().data());
+    }
+#endif // #ifdef USEPCL
+    
 
     if (m_pContentDObj == NULL)
 #ifdef USEPCL
