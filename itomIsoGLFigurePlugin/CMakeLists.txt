@@ -107,7 +107,7 @@ set(designer_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.h
     ${ITOM_SDK_INCLUDE_DIR}/common/typeDefs.h
     ${ITOM_SDK_INCLUDE_DIR}/DataObject/dataObjectFuncs.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjPclFigure.h
+    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjPCLFigure.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractItomDesignerPlugin.h
     ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
