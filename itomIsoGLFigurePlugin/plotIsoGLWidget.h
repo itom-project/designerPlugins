@@ -62,7 +62,7 @@ struct AxisLabel
 struct AxisProperties
 {
     AxisProperties(): label(""), unit(""), dimIdx(0), scale(1),
-        autoScale(1), startScaled(0), isMetric(0), show(1), showTicks(1) 
+        autoScale(1), startScaled(0), isMetric(0), show(1), showTicks(1)
     {
         idx[0] = 0;
         idx[1] = 0;
@@ -217,6 +217,71 @@ class plotGLWidget : public QGLWidget
         void DrawObjectInfo(void);
         int OGLTextOut(const char *buffer, double xpos, double ypos, const bool rightAligned, const bool topAligned);
         ito::RetVal ResetColors();
+        template<typename _Tp> void pclFindMinMax(pcl::PointCloud<_Tp> *pcl, double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
+        {
+            xmin = std::numeric_limits<ito::float64>::max();
+            xmax = std::numeric_limits<ito::float64>::min();
+            ymin = std::numeric_limits<ito::float64>::max();
+            ymax = std::numeric_limits<ito::float64>::min();
+            zmin = std::numeric_limits<ito::float64>::max();
+            zmax = std::numeric_limits<ito::float64>::min();
+            _Tp pt;
+
+            for (int np = 0; np < m_pContentPC->height() * m_pContentPC->width(); np++)
+            {
+                pt = pcl->at(np);
+                if (pt.x < xmin)
+                    xmin = pt.x;
+                if (pt.x > xmax)
+                    xmax = pt.x;
+                if (pt.y < ymin)
+                    ymin = pt.y;
+                if (pt.y > ymax)
+                    ymax = pt.y;
+                if (pt.z < zmin)
+                    zmin = pt.z;
+                if (pt.z > zmax)
+                    zmax = pt.z;
+            }
+        }
+        template<typename _Tp> void pclFillPtBuf(pcl::PointCloud<_Tp> *pcl, int &count, int xscale, int xshift, int yscale, int yshift, int zscale, int zshift)
+        {
+            count = 0;
+
+            #if (USEOMP)
+            #pragma omp parallel num_threads(NTHREADS)
+            {
+            #endif
+
+            _Tp pt;
+            #if (USEOMP)
+            #pragma omp for schedule(guided)
+            #endif
+            for (int npx = 0; npx < m_pContentPC->width() * m_pContentPC->height(); npx++)
+            {
+                pt = pcl->at(npx);
+//                if ((fabs(color - pt.z) < threshold) && ito::dObjHelper::isFinite<ito::float64>(pt.z))
+                if (ito::dObjHelper::isFinite<ito::float64>(pt.z))
+                {
+                    #if (USEOMP)
+                    #pragma omp critical
+                    {
+                    #endif
+                    count = m_NumElements++;
+                    #if (USEOMP)
+                    }
+                    #endif
+                    m_pPoints[count * 3] = ((double)(pt.x) * xscale * m_windowXScale - xshift);
+                    m_pPoints[count * 3 + 1] = ((double)(pt.y) * yscale * m_windowYScale - yshift);
+                    m_pPoints[count * 3 + 2] = pt.z * zscale - zshift;
+
+                    m_pColIndices[count * 4] = cv::saturate_cast<unsigned char>(pt.z * 255.0);
+                }
+            }
+            #if (USEOMP)
+            }
+            #endif
+        }
 
         enum elementModeEnum
         {

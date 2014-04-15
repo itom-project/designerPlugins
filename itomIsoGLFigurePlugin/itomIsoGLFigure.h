@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2012, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #ifndef ITOMFIGURE_H
 #define ITOMFIGURE_H
 
-#include "plot/AbstractDObjPclFigure.h"
+#include "plot/AbstractDObjPCLFigure.h"
 #include "plotIsoGLWidget.h"
 
 #if defined(CONNEXION_FOUND) //&& !_DEBUG
@@ -109,13 +109,13 @@ class ItomIsoGLWidget : public ito::AbstractDObjPclFigure
 
         //properties
         ito::RetVal displayLineCut(QVector<QPointF> bounds, ito::uint32 &uniqueID);
-        
+
         ito::RetVal applyUpdate();  //!> does the real update work
         QSharedPointer<ito::DataObject> getSource(void) const;
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
-        virtual inline void setOutpBounds(QVector<QPointF> bounds) 
-        { 
+        virtual inline void setOutpBounds(QVector<QPointF> bounds)
+        {
             double *pointArr = new double[2 * bounds.size()];
             for (int np = 0; np < bounds.size(); np++)
             {
@@ -139,7 +139,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjPclFigure
         QString getColorMap(void) const;
         void setColorMap(QString);
 
-        void setContextMenuEnabled(bool show); 
+        void setContextMenuEnabled(bool show);
         bool getContextMenuEnabled() const;
 
     protected:
@@ -151,7 +151,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjPclFigure
 
     private:
         QAction* m_actScaleSetting;
-/*       
+/*
         QAction  *m_actPan;
         QAction  *m_actZoomToRect;
         QAction  *m_actMarker;
@@ -184,17 +184,17 @@ class ItomIsoGLWidget : public ito::AbstractDObjPclFigure
 
         QLabel *m_lblCoordinates;
 
-        void riseZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->riseZAmplifierer(value);};
-        void reduceZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->reduceZAmplifierer(value);};
+        void riseZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->riseZAmplifierer(value);}
+        void reduceZAmplifierer(const double value){if(m_pContent) ((plotGLWidget*)m_pContent)->reduceZAmplifierer(value);}
 
         QTimer myTimer;
 
     signals:
-    
+
     private slots:
 
         void mnuHome();
-        
+
         /*
         void mnuPanner(bool checked);
         void mnuValuePicker(bool checked);

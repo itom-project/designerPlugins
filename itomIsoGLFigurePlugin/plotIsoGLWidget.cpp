@@ -69,7 +69,7 @@ int plotGLWidget::initOGL2(const int width, const int height)
     //somewhere, only once:
     QOpenGLFunctions *m_oglFunctions=new QOpenGLFunctions(QOpenGLContext::currentContext());
     m_oglFunctions->initializeOpenGLFunctions();
- 
+
     //everytime before doing anything OpenGL:
     m_oglFunctions->glUseProgram(0);
 
@@ -463,7 +463,7 @@ void plotGLWidget::paintGL()
     if (m_isInit != 3)
         return;
 
-    m_isInit |= IS_RENDERING; 
+    m_isInit |= IS_RENDERING;
     m_ticklength = (int)(sqrt(winSizeX * winSizeX + winSizeY * winSizeY) * 10.0 / 1000.0);
 
     glMatrixMode(GL_MODELVIEW);                             // select projection matrix
@@ -485,7 +485,7 @@ void plotGLWidget::paintGL()
     glRotated(m_RotA * GL_RAD_GRAD, 1.0f, 0.0f, 0.0f);
     glRotated(m_RotB * GL_RAD_GRAD, 0.0f, 1.0f, 0.0f);
     glRotated(m_RotC * GL_RAD_GRAD, 0.0f, 0.0f, 1.0f);
-    
+
 
     threeDRotationMatrix();
 
@@ -556,7 +556,7 @@ void plotGLWidget::paintGL()
         glVertexPointer(3, GL_FLOAT, 0, m_pTriangles);
         glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_pColTriangles);
 
-        if (m_colorMode == 0) 
+        if (m_colorMode == 0)
             glNormalPointer (GL_FLOAT, 0, m_pNormales);
         glDrawArrays(GL_TRIANGLES, 0, m_NumElements * 3);
     }
@@ -920,46 +920,59 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
                 m_isInit &= ~HAS_TRIANG;
                 m_NumElements = 0;
                 retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
-                goto CLEAREXIT;
             }
         }
     }
 
-    #if (USEOMP)
-    #pragma omp parallel num_threads(NTHREADS)
-    {
-    #endif
-    ito::float64 color = 0.0;
-    ito::float64 zsum = 0.0;
 
     if (!retVal.containsError())
     {
         if (m_elementMode == PAINT_POINTS)
         {
             int count = 0;
-            pcl::PointXYZ pt;
-            #if (USEOMP) 
-            #pragma omp for schedule(guided)
-            #endif
-            for (int npx = 0; npx < width * height; npx++)
-            {
-                pt = pcl->at(npx);
-                if ((fabs(color - pt.z) < threshold) && ito::dObjHelper::isFinite<ito::float64>(pt.z))
-                {
-                    #if (USEOMP)
-                    #pragma omp critical 
-                    {
-                    #endif
-                    count = m_NumElements++;
-                    #if (USEOMP)
-                    }
-                    #endif
-                    m_pPoints[count * 3] = ((double)(pt.x) * xscale * m_windowXScale - xshift);
-                    m_pPoints[count * 3 + 1] = ((double)(pt.y) * yscale * m_windowYScale - yshift);
-                    m_pPoints[count * 3 + 2] = pt.z * zscale - zshift;
 
-                    m_pColIndices[count * 4] = cv::saturate_cast<unsigned char>(pt.z * 255.0);
-                }
+            pcl::PointCloud<pcl::PointXYZ> *ppclXYZ;
+            pcl::PointCloud<pcl::PointXYZI> *ppclXYZI;
+            pcl::PointCloud<pcl::PointXYZINormal> *ppclXYZINormal;
+            pcl::PointCloud<pcl::PointNormal> *ppclXYZNormal;
+            pcl::PointCloud<pcl::PointXYZRGBA> *ppclXYZRGBA;
+            pcl::PointCloud<pcl::PointXYZRGBNormal> *ppclXYZRGBNormal;
+            switch (m_pContentPC->getType())
+            {
+                case ito::pclXYZ:
+                    ppclXYZ = m_pContentPC->toPointXYZ().get();
+                    pclFillPtBuf<pcl::PointXYZ>(ppclXYZ, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                break;
+
+                case ito::pclXYZI:
+                    ppclXYZI = m_pContentPC->toPointXYZI().get();
+                    pclFillPtBuf<pcl::PointXYZI>(ppclXYZI, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                break;
+
+                case ito::pclXYZINormal:
+                    ppclXYZINormal = m_pContentPC->toPointXYZINormal().get();
+                    pclFillPtBuf<pcl::PointXYZINormal>(ppclXYZINormal, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                break;
+
+                case ito::pclXYZNormal:
+                    ppclXYZNormal = m_pContentPC->toPointXYZNormal().get();
+                    pclFillPtBuf<pcl::PointNormal>(ppclXYZNormal, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                break;
+
+                case ito::pclXYZRGBA:
+                    ppclXYZRGBA = m_pContentPC->toPointXYZRGBA().get();
+                    pclFillPtBuf<pcl::PointXYZRGBA>(ppclXYZRGBA, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                break;
+
+                case ito::pclXYZRGBNormal:
+                    ppclXYZRGBNormal = m_pContentPC->toPointXYZRGBNormal().get();
+                    pclFillPtBuf<pcl::PointXYZRGBNormal>(ppclXYZRGBNormal, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                break;
+
+                default:
+                case ito::pclInvalid:
+                    retVal += ito::RetVal(ito::retError, 0, tr("invalid point cloud").toLatin1().data());
+                break;
             }
         }
     }
@@ -988,7 +1001,6 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
         m_isInit &= ~IS_CALCTRIANG;
     }
 
-CLEAREXIT:
     if (m_NumElements == 0 || retVal.containsError())
     {
         m_isInit &= ~HAS_TRIANG;
@@ -1164,7 +1176,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                 m_isInit &= ~HAS_TRIANG;
                 m_NumElements = 0;
                 retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
-                goto CLEAREXIT;
             }
         }
         else // PAINT_TRIANG
@@ -1180,7 +1191,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                 m_isInit &= ~HAS_TRIANG;
                 m_NumElements = 0;
                 retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
-                goto CLEAREXIT;
             }
         }
     }
@@ -1219,7 +1229,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                     if ((fabs(color - dpixel1) < threshold) && ito::dObjHelper::isFinite<ito::float64>(dpixel1) && (dpixel1 != invalidValue))
                     {
                         #if (USEOMP)
-                        #pragma omp critical 
+                        #pragma omp critical
                         {
                         #endif
                         count = totCount++;
@@ -1270,7 +1280,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                         && /*(fabs(dpixel1) < 1.6e308)*/ isFinite && (dpixel1 != invalidValue) && (dpixel2 != invalidValue) && (dpixel3 != invalidValue))
                     {
                         #if (USEOMP)
-                        #pragma omp critical 
+                        #pragma omp critical
                         {
                         #endif
                         count = totCount++;
@@ -1326,7 +1336,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                         && isFinite /*(fabs(dpixel1) < 1.6e308)*/ && (dpixel1 != invalidValue) && (dpixel2 != invalidValue) && (dpixel3 != invalidValue))
                     {
                         #if (USEOMP)
-                        #pragma omp critical 
+                        #pragma omp critical
                         {
                         #endif
                         count = totCount++;
@@ -1368,7 +1378,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
     }
     #endif
 
-    if (m_NumElements != 0 || !retVal.containsError())
+    if (m_NumElements != 0 && !retVal.containsError())
     {
         if(m_elementMode == PAINT_POINTS)
         {
@@ -1617,31 +1627,52 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         m_pContentPC = QSharedPointer<ito::PCLPointCloud>(new ito::PCLPointCloud(*pc));
 //        m_pContentPC->lockRead();
 
-        ito::float64 xmin = std::numeric_limits<ito::float64>::max();
-        ito::float64 xmax = std::numeric_limits<ito::float64>::min();
-        ito::float64 ymin = std::numeric_limits<ito::float64>::max();
-        ito::float64 ymax = std::numeric_limits<ito::float64>::min();
-        ito::float64 zmin = std::numeric_limits<ito::float64>::max();
-        ito::float64 zmax = std::numeric_limits<ito::float64>::min();
-        pcl::PointXYZ pt;
-        pcl::PointCloud<pcl::PointXYZ> *pcl = m_pContentPC->toPointXYZ().get();
-        for (int np = 0; np < pc->height() * pc->width(); np++)
+        ito::float64 xmin, xmax, ymin, ymax, zmin, zmax;
+
+        pcl::PointCloud<pcl::PointXYZ> *ppclXYZ;
+        pcl::PointCloud<pcl::PointXYZI> *ppclXYZI;
+        pcl::PointCloud<pcl::PointXYZINormal> *ppclXYZINormal;
+        pcl::PointCloud<pcl::PointNormal> *ppclXYZNormal;
+        pcl::PointCloud<pcl::PointXYZRGBA> *ppclXYZRGBA;
+        pcl::PointCloud<pcl::PointXYZRGBNormal> *ppclXYZRGBNormal;
+        switch (m_pContentPC->getType())
         {
-//            pt = pc->at(np).getPointXYZ();
-            pt = pcl->at(np);
-            if (pt.x < xmin)
-                xmin = pt.x;
-            if (pt.x > xmax)
-                xmax = pt.x;
-            if (pt.y < ymin)
-                ymin = pt.y;
-            if (pt.y > ymax)
-                ymax = pt.y;
-            if (pt.z < zmin)
-                zmin = pt.z;
-            if (pt.z > zmax)
-                zmax = pt.z;
+            case ito::pclXYZ:
+                ppclXYZ = m_pContentPC->toPointXYZ().get();
+                pclFindMinMax<pcl::PointXYZ>(ppclXYZ, xmin, xmax, ymin, ymax, zmin, zmax);
+            break;
+
+            case ito::pclXYZI:
+                ppclXYZI = m_pContentPC->toPointXYZI().get();
+                pclFindMinMax<pcl::PointXYZI>(ppclXYZI, xmin, xmax, ymin, ymax, zmin, zmax);
+            break;
+
+            case ito::pclXYZINormal:
+                ppclXYZINormal = m_pContentPC->toPointXYZINormal().get();
+                pclFindMinMax<pcl::PointXYZINormal>(ppclXYZINormal, xmin, xmax, ymin, ymax, zmin, zmax);
+            break;
+
+            case ito::pclXYZNormal:
+                ppclXYZNormal = m_pContentPC->toPointXYZNormal().get();
+                pclFindMinMax<pcl::PointNormal>(ppclXYZNormal, xmin, xmax, ymin, ymax, zmin, zmax);
+            break;
+
+            case ito::pclXYZRGBA:
+                ppclXYZRGBA = m_pContentPC->toPointXYZRGBA().get();
+                pclFindMinMax<pcl::PointXYZRGBA>(ppclXYZRGBA, xmin, xmax, ymin, ymax, zmin, zmax);
+            break;
+
+            case ito::pclXYZRGBNormal:
+                ppclXYZRGBNormal = m_pContentPC->toPointXYZRGBNormal().get();
+                pclFindMinMax<pcl::PointXYZRGBNormal>(ppclXYZRGBNormal, xmin, xmax, ymin, ymax, zmin, zmax);
+            break;
+
+            default:
+            case ito::pclInvalid:
+                retval += ito::RetVal(ito::retError, 0, tr("invalid point cloud").toLatin1().data());
+            break;
         }
+
         m_axisX.phys[0] = xmin;
         m_axisX.phys[1] = xmax;
         m_axisY.phys[0] = ymin;
@@ -1832,7 +1863,7 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         retval += ito::RetVal(ito::retError, 0, tr("DataObject-Container empty and compiled without pointCloud support").toLatin1().data());
     }
 #endif // #ifdef USEPCL
-    
+
 
     if (m_pContentDObj == NULL)
 #ifdef USEPCL
@@ -2102,55 +2133,55 @@ void plotGLWidget::threeDAxis(void)
     VRY = cos(m_RotB) / fabs(cos(m_RotB));
     /*
     std::cout << "\n";
-    std::cout << "m_RotA: " << m_RotA << "; m_RotB: " << m_RotB <<"m_RotC: " << m_RotC << "\n"; 
+    std::cout << "m_RotA: " << m_RotA << "; m_RotB: " << m_RotB <<"m_RotC: " << m_RotC << "\n";
     std::cout << "VRX: " << VRX << "; VRY: " << VRY << "\n";
     std::cout << "signedX: " << signedX << "; signedY: " << signedY << "\n";
     std::cout << "xb: " << xb << "; yb: " << yb << "\n";
     */
     //Y-Axis X signed.
     if (xb == xmin)
-    {        
-		if (dyy < 0)
+    {
+        if (dyy < 0)
         {
-			signedYAx = -1 * VRX * VRY;
+            signedYAx = -1 * VRX * VRY;
             //signedYAx = -1;
         }
         else
-		{
+        {
             signedYAx = 1 * VRX * VRY;
             //signedYAx = 1;
         }
 
         if (dyx > 0)
-		{
+        {
             signedYAy = -1 * VRX * VRY;
             //signedYAy = -1;
         }
         else
-		{
+        {
             signedYAy = 1 * VRX * VRY;
             //signedYAy = 1;
         }
     }
     else
     {
-		if (dyy < 0)
-		{
+        if (dyy < 0)
+        {
             signedYAx = 1 * VRX * VRY;
             //signedYAx = 1;
         }
         else
-		{
+        {
             signedYAx = -1 * VRX * VRY;
             //signedYAx = -1;
         }
         if (dyx > 0)
-		{
+        {
             signedYAy = 1 * VRX * VRY;
             //signedYAy = 1;
         }
         else
-		{
+        {
             signedYAy = -1 * VRX * VRY;
             //signedYAy = -1;
         }
@@ -2168,7 +2199,7 @@ void plotGLWidget::threeDAxis(void)
             signedXAy = 1 * VRX * VRY;
             //signedXAy = 1;
         }
-        
+
         if (dxy > 0)
         {
             signedXAx = -1 * VRX * VRY;
@@ -2242,7 +2273,7 @@ void plotGLWidget::threeDAxis(void)
             signedZAx = -1 * VRX * VRY;
             //signedZAx = -1;
         }
-        
+
         if (dzx > 0)
         {
             signedZAy = 1 * VRX * VRY;
@@ -2255,15 +2286,15 @@ void plotGLWidget::threeDAxis(void)
         }
 
     }
-/*    
-    std::cout << "signedXAx: " << signedXAy << "; signedXAy: " << signedXAy << 
-                 "; signedYAx: " << signedYAy << "; signedYAy: " << signedXAy << 
+/*
+    std::cout << "signedXAx: " << signedXAy << "; signedXAy: " << signedXAy <<
+                 "; signedYAx: " << signedYAy << "; signedYAy: " << signedXAy <<
                  "; signedZAx: " << signedZAy << "; signedZAy: " << signedZAy << "\n";
 
-    std::cout << "dyy: " << (dyy > 0 ? "true" : "false") << "; dyx: " << (dyx > 0 ? "true" : "false") << 
+    std::cout << "dyy: " << (dyy > 0 ? "true" : "false") << "; dyx: " << (dyx > 0 ? "true" : "false") <<
                  "; dxy: " << (dxy > 0 ? "true" : "false") << "; dxx: " << (dyx > 0 ? "true" : "false") <<
                  "; dzy: " << (dzy > 0 ? "true" : "false") << "; dzx: " << (dzx > 0 ? "true" : "false") << "\n";
-                 
+
     */
     if(m_axisX.show && m_axisY.show)
     {
@@ -2276,7 +2307,7 @@ void plotGLWidget::threeDAxis(void)
         paintAxisTicksOGL(xmin, yb, zmin, xmax, yb, zmin,  m_axisX.phys[0], m_axisX.phys[1], signedXAx, signedXAy, signedZA, m_axisX.label, m_axisX.unit, 0);
         paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 0);
     }
-    // make z-ticks adjustable 
+    // make z-ticks adjustable
     m_ticklength /= m_z_tickmulti;
 
     if(m_axisZ.show)
@@ -2284,7 +2315,7 @@ void plotGLWidget::threeDAxis(void)
         paintAxisOGL(xb, -yb, zmin, xb, -yb, zmax);
         paintAxisTicksOGL(xb, -yb, zmin, xb, -yb, zmax, m_axisZ.phys[0], m_axisZ.phys[1], signedZAx, signedZAy, signedZA, m_axisZ.label, m_axisZ.unit, 0);
     }
-    // make z-ticks adjustable 
+    // make z-ticks adjustable
     m_ticklength *= 10.0*m_z_tickmulti;
 
     if(m_axisX.show && m_axisY.show)
@@ -2295,7 +2326,7 @@ void plotGLWidget::threeDAxis(void)
         paintAxisTicksOGL(xb, ymin, zmin, xb, ymax, zmin, m_axisY.phys[0], m_axisY.phys[1], signedYAx, signedYAy, signedZA, m_axisY.label, m_axisY.unit, 1 & m_axisY.showTicks);
     }
 
-    // make z-ticks adjustable 
+    // make z-ticks adjustable
     m_ticklength /= m_z_tickmulti;
 
     if(m_axisZ.show)
@@ -2646,21 +2677,21 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
         glBegin(GL_LINES);
             glVertex3f(x0 + a * (x1 - x0), y0 + a * (y1 - y0), z0 + a * (z1 - z0));
             if (write)
-                glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength * 1.7, 
-                    y0 + a * (y1 - y0) + VorzYAs * ticklength * 1.7, 
+                glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength * 1.7,
+                    y0 + a * (y1 - y0) + VorzYAs * ticklength * 1.7,
                     z0 + a * (z1 - z0) - VorzZAs * ticklength * 1.7);
             else
-                glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength, 
-                    y0 + a * (y1 - y0) + VorzYAs * ticklength, 
+                glVertex3f(x0 + a * (x1 - x0) + VorzXAs * ticklength,
+                    y0 + a * (y1 - y0) + VorzYAs * ticklength,
                     z0 + a * (z1 - z0) - VorzZAs * ticklength);
         glEnd();
 
         if (write)
         {
-            gluProject(x0 + a * (x1 - x0) + VorzXAs * ticklength * 3, y0 + a * (y1 - y0) + VorzYAs * ticklength * 3, 
+            gluProject(x0 + a * (x1 - x0) + VorzXAs * ticklength * 3, y0 + a * (y1 - y0) + VorzYAs * ticklength * 3,
                 z0 + a * (z1 - z0) - VorzZAs * ticklength, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
-            //paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)), 
+            //paintAxisLabelOGL((void*)&al, xpos*(1 + 0.07 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)),
             //    ypos * (1 + 0.03 * m_windowYScale * fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0)), v);
 
             paintAxisLabelOGL(al, xpos, ypos, v);
@@ -2673,7 +2704,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
 
     if (write)
     {
-        gluProject(x0 + (x1 - x0) / 2.0, y0 + (y1 - y0) / 2.0, 
+        gluProject(x0 + (x1 - x0) / 2.0, y0 + (y1 - y0) / 2.0,
             z0 + (z1 - z0) / 2.0, GLModelViewMatrix, GLProjectionMatrix, GLViewport, &xpos, &ypos, &zpos);
 
         //al.dx = VorzX * (0.15 * m_windowXScale * fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0)) * fabs(sin(phi));
@@ -2810,17 +2841,17 @@ void plotGLWidget::OGLMakeFont(int size)
     QFont myFont("Arial", -size, QFont::Light & QFont::OpenGLCompatible & QFont::PreferBitmap);
     this->setFont(myFont);
 
-    if(m_myCharBitmapBuffer != 0) 
+    if(m_myCharBitmapBuffer != 0)
         glDeleteLists(m_myCharBitmapBuffer, 256);
     m_myCharBitmapBuffer = glGenLists(256);            // Storage For 256 Characters
 #if (defined linux)
 
 #elif (defined Q_OS_WIN32 || defined(Q_OS_WIN64))
 #if QT_VERSION >= 0x050000
-    HWND hwnd = (HWND)winId(); 
-    wglUseFontBitmaps(GetDC(hwnd), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32   
+    HWND hwnd = (HWND)winId();
+    wglUseFontBitmaps(GetDC(hwnd), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
 #else
-    wglUseFontBitmaps(getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32   
+    wglUseFontBitmaps(getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
 #endif
 #endif
 
@@ -3362,43 +3393,43 @@ inline void plotGLWidget::generateObjectInfoText()
         sprintf(buf, "Dev:  %.4g", m_objectInfo.divVal);
         m_objectInfo.DevText = buf;
     }
-    
+
     return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::rotateLightArrow(const double deltaA, const double deltaB, const double deltaC)
 {
-    lighDirAngles[0] += deltaA; 
+    lighDirAngles[0] += deltaA;
     lighDirAngles[1] += deltaC;
-    lighDirAngles[0] = lighDirAngles[0] < - GL_PI ? GL_PI + fmod(lighDirAngles[0], GL_PI) : (lighDirAngles[0] > GL_PI ? (- GL_PI) + fmod(lighDirAngles[0], GL_PI) : lighDirAngles[0]); 
+    lighDirAngles[0] = lighDirAngles[0] < - GL_PI ? GL_PI + fmod(lighDirAngles[0], GL_PI) : (lighDirAngles[0] > GL_PI ? (- GL_PI) + fmod(lighDirAngles[0], GL_PI) : lighDirAngles[0]);
     lighDirAngles[1] = lighDirAngles[1] < - GL_PI ? GL_PI + fmod(lighDirAngles[1], GL_PI) : (lighDirAngles[1] > GL_PI ? (- GL_PI) + fmod(lighDirAngles[1], GL_PI) : lighDirAngles[1]);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::rotateView(const double deltaA, const double deltaB, const double deltaC)
 {
     m_RotA += deltaA;
-    m_RotB += deltaB; 
+    m_RotB += deltaB;
     m_RotC += deltaC;
-    m_RotA = m_RotA < - GL_PI ? GL_PI + fmod(m_RotA, GL_PI) : (m_RotA > GL_PI ? (- GL_PI) + fmod(m_RotA, GL_PI) : m_RotA); 
-    m_RotB = m_RotB < - GL_PI ? GL_PI + fmod(m_RotB, GL_PI) : (m_RotB > GL_PI ? (- GL_PI) + fmod(m_RotB, GL_PI) : m_RotB); 
+    m_RotA = m_RotA < - GL_PI ? GL_PI + fmod(m_RotA, GL_PI) : (m_RotA > GL_PI ? (- GL_PI) + fmod(m_RotA, GL_PI) : m_RotA);
+    m_RotB = m_RotB < - GL_PI ? GL_PI + fmod(m_RotB, GL_PI) : (m_RotB > GL_PI ? (- GL_PI) + fmod(m_RotB, GL_PI) : m_RotB);
     m_RotC = m_RotC < - GL_PI ? GL_PI + fmod(m_RotC, GL_PI) : (m_RotC > GL_PI ? (- GL_PI) + fmod(m_RotC, GL_PI) : m_RotC);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::moveView(const double deltaX, const double deltaY, const double deltaZ)
 {
-    m_TransX += deltaX; 
-    m_TransY += deltaY; 
+    m_TransX += deltaX;
+    m_TransY += deltaY;
     m_TransZ += deltaZ;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void plotGLWidget::setView(const double transX, const double transY, const double transZ, const double rotA, const double rotB, const double rotC)
 {
-    m_TransX = transX; 
-    m_TransY = transY; 
+    m_TransX = transX;
+    m_TransY = transY;
     m_TransZ = transZ;
-    m_RotA = rotA < - GL_PI ? GL_PI + fmod(rotA, GL_PI) : (rotA > GL_PI ? (- GL_PI) + fmod(rotA, GL_PI) : rotA); 
-    m_RotB = rotB < - GL_PI ? GL_PI + fmod(rotB, GL_PI) : (rotB > GL_PI ? (- GL_PI) + fmod(rotB, GL_PI) : rotB); 
+    m_RotA = rotA < - GL_PI ? GL_PI + fmod(rotA, GL_PI) : (rotA > GL_PI ? (- GL_PI) + fmod(rotA, GL_PI) : rotA);
+    m_RotB = rotB < - GL_PI ? GL_PI + fmod(rotB, GL_PI) : (rotB > GL_PI ? (- GL_PI) + fmod(rotB, GL_PI) : rotB);
     m_RotC = rotC < - GL_PI ? GL_PI + fmod(rotC, GL_PI) : (rotC > GL_PI ? (- GL_PI) + fmod(rotC, GL_PI) : rotC);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
