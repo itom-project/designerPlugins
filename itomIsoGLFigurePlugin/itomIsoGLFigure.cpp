@@ -73,7 +73,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
     QGLFormat fmt;
     fmt.setOverlay(0);
     fmt.setDepth(1);
-//    fmt.setDoubleBuffer(0);
+    fmt.setDoubleBuffer(0);
 //    fmt.setDirectRendering(1);
 //    fmt.setStereo(0);
 //    if (fmt.swapInterval() != -1)

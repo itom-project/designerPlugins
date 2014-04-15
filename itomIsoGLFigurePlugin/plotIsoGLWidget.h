@@ -217,6 +217,7 @@ class plotGLWidget : public QGLWidget
         void DrawObjectInfo(void);
         int OGLTextOut(const char *buffer, double xpos, double ypos, const bool rightAligned, const bool topAligned);
         ito::RetVal ResetColors();
+#ifdef USEPCL
         template<typename _Tp> void pclFindMinMax(pcl::PointCloud<_Tp> *pcl, double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
         {
             xmin = std::numeric_limits<ito::float64>::max();
@@ -244,16 +245,18 @@ class plotGLWidget : public QGLWidget
                     zmax = pt.z;
             }
         }
-        template<typename _Tp> void pclFillPtBuf(pcl::PointCloud<_Tp> *pcl, int &count, int xscale, int xshift, int yscale, int yshift, int zscale, int zshift)
-        {
-            count = 0;
 
+        template<typename _Tp> void pclFillPtBuf(pcl::PointCloud<_Tp> *pcl, double xscale, double xshift, double yscale, double yshift, double zscale, double zshift)
+        {
+            m_NumElements = 0;
             #if (USEOMP)
             #pragma omp parallel num_threads(NTHREADS)
             {
             #endif
 
             _Tp pt;
+            int count = 0;
+
             #if (USEOMP)
             #pragma omp for schedule(guided)
             #endif
@@ -271,21 +274,23 @@ class plotGLWidget : public QGLWidget
                     #if (USEOMP)
                     }
                     #endif
-                    m_pPoints[count * 3] = ((double)(pt.x) * xscale * m_windowXScale - xshift);
-                    m_pPoints[count * 3 + 1] = ((double)(pt.y) * yscale * m_windowYScale - yshift);
+                    m_pPoints[count * 3] = pt.x * xscale * m_windowXScale - xshift;
+                    m_pPoints[count * 3 + 1] = pt.y * yscale * m_windowYScale - yshift;
                     m_pPoints[count * 3 + 2] = pt.z * zscale - zshift;
 
-                    m_pColIndices[count * 4] = cv::saturate_cast<unsigned char>(pt.z * 255.0);
+                    m_pColIndices[count] = cv::saturate_cast<unsigned char>(pt.z * 255.0);
                 }
             }
+
             #if (USEOMP)
             }
             #endif
         }
+#endif
 
         enum elementModeEnum
         {
-            PAINT_TRIANG = 0x00, //* Do not show ColorBar */
+            PAINT_TRIANG = 0x00, // Do not show ColorBar
             PAINT_POINTS = 0x01
         };
 

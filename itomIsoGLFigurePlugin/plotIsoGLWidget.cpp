@@ -475,6 +475,7 @@ void plotGLWidget::paintGL()
         glClearColor(255.0f, 255.0f, 255.0f, 0.0f);         // white background
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // clear screen and depth buffer
+
     if ( ( ((m_pTriangles == NULL) && (m_elementMode == PAINT_TRIANG)) && ((m_pPoints == NULL) && (m_elementMode == PAINT_POINTS)) ) || (m_pColTriangles == NULL) || (m_NumElements == 0))
     {
         m_isInit &= ~IS_RENDERING;
@@ -595,7 +596,7 @@ void plotGLWidget::paintGL()
 
 //    int ret = glGetError();
 
-    glFlush();
+//    glFlush();
     //glFinish();
 //    if (context()->format().doubleBuffer())
 //        swapBuffers();
@@ -896,13 +897,13 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     ito::float64 yscale = 1.0 / (m_axisY.phys[1] - m_axisY.phys[0]);
     ito::float64 yshift = m_windowYScale * yscale * (m_axisY.phys[0] + m_axisY.phys[1]) / 2.0;
 
-    ito::float64 zscale = 1.0;
-    ito::float64 zshift = m_windowZScale * (m_axisZ.phys[0] + m_axisZ.phys[1]) / 2.0;
+    ito::float64 zscale = 1.0 / (m_axisZ.phys[1] - m_axisZ.phys[0]);
+    ito::float64 zshift = zscale * (m_axisZ.phys[0] + m_axisZ.phys[1]) / 2.0;
 
     bool isFinite = false;
 
     ito::float64 threshold = 1.0;
-    pcl::PointCloud<pcl::PointXYZ> *pcl = m_pContentPC->toPointXYZ().get();
+//    pcl::PointCloud<pcl::PointXYZ> *pcl = m_pContentPC->toPointXYZ().get();
     int width = m_pContentPC->width();
     int height = m_pContentPC->height();
 
@@ -929,44 +930,43 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
     {
         if (m_elementMode == PAINT_POINTS)
         {
-            int count = 0;
-
             pcl::PointCloud<pcl::PointXYZ> *ppclXYZ;
             pcl::PointCloud<pcl::PointXYZI> *ppclXYZI;
             pcl::PointCloud<pcl::PointXYZINormal> *ppclXYZINormal;
             pcl::PointCloud<pcl::PointNormal> *ppclXYZNormal;
             pcl::PointCloud<pcl::PointXYZRGBA> *ppclXYZRGBA;
             pcl::PointCloud<pcl::PointXYZRGBNormal> *ppclXYZRGBNormal;
+
             switch (m_pContentPC->getType())
             {
                 case ito::pclXYZ:
                     ppclXYZ = m_pContentPC->toPointXYZ().get();
-                    pclFillPtBuf<pcl::PointXYZ>(ppclXYZ, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                    pclFillPtBuf<pcl::PointXYZ>(ppclXYZ, xscale, xshift, yscale, yshift, zscale, zshift);
                 break;
 
                 case ito::pclXYZI:
                     ppclXYZI = m_pContentPC->toPointXYZI().get();
-                    pclFillPtBuf<pcl::PointXYZI>(ppclXYZI, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                    pclFillPtBuf<pcl::PointXYZI>(ppclXYZI, xscale, xshift, yscale, yshift, zscale, zshift);
                 break;
 
                 case ito::pclXYZINormal:
                     ppclXYZINormal = m_pContentPC->toPointXYZINormal().get();
-                    pclFillPtBuf<pcl::PointXYZINormal>(ppclXYZINormal, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                    pclFillPtBuf<pcl::PointXYZINormal>(ppclXYZINormal, xscale, xshift, yscale, yshift, zscale, zshift);
                 break;
 
                 case ito::pclXYZNormal:
                     ppclXYZNormal = m_pContentPC->toPointXYZNormal().get();
-                    pclFillPtBuf<pcl::PointNormal>(ppclXYZNormal, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                    pclFillPtBuf<pcl::PointNormal>(ppclXYZNormal, xscale, xshift, yscale, yshift, zscale, zshift);
                 break;
 
                 case ito::pclXYZRGBA:
                     ppclXYZRGBA = m_pContentPC->toPointXYZRGBA().get();
-                    pclFillPtBuf<pcl::PointXYZRGBA>(ppclXYZRGBA, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                    pclFillPtBuf<pcl::PointXYZRGBA>(ppclXYZRGBA, xscale, xshift, yscale, yshift, zscale, zshift);
                 break;
 
                 case ito::pclXYZRGBNormal:
                     ppclXYZRGBNormal = m_pContentPC->toPointXYZRGBNormal().get();
-                    pclFillPtBuf<pcl::PointXYZRGBNormal>(ppclXYZRGBNormal, count, xscale, xshift, yscale, yshift, zscale, zshift);
+                    pclFillPtBuf<pcl::PointXYZRGBNormal>(ppclXYZRGBNormal, xscale, xshift, yscale, yshift, zscale, zshift);
                 break;
 
                 default:
@@ -976,9 +976,6 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
             }
         }
     }
-    #if (USEOMP)
-    }
-    #endif
 
     if (m_NumElements != 0 || !retVal.containsError())
     {
@@ -1931,10 +1928,9 @@ ito::RetVal plotGLWidget::ResetColors()
 
     if(m_elementMode == PAINT_POINTS)
     {
-/*
-        if(m_currentPalette.size() > 255)
+
+        if(m_currentPalette.size() >= 255)
         {
-*/
             for (count = 0; count < m_NumElements; count++)
             {
                 m_pColTriangles[4 * count] =   ((m_currentPalette[m_pColIndices[count]] & 0xFF0000L) >> 16);
@@ -1942,20 +1938,21 @@ ito::RetVal plotGLWidget::ResetColors()
                 m_pColTriangles[4 * count + 2] = ((m_currentPalette[m_pColIndices[count]] & 0x0000FFL));
                 m_pColTriangles[4 * count + 3] = 255;
             }
-/*
         }
         else
         {
+/*
             for (count = 0; count < m_NumElements; count++)
             {
-                m_pColIndices[4 * count]    = m_pColIndices[count];
-                m_pColIndices[4 * count + 1] = m_pColIndices[count];
-                m_pColIndices[4 * count + 2] = m_pColIndices[count];
+                m_pColTriangles[4 * count]    = m_pColIndices[count];
+                m_pColTriangles[4 * count + 1] = m_pColIndices[count];
+                m_pColTriangles[4 * count + 2] = m_pColIndices[count];
 
-                m_pColIndices[count + 3] = 255;
+                m_pColTriangles[count * 4 + 3] = 255;
             }
-        }
 */
+        }
+
     }
     else
     {
