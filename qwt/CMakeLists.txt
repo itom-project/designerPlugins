@@ -21,12 +21,12 @@ ENDIF(UNIX)
   # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-FIND_PACKAGE_QT(ON Widgets Xml Designer LinguistTools)
+FIND_PACKAGE_QT(ON PrintSupport Xml Designer UiTools Widgets Svg OpenGL LinguistTools)
+
 find_package(VisualLeakDetector QUIET)
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
 IF (BUILD_UNICODE)
     ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
 ENDIF (BUILD_UNICODE)
@@ -36,10 +36,6 @@ IF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
     ADD_DEFINITIONS(-DVISUAL_LEAK_DETECTOR_CMAKE)
 ENDIF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
 
-# enable some qt stuff
-#SET (QT_USE_QTOPENGL TRUE)
-#SET (QT_USE_QTXML TRUE)
-
 # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
 IF (DEFINED CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
@@ -47,30 +43,20 @@ ELSE(CMAKE_BUILD_TYPE)
     SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 ENDIF (DEFINED CMAKE_BUILD_TYPE)
 
+message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
+
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${ITOM_SDK_INCLUDE_DIR}
+    ${ITOM_SDK_INCLUDE_DIRS}
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
 )
-
-IF(NOT QT5_FOUND)
-    INCLUDE_DIRECTORIES(
-        ${QT_QTSVG_INCLUDE_DIR}
-    )
-ENDIF(NOT QT5_FOUND)
 
 LINK_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-if (NOT QT5_FOUND)
-    INCLUDE(${QT_USE_FILE})
-endif (NOT QT5_FOUND)
-
-message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
-
-set(designer_HEADERS
+set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_legend.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale.h
@@ -171,27 +157,15 @@ set(designer_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.h
 )
 
-if (QT5_FOUND)
-#    QT5_WRAP_CPP(designer_HEADERS_MOC ${designer_HEADERS})
-else (QT5_FOUND)
-    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
-endif (QT5_FOUND)
-
-#set(designer_ui
+set(plugin_UI
 #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
-#)
+)
 
-if (QT5_FOUND)
-    QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
-else (QT5_FOUND)
-    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
-endif (QT5_FOUND)
-
-#set(designer_rcc
+set(plugin_RCC
 #    ${CMAKE_CURRENT_SOURCE_DIR}/qwt.qrc
-#)
+)
 
-set(designer_SOURCES 
+set(plugin_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_legend.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale_draw.cpp
@@ -289,19 +263,15 @@ set(designer_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.cpp
 )
 
+ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_HEADERS_MOC} ${plugin_ui_MOC} ${plugin_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
+
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
 if (QT5_FOUND)
-    QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-else (QT5_FOUND)
-    QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+    qt5_use_modules(${target_name} ${QT_COMPONENTS} Concurrent)
 endif (QT5_FOUND)
 
-ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC})
-if (QT5_FOUND)
-    TARGET_LINK_LIBRARIES(${target_name} ${VISUALLEAKDETECTOR_LIBRARIES})
-else (QT5_FOUND)
-    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES})
-endif (QT5_FOUND)
-
-if (QT5_FOUND)
-    qt5_use_modules(${target_name} PrintSupport Concurrent UiTools Widgets Svg OpenGL)
-endif (QT5_FOUND)
+# if (QT5_FOUND)
+    # TARGET_LINK_LIBRARIES(${target_name} ${VISUALLEAKDETECTOR_LIBRARIES})
+# else (QT5_FOUND)
+    # TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES})
+# endif (QT5_FOUND)

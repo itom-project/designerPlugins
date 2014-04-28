@@ -22,14 +22,12 @@ ENDIF(BUILD_SHARED_LIBS)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-FIND_PACKAGE_QT(ON Widgets Xml Designer LinguistTools)
+FIND_PACKAGE_QT(ON Core Widgets Xml Designer LinguistTools)
 
-find_package(OpenCV COMPONENTS core REQUIRED)
 find_package(VisualLeakDetector QUIET)
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
 IF (BUILD_UNICODE)
     ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
 ENDIF (BUILD_UNICODE)
@@ -38,10 +36,6 @@ ADD_DEFINITIONS(-DCMAKE -DITOMSHAREDDESIGNER)
 IF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
     ADD_DEFINITIONS(-DVISUAL_LEAK_DETECTOR_CMAKE)
 ENDIF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
-
-# enable some qt stuff
-#SET (QT_USE_QTOPENGL TRUE)
-#SET (QT_USE_QTXML TRUE)
 
 # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
 IF (DEFINED CMAKE_BUILD_TYPE)
@@ -54,46 +48,30 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${QT_QTCORE_INCLUDE_DIR}
-    ${OpenCV_DIR}/include
-    ${ITOM_SDK_INCLUDE_DIR}
+    ${ITOM_SDK_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
 )
 
 LINK_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${OpenCV_DIR}/lib
 )
 
-if (NOT QT5_FOUND)
-    INCLUDE(${QT_USE_FILE})
-endif (NOT QT5_FOUND)
-
-set(designer_HEADERS
+set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectTable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dataobjecttablefactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
 )
 
-if (NOT QT5_FOUND)
-    QT4_WRAP_CPP_ITOM(designer_HEADERS_MOC ${designer_HEADERS})
-endif (NOT QT5_FOUND)
-
-#set(designer_ui
+set(plugin_UI
 #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
-#)
+)
 
-if (QT5_FOUND)
-    QT5_WRAP_UI(designer_ui_MOC ${designer_ui})
-else (QT5_FOUND)
-    QT4_WRAP_UI_ITOM(designer_ui_MOC ${designer_ui})
-endif (QT5_FOUND)
-
-set(designer_rcc
+set(plugin_RCC
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
 
-set(designer_SOURCES 
+set(plugin_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectTable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataobjecttablefactory.cpp
 )
@@ -103,57 +81,32 @@ if(MSVC)
     list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif(MSVC)
 
-#handle translations BEGIN STEP 1
-set (FILES_TO_TRANSLATE ${designer_SOURCES} ${designer_HEADERS} ${designer_ui})
-set (TRANSLATION_OUTPUT_FILES)
-set (TRANSLATIONS_FILES)
+if (QT5_FOUND)
+    #if automoc if OFF, you also need to call QT5_WRAP_CPP here
+    QT5_WRAP_UI(plugin_ui_MOC ${plugin_UI})
+    QT5_ADD_RESOURCES(plugin_rcc_MOC ${plugin_RCC})
+else (QT5_FOUND)
+    QT4_WRAP_CPP_ITOM(plugin_HEADERS_MOC ${plugin_HEADERS})
+    QT4_WRAP_UI_ITOM(plugin_ui_MOC ${plugin_UI})
+    QT4_ADD_RESOURCES(plugin_rcc_MOC ${plugin_RCC})
+endif (QT5_FOUND)
 
 file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
-#handle translations END STEP 1
 
+ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_HEADERS_MOC} ${plugin_ui_MOC} ${plugin_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
+
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
 if (QT5_FOUND)
-    QT5_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
-else (QT5_FOUND)
-    QT4_ADD_RESOURCES(designer_rcc_MOC ${designer_rcc})
+    qt5_use_modules(${target_name} ${QT_COMPONENTS})
 endif (QT5_FOUND)
 
-ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${designer_SOURCES} ${designer_HEADERS} ${designer_HEADERS_MOC} ${designer_ui_MOC} ${designer_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
-
-if (QT5_FOUND)
-    TARGET_LINK_LIBRARIES(${target_name} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY})
-    qt5_use_modules(${target_name} UiTools Widgets Svg Designer)
-else (QT5_FOUND)
-    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${OpenCV_LIBS} ${ITOM_SDK_dataobject_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY})
-endif (QT5_FOUND)
-
-#handle translations BEGIN STEP 2
-if (UPDATE_TRANSLATIONS)
-    if (QT5_FOUND)
-        QT5_CREATE_TRANSLATION(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
-    else (QT5_FOUND)
-        QT4_CREATE_TRANSLATION_ITOM(TRANSLATION_OUTPUT_FILES TRANSLATIONS_FILES ${target_name} ITOM_LANGUAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS_FILES})
-    endif (QT5_FOUND)
-    
-    add_custom_target (_${target_name}_translation DEPENDS ${TRANSLATION_OUTPUT_FILES})
-    add_dependencies(${target_name} _${target_name}_translation)
-    
-    if (QT5_FOUND)
-        QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
-    else (QT5_FOUND)
-        QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${TRANSLATIONS_FILES})
-    endif (QT5_FOUND)
-else (UPDATE_TRANSLATIONS)
-    if (QT5_FOUND)
-        QT5_ADD_TRANSLATION(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
-    else (QT5_FOUND)
-        QT4_ADD_TRANSLATION_ITOM(QM_FILES "${CMAKE_CURRENT_BINARY_DIR}/translation" ${target_name} ${EXISTING_TRANSLATION_FILES})
-    endif (QT5_FOUND)
-endif (UPDATE_TRANSLATIONS)
-#handle translations END STEP 2
+#translation
+set (FILES_TO_TRANSLATE ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_UI})
+PLUGIN_TRANSLATION(QM_FILES ${target_name} ${UPDATE_TRANSLATIONS} "${EXISTING_TRANSLATION_FILES}" ITOM_LANGUAGES "${FILES_TO_TRANSLATE}")
 
 # COPY SECTION
 set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")
 ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
-#ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
+ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
 POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
