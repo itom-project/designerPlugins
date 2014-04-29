@@ -1670,26 +1670,30 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             break;
         }
 
-        m_axisX.phys[0] = xmin;
-        m_axisX.phys[1] = xmax;
-        m_axisY.phys[0] = ymin;
-        m_axisY.phys[1] = ymax;
-        m_axisZ.phys[0] = zmin;
-        m_axisZ.phys[1] = zmax;
+        if (!retval.containsError())
+        {
 
-        if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-            m_zAmpl = 0.000000001; // make sure µm can be displayed
+            m_axisX.phys[0] = xmin;
+            m_axisX.phys[1] = xmax;
+            m_axisY.phys[0] = ymin;
+            m_axisY.phys[1] = ymax;
+            m_axisZ.phys[0] = zmin;
+            m_axisZ.phys[1] = zmax;
 
-        zs = m_axisZ.phys[1] - m_axisZ.phys[0];
-        xs = m_axisX.phys[1] - m_axisX.phys[0];
-        ys = m_axisY.phys[1] - m_axisY.phys[0];
+            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
+                m_zAmpl = 0.000000001; // make sure µm can be displayed
 
-        // To get cubic voxel in case of metric data
-        maxl = xs;
-        if ((ys > maxl) && (ys != 1))
-            maxl = ys;
-        if ((zs > maxl) && (zs != 1))
-            maxl = zs;
+            zs = m_axisZ.phys[1] - m_axisZ.phys[0];
+            xs = m_axisX.phys[1] - m_axisX.phys[0];
+            ys = m_axisY.phys[1] - m_axisY.phys[0];
+
+            // To get cubic voxel in case of metric data
+            maxl = xs;
+            if ((ys > maxl) && (ys != 1))
+                maxl = ys;
+            if ((zs > maxl) && (zs != 1))
+                maxl = zs;
+        }
 #else
         retval += ito::RetVal(ito::retError, 0, tr("compiled without pointCloud support").toLatin1().data());
 #endif // #ifdef USEPCL
