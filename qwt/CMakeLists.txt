@@ -21,7 +21,7 @@ ENDIF(UNIX)
   # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
+find_package(ITOM_SDK COMPONENTS itomCommonLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 FIND_PACKAGE_QT(ON PrintSupport Xml Designer UiTools Widgets Svg OpenGL LinguistTools)
 
@@ -56,7 +56,7 @@ LINK_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-set(plugin_HEADERS
+set(qwt_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_legend.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale.h
@@ -157,15 +157,13 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.h
 )
 
-set(plugin_UI
-#    ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
+set(qwt_UI
 )
 
-set(plugin_RCC
-#    ${CMAKE_CURRENT_SOURCE_DIR}/qwt.qrc
+set(qwt_RCC
 )
 
-set(plugin_SOURCES 
+set(qwt_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_legend.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale_draw.cpp
@@ -263,9 +261,19 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.cpp
 )
 
-ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_HEADERS_MOC} ${plugin_ui_MOC} ${plugin_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
+if (QT5_FOUND)
+    #if automoc if OFF, you also need to call QT5_WRAP_CPP here
+    QT5_WRAP_UI(qwt_ui_MOC ${qwt_UI})
+    QT5_ADD_RESOURCES(qwt_rcc_MOC ${qwt_RCC})
+else (QT5_FOUND)
+    QT4_WRAP_CPP_ITOM(qwt_HEADERS_MOC ${qwt_HEADERS})
+    QT4_WRAP_UI_ITOM(qwt_ui_MOC ${qwt_UI})
+    QT4_ADD_RESOURCES(qwt_rcc_MOC ${qwt_RCC})
+endif (QT5_FOUND)
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${qwt_SOURCES} ${qwt_HEADERS} ${qwt_HEADERS_MOC} ${qwt_ui_MOC} ${qwt_rcc_MOC})
+
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
 if (QT5_FOUND)
     qt5_use_modules(${target_name} ${QT_COMPONENTS} Concurrent)
 endif (QT5_FOUND)
