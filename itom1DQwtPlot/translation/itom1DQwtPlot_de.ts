@@ -143,8 +143,9 @@
 <context>
     <name>Itom1DQwtPlot</name>
     <message>
-        <location filename="../itom1DQwtPlot.cpp" line="+70"/>
+        <location filename="../itom1DQwtPlot.cpp" line="+54"/>
         <source>Points for line plots from 2d objects</source>
+        <extracomment>AbstractDObjFigure(&quot;&quot;, ModeInItomFigure, parent)</extracomment>
         <translation>Punkte für Linien-Plots von 2D-Objekten</translation>
     </message>
     <message>
@@ -153,7 +154,7 @@
         <translation>Symbolleiste 1D-Abbildung</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+68"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
@@ -163,7 +164,7 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+118"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -253,40 +254,40 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+553"/>
+        <location line="+563"/>
         <source>To Min-Max</source>
         <translation>Min-Max</translation>
     </message>
     <message>
-        <location line="-548"/>
+        <location line="-558"/>
         <source>Switch Imag, Real, Abs, Pha</source>
         <translation>Bildmodus</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+634"/>
+        <location line="+645"/>
         <source>Imag</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-633"/>
-        <location line="+638"/>
+        <location line="-644"/>
+        <location line="+649"/>
         <source>Real</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-637"/>
+        <location line="-648"/>
         <source>Abs</source>
         <translation></translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+641"/>
+        <location line="+652"/>
         <source>Pha</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-631"/>
+        <location line="-642"/>
         <source>Point</source>
         <translation>Punkt</translation>
     </message>
@@ -316,7 +317,7 @@
         <translation>Löscht alle gesetzen Marker</translation>
     </message>
     <message>
-        <location line="+872"/>
+        <location line="+883"/>
         <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
         <translation>Objekt entspricht nicht den Kriterien: Zweidimensional, Objekte x 11, Fließkommewerte</translation>
     </message>
@@ -341,7 +342,7 @@
         <translation>Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
     </message>
     <message>
-        <location line="-1140"/>
+        <location line="-1151"/>
         <source>Marker Positions</source>
         <translation>Positionsanzeiger</translation>
     </message>
@@ -371,7 +372,7 @@
         <translation>Offset Anzeige</translation>
     </message>
     <message>
-        <location line="+354"/>
+        <location line="+361"/>
         <source>PDF Documents (*.pdf)</source>
         <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -391,7 +392,7 @@
         <translation>Bilddateien (</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>Export File Name</source>
         <translation>Speichern unter</translation>
     </message>
@@ -399,7 +400,7 @@
 <context>
     <name>Plot1DWidget</name>
     <message>
-        <location filename="../plot1DWidget.cpp" line="+1689"/>
+        <location filename="../plot1DWidget.cpp" line="+1771"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation>%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
@@ -478,7 +479,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+66"/>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+68"/>
         <source>Source data for plot</source>
         <translation>Quelldaten der Abbildung</translation>
     </message>
@@ -488,75 +489,61 @@
         <translation>Aktuelle Ausgabedaten der Abbildung</translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="+192"/>
-        <location line="+46"/>
         <source>duplicate Channel, in addChannel</source>
-        <translation>Doppelte Verbindung (in addChannel)</translation>
+        <translation type="obsolete">Doppelte Verbindung (in addChannel)</translation>
     </message>
     <message>
-        <location line="-38"/>
-        <location line="+7"/>
         <source>parameters incompatible, while adding channel</source>
-        <translation>Nicht kompatible Parameter (in adding channel)</translation>
+        <translation type="obsolete">Nicht kompatible Parameter (in adding channel)</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>undefined channel direction, while adding channel</source>
-        <translation>Undefinierte Verbindungsrichtung (in adding channel)</translation>
+        <translation type="obsolete">Undefinierte Verbindungsrichtung (in adding channel)</translation>
     </message>
     <message>
-        <location line="+15"/>
         <source>invalid child pointer, in addChannel</source>
-        <translation>Ungültiger child pointer (in addChannel)</translation>
+        <translation type="obsolete">Ungültiger child pointer (in addChannel)</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <location line="+27"/>
         <source>channel does not exist</source>
-        <translation>Verbindung existiert nicht</translation>
+        <translation type="obsolete">Verbindung existiert nicht</translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.cpp" line="+105"/>
         <source>Parameter: does not exist in updateParam</source>
-        <translation>Parameter gibt es in updateParam nicht</translation>
+        <translation type="obsolete">Parameter gibt es in updateParam nicht</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Running update on a locked input channel, i.e. updatePending flag is not set</source>
-        <translation>Fehler beim Versuch eine gelockte Verbindung zu aktualisieren. Vielleicht wurde das updatePending-Flag nicht gesetzt</translation>
+        <translation type="obsolete">Fehler beim Versuch eine gelockte Verbindung zu aktualisieren. Vielleicht wurde das updatePending-Flag nicht gesetzt</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Channel is already updating</source>
-        <translation>Verbindung wurde bereits aktualisiert</translation>
+        <translation type="obsolete">Verbindung wurde bereits aktualisiert</translation>
     </message>
     <message>
-        <location line="+122"/>
         <source>parameters in list could not be found in channels, in updateChannels</source>
-        <translation>Die Parameter der Liste wurden in &apos;channels&apos; nicht gefunden (in updateChannels)</translation>
+        <translation type="obsolete">Die Parameter der Liste wurden in &apos;channels&apos; nicht gefunden (in updateChannels)</translation>
     </message>
     <message>
-        <location line="+38"/>
         <source>channel is not a sender in setUpdatePending</source>
-        <translation>Verbindung kann nicht als Quelle genutzt werden (in setUpdatePending)</translation>
+        <translation type="obsolete">Verbindung kann nicht als Quelle genutzt werden (in setUpdatePending)</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>unknown channel in setUpdatePending</source>
-        <translation>Unbekannte Verbindung (in setUpdatePending)</translation>
+        <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+209"/>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlot.cpp" line="-622"/>
+        <location filename="../itom1DQwtPlot.cpp" line="-718"/>
         <source>plot1D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlotPlugin.cpp" line="+15"/>
+        <location filename="../itom1DQwtPlotPlugin.cpp" line="+39"/>
         <source>itom widget for 1D DataObjects based on QWT.</source>
         <translation>itom-Widget für die Abbildung von 1D-Datenobjekten basierend auf QWT.</translation>
     </message>
@@ -569,22 +556,19 @@
 <context>
     <name>ito::AbstractDObjFigure</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.cpp" line="+114"/>
         <source>Function &apos;spawnLinePlot&apos; not supported from this plot widget</source>
-        <translation>Die Funktion &apos;spawnLinePlot&apos; wird von diesem Widget nicht unterstützt</translation>
+        <translation type="obsolete">Die Funktion &apos;spawnLinePlot&apos; wird von diesem Widget nicht unterstützt</translation>
     </message>
     <message>
-        <location line="+122"/>
         <source>Figure does not contain an input slot for live sources</source>
-        <translation>Die Abbildung hat keine Schnittstelle für Livebilder</translation>
+        <translation type="obsolete">Die Abbildung hat keine Schnittstelle für Livebilder</translation>
     </message>
 </context>
 <context>
     <name>ito::AbstractFigure</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractFigure.cpp" line="-146"/>
         <source>Properties</source>
-        <translation>Eigenschaften</translation>
+        <translation type="obsolete">Eigenschaften</translation>
     </message>
 </context>
 </TS>

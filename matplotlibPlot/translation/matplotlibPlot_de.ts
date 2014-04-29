@@ -4,7 +4,7 @@
 <context>
     <name>MatplotlibPlot</name>
     <message>
-        <location filename="../matplotlibplot.cpp" line="+20"/>
+        <location filename="../matplotlibplot.cpp" line="+22"/>
         <source>home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -96,7 +96,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../matplotlibplotfactory.cpp" line="+13"/>
+        <location filename="../matplotlibplotfactory.cpp" line="+37"/>
         <source>itom widget for matplotlib plots.</source>
         <translation>itom-Widget für matplotlib-Abbildungen.</translation>
     </message>
@@ -104,6 +104,11 @@
         <location line="+4"/>
         <source>LGPL</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
+        <source>Live data source for plot</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
