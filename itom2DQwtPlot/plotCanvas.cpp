@@ -749,6 +749,10 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             replot();
         }
     }
+    else if(event->matches(QKeySequence::Copy))
+    {
+        p->copyToClipBoard();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

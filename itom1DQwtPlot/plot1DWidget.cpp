@@ -594,6 +594,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 {
+    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
     Marker *m;
     int curves = m_plotCurveItems.size();
 
@@ -668,7 +669,10 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 
         updateMarkerPosition(false,false);
     }
-
+    else if(event->matches(QKeySequence::Copy))
+    {
+        p->copyToClipBoard();
+    }
     /*int x1 = ((DataObjectSeriesData*)(m_plotCurveItems[0]->data()))->size()-1;
 
      switch(event->key())
@@ -706,6 +710,8 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mousePressEvent (QMouseEvent * event)
 {
+    
+
     if (m_pData->m_state == stateIdle)
     {
         //int n;
