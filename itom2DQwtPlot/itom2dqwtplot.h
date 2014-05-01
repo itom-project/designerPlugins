@@ -255,6 +255,7 @@ private:
     QHash<QObject*,ito::uint32> m_childFigures;
 
     ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
+    ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
 private slots:
     void mnuActSave();
@@ -301,6 +302,7 @@ public slots:
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
+    ito::RetVal copyToClipBoard();
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);

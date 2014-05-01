@@ -821,7 +821,7 @@ void Itom2dQwtPlot::mnuActSave()
 
         QFileInfo fi(fileName);
         saveDefaultPath = fi.path();
-
+        /*
         QBrush curBrush = m_pContent->canvasBackground();
 
         QPalette curPalette = m_pContent->palette();
@@ -844,7 +844,8 @@ void Itom2dQwtPlot::mnuActSave()
         m_pContent->setCanvasBackground( curBrush);
 
         m_pContent->replot();
-
+        */
+        exportCanvas(false, fileName, curSize, resolution);
         
     }
 }
@@ -1801,4 +1802,55 @@ void Itom2dQwtPlot::mnuOverlaySliderChanged(int value)
         m_data.m_alpha = value;
         if(m_pContent) m_pContent->alphaChanged();
     }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+
+ito::RetVal Itom2dQwtPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
+{
+    if(!m_pContent)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
+    }
+    if(curSize.height() == 0 || curSize.width() == 0)
+    {
+        curSize = ((PlotCanvas *)m_pContent)->size();
+    }
+    QBrush curBrush = ((PlotCanvas *)m_pContent)->canvasBackground();
+
+    QPalette curPalette = ((PlotCanvas *)m_pContent)->palette();
+
+    ((PlotCanvas *)m_pContent)->setAutoFillBackground( true );
+    ((PlotCanvas *)m_pContent)->setPalette( Qt::white );
+    ((PlotCanvas *)m_pContent)->setCanvasBackground(Qt::white);    
+
+    ((PlotCanvas *)m_pContent)->replot();
+
+    QwtPlotRenderer renderer;
+
+    // flags to make the document look like the widget
+    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+    //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
+
+    if(exportType)
+    {
+        QSize myRect(curSize.width(), curSize.height());
+        QClipboard *clipboard = QApplication::clipboard();
+        QwtPlotRenderer renderer;
+        QImage img(myRect, QImage::Format_ARGB32);
+        QPainter painter(&img);
+        renderer.render(((PlotCanvas *)m_pContent), &painter, ((PlotCanvas *)m_pContent)->rect());
+        clipboard->setImage(img);    
+    }
+    else renderer.renderDocument((((PlotCanvas *)m_pContent)), fileName, curSize, resolution);
+
+    ((PlotCanvas *)m_pContent)->setPalette( curPalette);
+    ((PlotCanvas *)m_pContent)->setCanvasBackground( curBrush);
+
+    ((PlotCanvas *)m_pContent)->replot();
+    return ito::retOk;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::copyToClipBoard()
+{
+    return exportCanvas(true, "");
 }

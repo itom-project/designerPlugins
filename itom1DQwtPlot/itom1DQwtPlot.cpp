@@ -809,28 +809,7 @@ void Itom1DQwtPlot::mnuExport()
         QFileInfo fi(fileName);
         saveDefaultPath = fi.path();
 
-        QBrush curBrush = ((Plot1DWidget *)m_pContent)->canvasBackground();
-
-        QPalette curPalette = ((Plot1DWidget *)m_pContent)->palette();
-
-        ((Plot1DWidget *)m_pContent)->setAutoFillBackground( true );
-        ((Plot1DWidget *)m_pContent)->setPalette( Qt::white );
-        ((Plot1DWidget *)m_pContent)->setCanvasBackground(Qt::white);    
-
-        ((Plot1DWidget *)m_pContent)->replot();
-
-        QwtPlotRenderer renderer;
-
-        // flags to make the document look like the widget
-        renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-        //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
-
-        renderer.renderDocument((((Plot1DWidget *)m_pContent)), fileName, curSize, resolution);
-
-        ((Plot1DWidget *)m_pContent)->setPalette( curPalette);
-        ((Plot1DWidget *)m_pContent)->setCanvasBackground( curBrush);
-
-        ((Plot1DWidget *)m_pContent)->replot();
+        exportCanvas(false, fileName, curSize, resolution);
     }
 }
 
@@ -1542,4 +1521,53 @@ void Itom1DQwtPlot::setSelectedElement(const int idx)
         if(failed) emit ((Plot1DWidget *)m_pContent)->statusBarMessage(tr("Could not set active element, index out of range."), 12000 );
     }
     return;
+}
+
+ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
+{
+    if(!m_pContent)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
+    }
+    if(curSize.height() == 0 || curSize.width() == 0)
+    {
+        curSize = ((Plot1DWidget *)m_pContent)->size();
+    }
+    QBrush curBrush = ((Plot1DWidget *)m_pContent)->canvasBackground();
+
+    QPalette curPalette = ((Plot1DWidget *)m_pContent)->palette();
+
+    ((Plot1DWidget *)m_pContent)->setAutoFillBackground( true );
+    ((Plot1DWidget *)m_pContent)->setPalette( Qt::white );
+    ((Plot1DWidget *)m_pContent)->setCanvasBackground(Qt::white);    
+
+    ((Plot1DWidget *)m_pContent)->replot();
+
+    QwtPlotRenderer renderer;
+
+    // flags to make the document look like the widget
+    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+    //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
+
+    if(exportType)
+    {
+        QSize myRect(curSize.width(), curSize.height());
+        QClipboard *clipboard = QApplication::clipboard();
+        QwtPlotRenderer renderer;
+        QImage img(myRect, QImage::Format_ARGB32);
+        QPainter painter(&img);
+        renderer.render(((Plot1DWidget *)m_pContent), &painter, ((Plot1DWidget *)m_pContent)->rect());
+        clipboard->setImage(img);    
+    }
+    else renderer.renderDocument((((Plot1DWidget *)m_pContent)), fileName, curSize, resolution);
+
+    ((Plot1DWidget *)m_pContent)->setPalette( curPalette);
+    ((Plot1DWidget *)m_pContent)->setCanvasBackground( curBrush);
+
+    ((Plot1DWidget *)m_pContent)->replot();
+    return ito::retOk;
+}
+ito::RetVal Itom1DQwtPlot::copyToClipBoard()
+{
+    return exportCanvas(true, "");
 }

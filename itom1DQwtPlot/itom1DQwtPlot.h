@@ -182,11 +182,13 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction *m_pActProperties;
 
         ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
+        ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
     public slots:
 
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);
+        ito::RetVal copyToClipBoard();
 
         void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
         ito::RetVal clearGeometricElements(void);
