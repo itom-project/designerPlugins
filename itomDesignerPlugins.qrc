@@ -47,5 +47,6 @@
         <file>icons/upDate.png</file>
         <file>icons/settings.png</file>
         <file>icons/editDelete.png</file>
+        <file>icons/copyImg.png</file>
     </qresource>
 </RCC>
