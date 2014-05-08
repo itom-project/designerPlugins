@@ -22,8 +22,13 @@ ELSE(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
+
+if (ITOM_SDK_PCL_SUPPORT) #this comes from itom_sdk.cmake, describing the build configuration of itom
+    find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud REQUIRED)
+endif (ITOM_SDK_PCL_SUPPORT)
+
 FIND_PACKAGE_QT(ON Core Widgets Designer Xml Svg UiTools OpenGL LinguistTools)
 find_package(OpenGL REQUIRED)
 
@@ -75,7 +80,7 @@ INCLUDE_DIRECTORIES(
 
 IF(UNIX)
     INCLUDE_DIRECTORIES(
-        usr/include #for GL/GL.h and GL/GLU.h
+	usr/include #for GL/GL.h and GL/GLU.h
     )
     message(FATAL "TEST")
 ENDIF(UNIX)
@@ -149,13 +154,13 @@ IF(3DCONNEXION_FOUND)
     TARGET_LINK_LIBRARIES(${target_name} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
     
     if (QT5_FOUND)
-        qt5_use_modules(${target_name} ${QT_COMPONENTS})
+	qt5_use_modules(${target_name} ${QT_COMPONENTS})
     endif (QT5_FOUND)
 ELSE(3DCONNEXION_FOUND)
     Message(STATUS "WARNING: 3DCONNEXION was not found or disabled.")
     TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
     if (QT5_FOUND)
-        qt5_use_modules(${target_name} ${QT_COMPONENTS})
+	qt5_use_modules(${target_name} ${QT_COMPONENTS})
     endif (QT5_FOUND)
 ENDIF(3DCONNEXION_FOUND)
 
