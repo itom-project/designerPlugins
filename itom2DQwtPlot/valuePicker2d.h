@@ -27,14 +27,14 @@
 #include <qwt_plot_canvas.h>
 
 #include <qpoint.h>
-#include <qwt_raster_data.h>
+#include "dataObjRasterData.h"
 
 class ValuePicker2D : public QwtPlotPicker
 {
     Q_OBJECT
 
 public:
-    explicit ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData, const QwtRasterData* overlayData);
+    explicit ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const DataObjRasterData* valueData, const DataObjRasterData* overlayData);
     virtual ~ValuePicker2D();
 
     virtual QwtText trackerTextF( const QPointF &pos ) const;
@@ -47,8 +47,8 @@ public:
 protected:
 
 private:
-    const QwtRasterData *m_valueData;
-    const QwtRasterData *m_overlayData;
+    const DataObjRasterData *m_valueData;
+    const DataObjRasterData *m_overlayData;
     QBrush m_rectFillBrush;
     bool m_showOverlayInfo;
 

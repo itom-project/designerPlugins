@@ -85,23 +85,33 @@ QImage DataObjItem::renderImage(
     DataObjRasterData *dObjRasterData = (DataObjRasterData*)(data());
 
     if (dObjRasterData->getSize().isNull() )
+    {
         return QImage();
+    }
 
     const QwtInterval intensityRange = dObjRasterData->interval( Qt::ZAxis );
     if ( !intensityRange.isValid() )
+    {
         return QImage();
+    }
 
     const QwtInterval xRange = dObjRasterData->interval( Qt::XAxis );
     if ( !xRange.isValid() )
+    {
         return QImage();
+    }
 
-    QImage::Format format = ( colorMap()->format() == QwtColorMap::RGB )
+    bool isColorDataType = dObjRasterData->isColorObject();
+
+    QImage::Format format = ( colorMap()->format() == QwtColorMap::RGB || isColorDataType )
         ? QImage::Format_ARGB32 : QImage::Format_Indexed8;
 
     QImage image( imageSize, format );
 
-    if ( colorMap()->format() == QwtColorMap::Indexed )
+    if ( format == QImage::Format_Indexed8 ) //colorMap()->format() == QwtColorMap::Indexed )
+    {
         image.setColorTable( colorMap()->colorTable( intensityRange ) );
+    }
 
     dObjRasterData->initRaster( area, image.size() );
     int* t =const_cast<int*>(&m_counter); //)++;
@@ -133,13 +143,13 @@ QImage DataObjItem::renderImage(
         if ( i == numThreads - 1 )
         {
             tile.setHeight( image.height() - i * numRows );
-            renderTile( xMap, yMap, tile, &image );
+            renderTile( xMap, yMap, isColorDataType, tile, &image );
         }
         else
         {
             futures += QtConcurrent::run(
                 this, &DataObjItem::renderTile,
-                xMap, yMap, tile, &image );
+                xMap, yMap, isColorDataType, tile, &image );
         }
     }
     for ( int i = 0; i < futures.size(); i++ )
@@ -167,32 +177,30 @@ QImage DataObjItem::renderImage(
     \param image Image to be rendered
 */
 void DataObjItem::renderTile(
-    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+    const QwtScaleMap &xMap, const QwtScaleMap &yMap, const bool isColorDataType, 
     const QRect &tile, QImage *image ) const
 {
     DataObjRasterData *dataObjRasterData = (DataObjRasterData*)data();
 
     const QwtInterval range = dataObjRasterData->interval( Qt::ZAxis );
-    //ito::DataObject* source = (d_data->data->getDataObj().data());
-    if ( !range.isValid() )
-        return;
 
-    if ( colorMap()->format() == QwtColorMap::RGB )
+    if ( !range.isValid() )
+    {
+        return;
+    }
+
+    if (isColorDataType)
     {
         if (yMap.isInverting())
         {
             for ( int y = tile.top(); y <= tile.bottom(); y++ )
             {
-                //const double ty = yMap.invTransform( y );
-
                 QRgb *line = ( QRgb * )image->scanLine( y );
                 line += tile.left();
 
                 for ( int x = tile.left(); x <= tile.right(); x++ )
                 {
-                    //const double tx = xMap.invTransform( x );
-                    *line++ = colorMap()->rgb( range,
-                        dataObjRasterData->value2_yinv( y, x ) );
+                    *line++ = dataObjRasterData->value2_yinv_rgb( y, x );
                 }
             }
         }
@@ -200,53 +208,77 @@ void DataObjItem::renderTile(
         {
             for ( int y = tile.top(); y <= tile.bottom(); y++ )
             {
-                //const double ty = yMap.invTransform( y );
-
                 QRgb *line = ( QRgb * )image->scanLine( y );
                 line += tile.left();
 
                 for ( int x = tile.left(); x <= tile.right(); x++ )
                 {
-                    //const double tx = xMap.invTransform( x );
-                    *line++ = colorMap()->rgb( range,
-                        dataObjRasterData->value2( y, x ) );
+                    *line++ = dataObjRasterData->value2_rgb( y, x );
                 }
             }
         }
     }
-    else if ( colorMap()->format() == QwtColorMap::Indexed )
-    {
-        if (yMap.isInverting())
+    else //single-value data types, color map of qwt plot is considered (either index8 or rgb)
+    { 
+        if ( colorMap()->format() == QwtColorMap::RGB )
         {
-            for ( int y = tile.top(); y <= tile.bottom(); y++ )
+            if (yMap.isInverting())
             {
-                //const double ty = yMap.invTransform( y );
-
-                unsigned char *line = image->scanLine( y );
-                line += tile.left();
-
-                for ( int x = tile.left(); x <= tile.right(); x++ )
+                for ( int y = tile.top(); y <= tile.bottom(); y++ )
                 {
-                    //const double tx = xMap.invTransform( x );
-                    *line++ = colorMap()->colorIndex( range,
-                        dataObjRasterData->value2_yinv( y, x ) );
+                    QRgb *line = ( QRgb * )image->scanLine( y );
+                    line += tile.left();
+
+                    for ( int x = tile.left(); x <= tile.right(); x++ )
+                    {
+                        *line++ = colorMap()->rgb( range,
+                            dataObjRasterData->value2_yinv( y, x ) );
+                    }
+                }
+            }
+            else
+            {
+                for ( int y = tile.top(); y <= tile.bottom(); y++ )
+                {
+                    QRgb *line = ( QRgb * )image->scanLine( y );
+                    line += tile.left();
+
+                    for ( int x = tile.left(); x <= tile.right(); x++ )
+                    {
+                        *line++ = colorMap()->rgb( range,
+                            dataObjRasterData->value2( y, x ) );
+                    }
                 }
             }
         }
-        else
+        else if ( colorMap()->format() == QwtColorMap::Indexed )
         {
-            for ( int y = tile.top(); y <= tile.bottom(); y++ )
+            if (yMap.isInverting())
             {
-                //const double ty = yMap.invTransform( y );
-
-                unsigned char *line = image->scanLine( y );
-                line += tile.left();
-
-                for ( int x = tile.left(); x <= tile.right(); x++ )
+                for ( int y = tile.top(); y <= tile.bottom(); y++ )
                 {
-                    //const double tx = xMap.invTransform( x );
-                    *line++ = colorMap()->colorIndex( range,
-                        dataObjRasterData->value2( y, x ) );
+                    unsigned char *line = image->scanLine( y );
+                    line += tile.left();
+
+                    for ( int x = tile.left(); x <= tile.right(); x++ )
+                    {
+                        *line++ = colorMap()->colorIndex( range,
+                            dataObjRasterData->value2_yinv( y, x ) );
+                    }
+                }
+            }
+            else
+            {
+                for ( int y = tile.top(); y <= tile.bottom(); y++ )
+                {
+                    unsigned char *line = image->scanLine( y );
+                    line += tile.left();
+
+                    for ( int x = tile.left(); x <= tile.right(); x++ )
+                    {
+                        *line++ = colorMap()->colorIndex( range,
+                            dataObjRasterData->value2( y, x ) );
+                    }
                 }
             }
         }

@@ -414,6 +414,8 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
         if (p)
         {
+            p->setColorDataTypeRepresentation(dObj->getType() == ito::tRGBA32);
+
             if (dObj->getType() == ito::tComplex128 || dObj->getType() == ito::tComplex64)
             {
                 p->setCmplxSwitch(m_pData->m_cmplxType, true);

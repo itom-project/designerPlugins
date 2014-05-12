@@ -45,7 +45,10 @@ class DataObjRasterData : public QwtRasterData
 
         double value2(int m, int n) const;
         double value2_yinv(int m, int n) const;
+        QRgb value2_rgb(int m, int n) const;
+        QRgb value2_yinv_rgb(int m, int n) const;
         double value(double x, double y) const;
+        QRgb value_rgb(double x, double y) const;
         void initRaster( const QRectF& area, const QSize& raster );
         void discardRaster();
 
@@ -62,6 +65,8 @@ class DataObjRasterData : public QwtRasterData
 
         bool isInit() const {return m_dataObj.getDims() > 0 && m_dataObjPlane != NULL;}
 
+        bool isColorObject() const { return (m_dataObj.getType() == ito::tRGBA32); }
+
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
         inline double pxToScaleCoords(double px, double offset, double scaling) { return ((double)px - offset) * scaling; }
@@ -69,6 +74,7 @@ class DataObjRasterData : public QwtRasterData
 
     private:
         static double quietNaN;
+        static QRgb transparentColor;
 
         void deleteCache();
 

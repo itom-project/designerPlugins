@@ -27,7 +27,7 @@
 #include <qwt_plot_canvas.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const QwtRasterData* valueData, const QwtRasterData* overlayData) : 
+ValuePicker2D::ValuePicker2D(int xAxis, int yAxis, QWidget* parent, const DataObjRasterData* valueData, const DataObjRasterData* overlayData) : 
     QwtPlotPicker(xAxis, yAxis, parent),
     m_valueData(valueData),
     m_overlayData(overlayData),
@@ -46,15 +46,48 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
     QString text;
     if (m_valueData)
     {
-        double value = m_valueData->value(pos.x(), pos.y());
-        if(m_showOverlayInfo && m_overlayData)
+        if (m_valueData->isColorObject())
         {
-            double value2 = m_overlayData->value(pos.x(), pos.y());
-            text.sprintf("[%.2f, %.2f]\nL1:%.4f\nL2:%.4f", pos.x(), pos.y(), value, value2);
+            QRgb value = m_valueData->value_rgb(pos.x(), pos.y());
+            if(m_showOverlayInfo && m_overlayData)
+            {
+                if (m_overlayData->isColorObject())
+                {
+                    QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
+                    text.sprintf("[%.2f, %.2f]\nL1:rgb %i,%i,%i alpha %i\nL2:rgb %i,%i,%i alpha %i", pos.x(), pos.y(), qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                }
+                else
+                {
+                    double value2 = m_overlayData->value(pos.x(), pos.y());
+                    text.sprintf("[%.2f, %.2f]\nL1:rgb %i,%i,%i alpha %i\nL2:%.4f", pos.x(), pos.y(), qRed(value), qGreen(value), qBlue(value), qAlpha(value), value2);
+                }
+            }
+            else
+            {
+                text.sprintf("[%.2f, %.2f]\nrgb %i,%i,%i alpha %i", pos.x(), pos.y(), qRed(value), qGreen(value), qBlue(value), qAlpha(value));
+            }
         }
         else
         {
-            text.sprintf("[%.2f, %.2f]\n%.4f", pos.x(), pos.y(), value);
+            double value = m_valueData->value(pos.x(), pos.y());
+            if(m_showOverlayInfo && m_overlayData)
+            {
+                if (m_overlayData->isColorObject())
+                {
+                    QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
+                    text.sprintf("[%.2f, %.2f]\nL1:%.4f\nL2:rgb %i,%i,%i alpha %i", pos.x(), pos.y(), value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                }
+                else
+                {
+                    double value2 = m_overlayData->value(pos.x(), pos.y());
+                    text.sprintf("[%.2f, %.2f]\nL1:%.4f\nL2:%.4f", pos.x(), pos.y(), value, value2);
+                }
+                
+            }
+            else
+            {
+                text.sprintf("[%.2f, %.2f]\n%.4f", pos.x(), pos.y(), value);
+            }
         }
     }
     else

@@ -28,6 +28,7 @@
 #include <qdebug.h>
 
 double DataObjRasterData::quietNaN = std::numeric_limits<double>::quiet_NaN();
+QRgb DataObjRasterData::transparentColor = 0x00ffffff;
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const bool overlay) :
@@ -402,6 +403,36 @@ double DataObjRasterData::value(double x, double y) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QRgb DataObjRasterData::value_rgb(double x, double y) const
+{
+    bool inside1, inside2;
+    if (m_dataObj.getDims() > 0 && m_plane)
+    {
+        int d = m_dataObj.getDims();
+
+        if ( d>1 )
+        {
+            int n = qRound(m_dataObj.getPhysToPix(d-1, x, inside1));
+            int m = qRound(m_dataObj.getPhysToPix(d-2, y, inside2));
+
+            if (inside1 && inside2)
+            {
+                switch(m_dataObj.getType())
+                {
+                case ito::tRGBA32:
+                    {
+                        return m_plane->at<ito::Rgba32>(m,n).argb();
+                    }
+                default:
+                    return transparentColor;
+                }
+            }
+        }
+    }
+    return quietNaN;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 double DataObjRasterData::value2(int m, int n) const
 {
     if(m_validData)
@@ -634,6 +665,55 @@ double DataObjRasterData::value2_yinv(int m, int n) const
     else
     {
         return quietNaN;
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QRgb DataObjRasterData::value2_rgb(int m, int n) const
+{
+    if(m_validData)
+    {
+        switch(m_dataObj.getType())
+        {
+        case ito::tRGBA32:
+            {
+                ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
+                if(!line) return transparentColor;
+                return line[ m_xIndizes[n] ].argb();
+            }
+        default:
+            return transparentColor;
+        }
+    }
+    else
+    {
+        return transparentColor;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QRgb DataObjRasterData::value2_yinv_rgb(int m, int n) const
+{
+    if(m_validData)
+    {
+        m = m_rasteredLines - m - 1; //invert y-coordinate
+
+        switch(m_dataObj.getType())
+        {
+        case ito::tRGBA32:
+            {
+                ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
+                if(!line) return transparentColor;
+                return line[ m_xIndizes[n] ].argb();
+            }
+        default:
+            return transparentColor;
+        }
+    }
+    else
+    {
+        return transparentColor;
     }
 }
 

@@ -1088,6 +1088,23 @@ void Itom2dQwtPlot::setCmplxSwitch(PlotCanvas::ComplexType type, bool visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setColorDataTypeRepresentation(bool colorOn)
+{
+    if (colorOn)
+    {
+        if (m_pContent) m_pContent->setColorBarVisible(false);
+        m_pActColorPalette->setVisible(false);
+        m_pActToggleColorBar->setVisible(false);
+    }
+    else
+    {
+        m_pActColorPalette->setVisible(true);
+        m_pActToggleColorBar->setVisible(true);
+        if (m_pContent) m_pContent->setColorBarVisible(m_pActToggleColorBar->isChecked());
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack /*= false*/)
 {
     ito::RetVal retval = ito::retOk;

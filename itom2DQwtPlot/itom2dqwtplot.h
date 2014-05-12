@@ -216,6 +216,7 @@ protected:
     void createActions();
 
     //void setLinePlotCoordinates(const QVector<QPointF> pts);
+    void setColorDataTypeRepresentation(bool colorOn);
 
 private:
 
