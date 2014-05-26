@@ -125,7 +125,7 @@ struct InternalInfo
     QVector<relationsShip> m_relationsList;         /*!< A list with all relations to be evaluated for the figure*/
     //QHash<int, geometricPrimitives> m_rowHash;    /*!< A hashList with all geometric elements to be evaluated for the figure*/
     ito::uint8 m_numberOfDigits;                    /*!< Number of digits to be plotted */
-    bool m_consider2DOnly;                          /*!< Toogle wether only x and y or all coordinates of primitivs should be considered for evaluation of relations */
+    bool m_consider2DOnly;                          /*!< Toggle wether only x and y or all coordinates of primitivs should be considered for evaluation of relations */
 };
 
 /*!
@@ -164,7 +164,7 @@ class PlotTreeWidget : public QTreeWidget
             tExtern       =   0x8000
         }; 
 
-        bool m_showContextMenu;                                                       /*!< Toogle wether context menu should be accessable or not */
+        bool m_showContextMenu;                                                       /*!< Toggle wether context menu should be accessable or not */
         void refreshPlot(const ito::DataObject* dataObj);                             /*!< Refresh plot with new primitive list defiend by a dataObject */
 
         //ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);

@@ -214,7 +214,7 @@ void Itom2dQwtPlot::createActions()
     a->setObjectName("actRatio");
     a->setCheckable(true);
     a->setChecked(false);
-    a->setToolTip(tr("Toogle fixed / variable aspect ration between axis x and y"));
+    a->setToolTip(tr("Toggle fixed / variable aspect ration between axis x and y"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
     //m_actZoom

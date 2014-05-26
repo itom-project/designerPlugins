@@ -239,7 +239,7 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>Toogle fixed / variable aspect ration between axis x and y</source>
+        <source>Toggle fixed / variable aspect ration between axis x and y</source>
         <translation>Vollbild oder Seitenverhältnis beibehalten</translation>
     </message>
     <message>

@@ -229,7 +229,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
     connect(m_toggleIllumination, SIGNAL(toggled(bool)), this, SLOT(mnutoggleIllumination(bool)));
     connect(m_toggleIlluminationRotation, SIGNAL(toggled(bool)), this, SLOT(mnutoggleIlluminationRotation(bool)));
 
-    connect(m_toggleInfoText, SIGNAL(toggled(bool)), m_pContent, SLOT(toogleObjectInfoText(bool)));
+    connect(m_toggleInfoText, SIGNAL(toggled(bool)), m_pContent, SLOT(toggleObjectInfoText(bool)));
 
     //connect(m_actAScan, SIGNAL(toggled(bool)), this, SLOT(mnuAScanPicker(bool)));
     connect(m_mnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));

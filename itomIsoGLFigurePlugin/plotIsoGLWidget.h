@@ -329,7 +329,7 @@ class plotGLWidget : public QGLWidget
             m_timer.stop();
         }
 
-        inline void toogleObjectInfoText(const bool enabled);
+        inline void toggleObjectInfoText(const bool enabled);
 
 #if linux
         void setColorMap(QString colormap = QString());

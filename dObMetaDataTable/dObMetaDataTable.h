@@ -45,7 +45,7 @@ class dObMetaDataTable : public QTreeWidget
     Q_CLASSINFO("prop://decimals", "Number of decimals to show.")
     Q_CLASSINFO("prop://previewEnabled", "Add a preview to the meta data.")
     Q_CLASSINFO("prop://previewSize", "Set the preview size.")
-    Q_CLASSINFO("prop://detailedInfo", "Toogle between basic and detailed metaData.")
+    Q_CLASSINFO("prop://detailedInfo", "Toggle between basic and detailed metaData.")
     //Q_CLASSINFO("prop://colorBar", "Name of the color bar for the preview.")
 
 

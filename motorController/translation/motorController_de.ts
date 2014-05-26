@@ -5,7 +5,7 @@
     <name>MotorController</name>
     <message>
         <location filename="../motorController.cpp" line="+194"/>
-        <source>Toogle Unit</source>
+        <source>Toggle Unit</source>
         <translation type="unfinished">Symbolleiste</translation>
     </message>
     <message>
@@ -20,7 +20,7 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>Toogle Abs/Rel</source>
+        <source>Toggle Abs/Rel</source>
         <translation type="unfinished">Abs/Rel-Schalter</translation>
     </message>
     <message>
@@ -49,7 +49,7 @@
     <message>
         <location line="-631"/>
         <location line="+764"/>
-        <source>Toogle Update (off)</source>
+        <source>Toggle Update (off)</source>
         <translation type="unfinished">Aktualisierung aus</translation>
     </message>
     <message>
@@ -77,7 +77,7 @@
     </message>
     <message>
         <location line="+370"/>
-        <source>Toogle Update (on)</source>
+        <source>Toggle Update (on)</source>
         <translation type="unfinished">Aktualisierung ein</translation>
     </message>
 </context>

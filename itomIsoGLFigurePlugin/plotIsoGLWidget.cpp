@@ -3289,7 +3289,7 @@ void plotGLWidget::setCurrentVisMode(const int mode)
             if(!m_cmplxState) ((ItomIsoGLWidget*)m_pParent)->enableIlluGUI(true);
         break;
         case PAINT_POINTS:
-            toogleObjectInfoText(true);
+            toggleObjectInfoText(true);
             m_colorMode = 1;
             m_backgnd = false;
             m_axisZ.show = false;
@@ -3304,7 +3304,7 @@ void plotGLWidget::setCurrentVisMode(const int mode)
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-inline void plotGLWidget::toogleObjectInfoText(const bool enabled)
+inline void plotGLWidget::toggleObjectInfoText(const bool enabled)
 {
     if (enabled)
     {
