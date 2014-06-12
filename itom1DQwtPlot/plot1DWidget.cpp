@@ -371,7 +371,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     break;
                 default:
                 {
-                    if (width > height)
+                    if(width == 1 && height == 1 && dims < 3)
+                    {
+                        m_multiLine = Auto;
+                        numCurves = height;
+                    }
+                    else if (width >= height)
                     {
                         numCurves = height;
                         m_multiLine = MultiRows;
@@ -446,6 +451,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 break;
 
+            case Auto:
             case FirstRow:
             case MultiRows:
                 pts[0].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
