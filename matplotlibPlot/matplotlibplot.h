@@ -17,26 +17,30 @@
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
 
-class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public QMainWindow
+class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 {
     Q_OBJECT
-    Q_PROPERTY(bool toolbarVisible READ getToolbarVisible WRITE setToolbarVisible DESIGNABLE true)
-    Q_PROPERTY(bool contextMenuEnabled READ getContextMenuEnabled WRITE setContextMenuEnabled DESIGNABLE true)
 
-    Q_CLASSINFO("prop://toolbarVisible", "Toggles the visibility of the toolbar of the plot.")
-    Q_CLASSINFO("prop://contextMenuEnabled", "Defines whether the context menu of the plot should be enabled or not.")
+    Q_PROPERTY(bool forceWindowResize READ getForceWindowResize WRITE setForceWindowResize USER true)
 
+    Q_CLASSINFO("prop://forceWindowResize", "If set, the plot widget / area is resized to the desired sizes given by matplotlib. Uncheck this option, if you want to keep the canvas unchanged e.g. in an user-defined GUI")
+    
+    DESIGNER_PLUGIN_ITOM_API
 public:
-    MatplotlibPlot(QWidget *parent = 0);
+    MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~MatplotlibPlot();
 
     //properties
-    void setToolbarVisible(bool visible);
-    bool getToolbarVisible() const;
     void setContextMenuEnabled(bool show); 
     bool getContextMenuEnabled() const;
 
+    void setForceWindowResize(bool force) { m_forceWindowResize = force; } 
+    bool getForceWindowResize() const { return m_forceWindowResize; }
+
     void resizeCanvas(int width, int height);
+
+    ito::RetVal applyUpdate(void) { return ito::RetVal(ito::retWarning, 0, "not used in this plugin"); }
+    ito::RetVal update(void) { return ito::RetVal(ito::retWarning, 0, "not used in this plugin"); }
    
 private:
     QAction *m_actHome;
@@ -47,13 +51,13 @@ private:
     QAction *m_actSubplotConfig;
     QAction *m_actSave;
     QAction *m_actMarker;
+    QAction *m_actProperties;
     QLabel *m_lblCoordinates;
     QToolBar *m_toolbar;
     QMenu *m_contextMenu;
-//    MatplotlibWidget *m_pContent;
-//    MatplotlibSubfigConfig *m_pMatplotlibSubfigConfig;
     void *m_pContent;
     void *m_pMatplotlibSubfigConfig;
+    bool m_forceWindowResize;
 
 signals:
     void subplotConfigSliderChanged(int type, int value);
@@ -69,8 +73,11 @@ private slots:
     void subplotConfigSliderWSpaceChanged(int value);
     void subplotConfigSliderHSpaceChanged(int value);
 
+    void resetFixedSize() { setFixedSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX); }
+
 public slots:
     void showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace);
+    void setLabelText(QString text) { m_lblCoordinates->setText(text); }
 
 };
 

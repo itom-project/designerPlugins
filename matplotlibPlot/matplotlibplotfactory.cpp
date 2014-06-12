@@ -31,8 +31,11 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 MatplotlibPlotFactory::MatplotlibPlotFactory(QObject *parent)
-    : AbstractItomDesignerPlugin(parent)
+    : ito::AbstractItomDesignerPlugin(parent)
 {
+    m_plotDataFormats = 0;
+    m_plotDataTypes = 0;
+    m_plotFeatures = 0;
 
     m_description = QObject::tr("itom widget for matplotlib plots.");
     m_detaildescription = QObject::tr("");
@@ -63,13 +66,13 @@ bool MatplotlibPlotFactory::isInitialized() const
 //----------------------------------------------------------------------------------------------------------------------------------
 QWidget *MatplotlibPlotFactory::createWidget(QWidget *parent)
 {
-    return new MatplotlibPlot(parent);
+    return new MatplotlibPlot(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QWidget *MatplotlibPlotFactory::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
 {
-    return new MatplotlibPlot(parent);
+    return new MatplotlibPlot(m_itomSettingsFile, winMode, parent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
