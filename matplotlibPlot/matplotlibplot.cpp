@@ -3,8 +3,8 @@
 #include "matplotlibSubfigConfig.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------
-MatplotlibPlot::MatplotlibPlot(QWidget *parent)
-    : QMainWindow(parent),
+MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= 0*/)
+    : ito::AbstractFigure(itomSettingsFile, windowMode, parent),
     m_actHome(NULL),
     m_actForward(NULL),
     m_actBack(NULL),
@@ -57,12 +57,16 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     m_actSave->setObjectName("actionSave");
     m_actSave->setToolTip(tr("Save the figure..."));
 
+    m_actProperties = this->getPropertyDockWidget()->toggleViewAction();
+    connect(m_actProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
+
     m_lblCoordinates = new QLabel("",this);
-    m_lblCoordinates->setAlignment(Qt::AlignRight | Qt::AlignTop);
-    m_lblCoordinates->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+    m_lblCoordinates->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
+    m_lblCoordinates->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Ignored);
     m_lblCoordinates->setObjectName("lblCoordinates");
 
-    m_toolbar = new QToolBar(tr("MatPlotLib toolbar"), this);
+    m_toolbar = new QToolBar(tr("matplotlib toolbar"), this);
+    addToolBar(m_toolbar, "mainToolBar");
     m_toolbar->setObjectName("toolbar");
     m_toolbar->addAction(m_actHome);
     m_toolbar->addAction(m_actBack);
@@ -76,7 +80,6 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     m_toolbar->addAction(m_actSave);
     QAction *lblAction = m_toolbar->addWidget(m_lblCoordinates);
     lblAction->setVisible(true);
-    addToolBar(m_toolbar);
 
     QMenu *contextMenu = new QMenu(tr("Matplotlib"),this);
     contextMenu->addAction(m_actHome);
@@ -90,11 +93,15 @@ MatplotlibPlot::MatplotlibPlot(QWidget *parent)
     contextMenu->addAction(m_actSubplotConfig);
     contextMenu->addAction(m_actSave);
     contextMenu->addAction(m_toolbar->toggleViewAction());
+    contextMenu->addAction(m_actProperties);
+    addMenu(contextMenu);
 
     m_pContent = new MatplotlibWidget(contextMenu, this);
     ((MatplotlibWidget*)m_pContent)->setObjectName("canvasWidget");
 
     setCentralWidget((MatplotlibWidget*)m_pContent);
+
+    setPropertyObservedObject(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -110,7 +117,7 @@ MatplotlibPlot::~MatplotlibPlot()
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::resizeCanvas(int width, int height)
 {
-    if (m_toolbar->isVisible() && m_toolbar->isFloating() == false)
+    /*if (m_toolbar->isVisible() && m_toolbar->isFloating() == false)
     {
         if (m_toolbar->orientation() == Qt::Horizontal)
         {
@@ -124,26 +131,20 @@ void MatplotlibPlot::resizeCanvas(int width, int height)
     else
     {
         resize(width,height);
-    }
-}
+    }*/
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::setToolbarVisible(bool visible)
-{
-    if (m_toolbar)
-    {
-        m_toolbar->setVisible(visible);
-    }
-}
+    resize(width,height);
 
-//----------------------------------------------------------------------------------------------------------------------------------
-bool MatplotlibPlot::getToolbarVisible() const 
-{ 
-    if (m_toolbar)
+    if (m_forceWindowResize)
     {
-        return m_toolbar->isVisible();
+        setFixedSize(width,height); //forces the window to a fixed size...
+        updateGeometry();
+        QTimer::singleShot(50, this, SLOT(resetFixedSize())); //and fire a trigger in order to cancel the fixed size (this is a hack in order to really force the window to its new size)
     }
-    return false; 
+    else
+    {
+        updateGeometry();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -27,7 +27,7 @@
 #include <qdebug.h>
 #include "matplotlibplot.h"
 
-
+//-------------------------------------------------------------------------------------
 MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
         QGraphicsView(parent),
         m_trackerActive(false),
@@ -64,6 +64,7 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
     QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(paintTimeout()));
 };
 
+//-------------------------------------------------------------------------------------
 MatplotlibWidget::~MatplotlibWidget()
 {
 }
@@ -77,10 +78,9 @@ MatplotlibWidget::~MatplotlibWidget()
 //    return QGraphicsView::sizeHint();
 //}
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::externalResize(int width, int height)
 {
-    
-
     //QSize oldSize = this->size();
     //m_externalSizeHint = QSize(width,height);
 
@@ -101,6 +101,7 @@ void MatplotlibWidget::externalResize(int width, int height)
     //resize(width,height);
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintResult(QByteArray imageString, int x, int y, int w, int h, bool blit )
 {
     int imgHeight = 0;
@@ -164,7 +165,7 @@ void MatplotlibWidget::paintResult(QByteArray imageString, int x, int y, int w, 
     emit eventIdle();
 }
 
-
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintRect(bool drawRect, int x, int y, int w, int h)
 {
     if(drawRect == false && m_rectItem->isVisible())
@@ -187,6 +188,7 @@ void MatplotlibWidget::paintRect(bool drawRect, int x, int y, int w, int h)
     }
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
 {
     if(m_internalResize == false)
@@ -200,6 +202,8 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
             fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
         }
 
+        //qDebug() << "resizeEvent: " << event->size();
+
         m_pendingEvent = PendingEvent(event->size().height(), event->size().width());
         if(m_timer.isActive())
         {
@@ -212,15 +216,17 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
     }
     m_internalResize = false;
     
-    event->ignore();
+    //event->ignore();
+    QGraphicsView::resizeEvent(event);
 }
 
+//-------------------------------------------------------------------------------------
 //void MatplotlibWidget::paintEvent ( QPaintEvent * event )
 //{
 //    QGraphicsView::paintEvent(event);
 //}
 
-
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintTimeout()
 {
     if(m_pendingEvent.isValid())
@@ -245,6 +251,7 @@ void MatplotlibWidget::paintTimeout()
     }
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
 {
     Qt::MouseButton btn = event->button();
@@ -304,7 +311,7 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
     }
 }
 
-
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::keyPressEvent ( QKeyEvent * event )
 {
     if (!hasFocus())
@@ -314,6 +321,7 @@ void MatplotlibWidget::keyPressEvent ( QKeyEvent * event )
     event->accept();
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::keyReleaseEvent ( QKeyEvent * event )
 {
     if (!hasFocus())
@@ -322,6 +330,7 @@ void MatplotlibWidget::keyReleaseEvent ( QKeyEvent * event )
     event->accept();
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::leaveEvent ( QEvent * /*event*/ )
 {
     if (!hasFocus())
@@ -330,6 +339,7 @@ void MatplotlibWidget::leaveEvent ( QEvent * /*event*/ )
     emit eventLeaveEnter(0);
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::enterEvent ( QEvent * /*event*/ )
 {
     if (!hasFocus())
@@ -337,6 +347,7 @@ void MatplotlibWidget::enterEvent ( QEvent * /*event*/ )
     emit eventLeaveEnter(1);
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::wheelEvent( QWheelEvent * event )
 {
     if (!hasFocus())
@@ -354,6 +365,7 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
     }
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 {
     if (!hasFocus())
@@ -372,6 +384,7 @@ void MatplotlibWidget::mouseDoubleClickEvent ( QMouseEvent * event )
     event->accept();
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::mouseMoveEvent ( QMouseEvent * event )
 {
     if (!hasFocus())
@@ -380,6 +393,7 @@ void MatplotlibWidget::mouseMoveEvent ( QMouseEvent * event )
     event->accept();
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::mousePressEvent ( QMouseEvent * event )
 {
     if (!hasFocus())
@@ -391,6 +405,7 @@ void MatplotlibWidget::mousePressEvent ( QMouseEvent * event )
     event->accept();
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::mouseReleaseEvent ( QMouseEvent * event )
 {
     if (!hasFocus())
@@ -405,13 +420,14 @@ void MatplotlibWidget::mouseReleaseEvent ( QMouseEvent * event )
     event->accept();
 }
 
-
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::showEvent ( QShowEvent * event ) //widget is shown, now the view can be fitted to size
 {
     QGraphicsView::showEvent( event );
     fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
 }
 
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::contextMenuEvent(QContextMenuEvent * event)
 {
     if(m_showContextMenu)
@@ -424,3 +440,5 @@ void MatplotlibWidget::contextMenuEvent(QContextMenuEvent * event)
         event->ignore();
     }
 }
+
+
