@@ -48,11 +48,14 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_magnifier.h>
 
 #include "valuepicker1d.h"
 
 #include "../sharedFiles/userInteractionPlotPicker.h"
 #include "../sharedFiles/drawItem.h"
+#include "../sharedFiles/itomPlotMagnifier.h"
+#include "../sharedFiles/itomPlotZoomer.h"
 
 class Itom1DQwtPlot;
 struct InternalData;
@@ -163,8 +166,9 @@ class Plot1DWidget : public QwtPlot
         QStringList m_colorList;
 
         QWidget *m_pParent;
-        QwtPlotZoomer *m_pZoomer;
+        ItomPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
+        ItomPlotMagnifier *m_pMagnifier;
 
         ValuePicker1D *m_pValuePicker;
 

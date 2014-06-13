@@ -114,15 +114,27 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_colorList.append("darkCyan");
     m_colorList.append("darkYellow");
 
-    m_pZoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
+    m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
+    //m_pZoomer->setFixedAspectRatio(true);
     //all others settings for zoomer are set in init (since they need access to the settings via api)
 
     m_pPanner = new QwtPlotPanner(canvas());
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false);
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
+
+    m_pMagnifier = new ItomPlotMagnifier(canvas());
+    m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
+    m_pMagnifier->setZoomInKey(Qt::Key_Plus, Qt::KeypadModifier);
+    m_pMagnifier->setZoomOutKey(Qt::Key_Minus, Qt::KeypadModifier);
+    m_pMagnifier->setMouseFactor(-m_pMagnifier->mouseFactor());
+    m_pMagnifier->setEnabled(true);
+    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, false);
+    m_pMagnifier->setAxisEnabled(QwtPlot::yRight, false);
+    m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
+    m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
 
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
@@ -1709,48 +1721,50 @@ void Plot1DWidget::updateMarkerPosition(bool updatePositions, bool clear/* = fal
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::configRescaler(void)
 {
-    if (m_pData->m_keepAspect)
-    {
-        //int height = plotLayout()->canvasRect().height();
-        //int width = plotLayout()->canvasRect().width();
+    //if (m_pData->m_keepAspect)
+    //{
+    //    //int height = plotLayout()->canvasRect().height();
+    //    //int width = plotLayout()->canvasRect().width();
 
-        int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
-        
-        if (m_pRescaler == NULL)
-        {
-            QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
-            QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
+    //    int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
+    //    
+    //    if (m_pRescaler == NULL)
+    //    {
+    //        QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
+    //        QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
 
-            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
-            m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-            m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
-            m_pRescaler->setAspectRatio(1.0);
-            m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
-            m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
-            //m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
-        }
-        else
-        {
+    //        m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
+    //        m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
+    //        m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
+    //        m_pRescaler->setAspectRatio(1.0);
+    //        m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
+    //        m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+    //        //m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
+    //    }
+    //    else
+    //    {
 
-            m_pRescaler->setReferenceAxis(refAxis);
-        }
-        m_pRescaler->setEnabled(true);
-    }
-    else
-    {
-        if (m_pRescaler != NULL)
-        {
-            m_pRescaler->setEnabled(false);
-            //m_pRescaler->deleteLater();
-            //m_pRescaler = NULL;
-        }
-        
-    }
-    if (m_pRescaler != NULL && m_pData->m_keepAspect)
-    {
-        m_pRescaler->rescale();
-    }
-    //replot();
+    //        m_pRescaler->setReferenceAxis(refAxis);
+    //    }
+    //    m_pRescaler->setEnabled(true);
+    //}
+    //else
+    //{
+    //    if (m_pRescaler != NULL)
+    //    {
+    //        m_pRescaler->setEnabled(false);
+    //        //m_pRescaler->deleteLater();
+    //        //m_pRescaler = NULL;
+    //    }
+    //    
+    //}
+    //if (m_pRescaler != NULL && m_pData->m_keepAspect)
+    //{
+    //    m_pRescaler->rescale();
+    //}
+    ////replot();
+    m_pZoomer->setFixedAspectRatio(m_pData->m_keepAspect);
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

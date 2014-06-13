@@ -261,6 +261,7 @@ void Itom1DQwtPlot::createActions()
     m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     a->setObjectName("actHome");
     a->setToolTip(tr("Reset original view"));
+    a->setShortcut(Qt::CTRL + Qt::Key_0);
     connect(a, SIGNAL(triggered()), this, SLOT(mnuHome()));
  
     //m_actSave
@@ -1097,7 +1098,7 @@ void Itom1DQwtPlot::mnuActRatio(bool checked)
     ((InternalData*)m_data)->m_keepAspect = checked;
     if(((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->configRescaler();
 
-    if(m_pActZoomToRect->isChecked()) m_pActZoomToRect->setChecked(false);
+    /*if(m_pActZoomToRect->isChecked()) m_pActZoomToRect->setChecked(false);
     if(m_pActPan->isChecked()) m_pActPan->setChecked(false);
     
     m_pActPan->setEnabled(!checked);
@@ -1108,13 +1109,13 @@ void Itom1DQwtPlot::mnuActRatio(bool checked)
         ((Plot1DWidget *)m_pContent)->m_pZoomer->zoom(0);
         ((Plot1DWidget *)m_pContent)->setState(Plot1DWidget::stateIdle);
         ((Plot1DWidget *)m_pContent)->configRescaler();
-    }
+    }*/
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )
 {
     //resizeEvent(event);
-    if(((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->configRescaler();
+    //if(((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->configRescaler();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setEnabledPlotting(const bool &enabled)
