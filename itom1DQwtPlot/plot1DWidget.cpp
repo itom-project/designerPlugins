@@ -122,7 +122,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_pPanner = new QwtPlotPanner(canvas());
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false);
     m_pPanner->setCursor(Qt::SizeAllCursor);
-    m_pPanner->setEnabled(false);;
+    m_pPanner->setEnabled(false);
 
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
@@ -1330,7 +1330,7 @@ void Plot1DWidget::stickMarkerToXPx(Marker *m, double xScaleStart, int dir) //di
             }
         }
     }
-    if (dir == -1)
+    else if (dir == -1)
     {
         if (thisIdx <= 0)
         {
@@ -1434,7 +1434,7 @@ void Plot1DWidget::stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int 
             }
         }
     }
-    if (dir == -1)
+    else if (dir == -1)
     {
         while (!found)
         {
