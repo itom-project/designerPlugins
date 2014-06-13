@@ -15,7 +15,8 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_actMarker(NULL), 
     m_contextMenu(NULL), 
     m_pContent(NULL),
-    m_pMatplotlibSubfigConfig(NULL)
+    m_pMatplotlibSubfigConfig(NULL),
+    m_forceWindowResize(true)
 {
     setWindowFlags(Qt::Widget); //this is important such that this main window reacts as widget
 
