@@ -1573,11 +1573,11 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
         m_pZoomer->setEnabled(false);
         canvas()->setCursor(Qt::ArrowCursor);
 
-        foreach(QwtPlotCurve *curve, m_plotCurveItems)
+        /*foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
             setAxisAutoScale(curve->xAxis(),true);
             setAxisAutoScale(curve->yAxis(),true);
-        }
+        }*/
     }
 }
 
@@ -2586,20 +2586,27 @@ ito::RetVal Plot1DWidget::deleteMarkers(const int id)
     return retval;
 }
 
-////----------------------------------------------------------------------------------------------------------------------------------
-//void Itom1DQwtFigure::setMarkerCoordinates(const QVector<QPointF> pts)
-//{
-//    char buf[60] = {0};
-//    if (pts.size() > 1)
-//    {
-//        sprintf(buf, " [%.4g; %.4g]\n [%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-//    }
-//
-//    m_lblCoordinates->setText(buf);
-//
-//    if (pts.size() > 2)
-//    {
-//        sprintf(buf, " dx = %.4g\n dy = %.4g", pts[2].x(), pts[2].y());
-//    }
-//    m_CurCoordDelta->setText(buf);
-//}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::home()
+{
+    QStack<QRectF> currentZoomStack = m_pZoomer->zoomStack();
+
+    //get total bounding box
+    QRectF boundingRect;
+    foreach(QwtPlotCurve *curve, m_plotCurveItems)
+    {
+        boundingRect = boundingRect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
+    }
+
+    if (currentZoomStack.empty())
+    {
+        currentZoomStack.push(boundingRect);
+    }
+    else
+    {
+        currentZoomStack.first() = boundingRect;
+    }
+
+    m_pZoomer->setZoomStack(currentZoomStack, 0);
+    m_pZoomer->zoom(0);
+}

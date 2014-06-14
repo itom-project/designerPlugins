@@ -25,6 +25,7 @@
 #include <qevent.h>
 #include <qwt_plot.h>
 #include <qwt_scale_div.h>
+#include <qwt_scale_draw.h>
 #include <QtCore/qmath.h>
 
 //---------------------------------------------------------------------------
@@ -113,7 +114,7 @@ bool ItomPlotZoomer::accept( QPolygon &pa ) const
 }
 
 //---------------------------------------------------------------------------
-void ItomPlotZoomer::rescale()
+void ItomPlotZoomer::rescale(bool resizeEvent)
 {
     if (!m_fixedAspectRatio && !m_aspectRatioChanged)
     {
@@ -125,8 +126,11 @@ void ItomPlotZoomer::rescale()
         if ( !plt )
             return;
 
-        const QRectF &rect = zoomRect();
-        if ( rect != scaleRect() || m_aspectRatioChanged )
+        //if the zoomer is disabled and this method is called, this might come frome an explicit call to zoom... or due to a
+        //resize event with fixed aspect ratio. In the latter case, the zoom should not be done with respect to the current zoomRect
+        //but to the scaleRect, that is the currently visible region.
+        const QRectF &rect = (isEnabled() || !resizeEvent) ? zoomRect() : scaleRect();
+        if ( !isEnabled() || rect != scaleRect() || m_aspectRatioChanged )
         {
             const bool doReplot = plt->autoReplot();
             plt->setAutoReplot( false );
@@ -143,7 +147,14 @@ void ItomPlotZoomer::rescale()
                 //get effective area of the current plot (without margins, axes,...)
                 //int left, top, right, bottom;
                 //plt->canvas()->getContentsMargins( &left, &top, &right, &bottom );
-                const QSize size = plt->canvas()->contentsRect().size(); // - QSize(left+right,top+bottom);
+                //plt->canvas()->setStyleSheet("background-color: #ff00cc");
+                ////qDebug() << plt->canvas()->contentsMargins() << plt->contentsMargins();
+                //const QSize size = plt->canvas()->contentsRect().size(); // - QSize(left+right,top+bottom);
+
+                //qDebug() << plt->size() << plt->canvas()->size();
+
+                //more exact: take real pixel lenghts of axisScaleDraws are real area
+                const QSize size(plt->axisScaleDraw(xAxis())->length(), plt->axisScaleDraw(yAxis())->length());
 
                 //make square
                 double lx = qAbs(x2 - x1);
@@ -154,7 +165,7 @@ void ItomPlotZoomer::rescale()
                 if (sy > sx)
                 {
                     double factor = sy / sx;
-                    double center = (x1+x2)/2;
+                    double center = (x1+x2)/2.0;
                     //increase x1,x2
                     x1 = center - (center - x1)*factor;
                     x2 = center + (x2 - center)*factor;
@@ -162,7 +173,7 @@ void ItomPlotZoomer::rescale()
                 else if (sy < sx)
                 {
                     double factor = sx / sy;
-                    double center = (y1+y2)/2;
+                    double center = (y1+y2)/2.0;
                     //increase y1,y2
                     y1 = center - (center - y1)*factor;
                     y2 = center + (y2 - center)*factor;
@@ -184,6 +195,14 @@ void ItomPlotZoomer::rescale()
 
             plt->replot();
 
+            /*QRectF pixels(plt->transform(xAxis(), x1), plt->transform(yAxis(), y1), 0 , 0);
+            pixels.setRight(plt->transform(xAxis(), x2));
+            pixels.setBottom(plt->transform(yAxis(), y2));
+            pixels = pixels.normalized();
+            double lx = qAbs(x2 - x1);
+            double ly = qAbs(y2 - y1);
+            qDebug() << (lx/pixels.width()) << (ly/pixels.height());*/
+
             m_aspectRatioChanged = false;
         }
     }
@@ -199,8 +218,7 @@ bool ItomPlotZoomer::eventFilter( QObject *object, QEvent *event )
         {
             case QEvent::Resize:
             {
-                rescale();
-                //canvasResizeEvent( static_cast<QResizeEvent *>( event ) );
+                rescale(true);
                 break;
             }
             case QEvent::PolishRequest:
@@ -217,5 +235,5 @@ bool ItomPlotZoomer::eventFilter( QObject *object, QEvent *event )
         }
     }
 
-    return false; //QwtPlotZoomer::eventFilter(object,event);
+    return false;
 }

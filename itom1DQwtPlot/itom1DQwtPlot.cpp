@@ -1026,7 +1026,7 @@ void Itom1DQwtPlot::enableComplexGUI(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuHome()
 {
-    ((Plot1DWidget *)m_pContent)->m_pZoomer->zoom(0);
+    ((Plot1DWidget *)m_pContent)->home();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)

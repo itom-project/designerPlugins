@@ -134,6 +134,8 @@ class Plot1DWidget : public QwtPlot
         void stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int dir);
         void updateMarkerPosition(bool updatePositions, bool clear = false);
 
+        void home();
+
 
         QMenu *m_contextMenu;
 

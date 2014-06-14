@@ -43,7 +43,8 @@ public:
 protected:
     bool eventFilter( QObject *object, QEvent *event );
 
-    virtual void rescale();
+    virtual void rescale() { rescale(false); };
+    virtual void rescale(bool resizeEvent);
 
     virtual bool accept( QPolygon & ) const;
 
