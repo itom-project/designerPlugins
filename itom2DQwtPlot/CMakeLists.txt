@@ -89,6 +89,8 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
 
 )
 
@@ -113,6 +115,8 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.

@@ -1680,7 +1680,7 @@ void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActRatio(bool checked)
 {
-    m_data.m_keepAspect = checked;
+    /*m_data.m_keepAspect = checked;
     
     if(m_pActZoom->isChecked()) m_pActZoom->setChecked(false);
     if(m_pActPan->isChecked()) m_pActPan->setChecked(false);
@@ -1693,7 +1693,10 @@ void Itom2dQwtPlot::mnuActRatio(bool checked)
         m_pContent->m_pZoomer->zoom(0);
         m_pContent->setState(PlotCanvas::tIdle);
         m_pContent->configRescaler();
-    }
+    }*/
+
+    m_data.m_keepAspect = checked;
+    if(m_pContent) (m_pContent)->configRescaler();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resizeEvent ( QResizeEvent * event )

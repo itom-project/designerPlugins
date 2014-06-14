@@ -31,6 +31,8 @@
 #include "dataObjItem.h"
 #include "../sharedFiles/userInteractionPlotPicker.h"
 #include "../sharedFiles/drawItem.h"
+#include "../sharedFiles/itomPlotZoomer.h"
+#include "../sharedFiles/itomPlotMagnifier.h"
 
 
 #include <qwidget.h>
@@ -45,11 +47,9 @@
 #include <qhash.h>
 
 #include <qwt_plot.h>
-#include <qwt_plot_zoomer.h>
 #include <qwt_plot_panner.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
-#include <qwt_plot_magnifier.h>
 #include <qwt_plot_shapeitem.h>
 #include <qcolor.h>
 
@@ -151,9 +151,9 @@ class PlotCanvas : public QwtPlot
 
         ito::DataObject randImg;
 
-        QwtPlotZoomer *m_pZoomer;
+        ItomPlotZoomer *m_pZoomer;
         QwtPlotPanner *m_pPanner;
-        QwtPlotMagnifier *m_pMagnifier;
+        ItomPlotMagnifier *m_pMagnifier;
 
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;

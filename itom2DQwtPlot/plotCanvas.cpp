@@ -35,7 +35,6 @@
 #include <qwt_plot_layout.h>
 #include <qwt_matrix_raster_data.h>
 #include <qwt_scale_widget.h>
-#include <qwt_plot_magnifier.h>
 #include <qwt_plot_panner.h>
 #include <qwt_plot_renderer.h>
 #include <qwt_plot_grid.h>
@@ -109,7 +108,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_dOverlayItem->setColorMap(new QwtLinearColorMap(Qt::black, Qt::white, QwtColorMap::Indexed));
     m_dOverlayItem->setVisible(false);
     //zoom tool
-    m_pZoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
+    m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
 
@@ -119,7 +118,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
 
-    m_pMagnifier = new QwtPlotMagnifier(canvas());
+    m_pMagnifier = new ItomPlotMagnifier(canvas());
     m_pMagnifier->setEnabled(true);
     m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
     m_pMagnifier->setAxisEnabled(QwtPlot::yLeft,true);
@@ -2505,77 +2504,78 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::configRescaler(void)
 {
-    if (m_pData->m_keepAspect)
-    {
-        int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
-    
-        /*
-        QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
-        QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
+    //if (m_pData->m_keepAspect)
+    //{
+    //    int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
+    //
+    //    /*
+    //    QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
+    //    QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
 
-        QwtInterval userXInterVal = m_rasterData->interval(Qt::XAxis);
-        QwtInterval userYInterVal = m_rasterData->interval(Qt::YAxis);
+    //    QwtInterval userXInterVal = m_rasterData->interval(Qt::XAxis);
+    //    QwtInterval userYInterVal = m_rasterData->interval(Qt::YAxis);
 
-        if (curXInterVal.minValue() < userXInterVal.minValue())
-        {
-            curXInterVal.setMinValue(userXInterVal.minValue());
-        }
+    //    if (curXInterVal.minValue() < userXInterVal.minValue())
+    //    {
+    //        curXInterVal.setMinValue(userXInterVal.minValue());
+    //    }
 
-        if (curXInterVal.maxValue() > userXInterVal.maxValue())
-        {
-            curXInterVal.setMaxValue(userXInterVal.maxValue());
-        }
+    //    if (curXInterVal.maxValue() > userXInterVal.maxValue())
+    //    {
+    //        curXInterVal.setMaxValue(userXInterVal.maxValue());
+    //    }
 
-        if (curYInterVal.minValue() < userYInterVal.minValue())
-        {
-            curYInterVal.setMinValue(userYInterVal.minValue());
-        }
+    //    if (curYInterVal.minValue() < userYInterVal.minValue())
+    //    {
+    //        curYInterVal.setMinValue(userYInterVal.minValue());
+    //    }
 
-        if (curYInterVal.maxValue() > userYInterVal.maxValue())
-        {
-            curYInterVal.setMaxValue(userYInterVal.maxValue());
-        }
-        */
-        if (m_pRescaler == NULL)
-        {
-            QwtInterval curXInterVal = m_rasterData->interval(Qt::XAxis);
-            QwtInterval curYInterVal = m_rasterData->interval(Qt::YAxis);
+    //    if (curYInterVal.maxValue() > userYInterVal.maxValue())
+    //    {
+    //        curYInterVal.setMaxValue(userYInterVal.maxValue());
+    //    }
+    //    */
+    //    if (m_pRescaler == NULL)
+    //    {
+    //        QwtInterval curXInterVal = m_rasterData->interval(Qt::XAxis);
+    //        QwtInterval curYInterVal = m_rasterData->interval(Qt::YAxis);
 
-            m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
-            m_pRescaler->setEnabled(false);
-            m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-            m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
-            m_pRescaler->setIntervalHint(QwtPlot::yRight, m_rasterData->interval(Qt::ZAxis));
-            m_pRescaler->setAspectRatio(1.0);
-            m_pRescaler->setAspectRatio(QwtPlot::yRight, 0.0);
-            m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
-            m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
-            m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
-        }
-        else
-        {
-            m_pRescaler->setReferenceAxis(refAxis);
-        }
+    //        m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
+    //        m_pRescaler->setEnabled(false);
+    //        m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
+    //        m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
+    //        m_pRescaler->setIntervalHint(QwtPlot::yRight, m_rasterData->interval(Qt::ZAxis));
+    //        m_pRescaler->setAspectRatio(1.0);
+    //        m_pRescaler->setAspectRatio(QwtPlot::yRight, 0.0);
+    //        m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
+    //        m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+    //        m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
+    //    }
+    //    else
+    //    {
+    //        m_pRescaler->setReferenceAxis(refAxis);
+    //    }
 
-        //m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-        //m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
+    //    //m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
+    //    //m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
 
-        m_pRescaler->setEnabled(true);
-    }
-    else
-    {
-        if (m_pRescaler != NULL)
-        {
-            m_pRescaler->setEnabled(false);
-            //m_pRescaler->deleteLater();
-            //m_pRescaler = NULL;
-        }
-    }
-    if (m_pRescaler != NULL && m_pData->m_keepAspect)
-    {
-        m_pRescaler->rescale();
-    }
-    //replot();
+    //    m_pRescaler->setEnabled(true);
+    //}
+    //else
+    //{
+    //    if (m_pRescaler != NULL)
+    //    {
+    //        m_pRescaler->setEnabled(false);
+    //        //m_pRescaler->deleteLater();
+    //        //m_pRescaler = NULL;
+    //    }
+    //}
+    //if (m_pRescaler != NULL && m_pData->m_keepAspect)
+    //{
+    //    m_pRescaler->rescale();
+    //}
+    ////replot();
+    m_pZoomer->setFixedAspectRatio(m_pData->m_keepAspect);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
