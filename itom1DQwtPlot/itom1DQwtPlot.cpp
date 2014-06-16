@@ -115,22 +115,23 @@ void Itom1DQwtPlot::constructor()
 
     m_pContent = new Plot1DWidget(contextMenu, (InternalData*)m_data, this);
 
-    connect(((Plot1DWidget *)m_pContent), SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
-    connect(((Plot1DWidget *)m_pContent), SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
+    connect(m_pContent, SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
 
-    ((Plot1DWidget *)m_pContent)->setObjectName("canvasWidget");
+    m_pContent->setObjectName("canvasWidget");
 
-    connect(((Plot1DWidget *)m_pContent), SIGNAL(setMarkerText(const QString &, const QString &)), this, SLOT(setMarkerText(const QString &, const QString &)));
+    connect(m_pContent, SIGNAL(setMarkerText(const QString &, const QString &)), this, SLOT(setMarkerText(const QString &, const QString &)));
 
     setFocus();
-    setCentralWidget(((Plot1DWidget *)m_pContent));
-    ((Plot1DWidget *)m_pContent)->setFocus();
+    setCentralWidget(m_pContent);
+    m_pContent->setFocus();
 
     QMenu *menuView = new QMenu(tr("View"), this);
     menuView->addAction(m_pActHome);
     menuView->addAction(m_pActPan);
     menuView->addAction(m_pActZoomToRect);
     menuView->addAction(m_pActAspectRatio);
+    menuView->addAction(m_pActGrid);
     menuView->addSeparator();
     menuView->addAction(m_pActScaleSetting);
     menuView->addAction(m_pRescaleParent);
@@ -219,8 +220,8 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
         m_pMnuCmplxSwitch->deleteLater();
         m_pMnuCmplxSwitch = NULL;
     }
-    ((Plot1DWidget *)m_pContent)->deleteLater();
-//    ((Plot1DWidget *)m_pContent) = NULL;
+    m_pContent->deleteLater();
+//    m_pContent = NULL;
     m_pContent = NULL;
     if (m_data)
         delete ((InternalData*)m_data);
@@ -231,7 +232,7 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::init()
 { 
-    return ((Plot1DWidget *)m_pContent)->init(); 
+    return m_pContent->init(); 
 } //called when api-pointers are transmitted, directly after construction
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -284,19 +285,19 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(triggered()), this, SLOT(mnuParentScaleSetting()));
 
     //m_actForward
-    m_pActForward = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
+    m_pActForward = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("Forward"), this);
     a->setObjectName("actionForward");
     a->setEnabled(false);
     a->setToolTip(tr("Forward to next line"));
 
     //m_actBack
-    m_pActBack = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
+    m_pActBack = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("Back"), this);
     a->setObjectName("actionBack");
     a->setEnabled(false);
     a->setToolTip(tr("Back to previous line"));
 
     //m_actPan
-    m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
+    m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
     a->setObjectName("actionPan");
     a->setCheckable(true);
     a->setChecked(false);
@@ -304,7 +305,7 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
 
     //m_actZoomToRect
-    m_pActZoomToRect = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
+    m_pActZoomToRect = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("Zoom To Rectangle"), this);
     a->setObjectName("actionZoomToRect");
     a->setCheckable(true);
     a->setChecked(false);
@@ -312,7 +313,7 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
 
     //m_pActAspectRatio
-    m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("lock aspect ratio"), this);
+    m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("Lock Aspect Ratio"), this);
     a->setObjectName("actRatio");
     a->setCheckable(true);
     a->setChecked(false);
@@ -320,7 +321,7 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
     //m_actMarker
-    m_pActMarker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
+    m_pActMarker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("Marker"), this);
     a->setObjectName("actionMarker");
     a->setCheckable(true);
     a->setChecked(false);
@@ -378,7 +379,7 @@ void Itom1DQwtPlot::createActions()
     connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
     
     //m_pActClearDrawings
-    m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("clear Marker"), this);
+    m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear Marker"), this);
     a->setObjectName("actClearGeometricElements");
     a->setCheckable(false);
     a->setChecked(false);
@@ -399,6 +400,13 @@ void Itom1DQwtPlot::createActions()
     m_pActProperties = this->getPropertyDockWidget()->toggleViewAction();
     connect(m_pActProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
 
+    m_pActGrid = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/grid.png"), tr("Grid"), this);
+    a->setObjectName("actGrid");
+    a->setCheckable(true);
+    a->setChecked(false);
+    a->setToolTip(tr("Shows/hides a grid"));
+    connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuGridEnabled(bool)));
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -410,7 +418,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
         // why "source" is used here and not "displayed" .... ck 05/15/2013
-        ((Plot1DWidget *)m_pContent)->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
 
         ito::Channel* dataChannel = getInputChannel("source");
         m_pRescaleParent->setVisible(dataChannel && dataChannel->getParent());
@@ -429,14 +437,14 @@ void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getContextMenuEnabled() const
 {
-    if (((Plot1DWidget *)m_pContent)) return (((Plot1DWidget *)m_pContent))->m_showContextMenu;
+    if (m_pContent) return (m_pContent)->m_showContextMenu;
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setContextMenuEnabled(bool show)
 {
-    if (((Plot1DWidget *)m_pContent)) (((Plot1DWidget *)m_pContent))->m_showContextMenu = show;
+    if (m_pContent) (m_pContent)->m_showContextMenu = show;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -493,14 +501,14 @@ void Itom1DQwtPlot::setTitle(const QString &title)
         ((InternalData*)m_data)->m_title = title;
     }
 
-    if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetTitle()
 {
     ((InternalData*)m_data)->m_autoTitle = true;
-    if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -525,14 +533,14 @@ void Itom1DQwtPlot::setAxisLabel(const QString &label)
         ((InternalData*)m_data)->m_autoAxisLabel = false;
         ((InternalData*)m_data)->m_axisLabel = label;
     }
-    if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetAxisLabel()
 {
     ((InternalData*)m_data)->m_autoAxisLabel = true;
-    if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -557,22 +565,22 @@ void Itom1DQwtPlot::setValueLabel(const QString &label)
         ((InternalData*)m_data)->m_autoValueLabel = false;
         ((InternalData*)m_data)->m_valueLabel = label;
     }
-    if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetValueLabel()
 {
     ((InternalData*)m_data)->m_autoValueLabel = true;
-    if (((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->updateLabels();
+    if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont Itom1DQwtPlot::getTitleFont(void) const
 {
-    if (((Plot1DWidget *)m_pContent))
+    if (m_pContent)
     {
-        return ((Plot1DWidget *)m_pContent)->titleLabel()->font();
+        return m_pContent->titleLabel()->font();
     }
     return QFont();
 }
@@ -580,19 +588,19 @@ QFont Itom1DQwtPlot::getTitleFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setTitleFont(const QFont &font)
 {
-    if (((Plot1DWidget *)m_pContent))
+    if (m_pContent)
     {
-        ((Plot1DWidget *)m_pContent)->titleLabel()->setFont(font);
-        //((Plot1DWidget *)m_pContent)->replot();
+        m_pContent->titleLabel()->setFont(font);
+        //m_pContent->replot();
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont Itom1DQwtPlot::getLabelFont(void) const
 {
-    if (((Plot1DWidget *)m_pContent))
+    if (m_pContent)
     {
-        QwtText t = ((Plot1DWidget *)m_pContent)->axisWidget(QwtPlot::xBottom)->title();
+        QwtText t = m_pContent->axisWidget(QwtPlot::xBottom)->title();
         return t.font();
     }
     return QFont();
@@ -601,25 +609,25 @@ QFont Itom1DQwtPlot::getLabelFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLabelFont(const QFont &font)
 {
-    if (((Plot1DWidget *)m_pContent))
+    if (m_pContent)
     {
         QwtText title;
-        title = ((Plot1DWidget *)m_pContent)->axisWidget(QwtPlot::xBottom)->title();
+        title = m_pContent->axisWidget(QwtPlot::xBottom)->title();
         title.setFont(font);
-        ((Plot1DWidget *)m_pContent)->axisWidget(QwtPlot::xBottom)->setTitle(title);
+        m_pContent->axisWidget(QwtPlot::xBottom)->setTitle(title);
 
-        title = ((Plot1DWidget *)m_pContent)->axisWidget(QwtPlot::yLeft)->title();
+        title = m_pContent->axisWidget(QwtPlot::yLeft)->title();
         title.setFont(font);
-        ((Plot1DWidget *)m_pContent)->axisWidget(QwtPlot::yLeft)->setTitle(title);
+        m_pContent->axisWidget(QwtPlot::yLeft)->setTitle(title);
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont Itom1DQwtPlot::getAxisFont(void) const
 {
-    if (((Plot1DWidget *)m_pContent))
+    if (m_pContent)
     {
-        return ((Plot1DWidget *)m_pContent)->axisFont(QwtPlot::xBottom);
+        return m_pContent->axisFont(QwtPlot::xBottom);
     }
     return QFont();
 }
@@ -627,11 +635,31 @@ QFont Itom1DQwtPlot::getAxisFont(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setAxisFont(const QFont &font)
 {
-    if (((Plot1DWidget *)m_pContent))
+    if (m_pContent)
     {
-        ((Plot1DWidget *)m_pContent)->setAxisFont(QwtPlot::xBottom, font);
-        ((Plot1DWidget *)m_pContent)->setAxisFont(QwtPlot::yLeft, font);
+        m_pContent->setAxisFont(QwtPlot::xBottom, font);
+        m_pContent->setAxisFont(QwtPlot::yLeft, font);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom1DQwtPlot::getGrid(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_gridEnabled;
+    }
+    return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setGrid(const bool &enabled)
+{
+    if (m_pContent)
+    {
+        m_pContent->setGridEnabled(enabled);
+    }
+    m_pActGrid->setChecked(enabled);
 }
 
 
@@ -643,12 +671,12 @@ void Itom1DQwtPlot::mnuPanner(bool checked)
         m_pActZoomToRect->setChecked(false);
         m_pActMarker->setChecked(false);
         m_pActDrawMode->setChecked(false);
-        ((Plot1DWidget *)m_pContent)->setPannerEnable(true);
+        m_pContent->setPannerEnable(true);
     }
     else
     {
-        ((Plot1DWidget *)m_pContent)->setPannerEnable(false);
-        //(((Plot1DWidget *)m_pContent))->setMouseTracking(false);
+        m_pContent->setPannerEnable(false);
+        //(m_pContent)->setMouseTracking(false);
     }
 }
 
@@ -660,12 +688,12 @@ void Itom1DQwtPlot::mnuZoomer(bool checked)
         m_pActMarker->setChecked(false);
         m_pActPan->setChecked(false);
         m_pActDrawMode->setChecked(false);
-        ((Plot1DWidget *)m_pContent)->setZoomerEnable(true);
+        m_pContent->setZoomerEnable(true);
     }
     else
     {
-        ((Plot1DWidget *)m_pContent)->setZoomerEnable(false);
-        //(((Plot1DWidget *)m_pContent))->setMouseTracking(false);
+        m_pContent->setZoomerEnable(false);
+        //(m_pContent)->setMouseTracking(false);
     }
 }
 
@@ -679,7 +707,7 @@ void Itom1DQwtPlot::mnuMarkerClick(bool checked)
         m_pActZoomToRect->setChecked(false);
     }
     
-    ((Plot1DWidget *)m_pContent)->setPickerEnable(checked);
+    m_pContent->setPickerEnable(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -690,11 +718,11 @@ void Itom1DQwtPlot::mnuDrawMode(bool checked)
         m_pActPan->setChecked(false);
         m_pActZoomToRect->setChecked(false);
         m_pActMarker->setChecked(false);
-        ((Plot1DWidget *)m_pContent)->setZoomerEnable(false);
-        ((Plot1DWidget *)m_pContent)->setState(((Plot1DWidget *)m_pContent)->stateIdle);
+        m_pContent->setZoomerEnable(false);
+        m_pContent->setState(m_pContent->stateIdle);
     }
     // we need to find out which draw mode we should activate here ...
-//    ((Plot1DWidget *)m_pContent)->setState(checked ? PlotCanvas::tDraw : PlotCanvas::stateIdle);
+//    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::stateIdle);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuDrawMode(QAction *action)
@@ -702,7 +730,7 @@ void Itom1DQwtPlot::mnuDrawMode(QAction *action)
     m_pActPan->setChecked(false);
     m_pActZoomToRect->setChecked(false);
     m_pActMarker->setChecked(false);
-    ((Plot1DWidget *)m_pContent)->setZoomerEnable(false);
+    m_pContent->setZoomerEnable(false);
 
     m_pActDrawMode->setChecked(true);
 
@@ -711,26 +739,26 @@ void Itom1DQwtPlot::mnuDrawMode(QAction *action)
         default:
         case Plot1DWidget::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(Plot1DWidget::tPoint, 1, 1);
-//            connect(((Plot1DWidget *)m_pContent)->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
+            m_pContent->userInteractionStart(Plot1DWidget::tPoint, 1, 1);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
         break;
 
         case Plot1DWidget::tLine:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(Plot1DWidget::tLine, 1, 2);
-//            connect(((Plot1DWidget *)m_pContent)->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
+            m_pContent->userInteractionStart(Plot1DWidget::tLine, 1, 2);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
         break;
 
         case Plot1DWidget::tRect:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(Plot1DWidget::tRect, 1, 2);
-//            connect(((Plot1DWidget *)m_pContent)->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
+            m_pContent->userInteractionStart(Plot1DWidget::tRect, 1, 2);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
         break;
 
         case Plot1DWidget::tEllipse:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(Plot1DWidget::tEllipse, 1, 2);
-//            connect(((Plot1DWidget *)m_pContent)->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
+            m_pContent->userInteractionStart(Plot1DWidget::tEllipse, 1, 2);
+//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
         break;
     }
 }
@@ -788,7 +816,7 @@ void Itom1DQwtPlot::mnuExport()
     {
         bool abort = true;
 
-        QSizeF curSize = ((Plot1DWidget *)m_pContent)->size();
+        QSizeF curSize = m_pContent->size();
         int resolution = 300;
 
         DialogExportProperties *dlg = new DialogExportProperties("", curSize, this);
@@ -829,7 +857,7 @@ void Itom1DQwtPlot::mnuScaleSetting()
             recalculateBoundaries = true;
         }
 
-        ((Plot1DWidget *)m_pContent)->updateScaleValues(recalculateBoundaries);
+        m_pContent->updateScaleValues(recalculateBoundaries);
     }
 
     delete dlg;
@@ -837,14 +865,23 @@ void Itom1DQwtPlot::mnuScaleSetting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::mnuGridEnabled(bool checked)
+{
+    if (m_pContent)
+    {
+        m_pContent->setGridEnabled(checked);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuParentScaleSetting()
 {
-    if (((Plot1DWidget *)m_pContent) && ((Plot1DWidget *)m_pContent)->m_plotCurveItems.size() > 0)
+    if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
-        const QwtScaleDiv scale = ((Plot1DWidget *)m_pContent)->axisScaleDiv(QwtPlot::yLeft);
+        const QwtScaleDiv scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
         QPointF bounds = QPointF(scale.lowerBound(), scale.upperBound());
         /*
-        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((((Plot1DWidget *)m_pContent))->m_plotCurveItems[0]->data());
+        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
         int cmlpState = seriesData->getCmplxState();
         ito::uint32  minLoc[3], maxLoc[3];
         ito::float64 minVal, maxVal;
@@ -867,9 +904,9 @@ void Itom1DQwtPlot::mnuParentScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 {
-    if (((Plot1DWidget *)m_pContent) && ((Plot1DWidget *)m_pContent)->m_plotCurveItems.size() > 0)
+    if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
-        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((((Plot1DWidget *)m_pContent))->m_plotCurveItems[0]->data());
+        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
 
         if (action->text() == QString(tr("To Min-Max")))
         {
@@ -881,11 +918,11 @@ void Itom1DQwtPlot::mnuSetMarker(QAction *action)
             {
                 if (minLoc < maxLoc)
                 {
-                    ((Plot1DWidget *)m_pContent)->setMainMarkersToIndex(minLoc, maxLoc, 0);
+                    m_pContent->setMainMarkersToIndex(minLoc, maxLoc, 0);
                 }
                 else
                 {
-                    ((Plot1DWidget *)m_pContent)->setMainMarkersToIndex(maxLoc, minLoc, 0);
+                    m_pContent->setMainMarkersToIndex(maxLoc, minLoc, 0);
                 }
             }
         }
@@ -894,13 +931,13 @@ void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
-    return ((Plot1DWidget *)m_pContent)->plotMarkers(&coords, style, id, plane);
+    return m_pContent->plotMarkers(&coords, style, id, plane);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::deleteMarkers(int id)
 {
-    ito::RetVal retVal = ((Plot1DWidget *)m_pContent)->deleteMarkers(id);
+    ito::RetVal retVal = m_pContent->deleteMarkers(id);
     if(!retVal.containsWarningOrError()) emit plotItemDeleted(id);
     return retVal;
 }
@@ -913,7 +950,7 @@ ito::RetVal Itom1DQwtPlot::clearGeometricElements(void)
 
     for(int i = 0; i < keys.size(); i++)
     {
-        retVal += ((Plot1DWidget *)m_pContent)->deleteMarkers(keys[i]);
+        retVal += m_pContent->deleteMarkers(keys[i]);
     }
     emit plotItemsDeleted();
     return retVal;
@@ -925,25 +962,25 @@ void Itom1DQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     m_pActPan->setChecked(false);
     m_pActZoomToRect->setChecked(false);
     m_pActMarker->setChecked(false);
-    ((Plot1DWidget *)m_pContent)->setZoomerEnable(true);
+    m_pContent->setZoomerEnable(true);
 
     switch (type)
     {
         default:
         case Plot1DWidget::tPoint:
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(type, start, maxNrOfPoints);
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints);
         break;
 
         case Plot1DWidget::tLine:
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(type, start, maxNrOfPoints * 2);
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
         case Plot1DWidget::tRect:
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(type, start, maxNrOfPoints * 2);
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
         case Plot1DWidget::tEllipse:
-            ((Plot1DWidget *)m_pContent)->userInteractionStart(type, start, maxNrOfPoints * 2);
+            m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
     }
 
@@ -953,9 +990,9 @@ void Itom1DQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
 void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
 {
     DataObjectSeriesData *seriesData;
-    if (((Plot1DWidget *)m_pContent))
+    if (m_pContent)
     {
-        foreach(QwtPlotCurve *data, ((Plot1DWidget *)m_pContent)->m_plotCurveItems)
+        foreach(QwtPlotCurve *data, m_pContent->m_plotCurveItems)
         {
             seriesData = (DataObjectSeriesData*)data->data();
             if (seriesData)
@@ -983,7 +1020,7 @@ void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
             }
         }
 
-        ((Plot1DWidget *)m_pContent)->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
+        m_pContent->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
         
     }
 }
@@ -1000,11 +1037,11 @@ void Itom1DQwtPlot::setYAxisInterval(QPointF interval)
 { 
     if (interval.isNull())
     {
-        ((Plot1DWidget *)m_pContent)->setInterval(Qt::YAxis, true, 0.0, 0.0);
+        m_pContent->setInterval(Qt::YAxis, true, 0.0, 0.0);
     }
     else
     {
-        ((Plot1DWidget *)m_pContent)->setInterval(Qt::YAxis, false, interval.x(), interval.y());
+        m_pContent->setInterval(Qt::YAxis, false, interval.x(), interval.y());
     }
     return; 
 }   
@@ -1026,21 +1063,21 @@ void Itom1DQwtPlot::enableComplexGUI(const bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuHome()
 {
-    ((Plot1DWidget *)m_pContent)->home();
+    m_pContent->home();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
 {
-    if(!((Plot1DWidget *)m_pContent))
+    if(!m_pContent)
     {
         return QSharedPointer<ito::DataObject>(); 
     }
 
     ito::DataObject dataObjectOut;
 
-    if (((Plot1DWidget *)m_pContent) && ((Plot1DWidget *)m_pContent)->m_plotCurveItems.size() > 0)
+    if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
-        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((((Plot1DWidget *)m_pContent))->m_plotCurveItems[0]->data());
+        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
 
         if(seriesData->size() < 2)
         {
@@ -1096,7 +1133,7 @@ void Itom1DQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 void Itom1DQwtPlot::mnuActRatio(bool checked)
 {
     ((InternalData*)m_data)->m_keepAspect = checked;
-    if(((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->configRescaler();
+    if(m_pContent) m_pContent->configRescaler();
 
     /*if(m_pActZoomToRect->isChecked()) m_pActZoomToRect->setChecked(false);
     if(m_pActPan->isChecked()) m_pActPan->setChecked(false);
@@ -1104,18 +1141,18 @@ void Itom1DQwtPlot::mnuActRatio(bool checked)
     m_pActPan->setEnabled(!checked);
     m_pActZoomToRect->setEnabled(!checked);
 
-    if(((Plot1DWidget *)m_pContent))
+    if(m_pContent)
     {
-        ((Plot1DWidget *)m_pContent)->m_pZoomer->zoom(0);
-        ((Plot1DWidget *)m_pContent)->setState(Plot1DWidget::stateIdle);
-        ((Plot1DWidget *)m_pContent)->configRescaler();
+        m_pContent->m_pZoomer->zoom(0);
+        m_pContent->setState(Plot1DWidget::stateIdle);
+        m_pContent->configRescaler();
     }*/
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )
 {
     //resizeEvent(event);
-    //if(((Plot1DWidget *)m_pContent)) ((Plot1DWidget *)m_pContent)->configRescaler();
+    //if(m_pContent) m_pContent->configRescaler();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setEnabledPlotting(const bool &enabled)
@@ -1235,7 +1272,7 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 
     for(int i = 0; i < keys.size(); i++)
     {
-        retVal += ((Plot1DWidget *)m_pContent)->deleteMarkers(keys[i]);
+        retVal += m_pContent->deleteMarkers(keys[i]);
     }
     emit plotItemsDeleted();
 
@@ -1244,15 +1281,15 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
        (geometricElements->getType() != ito::tFloat32 && geometricElements->getType() != ito::tFloat64) ||
        geometricElements->getSize(1) < PRIM_ELEMENTLENGTH)
     {
-        ((Plot1DWidget *)m_pContent)->statusBarMessage(tr("Element container did not match criteria, 2 dims, elements x 11, floating point value"), 600 );
+        m_pContent->statusBarMessage(tr("Element container did not match criteria, 2 dims, elements x 11, floating point value"), 600 );
         plotItemsFinished(0, true);
         return;
     }
 
     if(geometricElements->getSize(0) == 0)
     {
-        ((Plot1DWidget *)m_pContent)->statusBarMessage(tr("Deleted element, new element list was empty"), 600 );
-        ((Plot1DWidget *)m_pContent)->replot();
+        m_pContent->statusBarMessage(tr("Deleted element, new element list was empty"), 600 );
+        m_pContent->replot();
         return;
     }
 
@@ -1459,19 +1496,19 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 
             default:
                 plotItemsFinished(0, true);
-                ((Plot1DWidget *)m_pContent)->statusBarMessage(tr("Could not convert elements, type undefined"), 600 );
+                m_pContent->statusBarMessage(tr("Could not convert elements, type undefined"), 600 );
                 return;    
         }
 
     }
 
-    ito::RetVal retval = ((Plot1DWidget *)m_pContent)->plotMarkers(&coords, "b", "", 0);
+    ito::RetVal retval = m_pContent->plotMarkers(&coords, "b", "", 0);
 
-    ((Plot1DWidget *)m_pContent)->replot();
+    m_pContent->replot();
 
     if(retval.containsError())
     {
-        ((Plot1DWidget *)m_pContent)->statusBarMessage(tr("Could not set elements"), 600 );
+        m_pContent->statusBarMessage(tr("Could not set elements"), 600 );
         plotItemsFinished(0, true);
         return;    
     }
@@ -1516,10 +1553,10 @@ void Itom1DQwtPlot::setSelectedElement(const int idx)
         }
     }
 
-    if(((Plot1DWidget *)m_pContent))
+    if(m_pContent)
     {
-        if(replot) ((Plot1DWidget *)m_pContent)->replot();
-        if(failed) emit ((Plot1DWidget *)m_pContent)->statusBarMessage(tr("Could not set active element, index out of range."), 12000 );
+        if(replot) m_pContent->replot();
+        if(failed) emit m_pContent->statusBarMessage(tr("Could not set active element, index out of range."), 12000 );
     }
     return;
 }
@@ -1532,17 +1569,17 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fi
     }
     if(curSize.height() == 0 || curSize.width() == 0)
     {
-        curSize = ((Plot1DWidget *)m_pContent)->size();
+        curSize = m_pContent->size();
     }
-    QBrush curBrush = ((Plot1DWidget *)m_pContent)->canvasBackground();
+    QBrush curBrush = m_pContent->canvasBackground();
 
-    QPalette curPalette = ((Plot1DWidget *)m_pContent)->palette();
+    QPalette curPalette = m_pContent->palette();
 
-    ((Plot1DWidget *)m_pContent)->setAutoFillBackground( true );
-    ((Plot1DWidget *)m_pContent)->setPalette( Qt::white );
-    ((Plot1DWidget *)m_pContent)->setCanvasBackground(Qt::white);    
+    m_pContent->setAutoFillBackground( true );
+    m_pContent->setPalette( Qt::white );
+    m_pContent->setCanvasBackground(Qt::white);    
 
-    ((Plot1DWidget *)m_pContent)->replot();
+    m_pContent->replot();
 
     QwtPlotRenderer renderer;
 
@@ -1557,15 +1594,15 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fi
         QwtPlotRenderer renderer;
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
-        renderer.render(((Plot1DWidget *)m_pContent), &painter, ((Plot1DWidget *)m_pContent)->rect());
+        renderer.render(m_pContent, &painter, m_pContent->rect());
         clipboard->setImage(img);    
     }
-    else renderer.renderDocument((((Plot1DWidget *)m_pContent)), fileName, curSize, resolution);
+    else renderer.renderDocument((m_pContent), fileName, curSize, resolution);
 
-    ((Plot1DWidget *)m_pContent)->setPalette( curPalette);
-    ((Plot1DWidget *)m_pContent)->setCanvasBackground( curBrush);
+    m_pContent->setPalette( curPalette);
+    m_pContent->setCanvasBackground( curBrush);
 
-    ((Plot1DWidget *)m_pContent)->replot();
+    m_pContent->replot();
     return ito::retOk;
 }
 ito::RetVal Itom1DQwtPlot::copyToClipBoard()

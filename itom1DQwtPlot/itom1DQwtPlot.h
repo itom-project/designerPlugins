@@ -46,6 +46,8 @@
 
 Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
 
+class Plot1DWidget;
+
 
 class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 {
@@ -57,6 +59,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
+    Q_PROPERTY(bool grid READ getGrid WRITE setGrid USER true)
 
     // Properties related with geometric elements
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
@@ -71,6 +74,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://titleFont", "Font for title.")
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
+    Q_CLASSINFO("prop://grid", "enables/disables a grid.")
 
     Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
     Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
@@ -120,6 +124,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QFont getAxisFont(void) const;
         void setAxisFont(const QFont &font);
 
+        bool getGrid(void) const;
+        void setGrid(const bool &enabled);
+
         void setSource(QSharedPointer<ito::DataObject> source);
     
         int getGeometricElementsCount() const;
@@ -143,8 +150,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void createActions();
         ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
-//        Plot1DWidget *m_pContent;
-        void *m_pContent;
+        Plot1DWidget *m_pContent;
 //        InternalData m_data;
         void *m_data;
 
@@ -152,34 +158,27 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void constructor();
         QAction* m_pActScaleSetting;
         QAction* m_pRescaleParent;
-
         QAction  *m_pActPan;
         QAction  *m_pActZoomToRect;
         QAction  *m_pActMarker;
-
         QAction *m_pActAspectRatio;
-
         QAction *m_pActSave;
         QAction *m_pActHome;
-
         QMenu    *m_pMnuSetMarker;
         QAction  *m_pActSetMarker;
-
         QAction *m_pActForward;
         QAction *m_pActBack;
-        
         QAction* m_pActCmplxSwitch;
         QMenu *m_pMnuCmplxSwitch;
-
         QLabel *m_pLblMarkerOffsets;
         QLabel *m_pLblMarkerCoords;
-
         QActionGroup *m_pDrawModeActGroup;
         QAction *m_pActClearDrawings;
         QAction* m_pActDrawMode;
         QMenu *m_pMnuDrawMode;
-
         QAction *m_pActProperties;
+        QAction *m_pActGrid;
+        QAction *m_pActGridSettings;
 
         ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
         ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
@@ -211,6 +210,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuDrawMode(QAction *action);
         void mnuDrawMode(bool checked);
 
+        void mnuGridEnabled(bool checked);
         void mnuHome();
         void setMarkerText(const QString &coords, const QString &offsets);
 

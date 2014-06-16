@@ -94,6 +94,8 @@ class Plot1DWidget : public QwtPlot
         void setPickerEnable(const bool checked);
         void setPannerEnable(const bool checked);
 
+        void setGridEnabled(const bool enabled);
+
         void setMainMarkersToIndex(int idx1, int idx2, int curveIdx);
 
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
@@ -155,6 +157,8 @@ class Plot1DWidget : public QwtPlot
         bool m_xDirect;
         bool m_yDirect;
         bool m_cmplxState;
+
+        bool m_gridEnabled;
 
         MultiLineMode m_multiLine;
         unsigned char m_autoLineColIndex;

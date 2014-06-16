@@ -34,6 +34,7 @@
         <file>icons/blkorwht.png</file>
         <file>icons/falseColor.png</file>
         <file>icons/rgba.png</file>
+        <file>icons/grid.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>

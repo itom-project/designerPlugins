@@ -74,7 +74,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_pData(data),
         m_activeDrawItem(1),
         m_pRescaler(NULL),
-        m_ignoreNextMouseEvent(false)
+        m_ignoreNextMouseEvent(false),
+        m_gridEnabled(false)
 {
     this->setMouseTracking(false);
 
@@ -141,6 +142,11 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
     //all others settings for tracker are set in init (since they need access to the settings via api)
+
+    m_pPlotGrid = new QwtPlotGrid();
+    m_pPlotGrid->attach(this);
+    setGridEnabled(m_gridEnabled);
+    m_pPlotGrid->setMajorPen(Qt::gray, 1);
 
     m_drawedIemsIndexes.clear();
     m_drawedIemsIndexes.reserve(10);
@@ -264,6 +270,15 @@ ito::RetVal Plot1DWidget::init()
 //
 //    }
 //}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setGridEnabled(const bool enabled)
+{
+    m_gridEnabled = enabled;
+    m_pPlotGrid->enableX(enabled);
+    m_pPlotGrid->enableY(enabled);
+    replot();
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel)
