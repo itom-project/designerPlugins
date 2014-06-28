@@ -163,6 +163,8 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         void setColorMode(const int type);
         void resetColorMode(void);
 
+        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
+
         friend class PlotWidget;
 
     protected:
@@ -219,6 +221,8 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 
         InternalData m_data;
 
+        ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
+
     signals:
     
     private slots:
@@ -233,11 +237,12 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         void mnuCmplxSwitch(QAction *action);
         void mnuAspectSwitch(QAction *action);
         void mnuZoomer(bool checked);
-        void mnuExport();
+        void mnuActSave();
         void mnuSwitchColorMode(QAction *action);
         void mnuActPlaneSelector(int plane);
 
     public slots:
+        ito::RetVal GraphicViewPlot::copyToClipBoard();
 
 };
 

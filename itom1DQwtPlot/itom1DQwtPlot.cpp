@@ -1605,7 +1605,25 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fi
     m_pContent->replot();
     return ito::retOk;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::copyToClipBoard()
 {
     return exportCanvas(true, "");
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
+{
+    QSizeF size(xsize, ysize);
+    QPixmap destinationImage(xsize, ysize);
+    if((this->exportCanvas(true, "", size, resolution)).containsError())
+    {  
+        destinationImage.fill(Qt::red);
+        return destinationImage;
+    }
+
+    QClipboard *clipboard = QApplication::clipboard();
+    destinationImage.fill();
+    destinationImage.convertFromImage(clipboard->image());
+
+    return destinationImage;
 }

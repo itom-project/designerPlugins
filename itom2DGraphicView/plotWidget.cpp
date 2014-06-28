@@ -321,172 +321,180 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
     {
         return;
     }    
-
-    switch(((const QKeyEvent *)event)->key())
+    
+    
+    if(event->matches(QKeySequence::Copy))
     {
-        case Qt::Key_Up:
-        { 
-            if (m_pData->m_state == tValuePicker)   // doing the linecut
-            {
-                QPointF scenePos = m_pValuePicker->pos() - QPointF(0.0, 1.0);
-                if (scenePos.y() < -1.0) scenePos.setY(-1.0);
-
-                m_pValuePicker->setPos(scenePos);
-                updatePointTracker();
-            }
-            else if (m_pData->m_state == tLineCut)
-            {
-                QPointF pt1 = m_pLineCut->line().p1() - QPointF(0.0, 1.0);
-                QPointF pt2 = m_pLineCut->line().p2() - QPointF(0.0, 1.0);
-
-                if (pt1.y() < 0.0) pt1.setY(0.0);
-                trackerAppended(pt1);
-
-                if (pt2.y() < 0.0) pt2.setY(0.0);
-                trackerMoved(pt2);
-            }
-        }
-        return;
-
-        case Qt::Key_Down:
+        ((GraphicViewPlot*)(this->parent()))->copyToClipBoard();
+    }
+    else
+    {
+        switch(((const QKeyEvent *)event)->key())
         {
-            int y1 = m_ObjectContainer->getDataObjHeight() - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
+            case Qt::Key_Up:
+            { 
+                if (m_pData->m_state == tValuePicker)   // doing the linecut
+                {
+                    QPointF scenePos = m_pValuePicker->pos() - QPointF(0.0, 1.0);
+                    if (scenePos.y() < -1.0) scenePos.setY(-1.0);
+
+                    m_pValuePicker->setPos(scenePos);
+                    updatePointTracker();
+                }
+                else if (m_pData->m_state == tLineCut)
+                {
+                    QPointF pt1 = m_pLineCut->line().p1() - QPointF(0.0, 1.0);
+                    QPointF pt2 = m_pLineCut->line().p2() - QPointF(0.0, 1.0);
+
+                    if (pt1.y() < 0.0) pt1.setY(0.0);
+                    trackerAppended(pt1);
+
+                    if (pt2.y() < 0.0) pt2.setY(0.0);
+                    trackerMoved(pt2);
+                }
+            }
+            return;
+
+            case Qt::Key_Down:
+            {
+                int y1 = m_ObjectContainer->getDataObjHeight() - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
        
-            if (m_pData->m_state == tValuePicker)   // doing the linecut
-            {
-                QPointF scenePos = m_pValuePicker->pos() + QPointF(0.0, 1.0);
-                if (scenePos.y() > (y1 - 1)) scenePos.setY(y1 - 1);
+                if (m_pData->m_state == tValuePicker)   // doing the linecut
+                {
+                    QPointF scenePos = m_pValuePicker->pos() + QPointF(0.0, 1.0);
+                    if (scenePos.y() > (y1 - 1)) scenePos.setY(y1 - 1);
 
-                m_pValuePicker->setPos(scenePos);
-                updatePointTracker();
+                    m_pValuePicker->setPos(scenePos);
+                    updatePointTracker();
+                }
+                else if (m_pData->m_state == tLineCut)
+                {
+                    QPointF pt1 = m_pLineCut->line().p1() + QPointF(0.0, 1.0);
+                    QPointF pt2 = m_pLineCut->line().p2() + QPointF(0.0, 1.0);
+
+                    if (pt1.y() > y1) pt1.setY(y1);
+                    trackerAppended(pt1);
+
+                    if (pt2.y() > y1) pt2.setY(y1);
+                    trackerMoved(pt2);
+                }
             }
-            else if (m_pData->m_state == tLineCut)
+            return;
+
+            case Qt::Key_Right:
             {
-                QPointF pt1 = m_pLineCut->line().p1() + QPointF(0.0, 1.0);
-                QPointF pt2 = m_pLineCut->line().p2() + QPointF(0.0, 1.0);
-
-                if (pt1.y() > y1) pt1.setY(y1);
-                trackerAppended(pt1);
-
-                if (pt2.y() > y1) pt2.setY(y1);
-                trackerMoved(pt2);
-            }
-        }
-        return;
-
-        case Qt::Key_Right:
-        {
-            int x1 = m_ObjectContainer->getDataObjWidth() - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
+                int x1 = m_ObjectContainer->getDataObjWidth() - 1; // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
  
-            if (m_pData->m_state == tValuePicker)   // doing the linecut
-            {
-                QPointF scenePos = m_pValuePicker->pos() + QPointF(1.0, 0.0);
-                if (scenePos.x() > x1) scenePos.setX(x1);
+                if (m_pData->m_state == tValuePicker)   // doing the linecut
+                {
+                    QPointF scenePos = m_pValuePicker->pos() + QPointF(1.0, 0.0);
+                    if (scenePos.x() > x1) scenePos.setX(x1);
 
-                m_pValuePicker->setPos(scenePos);
-                updatePointTracker();
+                    m_pValuePicker->setPos(scenePos);
+                    updatePointTracker();
+                }
+                else if (m_pData->m_state == tLineCut)
+                {
+                    QPointF pt1 = m_pLineCut->line().p1() + QPointF(1.0, 0.0);
+                    QPointF pt2 = m_pLineCut->line().p2() + QPointF(1.0, 0.0);
+
+                    if (pt1.x() > x1) pt1.setX(x1);
+                    trackerAppended(pt1);
+
+                    if (pt2.x() > x1) pt2.setX(x1);
+                    trackerMoved(pt2);
+                }
             }
-            else if (m_pData->m_state == tLineCut)
+            return;
+
+            case Qt::Key_Left:
             {
-                QPointF pt1 = m_pLineCut->line().p1() + QPointF(1.0, 0.0);
-                QPointF pt2 = m_pLineCut->line().p2() + QPointF(1.0, 0.0);
+                if (m_pData->m_state == tValuePicker)   // doing the linecut
+                {
+                    QPointF scenePos = m_pValuePicker->pos() - QPointF(1.0, 0.0);
+                    if (scenePos.x() < 0.0) scenePos.setX(0.0);
 
-                if (pt1.x() > x1) pt1.setX(x1);
-                trackerAppended(pt1);
+                    m_pValuePicker->setPos(scenePos);
+                    updatePointTracker();
+                }
+                else if (m_pData->m_state == tLineCut)
+                {
+                    QPointF pt1 = m_pLineCut->line().p1() - QPointF(1.0, 0.0);
+                    QPointF pt2 = m_pLineCut->line().p2() - QPointF(1.0, 0.0);
+                    if (pt1.x() < 0.0) pt1.setX(0.0);
+                    trackerAppended(pt1);
 
-                if (pt2.x() > x1) pt2.setX(x1);
-                trackerMoved(pt2);
+                    if (pt2.x() < 0.0) pt2.setX(0.0);
+                    trackerMoved(pt2);
+                }
             }
-        }
-        return;
+            return ;
 
-        case Qt::Key_Left:
-        {
-            if (m_pData->m_state == tValuePicker)   // doing the linecut
+            // The following keys represent a direction, they are
+            // organized on the keyboard.
+
+            case Qt::Key_H:
             {
-                QPointF scenePos = m_pValuePicker->pos() - QPointF(1.0, 0.0);
-                if (scenePos.x() < 0.0) scenePos.setX(0.0);
+    //            bool test = true;
+                double yCenter = m_ObjectContainer->getDataObjHeight()  / 2.0;
+                double xMin = 0.0;
+                double xMax = m_ObjectContainer->getDataObjWidth()  - 1;
 
-                m_pValuePicker->setPos(scenePos);
-                updatePointTracker();
+                if (m_pData->m_state == tValuePicker)   // doing the linecut
+                {
+                    QPointF scenePos = m_pValuePicker->pos();
+                    scenePos.setY(yCenter);
+                    if (scenePos.y() < 0.0) scenePos.setY(0.0);
+
+                    m_pValuePicker->setPos(scenePos);
+                    updatePointTracker();
+                }
+                else if (m_pData->m_state == tLineCut)
+                {
+                    QPointF pt(xMin, yCenter);
+                    trackerAppended(pt);
+
+                    pt = QPointF(xMax, yCenter);
+                    trackerMoved(pt);
+                }
             }
-            else if (m_pData->m_state == tLineCut)
-            {
-                QPointF pt1 = m_pLineCut->line().p1() - QPointF(1.0, 0.0);
-                QPointF pt2 = m_pLineCut->line().p2() - QPointF(1.0, 0.0);
-                if (pt1.x() < 0.0) pt1.setX(0.0);
-                trackerAppended(pt1);
-
-                if (pt2.x() < 0.0) pt2.setX(0.0);
-                trackerMoved(pt2);
-            }
-        }
-        return ;
-
-        // The following keys represent a direction, they are
-        // organized on the keyboard.
-
-        case Qt::Key_H:
-        {
-//            bool test = true;
-            double yCenter = m_ObjectContainer->getDataObjHeight()  / 2.0;
-            double xMin = 0.0;
-            double xMax = m_ObjectContainer->getDataObjWidth()  - 1;
-
-            if (m_pData->m_state == tValuePicker)   // doing the linecut
-            {
-                QPointF scenePos = m_pValuePicker->pos();
-                scenePos.setY(yCenter);
-                if (scenePos.y() < 0.0) scenePos.setY(0.0);
-
-                m_pValuePicker->setPos(scenePos);
-                updatePointTracker();
-            }
-            else if (m_pData->m_state == tLineCut)
-            {
-                QPointF pt(xMin, yCenter);
-                trackerAppended(pt);
-
-                pt = QPointF(xMax, yCenter);
-                trackerMoved(pt);
-            }
-        }
-        break;
-
-        case Qt::Key_V:
-        {
-//            int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
-//            bool test = true;
-            double xCenter = m_ObjectContainer->getDataObjWidth()  / 2.0;
-            double yMin = 0.0;
-            double yMax = m_ObjectContainer->getDataObjHeight()  - 1;
-
-            if (m_pData->m_state == tValuePicker)   // doing the linecut
-            {
-                QPointF scenePos = m_pValuePicker->pos();
-                scenePos.setX(xCenter);
-                if (scenePos.x() < 0.0) scenePos.setX(0.0);
-
-                m_pValuePicker->setPos(scenePos);
-                updatePointTracker();
-            }
-            else if (m_pData->m_state == tLineCut)
-            {
-                QPointF pt(xCenter, yMin);
-                trackerAppended(pt);
-
-                pt = QPointF(xCenter, yMax);
-                trackerMoved(pt);
-            }
-        }
-        break;
-
-        case Qt::Key_Control:
-            m_stateMoveAligned = true;
             break;
 
-        default:
-        break;
+            case Qt::Key_V:
+            {
+    //            int dims = m_ObjectContainer->getDataObject()->getDims();  // Be careful -> 3D Objects are orders in z y x so y-Dims changes its index
+    //            bool test = true;
+                double xCenter = m_ObjectContainer->getDataObjWidth()  / 2.0;
+                double yMin = 0.0;
+                double yMax = m_ObjectContainer->getDataObjHeight()  - 1;
+
+                if (m_pData->m_state == tValuePicker)   // doing the linecut
+                {
+                    QPointF scenePos = m_pValuePicker->pos();
+                    scenePos.setX(xCenter);
+                    if (scenePos.x() < 0.0) scenePos.setX(0.0);
+
+                    m_pValuePicker->setPos(scenePos);
+                    updatePointTracker();
+                }
+                else if (m_pData->m_state == tLineCut)
+                {
+                    QPointF pt(xCenter, yMin);
+                    trackerAppended(pt);
+
+                    pt = QPointF(xCenter, yMax);
+                    trackerMoved(pt);
+                }
+            }
+            break;
+
+            case Qt::Key_Control:
+                m_stateMoveAligned = true;
+                break;
+
+            default:
+            break;
+        }
     }
 }
 

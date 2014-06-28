@@ -144,6 +144,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         int getSelectedElement(void) const;
         void setSelectedElement(const int idx);
 
+        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
+
         friend class Plot1DWidget;
 
     protected:

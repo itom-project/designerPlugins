@@ -210,6 +210,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     friend class PlotCanvas;
 
+    QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
+
 protected:
     ito::RetVal init() { return m_pContent->init(); } //called when api-pointers are transmitted, directly after construction
 

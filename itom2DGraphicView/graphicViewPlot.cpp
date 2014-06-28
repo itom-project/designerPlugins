@@ -25,7 +25,7 @@
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qimagewriter.h>
-
+#include <qpainter.h>
 
 //#include <GV_plot_renderer.h>
 
@@ -183,7 +183,7 @@ void GraphicViewPlot::createActions()
     m_pActSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save..."), this);
     m_pActSave->setObjectName("actSave");
     m_pActSave->setToolTip(tr("Export current view..."));
-    connect(m_pActSave, SIGNAL(triggered()), this, SLOT(mnuExport()));
+    connect(m_pActSave, SIGNAL(triggered()), this, SLOT(mnuActSave()));
     
     //m_pActScaleSetting
     m_pActScaleSetting = new QAction(QIcon(":/plots/icons/itom_icons/autoscal.png"), tr("scale settings..."), this);
@@ -579,8 +579,10 @@ void GraphicViewPlot::mnuLinePicker(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void GraphicViewPlot::mnuExport()
+void GraphicViewPlot::mnuActSave()
 {
+    static QString saveDefaultPath;
+
 #ifndef QT_NO_PRINTER
     QString fileName = "bode.pdf";
 #else
@@ -620,18 +622,19 @@ void GraphicViewPlot::mnuExport()
         filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
 #endif
 
-/*
     if (!fileName.isEmpty())
     {
-        GVPlotRenderer renderer;
+        bool abort = true;
 
-        // flags to make the document look like the widget
-        renderer.setDiscardFlag(GVPlotRenderer::DiscardBackground, false);
-        renderer.setLayoutFlag(GVPlotRenderer::KeepFrames, true);
+        QSizeF curSize = m_pContent->size();
+        int resolution = 300;
 
-        renderer.renderDocument(((PlotWidget*)m_pContent), fileName, QSizeF(300, 200), 85);
+        QFileInfo fi(fileName);
+        saveDefaultPath = fi.path();
+
+        exportCanvas(false, fileName, curSize, resolution);
+        
     }
-*/
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1413,4 +1416,63 @@ void GraphicViewPlot::mnuActPlaneSelector(int plane)
     QStringList paramNames;
     paramNames << "displayed";
     updateChannels(paramNames);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+
+ito::RetVal GraphicViewPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
+{
+    if(!m_pContent)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
+    }
+    if(curSize.height() == 0 || curSize.width() == 0)
+    {
+        curSize = QSizeF(((PlotWidget *)m_pContent)->m_pContent->width(), ((PlotWidget *)m_pContent)->m_pContent->height());
+    }
+ 
+
+    ((PlotWidget *)m_pContent)->repaint();
+
+    QImage img(curSize.width(),curSize.height(), QImage::Format_ARGB32_Premultiplied);
+
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+    ((PlotWidget *)m_pContent)->m_pContent->render(&painter);
+    painter.end();
+ 
+    if(exportType)
+    {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setImage(img);    
+    }
+    else img.save(fileName);
+
+    return ito::retOk;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal GraphicViewPlot::copyToClipBoard()
+{
+    return exportCanvas(true, "");
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QPixmap GraphicViewPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
+{
+    QSizeF size(xsize, ysize);
+    QPixmap destinationImage(xsize, ysize);
+    if((this->exportCanvas(true, "", size, resolution)).containsError())
+    {  
+        destinationImage.fill(Qt::red);
+        return destinationImage;
+    }
+
+    ((PlotWidget *)m_pContent)->repaint();
+    QImage img(xsize, ysize, QImage::Format_ARGB32_Premultiplied);
+
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+    ((PlotWidget *)m_pContent)->m_pContent->render(&painter);
+    painter.end();
+    destinationImage.convertFromImage(img);
+
+    return destinationImage;
 }
