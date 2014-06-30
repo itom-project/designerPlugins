@@ -1433,10 +1433,15 @@ ito::RetVal GraphicViewPlot::exportCanvas(const bool exportType, const QString &
 
     ((PlotWidget *)m_pContent)->repaint();
 
-    QImage img(curSize.width(),curSize.height(), QImage::Format_ARGB32_Premultiplied);
+    int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
+    resFaktor = resFaktor < 1 ? 1 : resFaktor;
+
+    QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
+    QImage img(myRect, QImage::Format_ARGB32);
 
     QPainter painter(&img);
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.scale(resFaktor, resFaktor);
     ((PlotWidget *)m_pContent)->m_pContent->render(&painter);
     painter.end();
  
@@ -1457,19 +1462,28 @@ ito::RetVal GraphicViewPlot::copyToClipBoard()
 //----------------------------------------------------------------------------------------------------------------------------------
 QPixmap GraphicViewPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
 {
-    QSizeF size(xsize, ysize);
+    QSizeF curSize(xsize, ysize);
+    if(curSize.height() == 0 || curSize.width() == 0)
+    {
+        curSize = QSizeF(((PlotWidget *)m_pContent)->m_pContent->width(), ((PlotWidget *)m_pContent)->m_pContent->height());
+    }
     QPixmap destinationImage(xsize, ysize);
-    if((this->exportCanvas(true, "", size, resolution)).containsError())
-    {  
+    if(!m_pContent || !(((PlotWidget *)m_pContent)->m_pContent))
+    {
         destinationImage.fill(Qt::red);
         return destinationImage;
     }
 
-    ((PlotWidget *)m_pContent)->repaint();
-    QImage img(xsize, ysize, QImage::Format_ARGB32_Premultiplied);
+    int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
+    resFaktor = resFaktor < 1 ? 1 : resFaktor;
+
+    QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
+    QImage img(myRect, QImage::Format_ARGB32);
 
     QPainter painter(&img);
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.scale(resFaktor, resFaktor);
+
     ((PlotWidget *)m_pContent)->m_pContent->render(&painter);
     painter.end();
     destinationImage.convertFromImage(img);

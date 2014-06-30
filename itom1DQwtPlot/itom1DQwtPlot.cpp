@@ -1589,11 +1589,15 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fi
 
     if(exportType)
     {
-        QSize myRect(curSize.width(), curSize.height());
+        int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
+        resFaktor = resFaktor < 1 ? 1 : resFaktor;
+
+        QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
+
         QClipboard *clipboard = QApplication::clipboard();
-        QwtPlotRenderer renderer;
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
+        painter.scale(resFaktor, resFaktor);
         renderer.render(m_pContent, &painter, m_pContent->rect());
         clipboard->setImage(img);    
     }
@@ -1613,17 +1617,60 @@ ito::RetVal Itom1DQwtPlot::copyToClipBoard()
 //----------------------------------------------------------------------------------------------------------------------------------
 QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
 {
-    QSizeF size(xsize, ysize);
-    QPixmap destinationImage(xsize, ysize);
-    if((this->exportCanvas(true, "", size, resolution)).containsError())
-    {  
-        destinationImage.fill(Qt::red);
+    QSizeF curSize(xsize, ysize);
+    if(!m_pContent)
+    {
+        QSize myRect(curSize.width(), curSize.height());
+        QPixmap destinationImage(myRect);
         return destinationImage;
     }
 
-    QClipboard *clipboard = QApplication::clipboard();
-    destinationImage.fill();
-    destinationImage.convertFromImage(clipboard->image());
+    if(curSize.height() == 0 || curSize.width() == 0)
+    {
+        curSize = ((Plot1DWidget *)m_pContent)->size();
+    }
+
+    int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
+    resFaktor = resFaktor < 1 ? 1 : resFaktor;
+    resFaktor = resFaktor > 6 ? 6 : resFaktor;
+
+    QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
+
+    QPixmap destinationImage(myRect);
+
+    if(!m_pContent)
+    {
+        destinationImage.fill(Qt::red);
+        return destinationImage;
+    }
+    destinationImage.fill(Qt::white);
+    QBrush curBrush = m_pContent->canvasBackground();
+
+    QPalette curPalette = m_pContent->palette();
+
+    m_pContent->setAutoFillBackground( true );
+    m_pContent->setPalette( Qt::white );
+    m_pContent->setCanvasBackground(Qt::white);    
+
+    m_pContent->replot();
+
+    QwtPlotRenderer renderer;
+
+    // flags to make the document look like the widget
+    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+    //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
+
+    //QImage img(myRect, QImage::Format_ARGB32);
+    QPainter painter(&destinationImage);
+    painter.scale(resFaktor, resFaktor);
+    renderer.render(m_pContent, &painter, m_pContent->rect());
+    //destinationImage.convertFromImage(img);
+
+
+    m_pContent->setPalette( curPalette);
+    m_pContent->setCanvasBackground( curBrush);
+
+    m_pContent->replot();
 
     return destinationImage;
 }
