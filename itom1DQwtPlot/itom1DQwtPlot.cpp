@@ -1223,9 +1223,10 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
             for(size_t i = 0; i < seriesData->size(); i++)
             {
                 curPos = seriesData->sample(i);
-                length += curPos.x();
+                //length += curPos.x();
                 rowPtr[i] = curPos.y();
             }
+            length = seriesData->sample(seriesData->size()-1).x() - seriesData->sample(0).x();
         }
         else
         {
@@ -1235,9 +1236,10 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
             for(size_t i = 0; i < seriesData->size(); i++)
             {
                 curPos = seriesData->sample(i);
-                length += curPos.x();
+                //length += curPos.x();
                 rowPtr[i] = (ito::int32)(curPos.y());
             }
+            length = seriesData->sample(seriesData->size()-1).x() - seriesData->sample(0).x();
         }
 
         dataObjectOut.setAxisScale(1, length / (seriesData->size() - 1));

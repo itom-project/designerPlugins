@@ -78,6 +78,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
     Q_PROPERTY(QPointF overlayInterval READ getoverlayInterval WRITE setoverlayInterval DESIGNABLE true USER true)
 
+    Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -100,6 +102,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
+
+    Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
     DESIGNER_PLUGIN_ITOM_API
     public:
@@ -300,6 +304,8 @@ public slots:
 //    void userInteractionEndLine(const QVector<QPointF> &points);
 
     QSharedPointer<ito::DataObject> getDisplayed(void);
+
+    QSharedPointer<ito::DataObject> getDisplayedLineCut(void);
 
     //this can be invoked by python to trigger a lineplot
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);

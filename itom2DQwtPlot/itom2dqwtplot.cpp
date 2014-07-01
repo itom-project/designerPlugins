@@ -2028,6 +2028,33 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
     return m_pContent->getDisplayed();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayedLineCut(void)
+{
+    if(!m_pContent)
+    {
+        return QSharedPointer<ito::DataObject>(); 
+    }
+
+    if(!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return QSharedPointer<ito::DataObject>(); 
+    }
+
+    ito::AbstractDObjFigure* figure = NULL;
+    QList<QObject*> keys = m_childFigures.keys();
+
+    for( int i = 0; i < keys.length(); i++)
+    {
+        if( m_childFigures[keys[i]] == ((PlotCanvas *)m_pContent)->m_lineCutUID &&
+            keys[i]->inherits("ito::AbstractDObjFigure"))                        
+        {
+            return (qobject_cast<ito::AbstractDObjFigure*>(keys[i]))->getDisplayed();
+        }
+    }
+
+    return QSharedPointer<ito::DataObject>(); 
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getSelectedElement(void)const
 {
     QHash<int, DrawItem*>::const_iterator it = ((InternalData*) m_pVData)->m_pDrawItems.begin();
