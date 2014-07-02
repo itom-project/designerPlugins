@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2012, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -92,8 +92,8 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         QSharedPointer<ito::DataObject> getSource(void) const;
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
-        virtual inline void setOutpBounds(QVector<QPointF> bounds) 
-        { 
+        virtual inline void setOutpBounds(QVector<QPointF> bounds)
+        {
             double *pointArr = new double[2 * bounds.size()];
             for (int np = 0; np < bounds.size(); np++)
             {
@@ -107,7 +107,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         void setCoordinates(const QVector<QPointF> pts, const bool visible);
 
         //properties (setter/getter)
-        void setContextMenuEnabled(bool show); 
+        void setContextMenuEnabled(bool show);
         bool getContextMenuEnabled() const;
 
         bool colorBarVisible() const;
@@ -131,7 +131,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 
         bool getxAxisVisible() const;
         void setxAxisVisible(const bool &value);
-    
+
         bool getyAxisVisible() const;
         void setyAxisVisible(const bool &value);
 
@@ -143,10 +143,10 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 
         virtual QPointF getXAxisInterval(void) const;
         virtual void setXAxisInterval(QPointF point);
-        
+
         virtual QPointF getYAxisInterval(void) const;
         virtual void setYAxisInterval(QPointF point);
-        
+
         virtual QPointF getZAxisInterval(void) const;
         virtual void setZAxisInterval(QPointF point);
 
@@ -168,10 +168,10 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         friend class PlotWidget;
 
     protected:
-        ito::RetVal init() 
-        { 
+        ito::RetVal init()
+        {
             if(!m_pContent) return ito::retError;
-            else return m_pContent->init(); 
+            else return m_pContent->init();
         } //called when api-pointers are transmitted, directly after construction
         PlotWidget *m_pContent;
 
@@ -185,12 +185,12 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 
     private:
         void createActions();
-        
+
         QAction  *m_pActScaleSetting;
 
         QAction  *m_pActSave;
         QAction  *m_pActHome;
-       
+
         QAction  *m_pActPan;
         QAction  *m_pActZoomToRect;
         QAction  *m_pActValuePicker;
@@ -211,7 +211,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         QMenu    *m_pMnuColorSwitch;
 
         QLabel   *m_pPaletteRep;
-        QAction  *m_curPalette; 
+        QAction  *m_curPalette;
 
         QPixmap  m_pixMap;
 
@@ -224,7 +224,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
     signals:
-    
+
     private slots:
         void mnuHome();
         void mnuPanner(bool checked);
@@ -242,7 +242,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         void mnuActPlaneSelector(int plane);
 
     public slots:
-        ito::RetVal GraphicViewPlot::copyToClipBoard();
+        ito::RetVal copyToClipBoard();
 
 };
 
