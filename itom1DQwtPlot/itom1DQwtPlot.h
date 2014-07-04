@@ -68,6 +68,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
+    Q_PROPERTY(int columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true)
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
     Q_CLASSINFO("prop://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
@@ -81,6 +83,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
     Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
+
+    Q_CLASSINFO("prop://columnInterpretation", "Define the interpretation of M x N objects as Auto, FirstRow, FirstCol, MultiRows, MultiCols.")
 
     DESIGNER_PLUGIN_ITOM_API
 
@@ -144,6 +148,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         int getSelectedElement(void) const;
         void setSelectedElement(const int idx);
 
+        int getRowPresentation(void) const;
+        void setRowPresentation(const int idx);
+        void resetRowPresentation(); 
+
         QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
         friend class Plot1DWidget;
@@ -182,6 +190,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction *m_pActGrid;
         QAction *m_pActGridSettings;
 
+        QAction* m_pActMultiRowSwitch;
+        QMenu *m_pMnuMultiRowSwitch;
+
         ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
         ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
@@ -204,6 +215,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuScaleSetting();
         void mnuParentScaleSetting();
         void mnuCmplxSwitch(QAction *action);
+        void mnuMultiRowSwitch(QAction *action);
         void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();

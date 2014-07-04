@@ -64,7 +64,6 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 //        m_startScaledY(false),
         m_xDirect(false),
         m_yDirect(false),
-        m_multiLine(Auto),
         m_autoLineColIndex(0),
         m_lineCol(0),
         m_lineStyle(1),
@@ -384,7 +383,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if (bounds.size() == 0)
         {
-            switch (m_multiLine)
+            switch (m_pData->m_multiLine)
             {
                 case FirstRow:
                 case FirstCol:
@@ -400,18 +399,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 {
                     if(width == 1 && height == 1 && dims < 3)
                     {
-                        m_multiLine = Auto;
+                        m_pData->m_multiLine = Auto;
                         numCurves = height;
                     }
                     else if (width >= height)
                     {
                         numCurves = height;
-                        m_multiLine = MultiRows;
+                        m_pData->m_multiLine = MultiRows;
                     }
                     else
                     {
                         numCurves = width;
-                        m_multiLine = MultiCols;
+                        m_pData->m_multiLine = MultiCols;
                     }
                 }
             }
@@ -446,7 +445,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         {
             QVector<QPointF> pts(2);
 
-            switch(m_multiLine)
+            switch(m_pData->m_multiLine)
             {
             case FirstCol:
             case MultiCols:

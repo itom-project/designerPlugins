@@ -82,6 +82,7 @@ void Itom1DQwtPlot::constructor()
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoomToRect);
     mainTb->addAction(m_pActAspectRatio);
+    mainTb->addAction(m_pActMultiRowSwitch);
     // first block is zoom, scale settings, home
     mainTb->addSeparator();
     mainTb->addAction(m_pActMarker);
@@ -178,7 +179,9 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActDrawMode(NULL),
     m_pMnuDrawMode(NULL),
     m_pDrawModeActGroup(NULL),
-    m_pActProperties(NULL)
+    m_pActProperties(NULL),
+    m_pActMultiRowSwitch(NULL),
+    m_pMnuMultiRowSwitch(NULL)
 {
     constructor();
 }
@@ -207,7 +210,9 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
     m_pActDrawMode(NULL),
     m_pMnuDrawMode(NULL),
     m_pDrawModeActGroup(NULL),
-    m_pActProperties(NULL)
+    m_pActProperties(NULL),
+    m_pActMultiRowSwitch(NULL),
+    m_pMnuMultiRowSwitch(NULL)
 {
     constructor();
 }
@@ -215,6 +220,11 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::~Itom1DQwtPlot()
 {
+    if (m_pMnuMultiRowSwitch != NULL)
+    {
+        m_pMnuMultiRowSwitch->deleteLater();
+        m_pMnuMultiRowSwitch = NULL;    
+    }
     if (m_pMnuCmplxSwitch != NULL)
     {
         m_pMnuCmplxSwitch->deleteLater();
@@ -234,7 +244,51 @@ ito::RetVal Itom1DQwtPlot::init()
 { 
     return m_pContent->init(); 
 } //called when api-pointers are transmitted, directly after construction
-
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getRowPresentation(void) const
+{
+    return ((InternalData*)m_data)->m_multiLine;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setRowPresentation(const int idx)
+{
+    switch(idx)
+    {
+        default:
+        case 0:
+            ((InternalData*)m_data)->m_multiLine = Plot1DWidget::Auto;
+            break;
+        case 1:
+            ((InternalData*)m_data)->m_multiLine = Plot1DWidget::FirstRow;
+            break;
+        case 2:
+            ((InternalData*)m_data)->m_multiLine = Plot1DWidget::FirstCol;
+            break;
+        case 3:
+            ((InternalData*)m_data)->m_multiLine = Plot1DWidget::MultiRows;
+            break;
+        case 4:
+            ((InternalData*)m_data)->m_multiLine = Plot1DWidget::MultiCols;
+            break;
+    }
+    if(m_pContent)
+    {
+        QVector<QPointF> bounds = getBounds();
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+    }
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetRowPresentation() 
+{
+    ((InternalData*)m_data)->m_multiLine = Plot1DWidget::Auto;
+    if(m_pContent)
+    {
+        QVector<QPointF> bounds = getBounds();
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+    }
+    return;
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getGeometricElementsCount() const 
 { 
@@ -344,6 +398,18 @@ void Itom1DQwtPlot::createActions()
     m_pActCmplxSwitch->setMenu(m_pMnuCmplxSwitch);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
+
+    //m_pActMultiRowSwitch
+    m_pActMultiRowSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"), tr("Switch Auto, first row, first column, multi row, multi column"), this);
+    m_pMnuMultiRowSwitch = new QMenu("Complex Switch");
+    m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"), tr("Auto"));
+    m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"), tr("first row"));
+    m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"), tr("first column"));
+    m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xvm_plot.png"), tr("multi row"));
+    m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"), tr("multi column"));
+    m_pActMultiRowSwitch->setMenu(m_pMnuMultiRowSwitch);
+    m_pActMultiRowSwitch->setVisible(true);
+    connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
 
     //m_actDrawMode
     m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
@@ -1022,6 +1088,45 @@ void Itom1DQwtPlot::mnuCmplxSwitch(QAction *action)
 
         m_pContent->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
         
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::mnuMultiRowSwitch(QAction *action)
+{
+
+
+    if (action->text() == QString(tr("first row")))
+    {
+        ((InternalData*)m_data)->m_multiLine = Plot1DWidget::FirstRow;
+        m_pActMultiRowSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
+    }
+    else if (action->text() == QString(tr("first column")))
+    {
+        ((InternalData*)m_data)->m_multiLine = Plot1DWidget::FirstCol;
+        m_pActMultiRowSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
+    }
+    else if (action->text() == QString(tr("multi row")))
+    {
+        ((InternalData*)m_data)->m_multiLine = Plot1DWidget::MultiRows;
+        m_pActMultiRowSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvm_plot.png"));
+    }
+    else if (action->text() == QString(tr("multi column")))
+    {
+        ((InternalData*)m_data)->m_multiLine = Plot1DWidget::MultiCols;
+        m_pActMultiRowSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"));
+    }
+    else
+    {
+        ((InternalData*)m_data)->m_multiLine = Plot1DWidget::Auto;
+        m_pActMultiRowSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
+    }
+
+
+    if (m_pContent)
+    {
+        QVector<QPointF> bounds = getBounds();
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
     }
 }
 

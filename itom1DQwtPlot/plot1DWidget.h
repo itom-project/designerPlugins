@@ -160,7 +160,6 @@ class Plot1DWidget : public QwtPlot
 
         bool m_gridEnabled;
 
-        MultiLineMode m_multiLine;
         unsigned char m_autoLineColIndex;
         long m_lineCol;
         int m_lineStyle;
@@ -216,6 +215,7 @@ struct InternalData
     {
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
+        m_multiLine = Plot1DWidget::Auto;
     }
 
     ~InternalData()
@@ -268,6 +268,8 @@ struct InternalData
     //the hash might be the same, but we want to recalcuate 
     //boundaries if values of dataObject changed.
     bool m_forceValueParsing; 
+
+    Plot1DWidget::MultiLineMode m_multiLine;
 
     QHash<int, DrawItem *> m_pDrawItems;
 };

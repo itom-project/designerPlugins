@@ -50,4 +50,11 @@
         <file>icons/editDelete.png</file>
         <file>icons/copyImg.png</file>
     </qresource>
+    <qresource prefix="/itomDesignerPlugins/axis">
+        <file>icons/xvm_plot.png</file>
+        <file>icons/yvm_plot.png</file>
+        <file>icons/xv_plot.png</file>
+        <file>icons/yv_plot.png</file>
+        <file>icons/xvauto_plot.png</file>
+    </qresource>
 </RCC>
