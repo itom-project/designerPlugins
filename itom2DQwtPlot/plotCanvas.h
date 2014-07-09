@@ -53,8 +53,6 @@
 #include <qwt_plot_shapeitem.h>
 #include <qcolor.h>
 
-#include <qwt_plot_rescaler.h>
-
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
 struct InternalData;
@@ -129,7 +127,7 @@ class PlotCanvas : public QwtPlot
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel);
         void updateLabels();
-        void updateScaleValues();
+        void updateScaleValues(bool doReplot = true);
         void setColorBarVisible(bool visible);
         bool setColorMap(QString colormap = "__next__");
         inline QString colorMapName() const { return m_colorMapName; }
@@ -147,8 +145,6 @@ class PlotCanvas : public QwtPlot
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
     private:
-        QwtPlotRescaler* m_pRescaler;
-
         ito::DataObject randImg;
 
         ItomPlotZoomer *m_pZoomer;

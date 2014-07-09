@@ -125,7 +125,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
 
-    m_pMagnifier = new ItomPlotMagnifier(canvas());
+    m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
     m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
     m_pMagnifier->setZoomInKey(Qt::Key_Plus, Qt::KeypadModifier);
     m_pMagnifier->setZoomOutKey(Qt::Key_Minus, Qt::KeypadModifier);

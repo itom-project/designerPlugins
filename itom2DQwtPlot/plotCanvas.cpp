@@ -72,7 +72,6 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_lineCutUID(0),
         m_pLineCutLine(NULL),
         m_pMultiPointPicker(NULL),
-        m_pRescaler(NULL),
         m_activeDrawItem(-1),
         m_ignoreNextMouseEvent(false)
         
@@ -118,7 +117,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
 
-    m_pMagnifier = new ItomPlotMagnifier(canvas());
+    m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
     m_pMagnifier->setEnabled(true);
     m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
     m_pMagnifier->setAxisEnabled(QwtPlot::yLeft,true);
@@ -206,10 +205,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
     enableAxis(QwtPlot::yRight, m_pData->m_colorBarVisible);
     axisWidget(QwtPlot::yRight)->setLayoutFlag(QwtScaleWidget::TitleInverted, false); //let the label be in the same direction than on the left side
 
-    
-    //m_pRescaler = new QwtPlotRescaler(canvas(), QwtPlot::xBottom, QwtPlotRescaler::Fixed);
     configRescaler();
-    //m_pRescaler->setEnabled(true);
 
     m_drawedIemsIndexes.clear();
     m_drawedIemsIndexes.reserve(10);
@@ -232,12 +228,6 @@ PlotCanvas::~PlotCanvas()
     m_pCenterMarker = NULL;
 
     m_pMultiPointPicker = NULL;
-    
-    if (m_pRescaler != NULL)
-    {
-        m_pRescaler->deleteLater();
-        m_pRescaler = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -435,21 +425,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
         //updateMarkerPosition(true);
 
-        updateScaleValues(); //replot is done here
-
-        if (m_pRescaler != NULL)
-        {
-
-            QwtInterval curXInterVal = m_rasterData->interval(Qt::XAxis);
-            QwtInterval curYInterVal = m_rasterData->interval(Qt::YAxis);
-
-            m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-            m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
-
-            if (m_pData->m_keepAspect)m_pRescaler->rescale();
-        }
-
-        m_pZoomer->setZoomBase(true);
+        updateScaleValues(false); //no replot here
+        updateAxes();
+        m_pZoomer->setZoomBase(false); //do not replot in order to to destroy the recently set scale values, a rescale is executed at the end though
     }
     else
     {
@@ -850,7 +828,7 @@ void PlotCanvas::updateLabels()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::updateScaleValues()
+void PlotCanvas::updateScaleValues(bool doReplot)
 {
     QwtInterval ival;
     if (m_pData->m_valueScaleAuto)
@@ -902,7 +880,10 @@ void PlotCanvas::updateScaleValues()
         setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
     }
 
-    replot();
+    if (doReplot)
+    {
+        replot();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2504,77 +2485,6 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::configRescaler(void)
 {
-    //if (m_pData->m_keepAspect)
-    //{
-    //    int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
-    //
-    //    /*
-    //    QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
-    //    QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
-
-    //    QwtInterval userXInterVal = m_rasterData->interval(Qt::XAxis);
-    //    QwtInterval userYInterVal = m_rasterData->interval(Qt::YAxis);
-
-    //    if (curXInterVal.minValue() < userXInterVal.minValue())
-    //    {
-    //        curXInterVal.setMinValue(userXInterVal.minValue());
-    //    }
-
-    //    if (curXInterVal.maxValue() > userXInterVal.maxValue())
-    //    {
-    //        curXInterVal.setMaxValue(userXInterVal.maxValue());
-    //    }
-
-    //    if (curYInterVal.minValue() < userYInterVal.minValue())
-    //    {
-    //        curYInterVal.setMinValue(userYInterVal.minValue());
-    //    }
-
-    //    if (curYInterVal.maxValue() > userYInterVal.maxValue())
-    //    {
-    //        curYInterVal.setMaxValue(userYInterVal.maxValue());
-    //    }
-    //    */
-    //    if (m_pRescaler == NULL)
-    //    {
-    //        QwtInterval curXInterVal = m_rasterData->interval(Qt::XAxis);
-    //        QwtInterval curYInterVal = m_rasterData->interval(Qt::YAxis);
-
-    //        m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
-    //        m_pRescaler->setEnabled(false);
-    //        m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-    //        m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
-    //        m_pRescaler->setIntervalHint(QwtPlot::yRight, m_rasterData->interval(Qt::ZAxis));
-    //        m_pRescaler->setAspectRatio(1.0);
-    //        m_pRescaler->setAspectRatio(QwtPlot::yRight, 0.0);
-    //        m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
-    //        m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
-    //        m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
-    //    }
-    //    else
-    //    {
-    //        m_pRescaler->setReferenceAxis(refAxis);
-    //    }
-
-    //    //m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-    //    //m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
-
-    //    m_pRescaler->setEnabled(true);
-    //}
-    //else
-    //{
-    //    if (m_pRescaler != NULL)
-    //    {
-    //        m_pRescaler->setEnabled(false);
-    //        //m_pRescaler->deleteLater();
-    //        //m_pRescaler = NULL;
-    //    }
-    //}
-    //if (m_pRescaler != NULL && m_pData->m_keepAspect)
-    //{
-    //    m_pRescaler->rescale();
-    //}
-    ////replot();
     m_pZoomer->setFixedAspectRatio(m_pData->m_keepAspect);
 }
 

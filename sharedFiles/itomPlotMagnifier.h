@@ -25,13 +25,15 @@
 
 #include <qwt_plot_magnifier.h>
 #include <qpoint.h>
+#include <qpointer.h>
 
 class QMouseEvent;
+class ItomPlotZoomer;
 
 class ItomPlotMagnifier : public QwtPlotMagnifier
 {
 public:
-    explicit ItomPlotMagnifier(QWidget* parent);
+    explicit ItomPlotMagnifier(QWidget* parent, ItomPlotZoomer *zoomer = NULL);
     virtual ~ItomPlotMagnifier();
 
 protected:
@@ -39,7 +41,9 @@ protected:
     void widgetWheelEvent( QWheelEvent *wheelEvent );
 
     void rescale(double factor);
-    void rescale(double factor, QPointF mouseCoords);
+    void rescale(double factor, const QPointF &mouseCoords);
+
+    QPointer<ItomPlotZoomer> m_zoomer;
 
 private:
     QPoint m_mousePos;

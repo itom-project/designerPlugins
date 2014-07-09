@@ -57,17 +57,15 @@ void ItomPlotZoomer::setFixedAspectRatio(bool fixed)
     {
         m_aspectRatioChanged = true;
 
-        if (plot())
+        QWidget *w = parentWidget();
+        if ( w && !isEnabled())
         {
-            QWidget *w = plot()->canvas();
-            if ( w )
-            {
-                if ( fixed )
-                    w->installEventFilter( this );
-                else
-                    w->removeEventFilter( this );
-            }
+            if (fixed)
+                w->installEventFilter( this );
+            else
+                w->removeEventFilter( this );
         }
+
         m_fixedAspectRatio = fixed;
         rescale();
     }
@@ -126,20 +124,21 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
         if ( !plt )
             return;
 
-        //if the zoomer is disabled and this method is called, this might come frome an explicit call to zoom... or due to a
-        //resize event with fixed aspect ratio. In the latter case, the zoom should not be done with respect to the current zoomRect
-        //but to the scaleRect, that is the currently visible region.
-        const QRectF &rect = (isEnabled() || !resizeEvent) ? zoomRect() : scaleRect();
-        if ( !isEnabled() || rect != scaleRect() || m_aspectRatioChanged )
+        double x1, x2, y1, y2;
+        bool rescale = false;
+
+        const bool doReplot = plt->autoReplot();
+        plt->setAutoReplot( false );
+
+        if (resizeEvent) //the currently visible part of the contents rect should be still visible (if possible)
         {
-            const bool doReplot = plt->autoReplot();
-            plt->setAutoReplot( false );
+            QRectF visibleContentsRect = zoomRect().intersected(scaleRect());
 
             //rect is in scale coordinates, the square however should be guaranteed in screen coordinates (pixels)
-            double x1 = rect.left();
-            double x2 = rect.right();
-            double y1 = rect.top();
-            double y2 = rect.bottom();
+            x1 = visibleContentsRect.left();
+            x2 = visibleContentsRect.right();
+            y1 = visibleContentsRect.top();
+            y2 = visibleContentsRect.bottom();
 
             if (m_fixedAspectRatio)
             {
@@ -180,6 +179,66 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
                 }
             }
 
+            rescale = true;
+        }
+        else
+        {
+            //if the zoomer is disabled and this method is called, this might come frome an explicit call to zoom... or due to a
+            //resize event with fixed aspect ratio. In the latter case, the zoom should not be done with respect to the current zoomRect
+            //but to the scaleRect, that is the currently visible region.
+            if ( !isEnabled() || zoomRect() != scaleRect() || m_aspectRatioChanged )
+            {
+                //rect is in scale coordinates, the square however should be guaranteed in screen coordinates (pixels)
+                x1 = zoomRect().left();
+                x2 = zoomRect().right();
+                y1 = zoomRect().top();
+                y2 = zoomRect().bottom();
+
+                if (m_fixedAspectRatio)
+                {
+
+                    //get effective area of the current plot (without margins, axes,...)
+                    //int left, top, right, bottom;
+                    //plt->canvas()->getContentsMargins( &left, &top, &right, &bottom );
+                    //plt->canvas()->setStyleSheet("background-color: #ff00cc");
+                    ////qDebug() << plt->canvas()->contentsMargins() << plt->contentsMargins();
+                    //const QSize size = plt->canvas()->contentsRect().size(); // - QSize(left+right,top+bottom);
+
+                    //qDebug() << plt->size() << plt->canvas()->size();
+
+                    //more exact: take real pixel lenghts of axisScaleDraws are real area
+                    const QSize size(plt->axisScaleDraw(xAxis())->length(), plt->axisScaleDraw(yAxis())->length());
+
+                    //make square
+                    double lx = qAbs(x2 - x1);
+                    double ly = qAbs(y2 - y1);
+                    double sx = lx / size.width();
+                    double sy = ly / size.height();
+
+                    if (sy > sx)
+                    {
+                        double factor = sy / sx;
+                        double center = (x1+x2)/2.0;
+                        //increase x1,x2
+                        x1 = center - (center - x1)*factor;
+                        x2 = center + (x2 - center)*factor;
+                    }
+                    else if (sy < sx)
+                    {
+                        double factor = sx / sy;
+                        double center = (y1+y2)/2.0;
+                        //increase y1,y2
+                        y1 = center - (center - y1)*factor;
+                        y2 = center + (y2 - center)*factor;
+                    }
+                }
+
+                rescale = true;
+            }
+        }
+
+        if (rescale)
+        {
             if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() )
                 qSwap( x1, x2 );
 
@@ -208,7 +267,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
     }
 }
 
-
+//--------------------------------------------------------------------------------------
 //!  Event filter for the plot canvas
 bool ItomPlotZoomer::eventFilter( QObject *object, QEvent *event )
 {
@@ -236,4 +295,20 @@ bool ItomPlotZoomer::eventFilter( QObject *object, QEvent *event )
     }
 
     return false;
+}
+
+//--------------------------------------------------------------------------------------
+void ItomPlotZoomer::setEnabled(bool enabled)
+{
+    QwtPicker::setEnabled(enabled);
+
+    if (!enabled && m_fixedAspectRatio == true)
+    {
+        QWidget *w = parentWidget();
+        if ( w )
+        {
+            w->installEventFilter( this ); //re-install the event filter that has been removed by setEnabled of QwtPicker (if fixed aspect ratio is on)
+        }
+    }
+
 }

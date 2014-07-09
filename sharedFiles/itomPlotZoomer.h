@@ -30,6 +30,10 @@ class QEvent;
 
 class ItomPlotZoomer : public QwtPlotZoomer
 {
+    Q_OBJECT
+
+    Q_PROPERTY( bool isEnabled READ isEnabled WRITE setEnabled )
+
 public:
     explicit ItomPlotZoomer( QWidget *parent, bool doReplot = true );
     explicit ItomPlotZoomer( int xAxis, int yAxis,
@@ -39,6 +43,9 @@ public:
 
     void setFixedAspectRatio(bool fixed);
     bool fixedAspectRatio() const { return m_fixedAspectRatio; }
+
+public Q_SLOTS:
+    void setEnabled(bool enabled);
 
 protected:
     bool eventFilter( QObject *object, QEvent *event );

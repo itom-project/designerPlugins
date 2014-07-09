@@ -191,6 +191,7 @@ void Itom2dQwtPlot::createActions()
     m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     a->setObjectName("actHome");
     a->setToolTip(tr("Reset original view"));
+    a->setShortcut(Qt::CTRL + Qt::Key_0);
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActHome()));
 
     //m_actPan
