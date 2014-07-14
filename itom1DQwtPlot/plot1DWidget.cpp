@@ -901,13 +901,13 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
             {
                 ito::float32 dx, dy;
 
-                QPainterPath *path = new QPainterPath();
+                QPainterPath path;
                 switch (it.value()->m_type)
                 {
                     case tPoint:
-                        path->moveTo(canxpos, canypos);
-                        path->lineTo(canxpos, canypos);
-                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
+                        path.moveTo(canxpos, canypos);
+                        path.lineTo(canxpos, canypos);
+                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
@@ -923,21 +923,21 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 
                             if (fabs(dx) > fabs(dy))
                             {
-                                path->moveTo(canxpos, it.value()->y2);
-                                path->lineTo(it.value()->x2, it.value()->y2);  
+                                path.moveTo(canxpos, it.value()->y2);
+                                path.lineTo(it.value()->x2, it.value()->y2);  
                             }
                             else
                             {
-                                path->moveTo(it.value()->x2, canypos);
-                                path->lineTo(it.value()->x2, it.value()->y2);  
+                                path.moveTo(it.value()->x2, canypos);
+                                path.lineTo(it.value()->x2, it.value()->y2);  
                             }
                         }
                         else
                         {
-                            path->moveTo(canxpos, canypos);
-                            path->lineTo(it.value()->x2, it.value()->y2);                        
+                            path.moveTo(canxpos, canypos);
+                            path.lineTo(it.value()->x2, it.value()->y2);                        
                         }
-                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
+                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         replot();
                     break;
@@ -965,10 +965,10 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                             m_ignoreNextMouseEvent = true;
                         }
 
-                        path->addRect(canxpos, canypos,
+                        path.addRect(canxpos, canypos,
                             it.value()->x2 - canxpos,
                             it.value()->y2 - canypos);
-                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
+                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
 
                         if(m_ignoreNextMouseEvent)
@@ -1004,11 +1004,11 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                             }
                             m_ignoreNextMouseEvent = true;
                         }
-                        path->addEllipse(canxpos,
+                        path.addEllipse(canxpos,
                             canypos,
                              it.value()->x2 - canxpos,
                              it.value()->y2 - canypos);
-                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
+                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
 
                         if(m_ignoreNextMouseEvent)
@@ -1030,7 +1030,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
             {
                 ito::float32 dx, dy;
 
-                QPainterPath *path = new QPainterPath();
+                QPainterPath path;
                 switch (it.value()->m_type)
                 {
                     case tLine:
@@ -1041,22 +1041,22 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 
                             if (fabs(dx) > fabs(dy))
                             {
-                                path->moveTo(it.value()->x1, it.value()->y1);
-                                path->lineTo(canxpos, it.value()->y1);
+                                path.moveTo(it.value()->x1, it.value()->y1);
+                                path.lineTo(canxpos, it.value()->y1);
                             }
                             else
                             {
-                                path->moveTo(it.value()->x1, it.value()->y1);
-                                path->lineTo(it.value()->x1, canypos);
+                                path.moveTo(it.value()->x1, it.value()->y1);
+                                path.lineTo(it.value()->x1, canypos);
                             }
                         }
                         else
                         {
-                            path->moveTo(it.value()->x1, it.value()->y1);
-                            path->lineTo(canxpos, canypos);
+                            path.moveTo(it.value()->x1, it.value()->y1);
+                            path.lineTo(canxpos, canypos);
                         }
 
-                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
+                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
                         replot();
@@ -1083,10 +1083,10 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                             }
                             m_ignoreNextMouseEvent = true;
                         }
-                        path->addRect(it.value()->x1, it.value()->y1,
+                        path.addRect(it.value()->x1, it.value()->y1,
                             canxpos - it.value()->x1,
                             canypos - it.value()->y1);
-                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
+                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
                         if(m_ignoreNextMouseEvent)
@@ -1123,11 +1123,11 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                             m_ignoreNextMouseEvent = true;
                             
                         }
-                        path->addEllipse(it.value()->x1,
+                        path.addEllipse(it.value()->x1,
                             it.value()->y1,
                             canxpos - it.value()->x1,
                             canypos - it.value()->y1),
-                        it.value()->setShape(*path, m_inverseColor0, m_inverseColor1);
+                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
                         if(m_ignoreNextMouseEvent)
@@ -2062,41 +2062,30 @@ void Plot1DWidget::multiPointActivated (bool on)
 			case tPoint:
 				if (!on)
 				{
-					QPolygon polygon = m_pMultiPointPicker->selection();
-
-					QPolygonF polygonScale;
+					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
-					if (polygon.size() == 0)
+					if (polygonScale.size() == 0)
 					{
 						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
 					}
 					else
 					{
-						QPointF pt;
-
-						for (int i = 0; i < polygon.size() - 1; ++i)
-						{
-							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append(pt);
-						}
-
-						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size()-1), 2000);
 					}
 
-					if (!aborted && polygonScale.size() > 0)
+					if (!aborted && polygonScale.size() > 1)
 					{
-						for (int i = 0; i < polygonScale.size(); i++)
+						for (int i = 0; i < polygonScale.size() - 1; i++)
 						{
-							QPainterPath *path = new QPainterPath();
+							QPainterPath path;
 							DrawItem *newItem = NULL;
 							newItem = new DrawItem(this, tPoint);
-							path->moveTo(polygonScale[i].x(), polygonScale[i].y());
-							path->lineTo(polygonScale[i].x(), polygonScale[i].y());
+							path.moveTo(polygonScale[i].x(), polygonScale[i].y());
+							path.lineTo(polygonScale[i].x(), polygonScale[i].y());
 
-							newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+							newItem->setShape(path, m_inverseColor0, m_inverseColor1);
 
 							if (this->m_inverseColor0.isValid())
 							{
@@ -2132,12 +2121,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 			case tLine:
 				if (!on)
 				{
-					QPolygon polygon = m_pMultiPointPicker->selection();
-
-					QPolygonF polygonScale;
+					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
-					if (polygon.size() == 0)
+					if (polygonScale.size() == 0)
 					{
 						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
@@ -2145,24 +2132,15 @@ void Plot1DWidget::multiPointActivated (bool on)
 					}
 					else
 					{
-						QPointF pt;
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size()-1), 2000);
 
-						for (int i = 0; i < polygon.size(); ++i)
-						{
-							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append(pt);
-						}
-
-						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
-
-						QPainterPath *path = new QPainterPath();
+						QPainterPath path;
 						DrawItem *newItem = NULL;
 						newItem = new DrawItem(this, tLine);
-						path->moveTo(polygonScale[0].x(), polygonScale[0].y());
-						path->lineTo(polygonScale[1].x(), polygonScale[1].y());
+						path.moveTo(polygonScale[0].x(), polygonScale[0].y());
+						path.lineTo(polygonScale[1].x(), polygonScale[1].y());
 
-						newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+						newItem->setShape(path, m_inverseColor0, m_inverseColor1);
 
 						newItem->setVisible(true);
 						newItem->show();
@@ -2223,11 +2201,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 			case tRect:
 				if (!on)
 				{
-					QPolygon polygon = m_pMultiPointPicker->selection();
-					QPolygonF polygonScale;
+					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
-					if (polygon.size() == 0)
+					if (polygonScale.size() == 0)
 					{
 						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
@@ -2235,24 +2212,15 @@ void Plot1DWidget::multiPointActivated (bool on)
 					}
 					else
 					{
-						QPointF pt;
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size()-1), 2000);
 
-						for (int i = 0; i < polygon.size(); ++i)
-						{
-							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append(pt);
-						}
-
-						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
-
-						QPainterPath *path = new QPainterPath();
+						QPainterPath path;
 						DrawItem *newItem = NULL;
 						newItem = new DrawItem(this, tRect);
-						path->addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
+						path.addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
 									  polygonScale[1].y() - polygonScale[0].y());
 
-						newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+						newItem->setShape(path, m_inverseColor0, m_inverseColor1);
 					
 						newItem->setVisible(true);
 						newItem->show();
@@ -2312,12 +2280,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 			case tEllipse:
 				if (!on)
 				{
-					QPolygon polygon = m_pMultiPointPicker->selection();
-
-					QPolygonF polygonScale;
+					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
-					if (polygon.size() == 0)
+					if (polygonScale.size() == 0)
 					{
 						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
@@ -2325,24 +2291,15 @@ void Plot1DWidget::multiPointActivated (bool on)
 					}
 					else
 					{
-						QPointF pt;
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size()-1), 2000);
 
-						for (int i = 0; i < polygon.size(); ++i)
-						{
-							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append(pt);
-						}
-
-						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
-
-						QPainterPath *path = new QPainterPath();
+						QPainterPath path;
 						DrawItem *newItem = NULL;
 						newItem = new DrawItem(this, tEllipse);
-						path->addEllipse(polygonScale[0].x(), polygonScale[0].y(),
+						path.addEllipse(polygonScale[0].x(), polygonScale[0].y(),
 								(polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
-						newItem->setShape(*path, m_inverseColor0, m_inverseColor1);
+						newItem->setShape(path, m_inverseColor0, m_inverseColor1);
 					
 						if (this->m_inverseColor0.isValid())
 						{
