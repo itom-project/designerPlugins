@@ -26,6 +26,31 @@
 #include <qwt_painter.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
+UserInteractionPlotPicker::UserInteractionPlotPicker( QWidget *canvas ) : QwtPlotPicker(canvas) 
+{ 
+    init(); 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+UserInteractionPlotPicker::~UserInteractionPlotPicker() 
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+UserInteractionPlotPicker::UserInteractionPlotPicker( int xAxis, int yAxis, QWidget *widget ) : QwtPlotPicker(xAxis,yAxis,widget) 
+{ 
+    init(); 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+UserInteractionPlotPicker::UserInteractionPlotPicker( int xAxis, int yAxis,
+    RubberBand rubberBand, DisplayMode trackerMode, QWidget *widget ) :
+    QwtPlotPicker(xAxis,yAxis,rubberBand,trackerMode,widget) 
+{ 
+    init(); 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::reset()
 {
     //at the beginning no point is clicked, nevertheless the Abort-Key should abort the selection and
@@ -36,6 +61,14 @@ void UserInteractionPlotPicker::reset()
     }
 
     QwtPlotPicker::reset();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void UserInteractionPlotPicker::init()
+{
+    connect(this, SIGNAL(activated(bool)), this, SLOT(selectionActivated(bool)));
+    connect(this, SIGNAL(appended(QPointF)), this, SLOT(selectionAppended(QPointF)));
+    connect(this, SIGNAL(moved(QPointF)), this, SLOT(selectionMoved(QPointF)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -170,3 +203,25 @@ void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void UserInteractionPlotPicker::selectionAppended( const QPointF &pos )
+{
+    m_selection.append(pos);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void UserInteractionPlotPicker::selectionMoved( const QPointF &pos )
+{
+    if (m_selection.size() > 0)
+    {
+        m_selection.last() = pos;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void UserInteractionPlotPicker::selectionActivated(bool on)
+{
+    if (on)
+    {
+        m_selection.clear();
+    }
+}

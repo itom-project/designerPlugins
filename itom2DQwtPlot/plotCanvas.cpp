@@ -1671,28 +1671,17 @@ void PlotCanvas::multiPointActivated (bool on)
 			case tMultiPointPick:
 				if (!on)
 				{
-					QPolygon polygon = m_pMultiPointPicker->selection();
-
-					QPolygonF polygonScale;
+					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
-					if (polygon.size() == 0)
+					if (polygonScale.size() == 0)
 					{
 						emit statusBarMessage(tr("Selection has been aborted."), 2000);
 						aborted = true;
 					}
 					else
 					{
-						QPointF pt;
-
-						for (int i = 0; i < polygon.size() - 1; ++i)
-						{
-							pt.rx() = invTransform(QwtPlot::xBottom, polygon[i].rx());
-							pt.ry() = invTransform(QwtPlot::yLeft, polygon[i].ry());
-							polygonScale.append(pt);
-						}
-
-						emit statusBarMessage(tr("%1 points have been selected.").arg(polygon.size()-1), 2000);
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size()-1), 2000);
 					}
 
 					if (m_pData->m_elementsToPick > 1)
@@ -1714,6 +1703,10 @@ void PlotCanvas::multiPointActivated (bool on)
 					Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
 					if (p)
 					{
+                        if (polygonScale.size() > 0)
+                        {
+                            polygonScale.erase(polygonScale.end()-1); //remove last item, since the last one is always the current position of the mouse (without effective click)
+                        }
 						emit p->userInteractionDone(ito::PrimitiveContainer::tMultiPointPick, aborted, polygonScale);
 					}
 

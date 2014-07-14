@@ -33,26 +33,35 @@ class UserInteractionPlotPicker: public QwtPlotPicker
     Q_OBJECT
 
 public:
-    explicit UserInteractionPlotPicker( QWidget *canvas ) : QwtPlotPicker(canvas) {}
-    virtual ~UserInteractionPlotPicker() {}
-
-    explicit UserInteractionPlotPicker( int xAxis, int yAxis, QWidget *widget ) : QwtPlotPicker(xAxis,yAxis,widget) {}
+    explicit UserInteractionPlotPicker( QWidget *canvas );
+    
+    explicit UserInteractionPlotPicker( int xAxis, int yAxis, QWidget *widget );
 
     explicit UserInteractionPlotPicker( int xAxis, int yAxis,
-        RubberBand rubberBand, DisplayMode trackerMode, QWidget *widget ) :
-        QwtPlotPicker(xAxis,yAxis,rubberBand,trackerMode,widget) {}
+        RubberBand rubberBand, DisplayMode trackerMode, QWidget *widget );
+
+    virtual ~UserInteractionPlotPicker();
 
     void setBackgroundFillBrush( const QBrush &brush );
 
+    QPolygonF selectionInPlotCoordinates() const { return m_selection; }
 
 protected:
     void reset();
+    void init();
 
     void drawTracker( QPainter *painter ) const;
     void drawRubberBand( QPainter *painter ) const;
 
 private:
     QBrush m_rectFillBrush;
+
+    QPolygonF m_selection;
+
+private slots:
+    void selectionActivated(bool on);
+    void selectionAppended( const QPointF &pos );
+    void selectionMoved( const QPointF &pos );
 
 };
 
