@@ -46,6 +46,7 @@
 #include <QMenu>
 #include <QLineEdit>
 #include <QTimer>
+#include <qactiongroup.h>
 
 #if defined(CONNEXION_FOUND) //&& !_DEBUG
     #ifdef _DEBUG
@@ -271,6 +272,7 @@ private:
     QAction  *m_actUpdatePos;
     QAction  *m_actSetAutoUpdate;
     QMenu    *m_mnuSetAutoUpdate;
+    QActionGroup *m_unitActionGroup;
 
     QAction  *m_actSetAbsRel;
 

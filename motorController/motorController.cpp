@@ -53,6 +53,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_bigStep(0.010),
     m_actSetUnit(NULL),
     m_actUpdatePos(NULL),
+    m_unitActionGroup(NULL),
     m_mnuSetUnit(NULL),
     m_mnuSetAbsRel(NULL),
     m_actSetAbsRel(NULL),
@@ -192,13 +193,36 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetUnit = new QAction(tr("Toggle Unit"), this);
+    m_unitActionGroup = new QActionGroup(this);
+    QAction *a;
+
     m_mnuSetUnit = new QMenu(tr("Unit Switch"), this);
-    m_mnuSetUnit->addAction("nm");
-    m_mnuSetUnit->addAction(micronString);
-    m_mnuSetUnit->addAction("mm");
-    m_mnuSetUnit->addAction("m");
-    m_actSetUnit->setMenu(m_mnuSetUnit);
+
+    a = m_mnuSetUnit->addAction("nm");
+    a->setCheckable(true);
+    a->setData(Unit::nm);
+    m_unitActionGroup->addAction(a);
+
+    a = m_mnuSetUnit->addAction(micronString);
+    a->setCheckable(true);
+    a->setData(Unit::micron);
+    m_unitActionGroup->addAction(a);
+
+    a = m_mnuSetUnit->addAction("mm");
+    a->setCheckable(true);
+    a->setData(Unit::mm);
+    m_unitActionGroup->addAction(a);
+    a->setChecked(true);
+
+    a = m_mnuSetUnit->addAction("m");
+    a->setCheckable(true);
+    a->setData(Unit::m);
+    m_unitActionGroup->addAction(a);
     
+    m_actSetUnit->setMenu(m_mnuSetUnit);
+    connect(m_mnuSetUnit, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetUnit(QAction*)));
+    
+
     m_actUpdatePos = new QAction(tr("Update"), this);
     
     m_actSetAbsRel = new QAction(tr("Toggle Abs/Rel"), this);
@@ -211,7 +235,6 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     connect(m_mnuSetAbsRel, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAbsRel(QAction*)));
     
-    connect(m_mnuSetUnit, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetUnit(QAction*)));
     connect(m_actUpdatePos, SIGNAL(triggered()), this, SLOT(triggerUpdatePosition()));
     
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
@@ -363,6 +386,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     resizeEvent(NULL);
     m_isUpdating = false;
+
     return;
 }
 
@@ -825,13 +849,9 @@ void MotorController::setReadOnly(const bool value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void MotorController::mnuSetUnit(QAction* inputAction)
 {
-    const QMetaObject *mo = this->metaObject();
-    QMetaEnum me = mo->enumerator( mo->indexOfEnumerator("Unit") );
-    int unit = me.keyToValue(inputAction->text().toLatin1().data());
-
-    if (unit >= 0)
+    if (inputAction)
     {
-        setUnit((Unit)unit);
+        setUnit((Unit)inputAction->data().toInt());
     }
 }
 
