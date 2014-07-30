@@ -155,6 +155,8 @@ class PlotWidget :  public QGraphicsView
 
         ito::RetVal init();
 
+        void updateTransformation();
+
     protected:
         void resizeEvent (QResizeEvent * event);
         void keyPressEvent ( QKeyEvent * event );
@@ -203,7 +205,6 @@ class PlotWidget :  public QGraphicsView
 
         QWidget *m_pParent;
         QMenu *m_pCmplxMenu;
-
 
     signals:
         void spawnNewChild(QVector<QPointF>);
@@ -264,12 +265,13 @@ struct InternalData
         m_xaxisScaleAuto = 1;
         m_xaxisMin = 0;
         m_xaxisMax = 0;
+        m_xaxisFlipped = 0;
         m_xaxisVisible = 1;
 
         m_yaxisScaleAuto = 1;
         m_yaxisMin = 0;
         m_yaxisMax = 0;
-        m_yaxisFlipped = 0;
+        m_yaxisFlipped = 1;
         m_yaxisVisible = 1;
 
         m_colorBarVisible = 0;
@@ -322,6 +324,7 @@ struct InternalData
     bool m_xaxisScaleAuto;
     double m_xaxisMin;
     double m_xaxisMax;
+    bool m_xaxisFlipped;
     bool m_xaxisVisible;
 
     bool m_yaxisScaleAuto;

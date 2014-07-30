@@ -58,7 +58,8 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
     m_pItem->setZValue(0.0);
     m_pContent->addItem((QGraphicsItem*)m_pItem);   
 
-  
+    //m_pItem->setTransform(QTransform::fromScale(m_pData->m_xaxisFlipped ? -1 : 1, m_pData->m_yaxisFlipped ? 1 : -1));
+
 #if QT_VERSION < 0x050000
     m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
 #else
@@ -694,7 +695,7 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
 {
     int xsize = 1;
     int ysize = 1;
-
+    qreal factor = 1;
     if (m_ObjectContainer == NULL || m_pItem == NULL)
     {
         return ito::retError;
@@ -706,48 +707,51 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
     }
     switch(zoolLevel)
     {
+        default:
         case PlotWidget::RatioOff:
             m_pData->m_zoomLevel = PlotWidget::RatioOff;
             //m_pItem->setScale(1.0);
-            setMatrix(QMatrix(1, 0, 0, 1, 1, 1), false);
+            factor = 1;
             fitInView(m_pItem, Qt::KeepAspectRatio);
             break;
         case PlotWidget::Ratio1_1:
             m_pData->m_zoomLevel = PlotWidget::Ratio1_1;
             setSceneRect (0.0, 0.0, xsize, ysize);
-            setMatrix(QMatrix(1, 0, 0, 1, 1, 1), false);
+            factor = 1;
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case PlotWidget::Ratio1_2:
             m_pData->m_zoomLevel = PlotWidget::Ratio1_2;
             setSceneRect (0.0, 0.0, xsize, ysize);
-            setMatrix(QMatrix(2, 0, 0, 2, 1, 1), false);
+            factor = 2;
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case PlotWidget::Ratio1_4:
             m_pData->m_zoomLevel = PlotWidget::Ratio1_4;
             setSceneRect (0.0, 0.0, xsize, ysize);
-            setMatrix(QMatrix(4, 0, 0, 4, 1, 1), false);
+            factor = 4;
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case PlotWidget::Ratio2_1:
             m_pData->m_zoomLevel = PlotWidget::Ratio2_1;
             setSceneRect (0.0, 0.0, xsize, ysize);
-            setMatrix(QMatrix(0.5, 0, 0, 0.5, 1, 1), false);
+            factor = 0.5;
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
         case PlotWidget::Ratio4_1:
             m_pData->m_zoomLevel = PlotWidget::Ratio4_1;
             setSceneRect (0.0, 0.0, xsize, ysize);
-            setMatrix(QMatrix(0.25, 0, 0, 0.25, 1, 1), false);
+            factor = 0.25;
             m_pItem->setScale(1.0);
             centerOn(m_pItem);
             break;
     }
+
+    setMatrix(QMatrix( m_pData->m_xaxisFlipped ? -factor : factor , 0, 0, m_pData->m_yaxisFlipped ? factor : -factor, 1, 1), false);
 
     if (m_pItem) repaint();  // has an image to paint
     
@@ -934,6 +938,8 @@ bool PlotWidget::setColorMap(QString colormap /*= "__next__"*/)
         m_pData->m_inverseColor1 = newPalette.inverseColorTwo;
         ((GraphicViewPlot*)m_pParent)->setPaletteText(newPalette.name);
     }
+
+    
 
     refreshStyles();
 
@@ -1159,4 +1165,21 @@ void PlotWidget::changePlane(int plane)
 void PlotWidget::internalDataUpdated()
 {
     refreshPlot(m_dObjPtr, -1);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotWidget::updateTransformation()
+{
+    if(m_pItem && m_pData)
+    {
+        qreal factor = fabs(matrix().m11());
+        setMatrix(QMatrix( m_pData->m_xaxisFlipped ? -factor : factor , 0, 0, m_pData->m_yaxisFlipped ? factor : -factor, 1, 1), false);
+        /*
+        QPointF(
+        m_pItem->setTransform(QTransform::fromScale(m_pData->m_xaxisFlipped ? -1 : 1, m_pData->m_yaxisFlipped ? 1 : -1));
+        if(
+        m_pItem->setTransformOriginPoint(m_pItem->boundingRect().center());
+        
+        repaint();
+        */
+    }
 }

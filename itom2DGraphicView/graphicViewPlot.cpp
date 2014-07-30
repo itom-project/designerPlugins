@@ -1302,6 +1302,29 @@ void GraphicViewPlot::setAxisFont(const QFont &font)
     }
 
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool GraphicViewPlot::getxAxisFlipped() const
+{
+    return m_data.m_xaxisFlipped;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void GraphicViewPlot::setxAxisFlipped(const bool &value)
+{
+    m_data.m_xaxisFlipped = value;
+    if(m_pContent) m_pContent->updateTransformation();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+bool GraphicViewPlot::getyAxisFlipped() const
+{
+    return m_data.m_yaxisFlipped;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void GraphicViewPlot::setyAxisFlipped(const bool &value)
+    {
+    m_data.m_yaxisFlipped = value;
+    if(m_pContent) m_pContent->updateTransformation();
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void GraphicViewPlot::setColorMode(const int type)
 {

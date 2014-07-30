@@ -52,7 +52,10 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 
     Q_PROPERTY(int colorMode READ getColorMode WRITE setColorMode RESET resetColorMode USER true)
     Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true USER true)
-    //Q_PROPERTY(QString colorMap READ getColorMap WRITE setColorMap DESIGNABLE true USER true)
+    Q_PROPERTY(QString colorMap READ getColorMap WRITE setColorMap DESIGNABLE true USER true)
+
+    Q_PROPERTY(bool xAxisFlipped READ getxAxisFlipped WRITE setxAxisFlipped USER true)
+    Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped USER true)
 
     //Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)
     //Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel RESET resetxAxisLabel USER true)
@@ -67,7 +70,11 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://colorMode", "Defines color handling.")
     Q_CLASSINFO("prop://colorBarVisible", "Defines whether the color bar should be visible.")
-    //Q_CLASSINFO("prop://colorMap", "Defines which color map should be used [e.g. grayMarked, hotIron].")
+    Q_CLASSINFO("prop://colorMap", "Defines which color map should be used [e.g. grayMarked, hotIron].")
+
+    Q_CLASSINFO("prop://xAxisFlipped", "Sets whether x-axis should be flipped (default: false, zero is at the left side).")
+    Q_CLASSINFO("prop://yAxisFlipped", "Sets whether y-axis should be flipped (default: true, zero is at the top).")
+    
     //Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     //Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     //Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -134,6 +141,12 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
 
         bool getyAxisVisible() const;
         void setyAxisVisible(const bool &value);
+
+        bool getxAxisFlipped() const;
+        void setxAxisFlipped(const bool &value);
+
+        bool getyAxisFlipped() const;
+        void setyAxisFlipped(const bool &value);
 
         QString getColorMap() const;
         void setColorMap(const QString &name);
