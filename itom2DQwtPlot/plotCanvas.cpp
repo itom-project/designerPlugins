@@ -865,19 +865,42 @@ void PlotCanvas::updateScaleValues(bool doReplot)
         axisWidget(QwtPlot::yRight)->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
     }
 
-    setAxisScale(QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
-
-    QwtScaleEngine *scaleEngine = axisScaleEngine(QwtPlot::yLeft);
-
     if (m_pData->m_yaxisFlipped)
     {
-        scaleEngine->setAttribute(QwtScaleEngine::Inverted, true);
-        setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMax, m_pData->m_yaxisMin);
+        axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted, true);
     }
     else
     {
-        scaleEngine->setAttribute(QwtScaleEngine::Inverted, false);
-        setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
+        axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted, false);
+    }
+
+    if (m_pZoomer)
+    {
+        QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+        zoom = zoom.normalized();
+
+        if (zoom == m_pZoomer->zoomRect())
+        {
+            m_pZoomer->zoom(zoom);
+            m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+        }
+        else
+        {
+            m_pZoomer->zoom(zoom);
+        }
+    }
+    else
+    {
+        setAxisScale(QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
+
+        if (m_pData->m_yaxisFlipped)
+        {
+            setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMax, m_pData->m_yaxisMin);
+        }
+        else
+        {
+            setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
+        }
     }
 
     if (doReplot)

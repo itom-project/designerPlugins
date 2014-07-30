@@ -540,12 +540,15 @@ bool Itom2dQwtPlot::getyAxisFlipped() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setyAxisFlipped(const bool &value)
 {
-    m_data.m_yaxisFlipped = value;
-
-    if (m_pContent)
+    if (m_data.m_yaxisFlipped != value)
     {
-        m_pContent->updateScaleValues();
-        m_pContent->internalDataUpdated();
+        m_data.m_yaxisFlipped = value;
+
+        if (m_pContent)
+        {
+            m_pContent->updateScaleValues();
+            m_pContent->internalDataUpdated();
+        }
     }
 }
 

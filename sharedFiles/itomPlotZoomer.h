@@ -44,6 +44,8 @@ public:
     void setFixedAspectRatio(bool fixed);
     bool fixedAspectRatio() const { return m_fixedAspectRatio; }
 
+    virtual void rescale(bool resizeEvent);
+
 public Q_SLOTS:
     void setEnabled(bool enabled);
 
@@ -51,13 +53,13 @@ protected:
     bool eventFilter( QObject *object, QEvent *event );
 
     virtual void rescale() { rescale(false); };
-    virtual void rescale(bool resizeEvent);
-
+    
     virtual bool accept( QPolygon & ) const;
 
 private:
     bool m_fixedAspectRatio;
     bool m_aspectRatioChanged;
+    int m_invertedAxes; //this member remembers the inversion of the xBottom and yLeft axis
 };
 
 #endif //ITOMPLOTZOOMER_H

@@ -26,13 +26,15 @@
 #include <qwt_plot.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_engine.h>
 #include <QtCore/qmath.h>
 
 //---------------------------------------------------------------------------
 ItomPlotZoomer::ItomPlotZoomer( QWidget *parent, bool doReplot /*= true*/ ) :
     QwtPlotZoomer(parent, doReplot),
     m_fixedAspectRatio(false),
-    m_aspectRatioChanged(false)
+    m_aspectRatioChanged(false),
+    m_invertedAxes(-1)
 {
 }
 
@@ -41,7 +43,8 @@ ItomPlotZoomer::ItomPlotZoomer( int xAxis, int yAxis,
                         QWidget *parent, bool doReplot /*= true*/ ) :
     QwtPlotZoomer(xAxis, yAxis, parent, doReplot),
     m_fixedAspectRatio(false),
-    m_aspectRatioChanged(false)
+    m_aspectRatioChanged(false),
+    m_invertedAxes(-1)
 {
 }
 
@@ -61,9 +64,13 @@ void ItomPlotZoomer::setFixedAspectRatio(bool fixed)
         if ( w && !isEnabled())
         {
             if (fixed)
+            {
                 w->installEventFilter( this );
+            }
             else
+            {
                 w->removeEventFilter( this );
+            }
         }
 
         m_fixedAspectRatio = fixed;
@@ -114,16 +121,59 @@ bool ItomPlotZoomer::accept( QPolygon &pa ) const
 //---------------------------------------------------------------------------
 void ItomPlotZoomer::rescale(bool resizeEvent)
 {
+    QwtPlot *plt = plot();
+    if ( !plt )
+        return;
+
+    int xAxisId = xAxis();
+    int yAxisId = yAxis();
+
     if (!m_fixedAspectRatio && !m_aspectRatioChanged)
     {
-        return QwtPlotZoomer::rescale();
+        int invertedAxes = plt->axisScaleEngine(xAxisId)->testAttribute(QwtScaleEngine::Inverted) ? 1 : 0;
+        invertedAxes += plt->axisScaleEngine(yAxisId)->testAttribute(QwtScaleEngine::Inverted) ? 2 : 0;
+
+        const QRectF &rect = zoomRect();
+        if ( rect != scaleRect() || (invertedAxes != m_invertedAxes))
+        {
+            m_invertedAxes = invertedAxes;
+
+            const bool doReplot = plt->autoReplot();
+            plt->setAutoReplot( false );
+
+            double x1 = rect.left();
+            double x2 = rect.right();
+            double y1 = rect.top();
+            double y2 = rect.bottom();
+
+            if (invertedAxes & 1)
+            {
+                if (x1 < x2) qSwap(x1,x2);
+            }
+            else
+            {
+                if (x2 < x1) qSwap(x1,x2);
+            }
+
+            if (invertedAxes & 2)
+            {
+                if (y1 < y2) qSwap(y1,y2);
+            }
+            else
+            {
+                if (y2 < y1) qSwap(y1,y2);
+            }
+
+            plt->setAxisScale( xAxisId, x1, x2 );
+            plt->setAxisScale( yAxisId, y1, y2 );
+
+            plt->setAutoReplot( doReplot );
+
+            plt->replot();
+        }
     }
     else
     {
-        QwtPlot *plt = plot();
-        if ( !plt )
-            return;
-
         double x1, x2, y1, y2;
         bool rescale = false;
 
@@ -152,14 +202,15 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
 
                 //qDebug() << plt->size() << plt->canvas()->size();
 
-                //more exact: take real pixel lenghts of axisScaleDraws are real area
-                const QSize size(plt->axisScaleDraw(xAxis())->length(), plt->axisScaleDraw(yAxis())->length());
+                //more exact: take real pixel lenghts of axisScaleDraws are real area (only if axis is available, else take size of canvas)
+                const int canvas_width = plt->axisEnabled(xAxisId) ? plt->axisScaleDraw(xAxisId)->length() : plt->canvas()->width();
+                const int canvas_height = plt->axisEnabled(yAxisId) ? plt->axisScaleDraw(yAxisId)->length() : plt->canvas()->height();
 
                 //make square
                 double lx = qAbs(x2 - x1);
                 double ly = qAbs(y2 - y1);
-                double sx = lx / size.width();
-                double sy = ly / size.height();
+                double sx = lx / canvas_width;
+                double sy = ly / canvas_height;
 
                 if (sy > sx)
                 {
@@ -206,14 +257,15 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
 
                     //qDebug() << plt->size() << plt->canvas()->size();
 
-                    //more exact: take real pixel lenghts of axisScaleDraws are real area
-                    const QSize size(plt->axisScaleDraw(xAxis())->length(), plt->axisScaleDraw(yAxis())->length());
+                    //more exact: take real pixel lenghts of axisScaleDraws are real area (only if axis is available, else take size of canvas)
+                    const int canvas_width = plt->axisEnabled(xAxisId) ? plt->axisScaleDraw(xAxisId)->length() : plt->canvas()->width();
+                    const int canvas_height = plt->axisEnabled(yAxisId) ? plt->axisScaleDraw(yAxisId)->length() : plt->canvas()->height();
 
                     //make square
                     double lx = qAbs(x2 - x1);
                     double ly = qAbs(y2 - y1);
-                    double sx = lx / size.width();
-                    double sy = ly / size.height();
+                    double sx = lx / canvas_width;
+                    double sy = ly / canvas_height;
 
                     if (sy > sx)
                     {
@@ -239,30 +291,32 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
 
         if (rescale)
         {
-            if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() )
-                qSwap( x1, x2 );
+            if (plt->axisScaleEngine(xAxisId)->testAttribute(QwtScaleEngine::Inverted))
+            {
+                if (x1 < x2) qSwap(x1,x2);
+            }
+            else
+            {
+                if (x2 < x1) qSwap(x1,x2);
+            }
 
-            plt->setAxisScale( xAxis(), x1, x2 );
+            if (plt->axisScaleEngine(yAxisId)->testAttribute(QwtScaleEngine::Inverted))
+            {
+                if (y1 < y2) qSwap(y1,y2);
+            }
+            else
+            {
+                if (y2 < y1) qSwap(y1,y2);
+            }
 
-            
-            if ( !plt->axisScaleDiv( yAxis() ).isIncreasing() )
-                qSwap( y1, y2 );
-
-            plt->setAxisScale( yAxis(), y1, y2 );
+            plt->setAxisScale( yAxisId, y1, y2 );
+            plt->setAxisScale( xAxisId, x1, x2 );
 
             plt->setAutoReplot( doReplot );
 
-            plt->replot();
-
-            /*QRectF pixels(plt->transform(xAxis(), x1), plt->transform(yAxis(), y1), 0 , 0);
-            pixels.setRight(plt->transform(xAxis(), x2));
-            pixels.setBottom(plt->transform(yAxis(), y2));
-            pixels = pixels.normalized();
-            double lx = qAbs(x2 - x1);
-            double ly = qAbs(y2 - y1);
-            qDebug() << (lx/pixels.width()) << (ly/pixels.height());*/
-
             m_aspectRatioChanged = false;
+
+            plt->replot();
         }
     }
 }
