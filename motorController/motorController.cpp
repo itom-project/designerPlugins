@@ -200,23 +200,23 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
     a = m_mnuSetUnit->addAction("nm");
     a->setCheckable(true);
-    a->setData(Unit::nm);
+    a->setData(nm);
     m_unitActionGroup->addAction(a);
 
     a = m_mnuSetUnit->addAction(micronString);
     a->setCheckable(true);
-    a->setData(Unit::micron);
+    a->setData(micron);
     m_unitActionGroup->addAction(a);
 
     a = m_mnuSetUnit->addAction("mm");
     a->setCheckable(true);
-    a->setData(Unit::mm);
+    a->setData(mm);
     m_unitActionGroup->addAction(a);
     a->setChecked(true);
 
     a = m_mnuSetUnit->addAction("m");
     a->setCheckable(true);
-    a->setData(Unit::m);
+    a->setData(m);
     m_unitActionGroup->addAction(a);
     
     m_actSetUnit->setMenu(m_mnuSetUnit);
