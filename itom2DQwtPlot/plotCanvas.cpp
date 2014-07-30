@@ -259,6 +259,9 @@ void PlotCanvas::refreshStyles()
     labelFont.setItalic(false);
     QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica", 10), NULL).value<QFont>();
 
+    QSize centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", QSize(10, 10), NULL).value<QSize>();
+    QPen centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", QPen(QBrush(Qt::red), 1), NULL).value<QPen>();
+
     if (m_inverseColor1.isValid())
     {
         rubberBandPen.setColor(m_inverseColor1);
@@ -268,6 +271,7 @@ void PlotCanvas::refreshStyles()
     {
         selectionPen.setColor(m_inverseColor0);
         trackerPen.setColor(m_inverseColor0);
+        centerMarkerPen.setColor(m_inverseColor0);
     }
 
     m_pZoomer->setRubberBandPen(rubberBandPen);
@@ -287,7 +291,7 @@ void PlotCanvas::refreshStyles()
     m_pLineCutLine->setPen(selectionPen);
 
     m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7)));
-    m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor0), QPen(QBrush(m_inverseColor0),1),  QSize(11,11)));
+    m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
     
     QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
     for (;it != m_pData->m_pDrawItems.end(); ++it)        
