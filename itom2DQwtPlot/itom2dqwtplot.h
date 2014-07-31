@@ -23,8 +23,11 @@
 #ifndef ITOM2DQWTPLOT_H
 #define ITOM2DQWTPLOT_H
 
+class PlotCanvas;
+
 #if defined(ITOMSHAREDDESIGNER)
     #define ITOM2DPLOT_EXPORT Q_DECL_EXPORT
+    
 #else
     #define ITOM2DPLOT_EXPORT Q_DECL_IMPORT
 #endif
@@ -32,12 +35,12 @@
 #include "plot/AbstractDObjFigure.h"
 #include "plot/AbstractNode.h"
 
-#include "plotCanvas.h"
+//#include "plotCanvas.h"
+//#include <qwt_plot_shapeitem.h>
 
 #include <qaction.h>
 #include <qwidgetaction.h>
 #include <qspinbox.h>
-#include <qwt_plot_shapeitem.h>
 #include <qslider.h>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/qlabel.h>
@@ -97,6 +100,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     DESIGNER_PLUGIN_ITOM_API
     public:
+    Itom2dQwtPlot(QWidget *parent = 0);
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
 
@@ -127,7 +131,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     void setValueLabel(const QString &label);
     void resetValueLabel();
 
-    int getGeometricElementsCount() const { return m_data.m_pDrawItems.size();}
+    int getGeometricElementsCount() const;
 
     bool getyAxisFlipped() const;
     void setyAxisFlipped(const bool &value);
@@ -142,7 +146,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     void setColorMap(const QString &name);
 
     void setPlaneRange(int min, int max);
-    void setCmplxSwitch(PlotCanvas::ComplexType type, bool visible);
+    void setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool visible);
 
     virtual QPointF getXAxisInterval(void) const;
     virtual void setXAxisInterval(QPointF point);
@@ -165,46 +169,32 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     QFont getAxisFont(void) const;
     void setAxisFont(const QFont &font);
 
-    bool getkeepAspectRatio(void) const {return this->m_data.m_keepAspect;}
+    bool getkeepAspectRatio(void) const;
     void setkeepAspectRatio(const bool &keepAspectEnable);
 
     QSharedPointer< ito::DataObject > getGeometricElements();
     void setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
 
-    bool getEnabledPlotting(void) const {return m_data.m_enablePlotting;}
+    bool getEnabledPlotting(void) const;
     void setEnabledPlotting(const bool &enabled);
 
-    bool getEnabledCenterMarker(void) const {return m_data.m_showCenterMarker;}
+    bool getEnabledCenterMarker(void) const;
     void setEnabledCenterMarker(const bool &enabled);
 
     int getSelectedElement(void) const;
     void setSelectedElement(const int idx);
 
-    int getAlpha () const {return this->m_data.m_alpha;}
-    void setAlpha (const int alpha)
-    {
-        this->m_data.m_alpha = alpha > 0 && alpha < 255 ? alpha : this->m_data.m_alpha;
-        if(m_pContent) m_pContent->alphaChanged();
-        this->m_pOverlaySlider->setValue(m_data.m_alpha);
-    }
+    int getAlpha () const;
+    void setAlpha (const int alpha);
 
     void resetAlpha(void)
     {
         setAlpha(0);
     }
 
-    QSharedPointer< ito::DataObject > getOverlayImage() const {return QSharedPointer< ito::DataObject >(NULL); }
-    void setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
-    {
-        if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
-        
-    }
-
-    void resetOverlayImage(void)
-    {
-        if(m_pContent) m_pContent->setOverlayObject(NULL);
-    }
-    
+    QSharedPointer< ito::DataObject > getOverlayImage() const;
+    void setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj);
+    void resetOverlayImage(void);
 
     void enableOverlaySlider(bool enabled) {m_pActOverlaySlider->setVisible(enabled);}
 
@@ -213,7 +203,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
 protected:
-    ito::RetVal init() { return m_pContent->init(); } //called when api-pointers are transmitted, directly after construction
+    ito::RetVal init(); //called when api-pointers are transmitted, directly after construction
 
     void createActions();
 
@@ -221,9 +211,11 @@ protected:
     void setColorDataTypeRepresentation(bool colorOn);
 
 private:
+    void constructor();
 
     PlotCanvas *m_pContent;    
-    InternalData m_data;
+//  InternalData m_data;
+    void *m_pVData;
 
     QAction *m_pActSave;
     QAction *m_pActHome;

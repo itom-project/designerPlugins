@@ -20,7 +20,9 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+#include "plotCanvas.h"
 #include "itom2dqwtplot.h"
+
 #include "../sharedFiles/userInteractionPlotPicker.h"
 #include "../sharedFiles/multiPointPickerMachine.h"
 
@@ -36,39 +38,42 @@
 #include <qwt_scale_widget.h>
 #include <qwt_picker_machine.h>
 
+#include <qwt_plot_shapeitem.h>
+
 #include <qwt_plot_layout.h>
 
 #include "common/sharedStructuresPrimitives.h"
 #include "DataObject/dataObjectFuncs.h"
-
 //----------------------------------------------------------------------------------------------------------------------------------
-Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
-    m_pContent(NULL),
-    m_pActSave(NULL),
-    m_pActHome(NULL),
-    m_pActPan(NULL),
-    m_pActZoom(NULL),
-    m_pActScaleSettings(NULL),
-    m_pActColorPalette(NULL),
-    m_pActToggleColorBar(NULL),
-    m_pActValuePicker(NULL),
-    m_pActLineCut(NULL),
-    m_pActStackCut(NULL),
-    m_pActPlaneSelector(NULL),
-    m_pActCmplxSwitch(NULL),
-    m_pActClearDrawings(NULL),
-    m_mnuCmplxSwitch(NULL),
-    m_pActCoordinates(NULL),
-    m_pCoordinates(NULL),
-    m_pActDrawMode(NULL),
-    m_pMnuDrawMode(NULL),
-    m_pActCntrMarker(NULL),
-    m_pActAspectRatio(NULL),
-    m_pDrawModeActGroup(NULL),
-    m_pOverlaySlider(NULL),
-    m_pActOverlaySlider(NULL)
+void Itom2dQwtPlot::constructor()
 {
+    // Basic settings
+    m_pContent = NULL;
+    m_pActSave = NULL;
+    m_pActHome = NULL;
+    m_pActPan = NULL;
+    m_pActZoom = NULL;
+    m_pActScaleSettings = NULL;
+    m_pActColorPalette = NULL;
+    m_pActToggleColorBar = NULL;
+    m_pActValuePicker = NULL;
+    m_pActLineCut = NULL;
+    m_pActStackCut = NULL;
+    m_pActPlaneSelector = NULL;
+    m_pActCmplxSwitch = NULL;
+    m_pActClearDrawings = NULL;
+    m_mnuCmplxSwitch = NULL;
+    m_pActCoordinates = NULL;
+    m_pCoordinates = NULL;
+    m_pActDrawMode = NULL;
+    m_pMnuDrawMode = NULL;
+    m_pActCntrMarker = NULL;
+    m_pActAspectRatio = NULL;
+    m_pDrawModeActGroup = NULL;
+    m_pOverlaySlider = NULL;
+    m_pActOverlaySlider = NULL;
+
+
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
 
@@ -77,29 +82,32 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     //init actions
     createActions();
 
+    InternalData* pData = new InternalData();
+    m_pVData = (void*) pData;
+    
     //init internal data
-    m_data.m_dataType = ito::tFloat64;
-    m_data.m_autoTitle;
-    m_data.m_autoxAxisLabel = true;
-    m_data.m_autoyAxisLabel = true;
-    m_data.m_autoValueLabel = true;
-    m_data.m_valueScaleAuto = true;
-    m_data.m_valueMin = -127.0;
-    m_data.m_valueMax = 128.0;
-    m_data.m_xaxisScaleAuto = true;
-    m_data.m_yaxisScaleAuto = true;
-    m_data.m_xaxisVisible = true;
-    m_data.m_yaxisVisible = true;
-    m_data.m_colorBarVisible = false;
-    m_data.m_cmplxType = PlotCanvas::Abs;
-    m_data.m_yaxisFlipped = false;
-    m_data.m_pConstOutput = &m_pOutput;
-    m_data.m_state = PlotCanvas::tIdle;
-    m_data.m_elementsToPick = 0;
-    m_data.m_pDrawItems.clear();
+    pData->m_dataType = ito::tFloat64;
+    pData->m_autoTitle;
+    pData->m_autoxAxisLabel = true;
+    pData->m_autoyAxisLabel = true;
+    pData->m_autoValueLabel = true;
+    pData->m_valueScaleAuto = true;
+    pData->m_valueMin = -127.0;
+    pData->m_valueMax = 128.0;
+    pData->m_xaxisScaleAuto = true;
+    pData->m_yaxisScaleAuto = true;
+    pData->m_xaxisVisible = true;
+    pData->m_yaxisVisible = true;
+    pData->m_colorBarVisible = false;
+    pData->m_cmplxType = PlotCanvas::Abs;
+    pData->m_yaxisFlipped = false;
+    pData->m_pConstOutput = &m_pOutput;
+    pData->m_state = PlotCanvas::tIdle;
+    pData->m_elementsToPick = 0;
+    pData->m_pDrawItems.clear();
 
     //initialize canvas
-    m_pContent = new PlotCanvas(&m_data, this);
+    m_pContent = new PlotCanvas(pData, this);
     connect(m_pContent, SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
     connect(m_pContent, SIGNAL(statusBarMessage(QString)), (QObject*)statusBar(), SLOT(showMessage(QString)));
     connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
@@ -163,10 +171,21 @@ Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 
     setPropertyObservedObject(this);
 }
+Itom2dQwtPlot::Itom2dQwtPlot(QWidget *parent): AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent)
+{
+    constructor();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+    AbstractDObjFigure(itomSettingsFile, windowMode, parent)
+{
+    constructor();
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::~Itom2dQwtPlot()
 {
+    m_pVData = NULL;
     if (m_mnuCmplxSwitch != NULL)
     {
         delete m_mnuCmplxSwitch;
@@ -174,8 +193,13 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
     }
     m_pContent->deleteLater();
     m_pContent = NULL;
-}
 
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::init() 
+{ 
+    return m_pContent->init(); 
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::createActions()
 {
@@ -405,24 +429,25 @@ void Itom2dQwtPlot::setColorBarVisible(bool value)
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom2dQwtPlot::getTitle() const
 {
-    if (m_data.m_autoTitle)
+    if (!m_pVData || ((InternalData*) m_pVData)->m_autoTitle)
     {
         return "<auto>";
     }
-    return m_data.m_title;
+    return ((InternalData*) m_pVData)->m_title;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setTitle(const QString &title)
 {
+    if(m_pVData == NULL) return;
     if (title == "<auto>")
     {
-        m_data.m_autoTitle = true;
+        ((InternalData*) m_pVData)->m_autoTitle = true;
     }
     else
     {
-        m_data.m_autoTitle = false;
-        m_data.m_title = title;
+        ((InternalData*) m_pVData)->m_autoTitle = false;
+        ((InternalData*) m_pVData)->m_title = title;
     }
 
     if (m_pContent) m_pContent->updateLabels();
@@ -431,31 +456,33 @@ void Itom2dQwtPlot::setTitle(const QString &title)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetTitle()
 {
-    m_data.m_autoTitle = true;
+    if(m_pVData == NULL) return;
+    ((InternalData*) m_pVData)->m_autoTitle = true;
     if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom2dQwtPlot::getxAxisLabel() const
 {
-    if (m_data.m_autoxAxisLabel)
+    if (((InternalData*) m_pVData)->m_autoxAxisLabel)
     {
         return "<auto>";
     }
-    return m_data.m_xaxisLabel;
+    return ((InternalData*) m_pVData)->m_xaxisLabel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setxAxisLabel(const QString &label)
 {
+    if(m_pVData == NULL) return;
     if (label == "<auto>")
     {
-        m_data.m_autoxAxisLabel = true;
+        ((InternalData*) m_pVData)->m_autoxAxisLabel = true;
     }
     else
     {
-        m_data.m_autoxAxisLabel = false;
-        m_data.m_xaxisLabel = label;
+        ((InternalData*) m_pVData)->m_autoxAxisLabel = false;
+        ((InternalData*) m_pVData)->m_xaxisLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
 }
@@ -463,31 +490,33 @@ void Itom2dQwtPlot::setxAxisLabel(const QString &label)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetxAxisLabel()
 {
-    m_data.m_autoxAxisLabel = true;
+    if(!m_pVData) return;
+    ((InternalData*) m_pVData)->m_autoxAxisLabel = true;
     if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom2dQwtPlot::getyAxisLabel() const
 {
-    if (m_data.m_autoyAxisLabel)
+    if (((InternalData*) m_pVData)->m_autoyAxisLabel)
     {
         return "<auto>";
     }
-    return m_data.m_yaxisLabel;
+    return ((InternalData*) m_pVData)->m_yaxisLabel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setyAxisLabel(const QString &label)
 {
+    if(!m_pVData) return;
     if (label == "<auto>")
     {
-        m_data.m_autoyAxisLabel = true;
+        ((InternalData*) m_pVData)->m_autoyAxisLabel = true;
     }
     else
     {
-        m_data.m_autoyAxisLabel = false;
-        m_data.m_yaxisLabel = label;
+        ((InternalData*) m_pVData)->m_autoyAxisLabel = false;
+        ((InternalData*) m_pVData)->m_yaxisLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
 }
@@ -495,31 +524,33 @@ void Itom2dQwtPlot::setyAxisLabel(const QString &label)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetyAxisLabel()
 {
-    m_data.m_autoyAxisLabel = true;
+    if(!m_pVData) return;
+    ((InternalData*) m_pVData)->m_autoyAxisLabel = true;
     if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom2dQwtPlot::getValueLabel() const
 {
-    if (m_data.m_autoValueLabel)
+    if (((InternalData*) m_pVData)->m_autoValueLabel)
     {
         return "<auto>";
     }
-    return m_data.m_valueLabel;
+    return ((InternalData*) m_pVData)->m_valueLabel;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setValueLabel(const QString &label)
 {
+    if(!m_pVData) return;
     if (label == "<auto>")
     {
-        m_data.m_autoValueLabel = true;
+        ((InternalData*) m_pVData)->m_autoValueLabel = true;
     }
     else
     {
-        m_data.m_autoValueLabel = false;
-        m_data.m_valueLabel = label;
+        ((InternalData*) m_pVData)->m_autoValueLabel = false;
+        ((InternalData*) m_pVData)->m_valueLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
 }
@@ -527,41 +558,44 @@ void Itom2dQwtPlot::setValueLabel(const QString &label)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetValueLabel()
 {
-    m_data.m_autoValueLabel = true;
+    if(!m_pVData) return;
+    ((InternalData*) m_pVData)->m_autoValueLabel = true;
     if (m_pContent) m_pContent->updateLabels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getyAxisFlipped() const
 {
-    return m_data.m_yaxisFlipped;
+    return ((InternalData*) m_pVData)->m_yaxisFlipped;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setyAxisFlipped(const bool &value)
 {
-    if (m_data.m_yaxisFlipped != value)
+    if(!m_pVData) return;
+    if (((InternalData*) m_pVData)->m_yaxisFlipped != value)
     {
-        m_data.m_yaxisFlipped = value;
+        ((InternalData*) m_pVData)->m_yaxisFlipped = value;
 
-        if (m_pContent)
-        {
-            m_pContent->updateScaleValues();
-            m_pContent->internalDataUpdated();
-        }
+    if (m_pContent)
+    {
+        m_pContent->updateScaleValues();
+        m_pContent->internalDataUpdated();
     }
+}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getxAxisVisible() const
 {
-    return m_data.m_xaxisVisible;
+    return ((InternalData*) m_pVData)->m_xaxisVisible;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setxAxisVisible(const bool &value)
 {
-    m_data.m_xaxisVisible = value;
+    if(!m_pVData) return;
+    ((InternalData*) m_pVData)->m_xaxisVisible = value;
 
     if (m_pContent) m_pContent->enableAxis(QwtPlot::xBottom, value);
 }
@@ -569,13 +603,14 @@ void Itom2dQwtPlot::setxAxisVisible(const bool &value)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getyAxisVisible() const
 {
-    return m_data.m_yaxisVisible;
+    return ((InternalData*) m_pVData)->m_yaxisVisible;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setyAxisVisible(const bool &value)
 {
-    m_data.m_yaxisVisible = value;
+    if(!m_pVData) return;
+    ((InternalData*) m_pVData)->m_yaxisVisible = value;
 
     if (m_pContent) m_pContent->enableAxis(QwtPlot::yLeft, value);
 }
@@ -899,10 +934,11 @@ void Itom2dQwtPlot::mnuActZoom(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActScaleSettings()
 {
-    Dialog2DScale *dlg = new Dialog2DScale(m_data, this);
+    
+    Dialog2DScale *dlg = new Dialog2DScale(*((InternalData*)m_pVData), this);
     if (dlg->exec() == QDialog::Accepted)
     {
-        dlg->getData(m_data);
+        dlg->getData(*((InternalData*)m_pVData));
 
         m_pContent->updateScaleValues();
     }
@@ -1059,16 +1095,17 @@ void Itom2dQwtPlot::mnuCmplxSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setCmplxSwitch(PlotCanvas::ComplexType type, bool visible)
+void Itom2dQwtPlot::setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool visible)
 {
     m_pActCmplxSwitch->setVisible(visible);
+    if(!m_pVData) return;
 
-    if (m_data.m_cmplxType != type)
+    if (((InternalData*) m_pVData)->m_cmplxType != type)
     {
 
         if (visible)
         {
-            m_data.m_cmplxType = type;
+            ((InternalData*) m_pVData)->m_cmplxType = (PlotCanvas::ComplexType)type;
 
             switch (type)
             {
@@ -1243,8 +1280,10 @@ ito::RetVal Itom2dQwtPlot::deleteMarkers(int id)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::clearGeometricElements(void)
 {
-    QList<int> keys = m_data.m_pDrawItems.keys();
     ito::RetVal retVal = ito::retOk;
+    if(!m_pVData) return retVal;
+    QList<int> keys = ((InternalData*) m_pVData)->m_pDrawItems.keys();
+    
 
     for(int i = 0; i < keys.size(); i++)
     {
@@ -1322,7 +1361,13 @@ void Itom2dQwtPlot::setCoordinates(const QVector<QPointF> &pts, bool visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Itom2dQwtPlot::getGeometricElements()
 {
-    int ysize = m_data.m_pDrawItems.size();
+    if(m_pVData == NULL)
+    {
+        return QSharedPointer< ito::DataObject >(new ito::DataObject());
+    }    
+
+
+    int ysize = ((InternalData*) m_pVData)->m_pDrawItems.size();
     int xsize = PRIM_ELEMENTLENGTH;
 
     if(ysize == 0)
@@ -1341,7 +1386,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 {
     int ysize = dstObject->getSize(0);
 
-    if(ysize == 0 || ysize < m_data.m_pDrawItems.size())
+    if(ysize == 0 || ysize < ((InternalData*) m_pVData)->m_pDrawItems.size())
     {
         return ito::retError;
     }
@@ -1352,20 +1397,20 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
     ito::float32* rowPtr = tarMat->ptr<ito::float32>(0);
     memset(rowPtr, 0, sizeof(ito::float32) * xsize * ysize);
 
-    QHash<int, DrawItem*>::Iterator it = m_data.m_pDrawItems.begin();
+    QHash<int, DrawItem*>::Iterator it = ((InternalData*) m_pVData)->m_pDrawItems.begin();
 
 //    for(int y = 0; y < ysize; y++)
 //    {
     int y = 0;
-    for (; it != m_data.m_pDrawItems.end(); it++)
+    for (; it != ((InternalData*) m_pVData)->m_pDrawItems.end(); it++)
     {
         rowPtr = tarMat->ptr<ito::float32>(y);
-        //if(m_data.m_pDrawItems[y] == NULL)
+        //if(((InternalData*) m_pVData)->m_pDrawItems[y] == NULL)
         if(it.value() == NULL)
         {
             continue;
         }
-        //rowPtr[0] = (ito::float32) (m_data.m_pDrawItems[y]->m_idx);
+        //rowPtr[0] = (ito::float32) (((InternalData*) m_pVData)->m_pDrawItems[y]->m_idx);
         rowPtr[0] = (ito::float32) (it.value()->m_idx);
         switch (it.value()->m_type)
         {
@@ -1422,8 +1467,8 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
 {
-
-    QList<int> keys = m_data.m_pDrawItems.keys();
+    if(m_pVData == NULL) return;
+    QList<int> keys = ((InternalData*) m_pVData)->m_pDrawItems.keys();
     ito::RetVal retVal = ito::retOk;
 
     for(int i = 0; i < keys.size(); i++)
@@ -1673,6 +1718,11 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+bool Itom2dQwtPlot::getkeepAspectRatio(void) const 
+{
+    return ((InternalData*) m_pVData)->m_keepAspect;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 {
     if (m_pActAspectRatio) //if property is set in designer or by python, the action should represent the current status, too
@@ -1684,7 +1734,7 @@ void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActRatio(bool checked)
 {
-    /*m_data.m_keepAspect = checked;
+    /*((InternalData*) m_pVData)->m_keepAspect = checked;
     
     if(m_pActZoom->isChecked()) m_pActZoom->setChecked(false);
     if(m_pActPan->isChecked()) m_pActPan->setChecked(false);
@@ -1698,8 +1748,8 @@ void Itom2dQwtPlot::mnuActRatio(bool checked)
         m_pContent->setState(PlotCanvas::tIdle);
         m_pContent->configRescaler();
     }*/
-
-    m_data.m_keepAspect = checked;
+    if(m_pVData == NULL) return;
+    ((InternalData*) m_pVData)->m_keepAspect = checked;
     if(m_pContent) (m_pContent)->configRescaler();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1714,25 +1764,50 @@ void Itom2dQwtPlot::mnuActCenterMarker(bool checked)
     setEnabledCenterMarker(checked);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-
+bool Itom2dQwtPlot::getEnabledCenterMarker(void) const 
+{
+    return ((InternalData*) m_pVData)->m_showCenterMarker;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
 {
+    if(m_pVData == NULL) return;
     if (m_pActCntrMarker && m_pActCntrMarker->isChecked() != enabled) //if property is set in designer or by python, the action should represent the current status, too
     {
         m_pActCntrMarker->setChecked(enabled);
     }
 
-    m_data.m_showCenterMarker = enabled;
+    ((InternalData*) m_pVData)->m_showCenterMarker = enabled;
     if(m_pContent)
     {
-        m_pContent->setState(m_data.m_state);
+        m_pContent->setState(((InternalData*) m_pVData)->m_state);
         m_pContent->replot();
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+int Itom2dQwtPlot::getAlpha () const 
+{
+    return ((InternalData*) m_pVData)->m_alpha;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setAlpha (const int alpha)
+{
+    if(m_pVData == NULL) return;
+    ((InternalData*) m_pVData)->m_alpha = alpha > 0 && alpha < 255 ? alpha : ((InternalData*) m_pVData)->m_alpha;
+    if(m_pContent) m_pContent->alphaChanged();
+    this->m_pOverlaySlider->setValue(((InternalData*) m_pVData)->m_alpha);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom2dQwtPlot::getEnabledPlotting(void) const 
+{
+    return ((InternalData*) m_pVData)->m_enablePlotting;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setEnabledPlotting(const bool &enabled)
 {
-    m_data.m_enablePlotting = enabled;
+    if(m_pVData == NULL) return;
+    ((InternalData*) m_pVData)->m_enablePlotting = enabled;
     m_pActClearDrawings->setEnabled(enabled);
     m_pActDrawMode->setEnabled(enabled);
     if(m_pActDrawMode->isChecked() && !enabled) m_pActDrawMode->setChecked(enabled);
@@ -1751,8 +1826,8 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getSelectedElement(void)const
 {
-    QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
-    for (;it != m_data.m_pDrawItems.end(); ++it)        
+    QHash<int, DrawItem*>::const_iterator it = ((InternalData*) m_pVData)->m_pDrawItems.begin();
+    for (;it != ((InternalData*) m_pVData)->m_pDrawItems.end(); ++it)        
     {
         if(it.value() != NULL && it.value()->selected() != 0)
         { 
@@ -1764,10 +1839,11 @@ int Itom2dQwtPlot::getSelectedElement(void)const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setSelectedElement(const int idx)
 {
+    if(m_pVData == NULL) return;
     bool replot = false;
     bool failed = idx == -1 ? false : true;
-    QHash<int, DrawItem*>::const_iterator it = m_data.m_pDrawItems.begin();
-    for (;it != m_data.m_pDrawItems.end(); ++it)        
+    QHash<int, DrawItem*>::const_iterator it = ((InternalData*) m_pVData)->m_pDrawItems.begin();
+    for (;it != ((InternalData*) m_pVData)->m_pDrawItems.end(); ++it)        
     {
         if(it.value() != NULL && it.value()->m_idx == idx)
         {
@@ -1792,6 +1868,12 @@ void Itom2dQwtPlot::setSelectedElement(const int idx)
     }
     return;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom2dQwtPlot::getGeometricElementsCount() const 
+{ 
+    return ((InternalData*) m_pVData)->m_pDrawItems.size();
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const double x1, const double y1, const int /*destID*/)
 {
@@ -1821,14 +1903,30 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuOverlaySliderChanged(int value)
 {
-    if(value != m_data.m_alpha)
+    if(m_pVData == NULL) return;
+    if(value != ((InternalData*) m_pVData)->m_alpha)
     {
-        m_data.m_alpha = value;
+        ((InternalData*) m_pVData)->m_alpha = value;
         if(m_pContent) m_pContent->alphaChanged();
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-
+QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const 
+{
+    return QSharedPointer< ito::DataObject >(NULL); 
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
+{
+    if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
+        
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::resetOverlayImage(void)
+{
+    if(m_pContent) m_pContent->setOverlayObject(NULL);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
 {
     if(!m_pContent)

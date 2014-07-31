@@ -214,7 +214,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::~PlotCanvas()
 {
-
+    delete m_pData;
+    m_pData = NULL;
     m_pLineCutLine->detach();
     delete m_pLineCutLine;
     m_pLineCutLine = NULL;
@@ -228,6 +229,7 @@ PlotCanvas::~PlotCanvas()
     m_pCenterMarker = NULL;
 
     m_pMultiPointPicker = NULL;
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

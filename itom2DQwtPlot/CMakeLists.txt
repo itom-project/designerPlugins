@@ -119,6 +119,10 @@ set(plugin_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
 )
 
+set(plugin_HEADERS_COPY
+    ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
+)
+
 #If you want to use automatical metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND designer_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
@@ -151,5 +155,6 @@ PLUGIN_TRANSLATION(QM_FILES ${target_name} ${UPDATE_TRANSLATIONS} "${EXISTING_TR
 set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")
 ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
 ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
 POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
