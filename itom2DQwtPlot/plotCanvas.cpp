@@ -250,19 +250,38 @@ ito::RetVal PlotCanvas::init()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshStyles()
 {
-    QPen rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red), 1, Qt::DashLine),NULL).value<QPen>();
-    QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red), 2), NULL).value<QPen>();
-    QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana", 10), NULL).value<QFont>();
-    QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern), NULL).value<QBrush>();
-    QPen selectionPen = apiGetFigureSetting(parent(), "selectionPen", QPen(QBrush(Qt::gray), 2, Qt::SolidLine), NULL).value<QPen>();
+    QPen rubberBandPen = QPen(QBrush(Qt::red), 1, Qt::DashLine);
+    QPen trackerPen = QPen(QBrush(Qt::red), 2);
+    QFont trackerFont = QFont("Verdana", 10);
+    QBrush trackerBg = QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern);
+    QPen selectionPen = QPen(QBrush(Qt::gray), 2, Qt::SolidLine);
 
-    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica", 12), NULL).value<QFont>();
-    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica", 12), NULL).value<QFont>();
+    QFont titleFont = QFont("Helvetica", 12);
+    QFont labelFont = QFont("Helvetica", 12);
     labelFont.setItalic(false);
-    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica", 10), NULL).value<QFont>();
+    QFont axisFont = QFont("Helvetica", 10);
 
-    QSize centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", QSize(10, 10), NULL).value<QSize>();
-    QPen centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", QPen(QBrush(Qt::red), 1), NULL).value<QPen>();
+    QSize centerMarkerSize = QSize(10, 10);
+    QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);
+
+    if(ito::ITOM_API_FUNCS_GRAPH)
+    {
+        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red), 1, Qt::DashLine),NULL).value<QPen>();
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red), 2), NULL).value<QPen>();
+        trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana", 10), NULL).value<QFont>();
+        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern), NULL).value<QBrush>();
+        selectionPen = apiGetFigureSetting(parent(), "selectionPen", QPen(QBrush(Qt::gray), 2, Qt::SolidLine), NULL).value<QPen>();
+
+        titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica", 12), NULL).value<QFont>();
+        labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica", 12), NULL).value<QFont>();
+        labelFont.setItalic(false);
+        axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica", 10), NULL).value<QFont>();
+
+        centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", QSize(10, 10), NULL).value<QSize>();
+        centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", QPen(QBrush(Qt::red), 1), NULL).value<QPen>();
+    }
+
+
 
     if (m_inverseColor1.isValid())
     {
@@ -477,6 +496,12 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     ito::ItomPalette newPalette;
     ito::RetVal retval(ito::retOk);
     int numPalettes = 1;
+
+    if(!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        emit statusBarMessage(tr("Could not change color bar, api is missing"), 4000);
+        return false;
+    }
 
     retval += apiPaletteGetNumberOfColorBars(numPalettes);
 
@@ -1238,6 +1263,13 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
 {
     ito::RetVal retval;
     int limits[] = {2,8,0,99999};
+
+    if(!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        emit statusBarMessage(tr("Could not plot marker, api is missing"), 4000);
+        return ito::RetVal(ito::retError, 0, tr("Could not plot marker, api is missing").toLatin1().data());
+    }
+
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
 
     QwtSymbol::Style symStyle = QwtSymbol::XCross;

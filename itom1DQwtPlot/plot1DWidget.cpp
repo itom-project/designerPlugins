@@ -190,14 +190,27 @@ Plot1DWidget::~Plot1DWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::init()
 {
-    QPen rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red),2,Qt::DashLine),NULL).value<QPen>();
-    QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
-    QFont trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
-    QBrush trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
+    QPen rubberBandPen = QPen(QBrush(Qt::red),2,Qt::DashLine);
+    QPen trackerPen = QPen(QBrush(Qt::red),2);
+    QFont trackerFont = QFont("Verdana",10);
+    QBrush trackerBg = QBrush(QColor(255,255,255,155), Qt::SolidPattern);
 
-    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
-    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
-    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();
+    QFont titleFont = QFont("Helvetica",12);
+    QFont labelFont =  QFont("Helvetica",12);
+    QFont axisFont = QFont("Helvetica",10);
+
+    if(ito::ITOM_API_FUNCS_GRAPH)
+    {
+        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red),2,Qt::DashLine),NULL).value<QPen>();
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
+        trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
+        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
+
+        titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
+        labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
+        axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();    
+    }
+
     
     m_pZoomer->setRubberBandPen(rubberBandPen);
     m_pZoomer->setTrackerFont(trackerFont);
@@ -2371,6 +2384,10 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
 {
     ito::RetVal retval;
     int limits[] = {2,8,0,99999};
+
+    if(!ito::ITOM_API_FUNCS_GRAPH)
+        retval += ito::RetVal(ito::retError,0,"Could not plot markers because api is missing");
+
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
 
     QwtSymbol::Style symStyle = QwtSymbol::XCross;

@@ -1148,6 +1148,10 @@ void Itom2dQwtPlot::setColorDataTypeRepresentation(bool colorOn)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack /*= false*/)
 {
+    if(!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Could not spawn lineCut due to missing API-handle").toLatin1().data());
+    }
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
     ito::uint32 newUniqueID = uniqueID;
