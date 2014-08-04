@@ -64,7 +64,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 //        m_startScaledY(false),
         m_xDirect(false),
         m_yDirect(false),
-        m_autoLineColIndex(0),
+        //m_autoLineColIndex(0),
         m_lineCol(0),
         m_lineStyle(1),
         m_pParent(parent),
@@ -381,7 +381,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 //        gotNewObject = true;
         int dims = dataObj->getDims();
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
-        int height = dims > 1 ? dataObj->getSize(dims - 2) : 1;
+        int height = dims > 1 ? dataObj->getSize(dims - 2) : (width == 0) ? 0 : 1;
 
         if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
         {
@@ -393,6 +393,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             if (m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableComplexGUI(false);
             m_cmplxState = false;                
         }
+
+        Plot1DWidget::MultiLineMode multiLineMode = m_pData->m_multiLine;
 
         if (bounds.size() == 0)
         {
@@ -412,18 +414,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 {
                     if(width == 1 && height == 1 && dims < 3)
                     {
-                        m_pData->m_multiLine = Auto;
+                        multiLineMode = MultiRows;
                         numCurves = height;
                     }
                     else if (width >= height)
                     {
                         numCurves = height;
-                        m_pData->m_multiLine = MultiRows;
+                        multiLineMode = MultiRows;
                     }
                     else
                     {
                         numCurves = width;
-                        m_pData->m_multiLine = MultiCols;
+                        multiLineMode = MultiCols;
                     }
                 }
             }
@@ -447,7 +449,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             dObjCurve->setData(NULL);
             dObjCurve->attach(this);
             QPen plotPen;
-            colorIndex = (m_autoLineColIndex++) % m_colorList.size();
+            colorIndex = m_plotCurveItems.size() % m_colorList.size();
             plotPen.setColor(m_colorList[colorIndex]);
             plotPen.setStyle((Qt::PenStyle)m_lineStyle);
             dObjCurve->setPen(plotPen);
@@ -458,7 +460,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         {
             QVector<QPointF> pts(2);
 
-            switch(m_pData->m_multiLine)
+            switch(multiLineMode)
             {
             case FirstCol:
             case MultiCols:
