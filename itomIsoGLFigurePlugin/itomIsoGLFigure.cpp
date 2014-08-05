@@ -36,8 +36,6 @@ using namespace ito;
     int WM_3DXWARE = RegisterWindowMessage (L"SpaceWareMessage00");
 #endif
 
-int NTHREADS = 2;
-
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::ParamBase::Type inpType, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjPclFigure(itomSettingsFile, inpType, windowMode, parent),
@@ -302,8 +300,6 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
     m_pEventFilter = NULL;
     m_pEventFilter = new GL3DEFilter(this);
     installEventFilter(m_pEventFilter);
-
-    NTHREADS  = QThread::idealThreadCount();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

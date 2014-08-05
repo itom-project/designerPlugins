@@ -53,8 +53,6 @@ const char *dont_scale_units[] = {"frame", "frames", "frm", "frms", "digit", "di
 #define RotB0       -1.5
 #define RotC0       0.0
 
-extern int NTHREADS;
-
 //----------------------------------------------------------------------------------------------------------------------------------
 /** initialize openGL (below version two - i.e. using static pipelines)
 *    @param [in]    width    window width
@@ -155,7 +153,8 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_pContentPM(NULL),
 #endif
     m_pContentWhileRastering(NULL),
-    m_invalid(1.6e308)
+    m_invalid(1.6e308),
+    m_nthreads(2)
 {
     this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
 
@@ -248,6 +247,8 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
 
 //    refreshPlot(NULL);
     m_isInit = 1;
+
+    m_nthreads  = QThread::idealThreadCount();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -412,7 +413,7 @@ void plotGLWidget::initializeGL()
         unsigned char* ptrPal =  (unsigned char*)m_currentPalette.data();
 
         #if (USEOMP)
-        #pragma omp parallel num_threads(NTHREADS)
+        #pragma omp parallel num_threads(m_nthreads)
         {
         #pragma omp for schedule(guided)
         #endif
@@ -618,7 +619,7 @@ template<typename _Type> inline ito::RetVal plotGLWidget::NormalizeObj(cv::Mat &
     if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
     #if (USEOMP)
-    #pragma omp parallel num_threads(NTHREADS)
+    #pragma omp parallel num_threads(m_nthreads)
     {
     #endif
     ito::float64 pixval = 0.0;
@@ -661,7 +662,7 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
     if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
     #if (USEOMP)
-    #pragma omp parallel num_threads(NTHREADS)
+    #pragma omp parallel num_threads(m_nthreads)
     {
     #endif
 
@@ -766,7 +767,7 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
     if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
     #if (USEOMP)
-    #pragma omp parallel num_threads(NTHREADS)
+    #pragma omp parallel num_threads(m_nthreads)
     {
     #endif
 
@@ -1193,7 +1194,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
     }
 
     #if (USEOMP)
-    #pragma omp parallel num_threads(NTHREADS)
+    #pragma omp parallel num_threads(m_nthreads)
     {
     #endif
     ito::float64 color = 0.0;
@@ -1444,7 +1445,7 @@ void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscalei
             return;
 
         #if (USEOMP)
-        #pragma omp parallel num_threads(NTHREADS)
+        #pragma omp parallel num_threads(m_nthreads)
         {
         #endif
 
@@ -1467,7 +1468,7 @@ void plotGLWidget::rescaleTriangles(const double xscaleing, const double yscalei
             return;
 
         #if (USEOMP)
-        #pragma omp parallel num_threads(NTHREADS)
+        #pragma omp parallel num_threads(m_nthreads)
         {
         #endif
 

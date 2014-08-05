@@ -142,6 +142,7 @@ class plotGLWidget : public QGLWidget
         bool m_showContextMenu;
 
     protected:
+        int m_nthreads;
 
     private:
         QTimer m_timer;
@@ -250,7 +251,7 @@ class plotGLWidget : public QGLWidget
         {
             m_NumElements = 0;
             #if (USEOMP)
-            #pragma omp parallel num_threads(NTHREADS)
+            #pragma omp parallel num_threads(m_nthreads)
             {
             #endif
 
