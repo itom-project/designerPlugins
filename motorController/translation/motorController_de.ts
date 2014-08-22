@@ -4,17 +4,17 @@
 <context>
     <name>MotorController</name>
     <message>
-        <location filename="../motorController.cpp" line="+194"/>
+        <location filename="../motorController.cpp" line="+195"/>
         <source>Toggle Unit</source>
         <translation type="unfinished">Symbolleiste</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Unit Switch</source>
         <translation type="unfinished">Einheitenschalter</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Update</source>
         <translation>Aktualisieren</translation>
     </message>
@@ -30,53 +30,53 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+635"/>
+        <location line="+631"/>
         <source>abs</source>
         <translation>Absolut</translation>
     </message>
     <message>
-        <location line="-634"/>
-        <location line="+638"/>
+        <location line="-630"/>
+        <location line="+634"/>
         <source>rel</source>
         <translation>Relativ</translation>
     </message>
     <message>
-        <location line="-636"/>
-        <location line="+640"/>
+        <location line="-632"/>
+        <location line="+636"/>
         <source>origin</source>
         <translation type="unfinished">Nullposition</translation>
     </message>
     <message>
-        <location line="-631"/>
-        <location line="+764"/>
+        <location line="-628"/>
+        <location line="+761"/>
         <source>Toggle Update (off)</source>
         <translation type="unfinished">Aktualisierung aus</translation>
     </message>
     <message>
-        <location line="-763"/>
+        <location line="-760"/>
         <source>Update Switch</source>
         <translation type="unfinished">Aktualisierungsschalter</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+771"/>
+        <location line="+768"/>
         <source>on</source>
         <translation>ein</translation>
     </message>
     <message>
-        <location line="-770"/>
-        <location line="+774"/>
+        <location line="-767"/>
+        <location line="+771"/>
         <source>off</source>
         <translation>aus</translation>
     </message>
     <message>
-        <location line="-425"/>
+        <location line="-421"/>
         <location line="+37"/>
         <source>timeout while getting numaxis parameter</source>
         <translation type="unfinished">Zeitüberschreitung bei der Ermittlung der Anzahl der Achsen</translation>
     </message>
     <message>
-        <location line="+370"/>
+        <location line="+366"/>
         <source>Toggle Update (on)</source>
         <translation type="unfinished">Aktualisierung ein</translation>
     </message>

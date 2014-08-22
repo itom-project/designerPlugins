@@ -148,7 +148,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+191"/>
+        <location filename="../itom2dqwtplot.cpp" line="+215"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -158,7 +158,7 @@
         <translation>Ursprüngliche Ansicht wiederherstellen</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation>Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
@@ -194,7 +194,7 @@
         <translation>Farbleiste ein- und ausblenden</translation>
     </message>
     <message>
-        <location line="-108"/>
+        <location line="-125"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
@@ -209,7 +209,7 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+49"/>
         <source>Save...</source>
         <translation>Speichern...</translation>
     </message>
@@ -219,7 +219,7 @@
         <translation>Aktuelle Abbildung exportieren...</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>Move</source>
         <translation>Verschieben</translation>
     </message>
@@ -359,7 +359,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+409"/>
+        <location line="+423"/>
         <source>PDF Documents (*.pdf)</source>
         <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -383,13 +383,18 @@
         <source>Export File Name</source>
         <translation>Speichern unter</translation>
     </message>
+    <message id="false">
+        <location line="+319"/>
+        <source>Could not spawn lineCut due to missing API-handle</source>
+        <translation type="unfinished">Linienschnitt konnte nicht erzeugt werden, API-Handle wurde nicht gefunden</translation>
+    </message>
     <message>
-        <location line="+329"/>
+        <location line="+34"/>
         <source>the opened figure is not inherited from ito::AbstractDObjFigure</source>
         <translation>Die geöffnete Abbildung wurde nicht von ito::AbstractDObjFigure vererbt</translation>
     </message>
     <message>
-        <location line="+294"/>
+        <location line="+302"/>
         <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
         <translation>Objekt entspricht nicht den Kriterien: Zweidimensional, Objekte x 11, Fließkommewerte</translation>
     </message>
@@ -409,12 +414,12 @@
         <translation>Element konnte nicht gesetzt werden</translation>
     </message>
     <message>
-        <location line="+121"/>
+        <location line="+155"/>
         <source>Could not set active element, index out of range.</source>
         <translation>Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+20"/>
         <source>Set lineCut coordinates failed. Could not activate lineCut.</source>
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Der Linienschnitt konnte nicht aktiviert werden.</translation>
     </message>
@@ -423,11 +428,21 @@
         <source>Set lineCut coordinates failed. Widget not ready.</source>
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Widget nicht bereit.</translation>
     </message>
+    <message>
+        <location line="+35"/>
+        <source>Export image failed, canvas handle not initilized</source>
+        <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
+    </message>
 </context>
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+500"/>
+        <location filename="../plotCanvas.cpp" line="+502"/>
+        <source>Could not change color bar, api is missing</source>
+        <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
@@ -437,7 +452,13 @@
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="+738"/>
+        <location line="+724"/>
+        <location line="+1"/>
+        <source>Could not plot marker, api is missing</source>
+        <translation>Die Position kann nicht angezeigt werden, API wurde nicht gefunden</translation>
+    </message>
+    <message>
+        <location line="+50"/>
         <source>The style tag does not correspond to the required format</source>
         <translation>Das Tag-Format stimmt nicht mit dem benötigten Format überein</translation>
     </message>
@@ -477,60 +498,60 @@
     </message>
     <message>
         <location line="-96"/>
-        <location line="+307"/>
+        <location line="+280"/>
         <source>Please draw %1 lines. Esc aborts the selection.</source>
         <translation>%1 Linien einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-306"/>
-        <location line="+307"/>
+        <location line="-279"/>
+        <location line="+280"/>
         <source>Please draw one line. Esc aborts the selection.</source>
         <translation>Eine Linie einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-265"/>
-        <location line="+352"/>
+        <location line="-238"/>
+        <location line="+315"/>
         <source>Please draw %1 rectangles. Esc aborts the selection.</source>
         <translation>%1 Rechtecke einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-351"/>
-        <location line="+352"/>
+        <location line="-314"/>
+        <location line="+315"/>
         <source>Please draw one rectangle. Esc aborts the selection.</source>
         <translation>Ein Rechteck einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-309"/>
-        <location line="+396"/>
+        <location line="-272"/>
+        <location line="+349"/>
         <source>Please draw %1 ellipses. Esc aborts the selection.</source>
         <translation>%1 Ellipsen einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-395"/>
-        <location line="+396"/>
+        <location line="-348"/>
+        <location line="+349"/>
         <source>Please draw one ellipse. Esc aborts the selection.</source>
         <translation>Eine Ellipse einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-362"/>
+        <location line="-315"/>
         <source>Unknown type for userInteractionStart</source>
         <translation>Ungültiger Typ für &apos;userInteractionStart&apos;</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <location line="+54"/>
-        <location line="+61"/>
-        <location line="+89"/>
-        <location line="+88"/>
+        <location line="+21"/>
+        <location line="+48"/>
+        <location line="+51"/>
+        <location line="+79"/>
+        <location line="+78"/>
         <source>Selection has been aborted.</source>
         <translation>Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
-        <location line="-278"/>
-        <location line="+54"/>
-        <location line="+62"/>
-        <location line="+89"/>
-        <location line="+88"/>
+        <location line="-251"/>
+        <location line="+48"/>
+        <location line="+52"/>
+        <location line="+79"/>
+        <location line="+78"/>
         <source>%1 points have been selected.</source>
         <translation>%1 Punkt(e) wurden ausgewählt.</translation>
     </message>
@@ -597,7 +618,7 @@
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-1720"/>
+        <location filename="../itom2dqwtplot.cpp" line="-1861"/>
         <source>Points for line plots from 2d objects</source>
         <translation>Punkte für Linien-Plots von 2D-Objekten</translation>
     </message>

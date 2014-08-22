@@ -154,17 +154,17 @@
         <translation>Symbolleiste 1D-Abbildung</translation>
     </message>
     <message>
-        <location line="+68"/>
+        <location line="+69"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>Tools</source>
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+118"/>
+        <location line="+178"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -178,7 +178,7 @@
         <translation type="obsolete">Skaleneinstellungen</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Set the ranges and offsets of this view</source>
         <translation>Einstellungen der Skalen</translation>
     </message>
@@ -193,101 +193,95 @@
         <translation>Skaleneinstellungen auch für die ursprüngliche Abbildung übernehmen</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>forward</source>
-        <translation>Weiter</translation>
+        <translation type="obsolete">Weiter</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
         <source>Forward to next line</source>
         <translation>Zur nächsten Linie wechseln</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>back</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+6"/>
         <source>Back to previous line</source>
         <translation>Zur vorherigen Linie zurück</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>move</source>
-        <translation>Verschieben</translation>
+        <translation type="obsolete">Verschieben</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation>Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>zoom to rectangle</source>
-        <translation>Zoom in Rechteck</translation>
+        <translation type="obsolete">Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Zoom to rectangle</source>
         <translation>Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>lock aspect ratio</source>
-        <translation>Seitenverhältnis beibehalten</translation>
+        <translation type="obsolete">Seitenverhältnis beibehalten</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Toggle fixed / variable aspect ration between axis x and y</source>
         <translation>Vollbild oder Seitenverhältnis beibehalten</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>marker</source>
-        <translation>Positionsanzeiger</translation>
+        <translation type="obsolete">Positionsanzeiger</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+11"/>
         <source>Set Markers to</source>
         <translation>Anzeige setzen</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+563"/>
+        <location line="+595"/>
         <source>To Min-Max</source>
         <translation>Min-Max</translation>
     </message>
     <message>
-        <location line="-558"/>
+        <location line="-590"/>
         <source>Switch Imag, Real, Abs, Pha</source>
         <translation>Bildmodus</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+645"/>
+        <location line="+677"/>
         <source>Imag</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-644"/>
-        <location line="+649"/>
+        <location line="-676"/>
+        <location line="+681"/>
         <source>Real</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-648"/>
+        <location line="-680"/>
         <source>Abs</source>
         <translation></translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+652"/>
+        <location line="+684"/>
         <source>Pha</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-642"/>
+        <location line="-657"/>
         <source>Point</source>
         <translation>Punkt</translation>
     </message>
@@ -307,17 +301,16 @@
         <translation>Ellipse</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>clear Marker</source>
-        <translation>Alle Marker löschen</translation>
+        <translation type="obsolete">Alle Marker löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+17"/>
         <source>Clear all existing geometric elements</source>
         <translation>Löscht alle gesetzen Marker</translation>
     </message>
     <message>
-        <location line="+883"/>
+        <location line="+909"/>
         <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
         <translation>Objekt entspricht nicht den Kriterien: Zweidimensional, Objekte x 11, Fließkommewerte</translation>
     </message>
@@ -342,12 +335,12 @@
         <translation>Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
     </message>
     <message>
-        <location line="-1151"/>
+        <location line="-1177"/>
         <source>Marker Positions</source>
         <translation>Positionsanzeiger</translation>
     </message>
     <message>
-        <location line="-124"/>
+        <location line="-141"/>
         <source>Save...</source>
         <translation>Speichern...</translation>
     </message>
@@ -362,17 +355,92 @@
         <translation>Skaleneinstellungen...</translation>
     </message>
     <message>
-        <location line="+74"/>
+        <location line="+13"/>
+        <source>Forward</source>
+        <translation type="unfinished">Vorwärts</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Back</source>
+        <translation type="unfinished">Zurück</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Move</source>
+        <translation type="unfinished">Verschieben</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Zoom To Rectangle</source>
+        <translation type="unfinished">Zoom in Rechteck</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Lock Aspect Ratio</source>
+        <translation type="unfinished">Seitenverhältnis beibehalten</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Marker</source>
+        <translation type="unfinished">Positionsanzeiger</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Switch Auto, first row, first column, multi row, multi column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Auto</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>first row</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>first column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>multi row</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>multi column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Switch Draw Mode</source>
         <translation>Markermodus</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+33"/>
+        <source>Clear Marker</source>
+        <translation>Alle Marker löschen</translation>
+    </message>
+    <message>
+        <location line="+16"/>
         <source>Marker Offsets</source>
         <translation>Offset Anzeige</translation>
     </message>
     <message>
-        <location line="+361"/>
+        <location line="+5"/>
+        <source>Grid</source>
+        <translation type="unfinished">Gitter</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Shows/hides a grid</source>
+        <translation type="unfinished">Gitter ein-/ausblenden</translation>
+    </message>
+    <message>
+        <location line="+379"/>
         <source>PDF Documents (*.pdf)</source>
         <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -396,11 +464,16 @@
         <source>Export File Name</source>
         <translation>Speichern unter</translation>
     </message>
+    <message>
+        <location line="+769"/>
+        <source>Export image failed, canvas handle not initilized</source>
+        <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
+    </message>
 </context>
 <context>
     <name>Plot1DWidget</name>
     <message>
-        <location filename="../plot1DWidget.cpp" line="+1771"/>
+        <location filename="../plot1DWidget.cpp" line="+1826"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation>%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
@@ -419,58 +492,58 @@
     </message>
     <message>
         <location line="-97"/>
-        <location line="+328"/>
+        <location line="+306"/>
         <source>Please draw %1 lines. Esc aborts the selection.</source>
         <translation>%1 Linien einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-327"/>
-        <location line="+328"/>
+        <location line="-305"/>
+        <location line="+306"/>
         <source>Please draw one line. Esc aborts the selection.</source>
         <translation>Eine Linie einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-285"/>
-        <location line="+374"/>
+        <location line="-263"/>
+        <location line="+342"/>
         <source>Please draw %1 rectangles. Esc aborts the selection.</source>
         <translation>%1 Rechtecke einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-373"/>
-        <location line="+374"/>
+        <location line="-341"/>
+        <location line="+342"/>
         <source>Please draw one rectangle. Esc aborts the selection.</source>
         <translation>Ein Rechteck einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-331"/>
-        <location line="+427"/>
+        <location line="-299"/>
+        <location line="+384"/>
         <source>Please draw %1 ellipses. Esc aborts the selection.</source>
         <translation>%1 Ellipsen einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-426"/>
-        <location line="+427"/>
+        <location line="-383"/>
+        <location line="+384"/>
         <source>Please draw one ellipse. Esc aborts the selection.</source>
         <translation>Eine Ellipse einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-306"/>
-        <location line="+70"/>
-        <location line="+90"/>
-        <location line="+90"/>
+        <location line="-265"/>
+        <location line="+59"/>
+        <location line="+80"/>
+        <location line="+79"/>
         <source>Selection has been aborted.</source>
         <translation>Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
-        <location line="-236"/>
-        <location line="+71"/>
-        <location line="+90"/>
-        <location line="+90"/>
+        <location line="-213"/>
+        <location line="+60"/>
+        <location line="+80"/>
+        <location line="+79"/>
         <source>%1 points have been selected.</source>
         <translation>%1 Punkt(e) wurden ausgewählt.</translation>
     </message>
     <message>
-        <location line="+172"/>
+        <location line="+176"/>
         <location line="+28"/>
         <source>invalid marker type</source>
         <translation>Ungültiger Marker-Typ</translation>
@@ -538,7 +611,7 @@
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlot.cpp" line="-718"/>
+        <location filename="../itom1DQwtPlot.cpp" line="-1594"/>
         <source>plot1D</source>
         <translation></translation>
     </message>

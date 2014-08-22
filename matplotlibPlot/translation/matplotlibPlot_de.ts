@@ -4,7 +4,7 @@
 <context>
     <name>MatplotlibPlot</name>
     <message>
-        <location filename="../matplotlibplot.cpp" line="+22"/>
+        <location filename="../matplotlibplot.cpp" line="+23"/>
         <source>home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -79,13 +79,17 @@
         <translation>Abbildung speichern...</translation>
     </message>
     <message>
+        <location line="+10"/>
+        <source>matplotlib toolbar</source>
+        <translation>Symbolleiste Matplotlib</translation>
+    </message>
+    <message>
         <source>save</source>
         <translation type="obsolete">Speichern</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>MatPlotLib toolbar</source>
-        <translation>Symbolleiste MatPlotLib</translation>
+        <translation type="obsolete">Symbolleiste MatPlotLib</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -96,7 +100,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../matplotlibplotfactory.cpp" line="+37"/>
+        <location filename="../matplotlibplotfactory.cpp" line="+40"/>
         <source>itom widget for matplotlib plots.</source>
         <translation>itom-Widget für matplotlib-Abbildungen.</translation>
     </message>

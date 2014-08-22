@@ -4,7 +4,7 @@
 <context>
     <name>ItomIsoGLWidget</name>
     <message>
-        <location filename="../itomIsoGLFigure.cpp" line="+67"/>
+        <location filename="../itomIsoGLFigure.cpp" line="+65"/>
         <source>Points for line plots from 2d objects</source>
         <translation>Punkte für Linienplot von 2D-Objekten</translation>
     </message>
@@ -151,7 +151,7 @@
         <translation type="unfinished">Symbolleiste ISO</translation>
     </message>
     <message>
-        <location line="+262"/>
+        <location line="+260"/>
         <source>SVG Documents (*.svg)</source>
         <translation type="unfinished">SVG-Dokumente (*.svg)</translation>
     </message>
@@ -169,7 +169,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjPCLFigure.h" line="+75"/>
+        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjPCLFigure.h" line="+76"/>
         <location line="+2"/>
         <location line="+2"/>
         <source>Source data for plot</source>
@@ -260,13 +260,13 @@
 <context>
     <name>plotGLWidget</name>
     <message>
-        <location filename="../plotIsoGLWidget.cpp" line="+974"/>
+        <location filename="../plotIsoGLWidget.cpp" line="+975"/>
         <location line="+695"/>
         <source>invalid point cloud</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+29"/>
         <source>compiled without pointCloud support</source>
         <translation type="unfinished"></translation>
     </message>

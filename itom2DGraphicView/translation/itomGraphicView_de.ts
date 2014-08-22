@@ -214,29 +214,29 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+458"/>
+        <location line="+461"/>
         <source>imaginary</source>
         <translation type="unfinished">Imaginär</translation>
     </message>
     <message>
-        <location line="-457"/>
-        <location line="+462"/>
+        <location line="-460"/>
+        <location line="+465"/>
         <source>real</source>
         <translation type="unfinished">Real</translation>
     </message>
     <message>
-        <location line="-461"/>
+        <location line="-464"/>
         <source>absolute</source>
         <translation type="unfinished">Absolut</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+465"/>
+        <location line="+468"/>
         <source>phase</source>
         <translation type="unfinished">Phase</translation>
     </message>
     <message>
-        <location line="-462"/>
+        <location line="-465"/>
         <source>Switch imaginary, real, absolute, phase</source>
         <translation type="unfinished">Komplexitätstyp</translation>
     </message>
@@ -257,35 +257,35 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+483"/>
+        <location line="+486"/>
         <source>falseColor, bitshift</source>
         <translation type="unfinished">Falschfarbe, Bitverschiebung</translation>
     </message>
     <message>
-        <location line="-482"/>
-        <location line="+486"/>
+        <location line="-485"/>
+        <location line="+489"/>
         <source>falseColor, scaled</source>
         <translation type="unfinished">Falschfarbe, skaliert</translation>
     </message>
     <message>
-        <location line="-485"/>
-        <location line="+489"/>
+        <location line="-488"/>
+        <location line="+492"/>
         <source>Color, 24-Bit</source>
         <translation type="unfinished">Farbe, 24-Bit</translation>
     </message>
     <message>
-        <location line="-488"/>
-        <location line="+492"/>
+        <location line="-491"/>
+        <location line="+495"/>
         <source>Color, 32-Bit</source>
         <translation type="unfinished">Farbe, 32-Bit</translation>
     </message>
     <message>
-        <location line="-490"/>
+        <location line="-493"/>
         <source>Switch index and direct color mode</source>
         <translation type="unfinished">Farbmodus</translation>
     </message>
     <message>
-        <location line="+293"/>
+        <location line="+295"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished">FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -310,7 +310,7 @@
         <translation type="unfinished">Speichern unter</translation>
     </message>
     <message>
-        <location line="+468"/>
+        <location line="+469"/>
         <location line="+22"/>
         <location line="+110"/>
         <location line="+12"/>
@@ -322,16 +322,21 @@
         <translation type="unfinished">Noch nicht implementiert.</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+40"/>
         <location line="+5"/>
         <source>Specified color type out of range [0, 4].</source>
         <translation type="unfinished">Definierter Farbtyp außerhalb des erlaubten Bereichs [0, 4].</translation>
+    </message>
+    <message>
+        <location line="+106"/>
+        <source>Export image failed, canvas handle not initilized</source>
+        <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
     </message>
 </context>
 <context>
     <name>PlotWidget</name>
     <message>
-        <location filename="../plotWidget.cpp" line="+875"/>
+        <location filename="../plotWidget.cpp" line="+887"/>
         <source>No color maps defined.</source>
         <translation type="unfinished">Kein Farbschema definiert.</translation>
     </message>
@@ -351,7 +356,7 @@
         <translation type="unfinished">Ausgewählte Farbleiste ist ungültig</translation>
     </message>
     <message>
-        <location line="+80"/>
+        <location line="+82"/>
         <location line="+6"/>
         <source>Not implemented yet.</source>
         <translation type="unfinished">Noch nicht implementiert.</translation>
