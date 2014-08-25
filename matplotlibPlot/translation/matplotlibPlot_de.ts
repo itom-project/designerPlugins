@@ -112,7 +112,7 @@
     <message>
         <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Live-Datenquelle für die Anzeige</translation>
     </message>
 </context>
 <context>
