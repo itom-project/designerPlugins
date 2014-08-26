@@ -96,10 +96,16 @@ class Plot1DWidget : public QwtPlot
 
         void setGridEnabled(const bool enabled);
 
-        void setMainMarkersToIndex(int idx1, int idx2, int curveIdx);
+        void setMainPickersToIndex(int idx1, int idx2, int curveIdx);
 
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
         ito::RetVal deleteMarkers(const int id);
+
+        ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
+        ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+
+        QVector<ito::int32> getPickerPixel() const;
+        QVector<ito::float32> getPickerPhys() const;
 
         friend class Itom1DQwtPlot;
         friend class DrawItem;      
@@ -124,17 +130,20 @@ class Plot1DWidget : public QwtPlot
     private:
         QwtPlotRescaler* m_pRescaler;
 
-        struct Marker
+        struct Picker
         {
-            Marker() : item(NULL), active(0), curveIdx(0) {}
+            Picker() : item(NULL), active(0), curveIdx(0) {}
             QwtPlotMarker *item;
             bool active;
             int curveIdx;
         };
 
-        void stickMarkerToXPx(Marker *m, double xScaleStart, int dir);
-        void stickMarkerToSampleIdx(Marker *m, int idx, int curveIdx, int dir);
-        void updateMarkerPosition(bool updatePositions, bool clear = false);
+        void stickPickerToXPx(Picker *m, double xScaleStart, int dir);
+        void stickPickerToSampleIdx(Picker *m, int idx, int curveIdx, int dir);
+        void updatePickerPosition(bool updatePositions, bool clear = false);
+
+        int getPickerCount() const {return m_pickers.size();}
+        QSharedPointer< ito::DataObject > getPlotPicker() const;
 
         void home();
 
@@ -177,7 +186,7 @@ class Plot1DWidget : public QwtPlot
 
         ValuePicker1D *m_pValuePicker;
 
-        QList<Marker> m_markers;
+        QList<Picker> m_pickers;
 
         QMenu *m_pCmplxMenu;
 
@@ -194,7 +203,7 @@ class Plot1DWidget : public QwtPlot
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
-        void setMarkerText(const QString &coords, const QString &offsets);
+        void setPickerText(const QString &coords, const QString &offsets);
 
     public slots:
         //void replot();
@@ -216,6 +225,7 @@ struct InternalData
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
         m_multiLine = Plot1DWidget::Auto;
+        m_pickerLimit = 2;
     }
 
     ~InternalData()
@@ -238,6 +248,7 @@ struct InternalData
      
 //    Plot1DWidget::tState m_state;
     int m_state;
+    int m_pickerLimit;
 
     QString m_title;
     QString m_axisLabel;

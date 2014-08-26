@@ -46,7 +46,10 @@ class PlotCanvas;
 #include <QtWidgets/qlabel.h>
 #endif
 
-Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
+#ifndef DECLAREMETADATAOBJECT
+    Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
+    #define DECLAREMETADATAOBJECT
+#endif
 
 class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 {

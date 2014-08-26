@@ -60,7 +60,10 @@
 #include <QtWidgets/qlabel.h>
 #endif
 
-Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
+#ifndef DECLAREMETADATAOBJECT
+    Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
+    #define DECLAREMETADATAOBJECT
+#endif
 
 class ItomIsoGLWidget;
 //----------------------------------------------------------------------------------------------------------------------------------

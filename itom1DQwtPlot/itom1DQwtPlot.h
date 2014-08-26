@@ -44,7 +44,10 @@
 #include <QtWidgets/qlabel.h>
 #endif
 
-Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
+#ifndef DECLAREMETADATAOBJECT
+    Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
+    #define DECLAREMETADATAOBJECT
+#endif
 
 class Plot1DWidget;
 
@@ -69,6 +72,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
 
     Q_PROPERTY(int columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true)
+    
+    Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true)
+    Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false)
+    Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
+    
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -85,6 +93,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
 
     Q_CLASSINFO("prop://columnInterpretation", "Define the interpretation of M x N objects as Auto, FirstRow, FirstCol, MultiRows, MultiCols.")
+    
+    Q_CLASSINFO("prop://pickerLimit", "Define the maximal number of picker for this plot.")
+    Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
+    Q_CLASSINFO("prop://picker", "Get picker defined by a float32[3] array for each element containing [pixelIndex, physIndex, value].")
 
     DESIGNER_PLUGIN_ITOM_API
 
@@ -152,7 +164,17 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void setRowPresentation(const int idx);
         void resetRowPresentation(); 
 
+        int getPickerLimit(void) const;
+        void setPickerLimit(const int idx);
+        void resetPickerLimit(); 
+
+        int getPickerCount(void) const;
+        QSharedPointer< ito::DataObject > getPicker() const;
+
         QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
+
+        QVector<ito::int32> getPickerPixel() const;
+        QVector<ito::float32> getPickerPhys() const;
 
         friend class Plot1DWidget;
 
@@ -198,6 +220,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     public slots:
 
+        ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
+        ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);
         ito::RetVal copyToClipBoard();
@@ -226,7 +251,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         void mnuGridEnabled(bool checked);
         void mnuHome();
-        void setMarkerText(const QString &coords, const QString &offsets);
+        void setPickerText(const QString &coords, const QString &offsets);
 
     signals:
         void userInteractionDone(int type, bool aborted, QPolygonF points);

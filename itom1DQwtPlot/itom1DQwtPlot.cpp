@@ -121,7 +121,7 @@ void Itom1DQwtPlot::constructor()
 
     m_pContent->setObjectName("canvasWidget");
 
-    connect(m_pContent, SIGNAL(setMarkerText(const QString &, const QString &)), this, SLOT(setMarkerText(const QString &, const QString &)));
+    connect(m_pContent, SIGNAL(setPickerText(const QString &, const QString &)), this, SLOT(setPickerText(const QString &, const QString &)));
 
     setFocus();
     setCentralWidget(m_pContent);
@@ -296,6 +296,46 @@ void Itom1DQwtPlot::resetRowPresentation()
 {
     setRowPresentation(0);
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getPickerLimit(void) const
+{
+    if(m_data) return ((InternalData*)m_data)->m_pickerLimit;
+    return 0;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setPickerLimit(const int idx)
+{
+    if(m_data) ((InternalData*)m_data)->m_pickerLimit = idx;
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetPickerLimit()
+{
+    if(m_data) ((InternalData*)m_data)->m_pickerLimit = 2;
+    return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getPickerCount(void) const
+{
+    if(m_pContent)
+    {
+        return m_pContent->getPickerCount();
+    }
+    return 0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer< ito::DataObject > Itom1DQwtPlot::getPicker() const
+{
+    if(m_pContent)
+    {
+        return m_pContent->getPlotPicker();
+    }
+    return QSharedPointer< ito::DataObject >(new ito::DataObject());
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getGeometricElementsCount() const 
 { 
@@ -996,11 +1036,11 @@ void Itom1DQwtPlot::mnuSetMarker(QAction *action)
             {
                 if (minLoc < maxLoc)
                 {
-                    m_pContent->setMainMarkersToIndex(minLoc, maxLoc, 0);
+                    m_pContent->setMainPickersToIndex(minLoc, maxLoc, 0);
                 }
                 else
                 {
-                    m_pContent->setMainMarkersToIndex(maxLoc, minLoc, 0);
+                    m_pContent->setMainPickersToIndex(maxLoc, minLoc, 0);
                 }
             }
         }
@@ -1136,7 +1176,7 @@ void Itom1DQwtPlot::setYAxisInterval(QPointF interval)
 }   
 
 //----------------------------------------------------------------------------------------------------------------------------------   
-void Itom1DQwtPlot::setMarkerText(const QString &coords, const QString &offsets)
+void Itom1DQwtPlot::setPickerText(const QString &coords, const QString &offsets)
 {
     m_pLblMarkerCoords->setText(coords);
     m_pLblMarkerOffsets->setText(offsets);
@@ -1765,4 +1805,40 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     m_pContent->replot();
 
     return destinationImage;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom1DQwtPlot::setPicker(const QVector<ito::int32> &pxCords)
+{
+    if(!m_pContent)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Set picker failed, canvas handle not initilized").toLatin1().data());
+    }
+    return m_pContent->setPicker(pxCords);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom1DQwtPlot::setPicker(const QVector<ito::float32> &physCords)
+{
+    if(!m_pContent)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Set picker failed, canvas handle not initilized").toLatin1().data());
+    }
+    return m_pContent->setPicker(physCords);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QVector<ito::int32> Itom1DQwtPlot::getPickerPixel() const
+{
+    if(!m_pContent)
+    {
+        emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initilized."), 12000 );
+    }
+    return m_pContent->getPickerPixel();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QVector<ito::float32> Itom1DQwtPlot::getPickerPhys() const
+{
+    if(!m_pContent)
+    {
+        emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initilized."), 12000 );
+    }
+    return m_pContent->getPickerPhys();
 }
