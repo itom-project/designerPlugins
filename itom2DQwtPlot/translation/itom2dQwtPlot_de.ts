@@ -266,12 +266,12 @@
     <message>
         <location line="+8"/>
         <source>Control alpha-value of overlay image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Steuerung für den Alpa-Wert des Overlay-Bilds</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Set alpha for overlay</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alpha für das Overlay setzen</translation>
     </message>
     <message>
         <location line="+11"/>

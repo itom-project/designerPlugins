@@ -164,7 +164,7 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+178"/>
+        <location line="+218"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -469,6 +469,18 @@
         <source>Export image failed, canvas handle not initilized</source>
         <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
     </message>
+    <message>
+        <location line="+116"/>
+        <location line="+9"/>
+        <source>Set picker failed, canvas handle not initilized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location line="+9"/>
+        <source>Get picker failed, canvas handle not initilized.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Plot1DWidget</name>
@@ -611,7 +623,7 @@
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlot.cpp" line="-1594"/>
+        <location filename="../itom1DQwtPlot.cpp" line="-1777"/>
         <source>plot1D</source>
         <translation></translation>
     </message>
