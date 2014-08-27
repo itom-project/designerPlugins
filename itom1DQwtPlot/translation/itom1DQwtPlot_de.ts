@@ -387,7 +387,7 @@
     <message>
         <location line="+25"/>
         <source>Switch Auto, first row, first column, multi row, multi column</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Schalter für Zeilen und Spalten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -397,22 +397,22 @@
     <message>
         <location line="+2"/>
         <source>first row</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erste Zeile</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>first column</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erste Spalte</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>multi row</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alle Zeilen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>multi column</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alle Spalten</translation>
     </message>
     <message>
         <location line="+7"/>
