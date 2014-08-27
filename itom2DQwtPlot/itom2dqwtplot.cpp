@@ -73,8 +73,9 @@ void Itom2dQwtPlot::constructor()
     m_pOverlaySlider = NULL;
     m_pActOverlaySlider = NULL;
 
-
+    //bounds and zCutPoint are two different output connections, since it is possible to have a line cut and a z-stack cut visible at the same time.
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
+    m_pOutput.insert("zCutPoint", new ito::Param("zCutPoint", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for z-stack cut in 3d objects").toLatin1().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
@@ -1163,7 +1164,16 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         pointArr[np * 2] = bounds[np].x();
         pointArr[np * 2 + 1] = bounds[np].y();
     }
-    m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
+
+    if (zStack)
+    {
+        m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
+    }
+    else
+    {
+        m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    }
+
     delete[] pointArr;
     //setOutpBounds(bounds);
     //setLinePlotCoordinates(bounds);
@@ -1187,19 +1197,20 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
             }
 
-            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+            
 
             if (zStack)
             {
                 // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
                 // with one plane and cannot display the points in z-direction
-
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["zCutPoint"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure,  m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                paramNames << "bounds"  << "sourceout";
+                paramNames << "zCutPoint"  << "sourceout";
             }
             else
             {
                 // otherwise simply pass on the displayed plane
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "bounds"  << "displayed";
             }
@@ -1212,7 +1223,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         {
             if (zStack)
             {
-                paramNames << "bounds"  << "sourceout";
+                paramNames << "zCutPoint"  << "sourceout";
             }
             else
             {
