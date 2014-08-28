@@ -30,6 +30,7 @@
 DataObjectModel::DataObjectModel() : 
     m_readOnly(false), m_defaultRows(3), m_defaultCols(3)
 {
+    m_sharedDataObj = QSharedPointer<ito::DataObject>(new ito::DataObject());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -44,18 +45,18 @@ QVariant DataObjectModel::data(const QModelIndex &index, int role) const
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
-            switch(m_dataObj.getDims())
+            switch(m_sharedDataObj->getDims())
             {
             case 0:
                 return (double)0.0; //default case (for designer, adjustment can be done using the defaultRow and defaultCol property)
             case 1:
-                if (index.column() == 0 && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
+                if (index.column() == 0 && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
                 {
                     return at(index.row(), index.column());
                 }
                 return QVariant();
             case 2:
-                if (index.column() >= 0 && index.column() < (int)m_dataObj.getSize(1) && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
+                if (index.column() >= 0 && index.column() < (int)m_sharedDataObj->getSize(1) && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
                 {
                     return at(index.row(), index.column());
                 }
@@ -82,18 +83,18 @@ bool DataObjectModel::setData(const QModelIndex & index, const QVariant & value,
     {
         if (role == Qt::EditRole)
         {
-            switch(m_dataObj.getDims())
+            switch(m_sharedDataObj->getDims())
             {
             /*case 0:
                 return QVariant();*/
             case 1:
-                if (index.column() == 0 && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
+                if (index.column() == 0 && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
                 {
                     return setValue(index.row(), index.column(), value);
                 }
                 return false;
             case 2:
-                if (index.column() >= 0 && index.column() < (int)m_dataObj.getSize(1) && index.row() >= 0 && index.row() < (int)m_dataObj.getSize(0))
+                if (index.column() >= 0 && index.column() < (int)m_sharedDataObj->getSize(1) && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
                 {
                     return setValue(index.row(), index.column(), value);
                 }
@@ -109,33 +110,33 @@ QVariant DataObjectModel::at(const int row, const int column) const
 {
     Q_ASSERT(row >= 0);
     Q_ASSERT(column >= 0);
-    Q_ASSERT(m_dataObj.getDims() == 1 || m_dataObj.getDims() == 2);
-    Q_ASSERT(row < (int)m_dataObj.getSize(0));
-    Q_ASSERT(column < (int)m_dataObj.getSize(1));
+    Q_ASSERT(m_sharedDataObj->getDims() == 1 || m_sharedDataObj->getDims() == 2);
+    Q_ASSERT(row < (int)m_sharedDataObj->getSize(0));
+    Q_ASSERT(column < (int)m_sharedDataObj->getSize(1));
 
-    switch(m_dataObj.getType())
+    switch(m_sharedDataObj->getType())
     {
     case ito::tInt8:
-        return (int)m_dataObj.at<ito::int8>(row,column);
+        return (int)m_sharedDataObj->at<ito::int8>(row,column);
     case ito::tUInt8:
-        return (uint)m_dataObj.at<ito::uint8>(row,column);
+        return (uint)m_sharedDataObj->at<ito::uint8>(row,column);
     case ito::tInt16:
-        return (int)m_dataObj.at<ito::int16>(row,column);
+        return (int)m_sharedDataObj->at<ito::int16>(row,column);
     case ito::tUInt16:
-        return (uint)m_dataObj.at<ito::uint16>(row,column);
+        return (uint)m_sharedDataObj->at<ito::uint16>(row,column);
     case ito::tInt32:
-        return (int)m_dataObj.at<ito::int32>(row,column);
+        return (int)m_sharedDataObj->at<ito::int32>(row,column);
     case ito::tUInt32:
-        return (uint)m_dataObj.at<ito::uint32>(row,column);
+        return (uint)m_sharedDataObj->at<ito::uint32>(row,column);
     case ito::tFloat32:
-        return (float)m_dataObj.at<ito::float32>(row,column);
+        return (float)m_sharedDataObj->at<ito::float32>(row,column);
     case ito::tFloat64:
-        return (double)m_dataObj.at<ito::float64>(row,column);
+        return (double)m_sharedDataObj->at<ito::float64>(row,column);
     case ito::tComplex64:
-        //return (float)m_dataObj.at<ito::complex64>(row,column);
+        //return (float)m_sharedDataObj->at<ito::complex64>(row,column);
         return QVariant();
     case ito::tComplex128:
-        //return (double)m_dataObj.at<ito::complex128>(row,column);
+        //return (double)m_sharedDataObj->at<ito::complex128>(row,column);
         return QVariant();
     }
     return QVariant();
@@ -146,20 +147,20 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
 {
     Q_ASSERT(row >= 0);
     Q_ASSERT(column >= 0);
-    Q_ASSERT(m_dataObj.getDims() == 1 || m_dataObj.getDims() == 2);
-    Q_ASSERT(row < (int)m_dataObj.getSize(0));
-    Q_ASSERT(column < (int)m_dataObj.getSize(1));
+    Q_ASSERT(m_sharedDataObj->getDims() == 1 || m_sharedDataObj->getDims() == 2);
+    Q_ASSERT(row < (int)m_sharedDataObj->getSize(0));
+    Q_ASSERT(column < (int)m_sharedDataObj->getSize(1));
 
     QModelIndex i = createIndex(row, column);
     bool ok = false;
 
-    switch(m_dataObj.getType())
+    switch(m_sharedDataObj->getType())
     {
     case ito::tInt8:
         {
             int val = value.toInt(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::int8>(row,column) = cv::saturate_cast<ito::int8>(val);
+            m_sharedDataObj->at<ito::int8>(row,column) = cv::saturate_cast<ito::int8>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -167,7 +168,7 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
         {
             uint val = value.toUInt(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::uint8>(row,column) = cv::saturate_cast<ito::uint8>(val);
+            m_sharedDataObj->at<ito::uint8>(row,column) = cv::saturate_cast<ito::uint8>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -175,7 +176,7 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
         {
             int val = value.toInt(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::int16>(row,column) = cv::saturate_cast<ito::int16>(val);
+            m_sharedDataObj->at<ito::int16>(row,column) = cv::saturate_cast<ito::int16>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -183,7 +184,7 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
         {
             uint val = value.toUInt(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::uint16>(row,column) = cv::saturate_cast<ito::uint16>(val);
+            m_sharedDataObj->at<ito::uint16>(row,column) = cv::saturate_cast<ito::uint16>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -191,7 +192,7 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
         {
             int val = value.toInt(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::uint32>(row,column) = cv::saturate_cast<ito::int32>(val);
+            m_sharedDataObj->at<ito::uint32>(row,column) = cv::saturate_cast<ito::int32>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -199,7 +200,7 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
         {
             uint val = value.toUInt(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::uint32>(row,column) = cv::saturate_cast<ito::uint32>(val);
+            m_sharedDataObj->at<ito::uint32>(row,column) = cv::saturate_cast<ito::uint32>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -207,7 +208,7 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
         {
             double val = value.toDouble(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::float32>(row,column) = cv::saturate_cast<ito::float32>(val);
+            m_sharedDataObj->at<ito::float32>(row,column) = cv::saturate_cast<ito::float32>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -215,7 +216,7 @@ bool DataObjectModel::setValue(const int &row, const int &column, const QVariant
         {
             double val = value.toDouble(&ok);
             if (!ok) return false;
-            m_dataObj.at<ito::float64>(row,column) = cv::saturate_cast<ito::float64>(val);
+            m_sharedDataObj->at<ito::float64>(row,column) = cv::saturate_cast<ito::float64>(val);
             emit dataChanged(i,i);
             return true;
         }
@@ -248,9 +249,9 @@ QModelIndex DataObjectModel::parent(const QModelIndex &/*index*/) const
 //----------------------------------------------------------------------------------------------------------------------------------
 int DataObjectModel::rowCount(const QModelIndex &parent) const
 {
-    if (parent.isValid() == false && m_dataObj.getDims() > 0)
+    if (parent.isValid() == false && m_sharedDataObj->getDims() > 0)
     {
-        return m_dataObj.getSize(0);
+        return m_sharedDataObj->getSize(0);
     }
     else if (parent.isValid() == false) //default case
     {
@@ -264,11 +265,11 @@ int DataObjectModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid() == false)
     {
-        if (m_dataObj.getDims() > 1)
+        if (m_sharedDataObj->getDims() > 1)
         {
-            return m_dataObj.getSize(1);
+            return m_sharedDataObj->getSize(1);
         }
-        else if (m_dataObj.getDims() == 0) //default case
+        else if (m_sharedDataObj->getDims() == 0) //default case
         {
             return m_defaultCols;
         }
@@ -284,7 +285,7 @@ QVariant DataObjectModel::headerData(int section, Qt::Orientation orientation, i
     {
         if (orientation == Qt::Horizontal)
         {
-            switch(m_dataObj.getDims())
+            switch(m_sharedDataObj->getDims())
             {
             case 0:
                 if (m_horizontalHeader.count() > section) //default case
@@ -299,7 +300,7 @@ QVariant DataObjectModel::headerData(int section, Qt::Orientation orientation, i
                 return 0;
             default:
                 {
-                    if (section >= 0 && section < (int)m_dataObj.getSize(1))
+                    if (section >= 0 && section < (int)m_sharedDataObj->getSize(1))
                     {
                         if (m_horizontalHeader.count() > section)
                         {
@@ -316,7 +317,7 @@ QVariant DataObjectModel::headerData(int section, Qt::Orientation orientation, i
         }
         else //vertical
         {
-            switch(m_dataObj.getDims())
+            switch(m_sharedDataObj->getDims())
             {
             case 0:
                 if (m_verticalHeader.count() > section) //default case
@@ -331,7 +332,7 @@ QVariant DataObjectModel::headerData(int section, Qt::Orientation orientation, i
                 return 1;
             default:
                 {
-                    if (section >= 0 && section < (int)m_dataObj.getSize(0))
+                    if (section >= 0 && section < (int)m_sharedDataObj->getSize(0))
                     {
                         if (m_verticalHeader.count() > section)
                         {
@@ -371,7 +372,7 @@ void DataObjectModel::setHeaderLabels(Qt::Orientation orientation, const QString
 //----------------------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags DataObjectModel::flags (const QModelIndex & index) const
 {
-    if (m_readOnly || m_dataObj.getDims() == 0)
+    if (m_readOnly || m_sharedDataObj->getDims() == 0)
     {
         return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
@@ -379,10 +380,10 @@ Qt::ItemFlags DataObjectModel::flags (const QModelIndex & index) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectModel::setDataObject(ito::DataObject &dataObj)
+void DataObjectModel::setDataObject(QSharedPointer<ito::DataObject> dataObj)
 {
     beginResetModel();
-    m_dataObj = dataObj;
+    m_sharedDataObj = dataObj;
     endResetModel();
 }
 
@@ -643,13 +644,13 @@ DataObjectTable::~DataObjectTable()
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectTable::setData(QSharedPointer<ito::DataObject> dataObj)
 {
-    m_pModel->setDataObject(*dataObj);
+    m_pModel->setDataObject(dataObj);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> DataObjectTable::getData() const
 {
-    return QSharedPointer<ito::DataObject>(new ito::DataObject(m_pModel->getDataObject()));
+    return m_pModel->getDataObject();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

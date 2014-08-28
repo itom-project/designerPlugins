@@ -28,6 +28,7 @@
 #include <qtableview.h>
 #include <qabstractitemmodel.h>
 #include <qitemdelegate.h>
+#include <qsharedpointer.h>
 
 class DataObjectModel : public QAbstractItemModel
 {
@@ -50,10 +51,10 @@ public:
 
     void setHeaderLabels(Qt::Orientation orientation, const QStringList &labels);
 
-    void setDataObject(ito::DataObject &dataObj);
-    inline ito::DataObject getDataObject() const { return m_dataObj; };
+    void setDataObject(QSharedPointer<ito::DataObject> dataObj);
+    inline QSharedPointer<ito::DataObject> getDataObject() const { return m_sharedDataObj; };
 
-    inline int getType() const { return m_dataObj.getType(); }
+    inline int getType() const { return m_sharedDataObj.data() ? m_sharedDataObj->getType() : ito::tUInt8; }
 
 protected:
     friend class DataObjectTable;
@@ -72,9 +73,8 @@ protected:
     int m_defaultRows;
     int m_defaultCols;
 
-    ito::DataObject m_dataObj;
 
-
+    QSharedPointer<ito::DataObject> m_sharedDataObj;
 
 private:
     bool m_readOnly;
