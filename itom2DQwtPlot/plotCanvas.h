@@ -52,6 +52,7 @@
 #include <qwt_plot_marker.h>
 #include <qwt_plot_shapeitem.h>
 #include <qcolor.h>
+#include <qmenu.h>
 
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
@@ -88,8 +89,10 @@ class PlotCanvas : public QwtPlot
             Real = 2, 
             Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
 
-        PlotCanvas(InternalData *m_pData, QWidget * parent = NULL);
+        PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
+
+        bool m_showContextMenu;
 
         ito::RetVal init();
         void refreshPlot(const ito::DataObject *dObj, int plane = -1);
@@ -181,6 +184,8 @@ class PlotCanvas : public QwtPlot
 
         QColor m_inverseColor0, m_inverseColor1;
         int m_activeDrawItem;
+
+        QMenu *m_contextMenu;
 
         QVector<ito::uint16> m_drawedIemsIndexes;
         bool m_ignoreNextMouseEvent;

@@ -53,7 +53,7 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
+PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent /*= NULL*/) :
         QwtPlot(parent),
         m_pZoomer(NULL),
         m_pPanner(NULL),
@@ -73,10 +73,10 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, QWidget * parent /*= NULL*/) :
         m_pLineCutLine(NULL),
         m_pMultiPointPicker(NULL),
         m_activeDrawItem(-1),
-        m_ignoreNextMouseEvent(false)
+        m_ignoreNextMouseEvent(false),
+        m_contextMenu(contextMenu)
         
 {
-
     setMouseTracking(false);
 
     //this is the border between the canvas and the axes and the overall mainwindow
@@ -472,20 +472,6 @@ void PlotCanvas::changePlane(int plane)
 void PlotCanvas::internalDataUpdated()
 {
     refreshPlot(m_dObjPtr, -1);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
-{
-    /*if (m_showContextMenu)
-    {
-        event->accept();
-        m_contextMenu->exec(event->globalPos());
-    }
-    else
-    {
-        event->ignore();
-    }*/
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2545,6 +2531,19 @@ void PlotCanvas::alphaChanged()
     replot();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
+{
+    if (m_showContextMenu && m_pPanner->isEnabled() == false)
+    {
+        event->accept();
+        m_contextMenu->exec(event->globalPos());
+    }
+    else
+    {
+        event->ignore();
+    }
+}
 
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void PlotCanvas::multiPointSelected (const QPolygon &polygon)

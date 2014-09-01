@@ -112,8 +112,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     ito::RetVal applyUpdate();  //!> does the real update work
 
     //properties (setter/getter)
-    void setContextMenuEnabled(bool show) {}
-    bool getContextMenuEnabled() const { return false; }
+    void setContextMenuEnabled(bool show);
+    bool getContextMenuEnabled() const;
 
     bool colorBarVisible() const;
     void setColorBarVisible(bool value);

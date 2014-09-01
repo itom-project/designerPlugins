@@ -107,13 +107,6 @@ void Itom2dQwtPlot::constructor()
     pData->m_elementsToPick = 0;
     pData->m_pDrawItems.clear();
 
-    //initialize canvas
-    m_pContent = new PlotCanvas(pData, this);
-    connect(m_pContent, SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
-    connect(m_pContent, SIGNAL(statusBarMessage(QString)), (QObject*)statusBar(), SLOT(showMessage(QString)));
-    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
-    setCentralWidget(m_pContent);
-
     //initialize actions
     QToolBar *mainTb = new QToolBar(tr("plotting tools"), this);
     addToolBar(mainTb, "mainToolBar");
@@ -170,8 +163,19 @@ void Itom2dQwtPlot::constructor()
     menuTools->addAction(m_pActClearDrawings);
     addMenu(menuTools); //AbstractFigure takes care of the menu
 
+    QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
+    contextMenu->addAction(mainTb->toggleViewAction());
+
+    //initialize canvas
+    m_pContent = new PlotCanvas(contextMenu, pData, this);
+    connect(m_pContent, SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString)), (QObject*)statusBar(), SLOT(showMessage(QString)));
+    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
+    setCentralWidget(m_pContent);
+
     setPropertyObservedObject(this);
 }
+//----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(QWidget *parent): AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent)
 {
     constructor();
@@ -1924,6 +1928,18 @@ void Itom2dQwtPlot::mnuOverlaySliderChanged(int value)
         ((InternalData*) m_pVData)->m_alpha = value;
         if(m_pContent) m_pContent->alphaChanged();
     }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom2dQwtPlot::getContextMenuEnabled() const
+{
+    if (m_pContent) return (m_pContent)->m_showContextMenu;
+    return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setContextMenuEnabled(bool show)
+{
+    if (m_pContent) (m_pContent)->m_showContextMenu = show;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const 
