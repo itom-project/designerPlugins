@@ -66,7 +66,7 @@ class DataObjRasterData : public QwtRasterData
         bool isInit() const {return m_dataObj.getDims() > 0 && m_dataObjPlane != NULL;}
 
         bool isColorObject() const { return (m_dataObj.getType() == ito::tRGBA32); }
-
+        void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc);
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
         inline double pxToScaleCoords(double px, double offset, double scaling) { return ((double)px - offset) * scaling; }

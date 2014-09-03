@@ -2544,7 +2544,49 @@ void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
         event->ignore();
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc)
+{
+    if (!m_rasterData)
+    {
+        min = std::numeric_limits<double>::quiet_NaN();
+        max = std::numeric_limits<double>::quiet_NaN();
 
+        return;
+    }   
+
+    m_rasterData->getMinMaxLoc(min, minLoc, max, maxLoc);
+
+
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, double *maxPhysLoc)
+{
+    if (!m_rasterData || !m_dObjPtr || m_dObjPtr->getDims() < 2)
+    {
+        min = std::numeric_limits<double>::quiet_NaN();
+        max = std::numeric_limits<double>::quiet_NaN();
+
+        return;
+    }   
+
+    ito::uint32 minLoc[3];
+    ito::uint32 maxLoc[3];
+    m_rasterData->getMinMaxLoc(min, minLoc, max, maxLoc);
+
+    bool check;
+
+    minPhysLoc[0] = minLoc[0];
+    minPhysLoc[1] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-2, minLoc[1], check); 
+    minPhysLoc[2] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-1, minLoc[2], check); 
+
+    maxPhysLoc[0] = maxLoc[0];
+    maxPhysLoc[1] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-2, maxLoc[1], check); 
+    maxPhysLoc[2] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-1, maxLoc[2], check); 
+
+    return;
+}
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void PlotCanvas::multiPointSelected (const QPolygon &polygon)
 //{

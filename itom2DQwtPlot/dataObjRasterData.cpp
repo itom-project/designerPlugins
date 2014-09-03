@@ -862,3 +862,16 @@ void DataObjRasterData::discardRaster()
 {
     //qDebug() << "rendering time" << timer1.elapsed();
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjRasterData::getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc)
+{
+    if(!m_dataObjPlane || m_dataObjPlane->getDims() < 2)
+    {
+        min = std::numeric_limits<double>::quiet_NaN();
+        max = std::numeric_limits<double>::quiet_NaN();
+        return;
+    }
+
+    ito::dObjHelper::minMaxValue(m_dataObjPlane, min, minLoc, max, maxLoc, true, m_pInternalData->m_cmplxType);
+    return;
+}

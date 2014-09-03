@@ -288,6 +288,39 @@ void Itom2dQwtPlot::createActions()
     a->setToolTip(tr("Show a in plane line cut"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActLineCut(bool)));
 
+
+    m_pActLineCutMode = new QMenu(tr("Linecut Mode"), this);
+    m_pActLineCutGroup = new QActionGroup(this);
+
+    a = m_pActLineCutGroup->addAction(tr("min & max"));
+    a->setData(0);
+    m_pActLineCutMode->addAction(a);
+    a->setCheckable(true);
+    a->setChecked(true);
+
+    a = m_pActLineCutGroup->addAction(tr("- & min"));
+    a->setData(1);
+    m_pActLineCutMode->addAction(a);
+    a->setCheckable(true);
+
+    a = m_pActLineCutGroup->addAction(tr("- & max"));
+    a->setData(2);
+    m_pActLineCutMode->addAction(a);
+    a->setCheckable(true);
+
+    a = m_pActLineCutGroup->addAction(tr("| & min"));
+    a->setData(3);
+    m_pActLineCutMode->addAction(a);
+    a->setCheckable(true);
+
+    a = m_pActLineCutGroup->addAction(tr("| & max"));
+    a->setData(4);
+    m_pActLineCutMode->addAction(a);
+    a->setCheckable(true);
+
+    m_pActLineCut->setMenu(m_pActLineCutMode);
+    connect(m_pActLineCutGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuLineCutMode(QAction*)));
+
     //m_pOverlaySlider
     m_pOverlaySlider = new QSlider(Qt::Horizontal, this);
     m_pOverlaySlider->setMinimum(0);
@@ -993,6 +1026,158 @@ void Itom2dQwtPlot::mnuActLineCut(bool checked)
 
     m_pContent->setState(checked ? PlotCanvas::tLineCut : PlotCanvas::tIdle);
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
+{
+    if(!m_pActLineCut->isChecked())
+    {
+        m_pActLineCut->setChecked(true);
+    }
+
+    QPointF x = m_pContent->getInterval(Qt::XAxis);
+    QPointF y = m_pContent->getInterval(Qt::YAxis);
+
+    double min = 0;
+    double max = 0;
+
+    double minLoc[3];
+    double maxLoc[3];
+    m_pContent->getMinMaxPhysLoc(min, minLoc, max, maxLoc);
+
+    switch (action->data().toInt())
+    {
+        default:
+        case 0:
+            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            {
+                
+                double dy = maxLoc[1] - minLoc[1];
+                double dx = maxLoc[2] - minLoc[2];
+
+                if(!ito::dObjHelper::isNotZero(dy) && !ito::dObjHelper::isNotZero(dx))
+                {
+                    y.setX((y.x() + y.y()) / 2.0);
+                    y.setY(y.x());
+                }
+                else if(fabs(dx) < std::numeric_limits<double>::epsilon() * 100)
+                {
+                    y.setX(minLoc[1]);
+                    y.setY(maxLoc[1]);
+                }
+                else if(fabs(dy) < std::numeric_limits<double>::epsilon() * 100)
+                {
+                    x.setX(minLoc[2]);
+                    x.setY(maxLoc[2]);
+                }
+                else
+                {
+                    double b = minLoc[1] - dy / dx * minLoc[2];
+
+                    double xbmin = std::min(x.x(), x.y());
+                    double xbmax = std::max(x.x(), x.y());
+                    double ybmin = std::min(y.x(), y.y());
+                    double ybmax = std::max(y.x(), y.y());
+
+                    double xmin = (ybmin - b) / (dy / dx);
+                    double xmax = (ybmax - b) / (dy / dx);
+                    double ymin = xbmin * (dy / dx) + b;
+                    double ymax = xbmax * (dy / dx) + b;
+
+                    if(dx / dy > 0)
+                    {
+                        if(xmin < xbmin)
+                        {
+                            x.setX(xbmin);
+                            y.setX(ymin);
+                        }
+                        else
+                        {
+                            x.setX(xmin);
+                            y.setX(ybmin);                    
+                        }
+
+                        if(xmax > xbmax)
+                        {
+                            x.setY(xbmax);
+                            y.setY(ymax);
+                        }
+                        else
+                        {
+                            x.setY(xmax);
+                            y.setY(ybmax);                    
+                        }
+                    }
+                    else
+                    {
+                        if(xmin > xbmax)
+                        {
+                            x.setX(xbmin);
+                            y.setX(ymin);
+                        }
+                        else
+                        {
+                            x.setX(xmin);
+                            y.setX(ybmin);                    
+                        }
+
+                        if(xmax < xbmin)
+                        {
+                            x.setY(xbmax);
+                            y.setY(ymax);
+                        }
+                        else
+                        {
+                            x.setY(xmax);
+                            y.setY(ybmax);                    
+                        }
+                    }
+
+                }
+ /*               
+                x.setX(minLoc[2]);
+                x.setY(maxLoc[2]);
+                y.setX(minLoc[1]);
+                y.setY(maxLoc[1]);
+*/
+            }
+        break;
+        case 1:
+            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            {
+                y.setX(minLoc[1]);
+                y.setY(minLoc[1]);
+            }
+        break;
+        case 2:
+            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            {
+                y.setX(maxLoc[1]);
+                y.setY(maxLoc[1]);
+            }
+        break;
+
+        case 3:
+            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            {
+                x.setX(minLoc[2]);
+                x.setY(minLoc[2]);
+            }
+        break;
+
+        case 4:
+            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            {
+                x.setX(maxLoc[2]);
+                x.setY(maxLoc[2]);
+            }
+        break;
+    }
+
+    setLinePlot(x.x(), y.x(), x.y(), y.y());
+}
+
+
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActStackCut(bool checked)

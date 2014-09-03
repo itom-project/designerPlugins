@@ -230,6 +230,9 @@ private:
     QAction *m_pActToggleColorBar;
     QAction *m_pActValuePicker;
     QAction *m_pActLineCut;
+    QMenu *m_pActLineCutMode;
+    QActionGroup *m_pActLineCutGroup;
+
     QAction *m_pActStackCut;
     QWidgetAction *m_pActPlaneSelector;
     QActionGroup *m_pDrawModeActGroup;
@@ -266,7 +269,9 @@ private slots:
     void mnuActToggleColorBar(bool checked);
     void mnuActValuePicker(bool checked);
     void mnuActLineCut(bool checked);
+    void mnuLineCutMode(QAction *action);
     void mnuActStackCut(bool checked);
+    
     void mnuActPlaneSelector(int plane);
     void mnuDrawMode(QAction *action);
     void mnuDrawMode(bool checked);

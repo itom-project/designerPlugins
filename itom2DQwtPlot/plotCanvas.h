@@ -124,6 +124,8 @@ class PlotCanvas : public QwtPlot
         friend class DrawItem;
 
     protected:
+        void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc);
+        void getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, double *maxPhysLoc);
         void contextMenuEvent(QContextMenuEvent * event);
         void keyPressEvent ( QKeyEvent * event );
         void keyReleaseEvent ( QKeyEvent * event );
