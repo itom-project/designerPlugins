@@ -25,12 +25,18 @@
  * \brief This file contains basic container for the evaluateGeometrics-Widget.
  */
 
-#ifndef ITOMPLOT_H
-#define ITOMPLOT_H
+#ifndef ITOMPLOTTREE_H
+#define ITOITOMPLOTTREE_HMPLOT_H
+
+#if defined(ITOMSHAREDDESIGNER)
+    #define ITOM1DPLOT_EXPORT Q_DECL_EXPORT
+#else
+    #define ITOM1DPLOT_EXPORT Q_DECL_IMPORT
+#endif
 
 #include "plot/AbstractDObjFigure.h"
 
-#include "plotTreeWidget.h"
+//#include "plotTreeWidget.h"
 
 #include <qgridlayout.h>
 #include <qstyle.h>
@@ -58,7 +64,9 @@
 * \sa EvaluateGeometricsPlugin, PlotTreeWidget
 */
 
-class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
+class PlotTreeWidget;
+
+class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
@@ -91,13 +99,8 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
 
-        void setData(QSharedPointer<ito::DataObject> dataObj) 
-        {
-            if(m_pContent != NULL)
-            {
-                m_pContent->refreshPlot(dataObj.data());
-            }
-        };
+        void setData(QSharedPointer<ito::DataObject> dataObj); 
+
        // QSharedPointer<ito::DataObject> getData() const {return };
 
         //properties
@@ -123,47 +126,9 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
         QFont getLabelFont(void) const;
         void setLabelFont(const QFont &font);
 
-        QStringList getRelationNames(void) const 
-        {
-            return m_info.m_relationNames;
-        }
+        QStringList getRelationNames(void) const;
 
-        void setRelationNames(const QStringList input)
-        {
-            if(input.size() < 7)
-            {
-                return;
-            }
-
-            if(m_info.m_relationNames.length() < input.size())
-            {
-                m_info.m_relationNames.reserve(input.length());
-            }
-
-            for( int i = 6; i < input.length(); i++)
-            {
-                int idx = m_info.m_relationNames.indexOf(input[i]);
-                if(idx < 7 && idx != -1)
-                {
-                    continue;
-                }
-
-                if(m_info.m_relationNames.length() > i)
-                {
-                    m_info.m_relationNames[i] = input[i];
-                }
-                else
-                {
-                    m_info.m_relationNames.append(input[i]);
-                }
-            }
-
-            while(m_info.m_relationNames.length() > input.size() && m_info.m_relationNames.length() > 6)
-            {
-                m_info.m_relationNames.removeLast();
-            }
-            return;
-        }
+        void setRelationNames(const QStringList input);
 
         void setRelations(QSharedPointer<ito::DataObject> relations);
 
@@ -180,34 +145,25 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
             showExportWindow = 0x10
         };
 
-        void clearRelation(const bool apply)
-        {
-            m_info.m_relationsList.clear();
-        }
+        void clearRelation(const bool apply);
 
         void setDestinationFolder(const QString folder) {m_lastFolder = folder;}
-        QString getDestinationFolder() const {return m_lastFolder;};
+        QString getDestinationFolder() const {return m_lastFolder;}
 
         int getLastRelation(void) const {return m_lastAddedRelation;}
 
-        bool getConsider2dStatus(void) const {return m_info.m_consider2DOnly;}
-        void setConsider2dStatus(const bool enabled)
-        {
-            m_info.m_consider2DOnly = enabled;
-            m_pContent->updatePrimitives();
-            m_pContent->updateRelationShips(false);
-            return;
-        }
+        bool getConsider2dStatus(void) const;
+        void setConsider2dStatus(const bool enabled);
 
         void setSource(QSharedPointer<ito::DataObject> source);
     
     protected:
-        ito::RetVal init() { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
+        ito::RetVal init();
 
         PlotTreeWidget *m_pContent;
 
     private:
-        InternalInfo m_info;
+        void* m_pInfo;
 
         QAction *m_actSetting;
         QAction *m_actSave;
@@ -247,4 +203,4 @@ class EvaluateGeometricsFigure : public ito::AbstractDObjFigure
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
-#endif // ITOMPLOT_H
+#endif // ITOMPLOTTREE_H
