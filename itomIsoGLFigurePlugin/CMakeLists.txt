@@ -1,5 +1,5 @@
 SET (target_name itomIsoGLFigurePlugin)
-
+SET (figure_name itomIsoGLWidget)
 project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
@@ -167,6 +167,13 @@ ENDIF(3DCONNEXION_FOUND)
 #translation
 set (FILES_TO_TRANSLATE ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_UI})
 PLUGIN_TRANSLATION(QM_FILES ${target_name} ${UPDATE_TRANSLATIONS} "${EXISTING_TRANSLATION_FILES}" ITOM_LANGUAGES "${FILES_TO_TRANSLATE}")
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/doxygen/doxygen.dox.in ${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen/doxygen.dox )
+IF(EXISTS ${ITOM_SDK_DIR}/docs/plotDoc/plot_doc_config.cfg.in)
+    configure_file(${ITOM_SDK_DIR}/docs/plotDoc/plot_doc_config.cfg.in ${CMAKE_CURRENT_BINARY_DIR}/docs/userDoc/plot_doc_config.cfg )
+ELSEIF()
+    message(WARNING "Could not find and configure auto doc config file. Auto is not enabled")
+ENDIF()
 
 # COPY SECTION
 set(COPY_SOURCES "")
