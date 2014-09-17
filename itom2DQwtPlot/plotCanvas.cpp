@@ -2500,6 +2500,26 @@ QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> PlotCanvas::getDispledOverlayObject()
+{
+    if (!m_rasterOverlayData)
+    {
+        return QSharedPointer<ito::DataObject>(); 
+    }
+    return m_rasterOverlayData->rasterToObject(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft));
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> PlotCanvas::getOverlayObject()
+{
+    if (!m_rasterData)
+    {
+        return QSharedPointer<ito::DataObject>(); 
+    }
+    return m_rasterOverlayData->rasterToObject();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setOverlayObject(ito::DataObject* newOverlay)
 {
     if(newOverlay)

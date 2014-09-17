@@ -855,7 +855,17 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
 
     return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject()
+{
+    if(!m_dataObjPlane || m_dataObjPlane->getDims() < 2)
+    {
+        return QSharedPointer<ito::DataObject>();
+    }
+    ito::DataObject dataObjectOut;
+    m_dataObjPlane->copyTo(dataObjectOut);
+    return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::discardRaster()

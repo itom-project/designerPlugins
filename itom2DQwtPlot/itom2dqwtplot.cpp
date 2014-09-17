@@ -2156,6 +2156,7 @@ void Itom2dQwtPlot::setContextMenuEnabled(bool show)
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const 
 {
+    if (m_pContent) return m_pContent->getOverlayObject();
     return QSharedPointer< ito::DataObject >(NULL); 
 }
 //----------------------------------------------------------------------------------------------------------------------------------
