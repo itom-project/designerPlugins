@@ -981,7 +981,26 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF PlotCanvas::getInterval(Qt::Axis axis) const
 {
-    QwtInterval i = m_rasterData->interval(axis);
+    QwtInterval i;
+
+    switch (axis)
+    {
+    case Qt::ZAxis:
+        i = m_rasterData->interval(axis);
+        break;
+    case Qt::XAxis:
+        {
+            QwtScaleDiv div =axisScaleDiv(QwtPlot::xBottom);
+            i = div.interval();
+        }
+        break;
+    case Qt::YAxis:
+        {
+            QwtScaleDiv div =axisScaleDiv(QwtPlot::yLeft);
+            i = div.interval();
+        }
+    }
+
     return QPointF(i.minValue(), i.maxValue());
 }
 //----------------------------------------------------------------------------------------------------------------------------------
