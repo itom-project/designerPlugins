@@ -293,27 +293,32 @@ void Itom2dQwtPlot::createActions()
     m_pActLineCutGroup = new QActionGroup(this);
 
     a = m_pActLineCutGroup->addAction(tr("min & max"));
+    a->setToolTip(tr("line cut through global minimum and maximum value"));
     a->setData(0);
     m_pActLineCutMode->addAction(a);
     a->setCheckable(true);
-    a->setChecked(true);
+    //a->setChecked(true); //don't check any linecut mode points at beginning, since the default is the free-draw mode
 
     a = m_pActLineCutGroup->addAction(tr("- & min"));
+    a->setToolTip(tr("horizontal line cut through global minimum value"));
     a->setData(1);
     m_pActLineCutMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pActLineCutGroup->addAction(tr("- & max"));
+    a->setToolTip(tr("horizontal line cut through global maximum value"));
     a->setData(2);
     m_pActLineCutMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pActLineCutGroup->addAction(tr("| & min"));
+    a->setToolTip(tr("vertical line cut through global minimum value"));
     a->setData(3);
     m_pActLineCutMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pActLineCutGroup->addAction(tr("| & max"));
+    a->setToolTip(tr("vertical line cut through global maximum value"));
     a->setData(4);
     m_pActLineCutMode->addAction(a);
     a->setCheckable(true);
