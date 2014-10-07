@@ -105,6 +105,25 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
+
+    Q_CLASSINFO("slot://plotMarkers", "ToDo")
+    Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
+    Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")
+    Q_CLASSINFO("slot://userInteractionStart", "ToDo")  
+    Q_CLASSINFO("slot://clearGeometricElements", "ToDo")
+    Q_CLASSINFO("slot://getDisplayed", "ToDo")  
+    Q_CLASSINFO("slot://getDisplayedLineCut", "ToDo")
+    Q_CLASSINFO("slot://setLinePlot", "ToDo")
+    Q_CLASSINFO("slot://removeOverlayImage", "ToDo")
+    Q_CLASSINFO("slot://copyToClipBoard", "ToDo")
+
+    Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
+    Q_CLASSINFO("signal://userInteractionDone", "")
+    Q_CLASSINFO("signal://plotItemChanged", "")
+    Q_CLASSINFO("signal://plotItemDeleted", "")
+    Q_CLASSINFO("signal://plotItemsDeleted", "")
+    Q_CLASSINFO("signal://plotItemsFinished", "")
+
     DESIGNER_PLUGIN_ITOM_API
     public:
     Itom2dQwtPlot(QWidget *parent = 0);
