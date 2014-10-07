@@ -98,6 +98,13 @@ class MotorController : public QGroupBox
 
     Q_ENUMS(Unit);
 
+    Q_CLASSINFO("slot://triggerActuatorStep", "")
+    Q_CLASSINFO("slot://actuatorStatusChanged", "")
+    Q_CLASSINFO("slot://triggerUpdatePosition", "")
+
+    Q_CLASSINFO("signal://requestStatusAndPosition", "")
+    Q_CLASSINFO("signal://TriggerSoftJoyStickMovement", "")
+
 public:
     enum Unit { nm, micron, mm, m, km };
 

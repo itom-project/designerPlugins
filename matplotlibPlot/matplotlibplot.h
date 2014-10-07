@@ -25,6 +25,11 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 
     Q_CLASSINFO("prop://forceWindowResize", "If set, the plot widget / area is resized to the desired sizes given by matplotlib. Uncheck this option, if you want to keep the canvas unchanged e.g. in an user-defined GUI")
     
+    Q_CLASSINFO("slot://showSubplotConfig", "")
+    Q_CLASSINFO("slot://setLabelText", "")
+
+    Q_CLASSINFO("signal://subplotConfigSliderChanged", "")
+
     DESIGNER_PLUGIN_ITOM_API
 public:
     MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);

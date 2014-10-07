@@ -80,7 +80,6 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(int lastAddedRelation READ getLastRelation DESIGNABLE true)
     Q_PROPERTY(bool considerOnly2D READ getConsider2dStatus WRITE setConsider2dStatus DESIGNABLE true)
     
-
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://valueUnit", "The value unit for the metrical calculations that is used within the plot.")
     Q_CLASSINFO("prop://titleFont", "Font for title (toDo).")
@@ -90,6 +89,13 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("prop://relationNames", "A string list with the names of possible relation. The first elements [N.A., radius, angle to, distance to, intersection with, length and area] are read only and are calculated with these widget. For external calculated values you can define custom names e.g. roughness.")
     Q_CLASSINFO("prop://lastAddedRelation", "Get the index of the last added relation.")
     Q_CLASSINFO("prop://considerOnly2D",    "If true, only the x & y coordinates are considered.")
+
+    Q_CLASSINFO("slot://addRelation", "Add a set of relations via dataObject")
+    Q_CLASSINFO("slot://modifyRelation", "Change a single relation")
+    Q_CLASSINFO("slot://addRelationName", "Add a relation name to the internal relation list")
+    Q_CLASSINFO("slot://exportData", "Export data to file")
+    Q_CLASSINFO("slot://plotItemChanged", "Slot for c++ internal communication between a plot an this widgt")
+    Q_CLASSINFO("slot://clearAll", "Delete all relations and geometric elements")
 
     DESIGNER_PLUGIN_ITOM_API
 

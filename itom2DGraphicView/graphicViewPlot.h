@@ -88,6 +88,8 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
     //Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     //Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
 
+    Q_CLASSINFO("slot://copyToClipBoard", "")
+
     DESIGNER_PLUGIN_ITOM_API
 
     public:

@@ -98,6 +98,21 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
     Q_CLASSINFO("prop://picker", "Get picker defined by a float32[3] array for each element containing [pixelIndex, physIndex, value].")
 
+    Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
+    //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
+    Q_CLASSINFO("slot://plotMarkers", "Delete a specific marker")
+    Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
+    Q_CLASSINFO("slot://copyToClipBoard", "")
+    Q_CLASSINFO("slot://userInteractionStart", "")  
+    Q_CLASSINFO("slot://clearGeometricElements", "")
+    Q_CLASSINFO("slot://getDisplayed", "")
+
+    Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
+    Q_CLASSINFO("signal://userInteractionDone", "")
+    Q_CLASSINFO("signal://plotItemChanged", "")
+    Q_CLASSINFO("signal://plotItemDeleted", "")
+    Q_CLASSINFO("signal://plotItemsDeleted", "")
+
     DESIGNER_PLUGIN_ITOM_API
 
     public:
