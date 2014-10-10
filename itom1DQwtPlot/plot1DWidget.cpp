@@ -151,6 +151,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_drawedIemsIndexes.reserve(10);
 
     setState((Plot1DWidget::tState)m_pData->m_state);
+    updateColors();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2744,5 +2745,43 @@ QVector<ito::float32> Plot1DWidget::getPickerPhys() const
     }
 
     return exportItem;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::updateColors(void)
+{
+    if(m_pData)
+    {
+        QString styleSheet = this->styleSheet();
+
+        styleSheet = QString("background-color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_backgnd.red()), QString::number(m_pData->m_backgnd.green()), QString::number(m_pData->m_backgnd.blue())) ;
+        styleSheet.append(QString("color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_axisColor.red()), QString::number(m_pData->m_axisColor.green()), QString::number(m_pData->m_axisColor.blue())));
+        this->setStyleSheet(styleSheet);
+
+        QPalette newPalette(m_pData->m_backgnd);
+
+        newPalette.setColor( QPalette::WindowText, m_pData->m_axisColor); // for ticks
+        newPalette.setColor( QPalette::Text, m_pData->m_textColor); // for ticks' labels
+
+        setAutoFillBackground( true );
+        setPalette( newPalette );
+        setCanvasBackground(m_pData->m_backgnd);
+        
+        
+        axisWidget(QwtPlot::xBottom)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::xBottom)->setPalette(newPalette);
+
+        axisWidget(QwtPlot::yLeft)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::yLeft)->setPalette(newPalette);
+
+        axisWidget(QwtPlot::yRight)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::yRight)->setPalette(newPalette);
+
+        axisWidget(QwtPlot::xTop)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::xTop)->setPalette(newPalette);
+        
+        replot();        
+    }
+
+    return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------

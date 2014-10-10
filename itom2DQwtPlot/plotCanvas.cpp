@@ -209,6 +209,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
 
     m_drawedIemsIndexes.clear();
     m_drawedIemsIndexes.reserve(10);
+    updateColors();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2623,6 +2624,44 @@ void PlotCanvas::getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, 
     maxPhysLoc[0] = maxLoc[0];
     maxPhysLoc[1] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-2, maxLoc[1], check); 
     maxPhysLoc[2] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-1, maxLoc[2], check); 
+
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::updateColors(void)
+{
+    if(m_pData)
+    {
+        QString styleSheet = this->styleSheet();
+
+        styleSheet = QString("background-color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_backgnd.red()), QString::number(m_pData->m_backgnd.green()), QString::number(m_pData->m_backgnd.blue())) ;
+        styleSheet.append(QString("color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_axisColor.red()), QString::number(m_pData->m_axisColor.green()), QString::number(m_pData->m_axisColor.blue())));
+        this->setStyleSheet(styleSheet);
+
+        QPalette newPalette(m_pData->m_backgnd);
+
+        newPalette.setColor( QPalette::WindowText, m_pData->m_axisColor); // for ticks
+        newPalette.setColor( QPalette::Text, m_pData->m_textColor); // for ticks' labels
+
+        setAutoFillBackground( true );
+        setPalette( newPalette );
+        setCanvasBackground(m_pData->m_backgnd);
+        
+        
+        axisWidget(QwtPlot::xBottom)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::xBottom)->setPalette(newPalette);
+
+        axisWidget(QwtPlot::yLeft)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::yLeft)->setPalette(newPalette);
+
+        axisWidget(QwtPlot::yRight)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::yRight)->setPalette(newPalette);
+
+        axisWidget(QwtPlot::xTop)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::xTop)->setPalette(newPalette);
+        
+        replot();            
+    }
 
     return;
 }

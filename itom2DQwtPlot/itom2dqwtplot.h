@@ -80,6 +80,10 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
 
+    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+    Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
+    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -104,6 +108,10 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
 
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
+
+    Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
+    Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
+    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
 
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
@@ -221,6 +229,28 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     void resetOverlayImage(void);
 
     void enableOverlaySlider(bool enabled) {m_pActOverlaySlider->setVisible(enabled);}
+
+    //!> set new background color
+    void setBackgroundColor(const QColor newVal);
+
+    //!> get current background color
+    QColor getBackgroundColor(void) const;
+
+    /** set color of axis
+    *   @param [in] newVal  new axis color
+    */
+    void setAxisColor(const QColor newVal);
+
+    //!> return axis color
+    QColor getAxisColor(void) const;
+
+    /** set text color
+    *   @param [in] newVal  new text color
+    */
+    void setTextColor(const QColor newVal);
+
+    //!> return text color
+    QColor getTextColor(void) const;
 
     friend class PlotCanvas;
 

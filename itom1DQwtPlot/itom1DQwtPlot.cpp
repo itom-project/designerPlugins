@@ -1693,6 +1693,81 @@ void Itom1DQwtPlot::setSelectedElement(const int idx)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QColor Itom1DQwtPlot::getBackgroundColor(void) const
+{
+    if(m_data) 
+    {
+        return ((InternalData*)m_data)->m_backgnd;
+    }
+    else
+        return Qt::white;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setBackgroundColor(const QColor newVal)
+{
+    if(m_data) 
+    {
+        InternalData* intData = ((InternalData*)m_data);
+        intData->m_backgnd = newVal.rgb() & 0x00FFFFFF;
+    }
+    if(m_pContent)
+    {
+        m_pContent->updateColors();
+    }
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor Itom1DQwtPlot::getAxisColor(void) const
+{
+    if(m_data) 
+    {
+        return ((InternalData*)m_data)->m_axisColor;
+    }
+    else
+        return Qt::black;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setAxisColor(const QColor newVal)
+{
+    if(m_data) 
+    {
+        InternalData* intData = ((InternalData*)m_data);
+        intData->m_axisColor = newVal.rgb() & 0x00FFFFFF;
+    }
+    if(m_pContent)
+    {
+        m_pContent->updateColors();
+    }
+
+    return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor Itom1DQwtPlot::getTextColor(void) const
+{
+    if(m_data) 
+    {
+        return ((InternalData*)m_data)->m_textColor;
+    }
+    else
+        return Qt::black;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setTextColor(const QColor newVal)
+{
+    if(m_data) 
+    {
+        InternalData* intData = ((InternalData*)m_data);
+        intData->m_textColor = newVal.rgb() & 0x00FFFFFF;
+    }
+    if(m_pContent)
+    {
+        m_pContent->updateColors();
+    }
+
+    return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
 {
     if(!m_pContent)

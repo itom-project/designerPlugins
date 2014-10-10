@@ -77,6 +77,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false)
     Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
     
+    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+    Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
+    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -97,6 +100,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://pickerLimit", "Define the maximal number of picker for this plot.")
     Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
     Q_CLASSINFO("prop://picker", "Get picker defined by a float32[3] array for each element containing [pixelIndex, physIndex, value].")
+
+    Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
+    Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
+    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
 
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
     //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
@@ -190,6 +197,28 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QVector<ito::int32> getPickerPixel() const;
         QVector<ito::float32> getPickerPhys() const;
+
+        //!> set new background color
+        void setBackgroundColor(const QColor newVal);
+
+        //!> get current background color
+        QColor getBackgroundColor(void) const;
+
+        /** set color of axis
+        *   @param [in] newVal  new axis color
+        */
+        void setAxisColor(const QColor newVal);
+
+        //!> return axis color
+        QColor getAxisColor(void) const;
+
+        /** set text color
+        *   @param [in] newVal  new text color
+        */
+        void setTextColor(const QColor newVal);
+
+        //!> return text color
+        QColor getTextColor(void) const;
 
         friend class Plot1DWidget;
 

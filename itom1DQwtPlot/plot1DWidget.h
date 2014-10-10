@@ -126,7 +126,7 @@ class Plot1DWidget : public QwtPlot
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
 
         void setState( tState state);
-
+        void updateColors(void);
     private:
         QwtPlotRescaler* m_pRescaler;
 
@@ -226,6 +226,10 @@ struct InternalData
         m_state = Plot1DWidget::stateIdle;
         m_multiLine = Plot1DWidget::Auto;
         m_pickerLimit = 2;
+
+        m_axisColor = Qt::black;
+        m_textColor = Qt::black;
+        m_backgnd = Qt::white;
     }
 
     ~InternalData()
@@ -273,6 +277,10 @@ struct InternalData
     int m_elementsToPick;
     bool m_enablePlotting;
     bool m_keepAspect;
+
+    QColor m_backgnd;           //!> plot background color
+    QColor m_axisColor;         //!> color of axis
+    QColor m_textColor;         //!> text color
 
     //true for one replot if setSource-Property has been set 
     //(even if the same data object is given one more time, 

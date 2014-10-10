@@ -150,6 +150,7 @@ class PlotCanvas : public QwtPlot
         
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
+        void updateColors();
     private:
         ito::DataObject randImg;
 
@@ -258,6 +259,10 @@ struct InternalData
         m_overlayScaleAuto = 1;
         m_overlayMin = 0;
         m_overlayMax = 0;
+
+        m_axisColor = Qt::black;
+        m_textColor = Qt::black;
+        m_backgnd = Qt::white;
     }
     ~InternalData()
     {
@@ -317,6 +322,10 @@ struct InternalData
 
     int m_elementsToPick;
     unsigned char m_alpha;
+
+    QColor m_backgnd;           //!> plot background color
+    QColor m_axisColor;         //!> color of axis
+    QColor m_textColor;         //!> text color
 
     bool m_enablePlotting;
     bool m_showCenterMarker;
