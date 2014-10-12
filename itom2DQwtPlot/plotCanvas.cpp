@@ -846,6 +846,22 @@ void PlotCanvas::updateLabels()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::synchronizeScaleValues()
+{
+    QwtInterval ival = m_rasterData->interval(Qt::ZAxis);
+    m_pData->m_valueMin = ival.minValue();
+    m_pData->m_valueMax = ival.maxValue();
+
+    ival = m_rasterData->interval(Qt::XAxis);
+    m_pData->m_xaxisMin = ival.minValue();
+    m_pData->m_xaxisMax = ival.maxValue();
+
+    ival = m_rasterData->interval(Qt::YAxis);
+    m_pData->m_yaxisMin = ival.minValue();
+    m_pData->m_yaxisMax = ival.maxValue();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateScaleValues(bool doReplot)
 {
     QwtInterval ival;
@@ -928,22 +944,42 @@ void PlotCanvas::updateScaleValues(bool doReplot)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
+void PlotCanvas::setInterval(Qt::Axis axis, const ito::AutoInterval &interval)
 {
     if (axis == Qt::XAxis)
     {
-        m_pData->m_xaxisScaleAuto = false;
-        m_pData->m_xaxisMin = interval.x();
-        m_pData->m_xaxisMax = interval.y();
+        m_pData->m_xaxisScaleAuto = interval.isAuto();
+
+        if (m_pData->m_xaxisScaleAuto)
+        {
+            QwtInterval ival = m_rasterData->interval(Qt::XAxis);
+            m_pData->m_valueMin = ival.minValue();
+            m_pData->m_valueMax = ival.maxValue();
+        }
+        else
+        {
+            m_pData->m_xaxisMin = interval.minimum();
+            m_pData->m_xaxisMax = interval.maximum();
+        }
         setAxisScale(QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
     }
     else if (axis == Qt::YAxis)
     {
-        m_pData->m_yaxisScaleAuto = false;
+        m_pData->m_yaxisScaleAuto = interval.isAuto();
+
+        if (m_pData->m_xaxisScaleAuto)
+        {
+            QwtInterval ival = m_rasterData->interval(Qt::YAxis);
+            m_pData->m_yaxisMin = ival.minValue();
+            m_pData->m_yaxisMax = ival.maxValue();
+        }
+        else
+        {
+            m_pData->m_yaxisMin = interval.minimum();
+            m_pData->m_yaxisMax = interval.maximum();
+        }
 
         QwtScaleEngine *scaleEngine = axisScaleEngine(QwtPlot::yLeft);
-        m_pData->m_yaxisMin = interval.x();
-        m_pData->m_yaxisMax = interval.y();
 
         if (m_pData->m_yaxisFlipped)
         {
@@ -959,15 +995,26 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
     }
     else if (axis == Qt::ZAxis)
     {
-        m_pData->m_valueScaleAuto = false;
-        m_pData->m_valueMin = interval.x();
-        m_pData->m_valueMax = interval.y();
+        m_pData->m_valueScaleAuto = interval.isAuto();
+
+        if (m_pData->m_valueScaleAuto)
+        {
+            internalDataUpdated();
+            QwtInterval ival = m_rasterData->interval(Qt::ZAxis);
+            m_pData->m_valueMin = ival.minValue();
+            m_pData->m_valueMax = ival.maxValue();
+        }
+        else
+        {
+            m_pData->m_valueMin = interval.minimum();
+            m_pData->m_valueMax = interval.maximum();
+        }
 
         QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
 
         if (widget)
         {
-            QwtInterval ival(interval.x(), interval.y());
+            QwtInterval ival(interval.minimum(), interval.maximum());
             widget->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
         }
 
@@ -980,38 +1027,42 @@ void PlotCanvas::setInterval(Qt::Axis axis, const QPointF &interval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF PlotCanvas::getInterval(Qt::Axis axis) const
+ito::AutoInterval PlotCanvas::getInterval(Qt::Axis axis) const
 {
     QwtInterval i;
+    bool autoScale;
 
     switch (axis)
     {
     case Qt::ZAxis:
         i = m_rasterData->interval(axis);
+        autoScale = m_pData->m_valueScaleAuto;
         break;
     case Qt::XAxis:
         {
             QwtScaleDiv div =axisScaleDiv(QwtPlot::xBottom);
             i = div.interval();
+            autoScale = m_pData->m_xaxisScaleAuto;
         }
         break;
     case Qt::YAxis:
         {
             QwtScaleDiv div =axisScaleDiv(QwtPlot::yLeft);
             i = div.interval();
+            autoScale = m_pData->m_yaxisScaleAuto;
         }
     }
 
-    return QPointF(i.minValue(), i.maxValue());
+    return ito::AutoInterval(i.minValue(), i.maxValue(), autoScale);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setOverlayInterval(Qt::Axis axis, const QPointF &interval)
+void PlotCanvas::setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval)
 {
     if (axis == Qt::ZAxis)
     {
         m_pData->m_overlayScaleAuto = false;
-        m_pData->m_overlayMin = interval.x();
-        m_pData->m_overlayMax = interval.y();
+        m_pData->m_overlayMin = interval.minimum();
+        m_pData->m_overlayMax = interval.maximum();
 
         m_rasterOverlayData->setInterval(Qt::ZAxis, QwtInterval(m_pData->m_overlayMin, m_pData->m_overlayMax));
     }
@@ -1019,10 +1070,10 @@ void PlotCanvas::setOverlayInterval(Qt::Axis axis, const QPointF &interval)
     replot();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF PlotCanvas::getOverlayInterval(Qt::Axis axis) const
+ito::AutoInterval PlotCanvas::getOverlayInterval(Qt::Axis axis) const
 {
     QwtInterval i = m_rasterOverlayData->interval(axis);
-    return QPointF(i.minValue(), i.maxValue());
+    return ito::AutoInterval(i.minValue(), i.maxValue(), m_pData->m_overlayScaleAuto);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

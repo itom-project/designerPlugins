@@ -76,7 +76,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
-    Q_PROPERTY(QPointF overlayInterval READ getoverlayInterval WRITE setoverlayInterval DESIGNABLE true USER true)
+    Q_PROPERTY(ito::AutoInterval overlayInterval READ getoverlayInterval WRITE setoverlayInterval DESIGNABLE true USER true)
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
 
@@ -180,17 +180,17 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     void setPlaneRange(int min, int max);
     void setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool visible);
 
-    virtual QPointF getXAxisInterval(void) const;
-    virtual void setXAxisInterval(QPointF point);
+    virtual ito::AutoInterval getXAxisInterval(void) const;
+    virtual void setXAxisInterval(ito::AutoInterval interval);
         
-    virtual QPointF getYAxisInterval(void) const;
-    virtual void setYAxisInterval(QPointF point);
+    virtual ito::AutoInterval getYAxisInterval(void) const;
+    virtual void setYAxisInterval(ito::AutoInterval interval);
         
-    virtual QPointF getZAxisInterval(void) const;
-    virtual void setZAxisInterval(QPointF point);
+    virtual ito::AutoInterval getZAxisInterval(void) const;
+    virtual void setZAxisInterval(ito::AutoInterval interval);
 
-    QPointF getoverlayInterval(void) const;
-    void setoverlayInterval(QPointF point);
+    ito::AutoInterval getoverlayInterval(void) const;
+    void setoverlayInterval(ito::AutoInterval interval);
 
     QFont getTitleFont(void) const;
     void setTitleFont(const QFont &font);

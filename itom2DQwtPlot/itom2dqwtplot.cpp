@@ -659,78 +659,78 @@ void Itom2dQwtPlot::setyAxisVisible(const bool &value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom2dQwtPlot::getXAxisInterval(void) const
+ito::AutoInterval Itom2dQwtPlot::getXAxisInterval(void) const
 {
     if (m_pContent)
     {
         return m_pContent->getInterval(Qt::XAxis);
     }
-    return QPointF();
+    return ito::AutoInterval();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setXAxisInterval(QPointF point)
+void Itom2dQwtPlot::setXAxisInterval(ito::AutoInterval interval)
 {
     if (m_pContent)
     {
-        m_pContent->setInterval(Qt::XAxis, point);
+        m_pContent->setInterval(Qt::XAxis, interval);
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom2dQwtPlot::getYAxisInterval(void) const
+ito::AutoInterval Itom2dQwtPlot::getYAxisInterval(void) const
 {
     if (m_pContent)
     {
         return m_pContent->getInterval(Qt::YAxis);
     }
-    return QPointF();
+    return ito::AutoInterval();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setYAxisInterval(QPointF point)
+void Itom2dQwtPlot::setYAxisInterval(ito::AutoInterval interval)
 {
     if (m_pContent)
     {
-        m_pContent->setInterval(Qt::YAxis, point);
+        m_pContent->setInterval(Qt::YAxis, interval);
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom2dQwtPlot::getZAxisInterval(void) const
+ito::AutoInterval Itom2dQwtPlot::getZAxisInterval(void) const
 {
     if (m_pContent)
     {
         return m_pContent->getInterval(Qt::ZAxis);
     }
-    return QPointF();
+    return ito::AutoInterval();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setZAxisInterval(QPointF point)
+void Itom2dQwtPlot::setZAxisInterval(ito::AutoInterval interval)
 {
     if (m_pContent)
     {
-        m_pContent->setInterval(Qt::ZAxis, point);
+        m_pContent->setInterval(Qt::ZAxis, interval);
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom2dQwtPlot::getoverlayInterval(void) const
+ito::AutoInterval Itom2dQwtPlot::getoverlayInterval(void) const
 {
     if (m_pContent)
     {
         return m_pContent->getOverlayInterval(Qt::ZAxis);
     }
-    return QPointF();
+    return ito::AutoInterval();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setoverlayInterval(QPointF point)
+void Itom2dQwtPlot::setoverlayInterval(ito::AutoInterval interval)
 {
     if (m_pContent)
     {
-        m_pContent->setOverlayInterval(Qt::ZAxis, point);
+        m_pContent->setOverlayInterval(Qt::ZAxis, interval);
     }
 }
 
@@ -977,7 +977,8 @@ void Itom2dQwtPlot::mnuActZoom(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActScaleSettings()
 {
-    
+    m_pContent->synchronizeScaleValues();
+
     Dialog2DScale *dlg = new Dialog2DScale(*((InternalData*)m_pVData), this);
     if (dlg->exec() == QDialog::Accepted)
     {
@@ -1040,8 +1041,8 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
         m_pActLineCut->setChecked(true);
     }
 
-    QPointF x = m_pContent->getInterval(Qt::XAxis);
-    QPointF y = m_pContent->getInterval(Qt::YAxis);
+    ito::AutoInterval x = m_pContent->getInterval(Qt::XAxis);
+    ito::AutoInterval y = m_pContent->getInterval(Qt::YAxis);
 
     double min = 0;
     double max = 0;
@@ -1062,27 +1063,27 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
 
                 if(!ito::dObjHelper::isNotZero(dy) && !ito::dObjHelper::isNotZero(dx))
                 {
-                    y.setX((y.x() + y.y()) / 2.0);
-                    y.setY(y.x());
+                    y.setMinimum((y.rmin() + y.rmax()) / 2.0);
+                    y.setMaximum(y.rmin());
                 }
                 else if(fabs(dx) < std::numeric_limits<double>::epsilon() * 100)
                 {
-                    y.setX(minLoc[1]);
-                    y.setY(maxLoc[1]);
+                    y.setMinimum(minLoc[1]);
+                    y.setMaximum(maxLoc[1]);
                 }
                 else if(fabs(dy) < std::numeric_limits<double>::epsilon() * 100)
                 {
-                    x.setX(minLoc[2]);
-                    x.setY(maxLoc[2]);
+                    x.setMinimum(minLoc[2]);
+                    x.setMaximum(maxLoc[2]);
                 }
                 else
                 {
                     double b = minLoc[1] - dy / dx * minLoc[2];
 
-                    double xbmin = std::min(x.x(), x.y());
-                    double xbmax = std::max(x.x(), x.y());
-                    double ybmin = std::min(y.x(), y.y());
-                    double ybmax = std::max(y.x(), y.y());
+                    double xbmin = std::min(x.rmin(), x.rmax());
+                    double xbmax = std::max(x.rmin(), x.rmax());
+                    double ybmin = std::min(y.rmin(), y.rmax());
+                    double ybmax = std::max(y.rmin(), y.rmax());
 
                     double xmin = (ybmin - b) / (dy / dx);
                     double xmax = (ybmax - b) / (dy / dx);
@@ -1093,48 +1094,48 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
                     {
                         if(xmin < xbmin)
                         {
-                            x.setX(xbmin);
-                            y.setX(ymin);
+                            x.setMinimum(xbmin);
+                            y.setMinimum(ymin);
                         }
                         else
                         {
-                            x.setX(xmin);
-                            y.setX(ybmin);                    
+                            x.setMinimum(xmin);
+                            y.setMinimum(ybmin);                    
                         }
 
                         if(xmax > xbmax)
                         {
-                            x.setY(xbmax);
-                            y.setY(ymax);
+                            x.setMaximum(xbmax);
+                            y.setMaximum(ymax);
                         }
                         else
                         {
-                            x.setY(xmax);
-                            y.setY(ybmax);                    
+                            x.setMaximum(xmax);
+                            y.setMaximum(ybmax);                    
                         }
                     }
                     else
                     {
                         if(xmin > xbmax)
                         {
-                            x.setX(xbmin);
-                            y.setX(ymin);
+                            x.setMinimum(xbmin);
+                            y.setMinimum(ymin);
                         }
                         else
                         {
-                            x.setX(xmin);
-                            y.setX(ybmin);                    
+                            x.setMinimum(xmin);
+                            y.setMinimum(ybmin);                    
                         }
 
                         if(xmax < xbmin)
                         {
-                            x.setY(xbmax);
-                            y.setY(ymax);
+                            x.setMaximum(xbmax);
+                            y.setMaximum(ymax);
                         }
                         else
                         {
-                            x.setY(xmax);
-                            y.setY(ybmax);                    
+                            x.setMaximum(xmax);
+                            y.setMaximum(ybmax);                    
                         }
                     }
 
@@ -1150,36 +1151,36 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
         case 1:
             if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
-                y.setX(minLoc[1]);
-                y.setY(minLoc[1]);
+                y.setMinimum(minLoc[1]);
+                y.setMaximum(minLoc[1]);
             }
         break;
         case 2:
             if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
-                y.setX(maxLoc[1]);
-                y.setY(maxLoc[1]);
+                y.setMinimum(maxLoc[1]);
+                y.setMaximum(maxLoc[1]);
             }
         break;
 
         case 3:
             if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
-                x.setX(minLoc[2]);
-                x.setY(minLoc[2]);
+                x.setMinimum(minLoc[2]);
+                x.setMaximum(minLoc[2]);
             }
         break;
 
         case 4:
             if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
-                x.setX(maxLoc[2]);
-                x.setY(maxLoc[2]);
+                x.setMinimum(maxLoc[2]);
+                x.setMaximum(maxLoc[2]);
             }
         break;
     }
 
-    setLinePlot(x.x(), y.x(), x.y(), y.y());
+    setLinePlot(x.rmin(), y.rmin(), x.rmax(), y.rmax());
 }
 
 

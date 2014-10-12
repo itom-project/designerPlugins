@@ -25,6 +25,7 @@
 
 #include "common/sharedStructures.h"
 #include "common/sharedStructuresPrimitives.h"
+#include "common/interval.h"
 
 #include "DataObject/dataobj.h"
 
@@ -103,11 +104,11 @@ class PlotCanvas : public QwtPlot
         void setState( tState state);
         void childFigureDestroyed(QObject* obj, ito::uint32 UID);
 
-        QPointF getInterval(Qt::Axis axis) const;
-        void setInterval(Qt::Axis axis, const QPointF &interval);
+        ito::AutoInterval getInterval(Qt::Axis axis) const;
+        void setInterval(Qt::Axis axis, const ito::AutoInterval &interval);
 
-        QPointF getOverlayInterval(Qt::Axis axis) const;
-        void setOverlayInterval(Qt::Axis axis, const QPointF &interval);
+        ito::AutoInterval getOverlayInterval(Qt::Axis axis) const;
+        void setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval);
 
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
         ito::RetVal deleteMarkers(const QString &id);
@@ -133,6 +134,7 @@ class PlotCanvas : public QwtPlot
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel);
         void updateLabels();
+        void synchronizeScaleValues();
         void updateScaleValues(bool doReplot = true);
         void setColorBarVisible(bool visible);
         bool setColorMap(QString colormap = "__next__");
