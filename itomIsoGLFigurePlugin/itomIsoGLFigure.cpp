@@ -714,16 +714,16 @@ void ItomIsoGLWidget::mnuTringModeSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF ItomIsoGLWidget::getZAxisInterval(void) const
+ito::AutoInterval ItomIsoGLWidget::getZAxisInterval(void) const
 {
     //return ((plotGLWidget*)m_pContent)->m_startRangeZ;
-    return QPointF(0.0, 1.0);
+    return ito::AutoInterval(0.0, 1.0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomIsoGLWidget::setZAxisInterval(QPointF interval)
+void ItomIsoGLWidget::setZAxisInterval(ito::AutoInterval interval)
 {
-    ((plotGLWidget*)m_pContent)->setInterval(Qt::ZAxis, 0, interval.x(), interval.y());
+    ((plotGLWidget*)m_pContent)->setInterval(Qt::ZAxis, interval.isAuto(), interval.rmin(), interval.rmax());
     return;
 }
 

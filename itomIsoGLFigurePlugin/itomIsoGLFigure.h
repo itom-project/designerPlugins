@@ -136,8 +136,8 @@ class ItomIsoGLWidget : public ito::AbstractDObjPclFigure
 
         GL3DEFilter *m_pEventFilter;
 
-        QPointF getZAxisInterval(void) const;
-        void setZAxisInterval(QPointF);
+        ito::AutoInterval getZAxisInterval(void) const;
+        void setZAxisInterval(ito::AutoInterval interval);
 
         QString getColorMap(void) const;
         void setColorMap(QString);

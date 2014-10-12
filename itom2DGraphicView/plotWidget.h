@@ -45,6 +45,7 @@
 #include "common/sharedStructures.h"
 #include "common/sharedStructuresGraphics.h"
 #include "common/apiFunctionsGraphInc.h"
+#include "common/interval.h"
 //#include "valuepicker2d.h"
 
 class QGraphicsViewValuePicker : public QGraphicsSimpleTextItem
@@ -171,7 +172,7 @@ class PlotWidget :  public QGraphicsView
         void updateLabels();
 
         void enableAxis(const int axis, const bool value);
-        QPointF calcInterval(const int axis) const;
+        ito::AutoInterval calcInterval(const int axis) const;
         void setState( tState state);
         void changePlane(int plane);
         void internalDataUpdated();

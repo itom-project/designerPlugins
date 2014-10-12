@@ -767,9 +767,9 @@ void GraphicViewPlot::mnuCmplxSwitch(QAction *action)
             if(m_data.m_valueScaleAuto)
             {
             
-                QPointF val = m_pContent->calcInterval(Qt::ZAxis);
-                m_data.m_valueMin = val.x();
-                m_data.m_valueMax = val.y();
+                ito::AutoInterval val = m_pContent->calcInterval(Qt::ZAxis);
+                m_data.m_valueMin = val.rmin();
+                m_data.m_valueMax = val.rmax();
             }
             
             ((PlotWidget*)m_pContent)->internalDataUpdated();
@@ -1073,17 +1073,17 @@ void GraphicViewPlot::setyAxisVisible(const bool &value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF GraphicViewPlot::getXAxisInterval(void) const
+ito::AutoInterval GraphicViewPlot::getXAxisInterval(void) const
 {   
     if (m_data.m_xaxisScaleAuto && m_pContent)
     {
         return m_pContent->calcInterval(Qt::XAxis);
     }
-    return QPointF(m_data.m_xaxisMin, m_data.m_xaxisMax);
+    return ito::AutoInterval(m_data.m_xaxisMin, m_data.m_xaxisMax, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void GraphicViewPlot::setXAxisInterval(QPointF point)
+void GraphicViewPlot::setXAxisInterval(ito::AutoInterval interval)
 {
     if (m_pContent)
     {
@@ -1093,20 +1093,19 @@ void GraphicViewPlot::setXAxisInterval(QPointF point)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF GraphicViewPlot::getYAxisInterval(void) const
+ito::AutoInterval GraphicViewPlot::getYAxisInterval(void) const
 {
     if (m_data.m_yaxisScaleAuto && m_pContent)
     {
         return m_pContent->calcInterval(Qt::YAxis);
     }
-    return QPointF(m_data.m_yaxisMin, m_data.m_yaxisMax);
+    return ito::AutoInterval(m_data.m_yaxisMin, m_data.m_yaxisMax, false);
     
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void GraphicViewPlot::setYAxisInterval(QPointF point)
+void GraphicViewPlot::setYAxisInterval(ito::AutoInterval interval)
 {
-
     if (m_pContent)
     {
         emit m_pContent->statusBarMessage( tr("Not implemented yet."), 2000 );
@@ -1114,17 +1113,17 @@ void GraphicViewPlot::setYAxisInterval(QPointF point)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF GraphicViewPlot::getZAxisInterval(void) const
+ito::AutoInterval GraphicViewPlot::getZAxisInterval(void) const
 {
     if (m_data.m_valueScaleAuto && m_pContent)
     {
         return m_pContent->calcInterval(Qt::ZAxis);
     }
-    return QPointF(m_data.m_valueMin, m_data.m_valueMax);
+    return ito::AutoInterval(m_data.m_valueMin, m_data.m_valueMax, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void GraphicViewPlot::setZAxisInterval(QPointF point)
+void GraphicViewPlot::setZAxisInterval(ito::AutoInterval interval)
 {
     if(m_data.m_colorMode != RasterToQImageObj::ColorAutoSelect && m_data.m_colorMode != RasterToQImageObj::ColorIndex8Scaled && m_data.m_colorMode != RasterToQImageObj::ColorIndex8Bitshift)
     {
@@ -1132,17 +1131,17 @@ void GraphicViewPlot::setZAxisInterval(QPointF point)
         return;
     }
 
-    if(!ito::dObjHelper::isFinite(point.x() || !ito::dObjHelper::isFinite(point.y())) ||
-      (!ito::dObjHelper::isNotZero(point.x()) && !ito::dObjHelper::isNotZero(point.y())))
+    if(interval.isAuto() || !ito::dObjHelper::isFinite(interval.rmin() || !ito::dObjHelper::isFinite(interval.rmax())) ||
+      (!ito::dObjHelper::isNotZero(interval.rmin()) && !ito::dObjHelper::isNotZero(interval.rmax())))
     {
         m_data.m_valueScaleAuto = true;
         if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
         return;
     }
 
-    if(!ito::dObjHelper::isNotZero(point.x()) && ito::dObjHelper::isNotZero(point.y()))
+    if(!ito::dObjHelper::isNotZero(interval.rmin()) && ito::dObjHelper::isNotZero(interval.rmax()))
     {
-        switch((int)point.y())
+        switch((int)interval.rmax())
         {
             case 255:
                 //m_data.m_colorMode = RasterToQImageObj::ColorIndex8Bitshift;
@@ -1187,8 +1186,8 @@ void GraphicViewPlot::setZAxisInterval(QPointF point)
         m_data.m_colorMode = RasterToQImageObj::ColorIndex8Scaled;
     }
     m_data.m_valueScaleAuto = false;
-    m_data.m_valueMin = point.x();
-    m_data.m_valueMax = point.y();
+    m_data.m_valueMin = interval.rmin();
+    m_data.m_valueMax = interval.rmax();
     if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
     //if (m_pContent) m_pContent->refreshPlot(NULL);
     
@@ -1350,9 +1349,9 @@ void GraphicViewPlot::setColorMode(const int type)
     {
         case RasterToQImageObj::ColorIndex8Bitshift:
         {
-            QPointF val = m_pContent->calcInterval(Qt::ZAxis);
-            m_data.m_valueMin = val.x();
-            m_data.m_valueMax = val.y();
+            ito::AutoInterval val = m_pContent->calcInterval(Qt::ZAxis);
+            m_data.m_valueMin = val.rmin();
+            m_data.m_valueMax = val.rmax();
             m_data.m_numBits = 8;
             int maxval = (int)(m_data.m_valueMax > 255 ? (int)(m_data.m_valueMax + 0.5) : 255);
             while(maxval > 255)
@@ -1373,9 +1372,9 @@ void GraphicViewPlot::setColorMode(const int type)
             if(m_data.m_valueScaleAuto)
             {
             
-                QPointF val = m_pContent->calcInterval(Qt::ZAxis);
-                m_data.m_valueMin = val.x();
-                m_data.m_valueMax = val.y();
+                ito::AutoInterval val = m_pContent->calcInterval(Qt::ZAxis);
+                m_data.m_valueMin = val.rmin();
+                m_data.m_valueMax = val.rmax();
             }
 
             m_pActColorSwitch->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/falseColor.png"));
@@ -1403,9 +1402,9 @@ void GraphicViewPlot::resetColorMode(void)
         if(m_data.m_valueScaleAuto)
         {
             
-            QPointF val = m_pContent->calcInterval(Qt::ZAxis);
-            m_data.m_valueMin = val.x();
-            m_data.m_valueMax = val.y();
+            ito::AutoInterval val = m_pContent->calcInterval(Qt::ZAxis);
+            m_data.m_valueMin = val.rmin();
+            m_data.m_valueMax = val.rmax();
         }
         if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
         //m_pContent->refreshPlot(NULL); 

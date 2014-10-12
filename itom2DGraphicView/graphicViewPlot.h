@@ -159,14 +159,14 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         void setPlaneRange(int min, int max);
         void setCmplxSwitch(PlotWidget::ComplexType type, bool visible);
 
-        virtual QPointF getXAxisInterval(void) const;
-        virtual void setXAxisInterval(QPointF point);
+        virtual ito::AutoInterval getXAxisInterval(void) const;
+        virtual void setXAxisInterval(ito::AutoInterval interval);
 
-        virtual QPointF getYAxisInterval(void) const;
-        virtual void setYAxisInterval(QPointF point);
+        virtual ito::AutoInterval getYAxisInterval(void) const;
+        virtual void setYAxisInterval(ito::AutoInterval interval);
 
-        virtual QPointF getZAxisInterval(void) const;
-        virtual void setZAxisInterval(QPointF point);
+        virtual ito::AutoInterval getZAxisInterval(void) const;
+        virtual void setZAxisInterval(ito::AutoInterval interval);
 
         QFont getTitleFont(void) const;
         void setTitleFont(const QFont &font);

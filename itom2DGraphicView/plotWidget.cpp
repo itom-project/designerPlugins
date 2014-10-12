@@ -1015,10 +1015,10 @@ void PlotWidget::enableAxis(const int axis, const bool value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF PlotWidget::calcInterval(const int axis) const
+ito::AutoInterval PlotWidget::calcInterval(const int axis) const
 {
     if (!m_ObjectContainer || !m_ObjectContainer->getDataObject())
-        return QPointF(0.0, 1.0);
+        return ito::AutoInterval(0.0, 1.0);
 
     switch(axis)
     {
@@ -1028,7 +1028,7 @@ QPointF PlotWidget::calcInterval(const int axis) const
             bool check;
             double x0 = m_ObjectContainer->getDataObject()->getPixToPhys(dim, 0.0, check);
             double x1 = m_ObjectContainer->getDataObject()->getPixToPhys(dim, m_ObjectContainer->getDataObjWidth(), check);
-            return QPointF(x0, x1);
+            return ito::AutoInterval(x0, x1, m_pData->m_xaxisScaleAuto);
         }
         case Qt::YAxis:
         {
@@ -1036,7 +1036,7 @@ QPointF PlotWidget::calcInterval(const int axis) const
             bool check;
             double y0 = m_ObjectContainer->getDataObject()->getPixToPhys(dim, 0.0, check);
             double y1 = m_ObjectContainer->getDataObject()->getPixToPhys(dim, m_ObjectContainer->getDataObjHeight(), check);
-            return QPointF(y0, y1);
+            return ito::AutoInterval(y0, y1, m_pData->m_yaxisScaleAuto);
         }
         case Qt::ZAxis:
         {
@@ -1044,11 +1044,11 @@ QPointF PlotWidget::calcInterval(const int axis) const
             ito::float64 z1 = 1.0;
             ito::uint32 loc0[3], loc1[3];
             ito::dObjHelper::minMaxValue(m_ObjectContainer->getDataObject(), z0, loc0, z1, loc1, true, m_pData->m_cmplxType);
-            return QPointF(z0, z1);
+            return ito::AutoInterval(z0, z1, m_pData->m_valueScaleAuto);
         }
     }
 
-    return QPointF(0.0, 1.0);
+    return ito::AutoInterval(0.0, 1.0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
