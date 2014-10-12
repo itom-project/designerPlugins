@@ -119,6 +119,7 @@ class Plot1DWidget : public QwtPlot
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
+        void synchronizeCurrentScaleValues();
         void updateScaleValues(bool recalculateBoundaries = false);
 
         void configRescaler();

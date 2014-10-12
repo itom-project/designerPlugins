@@ -963,12 +963,15 @@ void Itom1DQwtPlot::mnuExport()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuScaleSetting()
 {
+    //update m_data to current values
+    m_pContent->synchronizeCurrentScaleValues();
+
     Dialog1DScale *dlg = new Dialog1DScale(*((InternalData*)m_data), this);
     if (dlg->exec() == QDialog::Accepted)
     {
         dlg->getData((*(InternalData*)m_data));
 
-         bool recalculateBoundaries = false;
+        bool recalculateBoundaries = false;
 
         if (((InternalData*)m_data)->m_valueScaleAuto == true || ((InternalData*)m_data)->m_axisScaleAuto == true)
         {
@@ -997,7 +1000,7 @@ void Itom1DQwtPlot::mnuParentScaleSetting()
     if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
     {
         const QwtScaleDiv scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
-        QPointF bounds = QPointF(scale.lowerBound(), scale.upperBound());
+        ito::AutoInterval bounds(scale.lowerBound(), scale.upperBound());
         /*
         DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
         int cmlpState = seriesData->getCmplxState();
@@ -1155,25 +1158,42 @@ void Itom1DQwtPlot::mnuMultiRowSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPointF Itom1DQwtPlot::getYAxisInterval(void) const
+ito::AutoInterval Itom1DQwtPlot::getYAxisInterval(void) const
 { 
-    QPointF interval(((InternalData*)m_data)->m_valueMin, ((InternalData*)m_data)->m_valueMax);
+    m_pContent->synchronizeCurrentScaleValues();
+    const InternalData* id = (const InternalData*)m_data;
+    ito::AutoInterval interval(id->m_valueMin, id->m_valueMax, id->m_valueScaleAuto);
     return interval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------        
-void Itom1DQwtPlot::setYAxisInterval(QPointF interval) 
+void Itom1DQwtPlot::setYAxisInterval(ito::AutoInterval interval) 
 { 
-    if (interval.isNull())
-    {
-        m_pContent->setInterval(Qt::YAxis, true, 0.0, 0.0);
-    }
-    else
-    {
-        m_pContent->setInterval(Qt::YAxis, false, interval.x(), interval.y());
-    }
-    return; 
+    InternalData* id = (InternalData*)m_data;
+    id->m_valueMin = interval.minimum();
+    id->m_valueMax = interval.maximum();
+    id->m_valueScaleAuto = interval.isAuto();
+    m_pContent->updateScaleValues( interval.isAuto() ); 
 }   
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::AutoInterval Itom1DQwtPlot::getXAxisInterval(void) const
+{ 
+    m_pContent->synchronizeCurrentScaleValues();
+    const InternalData* id = (const InternalData*)m_data;
+    ito::AutoInterval interval(id->m_axisMin, id->m_axisMax, id->m_axisScaleAuto);
+    return interval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------        
+void Itom1DQwtPlot::setXAxisInterval(ito::AutoInterval interval) 
+{ 
+    InternalData* id = (InternalData*)m_data;
+    id->m_axisMin = interval.minimum();
+    id->m_axisMax = interval.maximum();
+    id->m_axisScaleAuto = interval.isAuto();
+    m_pContent->updateScaleValues( interval.isAuto() );
+}  
 
 //----------------------------------------------------------------------------------------------------------------------------------   
 void Itom1DQwtPlot::setPickerText(const QString &coords, const QString &offsets)

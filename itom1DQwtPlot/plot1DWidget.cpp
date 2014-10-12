@@ -1657,6 +1657,18 @@ void Plot1DWidget::setPannerEnable(const bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::synchronizeCurrentScaleValues()
+{
+    QwtScaleDiv div = axisScaleDiv(QwtPlot::yLeft);
+    m_pData->m_valueMin = div.interval().minValue();
+    m_pData->m_valueMax = div.interval().maxValue();
+    
+    div = axisScaleDiv(QwtPlot::xBottom);
+    m_pData->m_axisMin = div.interval().minValue();
+    m_pData->m_axisMax = div.interval().maxValue();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
 {
     if (recalculateBoundaries)
@@ -1668,11 +1680,11 @@ void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
             QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
             if (qIsFinite(tmpRect.height()))
             {
-#if QT_VERSION >= 0x050000
+    #if QT_VERSION >= 0x050000
                 rect = rect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
-#else
+    #else
                 rect = rect.unite(((DataObjectSeriesData *)curve->data())->boundingRect());
-#endif
+    #endif
             }
         }
 

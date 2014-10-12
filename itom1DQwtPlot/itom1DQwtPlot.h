@@ -150,8 +150,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void setValueLabel(const QString &label);
         void resetValueLabel();
 
-        QPointF getYAxisInterval(void) const;
-        void setYAxisInterval(QPointF);
+        ito::AutoInterval getXAxisInterval(void) const;
+        void setXAxisInterval(ito::AutoInterval);
+
+        ito::AutoInterval getYAxisInterval(void) const;
+        void setYAxisInterval(ito::AutoInterval);
 
         QFont getTitleFont(void) const;
         void setTitleFont(const QFont &font);
