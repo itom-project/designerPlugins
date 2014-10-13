@@ -446,21 +446,7 @@ void EvaluateGeometricsFigure::mnuSetting()
 
     delete dlg;
     dlg = NULL;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QPointF EvaluateGeometricsFigure::getYAxisInterval(void) const
-{ 
-    QPointF interval(0.0, 1.0);
-    return interval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------        
-void EvaluateGeometricsFigure::setYAxisInterval(QPointF interval) 
-{ 
-
-    return; 
-}   
+}  
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::enableComplexGUI(const bool checked)

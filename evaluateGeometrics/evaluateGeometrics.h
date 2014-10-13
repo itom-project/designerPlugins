@@ -123,9 +123,6 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
         void setValueUnit(const QString &label);
         void resetValueUnit();
 
-        QPointF getYAxisInterval(void) const;
-        void setYAxisInterval(QPointF);
-
         QFont getTitleFont(void) const;
         void setTitleFont(const QFont &font);
 

@@ -467,6 +467,7 @@ bool Itom2dQwtPlot::colorBarVisible() const
 void Itom2dQwtPlot::setColorBarVisible(bool value)
 {
     m_pActToggleColorBar->setChecked(value); //emits toggle signal of action
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -494,6 +495,7 @@ void Itom2dQwtPlot::setTitle(const QString &title)
     }
 
     if (m_pContent) m_pContent->updateLabels();
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -528,6 +530,7 @@ void Itom2dQwtPlot::setxAxisLabel(const QString &label)
         ((InternalData*) m_pVData)->m_xaxisLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -562,6 +565,7 @@ void Itom2dQwtPlot::setyAxisLabel(const QString &label)
         ((InternalData*) m_pVData)->m_yaxisLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -596,6 +600,7 @@ void Itom2dQwtPlot::setValueLabel(const QString &label)
         ((InternalData*) m_pVData)->m_valueLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -619,13 +624,14 @@ void Itom2dQwtPlot::setyAxisFlipped(const bool &value)
     if (((InternalData*) m_pVData)->m_yaxisFlipped != value)
     {
         ((InternalData*) m_pVData)->m_yaxisFlipped = value;
-
+    }
     if (m_pContent)
     {
         m_pContent->updateScaleValues();
         m_pContent->internalDataUpdated();
     }
-}
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -641,6 +647,7 @@ void Itom2dQwtPlot::setxAxisVisible(const bool &value)
     ((InternalData*) m_pVData)->m_xaxisVisible = value;
 
     if (m_pContent) m_pContent->enableAxis(QwtPlot::xBottom, value);
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -656,6 +663,7 @@ void Itom2dQwtPlot::setyAxisVisible(const bool &value)
     ((InternalData*) m_pVData)->m_yaxisVisible = value;
 
     if (m_pContent) m_pContent->enableAxis(QwtPlot::yLeft, value);
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -675,6 +683,8 @@ void Itom2dQwtPlot::setXAxisInterval(ito::AutoInterval interval)
     {
         m_pContent->setInterval(Qt::XAxis, interval);
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -694,6 +704,8 @@ void Itom2dQwtPlot::setYAxisInterval(ito::AutoInterval interval)
     {
         m_pContent->setInterval(Qt::YAxis, interval);
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -713,6 +725,8 @@ void Itom2dQwtPlot::setZAxisInterval(ito::AutoInterval interval)
     {
         m_pContent->setInterval(Qt::ZAxis, interval);
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -732,6 +746,8 @@ void Itom2dQwtPlot::setoverlayInterval(ito::AutoInterval interval)
     {
         m_pContent->setOverlayInterval(Qt::ZAxis, interval);
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -751,6 +767,8 @@ void Itom2dQwtPlot::setColorMap(const QString &name)
     {
         m_pContent->setColorMap(name);
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -771,6 +789,8 @@ void Itom2dQwtPlot::setTitleFont(const QFont &font)
         m_pContent->titleLabel()->setFont(font);
         //m_pContent->replot();
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -802,6 +822,8 @@ void Itom2dQwtPlot::setLabelFont(const QFont &font)
         title.setFont(font);
         m_pContent->axisWidget(QwtPlot::yRight)->setTitle(title);
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -823,6 +845,8 @@ void Itom2dQwtPlot::setAxisFont(const QFont &font)
         m_pContent->setAxisFont(QwtPlot::yLeft, font);
         m_pContent->setAxisFont(QwtPlot::yRight, font);
     }
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1925,7 +1949,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     }
 
     plotItemsFinished(0, false);
-    return;
+    this->updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getkeepAspectRatio(void) const 
@@ -1940,6 +1964,7 @@ void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
         m_pActAspectRatio->setChecked(keepAspectEnable);
     }
     mnuActRatio(keepAspectEnable);
+    this->updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActRatio(bool checked)
@@ -1993,6 +2018,8 @@ void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
         m_pContent->setState(((InternalData*) m_pVData)->m_state);
         m_pContent->replot();
     }
+
+    this->updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getAlpha () const 
@@ -2006,6 +2033,7 @@ void Itom2dQwtPlot::setAlpha (const int alpha)
     ((InternalData*) m_pVData)->m_alpha = alpha > 0 && alpha < 255 ? alpha : ((InternalData*) m_pVData)->m_alpha;
     if(m_pContent) m_pContent->alphaChanged();
     this->m_pOverlaySlider->setValue(((InternalData*) m_pVData)->m_alpha);
+    this->updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2021,7 +2049,7 @@ void Itom2dQwtPlot::setEnabledPlotting(const bool &enabled)
     m_pActClearDrawings->setEnabled(enabled);
     m_pActDrawMode->setEnabled(enabled);
     if(m_pActDrawMode->isChecked() && !enabled) m_pActDrawMode->setChecked(enabled);
-
+    this->updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
@@ -2103,7 +2131,7 @@ void Itom2dQwtPlot::setSelectedElement(const int idx)
         if(replot) m_pContent->replot();
         if(failed) emit m_pContent->statusBarMessage(tr("Could not set active element, index out of range."), 12000 );
     }
-    return;
+    this->updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getGeometricElementsCount() const 
@@ -2158,6 +2186,7 @@ bool Itom2dQwtPlot::getContextMenuEnabled() const
 void Itom2dQwtPlot::setContextMenuEnabled(bool show)
 {
     if (m_pContent) (m_pContent)->m_showContextMenu = show;
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const 
@@ -2169,7 +2198,7 @@ QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const
 void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
 {
     if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
-        
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetOverlayImage(void)
@@ -2196,7 +2225,7 @@ void Itom2dQwtPlot::setBackgroundColor(const QColor newVal)
     }
     if(m_pContent) m_pContent->updateColors();
 
-    return;
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom2dQwtPlot::getAxisColor(void) const
@@ -2218,7 +2247,7 @@ void Itom2dQwtPlot::setAxisColor(const QColor newVal)
     }
     if(m_pContent) m_pContent->updateColors();
 
-    return;
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom2dQwtPlot::getTextColor(void) const
@@ -2240,7 +2269,7 @@ void Itom2dQwtPlot::setTextColor(const QColor newVal)
     }
     if(m_pContent) m_pContent->updateColors();
 
-    return;
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -290,6 +290,8 @@ void Itom1DQwtPlot::setRowPresentation(const int idx)
         m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
         m_pContent->setInterval(Qt::ZAxis, true, 0, 0); //replot is done here
     }
+
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetRowPresentation() 
@@ -307,7 +309,7 @@ int Itom1DQwtPlot::getPickerLimit(void) const
 void Itom1DQwtPlot::setPickerLimit(const int idx)
 {
     if(m_data) ((InternalData*)m_data)->m_pickerLimit = idx;
-    return;
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetPickerLimit()
@@ -563,6 +565,7 @@ bool Itom1DQwtPlot::getContextMenuEnabled() const
 void Itom1DQwtPlot::setContextMenuEnabled(bool show)
 {
     if (m_pContent) (m_pContent)->m_showContextMenu = show;
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -620,6 +623,7 @@ void Itom1DQwtPlot::setTitle(const QString &title)
     }
 
     if (m_pContent) m_pContent->updateLabels();
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -652,6 +656,7 @@ void Itom1DQwtPlot::setAxisLabel(const QString &label)
         ((InternalData*)m_data)->m_axisLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -684,6 +689,7 @@ void Itom1DQwtPlot::setValueLabel(const QString &label)
         ((InternalData*)m_data)->m_valueLabel = label;
     }
     if (m_pContent) m_pContent->updateLabels();
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -710,6 +716,7 @@ void Itom1DQwtPlot::setTitleFont(const QFont &font)
     {
         m_pContent->titleLabel()->setFont(font);
         //m_pContent->replot();
+        updatePropertyDock();
     }
 }
 
@@ -737,6 +744,8 @@ void Itom1DQwtPlot::setLabelFont(const QFont &font)
         title = m_pContent->axisWidget(QwtPlot::yLeft)->title();
         title.setFont(font);
         m_pContent->axisWidget(QwtPlot::yLeft)->setTitle(title);
+
+        updatePropertyDock();
     }
 }
 
@@ -757,6 +766,8 @@ void Itom1DQwtPlot::setAxisFont(const QFont &font)
     {
         m_pContent->setAxisFont(QwtPlot::xBottom, font);
         m_pContent->setAxisFont(QwtPlot::yLeft, font);
+
+        updatePropertyDock();
     }
 }
 
@@ -778,6 +789,8 @@ void Itom1DQwtPlot::setGrid(const bool &enabled)
         m_pContent->setGridEnabled(enabled);
     }
     m_pActGrid->setChecked(enabled);
+
+    updatePropertyDock();
 }
 
 
@@ -1174,6 +1187,7 @@ void Itom1DQwtPlot::setYAxisInterval(ito::AutoInterval interval)
     id->m_valueMax = interval.maximum();
     id->m_valueScaleAuto = interval.isAuto();
     m_pContent->updateScaleValues( interval.isAuto() ); 
+    updatePropertyDock();
 }   
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1193,6 +1207,7 @@ void Itom1DQwtPlot::setXAxisInterval(ito::AutoInterval interval)
     id->m_axisMax = interval.maximum();
     id->m_axisScaleAuto = interval.isAuto();
     m_pContent->updateScaleValues( interval.isAuto() );
+    updatePropertyDock();
 }  
 
 //----------------------------------------------------------------------------------------------------------------------------------   
@@ -1279,6 +1294,8 @@ void Itom1DQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
         m_pActAspectRatio->setChecked(keepAspectEnable);
     }
     mnuActRatio(keepAspectEnable);
+
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuActRatio(bool checked)
@@ -1312,6 +1329,8 @@ void Itom1DQwtPlot::setEnabledPlotting(const bool &enabled)
     m_pActClearDrawings->setEnabled(enabled);
     m_pActDrawMode->setEnabled(enabled);
     if(m_pActDrawMode->isChecked() && !enabled) m_pActDrawMode->setChecked(enabled);
+
+    updatePropertyDock();
 
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1665,6 +1684,9 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     }
 
     plotItemsFinished(0, false);
+
+    updatePropertyDock();
+
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1709,7 +1731,8 @@ void Itom1DQwtPlot::setSelectedElement(const int idx)
         if(replot) m_pContent->replot();
         if(failed) emit m_pContent->statusBarMessage(tr("Could not set active element, index out of range."), 12000 );
     }
-    return;
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1734,7 +1757,8 @@ void Itom1DQwtPlot::setBackgroundColor(const QColor newVal)
     {
         m_pContent->updateColors();
     }
-    return;
+
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom1DQwtPlot::getAxisColor(void) const
@@ -1759,7 +1783,7 @@ void Itom1DQwtPlot::setAxisColor(const QColor newVal)
         m_pContent->updateColors();
     }
 
-    return;
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom1DQwtPlot::getTextColor(void) const
@@ -1784,7 +1808,7 @@ void Itom1DQwtPlot::setTextColor(const QColor newVal)
         m_pContent->updateColors();
     }
 
-    return;
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
