@@ -137,7 +137,7 @@ EvaluateGeometricsFigure::~EvaluateGeometricsFigure()
 {
     if(m_pInfo)
     {
-        delete m_pInfo;
+        delete ((InternalInfo*)m_pInfo);
         m_pInfo = NULL;
     }
 
