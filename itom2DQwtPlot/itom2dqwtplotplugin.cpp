@@ -32,8 +32,8 @@ Itom2dQwtPlotPlugin::Itom2dQwtPlotPlugin(QObject *parent)
     : ito::AbstractItomDesignerPlugin(parent)
 {
     m_plotDataFormats = ito::Format_Gray8 | ito::Format_Gray16 | ito::Format_Gray32 | ito::Format_Float32 | ito::Format_Float64 | ito::Format_Complex;
-    m_plotDataTypes = ito::DataObjPlane;
-    m_plotFeatures = ito::Static | ito::Live | ito::PlotImage | ito::Cartesian;
+    m_plotDataTypes = ito::DataObjPlane | ito::DataObjLine;
+    m_plotFeatures = ito::Static | ito::Live | ito::PlotImage | ito::PlotLine | ito::Cartesian;
 
     m_description = QObject::tr("ITOM widget for 2D-visualisation of 2D/3D DataObjects based on QWT.");
     m_detaildescription = QObject::tr("");
