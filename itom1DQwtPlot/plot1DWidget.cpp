@@ -40,6 +40,8 @@
 #include <qwt_plot_renderer.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_legend.h>
+#include <qwt_legend_label.h>
 #include <qwt_symbol.h>
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
@@ -74,7 +76,10 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_activeDrawItem(1),
         m_pRescaler(NULL),
         m_ignoreNextMouseEvent(false),
-        m_gridEnabled(false)
+        m_gridEnabled(false),
+        m_legendPosition(BottomLegend),
+        m_legendVisible(false),
+        m_pLegend(NULL)
 {
     this->setMouseTracking(false);
 
@@ -184,8 +189,17 @@ Plot1DWidget::~Plot1DWidget()
         m_pRescaler = NULL;
     }
 
-    if (m_pMultiPointPicker != NULL) m_pMultiPointPicker->deleteLater();
-    m_pMultiPointPicker = NULL;
+    if (m_pMultiPointPicker != NULL) 
+    {
+        m_pMultiPointPicker->deleteLater();
+        m_pMultiPointPicker = NULL;
+    }
+
+    if (m_pLegend)
+    {
+        m_pLegend->deleteLater();
+        m_pLegend = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -237,52 +251,69 @@ ito::RetVal Plot1DWidget::init()
     return ito::retOk;
 }
 
-////----------------------------------------------------------------------------------------------------------------------------------
-//void Plot1DWidget::replot()
-//{
-//    DataObjectSeriesData *data = NULL;
-//    if (m_plotCurveItems.size() > 0)
-//    {
-//        /*if (m_pCurserEnable && m_pContent[0])
-//        {
-//            QVector<QPointF> pts(3);
-//
-//            data = (DataObjectSeriesData *)m_pContent[0]->data();
-//            data->setRasterObj();
-//
-//            int x1 = ((DataObjectSeriesData*)(m_pContent[0]->data()))->size()-1;
-//
-//            m_Curser[0] = m_Curser[0] > x1 ? x1: m_Curser[0];
-//            m_Curser[1] = m_Curser[1] > x1 ? x1: m_Curser[1];
-//
-//            pts[0] = data->sample(m_Curser[0]);
-//            pts[1] = data->sample(m_Curser[1]);
-//            pts[2] = pts[1] - pts[0];
-//
-//            m_pCurser1->setValue(pts[0]);
-//            m_pCurser2->setValue(pts[1]);
-//            data->releaseRasterObj();
-//            
-//            ((Itom1DQwtFigure*) m_pParent)->setMarkerCoordinates(pts);
-//        }*/
-//
-//        /*foreach(QwtPlotCurve* curve, m_plotCurveItems)
-//        {
-//            data = (DataObjectSeriesData *)m_pContent[n]->data();
-//
-//            if (data && data->isDobjInit())
-//            {
-//                data->beginSampling(
-//                data->setRasterObj();*/
-//    QwtPlot::replot();
-//                /*data->releaseRasterObj();
-//            }
-//            }
-//        }*/
-//
-//
-//    }
-//}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
+{
+    if (m_pLegend)
+    {
+        m_pLegend->deleteLater();
+        m_pLegend = NULL;
+    }
+
+    if (visible)
+    {
+        m_pLegend = new QwtLegend(this);
+        m_pLegend->setDefaultItemMode(QwtLegendData::Checkable);
+        connect(m_pLegend, SIGNAL(checked(QVariant,bool,int)), this, SLOT(legendItemChecked(QVariant,bool)));
+        insertLegend(m_pLegend, position);
+
+        if (m_pLegend)
+        {
+            QwtLegendLabel *legendLabel = NULL;
+            foreach (QwtPlotCurve *item, m_plotCurveItems)
+            {
+                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget( itemToInfo(item) ) );
+                if (legendLabel)
+                {
+                    legendLabel->setChecked(item->isVisible());
+                }
+            }
+        }
+    }
+    else
+    {
+        insertLegend(NULL);
+    }
+
+    m_legendVisible = visible;
+    m_legendPosition = position;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setLegendTitles(const QStringList &legends)
+{
+    int index = 0;
+    m_legendTitles = legends;
+
+    QwtLegendLabel *legendLabel = NULL;
+    foreach (QwtPlotCurve *item, m_plotCurveItems)
+    {
+        if (m_legendTitles.size() == 0)
+        {
+            item->setTitle(tr("curve %1").arg(index));
+        }
+        else if (m_legendTitles.size() > index)
+        {
+            item->setTitle(m_legendTitles[index]);
+        }
+        else
+        {
+            item->setTitle("");
+        }
+        index++;
+    }
+    replot();
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setGridEnabled(const bool enabled)
@@ -374,6 +405,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtPlotCurve *curve = NULL;
     QwtPlotCurveDataObject *dObjCurve = NULL;
     bool _unused;
+    QwtLegendLabel *legendLabel = NULL;
+    int index;
 //    bool gotNewObject = false;
     //QString valueLabel, axisLabel, title;
 
@@ -446,9 +479,32 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         while (m_plotCurveItems.size() < numCurves)
         {
-            dObjCurve = new QwtPlotCurveDataObject("");
+            index = m_plotCurveItems.size();
+            if (m_legendTitles.size() == 0)
+            {
+                dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index));
+            }
+            else if (m_legendTitles.size() > index)
+            {
+                dObjCurve = new QwtPlotCurveDataObject(m_legendTitles[index]);
+            }
+            else
+            {
+                dObjCurve = new QwtPlotCurveDataObject("");
+            }
+
             dObjCurve->setData(NULL);
             dObjCurve->attach(this);
+
+            if (m_pLegend)
+            {
+                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget( itemToInfo(dObjCurve) ) );
+                if (legendLabel)
+                {
+                    legendLabel->setChecked(true);
+                }
+            }
+
             QPen plotPen;
             colorIndex = m_plotCurveItems.size() % m_colorList.size();
             plotPen.setColor(m_colorList[colorIndex]);
@@ -2797,3 +2853,12 @@ void Plot1DWidget::updateColors(void)
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
+{
+    QwtPlotItem *pi = infoToItem(itemInfo);
+    if (pi)
+    {
+        pi->setVisible(on);
+        replot();
+    }
+}

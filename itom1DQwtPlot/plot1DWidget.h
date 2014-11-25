@@ -58,6 +58,7 @@
 #include "../sharedFiles/itomPlotZoomer.h"
 
 class Itom1DQwtPlot;
+class QwtLegend;
 struct InternalData;
 
 class Plot1DWidget : public QwtPlot
@@ -103,6 +104,9 @@ class Plot1DWidget : public QwtPlot
 
         ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
         ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+
+        void setLegendPosition(LegendPosition position, bool visible);
+        void setLegendTitles(const QStringList &legends);
 
         QVector<ito::int32> getPickerPixel() const;
         QVector<ito::float32> getPickerPhys() const;
@@ -155,6 +159,9 @@ class Plot1DWidget : public QwtPlot
 
         QwtPlotGrid *m_pPlotGrid;
 
+        QwtLegend *m_pLegend;
+        QStringList m_legendTitles;
+
         QVector<ito::uint16> m_drawedIemsIndexes;
 
         QByteArray m_hash; //hash of recently loaded dataObject
@@ -196,6 +203,10 @@ class Plot1DWidget : public QwtPlot
 
         UserInteractionPlotPicker *m_pMultiPointPicker;
         bool m_ignoreNextMouseEvent;
+
+        LegendPosition m_legendPosition;
+        bool m_legendVisible;
+
     signals:
 
         void statusBarClear();
@@ -212,6 +223,7 @@ class Plot1DWidget : public QwtPlot
 
     private slots:
         void multiPointActivated (bool on);
+        void legendItemChecked(const QVariant &itemInfo, bool on);
         
 
 };

@@ -793,6 +793,77 @@ void Itom1DQwtPlot::setGrid(const bool &enabled)
     updatePropertyDock();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+Itom1DQwtPlot::LegendPos Itom1DQwtPlot::getLegendPosition() const
+{
+    if (m_pContent)
+    {
+        if (m_pContent->m_legendVisible)
+        {
+            switch (m_pContent->m_legendPosition)
+            {
+            case QwtPlot::BottomLegend:
+                return Bottom;
+            case QwtPlot::TopLegend:
+                return Top;
+            case QwtPlot::LeftLegend:
+                return Left;
+            case QwtPlot::RightLegend:
+                return Right;
+            }
+        }
+    }
+    return Off;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLegendPosition(LegendPos legendPosition)
+{
+    if (m_pContent)
+    {
+        switch (legendPosition)
+        {
+        case Off:
+            m_pContent->setLegendPosition(QwtPlot::BottomLegend, false);
+            break;
+        case Left:
+            m_pContent->setLegendPosition(QwtPlot::LeftLegend, true);
+            break;
+        case Top:
+            m_pContent->setLegendPosition(QwtPlot::TopLegend, true);
+            break;
+        case Right:
+            m_pContent->setLegendPosition(QwtPlot::RightLegend, true);
+            break;
+        case Bottom:
+            m_pContent->setLegendPosition(QwtPlot::BottomLegend, true);
+            break;
+        }
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QStringList Itom1DQwtPlot::getLegendTitles() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_legendTitles;
+    }
+    return QStringList();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLegendTitles(const QStringList &legends)
+{
+    if (m_pContent)
+    {
+        return m_pContent->setLegendTitles(legends);
+    }
+
+    updatePropertyDock();
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuPanner(bool checked)

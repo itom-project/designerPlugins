@@ -81,6 +81,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
 
+    Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
+    Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER false);
+
+    Q_ENUMS(LegendPos);
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
     Q_CLASSINFO("prop://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
@@ -105,6 +110,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
 
+    Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
+    Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the default titles 'curve 0', 'curve 1'... are taken.")
+
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
     //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
     Q_CLASSINFO("slot://plotMarkers", "Delete a specific marker")
@@ -126,6 +134,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         Itom1DQwtPlot(QWidget *parent = 0);
         Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
         virtual ~Itom1DQwtPlot();
+
+        enum LegendPos { Off = 0, Left = 1, Top = 2, Right = 3, Bottom = 4 };
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         
@@ -167,6 +177,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         bool getGrid(void) const;
         void setGrid(const bool &enabled);
+
+        LegendPos getLegendPosition() const;
+        void setLegendPosition(LegendPos legendPosition);
+
+        QStringList getLegendTitles() const;
+        void setLegendTitles(const QStringList &legends);
 
         void setSource(QSharedPointer<ito::DataObject> source);
     
