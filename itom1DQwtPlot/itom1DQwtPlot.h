@@ -82,7 +82,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
 
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
-    Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER false);
+    Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
 
     Q_ENUMS(LegendPos);
 
