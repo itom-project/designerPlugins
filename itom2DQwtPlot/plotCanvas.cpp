@@ -64,6 +64,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
         m_rasterData(NULL),
         m_dOverlayItem(NULL),
         m_pData(m_pData),
+        m_curOverlayColorMapIndex(0),
         m_curColorMapIndex(0),
         m_pValuePicker(NULL),
         m_dObjPtr(NULL),
@@ -105,6 +106,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_dOverlayItem->attach(this);
     m_dOverlayItem->setAlpha(m_pData->m_alpha);
     m_dOverlayItem->setColorMap(new QwtLinearColorMap(Qt::black, Qt::white, QwtColorMap::Indexed));
+    m_colorOverlayMapName = "gray";
     m_dOverlayItem->setVisible(false);
     //zoom tool
     m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
@@ -638,7 +640,102 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     replot();
     return true;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+bool PlotCanvas::setOverlayColorMap(QString colormap /*= "__next__"*/)
+{
+    QwtLinearColorMap *colorMap = NULL;
+    ito::ItomPalette newPalette;
+    ito::RetVal retval(ito::retOk);
+    int numPalettes = 1;
 
+    if(!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        emit statusBarMessage(tr("Could not change color bar, api is missing"), 4000);
+        return false;
+    }
+
+    retval += apiPaletteGetNumberOfColorBars(numPalettes);
+
+    if (numPalettes == 0 || retval.containsError())
+    {
+        emit statusBarMessage(tr("No color maps defined."), 4000);
+        return false;
+    }
+
+    if (colormap == "__next__")
+    {
+        m_curOverlayColorMapIndex++;
+        m_curOverlayColorMapIndex %= numPalettes; //map index to [0,numPalettes)
+        retval += apiPaletteGetColorBarIdx(m_curOverlayColorMapIndex, newPalette);
+    }
+    else if (colormap == "__first__")
+    {
+        m_curOverlayColorMapIndex = 0;
+        retval += apiPaletteGetColorBarIdx(m_curOverlayColorMapIndex, newPalette);
+    }
+    else
+    {
+        retval += apiPaletteGetColorBarName(colormap, newPalette);
+    }
+
+    if (retval.containsError() && retval.errorMessage() != NULL)
+    {
+        emit statusBarMessage(QString("%1").arg(retval.errorMessage()), 4000);
+        return false;
+    }
+    else if (retval.containsError())
+    {
+        emit statusBarMessage("error when loading color map", 4000);
+        return false;
+    }
+
+    int totalStops = newPalette.colorStops.size();
+
+    if (totalStops < 2)
+    {
+        emit statusBarMessage(tr("Selected color map has less than two points."), 4000);
+        return false;
+    }
+
+    m_colorOverlayMapName = newPalette.name;
+
+
+    if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
+    {
+        colorMap    = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
+        if (totalStops > 2)
+        {
+            for (int i = 1; i < totalStops - 2; i++)
+            {
+                colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+            }
+            colorMap->addColorStop(newPalette.colorStops[totalStops-1].first, newPalette.colorStops[totalStops-1].second);
+        }
+    }
+    else
+    {
+        colorMap    = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
+        if (totalStops > 2)
+        {
+            for (int i = 1; i < totalStops - 1; i++)
+            {
+                colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+             }
+        }
+    }
+
+    if (colorMap)
+    {
+        this->m_dOverlayItem->setColorMap(colorMap);
+    }
+    else
+    {
+        delete colorMap;
+    }
+
+    replot();
+    return true;
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::keyPressEvent (QKeyEvent * event)
 {

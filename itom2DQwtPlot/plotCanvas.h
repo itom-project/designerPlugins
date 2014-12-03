@@ -140,6 +140,9 @@ class PlotCanvas : public QwtPlot
         bool setColorMap(QString colormap = "__next__");
         inline QString colorMapName() const { return m_colorMapName; }
 
+        bool setOverlayColorMap(QString colormap = "__next__");
+        inline QString colorOverlayMapName() const { return m_colorOverlayMapName; }
+
         void refreshStyles();
 
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
@@ -169,11 +172,13 @@ class PlotCanvas : public QwtPlot
 
         UserInteractionPlotPicker *m_pMultiPointPicker;
 
+        QString m_colorOverlayMapName;
         QString m_colorMapName;
         QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
 
         int m_curColorMapIndex;
-        
+        int m_curOverlayColorMapIndex;
+
         DataObjItem *m_dObjItem;
         DataObjItem *m_dOverlayItem;
 

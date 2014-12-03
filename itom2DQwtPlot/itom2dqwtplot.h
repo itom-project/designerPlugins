@@ -77,6 +77,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
     Q_PROPERTY(ito::AutoInterval overlayInterval READ getoverlayInterval WRITE setoverlayInterval DESIGNABLE true USER true)
+    Q_PROPERTY(QString overlayColorMap READ getOverlayColorMap WRITE setOverlayColorMap DESIGNABLE true USER true)
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
 
@@ -106,6 +107,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
+
+    Q_CLASSINFO("prop://overlayColorMap", "Defines which color map should be used for the overlay channel [e.g. grayMarked, hotIron].")
 
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
@@ -177,6 +180,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     QString getColorMap() const;
     void setColorMap(const QString &name);
 
+    QString getOverlayColorMap() const;
+    void setOverlayColorMap(const QString &name);
+    
     void setPlaneRange(int min, int max);
     void setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool visible);
 

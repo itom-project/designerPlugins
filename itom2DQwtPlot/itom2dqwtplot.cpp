@@ -772,6 +772,27 @@ void Itom2dQwtPlot::setColorMap(const QString &name)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QString Itom2dQwtPlot::getOverlayColorMap() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->colorOverlayMapName();
+    }
+    return "";
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setOverlayColorMap(const QString &name)
+{
+    if (name != "" && m_pContent)
+    {
+        m_pContent->setOverlayColorMap(name);
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QFont Itom2dQwtPlot::getTitleFont(void) const
 {
     if (m_pContent)
