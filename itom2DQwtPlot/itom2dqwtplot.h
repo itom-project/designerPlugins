@@ -368,8 +368,8 @@ public slots:
 
 signals:
     void userInteractionDone(int type, bool aborted, QPolygonF points);
-    void plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);
-    void plotItemDeleted(ito::int32 idx);
+    void plotItemChanged(int idx, int flags, QVector<float> values);
+    void plotItemDeleted(int idx);
     void plotItemsDeleted();
     //void plotItemChanged(ito::int32 idx);
     void plotItemsFinished(int type, bool aborted);
