@@ -168,9 +168,9 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
             plt->setAxisScale( yAxisId, y1, y2 );
 
             plt->setAutoReplot( doReplot );
-
-            plt->replot();
         }
+
+        plt->replot();
     }
     else
     {
@@ -314,10 +314,10 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
 
             plt->setAutoReplot( doReplot );
 
-            m_aspectRatioChanged = false;
-
-            plt->replot();
+            m_aspectRatioChanged = false; 
         }
+
+        plt->replot();
     }
 }
 
