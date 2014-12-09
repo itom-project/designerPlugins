@@ -118,6 +118,8 @@ class PlotCanvas : public QwtPlot
         QSharedPointer<ito::DataObject> getDisplayed(void);
         QSharedPointer<ito::DataObject> getOverlayObject(void);
         QSharedPointer<ito::DataObject> getDispledOverlayObject(void);
+
+        void setVisible(bool visible);
 /*        
         ito::RetVal addDrawItems(const ito::DataObject *items, QString style);
         ito::RetVal delDrawItems(const ito::DataObject *items, QString style);

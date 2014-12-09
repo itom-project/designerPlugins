@@ -640,6 +640,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     replot();
     return true;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotCanvas::setOverlayColorMap(QString colormap /*= "__next__"*/)
 {
@@ -736,6 +737,7 @@ bool PlotCanvas::setOverlayColorMap(QString colormap /*= "__next__"*/)
     replot();
     return true;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::keyPressEvent (QKeyEvent * event)
 {
@@ -1152,6 +1154,7 @@ ito::AutoInterval PlotCanvas::getInterval(Qt::Axis axis) const
 
     return ito::AutoInterval(i.minValue(), i.maxValue(), autoScale);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval)
 {
@@ -1166,6 +1169,7 @@ void PlotCanvas::setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &inte
 
     replot();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::AutoInterval PlotCanvas::getOverlayInterval(Qt::Axis axis) const
 {
@@ -2732,6 +2736,7 @@ void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
         event->ignore();
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc)
 {
@@ -2745,9 +2750,9 @@ void PlotCanvas::getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito
 
     m_rasterData->getMinMaxLoc(min, minLoc, max, maxLoc);
 
-
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, double *maxPhysLoc)
 {
@@ -2775,6 +2780,7 @@ void PlotCanvas::getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, 
 
     return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateColors(void)
 {
@@ -2795,7 +2801,6 @@ void PlotCanvas::updateColors(void)
         setPalette( newPalette );
         setCanvasBackground(m_pData->m_backgnd);
         
-        
         axisWidget(QwtPlot::xBottom)->setAutoFillBackground( true );
         axisWidget(QwtPlot::xBottom)->setPalette(newPalette);
 
@@ -2813,14 +2818,27 @@ void PlotCanvas::updateColors(void)
 
     return;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setVisible(bool visible)
+{    
+    this->QwtPlot::setVisible(visible);
+    if (visible)
+    {
+        this->updateScaleValues(1);
+    }
+}
+
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void PlotCanvas::multiPointSelected (const QPolygon &polygon)
 //{
 //    qDebug() << "pointSelected:" << polygon;
 //};
 //
+//
 ////----------------------------------------------------------------------------------------------------------------------------------
 //void PlotCanvas::multiPointAppended (const QPoint &pos)
 //{
 //    qDebug() << "pointAppended:" << pos;
-//};
+//}
+//----------------------------------------------------------------------------------------------------------------------------------
