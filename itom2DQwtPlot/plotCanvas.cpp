@@ -1434,7 +1434,8 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
     QSize symSize(5,5);
     QBrush symBrush(Qt::NoBrush);
     QPen symPen(Qt::red);
-
+    
+    bool insertLabel;
     QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
     if (rgexp.indexIn(style) != -1)
     {
@@ -1497,7 +1498,10 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 marker->setSymbol(new QwtSymbol(symStyle,symBrush,symPen,symSize));
                 marker->setValue(xCoords[i], yCoords[i]);
                 marker->attach(this);
-
+                QwtText label(QString(" %1").arg(id));
+                
+                marker->setLabel(label);
+                
                 m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
             }
         }
