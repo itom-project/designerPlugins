@@ -193,14 +193,16 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
         ito::RetVal plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);
         ito::RetVal clearAll(void);
 
+        void mnuAutoFitCols();
+        void mnuUpdate();
+
     private slots:
         void mnuSetting();
         void mnuExport(QAction* action);
         void mnuAddRelation();
         void mnuDeleteRelation();
-        void mnuUpdate();
-        void mnuAutoFitCols();
-
+        
+        
         void mnuHome();
 };
 

@@ -776,8 +776,8 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & 0x0000FFFF);
 
     // distance of two points or two circles or combination
-    if ((typeOne == ito::PrimitiveContainer::tPoint || typeOne == ito::PrimitiveContainer::tCircle) &&
-       (typeTwo == ito::PrimitiveContainer::tPoint || typeTwo == ito::PrimitiveContainer::tCircle))
+    if ((typeOne == ito::PrimitiveContainer::tPoint || typeOne == ito::PrimitiveContainer::tCircle || typeOne == ito::PrimitiveContainer::tEllipse) &&
+       (typeTwo == ito::PrimitiveContainer::tPoint || typeTwo == ito::PrimitiveContainer::tCircle || typeOne == ito::PrimitiveContainer::tEllipse))
     {
         if (eval2D)
         {
