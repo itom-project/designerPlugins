@@ -501,7 +501,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     }
                 }
 
-                secondType = secondType > 11 ? 0 : secondType; 
+                //secondType = secondType > 11 ? 0 : secondType; 
 
                 //if (idx2 > - 1 && secondType > 0) elements[1]->setText(QString(primitivNames[secondType]).append(QString::number(idx2)));
                 //else elements[1]->setText("");
@@ -1553,3 +1553,4 @@ void PlotTreeWidget::autoFitCols()
         setColumnWidth(col, max);
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------

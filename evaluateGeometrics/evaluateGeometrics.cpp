@@ -877,3 +877,94 @@ void EvaluateGeometricsFigure::clearRelation(const bool apply)
 {
     ((InternalInfo*)m_pInfo)->m_relationsList.clear();
 }
+//---------------------------------------------------------------------------------------------------------
+QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysize, const int resolution)
+{
+
+    QSizeF curSize(xsize, ysize);
+    if(curSize.height() == 0 || curSize.width() == 0)
+    {
+        curSize = QSizeF(m_pContent->width(), m_pContent->height());
+    }
+    
+    QPixmap destinationImage(xsize, ysize);
+
+    if(!m_pContent)
+    {
+        destinationImage.fill(Qt::red);
+        return destinationImage;
+    }
+    destinationImage.fill(Qt::white);
+    
+    QPainter painter( &destinationImage );
+    QPoint pos(m_pContent->iconSize().width() + 4,5);
+    QPoint posI(0,0);
+
+    int linesize = m_pContent->iconSize().height() + 4;
+
+    for (int topItem = 0; topItem < m_pContent->topLevelItemCount(); topItem++)
+    {
+        pos.setX(m_pContent->iconSize().width() + 4);
+        posI.setX(0);
+        painter.setFont(  m_pContent->topLevelItem(topItem)->font(0) );
+        painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->text(0));
+        painter.drawPixmap(posI, m_pContent->topLevelItem(topItem)->icon(0).pixmap(m_pContent->iconSize()));
+        pos.setY(pos.y() + linesize);
+        posI.setY(posI.y() + linesize);
+        if (m_pContent->topLevelItem(topItem)->childCount() > 0)
+        {
+            pos.setX(30 + m_pContent->iconSize().width() + 4);
+            posI.setX(30);
+            for (int childItem = 0; childItem < m_pContent->topLevelItem(topItem)->childCount(); childItem++)
+            {
+                painter.setFont(  m_pContent->topLevelItem(topItem)->child(childItem)->font(0) );
+                painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->child(childItem)->text(0));
+                painter.drawPixmap(posI, m_pContent->topLevelItem(topItem)->child(childItem)->icon(0).pixmap(m_pContent->iconSize()));
+                pos.setY(pos.y() + linesize);
+                posI.setY(posI.y() + linesize);
+            }            
+        }
+    }
+    pos.setX(0);
+    pos.setY(5);
+    for (int col = 1; col < m_pContent->columnCount(); col++)
+    {
+        pos.setX(pos.x() + m_pContent->columnWidth(col - 1));
+        pos.setY(5);
+        for (int topItem = 0; topItem < m_pContent->topLevelItemCount(); topItem++)
+        {
+            
+            painter.setFont(  m_pContent->topLevelItem(topItem)->font(col) );
+            painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->text(col));
+            pos.setY(pos.y() + linesize);
+
+            if (m_pContent->topLevelItem(topItem)->childCount() > 0)
+            {
+                for (int childItem = 0; childItem < m_pContent->topLevelItem(topItem)->childCount(); childItem++)
+                {
+                    painter.setFont(  m_pContent->topLevelItem(topItem)->child(childItem)->font(col) );
+                    painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->child(childItem)->text(col));
+                    pos.setY(pos.y() + linesize);
+                }            
+            }
+        }
+    }
+    
+
+
+    return destinationImage;
+}
+//---------------------------------------------------------------------------------------------------------
+int EvaluateGeometricsFigure::getNumberOfDigits() const
+{
+    return ((InternalInfo*)m_pInfo)->m_numberOfDigits;
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::setNumberOfDigits(const int val)
+{
+    if(val < 0 || val > 6)
+    {
+        return;
+    }
+    ((InternalInfo*)m_pInfo)->m_numberOfDigits = val;
+}
