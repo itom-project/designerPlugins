@@ -158,6 +158,7 @@ class PlotCanvas : public QwtPlot
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
         void updateColors();
+        void updateLabelVisibility();
     private:
         ito::DataObject randImg;
 
@@ -272,6 +273,8 @@ struct InternalData
         m_axisColor = Qt::black;
         m_textColor = Qt::black;
         m_backgnd = Qt::white;
+
+        m_markerLabelVisible = false;
     }
     ~InternalData()
     {
@@ -328,7 +331,7 @@ struct InternalData
     bool m_yaxisVisible;
 
     bool m_colorBarVisible;
-
+    bool m_markerLabelVisible;
     int m_elementsToPick;
     unsigned char m_alpha;
 

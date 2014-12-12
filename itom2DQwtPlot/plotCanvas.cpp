@@ -1498,9 +1498,12 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 marker->setSymbol(new QwtSymbol(symStyle,symBrush,symPen,symSize));
                 marker->setValue(xCoords[i], yCoords[i]);
                 marker->attach(this);
-                QwtText label(QString(" %1").arg(id));
+                if(m_pData->m_markerLabelVisible)
+                {
+                    QwtText label(QString(" %1").arg(id));
+                    marker->setLabel(label);
+                }
                 
-                marker->setLabel(label);
                 
                 m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
             }
@@ -2830,6 +2833,34 @@ void PlotCanvas::setVisible(bool visible)
     if (visible)
     {
         this->updateScaleValues(1);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::updateLabelVisibility()
+{    
+    if(!m_pData) return;
+
+    if(m_pData->m_markerLabelVisible)
+    {
+        QPair<int, QwtPlotMarker*> pair;
+        QList<QString> keys = m_plotMarkers.keys();
+        QString label;
+        foreach(label, keys)
+        {
+            foreach(pair, m_plotMarkers.values(label))
+            {
+                if(pair.second) pair.second->setLabel(label);
+            }
+        }
+    }
+    else
+    {
+        QPair<int, QwtPlotMarker*> pair;
+
+        foreach(pair, m_plotMarkers)
+        {
+            if(pair.second) pair.second->setLabel(QString(""));
+        }
     }
 }
 

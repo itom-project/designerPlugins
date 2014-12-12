@@ -2292,7 +2292,29 @@ void Itom2dQwtPlot::setTextColor(const QColor newVal)
 
     updatePropertyDock();
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom2dQwtPlot::getMarkerLablesVisible(void) const
+{
+    if(m_pVData) 
+    {
+        return ((InternalData*)m_pVData)->m_markerLabelVisible;
+    }
+    else
+        return false;    
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setMarkerLablesVisible(const bool val)
+{
+    if(!m_pVData) 
+    {
+        return ;
+    }
+    if(val != ((InternalData*)m_pVData)->m_markerLabelVisible)
+    {
+        ((InternalData*)m_pVData)->m_markerLabelVisible = val;
+        if(m_pContent) m_pContent->updateLabelVisibility();
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
 {

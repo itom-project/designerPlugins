@@ -73,6 +73,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
+    Q_PROPERTY(bool markerLabelsVisible READ getMarkerLablesVisible WRITE setMarkerLablesVisible DESIGNABLE true)
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
@@ -103,6 +104,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
     Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
     Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
+    Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels.")
 
     Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
@@ -257,6 +259,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     //!> return text color
     QColor getTextColor(void) const;
+
+    bool getMarkerLablesVisible(void) const;
+    void setMarkerLablesVisible(const bool val);
 
     friend class PlotCanvas;
 
