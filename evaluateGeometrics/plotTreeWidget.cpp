@@ -94,7 +94,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
     QString coordsString("[%1, %2, %3]");
 
-    if (m_pData->m_consider2DOnly)
+    if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
     {
         coordsString = "[%1, %2]";
     }
@@ -164,7 +164,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
         case ito::PrimitiveContainer::tPoint:
         {
-            if (m_pData->m_consider2DOnly)
+            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
                 topLevelItem(row)->setText(1, QString(coordsString)
                                             .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
@@ -183,7 +183,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tLine:
         {
-            if (m_pData->m_consider2DOnly)
+            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
                 //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
                 topLevelItem(row)->setText(1, QString(coordsString)
@@ -214,7 +214,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tCircle:
         {
-            if (m_pData->m_consider2DOnly)
+            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
                 //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
                 topLevelItem(row)->setText(1, QString(coordsString)
@@ -241,7 +241,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tEllipse:
         {
-            if (m_pData->m_consider2DOnly)
+            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
                 //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
                 topLevelItem(row)->setText(1, QString(coordsString)
@@ -279,7 +279,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tRectangle:
         {
-            if (m_pData->m_consider2DOnly)
+            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
                 //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
                 topLevelItem(row)->setText(1, QString(coordsString)
@@ -322,7 +322,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tSquare:
         {
-            if (m_pData->m_consider2DOnly)
+            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
                 //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
                 topLevelItem(row)->setText(1, QString(coordsString)
@@ -359,7 +359,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
         case ito::PrimitiveContainer::tPolygon:
         {
-            if (m_pData->m_consider2DOnly)
+            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
                 //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
                 topLevelItem(row)->setText(1, QString(coordsString)

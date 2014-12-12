@@ -82,7 +82,7 @@ struct InternalInfo
 
         m_numberOfDigits = 2;
         m_consider2DOnly = false;
-
+        m_coordsAs3D = true;
         //m_info.m_rowHash.clear();
         m_relationNames.clear();
         m_relationNames.append("N.A.");
@@ -113,6 +113,9 @@ struct InternalInfo
         static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};
 
         m_relationsList.clear();
+        m_rowPrintSpacing = 2;
+        m_tpPrintSpacing = 2;
+        m_columnPrintSpacing = 2;
     }
     ~InternalInfo() { }
 
@@ -126,6 +129,10 @@ struct InternalInfo
     //QHash<int, geometricPrimitives> m_rowHash;    /*!< A hashList with all geometric elements to be evaluated for the figure*/
     ito::uint8 m_numberOfDigits;                    /*!< Number of digits to be plotted */
     bool m_consider2DOnly;                          /*!< Toggle wether only x and y or all coordinates of primitivs should be considered for evaluation of relations */
+    bool m_coordsAs3D;                              /*!< Toggle wether only x and y or all coordinates of primitivs should be shown */
+    ito::int32 m_rowPrintSpacing;                    /*!< Number of pixels for each row pixmap export*/
+    ito::int32 m_tpPrintSpacing;                    /*!< Number of pixels for each row pixmap export*/
+    ito::int32 m_columnPrintSpacing;                    /*!< Number of pixels for each column pixmap export */
 };
 
 /*!

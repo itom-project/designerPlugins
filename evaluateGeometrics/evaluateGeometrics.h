@@ -80,7 +80,13 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(int lastAddedRelation READ getLastRelation DESIGNABLE true)
     Q_PROPERTY(int numberOfDigits READ getNumberOfDigits WRITE setNumberOfDigits DESIGNABLE true)
     Q_PROPERTY(bool considerOnly2D READ getConsider2dStatus WRITE setConsider2dStatus DESIGNABLE true)
+    Q_PROPERTY(bool coordinatesAs3D READ getCoordinatesAs3DStatus WRITE setCoordinatesAs3DStatus DESIGNABLE true)
+    Q_PROPERTY(int printRowSpacing READ getPrintRowSpacing WRITE setPrintRowSpacing DESIGNABLE true)
+    Q_PROPERTY(int printTopLevbelSpacing READ getPrintTopLevelRowSpacing WRITE setPrintTopLevelRowSpacing DESIGNABLE true)
+    Q_PROPERTY(int printColumnSpacing READ getPrintColumnSpacing WRITE setPrintColumnSpacing DESIGNABLE true)
     
+
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://valueUnit", "The value unit for the metrical calculations that is used within the plot.")
     Q_CLASSINFO("prop://titleFont", "Font for title (toDo).")
@@ -91,6 +97,10 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("prop://lastAddedRelation", "Get the index of the last added relation.")
     Q_CLASSINFO("prop://numberOfDigits", "Define the number of digits to be displayed.")
     Q_CLASSINFO("prop://considerOnly2D",    "If true, only the x & y coordinates are considered.")
+    Q_CLASSINFO("prop://coordinatesAs3D",    "If true, 3D-coordinates are plotted, even if considerOnly2D is true.")
+    Q_CLASSINFO("prop://printRowSpacing", "Define the number of pixels between to rows when printed.")
+    Q_CLASSINFO("prop://printTopLevbelSpacing", "Define the number of pixels after a top level element when printed.")
+    Q_CLASSINFO("prop://printColumnSpacing", "Define the number of pixels between to columns when printed.")
 
     Q_CLASSINFO("slot://addRelation", "Add a set of relations via dataObject")
     Q_CLASSINFO("slot://modifyRelation", "Change a single relation")
@@ -163,9 +173,20 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
         bool getConsider2dStatus(void) const;
         void setConsider2dStatus(const bool enabled);
 
+        bool getCoordinatesAs3DStatus(void) const;
+        void setCoordinatesAs3DStatus(const bool enabled);
+
         void setSource(QSharedPointer<ito::DataObject> source);
     
         inline QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution); 
+
+        int getPrintRowSpacing(void) const;
+        void setPrintRowSpacing(const int val);
+        int getPrintTopLevelRowSpacing(void) const;
+        void setPrintTopLevelRowSpacing(const int val);
+        int getPrintColumnSpacing(void) const;
+        void setPrintColumnSpacing(const int val);
+
     protected:
         ito::RetVal init();
 

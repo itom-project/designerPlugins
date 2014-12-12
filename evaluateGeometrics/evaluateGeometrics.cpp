@@ -858,6 +858,10 @@ QStringList EvaluateGeometricsFigure::getRelationNames(void) const
 void EvaluateGeometricsFigure::setConsider2dStatus(const bool enabled)
 {
     ((InternalInfo*)m_pInfo)->m_consider2DOnly = enabled;
+    if(((InternalInfo*)m_pInfo)->m_consider2DOnly == false)
+    {
+        ((InternalInfo*)m_pInfo)->m_coordsAs3D = true;
+    }
     m_pContent->updatePrimitives();
     m_pContent->updateRelationShips(false);
     return;
@@ -866,6 +870,20 @@ void EvaluateGeometricsFigure::setConsider2dStatus(const bool enabled)
 bool EvaluateGeometricsFigure::getConsider2dStatus(void) const 
 {
     return ((InternalInfo*)m_pInfo)->m_consider2DOnly;
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::setCoordinatesAs3DStatus(const bool enabled)
+{
+    if(((InternalInfo*)m_pInfo)->m_consider2DOnly == false) ((InternalInfo*)m_pInfo)->m_coordsAs3D = true;
+    else ((InternalInfo*)m_pInfo)->m_coordsAs3D = enabled;
+    m_pContent->updatePrimitives();
+    m_pContent->updateRelationShips(false);
+    return;
+}
+//---------------------------------------------------------------------------------------------------------
+bool EvaluateGeometricsFigure::getCoordinatesAs3DStatus(void) const 
+{
+    return ((InternalInfo*)m_pInfo)->m_coordsAs3D;
 }
 //---------------------------------------------------------------------------------------------------------
 ito::RetVal EvaluateGeometricsFigure::init() //called when api-pointers are transmitted, directly after construction
@@ -897,14 +915,23 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
     destinationImage.fill(Qt::white);
     
     QPainter painter( &destinationImage );
-    QPoint pos(m_pContent->iconSize().width() + 4,5);
-    QPoint posI(0,0);
 
-    int linesize = m_pContent->iconSize().height() + 4;
+
+    int ySpacing = ((InternalInfo*)m_pInfo)->m_rowPrintSpacing;
+    int ySpacingTp = ((InternalInfo*)m_pInfo)->m_tpPrintSpacing;
+    int xSpacing = ((InternalInfo*)m_pInfo)->m_columnPrintSpacing;
+    int yStartPos = 5; 
+    
+    int linesize = m_pContent->iconSize().height() + ySpacing;
+
+    //if(m_pContent->topLevelItemCount() > 0) yStartPos = (m_pContent->iconSize().height() - m_pContent->topLevelItem(0)->font(0).pixelSize()) / 2;
+
+    QPoint pos(m_pContent->iconSize().width() + 4,yStartPos);
+    QPoint posI(0,0);
 
     for (int topItem = 0; topItem < m_pContent->topLevelItemCount(); topItem++)
     {
-        pos.setX(m_pContent->iconSize().width() + 4);
+        pos.setX(m_pContent->iconSize().width() + xSpacing);
         posI.setX(0);
         painter.setFont(  m_pContent->topLevelItem(topItem)->font(0) );
         painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->text(0));
@@ -913,7 +940,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
         posI.setY(posI.y() + linesize);
         if (m_pContent->topLevelItem(topItem)->childCount() > 0)
         {
-            pos.setX(30 + m_pContent->iconSize().width() + 4);
+            pos.setX(30 + m_pContent->iconSize().width() + xSpacing);
             posI.setX(30);
             for (int childItem = 0; childItem < m_pContent->topLevelItem(topItem)->childCount(); childItem++)
             {
@@ -924,13 +951,14 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
                 posI.setY(posI.y() + linesize);
             }            
         }
+        pos.setY(pos.y() + ySpacingTp);
+        posI.setY(posI.y() + ySpacingTp);
     }
     pos.setX(0);
-    pos.setY(5);
     for (int col = 1; col < m_pContent->columnCount(); col++)
     {
-        pos.setX(pos.x() + m_pContent->columnWidth(col - 1));
-        pos.setY(5);
+        pos.setX(pos.x() + m_pContent->columnWidth(col - 1) + xSpacing);
+        pos.setY(yStartPos);
         for (int topItem = 0; topItem < m_pContent->topLevelItemCount(); topItem++)
         {
             
@@ -947,6 +975,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
                     pos.setY(pos.y() + linesize);
                 }            
             }
+            pos.setY(pos.y() + ySpacingTp);
         }
     }
     
@@ -967,4 +996,46 @@ void EvaluateGeometricsFigure::setNumberOfDigits(const int val)
         return;
     }
     ((InternalInfo*)m_pInfo)->m_numberOfDigits = val;
+}
+//---------------------------------------------------------------------------------------------------------
+int EvaluateGeometricsFigure::getPrintRowSpacing(void) const
+{
+    return ((InternalInfo*)m_pInfo)->m_rowPrintSpacing;
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::setPrintRowSpacing(const int val)
+{
+    if(val < 0 || val > 20)
+    {
+        return;
+    }
+    ((InternalInfo*)m_pInfo)->m_rowPrintSpacing = val;
+}
+//---------------------------------------------------------------------------------------------------------
+int EvaluateGeometricsFigure::getPrintTopLevelRowSpacing(void) const
+{
+    return ((InternalInfo*)m_pInfo)->m_tpPrintSpacing;
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::setPrintTopLevelRowSpacing(const int val)
+{
+    if(val < 0 || val > 20)
+    {
+        return;
+    }
+    ((InternalInfo*)m_pInfo)->m_tpPrintSpacing = val;
+}
+//---------------------------------------------------------------------------------------------------------
+int EvaluateGeometricsFigure::getPrintColumnSpacing(void) const
+{
+    return ((InternalInfo*)m_pInfo)->m_columnPrintSpacing;
+}
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::setPrintColumnSpacing(const int val)
+{
+    if(val < 0 || val > 20)
+    {
+        return;
+    }
+    ((InternalInfo*)m_pInfo)->m_columnPrintSpacing = val;
 }
