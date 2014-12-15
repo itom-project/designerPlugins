@@ -215,9 +215,9 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
 
         ito::RetVal addRelationName(const QString newName);
 
-        ito::RetVal exportData(QString fileName, ito::uint8 exportFlag);
+        ito::RetVal exportData(QString fileName, int exportFlag);
 
-        ito::RetVal plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values);
+        ito::RetVal plotItemChanged(int idx, int flags, QVector<float> values);
         ito::RetVal clearAll(void);
 
         void mnuAutoFitCols();
