@@ -385,7 +385,7 @@ void EvaluateGeometricsFigure::mnuExport(QAction* action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, ito::uint8 exportFlag)
+ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, int exportFlag)
 {
     ito::RetVal retVal = ito::retOk;
 
@@ -735,7 +735,7 @@ ito::RetVal EvaluateGeometricsFigure::addRelationName(const QString newName)
 }
 
 //---------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometricsFigure::plotItemChanged(ito::int32 idx, ito::int32 flags, QVector<ito::float32> values)
+ito::RetVal EvaluateGeometricsFigure::plotItemChanged(int idx, int flags, QVector<float> values)
 {
     if (m_pContent)
     {
