@@ -2291,6 +2291,33 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                                 path.lineTo(it.value()->x2, it.value()->y2);  
                             }
                         }
+                        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
+                        {
+
+                            dx = it.value()->x2 - it.value()->x1;
+                            dy = it.value()->y2 - it.value()->y1;
+
+                            path.moveTo(canxpos, canypos);
+                            path.lineTo(canxpos + dx, canypos + dy);
+                        }
+                        else if (QApplication::keyboardModifiers() == Qt::AltModifier)
+                        {
+                            dx = it.value()->x2 - it.value()->x1;
+                            dy = it.value()->y2 - it.value()->y1;
+
+                            ito::float32 length = sqrt(dx * dx + dy * dy);
+
+                            dx = canxpos - it.value()->x2;
+                            dy = canypos - it.value()->y2;
+
+                            ito::float32 alpha = atan2(dy, dx);
+
+                            dx = cos(alpha) * length;
+                            dy = sin(alpha) * length;
+
+                            path.moveTo(it.value()->x2 + dx, it.value()->y2 + dy);
+                            path.lineTo(it.value()->x2, it.value()->y2); 
+                        }
                         else
                         {
                             path.moveTo(canxpos, canypos);
@@ -2408,6 +2435,33 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                                 path.moveTo(it.value()->x1, it.value()->y1);
                                 path.lineTo(it.value()->x1, canypos);
                             }
+                        }
+                        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
+                        {
+
+                            dx = it.value()->x2 - it.value()->x1;
+                            dy = it.value()->y2 - it.value()->y1;
+
+                            path.moveTo(canxpos - dx, canypos - dy);
+                            path.lineTo(canxpos , canypos );
+                        }
+                        else if (QApplication::keyboardModifiers() == Qt::AltModifier)
+                        {
+                            dx = it.value()->x2 - it.value()->x1;
+                            dy = it.value()->y2 - it.value()->y1;
+
+                            ito::float32 length = sqrt(dx * dx + dy * dy);
+
+                            dx = it.value()->x1 - canxpos;
+                            dy = it.value()->y1 - canypos;
+
+                            ito::float32 alpha = atan2(dy, dx);
+
+                            dx = cos(alpha) * length;
+                            dy = sin(alpha) * length;
+
+                            path.moveTo(it.value()->x1, it.value()->y1);
+                            path.lineTo(it.value()->x1 - dx, it.value()->y1 - dy); 
                         }
                         else
                         {
