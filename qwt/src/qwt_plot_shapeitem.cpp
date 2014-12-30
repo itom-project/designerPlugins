@@ -12,7 +12,7 @@
 #include "qwt_painter.h"
 #include "qwt_curve_fitter.h"
 #include "qwt_clipper.h"
-
+#include <limits>
 static QPainterPath qwtTransformPath( const QwtScaleMap &xMap,
         const QwtScaleMap &yMap, const QPainterPath &path, bool doAlign )
 {
@@ -246,7 +246,16 @@ void QwtPlotShapeItem::setShape( const QPainterPath &shape )
         }
         else
         {
+            
             d_data->boundingRect = shape.boundingRect();
+            if(d_data->boundingRect.height() <  std::numeric_limits<float>::epsilon())
+            {
+                d_data->boundingRect.setHeight(std::numeric_limits<float>::epsilon());
+            }
+            if(d_data->boundingRect.width()  < std::numeric_limits<float>::epsilon())
+            {
+                d_data->boundingRect.setWidth(std::numeric_limits<float>::epsilon());
+            }
         }
 
         itemChanged();
