@@ -147,7 +147,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
 
     //marker for zstack cut
     m_pStackCutMarker = new QwtPlotMarker();
-    m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(7,7)));
+    m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green),3),  QSize(11,11)));
     m_pStackCutMarker->attach(this);
     m_pStackCutMarker->setVisible(false);
 
@@ -357,7 +357,7 @@ void PlotCanvas::refreshStyles()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 {
-    bool needToUpdate = false;
+    ito::uint8 updateState = 0; //changeNo (0): nothing changed, changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...), changeData (2): data changed (dimensions, sizes, other data object...)
 
     m_dObjPtr = dObj;
 
@@ -369,9 +369,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
 
-        needToUpdate = m_rasterData->updateDataObject(dObj, plane);
+        updateState = m_rasterData->updateDataObject(dObj, plane);
 
-        if (needToUpdate)
+        if (updateState & changeData)
         {
             bool valid;
             ito::DataObjectTagType tag;
@@ -426,7 +426,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
     updateLabels();
 
-    if (needToUpdate)
+    if (updateState != changeNo)
     {
         Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
         if (p)
@@ -451,16 +451,21 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             p->setPlaneRange(0, maxPlane);
         }
 
-        //updateMarkerPosition(true);
-
-        updateScaleValues(false); //no replot here
+        updateScaleValues(false, updateState & changeData); //no replot here
         updateAxes();
-        m_pZoomer->setZoomBase(false); //do not replot in order to to destroy the recently set scale values, a rescale is executed at the end though
+
+        //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
+        if (updateState & changeData)
+        {
+            m_pZoomer->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+        }
+        else
+        {
+            m_pZoomer->rescale(false);
+        }
     }
     else
     {
-        //updateMarkerPosition(true,false);
-
         replot();
     }
 }
@@ -961,7 +966,11 @@ void PlotCanvas::synchronizeScaleValues()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::updateScaleValues(bool doReplot)
+/*
+@param doReplot forces a replot of the content
+@param doZoomBase if true, the x/y-zoom is reverted to the full x-y-area of the manually set ranges (the same holds for the value range)
+*/
+void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/)
 {
     QwtInterval ival;
     if (m_pData->m_valueScaleAuto)
@@ -990,14 +999,6 @@ void PlotCanvas::updateScaleValues(bool doReplot)
         m_pData->m_yaxisMax = ival.maxValue();
     }
 
-    setAxisScale(QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
-    QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
-    if (widget)
-    {
-        QwtInterval ival(m_pData->m_valueMin, m_pData->m_valueMax);
-        axisWidget(QwtPlot::yRight)->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
-    }
-
     if (m_pData->m_yaxisFlipped)
     {
         axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted, true);
@@ -1007,32 +1008,43 @@ void PlotCanvas::updateScaleValues(bool doReplot)
         axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted, false);
     }
 
-    if (m_pZoomer)
+    if (doZoomBase)
     {
-        QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
-        zoom = zoom.normalized();
-
-        if (zoom == m_pZoomer->zoomRect())
+        setAxisScale(QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
+        QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
+        if (widget)
         {
-            m_pZoomer->zoom(zoom);
-            m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+            QwtInterval ival(m_pData->m_valueMin, m_pData->m_valueMax);
+            axisWidget(QwtPlot::yRight)->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
+        }
+
+        if (m_pZoomer)
+        {
+            QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+            zoom = zoom.normalized();
+
+            if (zoom == m_pZoomer->zoomRect())
+            {
+                m_pZoomer->zoom(zoom);
+                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+            }
+            else
+            {
+                m_pZoomer->zoom(zoom);
+            }
         }
         else
         {
-            m_pZoomer->zoom(zoom);
-        }
-    }
-    else
-    {
-        setAxisScale(QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
+            setAxisScale(QwtPlot::xBottom, m_pData->m_xaxisMin, m_pData->m_xaxisMax);
 
-        if (m_pData->m_yaxisFlipped)
-        {
-            setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMax, m_pData->m_yaxisMin);
-        }
-        else
-        {
-            setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
+            if (m_pData->m_yaxisFlipped)
+            {
+                setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMax, m_pData->m_yaxisMin);
+            }
+            else
+            {
+                setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
+            }
         }
     }
 
@@ -3051,7 +3063,7 @@ void PlotCanvas::setVisible(bool visible)
     this->QwtPlot::setVisible(visible);
     if (visible)
     {
-        this->updateScaleValues(1);
+        this->updateScaleValues(true, false);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------

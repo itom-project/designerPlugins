@@ -54,9 +54,9 @@ class DataObjRasterData : public QwtRasterData
 
         inline QSize getSize() const { return QSize(m_D.m_xSize, m_D.m_ySize); }
 
-        QByteArray calcHash(const ito::DataObject *dObj = NULL);
+        void calcHash(const ito::DataObject *dObj, QByteArray &dataHash, QByteArray &appearanceHash);
 
-        bool updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
+        ito::uint8 updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
 
         bool pointValid(const QPointF &point) const;
        
@@ -79,13 +79,14 @@ class DataObjRasterData : public QwtRasterData
 
         void deleteCache();
 
-        QByteArray m_hash;
+        QByteArray m_dataHash;
+        QByteArray m_appearanceHash;
 
         ito::DataObject m_dataObj; //the source data object (unchanged)
         ito::DataObject *m_dataObjPlane; //pointer to the source data object (<=2D) or a shallow copy to the depicted plane (>=3D)
 
         bool m_validData;
-        QByteArray m_dataHash;
+        
         QCryptographicHash m_hashGenerator;
         QRectF m_lastRasteredArea;
         QSize m_lastRasteredRaster;

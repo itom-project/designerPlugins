@@ -667,7 +667,7 @@ void Itom2dQwtPlot::setyAxisFlipped(const bool &value)
     }
     if (m_pContent)
     {
-        m_pContent->updateScaleValues();
+        m_pContent->updateScaleValues(true, false); //replot, but no change of the current x/y and value zoom ranges
         m_pContent->internalDataUpdated();
     }
 

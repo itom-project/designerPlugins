@@ -34,7 +34,6 @@ QRgb DataObjRasterData::transparentColor = 0x00ffffff;
 DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const bool overlay) :
     QwtRasterData(),
     m_validData(false),
-    m_dataHash(),
     m_rasteredLinePtr(NULL),
     m_xIndizes(NULL),
     m_plane(NULL),
@@ -65,23 +64,28 @@ DataObjRasterData::~DataObjRasterData()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QByteArray DataObjRasterData::calcHash(const ito::DataObject *dObj)
+/*
+dataHash only concerns fundamental items like the the number of dimensions or the pointer address to the real data
+apearanceHash contains things that might require a redraw of the data (however the current zoom... can be unchanged)
+*/
+void DataObjRasterData::calcHash(const ito::DataObject *dObj, QByteArray &dataHash, QByteArray &appearanceHash)
 {
     if (dObj == NULL) dObj = &m_dataObj;
 
     if(dObj->getDims() < 2)
     {
-        return m_hashGenerator.hash("", QCryptographicHash::Md5);
+        appearanceHash = dataHash = m_hashGenerator.hash("", QCryptographicHash::Md5);
     }
     else
     {
         QByteArray ba;
+        QByteArray ba2;
 
         int dims = dObj->getDims();
         ba.append( dims );
-        ba.append( m_pInternalData->m_cmplxType );
-        ba.append( m_pInternalData->m_yaxisFlipped );
-        ba.append( (char)m_D.m_planeIdx );
+        ba2.append( m_pInternalData->m_cmplxType );
+        ba2.append( m_pInternalData->m_yaxisFlipped );
+        ba2.append( (char)m_D.m_planeIdx );
 
         if( dims > 0 )
         {
@@ -92,7 +96,8 @@ QByteArray DataObjRasterData::calcHash(const ito::DataObject *dObj)
             ba.append( QByteArray().setNum( m->size[0] ));
         }
 
-        return m_hashGenerator.hash(ba, QCryptographicHash::Md5);
+        dataHash = m_hashGenerator.hash(ba, QCryptographicHash::Md5);
+        appearanceHash = m_hashGenerator.hash(ba2, QCryptographicHash::Md5);
     }
 }
 
@@ -117,13 +122,16 @@ void DataObjRasterData::deleteCache()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int planeIdx /*= -1*/) //true if hash has changed
+/*
+returns 0 if nothing changed, 1 if only the appearance changed and 3 if data and appearance changed
+*/
+ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int planeIdx /*= -1*/)
 {
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
     // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is 
     // responsible that no dataObject is deleted when it is still in use by any object of this entire plot plugin.
     
-    bool newHash = false;
+    ito::uint8 newHash = PlotCanvas::changeNo;
     bool dataObjPlaneWasShallow = (&m_dataObj != m_dataObjPlane);
 
     if(dataObj)
@@ -143,18 +151,29 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
             m_D.m_planeIdx = planeIdx;
         }
 
-        QByteArray hash = calcHash(dataObj);
+        QByteArray dataHash;
+        QByteArray appearanceHash;
+        calcHash(dataObj, dataHash, appearanceHash);
 
-        if (m_hash != hash)
-        {
-            m_hash = hash;
+        if (m_appearanceHash != appearanceHash || m_dataHash != dataHash)
+        { 
+            newHash |= PlotCanvas::changeAppearance;
 
             if (planeIdx == -1)
             {
                 m_D.m_planeIdx = 0;
             }
+        }
 
-            newHash = true;
+        if (m_dataHash != dataHash)
+        {
+            newHash |= PlotCanvas::changeData;
+        }
+
+        if (m_appearanceHash != appearanceHash || m_dataHash != dataHash)
+        {
+            m_dataHash = dataHash;
+            m_appearanceHash = appearanceHash;
 
             deleteCache();
 
@@ -285,8 +304,9 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
         m_D.m_planeIdx = 0;
 
         deleteCache();
-        m_hash = QByteArray();
-        newHash = true;
+        m_dataHash = QByteArray();
+        m_appearanceHash = QByteArray();
+        newHash = PlotCanvas::changeAppearance | PlotCanvas::changeData;
 
         setInterval(Qt::XAxis, QwtInterval() );
         setInterval(Qt::YAxis, QwtInterval() );
@@ -297,6 +317,7 @@ bool DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int pla
     return newHash;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 bool DataObjRasterData::pointValid(const QPointF &point) const
 {
     return interval(Qt::XAxis).contains( point.x() ) && interval(Qt::YAxis).contains( point.y() );

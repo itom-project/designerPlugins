@@ -99,6 +99,12 @@ class PlotCanvas : public QwtPlot
             Real = 2, 
             Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
 
+        enum changeFlag {
+            changeNo = 0,
+            changeAppearance = 1,
+            changeData = 2
+        };
+
         PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
 
@@ -146,7 +152,7 @@ class PlotCanvas : public QwtPlot
         void setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel);
         void updateLabels();
         void synchronizeScaleValues();
-        void updateScaleValues(bool doReplot = true);
+        void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
         void setColorBarVisible(bool visible);
         bool setColorMap(QString colormap = "__next__");
         inline QString colorMapName() const { return m_colorMapName; }
