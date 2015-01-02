@@ -404,7 +404,7 @@ void Itom2dQwtPlot::createActions()
     m_pMnuDrawModifyMode = new QMenu(tr("Elemet Modify Mode"), this);
 
     m_pDrawModifyModeActGroup = new QActionGroup(this);
-    a = m_pDrawModeActGroup->addAction(tr("Move elemets"));
+    a = m_pDrawModifyModeActGroup->addAction(tr("Move elemets"));
     a->setData(PlotCanvas::tMoveGeometricElements);
     a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
     m_pMnuDrawModifyMode->addAction(a);
