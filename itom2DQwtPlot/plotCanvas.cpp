@@ -1529,8 +1529,9 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
             {
                 QPainterPath path;
                 DrawItem *newItem = NULL;                
-                
-                switch ((int)types[i])
+                unsigned short type = ((int)types[i]) & ito::PrimitiveContainer::tTypeMask;
+                unsigned char flags = (((int)types[i]) & ito::PrimitiveContainer::tFlagMask) >> 16;
+                switch (type)
                 {
                     case tPoint:
                         path.moveTo(xCoords1[i], yCoords1[i]);
@@ -1557,10 +1558,11 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 if (m_pData->m_pDrawItems.contains((int)ids[i]))
                 {
                     m_pData->m_pDrawItems[(int)ids[i]]->setShape(path, m_inverseColor0, m_inverseColor1);
+                    m_pData->m_pDrawItems[(int)ids[i]]->m_flags = flags;
                 }
                 else
                 {
-                    switch ((int)types[i])
+                    switch (type)
                     {
                         case tMultiPointPick:
                         case tPoint:                    
@@ -1599,6 +1601,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                         newItem->setVisible(true);
                         newItem->show();
                         newItem->attach(this);
+                        newItem->m_flags = flags;
                         replot();
                         //                m_pData->m_pDrawItems.append(newItem);
                         m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
@@ -2239,324 +2242,476 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
         return;
     }
 
-//    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+    //    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     if (m_pData->m_state == tIdle)
     {
         ito::float32 canxpos = invTransform(QwtPlot::xBottom, event->x() - canvas()->x());
         ito::float32 canypos = invTransform(QwtPlot::yLeft, event->y() - canvas()->y());
 
+        bool modificationDone = false;
+
         QHash<int, DrawItem*>::Iterator it = m_pData->m_pDrawItems.begin();
         for (; it != m_pData->m_pDrawItems.end(); it++)
-        {
+        {   
             if (it.value() == NULL)
             {
                 continue;
             }
 
-            if (it.value()->m_active == 1)
+            if(it.value()->m_active == 0)
             {
-                ito::float32 dx, dy;
-
-                QPainterPath path;
-                switch (it.value()->m_type)
-                {
-                    case tPoint:
-
-                        path.moveTo(canxpos, canypos);
-                        path.lineTo(canxpos, canypos);                                              
-
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        replot();
-                    break;
-
-                    case tLine:
-
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = canxpos - it.value()->x2;
-                            dy = it.value()->y2 - canypos;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) > fabs(dy))
-                            {
-                                path.moveTo(canxpos, it.value()->y2);
-                                path.lineTo(it.value()->x2, it.value()->y2);  
-                            }
-                            else
-                            {
-                                path.moveTo(it.value()->x2, canypos);
-                                path.lineTo(it.value()->x2, it.value()->y2);  
-                            }
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
-                        {
-
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
-
-                            path.moveTo(canxpos, canypos);
-                            path.lineTo(canxpos + dx, canypos + dy);
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::AltModifier)
-                        {
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
-
-                            ito::float32 length = sqrt(dx * dx + dy * dy);
-
-                            dx = canxpos - it.value()->x2;
-                            dy = canypos - it.value()->y2;
-
-                            ito::float32 alpha = atan2(dy, dx);
-
-                            dx = cos(alpha) * length;
-                            dy = sin(alpha) * length;
-
-                            path.moveTo(it.value()->x2 + dx, it.value()->y2 + dy);
-                            path.lineTo(it.value()->x2, it.value()->y2); 
-                        }
-                        else
-                        {
-                            path.moveTo(canxpos, canypos);
-                            path.lineTo(it.value()->x2, it.value()->y2);                        
-                        }
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        replot();
-                    break;
-
-                    case tRect:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = it.value()->x2 - canxpos;
-                            dy = canypos - it.value()->y2;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) < fabs(dy))
-                            {
-                                //canypos = it.value()->x2 - dx;
-                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            else
-                            {
-                                //canxpos = it.value()->x2 - dy;
-                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
-                            }
-
-                            m_ignoreNextMouseEvent = true;
-                        }
-
-                        path.addRect(canxpos, canypos,
-                            it.value()->x2 - canxpos,
-                            it.value()->y2 - canypos);
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-
-                        if(m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
- 
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                            this->cursor().setPos(dst);
-                        }
-                        replot();
-                    break;
-
-                    case tEllipse:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = it.value()->x2 - canxpos;
-                            dy = canypos - it.value()->y2;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) < fabs(dy))
-                            {
-                                //canypos = it.value()->x2 - dx;
-                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            else
-                            {
-                                //canxpos = it.value()->x2 - dy;
-                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            m_ignoreNextMouseEvent = true;
-                        }
-                        path.addEllipse(canxpos,
-                            canypos,
-                             it.value()->x2 - canxpos,
-                             it.value()->y2 - canypos);
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-
-                        if(m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
- 
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                            this->cursor().setPos(dst);
-                        }
-                        replot();
-                    break;
-                }
-
-                break;
+                continue;
             }
-            else if (it.value()->m_active == 2)
+
+            ito::float32 dx, dy;
+            QPainterPath path;
+
+            switch(m_pData->m_modState)
             {
-                ito::float32 dx, dy;
-
-                QPainterPath path;
-                switch (it.value()->m_type)
+                default:
+                    emit statusBarMessage(tr("Could not perform specific action on geomtric element, action not implemented."), 4000);
+                    path = it.value()->shape();
+                    break;
+                case tMoveGeometricElements:
                 {
-                    case tLine:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = canxpos - it.value()->x1;
-                            dy = it.value()->y1 - canypos;
 
+                    ito::float32 lenx = it.value()->x2 - it.value()->x1; 
+                    ito::float32 leny = it.value()->y2 - it.value()->y1;
+
+                    if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                    {
+                        dx = invTransform(QwtPlot::xBottom, event->x()) - invTransform(QwtPlot::xBottom, m_initialMousePosition.x());
+                        dy = invTransform(QwtPlot::yLeft, event->y()) - invTransform(QwtPlot::yLeft, m_initialMousePosition.y());
+                        dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                        dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                        if (it.value()->m_active == 1)
+                        {
                             if (fabs(dx) > fabs(dy))
                             {
-                                path.moveTo(it.value()->x1, it.value()->y1);
-                                path.lineTo(canxpos, it.value()->y1);
+                                dx = canxpos - m_initialMarkerPosition.x();
+                                dy = 0.0;
                             }
                             else
                             {
-                                path.moveTo(it.value()->x1, it.value()->y1);
-                                path.lineTo(it.value()->x1, canypos);
+                                dy = canypos - m_initialMarkerPosition.y();
+                                dx = 0.0;
                             }
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
-                        {
-
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
-
-                            path.moveTo(canxpos - dx, canypos - dy);
-                            path.lineTo(canxpos , canypos );
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::AltModifier)
-                        {
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
-
-                            ito::float32 length = sqrt(dx * dx + dy * dy);
-
-                            dx = it.value()->x1 - canxpos;
-                            dy = it.value()->y1 - canypos;
-
-                            ito::float32 alpha = atan2(dy, dx);
-
-                            dx = cos(alpha) * length;
-                            dy = sin(alpha) * length;
-
-                            path.moveTo(it.value()->x1, it.value()->y1);
-                            path.lineTo(it.value()->x1 - dx, it.value()->y1 - dy); 
-                        }
-                        else
-                        {
-                            path.moveTo(it.value()->x1, it.value()->y1);
-                            path.lineTo(canxpos, canypos);
-                        }
                         
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        //if (p) emit p->plotItemChanged(n);
-                        replot();
-                    break;
-
-                    case tRect:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                        }
+                        else
                         {
-                            dx = canxpos - it.value()->x1;
-                            dy = it.value()->y1 - canypos;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) < fabs(dy))
+                            if (fabs(dx) > fabs(dy))
                             {
-                                //canypos = it.value()->y1 + dx;
-                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
+                                dx = canxpos - m_initialMarkerPosition.x() - lenx;
+                                dy = 0.0;
                             }
                             else
                             {
-                                //canypos = it.value()->x1 + dy;
-                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
+                                dy = canypos - m_initialMarkerPosition.y() - leny;
+                                dx = 0.0;
                             }
-                            m_ignoreNextMouseEvent = true;
                         }
-                        path.addRect(it.value()->x1, it.value()->y1,
-                            canxpos - it.value()->x1,
-                            canypos - it.value()->y1);
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        //if (p) emit p->plotItemChanged(n);
-                        if(m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
- 
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
 
-                            this->cursor().setPos(dst);
+
+                    }
+                    else
+                    {
+                        dx = 0.0;
+                        dy = 0.0;
+                        if (it.value()->m_active == 2)
+                        {
+                            canxpos -= lenx;
+                            canypos -= leny;
                         }
-                        replot();
-                    break;
+                    }
 
-                    case tEllipse:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                    switch (it.value()->m_type)
+                    {
+                        case tPoint:
                         {
-                            dx = canxpos - it.value()->x1;
-                            dy = it.value()->y1 - canypos;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) < fabs(dy))
+                            if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                             {
-                                //canypos = it.value()->y1 + dx;
-                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
+                                path.moveTo(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy);
+                                path.lineTo(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy); 
                             }
                             else
                             {
-                                //canypos = it.value()->x1 + dy;
-                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
+                                path.moveTo(canxpos, canypos);
+                                path.lineTo(canxpos, canypos);                            
                             }
-                            m_ignoreNextMouseEvent = true;
+                        }
+                        break;
+                        case tLine:
+                        {
+                            if (QApplication::keyboardModifiers() == Qt::ControlModifier)      
+                            {   
+                                path.moveTo(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy);
+                                path.lineTo(m_initialMarkerPosition.x() + dx + lenx, m_initialMarkerPosition.y() + dy + leny);  
+                            }
+                            else
+                            {
+                                path.moveTo(canxpos, canypos);
+                                path.lineTo(canxpos + lenx, canypos + leny);
+                            }
+                        }
+                        break;
+
+                        case tRect:
+                        {
+                            if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                            {
+                                path.addRect(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy, lenx, leny);                    
+                            }
+                            else
+                            {
+                                path.addRect(canxpos, canypos, lenx, leny);
+                            }
+                        }
+                        break;
+
+                        case tEllipse:
+                        {
+                            if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                            {
+                                path.addEllipse(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy, lenx, leny);
+                            }
+                            else
+                            {
+                                path.addEllipse(canxpos, canypos, lenx, leny);
+                            }
+                        }
+                        break;
+                    }
+                    it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                    it.value()->setActive(it.value()->m_active);
+                    replot();
+                }
+
+                break;
+                case tResizeGeometricElements:
+                    emit statusBarMessage(tr("Could not perform specific action on geomtric element, resize action not implemented yet."), 4000);
+                    break;
+                case tModifyPoints:
+                {
+                    if(it.value()->m_flags & 0x07)
+                    {
+                        emit statusBarMessage(tr("Could not change points of geomtric element, elemet is proteted."), 4000);
+                        break;
+                    }
+
+                    if (it.value()->m_active == 1)
+                    {
+
+                        
+                        switch (it.value()->m_type)
+                        {
+                            case tPoint:
+
+                                path.moveTo(canxpos, canypos);
+                                path.lineTo(canxpos, canypos);                                              
+
+                                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                                it.value()->setActive(it.value()->m_active);
+                                replot();
+                            break;
+
+                            case tLine:
+
+                                if (QApplication::keyboardModifiers() == Qt::ControlModifier)       // draw line horizontal or vertical with second point fixed
+                                {
                             
-                        }
-                        path.addEllipse(it.value()->x1,
-                            it.value()->y1,
-                            canxpos - it.value()->x1,
-                            canypos - it.value()->y1),
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        //if (p) emit p->plotItemChanged(n);
-                        if(m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
- 
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+                                    dx = canxpos - it.value()->x2;
+                                    dy = it.value()->y2 - canypos;
 
-                            this->cursor().setPos(dst);
+                                    dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                                    dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                                    if (fabs(dx) > fabs(dy))
+                                    {
+                                        path.moveTo(canxpos, it.value()->y2);
+                                        path.lineTo(it.value()->x2, it.value()->y2);  
+                                    }
+                                    else
+                                    {
+                                        path.moveTo(it.value()->x2, canypos);
+                                        path.lineTo(it.value()->x2, it.value()->y2);  
+                                    }
+                                }
+                                else if(QApplication::keyboardModifiers() == Qt::ShiftModifier)    // move line without resize
+                                {
+
+                                    dx = it.value()->x2 - it.value()->x1;
+                                    dy = it.value()->y2 - it.value()->y1;
+
+                                    path.moveTo(canxpos, canypos);
+                                    path.lineTo(canxpos + dx, canypos + dy);
+                                }
+                                else if(QApplication::keyboardModifiers() == Qt::AltModifier)      // keep linesize constant and second point fixed
+                                {
+                                    dx = it.value()->x2 - it.value()->x1;
+                                    dy = it.value()->y2 - it.value()->y1;
+
+                                    ito::float32 length = sqrt(dx * dx + dy * dy);
+
+                                    dx = canxpos - it.value()->x2;
+                                    dy = canypos - it.value()->y2;
+
+                                    ito::float32 alpha = atan2(dy, dx);
+
+                                    dx = cos(alpha) * length;
+                                    dy = sin(alpha) * length;
+
+                                    path.moveTo(it.value()->x2 + dx, it.value()->y2 + dy);
+                                    path.lineTo(it.value()->x2, it.value()->y2); 
+                                }
+                                else                                                                // just draw line
+                                {
+                                    path.moveTo(canxpos, canypos);
+                                    path.lineTo(it.value()->x2, it.value()->y2);                        
+                                }
+                                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                                it.value()->setActive(it.value()->m_active);
+                                replot();
+                            break;
+
+                            case tRect:
+                                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                                {
+                                    dx = it.value()->x2 - canxpos;
+                                    dy = canypos - it.value()->y2;
+
+                                    dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                                    dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                                    if (fabs(dx) < fabs(dy))
+                                    {
+                                        //canypos = it.value()->x2 - dx;
+                                        canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+                                    else
+                                    {
+                                        //canxpos = it.value()->x2 - dy;
+                                        canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+
+                                    m_ignoreNextMouseEvent = true;
+                                }
+
+                                path.addRect(canxpos, canypos,
+                                    it.value()->x2 - canxpos,
+                                    it.value()->y2 - canypos);
+                                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                                it.value()->setActive(it.value()->m_active);
+
+                                if(m_ignoreNextMouseEvent)
+                                {
+                                    ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                                    ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                                    QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                                    this->cursor().setPos(dst);
+                                }
+                                replot();
+                            break;
+
+                            case tEllipse:
+                                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                                {
+                                    dx = it.value()->x2 - canxpos;
+                                    dy = canypos - it.value()->y2;
+
+                                    dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                                    dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                                    if (fabs(dx) < fabs(dy))
+                                    {
+                                        //canypos = it.value()->x2 - dx;
+                                        canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+                                    else
+                                    {
+                                        //canxpos = it.value()->x2 - dy;
+                                        canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+                                    m_ignoreNextMouseEvent = true;
+                                }
+                                path.addEllipse(canxpos,
+                                    canypos,
+                                     it.value()->x2 - canxpos,
+                                     it.value()->y2 - canypos);
+                                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                                it.value()->setActive(it.value()->m_active);
+
+                                if(m_ignoreNextMouseEvent)
+                                {
+                                    ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                                    ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                                    QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                                    this->cursor().setPos(dst);
+                                }
+                                replot();
+                            break;
                         }
-                        replot();
-                    break;
+                    }
+                    else if (it.value()->m_active == 2)
+                    {
+
+                        if(it.value()->m_flags & 0x07)
+                        {
+                            emit statusBarMessage(tr("Could not change geomtric element, elemet is read only."), 4000);
+                            break;
+                        }
+
+                        ito::float32 dx, dy;
+
+                        QPainterPath path;
+                        switch (it.value()->m_type)
+                        {
+                            case tLine:
+                                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                                {
+                                    dx = canxpos - it.value()->x1;
+                                    dy = it.value()->y1 - canypos;
+
+                                    if (fabs(dx) > fabs(dy))
+                                    {
+                                        path.moveTo(it.value()->x1, it.value()->y1);
+                                        path.lineTo(canxpos, it.value()->y1);
+                                    }
+                                    else
+                                    {
+                                        path.moveTo(it.value()->x1, it.value()->y1);
+                                        path.lineTo(it.value()->x1, canypos);
+                                    }
+                                }
+                                else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
+                                {
+
+                                    dx = it.value()->x2 - it.value()->x1;
+                                    dy = it.value()->y2 - it.value()->y1;
+
+                                    path.moveTo(canxpos - dx, canypos - dy);
+                                    path.lineTo(canxpos , canypos );
+                                }
+                                else if (QApplication::keyboardModifiers() == Qt::AltModifier)
+                                {
+                                    dx = it.value()->x2 - it.value()->x1;
+                                    dy = it.value()->y2 - it.value()->y1;
+
+                                    ito::float32 length = sqrt(dx * dx + dy * dy);
+
+                                    dx = it.value()->x1 - canxpos;
+                                    dy = it.value()->y1 - canypos;
+
+                                    ito::float32 alpha = atan2(dy, dx);
+
+                                    dx = cos(alpha) * length;
+                                    dy = sin(alpha) * length;
+
+                                    path.moveTo(it.value()->x1, it.value()->y1);
+                                    path.lineTo(it.value()->x1 - dx, it.value()->y1 - dy); 
+                                }
+                                else
+                                {
+                                    path.moveTo(it.value()->x1, it.value()->y1);
+                                    path.lineTo(canxpos, canypos);
+                                }
+                        
+                                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                                it.value()->setActive(it.value()->m_active);
+                                //if (p) emit p->plotItemChanged(n);
+                                replot();
+                            break;
+
+                            case tRect:
+                                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                                {
+                                    dx = canxpos - it.value()->x1;
+                                    dy = it.value()->y1 - canypos;
+
+                                    dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                                    dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                                    if (fabs(dx) < fabs(dy))
+                                    {
+                                        //canypos = it.value()->y1 + dx;
+                                        canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+                                    else
+                                    {
+                                        //canypos = it.value()->x1 + dy;
+                                        canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+                                    m_ignoreNextMouseEvent = true;
+                                }
+                                path.addRect(it.value()->x1, it.value()->y1,
+                                    canxpos - it.value()->x1,
+                                    canypos - it.value()->y1);
+                                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                                it.value()->setActive(it.value()->m_active);
+                                //if (p) emit p->plotItemChanged(n);
+                                if(m_ignoreNextMouseEvent)
+                                {
+                                    ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                                    ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                                    QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                                    this->cursor().setPos(dst);
+                                }
+                                replot();
+                            break;
+
+                            case tEllipse:
+                                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                                {
+                                    dx = canxpos - it.value()->x1;
+                                    dy = it.value()->y1 - canypos;
+
+                                    dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                                    dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? - std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                                    if (fabs(dx) < fabs(dy))
+                                    {
+                                        //canypos = it.value()->y1 + dx;
+                                        canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+                                    else
+                                    {
+                                        //canypos = it.value()->x1 + dy;
+                                        canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
+                                    }
+                                    m_ignoreNextMouseEvent = true;
+                            
+                                }
+                                path.addEllipse(it.value()->x1,
+                                    it.value()->y1,
+                                    canxpos - it.value()->x1,
+                                    canypos - it.value()->y1),
+                                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                                it.value()->setActive(it.value()->m_active);
+                                //if (p) emit p->plotItemChanged(n);
+                                if(m_ignoreNextMouseEvent)
+                                {
+                                    ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                                    ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+ 
+                                    QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                                    this->cursor().setPos(dst);
+                                }
+                                replot();
+                            break;
+                        }
+                    }
                 }
                 break;
             }
+            break;
         }
     }
 }
@@ -2567,6 +2722,7 @@ void PlotCanvas::mousePressEvent (QMouseEvent * event)
     if (m_pData->m_state == tIdle)
     {
         //int n;
+
         QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
         for (;it != m_pData->m_pDrawItems.end(); ++it)
 //        for (n = 0; n < m_pData->m_pDrawItems.size(); n++)
@@ -2575,7 +2731,7 @@ void PlotCanvas::mousePressEvent (QMouseEvent * event)
             {
                 continue;
             }
-
+            
             int canxpos = event->x() - canvas()->x();
             int canypos = event->y() - canvas()->y();
   //          double x = it.value()->x1;
@@ -2589,6 +2745,11 @@ void PlotCanvas::mousePressEvent (QMouseEvent * event)
                 m_activeDrawItem = it.value()->m_idx;
                 it.value()->setActive(1);
                 it.value()->setSelected(true);
+                
+                m_initialMousePosition.setX( event->x() );
+                m_initialMousePosition.setY( event->y() );
+                m_initialMarkerPosition.setX( it.value()->x1 );
+                m_initialMarkerPosition.setY( it.value()->y1 );
                 ++it;
                 break;
             }
@@ -2599,6 +2760,10 @@ void PlotCanvas::mousePressEvent (QMouseEvent * event)
                 m_activeDrawItem = it.value()->m_idx;
                 it.value()->setActive(2);
                 it.value()->setSelected(true);
+                m_initialMousePosition.setX( event->x() );
+                m_initialMousePosition.setY( event->y() );
+                m_initialMarkerPosition.setX( it.value()->x1 );
+                m_initialMarkerPosition.setY( it.value()->y1 );
                 ++it;
                 break;
             }

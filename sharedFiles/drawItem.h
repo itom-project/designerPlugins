@@ -47,6 +47,7 @@ class DrawItem : public QwtPlotShapeItem
         double x1, y1, x2, y2;
         char m_active;
         char m_type;
+        unsigned char m_flags;
         static QVector<int> idxVec;
         int m_idx;
 

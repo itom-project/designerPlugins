@@ -27,6 +27,7 @@
         <file>icons/marker.png</file>
         <file>icons/ellipse.png</file>
         <file>icons/rectangle.png</file>
+        <file>icons/point.png</file>
         <file>icons/circle.png</file>
         <file>icons/square.png</file>
         <file>icons/polygon.png</file>
@@ -35,6 +36,10 @@
         <file>icons/falseColor.png</file>
         <file>icons/rgba.png</file>
         <file>icons/grid.png</file>
+        <file>icons/geosPoints.png</file>
+        <file>icons/geosResize.png</file>
+        <file>icons/geosRotate.png</file>
+        <file>icons/geosMove.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>

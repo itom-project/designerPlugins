@@ -298,6 +298,7 @@ private:
     QAction *m_pActStackCut;
     QWidgetAction *m_pActPlaneSelector;
     QActionGroup *m_pDrawModeActGroup;
+    QActionGroup *m_pDrawModifyModeActGroup;
     QAction *m_pActClearDrawings;
     QAction *m_pActProperties;
 
@@ -309,6 +310,9 @@ private:
 
     QAction* m_pActDrawMode;
     QMenu *m_pMnuDrawMode;
+
+    QAction* m_pActDrawModifyMode;
+    QMenu *m_pMnuDrawModifyMode;
 
     QAction* m_pActCntrMarker;
 
@@ -335,6 +339,7 @@ private slots:
     void mnuActStackCut(bool checked);
     
     void mnuActPlaneSelector(int plane);
+    void mnuDrawModifyMode(QAction *action);
     void mnuDrawMode(QAction *action);
     void mnuDrawMode(bool checked);
     void mnuOverlaySliderChanged(int value);

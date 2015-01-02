@@ -70,6 +70,9 @@ void Itom2dQwtPlot::constructor()
     m_pActCntrMarker = NULL;
     m_pActAspectRatio = NULL;
     m_pDrawModeActGroup = NULL;
+    m_pActDrawModifyMode = NULL;
+    m_pMnuDrawModifyMode = NULL;
+    m_pDrawModifyModeActGroup = NULL;
     m_pOverlaySlider = NULL;
     m_pActOverlaySlider = NULL;
 
@@ -130,6 +133,7 @@ void Itom2dQwtPlot::constructor()
     mainTb->addSeparator();
     mainTb->addAction(m_pActDrawMode);
     mainTb->addAction(m_pActClearDrawings);
+    mainTb->addAction(m_pActDrawModifyMode);
     mainTb->addSeparator();
     mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
@@ -161,6 +165,7 @@ void Itom2dQwtPlot::constructor()
     menuTools->addSeparator();
     menuTools->addAction(m_pActDrawMode);
     menuTools->addAction(m_pActClearDrawings);
+    menuTools->addAction(m_pActDrawModifyMode);
     addMenu(menuTools); //AbstractFigure takes care of the menu
 
     QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
@@ -364,7 +369,7 @@ void Itom2dQwtPlot::createActions()
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
 
     //m_actDrawMode
-    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/point.png"), tr("Switch Draw Mode"), this);
     m_pMnuDrawMode = new QMenu(tr("Draw Mode"), this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
@@ -394,6 +399,41 @@ void Itom2dQwtPlot::createActions()
     m_pActDrawMode->setCheckable(true);
     connect(m_pDrawModeActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuDrawMode(QAction*)));
     connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
+
+    m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"), tr("Switch Element Modification Mode"), this);
+    m_pMnuDrawModifyMode = new QMenu(tr("Elemet Modify Mode"), this);
+
+    m_pDrawModifyModeActGroup = new QActionGroup(this);
+    a = m_pDrawModeActGroup->addAction(tr("Move elemets"));
+    a->setData(PlotCanvas::tMoveGeometricElements);
+    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
+    m_pMnuDrawModifyMode->addAction(a);
+    a->setCheckable(false);
+
+    a = m_pDrawModifyModeActGroup->addAction(tr("Resize Elements"));
+    a->setData(PlotCanvas::tRotateGeometricElemets);
+    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
+    m_pMnuDrawModifyMode->addAction(a);
+    a->setCheckable(false);
+    a->setEnabled(false);
+
+    a = m_pDrawModifyModeActGroup->addAction(tr("Rotate Elements"));
+    a->setData(PlotCanvas::tResizeGeometricElements);
+    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
+    m_pMnuDrawModifyMode->addAction(a);
+    a->setCheckable(false);
+    a->setEnabled(false);
+
+    a = m_pDrawModifyModeActGroup->addAction(tr("Modify Points"));
+    a->setData(PlotCanvas::tModifyPoints);
+    m_pMnuDrawModifyMode->addAction(a);
+    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
+    a->setCheckable(false);
+
+    m_pActDrawModifyMode->setMenu(m_pMnuDrawModifyMode);
+    m_pActDrawModifyMode->setVisible(true);
+    m_pActDrawModifyMode->setCheckable(false);
+    connect(m_pDrawModifyModeActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuDrawModifyMode(QAction*)));
 
     //m_pActCntrMarker
     m_pActCntrMarker = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"), tr("Center marker"), this);
@@ -1289,6 +1329,36 @@ void Itom2dQwtPlot::mnuDrawMode(bool checked)
     // we need to find out which draw mode we should activate here ...
 //    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::tIdle);
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuDrawModifyMode(QAction *action)
+{
+
+    switch (action->data().toInt())
+    {
+        default:
+        case PlotCanvas::tMoveGeometricElements:
+            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tMoveGeometricElements;
+            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
+        break;
+
+        case PlotCanvas::tResizeGeometricElements:
+            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tResizeGeometricElements;
+            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
+        break;
+
+        case PlotCanvas::tRotateGeometricElemets:
+            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tRotateGeometricElemets;
+            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
+        break;
+
+        case PlotCanvas::tModifyPoints:
+            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tModifyPoints;
+            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
+        break;
+    }
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuDrawMode(QAction *action)

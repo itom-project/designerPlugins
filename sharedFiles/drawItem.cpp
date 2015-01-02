@@ -29,7 +29,7 @@ QVector<int> DrawItem::idxVec;
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &title) : m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1), m_autoColor(true),
-    x2(-1), y2(-1), m_selected(false)
+    x2(-1), y2(-1), m_selected(false), m_flags(0)
 {
 
     if (id <= 0)

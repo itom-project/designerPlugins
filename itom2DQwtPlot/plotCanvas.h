@@ -78,10 +78,19 @@ class PlotCanvas : public QwtPlot
             tPoint = ito::PrimitiveContainer::tPoint, 
             tLine = ito::PrimitiveContainer::tLine, 
             tRect = ito::PrimitiveContainer::tRectangle, 
-//            tSquare = ito::PrimitiveContainer::tSquare,
+            tSquare = ito::PrimitiveContainer::tSquare,
             tEllipse = ito::PrimitiveContainer::tEllipse, 
-//            tCircle = ito::PrimitiveContainer::tCircle, 
+            tCircle = ito::PrimitiveContainer::tCircle, 
             tPolygon = ito::PrimitiveContainer::tPolygon
+        };
+
+        enum tModificationState
+        {
+            tNextElementMode = 0,
+            tMoveGeometricElements = 1,
+            tRotateGeometricElemets = 2,
+            tResizeGeometricElements = 3,
+            tModifyPoints   = 4
         };
 
         enum ComplexType { 
@@ -203,6 +212,9 @@ class PlotCanvas : public QwtPlot
 
         QVector<ito::uint16> m_drawedIemsIndexes;
         bool m_ignoreNextMouseEvent;
+
+        QPoint m_initialMousePosition;
+        QPointF m_initialMarkerPosition;
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
@@ -256,6 +268,7 @@ struct InternalData
         m_colorBarVisible = 0;
         m_cmplxType = PlotCanvas::Real;
         m_state = PlotCanvas::tIdle;
+        m_modState = PlotCanvas::tMoveGeometricElements;
         m_pConstOutput = NULL;
 
         m_elementsToPick = 0;
@@ -345,7 +358,7 @@ struct InternalData
     PlotCanvas::ComplexType m_cmplxType;
 
     PlotCanvas::tState m_state;
-
+    PlotCanvas::tModificationState m_modState;
     const QHash<QString, ito::Param*> *m_pConstOutput;
 //    QVector<DrawItem *> m_pDrawItems;
     QHash<int, DrawItem *> m_pDrawItems;
