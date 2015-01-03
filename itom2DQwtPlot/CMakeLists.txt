@@ -91,6 +91,7 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotPicker.h
 
 )
 
@@ -117,6 +118,7 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotPicker.cpp
 )
 
 set(plugin_HEADERS_COPY

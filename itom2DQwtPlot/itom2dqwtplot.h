@@ -86,6 +86,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
 
+    Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -116,7 +118,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
-    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
+    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
+
+    Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
 
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
@@ -184,6 +188,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     QString getOverlayColorMap() const;
     void setOverlayColorMap(const QString &name);
+
+    int getPlaneIndex() const;
+    void setPlaneIndex(const int &index);
     
     void setPlaneRange(int min, int max);
     void setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool visible);

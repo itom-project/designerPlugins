@@ -34,6 +34,7 @@
 #include "../sharedFiles/drawItem.h"
 #include "../sharedFiles/itomPlotZoomer.h"
 #include "../sharedFiles/itomPlotMagnifier.h"
+#include "../sharedFiles/itomPlotPicker.h"
 
 
 #include <qwidget.h>
@@ -88,7 +89,7 @@ class PlotCanvas : public QwtPlot
         {
             tNextElementMode = 0,
             tMoveGeometricElements = 1,
-            tRotateGeometricElemets = 2,
+            tRotateGeometricElements = 2,
             tResizeGeometricElements = 3,
             tModifyPoints   = 4
         };
@@ -114,6 +115,8 @@ class PlotCanvas : public QwtPlot
         void refreshPlot(const ito::DataObject *dObj, int plane = -1);
 
         void changePlane(int plane);
+        int getCurrentPlane();
+
         void internalDataUpdated();
 
         void setState( tState state);
@@ -184,7 +187,7 @@ class PlotCanvas : public QwtPlot
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
         ValuePicker2D *m_pValuePicker;
-        QwtPlotPicker *m_pStackPicker;
+        ItomPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
         QwtPlotMarker *m_pCenterMarker;
 

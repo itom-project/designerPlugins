@@ -132,7 +132,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
 
     //zStack cut picker
-    m_pStackPicker = new QwtPlotPicker(canvas());
+    m_pStackPicker = new ItomPlotPicker(canvas());
     m_pStackPicker->setStateMachine(new QwtPickerClickPointMachine());
     m_pStackPicker->setTrackerMode(QwtPicker::AlwaysOn);
     m_pStackPicker->setRubberBand(QwtPicker::CrossRubberBand);
@@ -314,7 +314,12 @@ void PlotCanvas::refreshStyles()
     m_pLineCutPicker->setTrackerPen(trackerPen);
     m_pLineCutLine->setPen(selectionPen);
 
+    m_pStackPicker->setTrackerFont(trackerFont);
+    m_pStackPicker->setTrackerPen(trackerPen);
+    m_pStackPicker->setBackgroundFillBrush(trackerBg);
+
     m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7)));
+
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
     
     QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
@@ -474,6 +479,16 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 void PlotCanvas::changePlane(int plane)
 {
     refreshPlot(m_dObjPtr, plane);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int PlotCanvas::getCurrentPlane()
+{
+    if (m_rasterData)
+    {
+        return m_rasterData->getCurrentPlane();
+    }
+    return 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1447,7 +1462,6 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
     QBrush symBrush(Qt::NoBrush);
     QPen symPen(Qt::red);
     
-    bool insertLabel;
     QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
     if (rgexp.indexIn(style) != -1)
     {

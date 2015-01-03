@@ -404,14 +404,14 @@ void Itom2dQwtPlot::createActions()
     m_pMnuDrawModifyMode = new QMenu(tr("Elemet Modify Mode"), this);
 
     m_pDrawModifyModeActGroup = new QActionGroup(this);
-    a = m_pDrawModifyModeActGroup->addAction(tr("Move elemets"));
+    a = m_pDrawModifyModeActGroup->addAction(tr("Move elements"));
     a->setData(PlotCanvas::tMoveGeometricElements);
     a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
     m_pMnuDrawModifyMode->addAction(a);
     a->setCheckable(false);
 
     a = m_pDrawModifyModeActGroup->addAction(tr("Resize Elements"));
-    a->setData(PlotCanvas::tRotateGeometricElemets);
+    a->setData(PlotCanvas::tRotateGeometricElements);
     a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
     m_pMnuDrawModifyMode->addAction(a);
     a->setCheckable(false);
@@ -1288,11 +1288,45 @@ void Itom2dQwtPlot::mnuActStackCut(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActPlaneSelector(int plane)
 {
-    if (m_pContent) m_pContent->changePlane(plane);
+    setPlaneIndex(plane);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom2dQwtPlot::getPlaneIndex() const
+{
+    if (m_pContent) return m_pContent->getCurrentPlane();
+    return 0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setPlaneIndex(const int &index)
+{
+    int idx = index;
+    if (m_pActPlaneSelector)
+    {
+        QSpinBox *spinBox = qobject_cast<QSpinBox*>(m_pActPlaneSelector->defaultWidget());
+        if (spinBox)
+        {
+            if (index < spinBox->minimum())
+            {
+                idx = spinBox->minimum();
+            }
+            else if (index > spinBox->maximum())
+            {
+                idx = spinBox->maximum();
+            }
+
+            spinBox->setValue(idx);
+        }
+    }
+
+    if (m_pContent) m_pContent->changePlane(idx);
 
     QStringList paramNames;
     paramNames << "displayed";
     updateChannels(paramNames);
+
+    updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1347,8 +1381,8 @@ void Itom2dQwtPlot::mnuDrawModifyMode(QAction *action)
             m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
         break;
 
-        case PlotCanvas::tRotateGeometricElemets:
-            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tRotateGeometricElemets;
+        case PlotCanvas::tRotateGeometricElements:
+            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tRotateGeometricElements;
             m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
         break;
 
@@ -1511,6 +1545,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             if (zStack)
             {
+                ((QMainWindow*)figure)->setWindowTitle(tr("Z-Stack"));
                 // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
                 // with one plane and cannot display the points in z-direction
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["zCutPoint"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
@@ -1519,6 +1554,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             }
             else
             {
+                ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
                 // otherwise simply pass on the displayed plane
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
