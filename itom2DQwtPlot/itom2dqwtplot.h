@@ -234,7 +234,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     int getOverlayAlpha () const;
     void setOverlayAlpha (const int alpha);
 
-    void resetAlpha(void)
+    void resetOverlayAlpha(void)
     {
         setOverlayAlpha(0);
     }
