@@ -76,8 +76,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLablesVisible WRITE setMarkerLablesVisible DESIGNABLE true)
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
-    Q_PROPERTY(int overlayAlpha READ getAlpha WRITE setAlpha RESET resetAlpha USER true)
-    Q_PROPERTY(ito::AutoInterval overlayInterval READ getoverlayInterval WRITE setoverlayInterval DESIGNABLE true USER true)
+    Q_PROPERTY(int overlayAlpha READ getOverlayAlpha WRITE setOverlayAlpha RESET resetOverlayAlpha USER true)
+    Q_PROPERTY(ito::AutoInterval overlayInterval READ getOverlayInterval WRITE setOverlayInterval DESIGNABLE true USER true)
     Q_PROPERTY(QString overlayColorMap READ getOverlayColorMap WRITE setOverlayColorMap DESIGNABLE true USER true)
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
@@ -204,8 +204,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     virtual ito::AutoInterval getZAxisInterval(void) const;
     virtual void setZAxisInterval(ito::AutoInterval interval);
 
-    ito::AutoInterval getoverlayInterval(void) const;
-    void setoverlayInterval(ito::AutoInterval interval);
+    ito::AutoInterval getOverlayInterval(void) const;
+    void setOverlayInterval(ito::AutoInterval interval);
 
     QFont getTitleFont(void) const;
     void setTitleFont(const QFont &font);
@@ -231,12 +231,12 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     int getSelectedElement(void) const;
     void setSelectedElement(const int idx);
 
-    int getAlpha () const;
-    void setAlpha (const int alpha);
+    int getOverlayAlpha () const;
+    void setOverlayAlpha (const int alpha);
 
     void resetAlpha(void)
     {
-        setAlpha(0);
+        setOverlayAlpha(0);
     }
 
     QSharedPointer< ito::DataObject > getOverlayImage() const;

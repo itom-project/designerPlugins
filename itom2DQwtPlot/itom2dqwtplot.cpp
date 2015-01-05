@@ -770,7 +770,7 @@ void Itom2dQwtPlot::setZAxisInterval(ito::AutoInterval interval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::AutoInterval Itom2dQwtPlot::getoverlayInterval(void) const
+ito::AutoInterval Itom2dQwtPlot::getOverlayInterval(void) const
 {
     if (m_pContent)
     {
@@ -780,7 +780,7 @@ ito::AutoInterval Itom2dQwtPlot::getoverlayInterval(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setoverlayInterval(ito::AutoInterval interval)
+void Itom2dQwtPlot::setOverlayInterval(ito::AutoInterval interval)
 {
     if (m_pContent)
     {
@@ -2149,12 +2149,12 @@ void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
     this->updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-int Itom2dQwtPlot::getAlpha () const 
+int Itom2dQwtPlot::getOverlayAlpha () const 
 {
     return ((InternalData*) m_pVData)->m_alpha;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setAlpha (const int alpha)
+void Itom2dQwtPlot::setOverlayAlpha (const int alpha)
 {
     if(m_pVData == NULL) return;
     ((InternalData*) m_pVData)->m_alpha = alpha > 0 && alpha < 255 ? alpha : ((InternalData*) m_pVData)->m_alpha;
