@@ -543,8 +543,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
             else
             {
                 m_d.valid = true;
-                pxX1 = dataObj->getPhysToPix(dims - 1, bounds[0].x(), _unused);
-                pxY1 = dataObj->getPhysToPix(dims - 2, bounds[0].y(), _unused);
+                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, bounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, bounds[0].y(), _unused));
 
                 saturation( pxX1, 0, dataObj->getSize(dims - 1) - 1 );
                 saturation( pxX2, 0, dataObj->getSize(dims - 1) - 1 );
