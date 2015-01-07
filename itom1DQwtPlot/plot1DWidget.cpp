@@ -698,12 +698,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 {
+    event->ignore();
+
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
     Picker *m;
     int curves = m_plotCurveItems.size();
 
     if (m_pData->m_state == statePicker)
     {
+        event->accept();
+
         switch(event->key())
         {
         case Qt::Key_Left:
@@ -769,45 +773,23 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
             }
             break;
         }
+        default:
+            event->ignore();
+            break;
         }
 
-        updatePickerPosition(false,false);
+        if (event->isAccepted())
+        {
+            updatePickerPosition(false,false);
+        }
     }
-    else if(event->matches(QKeySequence::Copy))
+
+    if(event->isAccepted() == false && event->matches(QKeySequence::Copy))
     {
         p->copyToClipBoard();
     }
-    /*int x1 = ((DataObjectSeriesData*)(m_plotCurveItems[0]->data()))->size()-1;
 
-     switch(event->key())
-    {
-        case Qt::Key_1:
-            m_curserFirstActive = true;
-            break;
-        case Qt::Key_2:
-            m_curserFirstActive = false;
-            break;
-        case Qt::Key_Left:
-            
-            m_Curser[!m_curserFirstActive]--;
-            m_Curser[!m_curserFirstActive] = m_Curser[!m_curserFirstActive] < 0 ? 0 : m_Curser[!m_curserFirstActive];
-
-            break;
-        case Qt::Key_Right:
-            m_Curser[!m_curserFirstActive]++;
-            m_Curser[!m_curserFirstActive] = m_Curser[!m_curserFirstActive] > x1 ? x1 : m_Curser[!m_curserFirstActive];
-            break;
-    }
-
-    if (m_Curser[0] > m_Curser[1])
-    {
-        int temp = m_Curser[0];
-        m_Curser[0] = m_Curser[1];
-        m_Curser[1] = temp;
-        m_curserFirstActive = !m_curserFirstActive;
-    }*/
-
-    event->accept();
+    
     replot();
 }
 

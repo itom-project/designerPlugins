@@ -270,9 +270,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     bool getMarkerLablesVisible(void) const;
     void setMarkerLablesVisible(const bool val);
 
-    friend class PlotCanvas;
-
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
+
+    friend class PlotCanvas;
 
 protected:
     ito::RetVal init(); //called when api-pointers are transmitted, directly after construction
@@ -290,6 +290,7 @@ private:
     void *m_pVData;
 
     QAction *m_pActSave;
+    QAction *m_pActCopyClipboard;
     QAction *m_pActHome;
     QAction *m_pActPan;
     QAction *m_pActZoom;
@@ -329,7 +330,7 @@ private:
     QHash<QObject*,ito::uint32> m_childFigures;
 
     ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
-    ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
+    ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
 private slots:
     void mnuActSave();

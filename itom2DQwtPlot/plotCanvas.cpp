@@ -761,34 +761,52 @@ bool PlotCanvas::setOverlayColorMap(QString colormap /*= "__next__"*/)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::keyPressEvent (QKeyEvent * event)
 {
+    event->ignore();
+
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     m_activeModifiers = event->modifiers();
 
     QPointF incr;
-    incr.setX(invTransform(QwtPlot::xBottom, 1) - invTransform(QwtPlot::xBottom, 0));
-    incr.setY(invTransform(QwtPlot::yLeft, 1) - invTransform(QwtPlot::yLeft, 0));
+
+    if (event->modifiers() & Qt::ControlModifier)
+    {
+        //10-pixel increment
+        incr.setX(invTransform(QwtPlot::xBottom, 10) - invTransform(QwtPlot::xBottom, 0));
+        incr.setY(invTransform(QwtPlot::yLeft, 10) - invTransform(QwtPlot::yLeft, 0));
+    }
+    else
+    {
+        //1-pixel increment
+        incr.setX(invTransform(QwtPlot::xBottom, 1) - invTransform(QwtPlot::xBottom, 0));
+        incr.setY(invTransform(QwtPlot::yLeft, 1) - invTransform(QwtPlot::yLeft, 0));
+    }
 
     if (m_pData->m_state == tStackCut)
     {
         QPointF markerPosScaleCoords = m_pStackCutMarker->value();
 
+        event->accept();
+
         switch(event->key())
         {
             case Qt::Key_Left:
                 markerPosScaleCoords.rx()-=incr.rx();
-            break;
+                break;
             case Qt::Key_Right:
                 markerPosScaleCoords.rx()+=incr.rx();
-            break;
+                break;
             case Qt::Key_Up:
                 markerPosScaleCoords.ry()-=incr.ry();
-            break;
+                break;
             case Qt::Key_Down:
                 markerPosScaleCoords.ry()+=incr.ry();
+                break;
+            default:
+                event->ignore();
             break;
         }
 
-        if (m_rasterData->pointValid(markerPosScaleCoords))
+        if (event->isAccepted() && m_rasterData->pointValid(markerPosScaleCoords))
         {
             m_pStackCutMarker->setValue(markerPosScaleCoords);
             m_pStackCutMarker->setVisible(true);
@@ -803,11 +821,13 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
     {
         QVector<QPointF> pts;
 
-        QwtInterval hInterval = m_rasterData->interval(Qt::XAxis);
-        QwtInterval vInterval = m_rasterData->interval(Qt::YAxis);
+        event->accept();
 
         if (event->key() == Qt::Key_H) //draw horizontal line in the middle of the plotted dataObject
         {
+            QwtInterval hInterval = m_rasterData->interval(Qt::XAxis);
+            QwtInterval vInterval = m_rasterData->interval(Qt::YAxis);
+
             pts.append(QPointF(hInterval.minValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
             pts.append(QPointF(hInterval.maxValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
 
@@ -818,6 +838,9 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
         }
         else if (event->key() == Qt::Key_V) // draw vertical line in the middle of the plotted dataObject
         {
+            QwtInterval hInterval = m_rasterData->interval(Qt::XAxis);
+            QwtInterval vInterval = m_rasterData->interval(Qt::YAxis);
+
             pts.append(QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.minValue()));
             pts.append(QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.maxValue()));
 
@@ -836,43 +859,54 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
                 case Qt::Key_Left:
                     pts[0].rx()-=incr.rx();
                     pts[1].rx()-=incr.rx();
-                break;
+                    break;
                 case Qt::Key_Right:
                     pts[0].rx()+=incr.rx();
                     pts[1].rx()+=incr.rx();
-                break;
+                    break;
                 case Qt::Key_Up:
                     pts[0].ry()-=incr.ry();
                     pts[1].ry()-=incr.ry();
-                break;
+                    break;
                 case Qt::Key_Down:
                     pts[0].ry()+=incr.ry();
                     pts[1].ry()+=incr.ry();
-                break;
+                    break;
+                default:
+                    event->ignore();
+                    break;
             }
 
-            if (p)
+            if (event->isAccepted() && p)
             {
                 p->setCoordinates(pts, true);
             }
         }
 
-        if (m_rasterData->pointValid(pts[0]) && m_rasterData->pointValid(pts[1]))
+        if (event->isAccepted() && m_rasterData->pointValid(pts[0]) && m_rasterData->pointValid(pts[1]))
         {
             m_pLineCutLine->setSamples(pts);
+            m_pLineCutLine->setVisible(true);
 
             (p)->displayCut(pts, m_lineCutUID, false);
             replot();
         }
     }
-    else if(event->matches(QKeySequence::Copy))
+    
+    //check if the current event has not been accepted yet (special things to do)
+    if(event->isAccepted() == false && event->matches(QKeySequence::Copy))
     {
+        event->accept();
         p->copyToClipBoard();
+    }
+    else
+    {
+        event->ignore(); //Clearing the accept parameter indicates that the event receiver does not want the event. Unwanted events might be propagated to the parent widget.
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::keyReleaseEvent (QKeyEvent * event)
+void PlotCanvas::keyReleaseEvent (QKeyEvent* /*event*/)
 {
     m_activeModifiers = Qt::NoModifier;
 }

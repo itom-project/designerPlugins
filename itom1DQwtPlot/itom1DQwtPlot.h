@@ -246,11 +246,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
         Plot1DWidget *m_pContent;
-//        InternalData m_data;
         void *m_data;
 
     private:
-        void constructor();
         QAction* m_pActScaleSetting;
         QAction* m_pRescaleParent;
         QAction  *m_pActPan;
@@ -258,6 +256,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction  *m_pActMarker;
         QAction *m_pActAspectRatio;
         QAction *m_pActSave;
+        QAction *m_pActCopyClipboard;
         QAction *m_pActHome;
         QMenu    *m_pMnuSetMarker;
         QAction  *m_pActSetMarker;
@@ -278,11 +277,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction* m_pActMultiRowSwitch;
         QMenu *m_pMnuMultiRowSwitch;
 
+        void constructor();
+
         ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
-        ito::RetVal exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
+        ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
     public slots:
-
         ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
         ito::RetVal setPicker(const QVector<ito::float32> &physCords);
 

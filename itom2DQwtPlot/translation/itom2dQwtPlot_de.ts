@@ -280,7 +280,7 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>Show a slice through z-Stack</source>
+        <source>Show a slice through z-stack</source>
         <translation>Zeigt einen Schnitt in Z-Richtung</translation>
     </message>
     <message>

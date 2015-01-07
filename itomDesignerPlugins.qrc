@@ -44,6 +44,7 @@
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>
         <file>icons/filesave.png</file>
+        <file>icons/clipboard.png</file>
         <file>icons/forward.png</file>
         <file>icons/home.png</file>
         <file>icons/marker.png</file>

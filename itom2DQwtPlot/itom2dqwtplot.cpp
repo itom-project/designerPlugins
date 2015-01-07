@@ -50,6 +50,7 @@ void Itom2dQwtPlot::constructor()
     // Basic settings
     m_pContent = NULL;
     m_pActSave = NULL;
+    m_pActCopyClipboard = NULL;
     m_pActHome = NULL;
     m_pActPan = NULL;
     m_pActZoom = NULL;
@@ -157,6 +158,7 @@ void Itom2dQwtPlot::constructor()
 
     QMenu *menuTools = new QMenu(tr("Tools"), this);
     menuTools->addAction(m_pActSave);
+    menuTools->addAction(m_pActCopyClipboard);
     menuTools->addSeparator();
     menuTools->addAction(m_pActValuePicker);
     menuTools->addAction(m_pActCntrMarker);
@@ -220,6 +222,12 @@ void Itom2dQwtPlot::createActions()
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
+
+    //m_actCopyClipboard
+    m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
+    a->setObjectName("actCopyClipboard");
+    a->setToolTip(tr("Copies the current view to the clipboard"));
+    connect(a, SIGNAL(triggered()), this, SLOT(copyToClipBoard()));
 
     //m_actHome
     m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
@@ -350,7 +358,7 @@ void Itom2dQwtPlot::createActions()
     //m_actStackCut
     m_pActStackCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"), tr("Slice in z-direction"), this);
     a->setObjectName("actStackCut");
-    a->setToolTip(tr("Show a slice through z-Stack"));
+    a->setToolTip(tr("Show a slice through z-stack"));
     a->setCheckable(true);
     a->setVisible(false);
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActStackCut(bool)));
@@ -2206,7 +2214,7 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayedLineCut(void)
 
     for( int i = 0; i < keys.length(); i++)
     {
-        if( m_childFigures[keys[i]] == ((PlotCanvas *)m_pContent)->m_lineCutUID &&
+        if( m_childFigures[keys[i]] == m_pContent->m_lineCutUID &&
             keys[i]->inherits("ito::AbstractDObjFigure"))                        
         {
             return (qobject_cast<ito::AbstractDObjFigure*>(keys[i]))->getDisplayed();
@@ -2422,25 +2430,26 @@ void Itom2dQwtPlot::setMarkerLablesVisible(const bool val)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom2dQwtPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
+ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
 {
     if(!m_pContent)
     {
         return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
     }
+
     if(curSize.height() == 0 || curSize.width() == 0)
     {
-        curSize = ((PlotCanvas *)m_pContent)->size();
+        curSize = m_pContent->size();
     }
-    QBrush curBrush = ((PlotCanvas *)m_pContent)->canvasBackground();
+    QBrush curBrush = m_pContent->canvasBackground();
 
-    QPalette curPalette = ((PlotCanvas *)m_pContent)->palette();
+    QPalette curPalette = m_pContent->palette();
 
-    ((PlotCanvas *)m_pContent)->setAutoFillBackground( true );
-    ((PlotCanvas *)m_pContent)->setPalette( Qt::white );
-    ((PlotCanvas *)m_pContent)->setCanvasBackground(Qt::white);    
+    m_pContent->setAutoFillBackground( true );
+    m_pContent->setPalette( Qt::white );
+    m_pContent->setCanvasBackground(Qt::white);    
 
-    ((PlotCanvas *)m_pContent)->replot();
+    m_pContent->replot();
 
     QwtPlotRenderer renderer;
 
@@ -2448,8 +2457,10 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool exportType, const QString &fi
     renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
     //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
-    if(exportType)
+    if(copyToClipboardNotFile)
     {
+        m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
+
         int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
         resFaktor = resFaktor < 1 ? 1 : resFaktor;
 
@@ -2458,15 +2469,20 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool exportType, const QString &fi
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
-        renderer.render(((PlotCanvas *)m_pContent), &painter, ((PlotCanvas *)m_pContent)->rect());
+        renderer.render(m_pContent, &painter, m_pContent->rect());
         clipboard->setImage(img);    
+
+        m_pContent->statusBarMessage(tr("copy current view to clipboard. done."), 1000);
     }
-    else renderer.renderDocument((((PlotCanvas *)m_pContent)), fileName, curSize, resolution);
+    else
+    {
+        renderer.renderDocument(m_pContent, fileName, curSize, resolution);
+    }
 
-    ((PlotCanvas *)m_pContent)->setPalette( curPalette);
-    ((PlotCanvas *)m_pContent)->setCanvasBackground( curBrush);
+    m_pContent->setPalette( curPalette);
+    m_pContent->setCanvasBackground( curBrush);
 
-    ((PlotCanvas *)m_pContent)->replot();
+    m_pContent->replot();
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2487,7 +2503,7 @@ QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
 
     if(curSize.height() == 0 || curSize.width() == 0)
     {
-        curSize = ((PlotCanvas *)m_pContent)->size();
+        curSize = m_pContent->size();
     }
 
     int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
@@ -2503,15 +2519,15 @@ QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
         return destinationImage;
     }
     destinationImage.fill(Qt::white);
-    QBrush curBrush = ((PlotCanvas *)m_pContent)->canvasBackground();
+    QBrush curBrush = m_pContent->canvasBackground();
 
-    QPalette curPalette = ((PlotCanvas *)m_pContent)->palette();
+    QPalette curPalette = m_pContent->palette();
 
-    ((PlotCanvas *)m_pContent)->setAutoFillBackground( true );
-    ((PlotCanvas *)m_pContent)->setPalette( Qt::white );
-    ((PlotCanvas *)m_pContent)->setCanvasBackground(Qt::white);    
+    m_pContent->setAutoFillBackground( true );
+    m_pContent->setPalette( Qt::white );
+    m_pContent->setCanvasBackground(Qt::white);    
 
-    ((PlotCanvas *)m_pContent)->replot();
+    m_pContent->replot();
 
     QwtPlotRenderer renderer;
 
@@ -2522,14 +2538,14 @@ QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     //QImage img(myRect, QImage::Format_ARGB32);
     QPainter painter(&destinationImage);
     painter.scale(resFaktor, resFaktor);
-    renderer.render(((PlotCanvas *)m_pContent), &painter, ((PlotCanvas *)m_pContent)->rect());
+    renderer.render(m_pContent, &painter, m_pContent->rect());
     //destinationImage.convertFromImage(img);
 
 
-    ((PlotCanvas *)m_pContent)->setPalette( curPalette);
-    ((PlotCanvas *)m_pContent)->setCanvasBackground( curBrush);
+    m_pContent->setPalette( curPalette);
+    m_pContent->setCanvasBackground( curBrush);
 
-    ((PlotCanvas *)m_pContent)->replot();
+    m_pContent->replot();
 
     return destinationImage;
 }

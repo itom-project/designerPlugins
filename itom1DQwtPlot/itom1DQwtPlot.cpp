@@ -144,6 +144,7 @@ void Itom1DQwtPlot::constructor()
 
     QMenu *menuTools = new QMenu(tr("Tools"), this);
     menuTools->addAction(m_pActSave);
+    menuTools->addAction(m_pActCopyClipboard);
     menuTools->addSeparator();
     menuTools->addAction(m_pActMarker);
     menuTools->addAction(m_pActSetMarker);
@@ -165,6 +166,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActBack(NULL),
     m_pActHome(NULL),
     m_pActSave(NULL),
+    m_pActCopyClipboard(NULL),
     m_pActPan(NULL),
     m_pActZoomToRect(NULL),
     m_pActMarker(NULL),
@@ -196,6 +198,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
     m_pActBack(NULL),
     m_pActHome(NULL),
     m_pActSave(NULL),
+    m_pActCopyClipboard(NULL),
     m_pActPan(NULL),
     m_pActZoomToRect(NULL),
     m_pActMarker(NULL),
@@ -373,6 +376,12 @@ void Itom1DQwtPlot::createActions()
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuExport()));
+
+    //m_actCopyClipboard
+    m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
+    a->setObjectName("actCopyClipboard");
+    a->setToolTip(tr("Copies the current view to the clipboard"));
+    connect(a, SIGNAL(triggered()), this, SLOT(copyToClipBoard()));
 
     //m_actScaleSetting
     m_pActScaleSetting = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings..."), this);
@@ -1883,7 +1892,7 @@ void Itom1DQwtPlot::setTextColor(const QColor newVal)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fileName, QSizeF curSize, const int resolution)
+ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
 {
     if(!m_pContent)
     {
@@ -1909,8 +1918,10 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fi
     renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
     //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
-    if(exportType)
+    if(copyToClipboardNotFile)
     {
+        m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
+
         int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
         resFaktor = resFaktor < 1 ? 1 : resFaktor;
 
@@ -1921,9 +1932,14 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool exportType, const QString &fi
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
         renderer.render(m_pContent, &painter, m_pContent->rect());
-        clipboard->setImage(img);    
+        clipboard->setImage(img);  
+        
+        m_pContent->statusBarMessage(tr("copy current view to clipboard. done."), 1000);
     }
-    else renderer.renderDocument((m_pContent), fileName, curSize, resolution);
+    else 
+    {
+        renderer.renderDocument((m_pContent), fileName, curSize, resolution);
+    }
 
     m_pContent->setPalette( curPalette);
     m_pContent->setCanvasBackground( curBrush);
