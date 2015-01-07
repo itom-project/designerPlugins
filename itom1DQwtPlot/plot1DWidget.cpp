@@ -68,7 +68,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_yDirect(false),
         //m_autoLineColIndex(0),
         m_lineCol(0),
-        m_lineStyle(1),
+        m_lineStyle(Qt::SolidLine),
+        m_lineWidth(1.0),
         m_pParent(parent),
         m_actPickerIdx(-1),
         m_cmplxState(false),
@@ -216,14 +217,17 @@ ito::RetVal Plot1DWidget::init()
 
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
-        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red),2,Qt::DashLine),NULL).value<QPen>();
-        trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
-        trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana",10),NULL).value<QFont>();
-        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255,255,255,155), Qt::SolidPattern),NULL).value<QBrush>();
+        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>();
+        trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
+        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
 
-        titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
-        labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
-        axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();    
+        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>();
+        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>();
+        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>();   
+
+        m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", m_lineStyle, NULL).value<int>());
+        m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, NULL).value<qreal>();
     }
 
     
@@ -321,6 +325,36 @@ void Plot1DWidget::setGridEnabled(const bool enabled)
     m_gridEnabled = enabled;
     m_pPlotGrid->enableX(enabled);
     m_pPlotGrid->enableY(enabled);
+    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setLineWidth(const qreal &width)
+{
+    m_lineWidth = width;
+
+    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    {
+        QPen pen = c->pen();
+        pen.setWidth(m_lineWidth);
+        c->setPen(pen);
+    }
+
+    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setLineStyle(const Qt::PenStyle &style)
+{
+    m_lineStyle = style;
+
+    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    {
+        QPen pen = c->pen();
+        pen.setStyle(m_lineStyle);
+        c->setPen(pen);
+    }
+
     replot();
 }
 
@@ -508,7 +542,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             QPen plotPen;
             colorIndex = m_plotCurveItems.size() % m_colorList.size();
             plotPen.setColor(m_colorList[colorIndex]);
-            plotPen.setStyle((Qt::PenStyle)m_lineStyle);
+            plotPen.setStyle(m_lineStyle);
+            plotPen.setWidth(m_lineWidth);
             dObjCurve->setPen(plotPen);
             m_plotCurveItems.append(dObjCurve);
         }

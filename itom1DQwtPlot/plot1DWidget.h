@@ -132,6 +132,10 @@ class Plot1DWidget : public QwtPlot
 
         void setState( tState state);
         void updateColors(void);
+
+        void setLineWidth(const qreal &width);
+        void setLineStyle(const Qt::PenStyle &style);
+
     private:
         QwtPlotRescaler* m_pRescaler;
 
@@ -179,7 +183,8 @@ class Plot1DWidget : public QwtPlot
 
         //unsigned char m_autoLineColIndex;
         long m_lineCol;
-        int m_lineStyle;
+        Qt::PenStyle m_lineStyle;
+        qreal m_lineWidth;
         int m_linePlotID;
 
         int m_Curser[2];

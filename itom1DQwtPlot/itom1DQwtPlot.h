@@ -64,6 +64,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
     Q_PROPERTY(bool grid READ getGrid WRITE setGrid USER true)
 
+    Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
+    Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
+
     // Properties related with geometric elements
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
@@ -93,6 +96,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
     Q_CLASSINFO("prop://grid", "enables/disables a grid.")
+
+    Q_CLASSINFO("prop://lineWidth", "width of lines in pixel.")
+    Q_CLASSINFO("prop://lineStyle", "style of lines.")
 
     Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
     Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
@@ -177,6 +183,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         bool getGrid(void) const;
         void setGrid(const bool &enabled);
+
+        qreal getLineWidth(void) const;
+        void setLineWidth(const qreal &width);
+
+        Qt::PenStyle getLineStyle(void) const;
+        void setLineStyle(const Qt::PenStyle &style);
 
         LegendPos getLegendPosition() const;
         void setLegendPosition(LegendPos legendPosition);

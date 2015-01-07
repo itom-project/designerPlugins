@@ -803,6 +803,54 @@ void Itom1DQwtPlot::setGrid(const bool &enabled)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+qreal Itom1DQwtPlot::getLineWidth(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_lineWidth;
+    }
+    return 1.0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLineWidth(const qreal &width)
+{
+    if (m_pContent)
+    {
+        if (width >= 0.0)
+        {
+            m_pContent->setLineWidth(width);
+        }
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+Qt::PenStyle Itom1DQwtPlot::getLineStyle(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_lineStyle;
+    }
+    return Qt::SolidLine;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLineStyle(const Qt::PenStyle &style)
+{
+    if (m_pContent)
+    {
+        if (style != Qt::NoPen && style != Qt::CustomDashLine)
+        {
+            m_pContent->setLineStyle(style);
+        }
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::LegendPos Itom1DQwtPlot::getLegendPosition() const
 {
     if (m_pContent)
