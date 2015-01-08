@@ -171,6 +171,17 @@ void Itom2dQwtPlot::constructor()
     addMenu(menuTools); //AbstractFigure takes care of the menu
 
     QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
+    contextMenu->addAction(m_pActSave);
+    contextMenu->addAction(m_pActCopyClipboard);
+    contextMenu->addSeparator();
+    contextMenu->addAction(m_pActHome);
+    contextMenu->addAction(m_pActPan);
+    contextMenu->addAction(m_pActZoom);
+    contextMenu->addAction(m_pActAspectRatio);
+    contextMenu->addSeparator();
+    contextMenu->addAction(m_pActValuePicker);
+    contextMenu->addAction(m_pActCntrMarker);
+    contextMenu->addSeparator();
     contextMenu->addAction(mainTb->toggleViewAction());
 
     //initialize canvas
@@ -219,12 +230,14 @@ void Itom2dQwtPlot::createActions()
 
     //m_actSave
     m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
+    a->setShortcut(QKeySequence::Save);
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
 
     //m_actCopyClipboard
     m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
+    a->setShortcut(QKeySequence::Copy);
     a->setObjectName("actCopyClipboard");
     a->setToolTip(tr("Copies the current view to the clipboard"));
     connect(a, SIGNAL(triggered()), this, SLOT(copyToClipBoard()));
@@ -934,8 +947,6 @@ void Itom2dQwtPlot::mnuActSave()
         saveDefaultPath = QDir::currentPath();
     }
 
-    
-
 #ifndef QT_NO_FILEDIALOG
     const QList<QByteArray> imageFormats =
         QImageWriter::supportedImageFormats();
@@ -996,32 +1007,8 @@ void Itom2dQwtPlot::mnuActSave()
 
         QFileInfo fi(fileName);
         saveDefaultPath = fi.path();
-        /*
-        QBrush curBrush = m_pContent->canvasBackground();
 
-        QPalette curPalette = m_pContent->palette();
-
-        m_pContent->setAutoFillBackground( true );
-        m_pContent->setPalette( Qt::white );
-        m_pContent->setCanvasBackground(Qt::white);    
-
-        m_pContent->replot();
-
-        QwtPlotRenderer renderer;
-
-        // flags to make the document look like the widget
-        renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-        //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
-
-        renderer.renderDocument((m_pContent), fileName, curSize, resolution);
-
-        m_pContent->setPalette( curPalette);
-        m_pContent->setCanvasBackground( curBrush);
-
-        m_pContent->replot();
-        */
         exportCanvas(false, fileName, curSize, resolution);
-        
     }
 }
 
@@ -2461,8 +2448,8 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     {
         m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
 
-        int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
-        resFaktor = resFaktor < 1 ? 1 : resFaktor;
+        qreal resFaktor = resolution / 72.0 + 0.5;
+        resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
 
         QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
         QClipboard *clipboard = QApplication::clipboard();

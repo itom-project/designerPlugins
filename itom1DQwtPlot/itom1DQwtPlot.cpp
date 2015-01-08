@@ -63,6 +63,7 @@ void Itom1DQwtPlot::constructor()
 
     QMenu *contextMenu = new QMenu(QObject::tr("plot1D"), this);
     contextMenu->addAction(m_pActSave);
+    contextMenu->addAction(m_pActCopyClipboard);
     contextMenu->addSeparator();
     contextMenu->addAction(m_pActHome);
     contextMenu->addAction(m_pActScaleSetting);
@@ -374,12 +375,14 @@ void Itom1DQwtPlot::createActions()
     //m_actSave
     m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
     a->setObjectName("actSave");
+    a->setShortcut(QKeySequence::Save);
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuExport()));
 
     //m_actCopyClipboard
     m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
     a->setObjectName("actCopyClipboard");
+    a->setShortcut(QKeySequence::Copy);
     a->setToolTip(tr("Copies the current view to the clipboard"));
     connect(a, SIGNAL(triggered()), this, SLOT(copyToClipBoard()));
 
@@ -1970,8 +1973,8 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     {
         m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
 
-        int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
-        resFaktor = resFaktor < 1 ? 1 : resFaktor;
+        qreal resFaktor = resolution / 72.0 + 0.5;
+        resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
 
         QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
 
