@@ -40,30 +40,29 @@ public:
 
     void getData(QSizeF &exportSize, int &resolution);
 
-private:
-    QSizeF m_startSize;
-    Ui::DialogExport2File ui;
-    int m_currentMode;
-    QStringList m_items;
+protected:
+    void updateOutput(void);
 
-    bool m_skipMetricX;
-    bool m_skipMetricY;
-    bool m_skipPixelX;
-    bool m_skipPixelY;
+    double pxToMm(const int &px);
+    int mmToPx(const double &mm);
+
+private:
+    Ui::DialogExport2File ui;
 
     double m_aspect;
 
+    bool m_inEditing;
+    bool m_keepAspectRatio;
+
 private slots:
-    void updateOutPut(void);
+    void on_dSB_destHeight_valueChanged(double mm);
+    void on_dSB_destWidth_valueChanged(double mm);
 
-    void on_dSB_destHeight_valueChanged(double input);
-    void on_dSB_destWidth_valueChanged(double input);
-
-    void on_sB_destHeight_valueChanged(int input);
-    void on_sB_destWidth_valueChanged(int input);
+    void on_sB_destHeight_valueChanged(int pixel);
+    void on_sB_destWidth_valueChanged(int pixel);
 
     void on_cB_ExpType_currentIndexChanged(int index);
-    void on_sB_destRolution_valueChanged(int input);
+    void on_sB_destResolution_valueChanged(int value);
 
 };
 

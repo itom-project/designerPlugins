@@ -934,6 +934,28 @@ void Itom2dQwtPlot::setAxisFont(const QFont &font)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActSave()
 {
+    //first get the output format information, then the filename (in order to let the user see what can be adjusted before defining a filename)
+    bool abort = true;
+
+    QSizeF curSize = m_pContent->size();
+    int resolution = 300;
+
+    DialogExportProperties *dlg = new DialogExportProperties("", curSize, this);
+    if (dlg->exec() == QDialog::Accepted)
+    {
+        dlg->getData(curSize, resolution);
+
+        abort = false;
+    }
+
+    delete dlg;
+    dlg = NULL;
+
+    if(abort)
+    {
+        return;
+    }
+
     static QString saveDefaultPath;
 
     #ifndef QT_NO_PRINTER
@@ -984,27 +1006,6 @@ void Itom2dQwtPlot::mnuActSave()
 
     if (!fileName.isEmpty())
     {
-        bool abort = true;
-
-        QSizeF curSize = m_pContent->size();
-        int resolution = 300;
-
-        DialogExportProperties *dlg = new DialogExportProperties("", curSize, this);
-        if (dlg->exec() == QDialog::Accepted)
-        {
-            dlg->getData(curSize, resolution);
-
-            abort = false;
-        }
-
-        delete dlg;
-        dlg = NULL;
-
-        if(abort)
-        {
-            return;
-        }
-
         QFileInfo fi(fileName);
         saveDefaultPath = fi.path();
 

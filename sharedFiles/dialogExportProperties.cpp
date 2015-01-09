@@ -24,48 +24,57 @@
 
 //-----------------------------------------------------------------------------------------------
 DialogExportProperties::DialogExportProperties(const QString &type, const QSizeF curSize, QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+    m_inEditing(false),
+    m_keepAspectRatio(false)
 {
     ui.setupUi(this);
+ 
+    ui.lblCanvasWidth->setText(QString("%1 px").arg(curSize.width()));
+    ui.lblCanvasHeight->setText(QString("%1 px").arg(curSize.height()));
 
-    m_currentMode = 0;
+    QStringList items;
+    items << tr("user defined");
+    items << tr("user defined (keep aspect ratio)");
 
-    m_skipMetricX = false;
-    m_skipMetricY = false;
-    m_skipPixelX = false;
-    m_skipPixelY = false;
+    items << tr("A4 landscape");
+    items << tr("A4 portrait");
+    items << tr("A4 landscape (fitting)");
+    items << tr("A4 portrait (fitting)");
 
-    m_startSize = curSize;
+    items << tr("A5 landscape");
+    items << tr("A5 portrait");
+    items << tr("A5 landscape (fitting)");
+    items << tr("A5 portrait (fitting)");
+    ui.cB_ExpType->addItems(items);
+
+    //set initialize values
+    m_inEditing = true;
+
     m_aspect = curSize.width() / curSize.height();
 
-    ui.sB_orHeight->setValue(curSize.height());
-    ui.sB_orWidth->setValue(curSize.width());
+    ui.cB_ExpType->setCurrentIndex(0); //user defined
+    ui.sB_destResolution->setValue(150);
 
-    ui.sB_destRolution->setValue(150);
+    ui.dSB_destWidth->setValue(pxToMm(curSize.width()));
+    ui.dSB_destHeight->setValue(pxToMm(curSize.height()));
 
-    ui.dSB_destWidth->setValue(curSize.width() / ui.sB_destRolution->value() * 25.4 );
-    ui.dSB_destHeight->setValue( curSize.height() / ui.sB_destRolution->value() * 25.4);
+    ui.sB_destWidth->setValue(curSize.width());
+    ui.sB_destHeight->setValue( curSize.height());
 
-    m_items.clear();
+    m_inEditing = false;
+}
 
-    m_items << tr("user defined");
-    m_items << tr("user defined (keep aspect ratio)");
+//-----------------------------------------------------------------------------------------------
+double DialogExportProperties::pxToMm(const int &px)
+{
+    return 25.4 * (double)px / (double)(ui.sB_destResolution->value());
+}
 
-    m_items << tr("A4 landscape");
-    m_items << tr("A4 portrait");
-    m_items << tr("A4 landscape (fitting)");
-    m_items << tr("A4 portrait (fitting)");
-
-    m_items << tr("A5 landscape");
-    m_items << tr("A5 portrait");
-    m_items << tr("A5 landscape (fitting)");
-    m_items << tr("A5 portrait (fitting)");
-
-    ui.cB_ExpType->addItems(m_items);
-
-    updateOutPut();
-
-    return;
+//-----------------------------------------------------------------------------------------------
+int DialogExportProperties::mmToPx(const double &mm)
+{
+    return qRound((double)(ui.sB_destResolution->value()) * mm / 25.4);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -73,28 +82,20 @@ void DialogExportProperties::getData(QSizeF &exportSize, int &resolution)
 {
     exportSize.setHeight(ui.dSB_destHeight->value());
     exportSize.setWidth(ui.dSB_destWidth->value());
-    resolution = ui.sB_destRolution->value();
-
-    return;
+    resolution = ui.sB_destResolution->value();
 }
 //-----------------------------------------------------------------------------------------------
-void DialogExportProperties::updateOutPut()
+void DialogExportProperties::updateOutput()
 {
-    m_skipMetricX = true;
-    m_skipMetricY = true;
-    m_skipPixelX = true;
-    m_skipPixelY = true;
-
     int index = ui.cB_ExpType->currentIndex();
 
-    bool disable = index < 2;
-    ui.sB_destHeight->setEnabled(disable);
-    ui.dSB_destHeight->setEnabled(disable);
+    bool enable = index < 2;
+    ui.sB_destHeight->setEnabled(enable);
+    ui.dSB_destHeight->setEnabled(enable);
+    ui.sB_destWidth->setEnabled(enable);
+    ui.dSB_destWidth->setEnabled(enable);
 
-
-    disable = index < 1;
-    ui.sB_destWidth->setEnabled(disable);
-    ui.dSB_destWidth->setEnabled(disable);
+    m_keepAspectRatio = (index > 0);    
 
     switch(index)
     {
@@ -106,36 +107,36 @@ void DialogExportProperties::updateOutPut()
             break;
 
         case 2: // A4 landscape
-            ui.dSB_destWidth->setValue( 290.0 );
+            ui.dSB_destWidth->setValue( 297.0 );
             ui.dSB_destHeight->setValue( 210.0);
             break;
 
         case 3: // A4 portrait
             ui.dSB_destWidth->setValue(210.0);
-            ui.dSB_destHeight->setValue(290.0);
+            ui.dSB_destHeight->setValue(297.0);
             break;
 
         case 4: // A4 landscape (fitting)
 
-            if(m_aspect < 1.380)
+            if(m_aspect < 1.414)
             {
                 ui.dSB_destWidth->setValue( 210.0 * m_aspect);
                 ui.dSB_destHeight->setValue( 210.0 );
             }
             else
             {
-                ui.dSB_destWidth->setValue(290.0);
-                ui.dSB_destHeight->setValue( 290.0 / m_aspect);
+                ui.dSB_destWidth->setValue(297.0);
+                ui.dSB_destHeight->setValue( 297.0 / m_aspect);
             }
 
             break;
 
         case 5: // A4 portrait (fitting)
 
-            if(m_aspect < 0.724)
+            if(m_aspect < 0.707)
             {
-                ui.dSB_destWidth->setValue( 290.0 * m_aspect);
-                ui.dSB_destHeight->setValue( 290.0 );
+                ui.dSB_destWidth->setValue( 297.0 * m_aspect);
+                ui.dSB_destHeight->setValue( 297.0 );
             }
             else
             {
@@ -189,79 +190,104 @@ void DialogExportProperties::updateOutPut()
         
     }
 
-    ui.sB_destWidth->setValue(ui.dSB_destWidth->value() / 25.4 * ui.sB_destRolution->value());
-    ui.sB_destHeight->setValue(ui.dSB_destHeight->value() / 25.4 * ui.sB_destRolution->value());
+    ui.sB_destWidth->setValue(mmToPx(ui.dSB_destWidth->value()));
+    ui.sB_destHeight->setValue(mmToPx(ui.dSB_destHeight->value()));
 
 }
 //-----------------------------------------------------------------------------------------------
-void DialogExportProperties::on_dSB_destHeight_valueChanged(double input)
+void DialogExportProperties::on_dSB_destHeight_valueChanged(double mm)
 {
-    if(m_skipMetricX)
+    if (!m_inEditing)
     {
-        m_skipMetricX = false;
-        return;
-    }
-    m_skipPixelX = true;
-    ui.sB_destHeight->setValue(input * ui.sB_destRolution->value() / 25.4);
+        m_inEditing = true;
 
-    if(ui.cB_ExpType->currentIndex() == 1)
-    {
-        ui.dSB_destWidth->setValue( ui.dSB_destHeight->value() * m_aspect);
+        ui.sB_destHeight->setValue(mmToPx(mm));
+
+        if (m_keepAspectRatio)
+        {
+            ui.dSB_destWidth->setValue(mm * m_aspect);
+            ui.sB_destWidth->setValue(mmToPx(mm) * m_aspect);
+        }
+
+        m_inEditing = false;
     }
-    
-    return;
 }
 //-----------------------------------------------------------------------------------------------
-void DialogExportProperties::on_dSB_destWidth_valueChanged(double input)
+void DialogExportProperties::on_dSB_destWidth_valueChanged(double mm)
 {
-    if(m_skipMetricY)
+    if (!m_inEditing)
     {
-        m_skipMetricY = false;
-        return;
+        m_inEditing = true;
+
+        ui.sB_destWidth->setValue(mmToPx(mm));
+
+        if (m_keepAspectRatio)
+        {
+            ui.dSB_destHeight->setValue(mm/m_aspect);
+            ui.sB_destHeight->setValue(mmToPx(mm)/m_aspect);
+        }
+
+        m_inEditing = false;
     }
-    m_skipPixelY = true;  
-    ui.sB_destWidth->setValue(input * ui.sB_destRolution->value() / 25.4);
-    
-    return;
 }
 //-----------------------------------------------------------------------------------------------
-void DialogExportProperties::on_sB_destHeight_valueChanged(int input)
+void DialogExportProperties::on_sB_destHeight_valueChanged(int pixel)
 {
-    if(m_skipPixelX)
+    if (!m_inEditing)
     {
-        m_skipPixelX = false;
-        return;
-    }
-    m_skipMetricX = true;
-    ui.dSB_destHeight->setValue((double)input * 25.4 /  ui.sB_destRolution->value());
-    if(ui.cB_ExpType->currentIndex() == 1)
-    {
-        ui.dSB_destWidth->setValue( ui.dSB_destHeight->value() * m_aspect);
-    }
+        m_inEditing = true;
 
-    return;
+        ui.dSB_destHeight->setValue(pxToMm(pixel));
+
+        if (m_keepAspectRatio)
+        {
+            ui.dSB_destWidth->setValue(pxToMm(pixel) * m_aspect);
+            ui.sB_destWidth->setValue(pixel * m_aspect);
+        }
+
+        m_inEditing = false;
+    }
 }
 //-----------------------------------------------------------------------------------------------
-void DialogExportProperties::on_sB_destWidth_valueChanged(int input)
+void DialogExportProperties::on_sB_destWidth_valueChanged(int pixel)
 {
-    if(m_skipPixelY)
+    if (!m_inEditing)
     {
-        m_skipPixelY = false;
-        return;
-    }
-    m_skipMetricY = true;
-    ui.dSB_destWidth->setValue((double)input * 25.4 / ui.sB_destRolution->value());
+        m_inEditing = true;
 
-    return;
+        ui.dSB_destWidth->setValue(pxToMm(pixel));
+
+        if (m_keepAspectRatio)
+        {
+            ui.dSB_destHeight->setValue(pxToMm(pixel)/m_aspect);
+            ui.sB_destHeight->setValue(pixel/m_aspect);
+        }
+
+        m_inEditing = false;
+    }
 }
 //-----------------------------------------------------------------------------------------------
 void DialogExportProperties::on_cB_ExpType_currentIndexChanged(int index)
 {
-    updateOutPut();
+    if (!m_inEditing)
+    {
+        m_inEditing = true;
+
+        updateOutput();
+
+        m_inEditing = false;
+    }
 }
 //-----------------------------------------------------------------------------------------------
-void DialogExportProperties::on_sB_destRolution_valueChanged(int input)
+void DialogExportProperties::on_sB_destResolution_valueChanged(int value)
 {
-    updateOutPut();
+    if (!m_inEditing)
+    {
+        m_inEditing = true;
+
+        updateOutput();
+
+        m_inEditing = false;
+    }
 }
 //-----------------------------------------------------------------------------------------------
