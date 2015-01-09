@@ -226,7 +226,7 @@ ito::RetVal Plot1DWidget::init()
         labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>();
         axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>();   
 
-        m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", m_lineStyle, NULL).value<int>());
+        m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, NULL).value<int>());
         m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, NULL).value<qreal>();
     }
 
