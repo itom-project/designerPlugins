@@ -87,6 +87,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
     Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
 
+    Q_PROPERTY(int lineWidth READ getLineWidth WRITE setLineWidth RESET resetLineWidth DESIGNABLE true USER true)
+
     Q_ENUMS(LegendPos);
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -118,6 +120,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
     Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the default titles 'curve 0', 'curve 1'... are taken.")
+
+     Q_CLASSINFO("prop://lineWidth", "General width of the plotted line.")
+
 
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
     //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
@@ -247,6 +252,16 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         *   @param [in] newVal  new text color
         */
         void setTextColor(const QColor newVal);
+
+        //!> return the line width of the plotted lines     
+        int getLineWidth() const;
+        /** set the line width of the plotted lines
+        *   @param [in] newVal  new line width
+        */       
+        void setLineWidth(const int newVal);
+
+        //!> reset the line width of the plotted lines to 1 pixel    
+        void resetLineWidth();
 
         //!> return text color
         QColor getTextColor(void) const;

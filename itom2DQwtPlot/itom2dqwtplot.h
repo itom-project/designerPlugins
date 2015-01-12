@@ -85,7 +85,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
-
+    
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")

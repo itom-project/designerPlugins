@@ -69,7 +69,6 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         //m_autoLineColIndex(0),
         m_lineCol(0),
         m_lineStyle(Qt::SolidLine),
-        m_lineWidth(1.0),
         m_pParent(parent),
         m_actPickerIdx(-1),
         m_cmplxState(false),
@@ -544,7 +543,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             colorIndex = m_plotCurveItems.size() % m_colorList.size();
             plotPen.setColor(m_colorList[colorIndex]);
             plotPen.setStyle(m_lineStyle);
-            plotPen.setWidth(m_lineWidth);
+            if(m_pData) plotPen.setWidth(m_pData->m_lineWidth);
+            else plotPen.setWidth(1);
             dObjCurve->setPen(plotPen);
             m_plotCurveItems.append(dObjCurve);
         }
@@ -2878,5 +2878,25 @@ void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
     {
         pi->setVisible(on);
         replot();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::updatePlotLineStyle()
+{
+    QPen plotPen;
+    
+    int colorIndex;
+    plotPen.setStyle((Qt::PenStyle)m_lineStyle);
+    if(m_pData) plotPen.setWidth(m_pData->m_lineWidth);
+    else plotPen.setWidth(1);
+
+    plotPen.setStyle((Qt::PenStyle)1);
+
+    for(int i = 0; i < m_plotCurveItems.size(); i++)
+    {
+        if(m_plotCurveItems[i]) continue;
+        colorIndex = i % m_colorList.size();
+        plotPen.setColor(m_colorList[colorIndex]);
+        m_plotCurveItems[i]->setPen(plotPen);
     }
 }

@@ -307,7 +307,7 @@ void Itom1DQwtPlot::resetRowPresentation()
 int Itom1DQwtPlot::getPickerLimit(void) const
 {
     if(m_data) return ((InternalData*)m_data)->m_pickerLimit;
-    return 0;
+    return 2;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerLimit(const int idx)
@@ -320,6 +320,31 @@ void Itom1DQwtPlot::resetPickerLimit()
 {
     if(m_data) ((InternalData*)m_data)->m_pickerLimit = 2;
     return;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getLineWidth(void) const
+{
+    if(m_data) return ((InternalData*)m_data)->m_lineWidth;
+    return 1;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLineWidth(const int newVal)
+{
+    if(m_data) ((InternalData*)m_data)->m_lineWidth = newVal;
+    updatePropertyDock();
+    if(m_pContent)
+    {
+        m_pContent->updatePlotLineStyle();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetLineWidth()
+{
+    if(m_data) ((InternalData*)m_data)->m_lineWidth = 1;
+    if(m_pContent)
+    {
+        m_pContent->updatePlotLineStyle();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1946,6 +1971,10 @@ void Itom1DQwtPlot::setTextColor(const QColor newVal)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
 {
+    if(!m_data)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Export image failed, internal setting handle not initilized").toLatin1().data());
+    }
     if(!m_pContent)
     {
         return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
@@ -1957,11 +1986,21 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     QBrush curBrush = m_pContent->canvasBackground();
 
     QPalette curPalette = m_pContent->palette();
-
+    int linewidth = ((InternalData*)m_data)->m_lineWidth;
     m_pContent->setAutoFillBackground( true );
     m_pContent->setPalette( Qt::white );
-    m_pContent->setCanvasBackground(Qt::white);    
+    m_pContent->setCanvasBackground(Qt::white);
+    qreal resFaktor = 1.0;
 
+    if(copyToClipboardNotFile)
+    {
+        m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
+
+        resFaktor = resFaktor = resolution / 72.0 + 0.5;;
+        resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
+        ((InternalData*)m_data)->m_lineWidth *= resFaktor;
+    }
+    m_pContent->updatePlotLineStyle();
     m_pContent->replot();
 
     QwtPlotRenderer renderer;
@@ -1969,20 +2008,17 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     // flags to make the document look like the widget
     renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
     //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
-
+    
     if(copyToClipboardNotFile)
     {
         m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
-
-        qreal resFaktor = resolution / 72.0 + 0.5;
-        resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
-
         QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
-
+        
         QClipboard *clipboard = QApplication::clipboard();
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
+        
         renderer.render(m_pContent, &painter, m_pContent->rect());
         clipboard->setImage(img);  
         
@@ -1995,7 +2031,8 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
 
     m_pContent->setPalette( curPalette);
     m_pContent->setCanvasBackground( curBrush);
-
+    ((InternalData*)m_data)->m_lineWidth = linewidth;
+    m_pContent->updatePlotLineStyle();
     m_pContent->replot();
     return ito::retOk;
 }
@@ -2009,8 +2046,9 @@ ito::RetVal Itom1DQwtPlot::copyToClipBoard()
 //----------------------------------------------------------------------------------------------------------------------------------
 QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
 {
+
     QSizeF curSize(xsize, ysize);
-    if(!m_pContent)
+    if(!m_pContent || !m_data)
     {
         QSize myRect(curSize.width(), curSize.height());
         QPixmap destinationImage(myRect);
@@ -2021,7 +2059,7 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     {
         curSize = ((Plot1DWidget *)m_pContent)->size();
     }
-
+    int linewidth = ((InternalData*)m_data)->m_lineWidth;
     int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
     resFaktor = resFaktor < 1 ? 1 : resFaktor;
     resFaktor = resFaktor > 6 ? 6 : resFaktor;
@@ -2043,7 +2081,8 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     m_pContent->setAutoFillBackground( true );
     m_pContent->setPalette( Qt::white );
     m_pContent->setCanvasBackground(Qt::white);    
-
+    ((InternalData*)m_data)->m_lineWidth *= resFaktor; 
+    m_pContent->updatePlotLineStyle();
     m_pContent->replot();
 
     QwtPlotRenderer renderer;
@@ -2061,7 +2100,8 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
 
     m_pContent->setPalette( curPalette);
     m_pContent->setCanvasBackground( curBrush);
-
+    ((InternalData*)m_data)->m_lineWidth = linewidth; 
+    m_pContent->updatePlotLineStyle();
     m_pContent->replot();
 
     return destinationImage;
