@@ -130,6 +130,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false);
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
+    connect(m_pPanner, SIGNAL(panned(int,int)), m_pZoomer, SLOT(canvasPanned(int,int))); //if panner is moved, the new rect is added to the zoom stack for a synchronization of both tools
 
     m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
     m_pMagnifier->setWheelModifiers(Qt::ControlModifier);

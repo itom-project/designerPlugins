@@ -49,6 +49,8 @@ public:
 public Q_SLOTS:
     void setEnabled(bool enabled);
 
+    void canvasPanned(int dx, int dy); //connect this to panned signal of panner to synchronize both
+
 protected:
     bool eventFilter( QObject *object, QEvent *event );
 

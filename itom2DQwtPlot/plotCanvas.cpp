@@ -118,6 +118,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_pPanner->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis
     m_pPanner->setCursor(Qt::SizeAllCursor);
     m_pPanner->setEnabled(false);
+    connect(m_pPanner, SIGNAL(panned(int,int)), m_pZoomer, SLOT(canvasPanned(int,int))); //if panner is moved, the new rect is added to the zoom stack for a synchronization of both tools
 
     m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
     m_pMagnifier->setEnabled(true);
