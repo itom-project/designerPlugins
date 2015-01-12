@@ -1971,7 +1971,7 @@ void PlotCanvas::multiPointActivated (bool on)
 					}
 					else
 					{
-						emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size()-1), 2000);
+						emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size()), 2000);
 					}
 
 					if (m_pData->m_elementsToPick > 1)

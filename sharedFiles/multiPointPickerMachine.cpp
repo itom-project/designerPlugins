@@ -54,7 +54,8 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                 if ( state() == 0 )
                 {
                     cmdList += Begin;
-                    cmdList += Append;
+                    cmdList += Append; //first point (point that has been clicked)
+                    cmdList += Append; //this is the same point whose coordinates are now changed if the mouse cursor is moved
                     m_currentNrItems = 1;
                     setState( 1 );
                 }
@@ -64,7 +65,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                     m_currentNrItems++;
                 }
 
-                if (m_currentNrItems > m_maxNrItems && m_maxNrItems >= 0) // "> m_maxNrItems" since the last item is always the currently "moved" point (not clicked yet)
+                if (m_currentNrItems >= m_maxNrItems && m_maxNrItems >= 0)
                 {
                     cmdList += End;
                     setState( 0 );
@@ -98,7 +99,8 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                 if ( state() == 0 )
                 {
                     cmdList += Begin;
-                    cmdList += Append;
+                    cmdList += Append; //first point (point that has been clicked)
+                    cmdList += Append; //this is the same point whose coordinates are now changed if the mouse cursor is moved
                     m_currentNrItems = 1;
                     setState( 1 );
                 }
@@ -108,7 +110,7 @@ QList<QwtPickerMachine::Command> MultiPointPickerMachine::transition(
                     m_currentNrItems++;
                 }
 
-                if (m_currentNrItems > m_maxNrItems && m_maxNrItems >= 0) // "> m_maxNrItems" since the last item is always the currently "moved" point (not clicked yet)
+                if (m_currentNrItems >= m_maxNrItems && m_maxNrItems >= 0)
                 {
                     cmdList += End;
                     setState( 0 );
