@@ -108,8 +108,6 @@ class Plot1DWidget : public QwtPlot
         void setLegendPosition(LegendPosition position, bool visible);
         void setLegendTitles(const QStringList &legends);
 
-        void updatePlotLineStyle();
-
         QVector<ito::int32> getPickerPixel() const;
         QVector<ito::float32> getPickerPhys() const;
 
@@ -185,6 +183,7 @@ class Plot1DWidget : public QwtPlot
 
         //unsigned char m_autoLineColIndex;
         long m_lineCol;
+        qreal m_lineWidth;
         Qt::PenStyle m_lineStyle;
         int m_linePlotID;
 
@@ -249,7 +248,6 @@ struct InternalData
         m_axisColor = Qt::black;
         m_textColor = Qt::black;
         m_backgnd = Qt::white;
-        m_lineWidth = 1;
     }
 
     ~InternalData()
@@ -273,8 +271,6 @@ struct InternalData
 //    Plot1DWidget::tState m_state;
     int m_state;
     int m_pickerLimit;
-
-    int m_lineWidth;
 
     QString m_title;
     QString m_axisLabel;

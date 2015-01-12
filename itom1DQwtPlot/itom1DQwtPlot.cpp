@@ -321,31 +321,6 @@ void Itom1DQwtPlot::resetPickerLimit()
     if(m_data) ((InternalData*)m_data)->m_pickerLimit = 2;
     return;
 }
-//----------------------------------------------------------------------------------------------------------------------------------
-int Itom1DQwtPlot::getLineWidth(void) const
-{
-    if(m_data) return ((InternalData*)m_data)->m_lineWidth;
-    return 1;
-}
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::setLineWidth(const int newVal)
-{
-    if(m_data) ((InternalData*)m_data)->m_lineWidth = newVal;
-    updatePropertyDock();
-    if(m_pContent)
-    {
-        m_pContent->updatePlotLineStyle();
-    }
-}
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::resetLineWidth()
-{
-    if(m_data) ((InternalData*)m_data)->m_lineWidth = 1;
-    if(m_pContent)
-    {
-        m_pContent->updatePlotLineStyle();
-    }
-}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getPickerCount(void) const
@@ -1986,7 +1961,7 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     QBrush curBrush = m_pContent->canvasBackground();
 
     QPalette curPalette = m_pContent->palette();
-    int linewidth = ((InternalData*)m_data)->m_lineWidth;
+    //qreal linewidth = m_pContent->m_lineWidth;
     m_pContent->setAutoFillBackground( true );
     m_pContent->setPalette( Qt::white );
     m_pContent->setCanvasBackground(Qt::white);
@@ -1998,9 +1973,8 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
 
         resFaktor = resFaktor = resolution / 72.0 + 0.5;;
         resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
-        ((InternalData*)m_data)->m_lineWidth *= resFaktor;
+        //m_pContent->setLineWidth(linewidth * resFaktor);
     }
-    m_pContent->updatePlotLineStyle();
     m_pContent->replot();
 
     QwtPlotRenderer renderer;
@@ -2031,8 +2005,7 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
 
     m_pContent->setPalette( curPalette);
     m_pContent->setCanvasBackground( curBrush);
-    ((InternalData*)m_data)->m_lineWidth = linewidth;
-    m_pContent->updatePlotLineStyle();
+    //m_pContent->setLineWidth(linewidth);
     m_pContent->replot();
     return ito::retOk;
 }
@@ -2059,8 +2032,8 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     {
         curSize = ((Plot1DWidget *)m_pContent)->size();
     }
-    int linewidth = ((InternalData*)m_data)->m_lineWidth;
-    int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
+    //qreal linewidth = m_pContent->m_lineWidth;
+    qreal resFaktor = resolution / 72.0 + 0.5;
     resFaktor = resFaktor < 1 ? 1 : resFaktor;
     resFaktor = resFaktor > 6 ? 6 : resFaktor;
 
@@ -2081,8 +2054,7 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     m_pContent->setAutoFillBackground( true );
     m_pContent->setPalette( Qt::white );
     m_pContent->setCanvasBackground(Qt::white);    
-    ((InternalData*)m_data)->m_lineWidth *= resFaktor; 
-    m_pContent->updatePlotLineStyle();
+    //m_pContent->setLineWidth(linewidth*resFaktor);
     m_pContent->replot();
 
     QwtPlotRenderer renderer;
@@ -2100,8 +2072,7 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
 
     m_pContent->setPalette( curPalette);
     m_pContent->setCanvasBackground( curBrush);
-    ((InternalData*)m_data)->m_lineWidth = linewidth; 
-    m_pContent->updatePlotLineStyle();
+    //m_pContent->setLineWidth(linewidth);
     m_pContent->replot();
 
     return destinationImage;
