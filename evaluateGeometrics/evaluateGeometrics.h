@@ -178,7 +178,7 @@ class ITOM1DPLOT_EXPORT EvaluateGeometricsFigure : public ito::AbstractDObjFigur
 
         void setSource(QSharedPointer<ito::DataObject> source);
     
-        inline QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution); 
+        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution); 
 
         int getPrintRowSpacing(void) const;
         void setPrintRowSpacing(const int val);
