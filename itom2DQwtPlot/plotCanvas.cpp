@@ -1006,11 +1006,26 @@ void PlotCanvas::synchronizeScaleValues()
     m_pData->m_valueMin = ival.minValue();
     m_pData->m_valueMax = ival.maxValue();
 
-    ival = m_rasterData->interval(Qt::XAxis);
+    if (m_pData->m_xaxisScaleAuto)
+    {
+        ival = m_rasterData->interval(Qt::XAxis);
+        
+    }
+    else
+    {
+        ival = axisScaleDiv(xBottom).interval();
+    }
     m_pData->m_xaxisMin = ival.minValue();
     m_pData->m_xaxisMax = ival.maxValue();
 
-    ival = m_rasterData->interval(Qt::YAxis);
+    if (m_pData->m_yaxisScaleAuto)
+    {
+        ival = m_rasterData->interval(Qt::YAxis);
+    }
+    else
+    {
+        ival = axisScaleDiv(yLeft).interval();
+    }
     m_pData->m_yaxisMin = ival.minValue();
     m_pData->m_yaxisMax = ival.maxValue();
 }
