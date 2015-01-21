@@ -129,7 +129,6 @@ void PlotWidget::handleMouseEvent(int type, QMouseEvent *event)
                 }
                 break;
             }
-
         break;
         case 1:
             if (m_pData->m_state == tLineCut)
@@ -230,7 +229,6 @@ void PlotWidget::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
     
     if (newObjectContainer)
     {
-
         GraphicViewPlot *p = (GraphicViewPlot*)(this->parent());
         if (p)
         {
@@ -324,7 +322,7 @@ void PlotWidget::keyPressEvent (QKeyEvent * event)
     }    
     
     
-    if(event->matches(QKeySequence::Copy))
+    if (event->matches(QKeySequence::Copy))
     {
         ((GraphicViewPlot*)(this->parent()))->copyToClipBoard();
     }
@@ -525,7 +523,9 @@ void PlotWidget::mousePressEvent (QMouseEvent * event)
 void PlotWidget::mouseReleaseEvent (QMouseEvent * event)
 {
     if (!hasFocus())
+    {
         return;
+    }
     QApplication::restoreOverrideCursor();
     handleMouseEvent(3, event);
     event->accept();
@@ -569,7 +569,10 @@ void PlotWidget::resizeEvent(QResizeEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::trackerAppended(const QPointF &pt)
 {
-    if (!m_pLineCut) return;
+    if (!m_pLineCut)
+    {
+        return;
+    }
 
     int ymax = m_ObjectContainer->getDataObjHeight() - 1;
     int xmax = m_ObjectContainer->getDataObjWidth() - 1;
@@ -581,11 +584,23 @@ void PlotWidget::trackerAppended(const QPointF &pt)
     double x0 = pt.x();
     double y0 = pt.y();
 
-    if (x0 < 0) x0 = 0.0;
-    else if (x0 > xmax) x0 = xmax;
+    if (x0 < 0)
+    {
+        x0 = 0.0;
+    }
+    else if (x0 > xmax)
+    {
+        x0 = xmax;
+    }
 
-    if (y0 < 0) y0 = 0.0;
-    else if (y0 > ymax) y0 = ymax;
+    if (y0 < 0)
+    {
+        y0 = 0.0;
+    }
+    else if (y0 > ymax)
+    {
+        y0 = ymax;
+    }
 
     double x1 = x0 + 1;
     double y1 = y0 + 1;
@@ -624,11 +639,23 @@ void PlotWidget::trackerMoved(const QPointF &pt)
 
     pts[1] = pt;
 
-    if (x1 < 0) x1 = 0.0;
-    else if (x1 > xmax) x1 = xmax;
+    if (x1 < 0)
+    {
+        x1 = 0.0;
+    }
+    else if (x1 > xmax)
+    {
+        x1 = xmax;
+    }
 
-    if (y1 < 0) y1 = 0.0;
-    else if (y1 > ymax) y1 = ymax;
+    if (y1 < 0)
+    {
+        y1 = 0.0;
+    }
+    else if (y1 > ymax)
+    {
+        y1 = ymax;
+    }
 
     m_pLineCut->setLine(x0, y0, x1, y1);
 
@@ -705,6 +732,7 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
         ysize = m_ObjectContainer->getDataObjHeight();
         xsize = m_ObjectContainer->getDataObjWidth();
     }
+
     switch(zoolLevel)
     {
         default:
@@ -751,9 +779,12 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
             break;
     }
 
-    setMatrix(QMatrix( m_pData->m_xaxisFlipped ? -factor : factor , 0, 0, m_pData->m_yaxisFlipped ? factor : -factor, 1, 1), false);
+    setMatrix(QMatrix(m_pData->m_xaxisFlipped ? -factor : factor , 0, 0, m_pData->m_yaxisFlipped ? factor : -factor, 1, 1), false);
 
-    if (m_pItem) repaint();  // has an image to paint
+    if (m_pItem)   // has an image to paint
+    {
+        repaint();
+    }
     
     return ito::retError;
 }
@@ -762,7 +793,9 @@ ito::RetVal PlotWidget::setCanvasZoom(const int zoolLevel)
 void PlotWidget::updatePointTracker()
 {
     if (!m_ObjectContainer || !m_pValuePicker)
+    {
         return;
+    }
 
     char buf[60] = {0};
 
@@ -770,7 +803,9 @@ void PlotWidget::updatePointTracker()
     int x1 = m_ObjectContainer->getDataObjWidth() - 1;
 
     if (x1 < 0 || y1 < 0)
+    {
         return;
+    }
 
     QPointF cursorPos = m_pValuePicker->pos();
     
@@ -837,8 +872,14 @@ void PlotWidget::updatePointTracker()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::enableMarker(const bool enabled)
 {
-    if (m_pValuePicker) m_pValuePicker->setShown(enabled);
-    else return;
+    if (m_pValuePicker)
+    {
+        m_pValuePicker->setShown(enabled);
+    }
+    else
+    {
+        return;
+    }
 
     if (!enabled) m_trackerIsSampling = false;
 
@@ -848,9 +889,16 @@ void PlotWidget::enableMarker(const bool enabled)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::enableLinePointer(const bool enabled)
 {
-    if (!m_pLineCut) return;
+    if (!m_pLineCut)
+    {
+        return;
+    }
     m_pLineCut->setVisible(enabled);
-    if (!enabled) m_lineIsSampling = false;
+
+    if (!enabled)
+    {
+        m_lineIsSampling = false;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -939,8 +987,6 @@ bool PlotWidget::setColorMap(QString colormap /*= "__next__"*/)
         ((GraphicViewPlot*)m_pParent)->setPaletteText(newPalette.name);
     }
 
-    
-
     refreshStyles();
 
     internalDataUpdated();
@@ -952,7 +998,9 @@ bool PlotWidget::setColorMap(QString colormap /*= "__next__"*/)
 void PlotWidget::refreshStyles()
 {
     if (ito::ITOM_API_FUNCS_GRAPH == NULL)
+    {
         return;
+    }
 
     //QPen rubberBandPen = apiGetFigureSetting(m_pParent, "zoomRubberBandPen", QPen(QBrush(Qt::red),1,Qt::DashLine),NULL).value<QPen>();
     QPen trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red),2),NULL).value<QPen>();
@@ -977,8 +1025,15 @@ void PlotWidget::refreshStyles()
     m_pZoomer->setTrackerPen(trackerPen);
     */
 
-    if (m_pLineCut) m_pLineCut->setPen(trackerPen);
-    if (m_pValuePicker) m_pValuePicker->setColor(m_pData->m_inverseColor0);
+    if (m_pLineCut)
+    {
+        m_pLineCut->setPen(trackerPen);
+    }
+
+    if (m_pValuePicker)
+    {
+        m_pValuePicker->setColor(m_pData->m_inverseColor0);
+    }
 
     //m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(m_inverseColor1), QPen(QBrush(m_inverseColor1),3),  QSize(7,7)));
     
@@ -999,7 +1054,10 @@ void PlotWidget::refreshStyles()
 //    t = axisWidget(QwtPlot::yRight)->title();
 //    t.setFont(labelFont);
 //    axisWidget(QwtPlot::yRight)->setTitle(t);
-    if (m_pItem) repaint();  // has an image to paint
+    if (m_pItem)  // has an image to paint
+    {
+        repaint();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1018,7 +1076,9 @@ void PlotWidget::enableAxis(const int axis, const bool value)
 ito::AutoInterval PlotWidget::calcInterval(const int axis) const
 {
     if (!m_ObjectContainer || !m_ObjectContainer->getDataObject())
+    {
         return ito::AutoInterval(0.0, 1.0);
+    }
 
     switch(axis)
     {
@@ -1079,8 +1139,15 @@ void PlotWidget::setState(tState state)
         //if (m_pZoomer) m_pZoomer->setEnabled(state == tZoom);
         //if (m_pPanner) m_pPanner->setEnabled(state == tPan);
 
-        if (m_pValuePicker) enableMarker(state == tValuePicker);
-        if (m_pLineCut) enableLinePointer(state == tLineCut);
+        if (m_pValuePicker)
+        {
+            enableMarker(state == tValuePicker);
+        }
+
+        if (m_pLineCut)
+        {
+            enableLinePointer(state == tLineCut);
+        }
 
         //if (m_pStackPicker) m_pStackPicker->setEnabled(state == tStackCut);
         
@@ -1169,14 +1236,14 @@ void PlotWidget::internalDataUpdated()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotWidget::updateTransformation()
 {
-    if(m_pItem && m_pData)
+    if (m_pItem && m_pData)
     {
         qreal factor = fabs(matrix().m11());
-        setMatrix(QMatrix( m_pData->m_xaxisFlipped ? -factor : factor , 0, 0, m_pData->m_yaxisFlipped ? factor : -factor, 1, 1), false);
+        setMatrix(QMatrix(m_pData->m_xaxisFlipped ? -factor : factor , 0, 0, m_pData->m_yaxisFlipped ? factor : -factor, 1, 1), false);
         /*
         QPointF(
         m_pItem->setTransform(QTransform::fromScale(m_pData->m_xaxisFlipped ? -1 : 1, m_pData->m_yaxisFlipped ? 1 : -1));
-        if(
+        if (
         m_pItem->setTransformOriginPoint(m_pItem->boundingRect().center());
         
         repaint();
