@@ -117,7 +117,7 @@ void ItomPlotMagnifier::rescale(double factor)
         }
     }
 
-    if (m_zoomer.data() && zoomRect.isValid())
+    if (m_zoomer.data())
     {
         m_zoomer->zoom(zoomRect);
     }
@@ -241,7 +241,7 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
         }
     }
 
-    if (m_zoomer.data() && zoomRect.isValid())
+    if (m_zoomer.data())
     {
         m_zoomer->zoom(zoomRect);
     }
