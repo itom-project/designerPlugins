@@ -88,6 +88,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
+    Q_PROPERTY(int geometryModMode READ getModState WRITE setModState DESIGNABLE true)
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -121,6 +123,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
 
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
+
+    Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode.")
 
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
@@ -269,6 +273,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     bool getMarkerLablesVisible(void) const;
     void setMarkerLablesVisible(const bool val);
+
+    int getModState() const;
+    void setModState(const int val);
 
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 

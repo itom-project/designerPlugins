@@ -2418,6 +2418,27 @@ void Itom2dQwtPlot::setMarkerLablesVisible(const bool val)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+int Itom2dQwtPlot::getModState(void) const
+{
+    if(!m_pVData) 
+    {
+        return 0;
+    }
+    return ((InternalData*)m_pVData)->m_modState;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setModState(const int val)
+{
+    if(!m_pVData) 
+    {
+        return;
+    }
+    if(val < 1 || val > 4) return;
+
+    ((InternalData*)m_pVData)->m_modState = (PlotCanvas::tModificationState)val;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
 {
     if(!m_pContent)
