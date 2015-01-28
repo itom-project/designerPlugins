@@ -1,13 +1,24 @@
-// *************************************************************************************************
-//
-// This code is part of the Sample Application to demonstrate the use of the QPropertyEditor library.
-// It is distributed as public domain and can be modified and used by you without any limitations.
-// 
-// Your feedback is welcome!
-//
-// Author: Volker Wiendl
-// Enum enhancement by Roman alias banal from qt-apps.org
-// *************************************************************************************************
+/* ********************************************************************
+   itom measurement system
+   URL: http://www.uni-stuttgart.de/ito
+   Copyright (C) 2015, Institut für Technische Optik (ITO), 
+   Universität Stuttgart, Germany 
+ 
+   This file is part of the designer widget 'vtk3dVisualizer' for itom.
+
+   itom is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   itom is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with itom. If not, see <http://www.gnu.org/licenses/>.
+*********************************************************************** */
 
 
 #include "Vec3fProperty.h"
