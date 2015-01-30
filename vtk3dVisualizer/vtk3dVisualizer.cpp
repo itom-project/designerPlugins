@@ -51,7 +51,7 @@
 #include "itemPointCloudNormal.h"
 #include "item.h"
 
-#include "ui_win3dVisualizer.h"
+#include "ui_vtk3dVisualizer.h"
 
 #include "common/apiFunctionsInc.h"
 

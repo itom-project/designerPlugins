@@ -69,6 +69,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/..
             ${VTK_QT_DIR}/lib/${VTK_VERSION_STR}
             ${VTK_QT_DIR}/lib
+			${Boost_LIBRARY_DIR}
         )
 
         set(plugin_HEADERS
@@ -136,7 +137,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
         STRING(REGEX MATCH "[0-9]\\.[0-9]$" VTK_VERSION_SUBSTR ${VTK_VERSION_STR})
         
         IF(${VTK_VERSION_STR} MATCHES "(.*)6(.*)")
-            set(VTK_COMPONENTS vtkCommonCore vtkCommonMath vtkRenderingCore vtkRenderingLOD vtkRenderingQt vtkGUISupportQt vtkCommonDataModel vtkIOCore vtkViewsCore vtksys vtkzlib vtkfreetype vtklibxml2 vtkexpat vtkpng vtktiff vtkjpeg vtkftgl)
+            set(VTK_COMPONENTS vtkCommonCore vtkCommonMath vtkRenderingCore vtkRenderingLOD vtkRenderingQt vtkGUISupportQt vtkFiltersGeometry vtkFiltersCore vtkRenderingAnnotation vtkFiltersSources vtkInteractionStyle vtkCommonDataModel vtkCommonExecutionModel vtkCommonMisc vtkFiltersExtraction vtkCommonSystem vtkFiltersModeling vtkCommonTransforms vtkIOCore vtkViewsCore vtksys vtkzlib vtkfreetype vtklibxml2 vtkexpat vtkpng vtktiff vtkjpeg vtkftgl)
             foreach(__comps ${VTK_COMPONENTS})
                 set(PCLVTK_LIBS ${PCLVTK_LIBS} debug ${__comps}-${VTK_VERSION_SUBSTR}-gd.lib optimized ${__comps}-${VTK_VERSION_SUBSTR}.lib)
             endforeach(__comps)
