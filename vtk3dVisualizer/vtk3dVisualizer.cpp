@@ -128,10 +128,17 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     ////win->StereoUpdate();
 
     d->ui.pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
-    d->PCLVis->setupInteractor(d->ui.pclCanvas->GetInteractor(), d->ui.pclCanvas->GetRenderWindow());
+    QVTKInteractor *interactor = d->ui.pclCanvas->GetInteractor();
+    
+
+    d->PCLVis->setupInteractor(interactor, d->ui.pclCanvas->GetRenderWindow());
     d->PCLVis->getInteractorStyle()->setKeyboardModifier(pcl::visualization::INTERACTOR_KB_MOD_SHIFT);
     d->PCLVis->getRenderWindow()->Render(); //wichtig, dass dieser befehl vor dem ersten Hinzufügen von Elementen oder setzen von visuellen Eigenschaften kommt, da sonst addPointCloud crashed, alternativ kann auch setBackgroundColor gerufen werden, aber das ruft intern auch render() auf.
 
+    if (interactor->HasObserver(vtkCommand::ExitEvent))
+    {
+        interactor->RemoveObservers(vtkCommand::ExitEvent);
+    }
     
 
     //win->SetStereoTypeToRedBlue();
