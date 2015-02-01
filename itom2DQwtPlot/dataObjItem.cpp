@@ -101,9 +101,9 @@ QImage DataObjItem::renderImage(
         return QImage();
     }
 
-    bool isColorDataType = dObjRasterData->isColorObject();
+    char dataTypeFlag = dObjRasterData->getTypeFlag();
 
-    QImage::Format format = ( colorMap()->format() == QwtColorMap::RGB || isColorDataType )
+    QImage::Format format = ( colorMap()->format() == QwtColorMap::RGB || dataTypeFlag )
         ? QImage::Format_ARGB32 : QImage::Format_Indexed8;
 
     QImage image( imageSize, format );
@@ -143,13 +143,15 @@ QImage DataObjItem::renderImage(
         if ( i == numThreads - 1 )
         {
             tile.setHeight( image.height() - i * numRows );
-            renderTile( xMap, yMap, isColorDataType, tile, &image );
+            renderTile( xMap, yMap, dataTypeFlag, tile, &image );
         }
         else
         {
+            
             futures += QtConcurrent::run(
                 this, &DataObjItem::renderTile,
-                xMap, yMap, isColorDataType, tile, &image );
+                xMap, yMap, dataTypeFlag, tile, &image );
+                
         }
     }
     for ( int i = 0; i < futures.size(); i++ )
@@ -177,8 +179,7 @@ QImage DataObjItem::renderImage(
     \param image Image to be rendered
 */
 void DataObjItem::renderTile(
-    const QwtScaleMap &xMap, const QwtScaleMap &yMap, const bool isColorDataType, 
-    const QRect &tile, QImage *image ) const
+    const QwtScaleMap &xMap, const QwtScaleMap &yMap, const char dataTypeFlag, const QRect &tile, QImage *image ) const
 {
     DataObjRasterData *dataObjRasterData = (DataObjRasterData*)data();
 
@@ -189,7 +190,7 @@ void DataObjItem::renderTile(
         return;
     }
 
-    if (isColorDataType)
+    if (dataTypeFlag == DataObjRasterData::tRGB)
     {
         if (yMap.isInverting())
         {
@@ -220,7 +221,7 @@ void DataObjItem::renderTile(
     }
     else //single-value data types, color map of qwt plot is considered (either index8 or rgb)
     { 
-        if ( colorMap()->format() == QwtColorMap::RGB )
+        if ( colorMap()->format() == QwtColorMap::RGB || dataTypeFlag == DataObjRasterData::tFloating)
         {
             if (yMap.isInverting())
             {

@@ -46,12 +46,12 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
     QString text;
     if (m_valueData)
     {
-        if (m_valueData->isColorObject())
+        if (m_valueData->getTypeFlag() == DataObjRasterData::tRGB)
         {
             QRgb value = m_valueData->value_rgb(pos.x(), pos.y());
             if(m_showOverlayInfo && m_overlayData)
             {
-                if (m_overlayData->isColorObject())
+                if (m_overlayData->getTypeFlag() == DataObjRasterData::tRGB)
                 {
                     QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
                     text.sprintf("[%.2f, %.2f]\nL1:rgb %i,%i,%i alpha %i\nL2:rgb %i,%i,%i alpha %i", pos.x(), pos.y(), qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
@@ -72,7 +72,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
             double value = m_valueData->value(pos.x(), pos.y());
             if(m_showOverlayInfo && m_overlayData)
             {
-                if (m_overlayData->isColorObject())
+                if (m_overlayData->getTypeFlag() == DataObjRasterData::tRGB)
                 {
                     QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
                     text.sprintf("[%.2f, %.2f]\nL1:%.4f\nL2:rgb %i,%i,%i alpha %i", pos.x(), pos.y(), value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));

@@ -41,7 +41,7 @@ public:
 
 protected:
     QImage renderImage(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &area, const QSize &imageSize ) const;
-    void renderTile(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const bool isColorDataType, const QRect &tile, QImage *image ) const;
+    void renderTile(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const char dataTypeFlag, const QRect &tile, QImage *image ) const;
 
     int m_counter;
 
