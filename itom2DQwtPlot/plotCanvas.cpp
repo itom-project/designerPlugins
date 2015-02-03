@@ -383,7 +383,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             ito::DataObjectTagType tag;
             std::string descr, unit;
             tag = dObj->getTag("title", valid);
-            m_pData->m_titleDObj = valid ? tag.getVal_ToString().data() : "";
+            m_pData->m_titleDObj = valid ? QString::fromLatin1(tag.getVal_ToString().data()) : "";
             m_pData->m_dataType = (ito::tDataType)dObj->getType();
 
             descr = dObj->getValueDescription();
@@ -393,7 +393,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             {
                 descr.append(" [" + unit + "]");
             }
-            m_pData->m_valueLabelDObj = QString::fromStdString(descr);
+            m_pData->m_valueLabelDObj = QString::fromLatin1(descr.data());
 
             if (dims >= 2)
             {
@@ -406,7 +406,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 {
                     descr.append(" [" + unit + "]");
                 }
-                m_pData->m_xaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_xaxisLabelDObj = QString::fromLatin1(descr.data());
 
                 descr = dObj->getAxisDescription(dims-2, valid);
                 if (!valid) descr = "";
@@ -417,7 +417,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 {
                     descr.append(" [" + unit + "]");
                 }
-                m_pData->m_yaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_yaxisLabelDObj = QString::fromLatin1(descr.data());
             }
             else
             {

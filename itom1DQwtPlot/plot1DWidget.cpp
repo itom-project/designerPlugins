@@ -655,7 +655,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         bool valid;
         ito::DataObjectTagType tag;
         tag = dataObj->getTag("title", valid);
-        m_pData->m_titleDObj = valid? tag.getVal_ToString().data() : "";
+        m_pData->m_titleDObj = valid? QString::fromLatin1(tag.getVal_ToString().data()) : "";
 
     } 
 
