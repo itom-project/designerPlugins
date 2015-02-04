@@ -35,24 +35,21 @@
 class ItemCanvas : public Item
 {
     Q_OBJECT
+    Q_ENUMS(Stereo);
 
     Q_PROPERTY(QColor BackgroundColor READ backgroundColor WRITE setBackgroundColor DESIGNABLE true USER true);
 
     Q_PROPERTY(bool CoordSysVisible READ coordSysVisible WRITE setCoordSysVisible DESIGNABLE true USER true)
+    Q_PROPERTY(bool ShowFPS READ showFPS WRITE setShowFPS DESIGNABLE true USER true)
+    Q_PROPERTY(Stereo StereoType READ stereoType WRITE setStereoType DESIGNABLE true USER true)
     Q_PROPERTY(double CoordSysScale READ coordSysScale WRITE setCoordSysScale DESIGNABLE true USER true)
     Q_PROPERTY(Vec3f CoordSysPos READ coordSysPos WRITE setCoordSysPos DESIGNABLE true USER true)
 	Q_CLASSINFO("CoordSysPos", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
 
 public:
-    ItemCanvas(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, QTreeWidgetItem *treeItem) :
-        Item("canvas", treeItem),
-        m_visualizer(visualizer)
-    {
-        m_type = "canvas";
-        m_coordinateSysPos = Vec3f(0,0,0);
-        m_coordinateSysVisible = true;
-        m_coordinateSysScale = 1.0;
-    }
+    enum Stereo { No, CrystalEyes, RedBlue, Interlaced, Left, Right, Dresden, Anaglyph, Checkerboard };
+
+    ItemCanvas(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, QTreeWidgetItem *treeItem);
 
     ~ItemCanvas() {};
 
@@ -71,6 +68,12 @@ public:
     double coordSysScale() const { return m_coordinateSysScale; }
     void setCoordSysScale( const double& coordSysScale );
 
+    bool showFPS() const { return m_showFPS; }
+    void setShowFPS( const bool& showFPS );
+
+    Stereo stereoType() const { return m_stereoType; }
+    void setStereoType( const Stereo& stereoType );
+
 
 
 protected:
@@ -83,6 +86,8 @@ private:
     bool m_coordinateSysVisible;
     double m_coordinateSysScale;
     Vec3f m_coordinateSysPos; 
+    bool m_showFPS;
+    Stereo m_stereoType;
 };
 
 #endif

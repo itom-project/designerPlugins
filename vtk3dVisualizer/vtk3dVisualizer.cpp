@@ -119,12 +119,12 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
 
-    //win->SetStereoCapableWindow(1);
+    win->SetStereoCapableWindow(1);
     ////win->StereoCapableWindowOn();
     //
     //win->SetStereoTypeToCrystalEyes();
-    ////win->SetStereoTypeToAnaglyph();
-    //win->StereoRenderOn();
+    //win->SetStereoTypeToAnaglyph();
+    win->StereoRenderOff();
     ////win->StereoUpdate();
 
     d->ui.pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
@@ -652,7 +652,7 @@ ito::RetVal Vtk3dVisualizer::addCuboid(const ito::DataObject &points, const QStr
 }
 
 //-------------------------------------------------------------------------------------
-ito::RetVal Vtk3dVisualizer::addBox(QVector<double> minimums, QVector<double> maximums, QVector<double> translation, QVector<double> rotation, const QString &fullname, const QColor &color /*= Qt::white*/)
+ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> translation, QVector<double> rotation, const QString &fullname, const QColor &color /*= Qt::white*/)
 {
     ito::RetVal retval;
 
@@ -689,30 +689,126 @@ ito::RetVal Vtk3dVisualizer::addBox(QVector<double> minimums, QVector<double> ma
         retval += ito::RetVal(ito::retError, 0, "translation must have zero or 3 values");
     }
 
+    if (size.size() != 3)
+    {
+        retval += ito::RetVal(ito::retError, 0, "size must have 3 values.");
+    }
+
     if (!retval.containsError())
     {
         Eigen::Affine3f trafo = pcl::getTransformation(x,y,z,rx,ry,rz);
-        
-        Eigen::Matrix<float, 3, 8, Eigen::RowMajor> points;
-        points.col(0) = Eigen::Vector3f(minimums[0], minimums[1], minimums[2]); //p0
-        points.col(1) = Eigen::Vector3f(minimums[0], minimums[1], maximums[2]); //p1
-        points.col(2) = Eigen::Vector3f(maximums[0], minimums[1], maximums[2]); //p2
-        points.col(3) = Eigen::Vector3f(maximums[0], minimums[1], minimums[2]); //p3
-        points.col(4) = Eigen::Vector3f(minimums[0], maximums[1], minimums[2]); //p4
-        points.col(5) = Eigen::Vector3f(minimums[0], maximums[1], maximums[2]); //p5
-        points.col(6) = Eigen::Vector3f(maximums[0], maximums[1], maximums[2]); //p6
-        points.col(7) = Eigen::Vector3f(maximums[0], maximums[1], minimums[2]); //p7
+        Eigen::Vector3f s(size[0], size[1], size[2]);
 
-        points = trafo * points;
+        QTreeWidgetItem *parent;
+        QString name = fullname;
 
-        int sizes[] = {3,8};
-        ito::DataObject points_(2, sizes,ito::tFloat32, (uchar*)(points.data()));
+        retval += createRecursiveTree(name, d->geometryItem, &parent);
 
-        retval += addCuboid(points_, fullname, color);
+        if (!retval.containsError())
+        {
+            //check if item already exists with this name
+            QTreeWidgetItem *item = NULL;
+            for (int i = 0; i < parent->childCount(); i++)
+            {
+                if (parent->child(i)->data(0, Qt::ToolTipRole) == fullname)
+                {
+                    item = parent->child(i);
+                    break;
+                }
+            }
+
+            if (!item)
+            {
+                item = new QTreeWidgetItem();
+                item->setData(0, Qt::DisplayRole, name);
+                item->setData(0, Qt::ToolTipRole, fullname);
+                parent->addChild(item);
+            }        
+            SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
+            item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            ((ItemGeometry*)(i.data()))->addCube(s, trafo, color);
+        }
+
+        d->ui.pclCanvas->update();
     }
+        
+        //Eigen::Matrix<float, 3, 8, Eigen::RowMajor> points;
+        //points.col(0) = Eigen::Vector3f(minimums[0], minimums[1], minimums[2]); //p0
+        //points.col(1) = Eigen::Vector3f(minimums[0], minimums[1], maximums[2]); //p1
+        //points.col(2) = Eigen::Vector3f(maximums[0], minimums[1], maximums[2]); //p2
+        //points.col(3) = Eigen::Vector3f(maximums[0], minimums[1], minimums[2]); //p3
+        //points.col(4) = Eigen::Vector3f(minimums[0], maximums[1], minimums[2]); //p4
+        //points.col(5) = Eigen::Vector3f(minimums[0], maximums[1], maximums[2]); //p5
+        //points.col(6) = Eigen::Vector3f(maximums[0], maximums[1], maximums[2]); //p6
+        //points.col(7) = Eigen::Vector3f(maximums[0], maximums[1], minimums[2]); //p7
+
+        //points = trafo * points;
+
+        //int sizes[] = {3,8};
+        //ito::DataObject points_(2, sizes,ito::tFloat32, (uchar*)(points.data()));
+
+        //retval += addCuboid(points_, fullname, color);
 
     return retval;
 
+}
+
+//-------------------------------------------------------------------------------------
+ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, const QString &fullname, const QColor &color /*= Qt::red*/)
+{
+    ito::RetVal retval;
+
+    pcl::PointXYZ center;
+
+    if (point.size() == 3)
+    {
+        center.x = point[0];
+        center.y = point[1];
+        center.z = point[2];
+    }
+    else
+    {
+        retval += ito::RetVal(ito::retError, 0, "center point must have three values.");
+    }
+
+    if (!retval.containsError())
+    {
+        QTreeWidgetItem *parent;
+        QString name = fullname;
+
+        retval += createRecursiveTree(name, d->geometryItem, &parent);
+
+        if (!retval.containsError())
+        {
+            //check if item already exists with this name
+            QTreeWidgetItem *item = NULL;
+            for (int i = 0; i < parent->childCount(); i++)
+            {
+                if (parent->child(i)->data(0, Qt::ToolTipRole) == fullname)
+                {
+                    item = parent->child(i);
+                    break;
+                }
+            }
+
+            if (!item)
+            {
+                item = new QTreeWidgetItem();
+                item->setData(0, Qt::DisplayRole, name);
+                item->setData(0, Qt::ToolTipRole, fullname);
+                parent->addChild(item);
+            }        
+            SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
+            item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            ((ItemGeometry*)(i.data()))->addSphere(center, radius, color);
+        }
+
+        d->ui.pclCanvas->update();
+    }
+
+    return retval;
 }
 
 
@@ -760,6 +856,66 @@ ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QStri
     }
 
     if (points2) delete points2;
+
+    return retval;
+}
+
+//-------------------------------------------------------------------------------------
+ito::RetVal Vtk3dVisualizer::setGeometryPose(const QString &name, QVector<double> translation, QVector<double> rotation)
+{
+    ito::RetVal retval;
+
+    float x,y,z;
+    float rx,ry,rz;
+
+    if (rotation.size() == 0)
+    {
+        rx = ry = rz = 0.0;
+    }
+    else if (rotation.size() == 3)
+    {
+        rx = rotation[0];
+        ry = rotation[1];
+        rz = rotation[2];
+    }
+    else
+    {
+        retval += ito::RetVal(ito::retError, 0, "rotation must have zero or 3 euler angles (in rad)");
+    }
+
+    if (translation.size() == 0)
+    {
+        x = y = z = 0.0;
+    }
+    else if (translation.size() == 3)
+    {
+        x = translation[0];
+        y = translation[1];
+        z = translation[2];
+    }
+    else
+    {
+        retval += ito::RetVal(ito::retError, 0, "translation must have zero or 3 values");
+    }
+
+    if (!retval.containsError())
+    {
+        Eigen::Affine3f trafo = pcl::getTransformation(x,y,z,rx,ry,rz);
+
+        QTreeWidgetItem *item = NULL;
+        QString n = name;
+        bool found = false;
+
+        //test all categories
+        retval += searchRecursiveTree(name, d->geometryItem, &item);
+
+        if (!retval.containsError())
+        {
+            SharedItemPtr obj = item->data(0, Item::itemRole).value<SharedItemPtr>();
+            retval += ((ItemGeometry*)(&(*obj)))->updatePose(trafo);
+            d->ui.pclCanvas->update();
+        }
+    }
 
     return retval;
 }

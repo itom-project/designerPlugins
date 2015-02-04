@@ -114,13 +114,16 @@ public slots:
 
     ito::RetVal addCuboid(const ito::DataObject &points, const QString &fullname, const QColor &color = Qt::white); //points must be a 3x8 float matrix
 
-    ito::RetVal addBox(QVector<double> minimums, QVector<double> maximums, QVector<double> translation, QVector<double> rotation, const QString &fullname, const QColor &color = Qt::white);
+    ito::RetVal addCube(QVector<double> size, QVector<double> translation, QVector<double> rotation, const QString &fullname, const QColor &color = Qt::white);
 
     ito::RetVal addLines(const ito::DataObject &points, const QString &fullname, const QColor &color = Qt::red);
+
+    ito::RetVal addSphere(QVector<double> point, double radius, const QString &fullname, const QColor &color = Qt::red);
 
     ito::RetVal deletePointCloud(const QString &name);
     ito::RetVal deleteMesh(const QString &name);
     ito::RetVal deleteGeometry(const QString &name);
+    ito::RetVal setGeometryPose(const QString &name, QVector<double> translation, QVector<double> rotation);
 
     ito::RetVal setItemProperty(const QString &name, const QByteArray &property, const QVariant &value);
 
