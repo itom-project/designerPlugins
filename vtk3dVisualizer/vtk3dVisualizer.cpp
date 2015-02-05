@@ -148,7 +148,6 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     //win->SetStereoTypeToDresden();
 
     //m_pPCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualization") );
-
     d->PCLVis->initCameraParameters ();
     d->PCLVis->setCameraPosition(5.0, -8.0, 4.0, -0.5, -1.0, 1.0);
 
@@ -915,6 +914,43 @@ ito::RetVal Vtk3dVisualizer::setGeometryPose(const QString &name, QVector<double
             retval += ((ItemGeometry*)(&(*obj)))->updatePose(trafo);
             d->ui.pclCanvas->update();
         }
+    }
+
+    return retval;
+}
+
+//-------------------------------------------------------------------------------------
+ito::RetVal Vtk3dVisualizer::setGeometriesPosition(const QStringList &names, QVector<double> positions)
+{
+    ito::RetVal retval;
+
+    float x,y,z;
+    float rx,ry,rz;
+
+    if (positions.size() != 3*names.size())
+    {
+        retval += ito::RetVal(ito::retError, 0, "positions must have three values per named item.");
+    }
+
+    if (!retval.containsError())
+    {
+        for (int i = 0; i < names.size(); ++i)
+        {
+            Eigen::Affine3f trafo = pcl::getTransformation(positions[i*3+0],positions[i*3+1],positions[i*3+2],0,0,0);
+
+            QTreeWidgetItem *item = NULL;
+            bool found = false;
+
+            //test all categories
+            retval += searchRecursiveTree(names[i], d->geometryItem, &item);
+
+            if (!retval.containsError())
+            {
+                SharedItemPtr obj = item->data(0, Item::itemRole).value<SharedItemPtr>();
+                retval += ((ItemGeometry*)(&(*obj)))->updatePose(trafo);
+            }
+        }
+        d->ui.pclCanvas->update();
     }
 
     return retval;

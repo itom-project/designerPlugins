@@ -124,6 +124,7 @@ public slots:
     ito::RetVal deleteMesh(const QString &name);
     ito::RetVal deleteGeometry(const QString &name);
     ito::RetVal setGeometryPose(const QString &name, QVector<double> translation, QVector<double> rotation);
+    ito::RetVal setGeometriesPosition(const QStringList &names, QVector<double> positions);
 
     ito::RetVal setItemProperty(const QString &name, const QByteArray &property, const QVariant &value);
 
