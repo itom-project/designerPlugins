@@ -22,14 +22,14 @@
 
 #include "drawItem.h"
 #include "common/sharedStructuresPrimitives.h"
-
+#include "qwt_scale_map.h"
 #include <qwt_symbol.h>
 
 QVector<int> DrawItem::idxVec;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &title) : m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1), m_autoColor(true),
-    x2(-1), y2(-1), m_selected(false), m_flags(0)
+DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &label) : QwtPlotShapeItem(label), m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1), m_autoColor(true),
+    x2(-1), y2(-1), m_selected(false), m_flags(0), m_label(label), m_labelVisible(false)
 {
 
     if (id <= 0)
@@ -62,6 +62,7 @@ DrawItem::~DrawItem()
     }
     m_marker.clear();
     idxVec.remove(idxVec.indexOf(m_idx));
+    
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setSelected(const bool selected)
@@ -83,7 +84,12 @@ bool DrawItem::selected() const
 {
     return m_selected;
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setLabel(const QString newLabel) 
+{
+    m_label = newLabel;
+    QwtPlotShapeItem::setTitle(m_label);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setActive(int active)
 {
@@ -155,6 +161,7 @@ void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, cons
     setPen(firstColor, m_selected ? 3 : 1);
 
     QwtPlotShapeItem::setShape(path);
+    QwtPlotShapeItem::setTitle(m_label);
     
     if (m_marker.size() > 0)
     {
@@ -286,5 +293,45 @@ void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, cons
     }
 
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::draw( QPainter *painter, 
+            const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+            const QRectF &canvasRect ) const
+{
+    QwtPlotShapeItem::draw(painter, xMap, yMap, canvasRect);
 
+    //const QRectF cRect = QwtScaleMap::invTransform(xMap, yMap, canvasRect.toRect() );
+    if(!m_label.isEmpty() && m_labelVisible)
+    {
+        QRectF myRect(0, 0, 0, 0);
+    
+        const QwtText label(m_label);
+
+        const QSizeF textSize = label.textSize( painter->font() );
+
+        const QPointF textSizeScales = QPointF(textSize.width() * fabs(xMap.sDist()/xMap.pDist()), textSize.height() * fabs(yMap.sDist()/yMap.pDist()));
+
+        if(m_marker.size() == 1 && m_marker[0] != NULL)
+        {
+            myRect = QRectF(m_marker[0]->xValue(), m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
+        }
+        else if(m_marker.size() > 1)
+        {
+            myRect = QRectF(m_marker[0]->xValue(), m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
+        }
+        const QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect );
+
+        if ( !cRect.isEmpty() )
+        {
+            if ( !label.isEmpty() )
+            {
+                QBrush myBrush = QBrush(QColor(255, 255, 255, 170),Qt::BrushStyle::SolidPattern);
+                painter->fillRect(cRect, myBrush);
+                label.draw( painter, cRect );
+            }
+        }
+    }
+
+    return;
+}
 //----------------------------------------------------------------------------------------------------------------------------------

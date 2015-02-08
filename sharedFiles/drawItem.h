@@ -33,7 +33,7 @@
 class DrawItem : public QwtPlotShapeItem
 {
     public:
-        explicit DrawItem(QwtPlot *parent, char type, const int id = 0, const QString &title = QString::null);
+        explicit DrawItem(QwtPlot *parent, char type, const int id = 0, const QString &label = QString::null);
         virtual ~DrawItem();
         void setRect(const QRectF &);
         void setShape( const QPainterPath & , const QColor &, const QColor &);
@@ -42,6 +42,12 @@ class DrawItem : public QwtPlotShapeItem
         
         void setSelected(const bool selected);
         bool selected() const;
+
+        void setLabel(const QString newLabel);
+        QString getLabel() const {return m_label;}
+
+        void setLabelVisible(const bool labelVisible) {m_labelVisible = labelVisible;}
+        bool getLabelVisible() const {return m_labelVisible;}
 
         QVector<QwtPlotMarker *> m_marker;
         double x1, y1, x2, y2;
@@ -52,13 +58,15 @@ class DrawItem : public QwtPlotShapeItem
         int m_idx;
 
         bool m_autoColor;
-        
+        QString m_label;
+        bool m_labelVisible;
     //    virtual QwtText trackerTextF( const QPointF &pos ) const;
     //    void drawTracker( QPainter *painter ) const;
     //    void setBackgroundFillBrush( const QBrush &brush );
 
-
-    protected:
+        void draw( QPainter *painter, 
+            const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+            const QRectF &canvasRect ) const;
 
     private:
         QPen m_markerPen;

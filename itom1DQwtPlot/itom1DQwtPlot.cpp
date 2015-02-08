@@ -2113,3 +2113,47 @@ QVector<ito::float32> Itom1DQwtPlot::getPickerPhys() const
     }
     return m_pContent->getPickerPhys();
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom1DQwtPlot::setGeometricElementLabel(int id, QString label)
+{
+    if(!m_data) 
+    {
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+    }
+
+    InternalData* pData = ((InternalData*)m_data);
+
+    if(!pData->m_pDrawItems.contains(id))
+    {
+        return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
+    }
+
+    pData->m_pDrawItems[id]->setLabel(label);
+    if(m_pContent)
+    {
+        m_pContent->replot();
+    }
+    return ito::retOk;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom1DQwtPlot::setGeometricElementLabelVisible(int id, bool setVisible)
+{
+    if(!m_data) 
+    {
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+    }
+
+    InternalData* pData = ((InternalData*)m_data);
+
+    if(!pData->m_pDrawItems.contains(id))
+    {
+        return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
+    }
+
+    pData->m_pDrawItems[id]->setLabelVisible(setVisible);
+    if(m_pContent)
+    {
+        m_pContent->replot();
+    }
+    return ito::retOk;
+}

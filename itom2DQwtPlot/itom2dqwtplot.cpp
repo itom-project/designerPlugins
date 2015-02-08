@@ -2558,3 +2558,47 @@ QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
 
     return destinationImage;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::setGeometricElementLabel(int id, QString label)
+{
+    if(!m_pVData) 
+    {
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+    }
+
+    InternalData* pData = ((InternalData*)m_pVData);
+
+    if(!pData->m_pDrawItems.contains(id))
+    {
+        return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
+    }
+
+    pData->m_pDrawItems[id]->setLabel(label);
+    if(m_pContent)
+    {
+        m_pContent->replot();
+    }
+    return ito::retOk;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::setGeometricElementLabelVisible(int id, bool setVisible)
+{
+    if(!m_pVData) 
+    {
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+    }
+
+    InternalData* pData = ((InternalData*)m_pVData);
+
+    if(!pData->m_pDrawItems.contains(id))
+    {
+        return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
+    }
+
+    pData->m_pDrawItems[id]->setLabelVisible(setVisible);
+    if(m_pContent)
+    {
+        m_pContent->replot();
+    }
+    return ito::retOk;
+}

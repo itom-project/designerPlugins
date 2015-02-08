@@ -128,6 +128,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://clearGeometricElements", "")
     Q_CLASSINFO("slot://getDisplayed", "")
 
+    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
+    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
+
     Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
     Q_CLASSINFO("signal://userInteractionDone", "")
     Q_CLASSINFO("signal://plotItemChanged", "")
@@ -307,6 +310,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QSharedPointer<ito::DataObject> getDisplayed(void);
         
+        ito::RetVal setGeometricElementLabel(int id, QString label);
+        ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
+
     private slots:
         void resizeEvent ( QResizeEvent * event );
 
