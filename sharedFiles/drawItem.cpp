@@ -325,7 +325,7 @@ void DrawItem::draw( QPainter *painter,
         {
             if ( !label.isEmpty() )
             {
-                QBrush myBrush = QBrush(QColor(255, 255, 255, 170),Qt::BrushStyle::SolidPattern);
+                QBrush myBrush = QBrush(QColor(255, 255, 255, 170),Qt::SolidPattern);
                 painter->fillRect(cRect, myBrush);
                 label.draw( painter, cRect );
             }
