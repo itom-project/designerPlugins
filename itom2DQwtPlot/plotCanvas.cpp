@@ -1083,7 +1083,8 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
             axisWidget(QwtPlot::yRight)->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
         }
 
-        if (m_pZoomer)
+        // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
+        if (m_pZoomer->isEnabled())
         {
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
@@ -3130,6 +3131,7 @@ void PlotCanvas::setVisible(bool visible)
         this->updateScaleValues(true, false);
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateLabelVisibility()
 {    
