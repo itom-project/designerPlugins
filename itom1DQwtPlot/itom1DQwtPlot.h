@@ -50,6 +50,7 @@
 #endif
 
 class Plot1DWidget;
+struct InternalData;
 
 
 class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
@@ -261,7 +262,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
         Plot1DWidget *m_pContent;
-        void *m_data;
+        InternalData *m_data;
 
     private:
         QAction* m_pActScaleSetting;
@@ -341,33 +342,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void plotItemsDeleted();
         void plotItemsFinished(int type, bool aborted);
 };
-
-//----------------------------------------------------------------------------------------------------------------------------------
-/*
-class Plot2DEFilter : public QObject
-{
-    Q_OBJECT
-
-    public:
-        Plot2DEFilter(Plot2DImage *plotObj, AbstractNode *plotNode, ItoPlotSpectrogram *plot2D)
-            : m_plotObj(plotObj), m_plotNode(plotNode), m_plot2D(plot2D) { }
-        ~Plot2DEFilter() {}
-        virtual bool eventFilter(QObject *, QEvent *);
-        virtual bool event(QEvent *);
-        Plot2DImage *m_plotObj;
-        AbstractNode *m_plotNode;
-        ItoPlotSpectrogram *m_plot2D;
-
-    private:
-
-    signals:
-
-    public slots:
-
-    private slots:
-
-};
-*/
 //----------------------------------------------------------------------------------------------------------------------------------
 
 #endif // ITOMPLOT_H
