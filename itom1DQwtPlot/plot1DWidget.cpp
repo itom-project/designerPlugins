@@ -2722,7 +2722,7 @@ QSharedPointer< ito::DataObject > Plot1DWidget::getPlotPicker() const
     return exportItem;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::setPicker(const QVector<ito::int32> &pxCords)
+ito::RetVal Plot1DWidget::setPicker(const QVector<int> &pxCords)
 {
     int cnt = pxCords.size();
     if(cnt < m_pData->m_pickerLimit)
@@ -2755,7 +2755,7 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<ito::int32> &pxCords)
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::setPicker(const QVector<ito::float32> &physCords)
+ito::RetVal Plot1DWidget::setPicker(const QVector<float> &physCords)
 {
     int cnt = physCords.size();
     if(cnt < m_pData->m_pickerLimit)
@@ -2788,16 +2788,16 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<ito::float32> &physCords)
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-QVector<ito::int32> Plot1DWidget::getPickerPixel() const
+QVector<int> Plot1DWidget::getPickerPixel() const
 {
     int ysize = m_pickers.size();
 
     if(ysize == 0)
     {
-        return QVector<ito::int32>();
+        return QVector<int>();
     }
 
-    QVector<ito::int32> exportItem(ysize, 0);
+    QVector<int> exportItem(ysize, 0);
 
     for(int idx = 0; idx < ysize; idx++)
     {
@@ -2814,7 +2814,7 @@ QVector<ito::int32> Plot1DWidget::getPickerPixel() const
     return exportItem;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-QVector<ito::float32> Plot1DWidget::getPickerPhys() const
+QVector<float> Plot1DWidget::getPickerPhys() const
 {
     int ysize = m_pickers.size();
 

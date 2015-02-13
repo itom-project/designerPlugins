@@ -230,8 +230,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
-        QVector<ito::int32> getPickerPixel() const;
-        QVector<ito::float32> getPickerPhys() const;
+        QVector<int> getPickerPixel() const;
+        QVector<float> getPickerPhys() const;
 
         //!> set new background color
         void setBackgroundColor(const QColor newVal);
@@ -299,8 +299,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
     public slots:
-        ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
-        ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+        //ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
+        //ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+        ito::RetVal setPicker(const QVector<int> &pxCords);
+        ito::RetVal setPicker(const QVector<float> &physCords);
 
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);

@@ -102,14 +102,14 @@ class Plot1DWidget : public QwtPlot
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
         ito::RetVal deleteMarkers(const int id);
 
-        ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
-        ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+        ito::RetVal setPicker(const QVector<int> &pxCords);
+        ito::RetVal setPicker(const QVector<float> &physCords);
 
         void setLegendPosition(LegendPosition position, bool visible);
         void setLegendTitles(const QStringList &legends);
 
-        QVector<ito::int32> getPickerPixel() const;
-        QVector<ito::float32> getPickerPhys() const;
+        QVector<int> getPickerPixel() const;
+        QVector<float> getPickerPhys() const;
 
         friend class Itom1DQwtPlot;
         friend class DrawItem;      

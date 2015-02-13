@@ -2077,7 +2077,7 @@ QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     return destinationImage;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::setPicker(const QVector<ito::int32> &pxCords)
+ito::RetVal Itom1DQwtPlot::setPicker(const QVector<int> &pxCords)
 {
     if(!m_pContent)
     {
@@ -2086,7 +2086,7 @@ ito::RetVal Itom1DQwtPlot::setPicker(const QVector<ito::int32> &pxCords)
     return m_pContent->setPicker(pxCords);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::setPicker(const QVector<ito::float32> &physCords)
+ito::RetVal Itom1DQwtPlot::setPicker(const QVector<float> &physCords)
 {
     if(!m_pContent)
     {
@@ -2095,7 +2095,7 @@ ito::RetVal Itom1DQwtPlot::setPicker(const QVector<ito::float32> &physCords)
     return m_pContent->setPicker(physCords);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-QVector<ito::int32> Itom1DQwtPlot::getPickerPixel() const
+QVector<int> Itom1DQwtPlot::getPickerPixel() const
 {
     if(!m_pContent)
     {
@@ -2104,7 +2104,7 @@ QVector<ito::int32> Itom1DQwtPlot::getPickerPixel() const
     return m_pContent->getPickerPixel();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-QVector<ito::float32> Itom1DQwtPlot::getPickerPhys() const
+QVector<float> Itom1DQwtPlot::getPickerPhys() const
 {
     if(!m_pContent)
     {
