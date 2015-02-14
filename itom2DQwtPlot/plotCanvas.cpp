@@ -383,7 +383,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             ito::DataObjectTagType tag;
             std::string descr, unit;
             tag = dObj->getTag("title", valid);
-            m_pData->m_titleDObj = valid ? tag.getVal_ToString().data() : "";
+            m_pData->m_titleDObj = valid ? QString::fromLatin1(tag.getVal_ToString().data()) : "";
             m_pData->m_dataType = (ito::tDataType)dObj->getType();
 
             descr = dObj->getValueDescription();
@@ -393,7 +393,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
             {
                 descr.append(" [" + unit + "]");
             }
-            m_pData->m_valueLabelDObj = QString::fromStdString(descr);
+            m_pData->m_valueLabelDObj = QString::fromLatin1(descr.data());
 
             if (dims >= 2)
             {
@@ -406,7 +406,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 {
                     descr.append(" [" + unit + "]");
                 }
-                m_pData->m_xaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_xaxisLabelDObj = QString::fromLatin1(descr.data());
 
                 descr = dObj->getAxisDescription(dims-2, valid);
                 if (!valid) descr = "";
@@ -417,7 +417,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 {
                     descr.append(" [" + unit + "]");
                 }
-                m_pData->m_yaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_yaxisLabelDObj = QString::fromLatin1(descr.data());
             }
             else
             {
@@ -1083,7 +1083,8 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
             axisWidget(QwtPlot::yRight)->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
         }
 
-        if (m_pZoomer)
+        // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
+        if (m_pZoomer->isEnabled())
         {
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
@@ -3130,6 +3131,7 @@ void PlotCanvas::setVisible(bool visible)
         this->updateScaleValues(true, false);
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateLabelVisibility()
 {    

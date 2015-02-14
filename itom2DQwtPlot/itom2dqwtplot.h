@@ -137,6 +137,10 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://removeOverlayImage", "")
     Q_CLASSINFO("slot://copyToClipBoard", "")
 
+    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
+    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
+
+
     Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
     Q_CLASSINFO("signal://userInteractionDone", "")
     Q_CLASSINFO("signal://plotItemChanged", "")
@@ -387,6 +391,9 @@ public slots:
 
     //this can be invoked by python to trigger a lineplot
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
+
+    ito::RetVal setGeometricElementLabel(int id, QString label);
+    ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
     ito::RetVal copyToClipBoard();

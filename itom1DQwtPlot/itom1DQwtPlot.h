@@ -50,6 +50,7 @@
 #endif
 
 class Plot1DWidget;
+struct InternalData;
 
 
 class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
@@ -127,6 +128,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://userInteractionStart", "")  
     Q_CLASSINFO("slot://clearGeometricElements", "")
     Q_CLASSINFO("slot://getDisplayed", "")
+
+    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
+    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
 
     Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
     Q_CLASSINFO("signal://userInteractionDone", "")
@@ -226,8 +230,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
-        QVector<ito::int32> getPickerPixel() const;
-        QVector<ito::float32> getPickerPhys() const;
+        QVector<int> getPickerPixel() const;
+        QVector<float> getPickerPhys() const;
 
         //!> set new background color
         void setBackgroundColor(const QColor newVal);
@@ -258,7 +262,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
         Plot1DWidget *m_pContent;
-        void *m_data;
+        InternalData *m_data;
 
     private:
         QAction* m_pActScaleSetting;
@@ -295,8 +299,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
     public slots:
-        ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
-        ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+        //ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
+        //ito::RetVal setPicker(const QVector<ito::float32> &physCords);
+        ito::RetVal setPicker(const QVector<int> &pxCords);
+        ito::RetVal setPicker(const QVector<float> &physCords);
 
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);
@@ -307,6 +313,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QSharedPointer<ito::DataObject> getDisplayed(void);
         
+        ito::RetVal setGeometricElementLabel(int id, QString label);
+        ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
+
     private slots:
         void resizeEvent ( QResizeEvent * event );
 
@@ -335,33 +344,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void plotItemsDeleted();
         void plotItemsFinished(int type, bool aborted);
 };
-
-//----------------------------------------------------------------------------------------------------------------------------------
-/*
-class Plot2DEFilter : public QObject
-{
-    Q_OBJECT
-
-    public:
-        Plot2DEFilter(Plot2DImage *plotObj, AbstractNode *plotNode, ItoPlotSpectrogram *plot2D)
-            : m_plotObj(plotObj), m_plotNode(plotNode), m_plot2D(plot2D) { }
-        ~Plot2DEFilter() {}
-        virtual bool eventFilter(QObject *, QEvent *);
-        virtual bool event(QEvent *);
-        Plot2DImage *m_plotObj;
-        AbstractNode *m_plotNode;
-        ItoPlotSpectrogram *m_plot2D;
-
-    private:
-
-    signals:
-
-    public slots:
-
-    private slots:
-
-};
-*/
 //----------------------------------------------------------------------------------------------------------------------------------
 
 #endif // ITOMPLOT_H

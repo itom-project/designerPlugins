@@ -31,36 +31,47 @@
 #include "item.h"
 
 #include <qcolor.h>
+#include <qvector.h>
 
 class ItemGeometry : public Item
 {
     Q_OBJECT
     Q_ENUMS(Representation)
+    Q_ENUMS(Interpolation)
 
     //Q_PROPERTY(bool selected READ selected WRITE setSelected DESIGNABLE true USER true);
     //Q_PROPERTY(int PointSize READ pointSize WRITE setPointSize DESIGNABLE true USER true);
     Q_PROPERTY(double LineWidth READ lineWidth WRITE setLineWidth DESIGNABLE true USER true);
     Q_PROPERTY(double Opacity READ opacity WRITE setOpacity DESIGNABLE true USER true);
+    Q_PROPERTY(bool Lighting READ lighting WRITE setLighting DESIGNABLE true USER true);
     Q_PROPERTY(Representation Representation READ representation WRITE setRepresentation DESIGNABLE true USER true);
+    Q_PROPERTY(Interpolation Interpolation READ interpolation WRITE setInterpolation DESIGNABLE true USER true);
     Q_PROPERTY(QColor LineColor READ lineColor WRITE setLineColor DESIGNABLE true USER true);
 
 public:
-    enum Type { tCylinder, tPlane, tCircle, tCone, tCube, tPyramid, tCuboid };
+    enum Type { tCylinder, tPlane, tCircle, tCone, tCube, tPyramid, tCuboid, tSphere };
     ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
     ~ItemGeometry();
 
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
+    enum Interpolation { Flat, Gouraud, Phong };
 
     ito::RetVal addCylinder(const pcl::ModelCoefficients &coefficients, const QColor &color);
     ito::RetVal addPyramid(const ito::DataObject *points, const QColor &color);
     ito::RetVal addCuboid(const ito::DataObject *points, const QColor &color);
+    ito::RetVal addCube(const Eigen::Vector3f &size, const Eigen::Affine3f &pose, const QColor &color);
     ito::RetVal addLines(const ito::DataObject *points, const QColor &color);
+    ito::RetVal addSphere(const pcl::PointXYZ &center, double radius, const QColor &color);
+    ito::RetVal updatePose(const Eigen::Affine3f &pose);
 
     //properties
     virtual void setVisible(bool value);
 
     Representation representation() const { return m_representation; }
     void setRepresentation(Representation value);
+
+    Interpolation interpolation() const { return m_interpolation; }
+    void setInterpolation(Interpolation value);
 
     QColor lineColor() const { return m_lineColor; }
     void setLineColor(QColor color);
@@ -71,7 +82,14 @@ public:
     double opacity() const { return m_opacity; }
     void setOpacity(double value);
 
+    bool lighting() const { return m_lighting; }
+    void setLighting(bool value);
+
 protected:
+    QVector<vtkActor*> getSafeActors(); //tries to find m_actor in list of current actors of renderer
+    vtkActor *getLastActor();
+    void syncActorProperties(vtkActor *actor);
+
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
     
     Type m_geometryType;
@@ -80,6 +98,10 @@ protected:
     QColor m_lineColor;
     double m_lineWidth;
     double m_opacity;
+    Interpolation m_interpolation;
+    QVector<vtkActor*> m_actors; //reference to actor(s), this is a guess since no access to the shapeactormap of m_visualizer is available. don't use this, always get the actor using getSafeActor.
+    bool m_lighting;
+    int m_nrOfShapes;
 
 };
 
