@@ -83,9 +83,9 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.h
         )
 
-		set(plugin_HEADERS_COPY
-			${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.h
-		)
+        set(plugin_HEADERS_COPY
+            ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.h
+        )
 
         set(plugin_UI
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.ui
@@ -126,10 +126,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
         
         set(PCLVTK_LIBS "")
         
-        STRING(REGEX MATCH "[0-9]\\.[0-9]$" VTK_VERSION_SUBSTR ${VTK_VERSION_STR})
-        
-        IF(${VTK_VERSION_STR} MATCHES "(.*)6(.*)")
-        ELSE()
+        IF("${VTK_MAJOR_VERSION}" EQUAL 5)
             set(VTK_COMPONENTS QVTK)
             foreach(__comps ${VTK_COMPONENTS})
                 set(PCLVTK_LIBS ${PCLVTK_LIBS} debug ${__comps}-gd.lib optimized ${__comps}.lib)
@@ -161,7 +158,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
         set(COPY_DESTINATIONS "")
         ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
         ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
-		ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
+        ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
         POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
         
     ELSE(EXISTS ${VTK_DIR})
