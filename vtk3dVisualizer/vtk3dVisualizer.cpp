@@ -35,6 +35,7 @@
 #include <qsharedpointer.h>
 #include <qcolor.h>
 #include <qdebug.h>
+#include <qstatusbar.h>
 
 #include "QVTKWidget.h"
 
@@ -116,6 +117,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 	Eigen::Quaternion<float,0> q;
 	vtkSmartPointer<vtkMatrix4x4> m;
 	pcl::visualization::PCLVisualizer::convertToVtkMatrix(v1, q, m);*/
+    d->ui.statusbar->setVisible(false);
 
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
 
@@ -149,7 +151,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     //m_pPCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualization") );
     d->PCLVis->initCameraParameters ();
-    d->PCLVis->setCameraPosition(5.0, -8.0, 4.0, -0.5, -1.0, 1.0);
+    d->PCLVis->setCameraPosition(0.0, 0.0, 16.0, 0.0, -1.0, 0.0);
 
     //prepare QPropertyEditor for visualization
     CustomTypes::registerTypes();
@@ -923,9 +925,6 @@ ito::RetVal Vtk3dVisualizer::setGeometryPose(const QString &name, QVector<double
 ito::RetVal Vtk3dVisualizer::setGeometriesPosition(const QStringList &names, QVector<double> positions)
 {
     ito::RetVal retval;
-
-    float x,y,z;
-    float rx,ry,rz;
 
     if (positions.size() != 3*names.size())
     {
