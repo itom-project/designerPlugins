@@ -60,7 +60,6 @@ ItemGeometry::~ItemGeometry()
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addCylinder(const pcl::ModelCoefficients &coefficients, const QColor &color)
 {
-    m_geometryType = tCylinder;
     m_nrOfShapes = 1;
 
     if (m_visualizer->addCylinder( coefficients, m_name.toStdString() ))
@@ -79,7 +78,6 @@ ito::RetVal ItemGeometry::addCylinder(const pcl::ModelCoefficients &coefficients
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addSphere(const pcl::PointXYZ &center, double radius, const QColor &color)
 {
-    m_geometryType = tSphere;
     m_nrOfShapes = 1;
 
     if (m_visualizer->addSphere(center, radius, color.redF(), color.greenF(), color.blueF(), m_name.toStdString()))
@@ -96,9 +94,26 @@ ito::RetVal ItemGeometry::addSphere(const pcl::PointXYZ &center, double radius, 
 }
 
 //-------------------------------------------------------------------------------------------
+ito::RetVal ItemGeometry::addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color)
+{
+	m_nrOfShapes = 1;
+
+	if (m_visualizer->addText(text.toStdString(), x, y, fontsize, color.redF(), color.greenF(), color.blueF(), m_name.toStdString() ))
+    {
+        vtkActor *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.clear();
+        m_actors.append(a);
+
+        m_lineColor = color;
+    }
+
+    return ito::retOk;
+}
+
+//-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addPyramid(const ito::DataObject *points, const QColor &color)
 {
-    m_geometryType = tPyramid;
     m_nrOfShapes = 1;
 
     const ito::float32 *xPtr = (ito::float32*)points->rowPtr(0,0);
@@ -354,7 +369,6 @@ ito::RetVal ItemGeometry::addCuboid(const ito::DataObject *points, const QColor 
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addCube(const Eigen::Vector3f &size, const Eigen::Affine3f &pose, const QColor &color)
 {
-    m_geometryType = tCuboid;
     m_nrOfShapes = 1;
 
     Eigen::Vector3f translation(1,0,0);

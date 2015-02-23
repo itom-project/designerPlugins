@@ -120,6 +120,8 @@ public slots:
 
     ito::RetVal addSphere(QVector<double> point, double radius, const QString &fullname, const QColor &color = Qt::red);
 
+	ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color = Qt::white);
+
     ito::RetVal deletePointCloud(const QString &name);
     ito::RetVal deleteMesh(const QString &name);
     ito::RetVal deleteGeometry(const QString &name);

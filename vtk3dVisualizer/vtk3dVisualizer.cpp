@@ -812,6 +812,47 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
     return retval;
 }
 
+//-------------------------------------------------------------------------------------
+ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color /*= Qt::white*/)
+{
+	ito::RetVal retval;
+
+    QTreeWidgetItem *parent;
+    QString name = fullname;
+
+    retval += createRecursiveTree(name, d->geometryItem, &parent);
+
+    if (!retval.containsError())
+    {
+        //check if item already exists with this name
+        QTreeWidgetItem *item = NULL;
+        for (int i = 0; i < parent->childCount(); i++)
+        {
+            if (parent->child(i)->data(0, Qt::ToolTipRole) == fullname)
+            {
+                item = parent->child(i);
+                break;
+            }
+        }
+
+        if (!item)
+        {
+            item = new QTreeWidgetItem();
+            item->setData(0, Qt::DisplayRole, name);
+            item->setData(0, Qt::ToolTipRole, fullname);
+            parent->addChild(item);
+        }        
+        SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
+        item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
+        connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+        ((ItemGeometry*)(i.data()))->addText(text, x, y, fontsize, color);
+    }
+
+    d->ui.pclCanvas->update();
+
+    return retval;
+	}
+
 
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QString &fullname, const QColor &color /*= Qt::red*/)

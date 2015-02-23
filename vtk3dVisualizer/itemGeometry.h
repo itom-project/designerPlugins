@@ -49,13 +49,13 @@ class ItemGeometry : public Item
     Q_PROPERTY(QColor LineColor READ lineColor WRITE setLineColor DESIGNABLE true USER true);
 
 public:
-    enum Type { tCylinder, tPlane, tCircle, tCone, tCube, tPyramid, tCuboid, tSphere };
     ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
     ~ItemGeometry();
 
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
     enum Interpolation { Flat, Gouraud, Phong };
 
+	ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
     ito::RetVal addCylinder(const pcl::ModelCoefficients &coefficients, const QColor &color);
     ito::RetVal addPyramid(const ito::DataObject *points, const QColor &color);
     ito::RetVal addCuboid(const ito::DataObject *points, const QColor &color);
@@ -92,7 +92,6 @@ protected:
 
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
     
-    Type m_geometryType;
     pcl::ModelCoefficients m_coefficients;
     Representation m_representation;
     QColor m_lineColor;
