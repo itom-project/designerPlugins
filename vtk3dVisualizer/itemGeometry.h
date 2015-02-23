@@ -67,6 +67,7 @@ public:
     ito::RetVal addLines(const ito::DataObject *points, const QColor &color);
     ito::RetVal addSphere(const pcl::PointXYZ &center, double radius, const QColor &color);
     ito::RetVal updatePose(const Eigen::Affine3f &pose);
+    ito::RetVal updateText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
 
     //properties
     virtual void setVisible(bool value);

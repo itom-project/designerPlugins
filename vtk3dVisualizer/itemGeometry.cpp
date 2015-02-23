@@ -118,6 +118,25 @@ ito::RetVal ItemGeometry::addText(const QString &text, const int x, const int y,
 }
 
 //-------------------------------------------------------------------------------------------
+ito::RetVal ItemGeometry::updateText(const QString &text, const int x, const int y, const int fontsize, const QColor &color)
+{
+    ito::RetVal retVal;
+    if (m_geometryType == tText)
+    {
+        if (m_visualizer->updateText(text.toStdString(), x, y, fontsize, color.redF(), color.greenF(), color.blueF(), m_name.toStdString()) == false)
+        {
+            retVal += ito::RetVal(ito::retError, 0, "error updating text");
+        }
+    }
+    else
+    {
+        retVal += ito::RetVal(ito::retError, 0, "item was no text item before");
+    }
+
+    return retVal;
+}
+
+//-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addPyramid(const ito::DataObject *points, const QColor &color)
 {
     m_geometryType = tPyramid;
