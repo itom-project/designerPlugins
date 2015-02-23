@@ -23,6 +23,7 @@
 #include "itemGeometry.h"
 
 #include "vtkPolyLine.h"
+#include "vtkTextActor.h"
 
 //-------------------------------------------------------------------------------------------
 ItemGeometry::ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
@@ -33,7 +34,9 @@ ItemGeometry::ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> 
     m_lineWidth(1.0),
     m_opacity(1.0),
     m_lighting(false),
-    m_nrOfShapes(1)
+    m_nrOfShapes(1),
+    m_specular(0.8),
+    m_specularPower(0.8)
     //m_selected(false)
 {
     m_type = "geometry";
@@ -60,11 +63,12 @@ ItemGeometry::~ItemGeometry()
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addCylinder(const pcl::ModelCoefficients &coefficients, const QColor &color)
 {
+    m_geometryType = tCylinder;
     m_nrOfShapes = 1;
 
     if (m_visualizer->addCylinder( coefficients, m_name.toStdString() ))
     {
-        vtkActor *a = getLastActor();
+        vtkProp *a = getLastActor();
         syncActorProperties(a);
         m_actors.clear();
         m_actors.append(a);
@@ -78,11 +82,12 @@ ito::RetVal ItemGeometry::addCylinder(const pcl::ModelCoefficients &coefficients
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addSphere(const pcl::PointXYZ &center, double radius, const QColor &color)
 {
+    m_geometryType = tSphere;
     m_nrOfShapes = 1;
 
     if (m_visualizer->addSphere(center, radius, color.redF(), color.greenF(), color.blueF(), m_name.toStdString()))
     {
-        vtkActor *a = getLastActor();
+        vtkProp *a = getLastActor();
         syncActorProperties(a);
         m_actors.clear();
         m_actors.append(a);
@@ -96,11 +101,12 @@ ito::RetVal ItemGeometry::addSphere(const pcl::PointXYZ &center, double radius, 
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color)
 {
+    m_geometryType = tText;
 	m_nrOfShapes = 1;
 
 	if (m_visualizer->addText(text.toStdString(), x, y, fontsize, color.redF(), color.greenF(), color.blueF(), m_name.toStdString() ))
     {
-        vtkActor *a = getLastActor();
+        vtkProp *a = getLastActor();
         syncActorProperties(a);
         m_actors.clear();
         m_actors.append(a);
@@ -114,6 +120,7 @@ ito::RetVal ItemGeometry::addText(const QString &text, const int x, const int y,
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addPyramid(const ito::DataObject *points, const QColor &color)
 {
+    m_geometryType = tPyramid;
     m_nrOfShapes = 1;
 
     const ito::float32 *xPtr = (ito::float32*)points->rowPtr(0,0);
@@ -154,7 +161,7 @@ ito::RetVal ItemGeometry::addPyramid(const ito::DataObject *points, const QColor
 
     if (m_visualizer->addPolylineFromPolygonMesh( mesh, m_name.toStdString() ))
     {
-        vtkActor *a = getLastActor();
+        vtkProp *a = getLastActor();
         syncActorProperties(a);
         m_actors.clear();
         m_actors.append(a);
@@ -309,6 +316,7 @@ ito::RetVal ItemGeometry::addCuboid(const ito::DataObject *points, const QColor 
 //
 //    m_lineColor = color;*/
 //
+    m_geometryType = tCube; 
     m_nrOfShapes = 1;
     pcl::PolygonMesh mesh;
     pcl::Vertices indices;
@@ -355,7 +363,7 @@ ito::RetVal ItemGeometry::addCuboid(const ito::DataObject *points, const QColor 
 
     if (m_visualizer->addPolylineFromPolygonMesh( mesh, m_name.toStdString() ))
     {
-        vtkActor *a = getLastActor();
+        vtkProp *a = getLastActor();
         syncActorProperties(a);
         m_actors.clear();
         m_actors.append(a);
@@ -369,6 +377,7 @@ ito::RetVal ItemGeometry::addCuboid(const ito::DataObject *points, const QColor 
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addCube(const Eigen::Vector3f &size, const Eigen::Affine3f &pose, const QColor &color)
 {
+    m_geometryType = tCube;
     m_nrOfShapes = 1;
 
     Eigen::Vector3f translation(1,0,0);
@@ -376,7 +385,9 @@ ito::RetVal ItemGeometry::addCube(const Eigen::Vector3f &size, const Eigen::Affi
 
     if (m_visualizer->addCube(pose.translation(), rotation_, size.x(), size.y(), size.z(), m_name.toStdString()))
     {
-        vtkActor *a = getLastActor();
+        vtkProp *a = getLastActor();
+        vtkActor::SafeDownCast(a)->GetProperty()->SetDiffuseColor(1.0, 0.0, 0.5);
+        vtkActor::SafeDownCast(a)->GetProperty()->SetAmbientColor(0.0, 1.0, 0.5);
         syncActorProperties(a);
         m_actors.clear();
         m_actors.append(a);
@@ -391,6 +402,8 @@ ito::RetVal ItemGeometry::addCube(const Eigen::Vector3f &size, const Eigen::Affi
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addLines(const ito::DataObject *points, const QColor &color)
 {
+    m_geometryType = tLines;
+
     pcl::PolygonMesh mesh;
     pcl::Vertices indices;
     pcl::PointCloud<pcl::PointXYZ> cloud;
@@ -437,17 +450,33 @@ void ItemGeometry::setVisible(bool value)
 
     double val = value ? 1.0 : 0.0;
 
-    if (m_nrOfShapes == 1)
+    if (m_geometryType == tText)
     {
-        m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_OPACITY, val, m_name.toStdString());
+        QVector<vtkProp*> props =  getSafeActors();
+        vtkTextActor *ta;
+        foreach (vtkProp *p, props)
+        {
+            ta = vtkTextActor::SafeDownCast(p);
+            if (ta)
+            {
+                ta->SetVisibility(value);
+            }
+        }
     }
     else
     {
-        QString name;
-        for (int i = 0; i < m_nrOfShapes; ++i)
+        if (m_nrOfShapes == 1)
         {
-            name = QString("%1_%2").arg(m_name).arg(i);
-            m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_OPACITY, val, name.toStdString());
+            m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_OPACITY, val, m_name.toStdString());
+        }
+        else
+        {
+            QString name;
+            for (int i = 0; i < m_nrOfShapes; ++i)
+            {
+                name = QString("%1_%2").arg(m_name).arg(i);
+                m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_OPACITY, val, name.toStdString());
+            }
         }
     }
 
@@ -461,99 +490,120 @@ void ItemGeometry::setVisible(bool value)
 void ItemGeometry::setRepresentation(Representation value)
 {
     int val = 0;
-    switch (int (value))
+    if (m_geometryType != tText)
     {
-        case ItemGeometry::Points:
+        switch (int (value))
         {
-            val = pcl::visualization::PCL_VISUALIZER_REPRESENTATION_POINTS;
-            break;
+            case ItemGeometry::Points:
+            {
+                val = pcl::visualization::PCL_VISUALIZER_REPRESENTATION_POINTS;
+                break;
+            }
+            case ItemGeometry::Wireframe:
+            {
+                val = pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME;
+                break;
+            }
+            case ItemGeometry::Surface:
+            {
+                val = pcl::visualization::PCL_VISUALIZER_REPRESENTATION_SURFACE;
+                break;
+            }
+            default:
+                return;
         }
-        case ItemGeometry::Wireframe:
-        {
-            val = pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME;
-            break;
-        }
-        case ItemGeometry::Surface:
-        {
-            val = pcl::visualization::PCL_VISUALIZER_REPRESENTATION_SURFACE;
-            break;
-        }
-        default:
-            return;
-    }
 
-    if (m_nrOfShapes == 1)
-    {
-        m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_REPRESENTATION, val, m_name.toStdString());
-    }
-    else
-    {
-        QString name;
-        for (int i = 0; i < m_nrOfShapes; ++i)
+        if (m_nrOfShapes == 1)
         {
-            name = QString("%1_%2").arg(m_name).arg(i);
-            m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_REPRESENTATION, val, name.toStdString());
+            m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_REPRESENTATION, val, m_name.toStdString());
         }
+        else
+        {
+            QString name;
+            for (int i = 0; i < m_nrOfShapes; ++i)
+            {
+                name = QString("%1_%2").arg(m_name).arg(i);
+                m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_REPRESENTATION, val, name.toStdString());
+            }
+        }
+
+        m_representation = value;
+
+        emit updateCanvasRequest();
     }
-
-    m_representation = value;
-
-    emit updateCanvasRequest();
 }
 
 //-------------------------------------------------------------------------------------------
 void ItemGeometry::setInterpolation(Interpolation value)
 {
-    int val = 0;
-    switch (int (value))
+    if (m_geometryType != tText)
     {
-        case ItemGeometry::Flat:
+        int val = 0;
+        switch (int (value))
         {
-            val = pcl::visualization::PCL_VISUALIZER_SHADING_FLAT;
-            break;
+            case ItemGeometry::Flat:
+            {
+                val = pcl::visualization::PCL_VISUALIZER_SHADING_FLAT;
+                break;
+            }
+            case ItemGeometry::Phong:
+            {
+                val = pcl::visualization::PCL_VISUALIZER_SHADING_PHONG;
+                break;
+            }
+            case ItemGeometry::Gouraud:
+            {
+                val = pcl::visualization::PCL_VISUALIZER_SHADING_GOURAUD;
+                break;
+            }
+            default:
+                return;
         }
-        case ItemGeometry::Phong:
-        {
-            val = pcl::visualization::PCL_VISUALIZER_SHADING_PHONG;
-            break;
-        }
-        case ItemGeometry::Gouraud:
-        {
-            val = pcl::visualization::PCL_VISUALIZER_SHADING_GOURAUD;
-            break;
-        }
-        default:
-            return;
-    }
 
-    if (m_nrOfShapes == 1)
-    {
-        m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_SHADING, val, m_name.toStdString());
-    }
-    else
-    {
-        QString name;
-        for (int i = 0; i < m_nrOfShapes; ++i)
+        if (m_nrOfShapes == 1)
         {
-            name = QString("%1_%2").arg(m_name).arg(i);
-            m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_SHADING, val, name.toStdString());
+            m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_SHADING, val, m_name.toStdString());
         }
+        else
+        {
+            QString name;
+            for (int i = 0; i < m_nrOfShapes; ++i)
+            {
+                name = QString("%1_%2").arg(m_name).arg(i);
+                m_visualizer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_SHADING, val, name.toStdString());
+            }
+        }
+
+        m_interpolation = value;
+
+        emit updateCanvasRequest();
     }
-
-    m_interpolation = value;
-
-    emit updateCanvasRequest();
 }
 
 //-------------------------------------------------------------------------------------------
 void ItemGeometry::setLineColor(QColor color)
 {
-    QVector<vtkActor*> actors = getSafeActors();
+    QVector<vtkProp*> actors = getSafeActors();
+    vtkActor *a;
+    vtkTextActor *ta;
 
-    foreach (vtkActor *a, actors)
+    foreach (vtkProp *p, actors)
     {
-        a->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
-        a->GetProperty ()->SetEdgeColor (color.redF(), color.greenF(), color.blueF());
+        a = vtkActor::SafeDownCast(p);
+        if (a)
+        {
+            a->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+            a->GetProperty ()->SetEdgeColor (color.redF(), color.greenF(), color.blueF());
+        }
+    }
+
+    foreach (vtkProp *p, actors)
+    {
+        ta = vtkTextActor::SafeDownCast(p);
+        if (ta)
+        {
+            ta->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+        }
     }
 
     if (actors.size() == 0)
@@ -580,39 +630,58 @@ void ItemGeometry::setLineColor(QColor color)
 //-------------------------------------------------------------------------------------------
 void ItemGeometry::setLineWidth(double value)
 {
-    if (m_nrOfShapes == 1)
+    if (m_geometryType != tText)
     {
-        m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, value, m_name.toStdString());
-    }
-    else
-    {
-        QString name;
-        for (int i = 0; i < m_nrOfShapes; ++i)
+        if (m_nrOfShapes == 1)
         {
-            name = QString("%1_%2").arg(m_name).arg(i);
-            m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, value, name.toStdString());
+            m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, value, m_name.toStdString());
         }
+        else
+        {
+            QString name;
+            for (int i = 0; i < m_nrOfShapes; ++i)
+            {
+                name = QString("%1_%2").arg(m_name).arg(i);
+                m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, value, name.toStdString());
+            }
+        }
+
+        m_lineWidth = value;
+
+        emit updateCanvasRequest();
     }
-
-    m_lineWidth = value;
-
-    emit updateCanvasRequest();
 }
 
 //-------------------------------------------------------------------------------------------
 void ItemGeometry::setOpacity(double value)
 {
-    if (m_nrOfShapes == 1)
+    value = qBound(0.0, value, 1.0);
+    if (m_geometryType == tText)
     {
-        m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, value, m_name.toStdString());
+        vtkTextActor *ta;
+        foreach (vtkProp *p, getSafeActors())
+        {
+            ta = vtkTextActor::SafeDownCast(p);
+            if (ta)
+            {
+                ta->GetProperty()->SetOpacity(value);
+            }
+        }
     }
     else
     {
-        QString name;
-        for (int i = 0; i < m_nrOfShapes; ++i)
+        if (m_nrOfShapes == 1)
         {
-            name = QString("%1_%2").arg(m_name).arg(i);
-            m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, value, name.toStdString());
+            m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, value, m_name.toStdString());
+        }
+        else
+        {
+            QString name;
+            for (int i = 0; i < m_nrOfShapes; ++i)
+            {
+                name = QString("%1_%2").arg(m_name).arg(i);
+                m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, value, name.toStdString());
+            }
         }
     }
 
@@ -622,15 +691,93 @@ void ItemGeometry::setOpacity(double value)
 }
 
 //-------------------------------------------------------------------------------------------
+void ItemGeometry::setSpecular(double value)
+{
+    value = qBound(0.0, value, 1.0);
+    if (m_geometryType == tText)
+    {
+    }
+    else
+    {
+        vtkActor *a;
+        foreach (vtkProp *p, getSafeActors())
+        {
+            a = vtkActor::SafeDownCast(p);
+            if (a)
+            {
+                a->GetProperty()->SetSpecular(value);
+            }
+        }
+    }
+
+    m_specular = value;
+
+    emit updateCanvasRequest();
+}
+
+//-------------------------------------------------------------------------------------------
+void ItemGeometry::setSpecularPower(double value)
+{
+    value = qBound(0.0, value, 1.0);
+    if (m_geometryType == tText)
+    {
+    }
+    else
+    {
+        vtkActor *a;
+        foreach (vtkProp *p, getSafeActors())
+        {
+            a = vtkActor::SafeDownCast(p);
+            if (a)
+            {
+                a->GetProperty()->SetSpecularPower(value);
+            }
+        }
+    }
+
+    m_specularPower = value;
+
+    emit updateCanvasRequest();
+}
+
+//-------------------------------------------------------------------------------------------
+void ItemGeometry::setSpecularColor(QColor color)
+{
+    if (m_geometryType == tText)
+    {
+    }
+    else
+    {
+        vtkActor *a;
+        foreach (vtkProp *p, getSafeActors())
+        {
+            a = vtkActor::SafeDownCast(p);
+            if (a)
+            {
+                a->GetProperty()->SetSpecularColor(color.redF(), color.greenF(), color.blueF());
+            }
+        }
+    }
+
+    m_specularColor = color;
+
+    emit updateCanvasRequest();
+}
+
+//-------------------------------------------------------------------------------------------
 void ItemGeometry::setLighting(bool value)
 {
-    QVector<vtkActor*> actors = getSafeActors();
+    QVector<vtkProp*> actors = getSafeActors();
+    vtkActor *a;
 
-    foreach (vtkActor *a, actors)
+    foreach (vtkProp *p, actors)
     {
-        m_lighting = value;
-        a->GetProperty()->SetLighting(value);
-        
+        a = vtkActor::SafeDownCast(p);
+        if (a)
+        {
+            m_lighting = value;
+            a->GetProperty()->SetLighting(value);
+        }        
     }
 
     emit updateCanvasRequest();
@@ -671,21 +818,21 @@ ito::RetVal ItemGeometry::updatePose(const Eigen::Affine3f &pose)
 }
 
 //-------------------------------------------------------------------------------------------
-QVector<vtkActor*> ItemGeometry::getSafeActors() 
+QVector<vtkProp*> ItemGeometry::getSafeActors() 
 {
     vtkSmartPointer<vtkRendererCollection> _rens = m_visualizer->getRendererCollection();
     vtkRenderer *rend = m_visualizer->getRendererCollection()->GetFirstRenderer();
-    vtkActorCollection *ac = rend->GetActors();
+    vtkPropCollection *pc = rend->GetViewProps();
 
-    QVector<vtkActor*>::iterator it = m_actors.begin();
+    QVector<vtkProp*>::iterator it = m_actors.begin();
     bool found;
 
     while(it != m_actors.end())
     {
         found = false;
-        ac->InitTraversal();
-        vtkActor *a = NULL;
-        while((a =ac->GetNextActor()) != NULL)
+        pc->InitTraversal();
+        vtkProp *a = NULL;
+        while((a =pc->GetNextProp()) != NULL)
         {
             if (a == *it)
             {
@@ -708,20 +855,29 @@ QVector<vtkActor*> ItemGeometry::getSafeActors()
 }
 
 //-------------------------------------------------------------------------------------------
-vtkActor *ItemGeometry::getLastActor()
+vtkProp *ItemGeometry::getLastActor()
 {
     vtkSmartPointer<vtkRendererCollection> _rens = m_visualizer->getRendererCollection();
     vtkRenderer *rend = m_visualizer->getRendererCollection()->GetFirstRenderer();
-    return rend->GetActors()->GetLastActor();
+    return rend->GetViewProps()->GetLastProp();
 }
 
 //-------------------------------------------------------------------------------------------
-void ItemGeometry::syncActorProperties(vtkActor *actor)
+void ItemGeometry::syncActorProperties(vtkProp *prop)
 {
-    if (actor)
+    vtkActor *a = vtkActor::SafeDownCast (prop);
+    if (a)
     {
-        vtkProperty *p = actor->GetProperty();
+        vtkProperty *p = a->GetProperty();
         m_lighting = p->GetLighting();
-        //p->Get
+        m_specular = p->GetSpecular();
+        m_specularPower = p->GetSpecularPower();
+        double color[3];
+        p->GetSpecularColor(color);
+        m_specularColor = QColor::fromRgbF(color[0], color[1], color[2]);
+    }
+    else
+    {
+        m_lighting = false;
     }
 }
