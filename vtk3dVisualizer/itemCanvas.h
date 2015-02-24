@@ -47,6 +47,7 @@ class ItemCanvas : public Item
 	Q_CLASSINFO("CoordSysPos", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
     Q_PROPERTY(Vec3f CameraPosition READ cameraPosition WRITE setCameraPosition DESIGNABLE true USER true)
     Q_PROPERTY(Vec3f CameraView READ cameraView WRITE setCameraView DESIGNABLE true USER true)
+	Q_PROPERTY(Vec3f CameraFocalPoint READ cameraFocalPoint WRITE setCameraFocalPoint DESIGNABLE true USER true)
     
 
 public:
@@ -82,6 +83,9 @@ public:
 
     Vec3f cameraView() const;
     void setCameraView( const Vec3f& cameraView );
+
+	Vec3f cameraFocalPoint() const;
+    void setCameraFocalPoint( const Vec3f& focalPoint );
 
 
 

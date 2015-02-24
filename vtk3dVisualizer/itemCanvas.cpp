@@ -175,7 +175,9 @@ void ItemCanvas::setCameraPosition( const Vec3f& cameraPosition )
     m_visualizer->getCameras(cameras);
     if (cameras.size() > 0)
     {
-        m_visualizer->setCameraPosition(cameraPosition.X, cameraPosition.Y, cameraPosition.Z, cameras[0].view[0], cameras[0].view[1], cameras[0].view[2]);
+		m_visualizer->setCameraPosition(cameraPosition.X,    cameraPosition.Y,    cameraPosition.Z, \
+										cameras[0].focal[0], cameras[0].focal[1], cameras[0].focal[2], \
+										cameras[0].view[0],  cameras[0].view[1],  cameras[0].view[2]);
         emit updateCanvasRequest();
     } 
 }
@@ -200,7 +202,36 @@ void ItemCanvas::setCameraView( const Vec3f& cameraView )
     m_visualizer->getCameras(cameras);
     if (cameras.size() > 0)
     {
-        m_visualizer->setCameraPosition(cameras[0].pos[0], cameras[0].pos[1], cameras[0].pos[2], cameraView.X, cameraView.Y, cameraView.Z);
+		m_visualizer->setCameraPosition(cameras[0].pos[0],  cameras[0].pos[1],  cameras[0].pos[2], \
+										cameras[0].focal[0], cameras[0].focal[1], cameras[0].focal[2], \
+										cameraView.X, cameraView.Y, cameraView.Z);
+        emit updateCanvasRequest();
+    } 
+}
+
+//-----------------------------------------------------------------------
+Vec3f ItemCanvas::cameraFocalPoint() const
+{
+    std::vector<pcl::visualization::Camera> cameras;
+    m_visualizer->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        return Vec3f(cameras[0].focal[0], cameras[0].focal[1], cameras[0].focal[2]);
+    } 
+
+    return Vec3f(0.0, 0.0, 0.0);
+}
+
+//-----------------------------------------------------------------------
+void ItemCanvas::setCameraFocalPoint( const Vec3f& focalPoint )
+{
+	std::vector<pcl::visualization::Camera> cameras;
+    m_visualizer->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        m_visualizer->setCameraPosition(cameras[0].pos[0],  cameras[0].pos[1],  cameras[0].pos[2], \
+										focalPoint.X,       focalPoint.Y,       focalPoint.Z, \
+										cameras[0].view[0], cameras[0].view[1], cameras[0].view[2]);
         emit updateCanvasRequest();
     } 
 }
