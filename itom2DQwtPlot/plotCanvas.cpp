@@ -1360,16 +1360,21 @@ void PlotCanvas::zStackCutTrackerAppended(const QPoint &pt)
 
     if (m_pData->m_state == tStackCut)
     {
+        
         QPointF ptScale;
         ptScale.setY(invTransform(QwtPlot::yLeft, pt.y()));
         ptScale.setX(invTransform(QwtPlot::xBottom, pt.x()));
+        if (m_rasterData->pointValid(ptScale))
+        {
+            m_pStackCutMarker->setValue(ptScale);
+            m_pStackCutMarker->setVisible(true);
 
-        m_pStackCutMarker->setValue(ptScale);
-        m_pStackCutMarker->setVisible(true);
 
-        pts.append(ptScale);
-        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
-        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+            pts.append(ptScale);
+            ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+        }
+        
     }
 
     replot();
@@ -1385,25 +1390,31 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
         QPointF ptScale;
         ptScale.setY(invTransform(QwtPlot::yLeft, pt.y()));
         ptScale.setX(invTransform(QwtPlot::xBottom, pt.x()));
-
-        if (m_activeModifiers.testFlag(Qt::ControlModifier))
+        if (m_rasterData->pointValid(ptScale))
         {
-            if (abs(ptScale.x() - m_pStackCutMarker->xValue()) > abs(ptScale.y() - m_pStackCutMarker->yValue()))
+            if (m_activeModifiers.testFlag(Qt::ControlModifier))
             {
-                ptScale.setY(m_pStackCutMarker->yValue());
+                if (abs(ptScale.x() - m_pStackCutMarker->xValue()) > abs(ptScale.y() - m_pStackCutMarker->yValue()))
+                {
+                    ptScale.setY(m_pStackCutMarker->yValue());
+                }
+                else
+                {
+                    ptScale.setX(m_pStackCutMarker->xValue());
+                }
             }
-            else
-            {
-                ptScale.setX(m_pStackCutMarker->xValue());
-            }
+            bool valid;
+            valid = m_rasterData->pointValid(ptScale);
+
+
+
+            m_pStackCutMarker->setValue(ptScale);
+            m_pStackCutMarker->setVisible(true);
+
+            pts.append(ptScale);
+            ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
         }
-
-        m_pStackCutMarker->setValue(ptScale);
-        m_pStackCutMarker->setVisible(true);
-
-        pts.append(ptScale);
-        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
-        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
     }
 
     replot();
