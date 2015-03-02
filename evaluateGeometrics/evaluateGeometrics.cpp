@@ -485,7 +485,7 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
     ((InternalInfo*)m_pInfo)->m_relationsList.clear();
     ((InternalInfo*)m_pInfo)->m_relationsList.reserve(rows);
 
-    cv::Mat * myMat = (cv::Mat*)(importedData->get_mdata()[0]);
+    cv::Mat * myMat = importedData->getCvPlaneMat(0);
     ito::float32* ptr = NULL;
 
     relationsShip newRelation;
@@ -642,7 +642,7 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) con
 
     QSharedPointer<ito::DataObject> exportedData(new ito::DataObject(4, ((InternalInfo*)m_pInfo)->m_relationsList.size(), ito::tFloat32));
 
-    cv::Mat * myMat = (cv::Mat*)(exportedData->get_mdata()[0]);
+    cv::Mat * myMat = exportedData->getCvPlaneMat(0);
     ito::float32* ptr = NULL;
     for (int i = 0; i < ((InternalInfo*)m_pInfo)->m_relationsList.size(); i ++)
     {
