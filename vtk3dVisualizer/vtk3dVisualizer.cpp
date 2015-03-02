@@ -35,6 +35,7 @@
 #include <qsharedpointer.h>
 #include <qcolor.h>
 #include <qdebug.h>
+#include <qstatusbar.h>
 
 #include "QVTKWidget.h"
 
@@ -116,6 +117,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 	Eigen::Quaternion<float,0> q;
 	vtkSmartPointer<vtkMatrix4x4> m;
 	pcl::visualization::PCLVisualizer::convertToVtkMatrix(v1, q, m);*/
+    d->ui.statusbar->setVisible(false);
 
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
 
@@ -149,7 +151,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     //m_pPCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualization") );
     d->PCLVis->initCameraParameters ();
-    d->PCLVis->setCameraPosition(5.0, -8.0, 4.0, -0.5, -1.0, 1.0);
+    d->PCLVis->setCameraPosition(0.0, 0.0, 16.0, 0.0, -1.0, 0.0);
 
     //prepare QPropertyEditor for visualization
     CustomTypes::registerTypes();
@@ -810,6 +812,76 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
     return retval;
 }
 
+//-------------------------------------------------------------------------------------
+ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color /*= Qt::white*/)
+{
+	ito::RetVal retval;
+
+    QTreeWidgetItem *parent;
+    QString name = fullname;
+
+    retval += createRecursiveTree(name, d->geometryItem, &parent);
+
+    if (!retval.containsError())
+    {
+        //check if item already exists with this name
+        QTreeWidgetItem *item = NULL;
+        for (int i = 0; i < parent->childCount(); i++)
+        {
+            if (parent->child(i)->data(0, Qt::ToolTipRole) == fullname)
+            {
+                item = parent->child(i);
+                break;
+            }
+        }
+
+        if (!item)
+        {
+            item = new QTreeWidgetItem();
+            item->setData(0, Qt::DisplayRole, name);
+            item->setData(0, Qt::ToolTipRole, fullname);
+            parent->addChild(item);
+        }        
+        SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
+        item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
+        connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+        ((ItemGeometry*)(i.data()))->addText(text, x, y, fontsize, color);
+    }
+
+    d->ui.pclCanvas->update();
+
+    return retval;
+}
+
+//-------------------------------------------------------------------------------------
+ito::RetVal Vtk3dVisualizer::updateText(const QString &text, const int x, const int y, const int fontsize, const QString &name, const QColor &color, bool createIfNotExists)
+{
+    ito::RetVal retval;
+    QTreeWidgetItem *item = NULL;
+    QString n = name;
+    bool found = false;
+    retval += searchRecursiveTree(name, d->geometryItem, &item);
+
+    if (!retval.containsError())
+    {
+        SharedItemPtr i = item->data(0, Item::itemRole).value<SharedItemPtr>();
+
+        if (i.data())
+        {
+            ItemGeometry *tg = (ItemGeometry*)(i.data());
+            retval += tg->updateText(text, x, y, fontsize, color);
+
+            d->ui.pclCanvas->update();
+        }
+    }
+    else if (createIfNotExists)
+    {
+        retval = addText(text, x, y, fontsize, name, color); //retval is assigned, no += since not-found error from above should be handled.
+    }
+
+    return retval;
+}
+
 
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QString &fullname, const QColor &color /*= Qt::red*/)
@@ -923,9 +995,6 @@ ito::RetVal Vtk3dVisualizer::setGeometryPose(const QString &name, QVector<double
 ito::RetVal Vtk3dVisualizer::setGeometriesPosition(const QStringList &names, QVector<double> positions)
 {
     ito::RetVal retval;
-
-    float x,y,z;
-    float rx,ry,rz;
 
     if (positions.size() != 3*names.size())
     {

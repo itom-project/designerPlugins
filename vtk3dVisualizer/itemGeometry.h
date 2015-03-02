@@ -47,15 +47,19 @@ class ItemGeometry : public Item
     Q_PROPERTY(Representation Representation READ representation WRITE setRepresentation DESIGNABLE true USER true);
     Q_PROPERTY(Interpolation Interpolation READ interpolation WRITE setInterpolation DESIGNABLE true USER true);
     Q_PROPERTY(QColor LineColor READ lineColor WRITE setLineColor DESIGNABLE true USER true);
+    Q_PROPERTY(double Specular READ specular WRITE setSpecular DESIGNABLE true USER true);
+    Q_PROPERTY(double SpecularPower READ specularPower WRITE setSpecularPower DESIGNABLE true USER true);
+    Q_PROPERTY(QColor SpecularColor READ specularColor WRITE setSpecularColor DESIGNABLE true USER true);
 
 public:
-    enum Type { tCylinder, tPlane, tCircle, tCone, tCube, tPyramid, tCuboid, tSphere };
     ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
     ~ItemGeometry();
 
+    enum Type { tCylinder, tPlane, tCircle, tCone, tCube, tPyramid, tCuboid, tSphere, tText, tLines };
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
     enum Interpolation { Flat, Gouraud, Phong };
 
+	ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
     ito::RetVal addCylinder(const pcl::ModelCoefficients &coefficients, const QColor &color);
     ito::RetVal addPyramid(const ito::DataObject *points, const QColor &color);
     ito::RetVal addCuboid(const ito::DataObject *points, const QColor &color);
@@ -63,6 +67,7 @@ public:
     ito::RetVal addLines(const ito::DataObject *points, const QColor &color);
     ito::RetVal addSphere(const pcl::PointXYZ &center, double radius, const QColor &color);
     ito::RetVal updatePose(const Eigen::Affine3f &pose);
+    ito::RetVal updateText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
 
     //properties
     virtual void setVisible(bool value);
@@ -85,10 +90,19 @@ public:
     bool lighting() const { return m_lighting; }
     void setLighting(bool value);
 
+    double specular() const { return m_specular; }
+    void setSpecular(double value);
+
+    double specularPower() const { return m_specularPower; }
+    void setSpecularPower(double value);
+
+    QColor specularColor() const { return m_specularColor; }
+    void setSpecularColor(QColor color);
+
 protected:
-    QVector<vtkActor*> getSafeActors(); //tries to find m_actor in list of current actors of renderer
-    vtkActor *getLastActor();
-    void syncActorProperties(vtkActor *actor);
+    QVector<vtkProp*> getSafeActors(); //tries to find m_actor in list of current actors of renderer
+    vtkProp *getLastActor();
+    void syncActorProperties(vtkProp *actor);
 
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
     
@@ -99,9 +113,12 @@ protected:
     double m_lineWidth;
     double m_opacity;
     Interpolation m_interpolation;
-    QVector<vtkActor*> m_actors; //reference to actor(s), this is a guess since no access to the shapeactormap of m_visualizer is available. don't use this, always get the actor using getSafeActor.
+    QVector<vtkProp*> m_actors; //reference to actor(s), this is a guess since no access to the shapeactormap of m_visualizer is available. don't use this, always get the actor using getSafeActor.
     bool m_lighting;
     int m_nrOfShapes;
+    double m_specular;
+    double m_specularPower;
+    QColor m_specularColor;
 
 };
 

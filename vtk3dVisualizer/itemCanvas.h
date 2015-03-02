@@ -45,6 +45,10 @@ class ItemCanvas : public Item
     Q_PROPERTY(double CoordSysScale READ coordSysScale WRITE setCoordSysScale DESIGNABLE true USER true)
     Q_PROPERTY(Vec3f CoordSysPos READ coordSysPos WRITE setCoordSysPos DESIGNABLE true USER true)
 	Q_CLASSINFO("CoordSysPos", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
+    Q_PROPERTY(Vec3f CameraPosition READ cameraPosition WRITE setCameraPosition DESIGNABLE true USER true)
+    Q_PROPERTY(Vec3f CameraView READ cameraView WRITE setCameraView DESIGNABLE true USER true)
+	Q_PROPERTY(Vec3f CameraFocalPoint READ cameraFocalPoint WRITE setCameraFocalPoint DESIGNABLE true USER true)
+    
 
 public:
     enum Stereo { No, CrystalEyes, RedBlue, Interlaced, Left, Right, Dresden, Anaglyph, Checkerboard };
@@ -73,6 +77,15 @@ public:
 
     Stereo stereoType() const { return m_stereoType; }
     void setStereoType( const Stereo& stereoType );
+
+    Vec3f cameraPosition() const;
+    void setCameraPosition( const Vec3f& cameraPosition );
+
+    Vec3f cameraView() const;
+    void setCameraView( const Vec3f& cameraView );
+
+	Vec3f cameraFocalPoint() const;
+    void setCameraFocalPoint( const Vec3f& focalPoint );
 
 
 

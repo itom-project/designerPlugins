@@ -178,6 +178,10 @@ class PlotCanvas : public QwtPlot
         void updateColors();
         void updateLabelVisibility();
     private:
+
+        // a1 is line1 start, a2 is line1 end, b1 is line2 start, b2 is line2 end
+        bool lineIntersection(const QPointF &a1, const QPointF &a2, const QPointF &b1, const QPointF &b2, QPointF &intersection);
+
         ito::DataObject randImg;
 
         ItomPlotZoomer *m_pZoomer;
@@ -208,6 +212,7 @@ class PlotCanvas : public QwtPlot
         
         ito::uint32 m_zstackCutUID;
         ito::uint32 m_lineCutUID;
+        bool m_lineCutValidStart; //true if the first point of the line cut is a valid point inside of the data object
 
         InternalData *m_pData;
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object

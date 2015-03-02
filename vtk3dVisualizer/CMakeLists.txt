@@ -10,8 +10,6 @@ OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to 
 OPTION(UPDATE_TRANSLATIONS "Update source translation translation/*.ts files (WARNING: make clean will delete the source .ts files! Danger!)")
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
-SET (VTK_QT_DIR ${VTK_DIR} CACHE PATH "path to the vtk directory with qt support (the lib folder must lie in this folder")
-SET (VTK_VERSION_STR "vtk-5.8" CACHE STRING "Version of vtk, that is the folder name (e.g. vtk-5.8)")
 SET (ITOM_LANGUAGES "de" CACHE STRING "semicolon separated list of languages that should be created (en must not be given since it is the default)")
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
@@ -29,15 +27,14 @@ find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointc
 IF(ITOM_SDK_PCL_SUPPORT)
     
     include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-    FIND_PACKAGE_QT(ON Core Widgets LinguistTools Designer)
+    FIND_PACKAGE_QT(ON Core Widgets LinguistTools Designer OpenGL)
 
-    SET(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
+    #SET(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
     #SET(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked
-    find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
+    find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
     find_package(VisualLeakDetector QUIET)
     
-    IF(EXISTS ${VTK_QT_DIR})
-        message(STATUS ${VTK_LIBRARY_DIRS} - ${VTK_LIBRARIES})
+    IF(EXISTS ${VTK_DIR})
 
         IF (BUILD_UNICODE)
             ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
@@ -60,16 +57,14 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}
             ${PCL_INCLUDE_DIRS}
             ${ITOM_SDK_INCLUDE_DIRS}
-            ${VTK_QT_DIR}/include/${VTK_VERSION_STR}
             ${VISUALLEAKDETECTOR_INCLUDE_DIR}
             ${CMAKE_CURRENT_SOURCE_DIR}/icons
         )
 
         LINK_DIRECTORIES(
             ${CMAKE_CURRENT_SOURCE_DIR}/..
-            ${VTK_QT_DIR}/lib/${VTK_VERSION_STR}
-            ${VTK_QT_DIR}/lib
 			${Boost_LIBRARY_DIR}
+			${VTK_DIR}
         )
 
         set(plugin_HEADERS
@@ -88,9 +83,9 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.h
         )
 
-		set(plugin_HEADERS_COPY
-			${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.h
-		)
+        set(plugin_HEADERS_COPY
+            ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.h
+        )
 
         set(plugin_UI
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.ui
@@ -129,20 +124,10 @@ IF(ITOM_SDK_PCL_SUPPORT)
             QT4_ADD_RESOURCES(plugin_rcc_MOC ${plugin_RCC})
         endif (QT5_FOUND)
         
-        string(REPLACE "common" "visualization" PCL_VISUALIZATION_LIBRARY_DEBUG_TEMP ${PCL_COMMON_LIBRARY_DEBUG})
-        string(REPLACE "common" "visualization" PCL_VISUALIZATION_LIBRARY_TEMP ${PCL_COMMON_LIBRARY})
+        set(PCLVTK_LIBS "")
         
-        set(PCLVTK_LIBS debug ${PCL_VISUALIZATION_LIBRARY_DEBUG_TEMP} optimized ${PCL_VISUALIZATION_LIBRARY_TEMP})
-        
-        STRING(REGEX MATCH "[0-9]\\.[0-9]$" VTK_VERSION_SUBSTR ${VTK_VERSION_STR})
-        
-        IF(${VTK_VERSION_STR} MATCHES "(.*)6(.*)")
-            set(VTK_COMPONENTS vtkCommonCore vtkCommonMath vtkRenderingCore vtkRenderingLOD vtkRenderingQt vtkGUISupportQt vtkFiltersGeometry vtkFiltersCore vtkRenderingAnnotation vtkFiltersSources vtkInteractionStyle vtkCommonDataModel vtkCommonExecutionModel vtkCommonMisc vtkFiltersExtraction vtkCommonSystem vtkFiltersModeling vtkCommonTransforms vtkIOCore vtkViewsCore vtksys vtkzlib vtkfreetype vtklibxml2 vtkexpat vtkpng vtktiff vtkjpeg vtkftgl)
-            foreach(__comps ${VTK_COMPONENTS})
-                set(PCLVTK_LIBS ${PCLVTK_LIBS} debug ${__comps}-${VTK_VERSION_SUBSTR}-gd.lib optimized ${__comps}-${VTK_VERSION_SUBSTR}.lib)
-            endforeach(__comps)
-        ELSE()
-            set(VTK_COMPONENTS QVTK vtkGraphics vtkIO vtkCommon vtkViews vtkWidgets vtkRendering vtksys vtkFiltering vtkzlib vtkfreetype vtklibxml2 vtkexpat vtkpng vtktiff vtkjpeg vtkftgl)
+        IF("${VTK_MAJOR_VERSION}" EQUAL 5)
+            set(VTK_COMPONENTS QVTK)
             foreach(__comps ${VTK_COMPONENTS})
                 set(PCLVTK_LIBS ${PCLVTK_LIBS} debug ${__comps}-gd.lib optimized ${__comps}.lib)
             endforeach(__comps)
@@ -152,7 +137,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
         ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_HEADERS_MOC} ${plugin_ui_MOC} ${plugin_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${PCL_LIBRARIES} ${PCLVTK_LIBS} ${ITOM_SDK_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES} opengl32)
+        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${PCL_LIBRARIES} ${PCLVTK_LIBS} ${ITOM_SDK_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
         if (QT5_FOUND)
             qt5_use_modules(${target_name} ${QT_COMPONENTS})
         endif (QT5_FOUND)
@@ -173,12 +158,12 @@ IF(ITOM_SDK_PCL_SUPPORT)
         set(COPY_DESTINATIONS "")
         ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
         ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
-		ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
+        ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
         POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
         
-    ELSE(EXISTS ${VTK_QT_DIR})
-        message(WARNING "VTK_QT_DIR does not exist. ${target_name} will not be build.")
-    ENDIF(EXISTS ${VTK_QT_DIR})
+    ELSE(EXISTS ${VTK_DIR})
+        message(WARNING "VTK_DIR does not exist. ${target_name} will not be build.")
+    ENDIF(EXISTS ${VTK_DIR})
 
 ELSE(ITOM_SDK_PCL_SUPPORT)
     message(FATAL "${target_name} will not be build since itom has been compiled without PCL support")

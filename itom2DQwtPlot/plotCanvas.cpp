@@ -1354,25 +1354,55 @@ void PlotCanvas::setState(tState state)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+// a1 is line1 start, a2 is line1 end, b1 is line2 start, b2 is line2 end
+bool PlotCanvas::lineIntersection(const QPointF &a1, const QPointF &a2, const QPointF &b1, const QPointF &b2, QPointF &intersection)
+{
+    intersection = QPointF(0,0);
+
+    QPointF b = a2 - a1;
+    QPointF d = b2 - b1;
+    float bDotDPerp = b.x() * d.y() - b.y() * d.x();
+
+    // if b dot d == 0, it means the lines are parallel so have infinite intersection points
+    if (bDotDPerp == 0)
+        return false;
+
+    QPointF c = b1 - a1;
+    float t = (c.x() * d.y() - c.y() * d.x()) / bDotDPerp;
+    if (t < 0 || t > 1)
+        return false;
+
+    float u = (c.x() * b.y() - c.y() * b.x()) / bDotDPerp;
+    if (u < 0 || u > 1)
+        return false;
+
+    intersection = a1 + t * b;
+
+    return true;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::zStackCutTrackerAppended(const QPoint &pt)
 {
     QVector<QPointF> pts;
 
     if (m_pData->m_state == tStackCut)
     {
+        
         QPointF ptScale;
         ptScale.setY(invTransform(QwtPlot::yLeft, pt.y()));
         ptScale.setX(invTransform(QwtPlot::xBottom, pt.x()));
+        if (m_rasterData->pointValid(ptScale))
+        {
+            m_pStackCutMarker->setValue(ptScale);
+            m_pStackCutMarker->setVisible(true);
 
-        m_pStackCutMarker->setValue(ptScale);
-        m_pStackCutMarker->setVisible(true);
-
-        pts.append(ptScale);
-        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
-        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+            pts.append(ptScale);
+            ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+            replot();
+        }   
     }
-
-    replot();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1385,28 +1415,29 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
         QPointF ptScale;
         ptScale.setY(invTransform(QwtPlot::yLeft, pt.y()));
         ptScale.setX(invTransform(QwtPlot::xBottom, pt.x()));
-
-        if (m_activeModifiers.testFlag(Qt::ControlModifier))
+        if (m_rasterData->pointValid(ptScale))
         {
-            if (abs(ptScale.x() - m_pStackCutMarker->xValue()) > abs(ptScale.y() - m_pStackCutMarker->yValue()))
+            if (m_activeModifiers.testFlag(Qt::ControlModifier))
             {
-                ptScale.setY(m_pStackCutMarker->yValue());
+                if (abs(ptScale.x() - m_pStackCutMarker->xValue()) > abs(ptScale.y() - m_pStackCutMarker->yValue()))
+                {
+                    ptScale.setY(m_pStackCutMarker->yValue());
+                }
+                else
+                {
+                    ptScale.setX(m_pStackCutMarker->xValue());
+                }
             }
-            else
-            {
-                ptScale.setX(m_pStackCutMarker->xValue());
-            }
-        }
 
-        m_pStackCutMarker->setValue(ptScale);
-        m_pStackCutMarker->setVisible(true);
+            m_pStackCutMarker->setValue(ptScale);
+            m_pStackCutMarker->setVisible(true);
 
-        pts.append(ptScale);
-        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
-        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+            pts.append(ptScale);
+            ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+            replot();
+        }    
     }
-
-    replot();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1417,29 +1448,122 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
 
     if (m_pData->m_state == tLineCut)
     {
-        pts[0] = m_pLineCutLine->sample(0);
-        pts[1].setY(invTransform(QwtPlot::yLeft, pt.y()));
-        pts[1].setX(invTransform(QwtPlot::xBottom, pt.x()));
+        QwtInterval xInterval = m_rasterData->interval(Qt::XAxis); 
+        QwtInterval yInterval = m_rasterData->interval(Qt::YAxis);
 
-        if (m_activeModifiers.testFlag(Qt::ControlModifier))
+        pts[0] = m_pLineCutLine->sample(0);
+
+        if (m_lineCutValidStart)
         {
-            if (abs(pts[1].x() - pts[0].x()) > abs(pts[1].y() - pts[0].y()))
+            pts[1].setY(invTransform(QwtPlot::yLeft, pt.y()));
+            pts[1].setX(invTransform(QwtPlot::xBottom, pt.x()));
+
+            if (!xInterval.contains(pts[1].x()) || !yInterval.contains(pts[1].y()))
             {
-                pts[1].setY(pts[0].y());
+                QPointF intersection;
+                QPointF rt(xInterval.maxValue(), yInterval.maxValue());
+                QPointF lt(xInterval.minValue(), yInterval.maxValue());
+                QPointF rb(xInterval.maxValue(), yInterval.minValue());
+                QPointF lb(xInterval.minValue(), yInterval.minValue());
+                
+                if ((pts[1].x() < pts[0].x()) && lineIntersection(pts[1], pts[0], lt, lb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with left border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].x() > pts[0].x()) && lineIntersection(pts[1], pts[0], rt, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with right border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].y() > pts[0].y()) && lineIntersection(pts[1], pts[0], lt, rt, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with top border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].y() < pts[0].y()) && lineIntersection(pts[1], pts[0], lb, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with bottom border
+                    pts[1] = intersection;
+                }
+            }
+
+            if (m_activeModifiers.testFlag(Qt::ControlModifier))
+            {
+                if (abs(pts[1].x() - pts[0].x()) > abs(pts[1].y() - pts[0].y()))
+                {
+                    pts[1].setY(pts[0].y());
+                }
+                else
+                {
+                    pts[1].setX(pts[0].x());
+                }
+            }
+
+            m_pLineCutLine->setSamples(pts);
+
+            ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+            replot();
+        }
+        else //first point is still not valid, try to find a valid first point
+        {
+            QPointF pts0 = pts[0];
+
+            pts[0].setY(invTransform(QwtPlot::yLeft, pt.y()));
+            pts[0].setX(invTransform(QwtPlot::xBottom, pt.x()));
+
+            if (m_rasterData->pointValid(pts[0]))
+            {
+                //the mouse cursor is now in a valid area. Due to discretization limits, it might be that this point is not exactly at the border
+                //towards the direction where the mouse has been pressed for the first time. Therefore get the intersection to the initial mouse press
+                //position.
+                QPointF intersection;
+                QPointF rt(xInterval.maxValue(), yInterval.maxValue());
+                QPointF lt(xInterval.minValue(), yInterval.maxValue());
+                QPointF rb(xInterval.maxValue(), yInterval.minValue());
+                QPointF lb(xInterval.minValue(), yInterval.minValue());
+                
+                if (lineIntersection(pts[0], pts0, lt, lb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with left border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, rt, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with right border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, lt, rt, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with top border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, lb, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with bottom border
+                    pts[0] = intersection;
+                }
+
+                m_lineCutValidStart = true;
             }
             else
             {
-                pts[1].setX(pts[0].x());
+                //first point not valid
+                m_lineCutValidStart = false;
             }
+
+            pts[1] = pts[0];
+
+            m_pLineCutLine->setVisible(true);
+            m_pLineCutLine->setSamples(pts);
+
+            ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+
+            replot();
         }
-
-        m_pLineCutLine->setSamples(pts);
-
-        ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
-        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
     }
-
-    replot();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1453,6 +1577,16 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
         pts[0].setY(invTransform(QwtPlot::yLeft, pt.y()));
         pts[0].setX(invTransform(QwtPlot::xBottom, pt.x()));
 
+        if (m_rasterData->pointValid(pts[0]))
+        {
+            m_lineCutValidStart = true;
+        }
+        else
+        {
+            //first point not valid
+            m_lineCutValidStart = false;
+        }
+
         pts[1] = pts[0];
 
         m_pLineCutLine->setVisible(true);
@@ -1460,9 +1594,9 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
 
         ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-    }
 
-    replot();
+        replot();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
