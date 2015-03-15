@@ -34,8 +34,13 @@
 #include <qdebug.h>
 #include <qmessagebox.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#if (defined __APPLE__)
+    #include <OpenGL/gl.h>
+    #include <OpenGL/glu.h>
+#else // __APPLE__
+    #include <GL/gl.h>
+    #include <GL/glu.h>
+#endif // __APPLE__
 
 #define _USE_MATH_DEFINES  // needs to be defined to enable standard declarations of PI constant
 #include "math.h"

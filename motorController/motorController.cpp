@@ -132,25 +132,25 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         QString bname(10);
         
         buttons.append(new QPushButton("--", this));
-        bname.sprintf("%c--", m_axisName[i][0]);
+        bname.sprintf("%c--", m_axisName[i][0].toLatin1());
         buttons[0]->setToolTip(bname);
         buttons[0]->setMinimumSize(24, 24);
         buttons[0]->setMaximumSize(24, 24);
 
         buttons.append(new QPushButton("-", this));
-        bname.sprintf("%c-", m_axisName[i][0]);
+        bname.sprintf("%c-", m_axisName[i][0].toLatin1());
         buttons[1]->setToolTip(bname);
         buttons[1]->setMinimumSize(24, 24);
         buttons[1]->setMaximumSize(24, 24);
 
         buttons.append(new QPushButton("+", this));
-        bname.sprintf("%c+", m_axisName[i][0]);
+        bname.sprintf("%c+", m_axisName[i][0].toLatin1());
         buttons[2]->setToolTip(bname);
         buttons[2]->setMinimumSize(24, 24);
         buttons[2]->setMaximumSize(24, 24);
 
         buttons.append(new QPushButton("++", this));
-        bname.sprintf("%c++", m_axisName[i][0]);
+        bname.sprintf("%c++", m_axisName[i][0].toLatin1());
         buttons[3]->setToolTip(bname);
         buttons[3]->setMinimumSize(24, 24);
         buttons[3]->setMaximumSize(24, 24);
@@ -924,7 +924,7 @@ void MotorController::setAbsRel(const bool absRel)
     for (int i = 0; i < m_posWidgets.size(); i ++)
     {
         axisName = m_axisName[i][0];
-        m_axisName[i].sprintf(text, axisName);
+        m_axisName[i].sprintf(text, axisName.toLatin1());
 
         m_posLabels[i]->setText(m_axisName[i]);
     }
