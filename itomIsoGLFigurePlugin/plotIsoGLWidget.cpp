@@ -21,7 +21,7 @@
 *********************************************************************** */
 //#include "GL/glew.h"
 
-#if linux
+#ifndef WIN32
     #include <unistd.h>
 #endif
 #include "itomIsoGLFigure.h"
@@ -34,8 +34,13 @@
 #include <qdebug.h>
 #include <qmessagebox.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#if (defined __APPLE__)
+    #include <OpenGL/gl.h>
+    #include <OpenGL/glu.h>
+#else // __APPLE__
+    #include <GL/gl.h>
+    #include <GL/glu.h>
+#endif // __APPLE__
 
 #define _USE_MATH_DEFINES  // needs to be defined to enable standard declarations of PI constant
 #include "math.h"
@@ -2846,7 +2851,7 @@ void plotGLWidget::OGLMakeFont(int size)
     if(m_myCharBitmapBuffer != 0)
         glDeleteLists(m_myCharBitmapBuffer, 256);
     m_myCharBitmapBuffer = glGenLists(256);            // Storage For 256 Characters
-#if (defined linux)
+#ifndef WIN32
 
 #elif (defined Q_OS_WIN32 || defined(Q_OS_WIN64))
 #if QT_VERSION >= 0x050000
