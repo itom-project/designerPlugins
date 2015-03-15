@@ -332,7 +332,7 @@ class plotGLWidget : public QGLWidget
 
         inline void toggleObjectInfoText(const bool enabled);
 
-#if linux
+#ifndef WIN32
         void setColorMap(QString colormap = QString());
 #else
         void setColorMap(QString colormap = QString::QString(""));

@@ -21,7 +21,7 @@
 *********************************************************************** */
 //#include "GL/glew.h"
 
-#if linux
+#ifndef WIN32
     #include <unistd.h>
 #endif
 #include "itomIsoGLFigure.h"
@@ -2851,7 +2851,7 @@ void plotGLWidget::OGLMakeFont(int size)
     if(m_myCharBitmapBuffer != 0)
         glDeleteLists(m_myCharBitmapBuffer, 256);
     m_myCharBitmapBuffer = glGenLists(256);            // Storage For 256 Characters
-#if (defined linux)
+#ifndef WIN32
 
 #elif (defined Q_OS_WIN32 || defined(Q_OS_WIN64))
 #if QT_VERSION >= 0x050000
