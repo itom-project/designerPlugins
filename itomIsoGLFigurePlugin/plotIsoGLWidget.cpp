@@ -21,7 +21,7 @@
 *********************************************************************** */
 //#include "GL/glew.h"
 
-#if !defined(WIN32) && !defined(_WIN64)
+#ifndef WIN32
     #include <unistd.h>
 #endif
 #include "itomIsoGLFigure.h"
@@ -2851,15 +2851,13 @@ void plotGLWidget::OGLMakeFont(int size)
     if(m_myCharBitmapBuffer != 0)
         glDeleteLists(m_myCharBitmapBuffer, 256);
     m_myCharBitmapBuffer = glGenLists(256);            // Storage For 256 Characters
-#if !defined(Q_OS_WIN32) && !defined(Q_OS_WIN64)
-
-#elif (defined Q_OS_WIN32 || defined(Q_OS_WIN64))
-#if QT_VERSION >= 0x050000
-    HWND hwnd = (HWND)winId();
-    wglUseFontBitmaps(GetDC(hwnd), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
-#else
-    wglUseFontBitmaps(getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
-#endif
+#ifdef WIN32
+    #if QT_VERSION >= 0x050000
+        HWND hwnd = (HWND)winId();
+        wglUseFontBitmaps(GetDC(hwnd), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
+    #else
+        wglUseFontBitmaps(getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
+    #endif
 #endif
 
     this->setFont(oldFont);
