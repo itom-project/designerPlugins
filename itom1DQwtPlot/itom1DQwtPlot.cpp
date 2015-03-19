@@ -84,6 +84,7 @@ void Itom1DQwtPlot::constructor()
     mainTb->addAction(m_pActZoomToRect);
     mainTb->addAction(m_pActAspectRatio);
     mainTb->addAction(m_pActMultiRowSwitch);
+    mainTb->addAction(m_pActRGBSwitch);
     // first block is zoom, scale settings, home
     mainTb->addSeparator();
     mainTb->addAction(m_pActMarker);
@@ -175,6 +176,8 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActSetMarker(NULL),
     m_pActCmplxSwitch(NULL),
     m_pMnuCmplxSwitch(NULL),
+    m_pActRGBSwitch(NULL),
+    m_pMnuRGBSwitch(NULL),
     m_pLblMarkerOffsets(NULL),
     m_pLblMarkerCoords(NULL),
     m_pActAspectRatio(NULL),
@@ -207,6 +210,8 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
     m_pActSetMarker(NULL),
     m_pActCmplxSwitch(NULL),
     m_pMnuCmplxSwitch(NULL),
+    m_pActRGBSwitch(NULL),
+    m_pMnuRGBSwitch(NULL),
     m_pLblMarkerOffsets(NULL),
     m_pLblMarkerCoords(NULL),
     m_pActAspectRatio(NULL),
@@ -234,6 +239,12 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
         m_pMnuCmplxSwitch->deleteLater();
         m_pMnuCmplxSwitch = NULL;
     }
+    if (m_pMnuRGBSwitch != NULL)
+    {
+        m_pMnuRGBSwitch->deleteLater();
+        m_pMnuRGBSwitch = NULL;
+    }
+
     m_pContent->deleteLater();
 //    m_pContent = NULL;
     m_pContent = NULL;
@@ -304,7 +315,62 @@ void Itom1DQwtPlot::resetRowPresentation()
 {
     setRowPresentation(0);
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getRGBPresentation(void) const
+{
+    return m_data->m_colorLine;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setRGBPresentation(const int idx)
+{
+    QAction *action = NULL;
+    bool ok;
+    foreach(QAction *a, m_pMnuRGBSwitch->actions())
+    {
+        if (a->data().toInt(&ok) == idx)
+        {
+            if (ok) action = a;
+        }
+    }
 
+    if (action) m_pMnuRGBSwitch->setIcon(action->icon());
+
+    switch(idx)
+    {
+        default:
+        case 0:
+            m_data->m_colorLine = Plot1DWidget::AutoColor;
+            break;
+        case 1:
+            m_data->m_colorLine = Plot1DWidget::Gray;
+            break;
+        case 2:
+            m_data->m_colorLine = Plot1DWidget::RGB;
+            break;
+        case 3:
+            m_data->m_colorLine = Plot1DWidget::RGBA;
+            break;
+        case 4:
+            m_data->m_colorLine = Plot1DWidget::RGBGray;
+            break;
+    }
+
+    if(m_pContent)
+    {
+        QVector<QPointF> bounds = getBounds();
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+
+        //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
+        m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
+    }
+
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetRGBPresentation() 
+{
+    setRGBPresentation(0);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getPickerLimit(void) const
 {
@@ -478,6 +544,23 @@ void Itom1DQwtPlot::createActions()
     m_pActMultiRowSwitch->setMenu(m_pMnuMultiRowSwitch);
     m_pActMultiRowSwitch->setVisible(true);
     connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
+
+    //m_pActRGBSwitch
+    m_pActRGBSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis/icons/rgb_plot.png"), tr("Switch Auto, gray, rgb, rgba, rgb-gray"), this);
+    m_pMnuRGBSwitch = new QMenu("Color Representation");
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgb_plot.png"), tr("auto value"));
+    a->setData(0);
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/gray_plot.png"), tr("gray value"));
+    a->setData(1);
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgb_plot.png"), tr("RGB-lines"));
+    a->setData(2);
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgba_plot.png"), tr("RGBA-lines"));
+    a->setData(3);
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgbgray_plot.png"), tr("RGB + Gray"));
+    a->setData(4);
+    m_pActRGBSwitch->setMenu(m_pMnuRGBSwitch);
+    m_pActRGBSwitch->setVisible(false);
+    connect(m_pMnuRGBSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuRGBSwitch(QAction*)));
 
     //m_actDrawMode
     m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
@@ -1304,6 +1387,17 @@ void Itom1DQwtPlot::mnuMultiRowSwitch(QAction *action)
         setRowPresentation(idx);
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::mnuRGBSwitch(QAction *action)
+{
+    bool ok;
+    int idx = action->data().toInt(&ok);
+
+    if (ok)
+    {
+        setRGBPresentation(idx);
+    }
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::AutoInterval Itom1DQwtPlot::getYAxisInterval(void) const
@@ -1349,10 +1443,35 @@ void Itom1DQwtPlot::setPickerText(const QString &coords, const QString &offsets)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::enableComplexGUI(const bool checked)
+void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
 { 
-    m_pActCmplxSwitch->setEnabled(checked);
-    m_pActCmplxSwitch->setVisible(checked);
+    switch(mode & 0x1)
+    {
+        case 0: // Standard
+            m_pActCmplxSwitch->setEnabled(false);
+            m_pActCmplxSwitch->setVisible(false);
+            m_pActRGBSwitch->setEnabled(false);
+            m_pActRGBSwitch->setVisible(false);
+            m_pMnuMultiRowSwitch->actions()[3]->setEnabled(true);
+            m_pMnuMultiRowSwitch->actions()[4]->setEnabled(true);
+            break;
+        case 1: // RGB
+            m_pActCmplxSwitch->setEnabled(false);
+            m_pActCmplxSwitch->setVisible(false);
+            m_pActRGBSwitch->setEnabled(true);
+            m_pActRGBSwitch->setVisible(true);
+            m_pMnuMultiRowSwitch->actions()[3]->setEnabled(false);
+            m_pMnuMultiRowSwitch->actions()[4]->setEnabled(false);
+            break;
+        case 2: // Complex
+            m_pActCmplxSwitch->setEnabled(true);
+            m_pActCmplxSwitch->setVisible(true);
+            m_pActRGBSwitch->setEnabled(false);
+            m_pActRGBSwitch->setVisible(false);
+            m_pMnuMultiRowSwitch->actions()[3]->setEnabled(true);
+            m_pMnuMultiRowSwitch->actions()[4]->setEnabled(true);
+            break;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

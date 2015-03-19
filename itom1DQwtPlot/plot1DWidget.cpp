@@ -73,6 +73,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_pParent(parent),
         m_actPickerIdx(-1),
         m_cmplxState(false),
+        m_colorState(false),
         m_pData(data),
         m_activeDrawItem(1),
         m_pRescaler(NULL),
@@ -454,19 +455,58 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
         {
-            if (!m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableComplexGUI(true);
-            m_cmplxState = true;                
+            if (!m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(2);
+            m_cmplxState = true;
+            m_colorState = false;
+        }
+        else if(dataObj->getType() == ito::tRGBA32)
+        {
+            if (!m_colorState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(1);
+            m_colorState = true;
+            m_cmplxState = false;
         }
         else
         {
-            if (m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableComplexGUI(false);
-            m_cmplxState = false;                
+            if (m_cmplxState || m_colorState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(0);
+            m_cmplxState = false;  
+            m_colorState = false;
         }
 
         Plot1DWidget::MultiLineMode multiLineMode = m_pData->m_multiLine;
 
-        if (bounds.size() == 0)
+        if(dataObj->getType() == ito::tRGBA32)
         {
+            if(bounds.size() == 0) m_pData->m_multiLine = width == 1 ? FirstCol : FirstRow;
+            m_legendTitles.clear();
+            switch(m_pData->m_colorLine)
+            {
+                case Gray:
+                    numCurves = 1;
+                    m_legendTitles << "gray";
+                break;
+                case RGB:
+                    numCurves = 3;
+                    m_legendTitles << "blue" << "green" << "red";
+                break;
+                case RGBA:
+                    numCurves = 4;
+                    m_legendTitles << "blue" << "green" << "red" << "alpha";
+                break;
+                case RGBGray:
+                    numCurves = 4;
+                    m_legendTitles << "blue" << "green" << "red" << "gray";
+                break;
+                default:
+                    numCurves = 3;
+                    m_pData->m_colorLine = RGB;
+                    m_legendTitles << "blue" << "green" << "red";
+                break;
+            }
+
+        }
+        else if (bounds.size() == 0)
+        {
+            m_pData->m_colorLine = AutoColor;
             switch (m_pData->m_multiLine)
             {
                 case FirstRow:
@@ -478,6 +518,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     break;
                 case MultiCols:
                     numCurves = width;
+                    break;
+                case MultiLayer:
+                    numCurves = dims > 2 ? dataObj->getSize(dims - 3) : 1;
                     break;
                 default:
                 {
@@ -501,6 +544,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else //if there are boundaries, only plot one curve from bounds[0] to bounds[1]
         {
+            m_pData->m_colorLine = AutoColor;
             numCurves = 1;
         }
 
@@ -563,8 +607,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setX(dataObj->getPixToPhys(dims-1, n, _unused));
-                    pts[1].setX(dataObj->getPixToPhys(dims-1, n, _unused));
+                    pts[0].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));
+                    pts[1].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
@@ -574,6 +618,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         seriesData = new DataObjectSeriesData(1);
                         seriesData->updateDataObject(dataObj, pts);
                         m_plotCurveItems[n]->setData(seriesData);
+                    }
+                    if(m_colorState)
+                    {
+                        if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                        else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
+                        else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                     }
                 }
 
@@ -594,8 +644,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setY(dataObj->getPixToPhys(dims-2, n, _unused));
-                    pts[1].setY(dataObj->getPixToPhys(dims-2, n, _unused));
+                    pts[0].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));
+                    pts[1].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
@@ -605,6 +655,13 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         seriesData = new DataObjectSeriesData(1);
                         seriesData->updateDataObject(dataObj, pts);
                         m_plotCurveItems[n]->setData(seriesData);
+                    }
+
+                    if(m_colorState)
+                    {
+                        if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                        else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
+                        else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                     }
                 }
 
@@ -619,37 +676,64 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else if (bounds.size() == 2) //boundaries given ->line plot
         {
-            seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-            if (seriesData && seriesData->isDobjInit())
+
+            for (int n = 0; n < numCurves; n++)
             {
-                seriesData->updateDataObject(dataObj, bounds);
-            }
-            else
-            {
-                seriesData = new DataObjectSeriesData(1);
-                seriesData->updateDataObject(dataObj, bounds);
-                m_plotCurveItems[0]->setData(seriesData);
+                seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
+                if (seriesData && seriesData->isDobjInit())
+                {
+                    seriesData->updateDataObject(dataObj, bounds);
+                }
+                else
+                {
+                    seriesData = new DataObjectSeriesData(1);
+                    seriesData->updateDataObject(dataObj, bounds);
+                    m_plotCurveItems[n]->setData(seriesData);
+                }
+                if(m_colorState)
+                {
+                    if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                    else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
+                    else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                }
             }
 
-            m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
-            m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+            if (numCurves > 0)
+            {
+                seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
+                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
+                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+            }
         }
         else if (bounds.size() == 1) //point in third dimension
         {
-            seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-            if (seriesData && seriesData->isDobjInit())
+            for (int n = 0; n < numCurves; n++)
             {
-                seriesData->updateDataObject(dataObj, bounds);
-            }
-            else
-            {
-                seriesData = new DataObjectSeriesData(1);
-                seriesData->updateDataObject(dataObj, bounds);
-                m_plotCurveItems[0]->setData(seriesData);
-            }
+                seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
+                if (seriesData && seriesData->isDobjInit())
+                {
+                    seriesData->updateDataObject(dataObj, bounds);
+                }
+                else
+                {
+                    seriesData = new DataObjectSeriesData(1);
+                    seriesData->updateDataObject(dataObj, bounds);
+                    m_plotCurveItems[n]->setData(seriesData);
+                }
 
-            m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
-            m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+                if(m_colorState)
+                {
+                    if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                    else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
+                    else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                }
+            }
+            if (numCurves > 0)
+            {
+                seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
+                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
+                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+            }
         }
 
         bool valid;

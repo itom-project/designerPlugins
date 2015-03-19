@@ -156,7 +156,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QVector<QPointF> getBounds(void);
         void setBounds(QVector<QPointF> bounds);
 
-        void enableComplexGUI(const bool checked);
+        void enableObjectGUIElements(const int mode);
 
         QString getTitle() const;
         void setTitle(const QString &title);
@@ -221,6 +221,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void setRowPresentation(const int idx);
         void resetRowPresentation(); 
 
+        int getRGBPresentation(void) const;
+        void setRGBPresentation(const int idx);
+        void resetRGBPresentation(); 
+
         int getPickerLimit(void) const;
         void setPickerLimit(const int idx);
         void resetPickerLimit(); 
@@ -280,6 +284,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction *m_pActBack;
         QAction* m_pActCmplxSwitch;
         QMenu *m_pMnuCmplxSwitch;
+        QAction *m_pActRGBSwitch;
+        QMenu *m_pMnuRGBSwitch;
         QLabel *m_pLblMarkerOffsets;
         QLabel *m_pLblMarkerCoords;
         QActionGroup *m_pDrawModeActGroup;
@@ -324,6 +330,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuScaleSetting();
         void mnuParentScaleSetting();
         void mnuCmplxSwitch(QAction *action);
+        void mnuRGBSwitch(QAction *action);
         void mnuMultiRowSwitch(QAction *action);
         void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);

@@ -39,6 +39,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 {
     public:
 
+        enum ColorType { grayColor = 4, blueColor = 0, greenColor = 1, redColor = 2, alphaColor = 3 };
         enum ComplexType { cmplxAbs = 0, cmplxReal = 1, cmplxImag = 2, cmplxArg = 3 };
         enum Direction { dirX = 0, dirY = 1, dirZ = 2, dirXY = 3 };
 
@@ -113,6 +114,8 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         inline QByteArray getHash() const { return m_hash; }
         void calcHash();
 
+        void setColorState(int newVal) {m_colorState = (ColorType)newVal;}
+
     protected:
 
         inline void saturation(int &value, int min, int max) { value = ( value < min ? min : ( value > max ? max : value) ); }
@@ -120,6 +123,8 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
     private:
         const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
+
+        ColorType m_colorState;
 
         bool inSamplingMode;
 

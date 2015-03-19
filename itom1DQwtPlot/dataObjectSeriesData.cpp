@@ -38,7 +38,8 @@ DataObjectSeriesData::DataObjectSeriesData(const int fastmode) :
     m_maxX(1.0),
     m_cmplxState(DataObjectSeriesData::cmplxAbs),
     m_pDataObj(NULL),
-    inSamplingMode(false) 
+    inSamplingMode(false),
+    m_colorState(grayColor)
 {
     m_d.nrPoints = 0;
     m_d.points.clear();
@@ -907,7 +908,26 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                 }
                 break;
                 case ito::tRGBA32:
-                    return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->gray() );
+                    switch (m_colorState)
+                    {
+                        default:
+                        case grayColor:
+                            return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->gray() );
+                        break;
+                        case blueColor:
+                            return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->blue() );
+                        break;
+                        case greenColor:
+                            return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->green() );
+                        break;
+                        case redColor:
+                            return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->red() );
+                        break;
+                        case alphaColor:
+                            return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->alpha() );
+                        break;
+                    }
+                    
                 break;
             }
         }

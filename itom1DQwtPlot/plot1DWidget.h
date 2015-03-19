@@ -65,7 +65,9 @@ class Plot1DWidget : public QwtPlot
 {
     Q_OBJECT
     public:
-        enum MultiLineMode { Auto, FirstRow, FirstCol, MultiRows, MultiCols };
+
+        enum MultiLineMode { Auto, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayer };
+        enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
         enum tState
         { 
             stateIdle   = 0, 
@@ -178,7 +180,7 @@ class Plot1DWidget : public QwtPlot
         bool m_xDirect;
         bool m_yDirect;
         bool m_cmplxState;
-
+        bool m_colorState;
         bool m_gridEnabled;
 
         //unsigned char m_autoLineColIndex;
@@ -243,6 +245,7 @@ struct InternalData
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
         m_multiLine = Plot1DWidget::Auto;
+        m_colorLine = Plot1DWidget::AutoColor;
         m_pickerLimit = 2;
 
         m_axisColor = Qt::black;
@@ -307,7 +310,7 @@ struct InternalData
     bool m_forceValueParsing; 
 
     Plot1DWidget::MultiLineMode m_multiLine;
-
+    Plot1DWidget::ColorHandling m_colorLine;
     QHash<int, DrawItem *> m_pDrawItems;
 };
 
