@@ -559,7 +559,7 @@ void Itom1DQwtPlot::createActions()
     a->setData(1);
     a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("RGB-lines"));
     a->setData(2);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBA.png"), tr("RGBA-lines"));
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGBA.png"), tr("RGBA-lines"));
     a->setData(3);
     a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBGray.png"), tr("RGB + Gray"));
     a->setData(4);
