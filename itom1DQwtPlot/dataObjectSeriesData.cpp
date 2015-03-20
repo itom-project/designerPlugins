@@ -124,7 +124,7 @@ void DataObjectSeriesData::calcHash()
 
         if( dims > 0 )
         {
-            cv::Mat *m = (cv::Mat*)m_pDataObj->get_mdata()[0];
+            cv::Mat *m = (cv::Mat*)m_pDataObj->get_mdata()[m_pDataObj->seekMat(m_d.plane)];
             uchar* d = m->data;
             ba.append( QByteArray( (const char*)&d, (sizeof(int)/sizeof(char)))); //address to data of first plane
 
@@ -153,6 +153,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
     if(dataObj == NULL)
     {
+        m_d.plane = 0;
         m_d.dir = dirZ;
         m_d.nrPoints = 0;
         m_d.points.clear();
@@ -173,30 +174,47 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
             prependedOneDims++;
         }
 
-        
-        switch( bounds.size() )
+        QVector<QPointF> tmpBounds;
+
+        if(bounds.size() == 3)
+        {
+            m_d.plane = bounds[0].x();
+            m_d.plane = dims > 2 ? std::min(m_d.plane, dataObj->getSize(dims-3)) : 0;
+            m_d.plane = std::max(m_d.plane, 0);
+            tmpBounds.resize(2);
+            tmpBounds[0] = bounds[1];
+            tmpBounds[1] = bounds[2];
+        }
+        else
+        {
+            m_d.plane = 0;
+            tmpBounds = bounds;
+        }
+
+        switch( tmpBounds.size() )
         {
         case 2: //dirX, dirY or dirXY
 
-            if( (dims-prependedOneDims) != 2)
+            if( (dims-prependedOneDims) != 2 && (dims-prependedOneDims) != 3)
             {
                 m_d.valid = false;
                 retval += RetVal(retError,0,"line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
             }
             else
             {
+                
                 m_d.valid = true;
-                pxX1 = qRound(dataObj->getPhysToPix(dims-1, bounds[0].x(), _unused));
-                pxY1 = qRound(dataObj->getPhysToPix(dims-2, bounds[0].y(), _unused));
-                pxX2 = qRound(dataObj->getPhysToPix(dims-1, bounds[1].x(), _unused));
-                pxY2 = qRound(dataObj->getPhysToPix(dims-2, bounds[1].y(), _unused));
+                pxX1 = qRound(dataObj->getPhysToPix(dims-1, tmpBounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPhysToPix(dims-2, tmpBounds[0].y(), _unused));
+                pxX2 = qRound(dataObj->getPhysToPix(dims-1, tmpBounds[1].x(), _unused));
+                pxY2 = qRound(dataObj->getPhysToPix(dims-2, tmpBounds[1].y(), _unused));
 
                 saturation( pxX1, 0, dataObj->getSize(dims-1)-1 );
                 saturation( pxX2, 0, dataObj->getSize(dims-1)-1 );
                 saturation( pxY1, 0, dataObj->getSize(dims-2)-1 );
                 saturation( pxY2, 0, dataObj->getSize(dims-2)-1 );
 
-                mat = (cv::Mat*)dataObj->get_mdata()[ dataObj->seekMat(0) ]; //first plane in ROI
+                mat = (cv::Mat*)dataObj->get_mdata()[ dataObj->seekMat(m_d.plane) ]; //first plane in ROI
 
                 if( pxX1 == pxX2 ) //pure line in y-direction
                 {
@@ -204,8 +222,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     if(pxY2 >= pxY1)
                     {
                         m_d.nrPoints = 1 + pxY2 - pxY1;
-                        m_d.startPhys= dataObj->getPixToPhys(dims-2, pxY1, _unused); //bounds[0].y() ;
-                        right = dataObj->getPixToPhys(dims-2, pxY2, _unused); //bounds[1].y();
+                        m_d.startPhys= dataObj->getPixToPhys(dims-2, pxY1, _unused); //tmpBounds[0].y() ;
+                        right = dataObj->getPixToPhys(dims-2, pxY2, _unused); //tmpBounds[1].y();
                         m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
                         
                         m_d.startPx.setX(pxX1);
@@ -219,8 +237,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     else
                     {
                         m_d.nrPoints = 1 + pxY1 - pxY2;
-                        m_d.startPhys = dataObj->getPixToPhys(dims-2, pxY2, _unused); //bounds[1].y();
-                        right = dataObj->getPixToPhys(dims-2, pxY1, _unused); //bounds[0].y();
+                        m_d.startPhys = dataObj->getPixToPhys(dims-2, pxY2, _unused); //tmpBounds[1].y();
+                        right = dataObj->getPixToPhys(dims-2, pxY1, _unused); //tmpBounds[0].y();
                         m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
 
                         m_d.startPx.setX(pxX1);
@@ -262,8 +280,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     if(pxX2 >= pxX1)
                     {
                         m_d.nrPoints = 1 + pxX2 - pxX1;
-                        m_d.startPhys= dataObj->getPixToPhys(dims-1, pxX1, _unused); //bounds[0].y() ;
-                        right = dataObj->getPixToPhys(dims-1, pxX2, _unused); //bounds[1].y();
+                        m_d.startPhys= dataObj->getPixToPhys(dims-1, pxX1, _unused); //tmpBounds[0].y() ;
+                        right = dataObj->getPixToPhys(dims-1, pxX2, _unused); //tmpBounds[1].y();
                         m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
                         
                         m_d.startPx.setX(pxX1);
@@ -277,8 +295,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     else
                     {
                         m_d.nrPoints = 1 + pxX1 - pxX2;
-                        m_d.startPhys = dataObj->getPixToPhys(dims-1, pxX2, _unused); //bounds[1].y();
-                        right = dataObj->getPixToPhys(dims-1, pxX1, _unused); //bounds[0].y();
+                        m_d.startPhys = dataObj->getPixToPhys(dims-1, pxX2, _unused); //tmpBounds[1].y();
+                        right = dataObj->getPixToPhys(dims-1, pxX1, _unused); //tmpBounds[0].y();
                         m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
 
                         m_d.startPx.setX(pxX1);
@@ -399,8 +417,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     else
                     {
                         //// "full" calculation of line points using interpolation values for always four neighbouring point
-                        //double dx = (bounds[1].x() - bounds[0].x());
-                        //double dy = (bounds[1].y() - bounds[0].y());
+                        //double dx = (tmpBounds[1].x() - tmpBounds[0].x());
+                        //double dy = (tmpBounds[1].y() - tmpBounds[0].y());
                         //double sizex = dataObj->getSize(dims-1);
                         //double sizey = dataObj->getSize(dims-2);
 
@@ -434,12 +452,12 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         //}
                         //else if(ydirect)
                         //{
-                        //    m_startPos = bounds[0].y();
+                        //    m_startPos = tmpBounds[0].y();
                         //    m_physLength = yscale* dy ;      
                         //}
                         //else
                         //{
-                        //    m_startPos = bounds[0].x();
+                        //    m_startPos = tmpBounds[0].x();
                         //    m_physLength = xscale* dx ;             
                         //}
 
@@ -544,8 +562,8 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
             else
             {
                 m_d.valid = true;
-                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, bounds[0].x(), _unused));
-                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, bounds[0].y(), _unused));
+                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
 
                 saturation( pxX1, 0, dataObj->getSize(dims - 1) - 1 );
                 saturation( pxX2, 0, dataObj->getSize(dims - 1) - 1 );
@@ -568,7 +586,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                 m_d.stepSizePx.setWidth(0);
                 m_d.stepSizePx.setHeight(0);
 
-                mat = (cv::Mat*)dataObj->get_mdata()[ dataObj->seekMat(0) ]; //first plane in ROI
+                mat = (cv::Mat*)dataObj->get_mdata()[ dataObj->seekMat(m_d.plane) ]; //first plane in ROI
                 m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
                 m_d.matStepSize= 0 ; //step in x-direction (in bytes)
 
@@ -821,7 +839,7 @@ QPointF DataObjectSeriesData::sample(size_t n) const
             {
                 case dirX:
                 case dirY:
-                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(0) ]);
+                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(m_d.plane) ]);
                     ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
                     fPos = m_d.startPhys + m_d.stepSizePhys * n;
                 break;
@@ -833,7 +851,7 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                 break;
 
                 case dirXY:
-                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(0) ]);
+                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(m_d.plane) ]);
                     ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
                     fPos = m_d.startPhys + m_d.stepSizePhys * n;
                 break;
@@ -1736,7 +1754,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1750,7 +1768,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1791,7 +1809,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1810,7 +1828,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1860,7 +1878,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1879,7 +1897,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1931,7 +1949,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1966,7 +1984,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -2048,7 +2066,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -2082,7 +2100,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(0) ]);
+        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
         ptr = (mat->data + d.matOffset);
         for(int i = 0 ; i < d.nrPoints ; i++)
         {

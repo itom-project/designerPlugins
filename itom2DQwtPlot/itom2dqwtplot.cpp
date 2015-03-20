@@ -1548,6 +1548,14 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 retval += addChannel((ito::AbstractNode*)figure,  m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "zCutPoint"  << "sourceout";
             }
+            else if(bounds.size() == 3) // its a 3D-Object
+            {
+                ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
+                // otherwise simply pass on the displayed plane
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                paramNames << "bounds"  << "sourceout";
+            }
             else
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
@@ -1566,6 +1574,10 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             if (zStack)
             {
                 paramNames << "zCutPoint"  << "sourceout";
+            }
+            else if(bounds.size() == 3) // its a 3D-Object
+            {
+                paramNames << "bounds"  << "sourceout";
             }
             else
             {

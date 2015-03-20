@@ -66,7 +66,7 @@ class Plot1DWidget : public QwtPlot
     Q_OBJECT
     public:
 
-        enum MultiLineMode { Auto, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayer };
+        enum MultiLineMode { Auto, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
         enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
         enum tState
         { 
@@ -181,6 +181,7 @@ class Plot1DWidget : public QwtPlot
         bool m_yDirect;
         bool m_cmplxState;
         bool m_colorState;
+        bool m_layerState;
         bool m_gridEnabled;
 
         //unsigned char m_autoLineColIndex;

@@ -74,6 +74,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_actPickerIdx(-1),
         m_cmplxState(false),
         m_colorState(false),
+        m_layerState(false),
         m_pData(data),
         m_activeDrawItem(1),
         m_pRescaler(NULL),
@@ -441,6 +442,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtPlotCurve *curve = NULL;
     QwtPlotCurveDataObject *dObjCurve = NULL;
     bool _unused;
+
     QwtLegendLabel *legendLabel = NULL;
     int index;
 //    bool gotNewObject = false;
@@ -476,6 +478,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if(dataObj->getType() == ito::tRGBA32)
         {
+            m_layerState = false;
             if(bounds.size() == 0) m_pData->m_multiLine = width == 1 ? FirstCol : FirstRow;
             m_legendTitles.clear();
             switch(m_pData->m_colorLine)
@@ -511,19 +514,38 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             {
                 case FirstRow:
                 case FirstCol:
+                    m_layerState = false;
                     numCurves = 1;
                     break;
                 case MultiRows:
+                    m_layerState = false;
                     numCurves = height;
                     break;
                 case MultiCols:
+                    m_layerState = false;
                     numCurves = width;
                     break;
-                case MultiLayer:
+                case MultiLayerAuto:
+                    if(width == 1 && height == 1)
+                    {
+                        multiLineMode = MultiLayerRows;
+                    }
+                    else if (width >= height)
+                    {
+                        multiLineMode = MultiLayerRows;
+                    }
+                    else
+                    {
+                        multiLineMode = MultiLayerCols;
+                    }
+                case MultiLayerCols:
+                case MultiLayerRows:
                     numCurves = dims > 2 ? dataObj->getSize(dims - 3) : 1;
+                    m_layerState = true;
                     break;
                 default:
                 {
+                    m_layerState = false;
                     if(width == 1 && height == 1 && dims < 3)
                     {
                         multiLineMode = MultiRows;
@@ -544,8 +566,27 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else //if there are boundaries, only plot one curve from bounds[0] to bounds[1]
         {
+            if(bounds.size() == 3)
+            {
+                if(m_pData->m_multiLine == MultiLayerCols || 
+                   m_pData->m_multiLine == MultiLayerRows || 
+                   m_pData->m_multiLine == MultiLayerAuto)
+                {
+                    m_layerState = true;
+                    numCurves = dims > 2 ? dataObj->getSize(dims - 3) : 1;
+                }
+                else
+                {
+                    m_layerState = false;
+                    numCurves = 1;
+                }
+            }
+            else
+            {
+                numCurves = 1;
+                m_layerState = false;
+            }
             m_pData->m_colorLine = AutoColor;
-            numCurves = 1;
         }
 
         //check if current number of curves does not correspond to height. If so, adjust the number of curves to the required number
@@ -595,21 +636,41 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if (bounds.size() == 0)
         {
-            bool ignoreN = (m_colorState || m_pData->m_multiLine == MultiLayer);
             QVector<QPointF> pts(2);
 
             switch(multiLineMode)
             {
+            case MultiLayerCols:
             case FirstCol:
             case MultiCols:
-                pts[0].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
-                pts[1].setY(dataObj->getPixToPhys(dims-2, height-1, _unused)); 
+                if(m_layerState)
+                {
+                    pts.resize(3);
+                    pts[1].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
+                    pts[2].setY(dataObj->getPixToPhys(dims-2, height-1, _unused)); 
+                }
+                else
+                {
+                    pts[0].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
+                    pts[1].setY(dataObj->getPixToPhys(dims-2, height-1, _unused)); 
+                }
 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setX(dataObj->getPixToPhys(dims-1, ignoreN ? 0 : n, _unused));
-                    pts[1].setX(dataObj->getPixToPhys(dims-1, ignoreN ? 0 : n, _unused));
+                    if(m_layerState)
+                    {
+                        pts[0].setX(n);
+                        pts[0].setY(n);
+                        pts[1].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
+                        pts[2].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
+                    }
+                    else
+                    {
+                        pts[0].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));
+                        pts[1].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));                    
+                    }
+
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
@@ -637,16 +698,41 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 break;
 
             case Auto:
+            case MultiLayerAuto:
+            case MultiLayerRows:
             case FirstRow:
             case MultiRows:
-                pts[0].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
-                pts[1].setX(dataObj->getPixToPhys(dims-1, width-1, _unused));
+
+                if(m_layerState)
+                {
+                    pts.resize(3);
+                    pts[1].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
+                    pts[2].setX(dataObj->getPixToPhys(dims-1, width-1, _unused));
+                }
+                else
+                {
+                    pts[0].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
+                    pts[1].setX(dataObj->getPixToPhys(dims-1, width-1, _unused));
+                }
+
 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setY(dataObj->getPixToPhys(dims-2, ignoreN ? 0 : n, _unused));
-                    pts[1].setY(dataObj->getPixToPhys(dims-2, ignoreN ? 0 : n, _unused));
+
+                    if(m_layerState)
+                    {
+                        pts[0].setX(n);
+                        pts[0].setY(n);
+                        pts[1].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
+                        pts[2].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
+                    }
+                    else
+                    {
+                        pts[0].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));
+                        pts[1].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));               
+                    }
+
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
@@ -673,22 +759,27 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
                 }
                 break;
-            }
+            } 
         }
-        else if (bounds.size() == 2) //boundaries given ->line plot
+        else if (bounds.size() > 1 && bounds.size() < 4) //boundaries given ->line plot
         {
-
+            QVector<QPointF> tmpBounds = bounds;
             for (int n = 0; n < numCurves; n++)
             {
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
+                if(tmpBounds.size() == 3 && m_layerState)
+                {
+                    tmpBounds[0].setX(n);
+                    tmpBounds[0].setY(n);
+                }
                 if (seriesData && seriesData->isDobjInit())
                 {
-                    seriesData->updateDataObject(dataObj, bounds);
+                    seriesData->updateDataObject(dataObj, tmpBounds);
                 }
                 else
                 {
                     seriesData = new DataObjectSeriesData(1);
-                    seriesData->updateDataObject(dataObj, bounds);
+                    seriesData->updateDataObject(dataObj, tmpBounds);
                     m_plotCurveItems[n]->setData(seriesData);
                 }
                 if(m_colorState)

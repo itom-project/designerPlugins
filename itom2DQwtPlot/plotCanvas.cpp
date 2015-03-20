@@ -889,7 +889,12 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             m_pLineCutLine->setSamples(pts);
             m_pLineCutLine->setVisible(true);
 
+            if(m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
+            }
             (p)->displayCut(pts, m_lineCutUID, false);
+            
             replot();
         }
     }
@@ -1503,7 +1508,13 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
             m_pLineCutLine->setSamples(pts);
 
             ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+
+            if(m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
+            }
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+
             replot();
         }
         else //first point is still not valid, try to find a valid first point
@@ -1559,6 +1570,12 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
             m_pLineCutLine->setSamples(pts);
 
             ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+
+            if(m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
+            }
+
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
 
             replot();
@@ -1593,6 +1610,12 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
         m_pLineCutLine->setSamples(pts);
 
         ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
+
+        if(m_dObjPtr->getDims() > 2)
+        {
+            pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
+        }
+        
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
 
         replot();

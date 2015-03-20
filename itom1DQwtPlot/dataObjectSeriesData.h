@@ -56,9 +56,10 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         };
 
         struct LineData {
-            LineData() : dir(DataObjectSeriesData::dirX), nrPoints(0), startPhys(0.0), stepSizePhys(0.0), matOffset(0), matStepSize(1), valid(0) {}
+            LineData() : dir(DataObjectSeriesData::dirX), nrPoints(0), startPhys(0.0), stepSizePhys(0.0), matOffset(0), matStepSize(1), valid(0), plane(0) {}
             Direction dir;
             int nrPoints;
+            int plane;
             float startPhys;
             float stepSizePhys; //xRight = xLeft + xStepSize * (m_numPts - 1)
             QPoint startPx;
