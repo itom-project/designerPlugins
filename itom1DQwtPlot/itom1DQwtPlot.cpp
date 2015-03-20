@@ -297,6 +297,9 @@ void Itom1DQwtPlot::setRowPresentation(const int idx)
         case 4:
             m_data->m_multiLine = Plot1DWidget::MultiCols;
             break;
+        //case 5:
+        //    m_data->m_multiLine = Plot1DWidget::MultiLayer;
+        //    break;
     }
 
     if(m_pContent)
@@ -541,6 +544,8 @@ void Itom1DQwtPlot::createActions()
     a->setData(3);
     a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"), tr("multi column"));
     a->setData(4);
+    //a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yxvzm_plot.png"), tr("multi layer"));
+    //a->setData(5);
     m_pActMultiRowSwitch->setMenu(m_pMnuMultiRowSwitch);
     m_pActMultiRowSwitch->setVisible(true);
     connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
@@ -1445,7 +1450,7 @@ void Itom1DQwtPlot::setPickerText(const QString &coords, const QString &offsets)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
 { 
-    switch(mode & 0x1)
+    switch(mode & 0x0F)
     {
         case 0: // Standard
             m_pActCmplxSwitch->setEnabled(false);
@@ -1454,6 +1459,15 @@ void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
             m_pActRGBSwitch->setVisible(false);
             m_pMnuMultiRowSwitch->actions()[3]->setEnabled(true);
             m_pMnuMultiRowSwitch->actions()[4]->setEnabled(true);
+            /*if(mode & 0xF0 == 0x10)
+            {
+                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(true);
+            }
+            else
+            {
+                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(false);
+            }*/
+
             break;
         case 1: // RGB
             m_pActCmplxSwitch->setEnabled(false);
@@ -1462,6 +1476,8 @@ void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
             m_pActRGBSwitch->setVisible(true);
             m_pMnuMultiRowSwitch->actions()[3]->setEnabled(false);
             m_pMnuMultiRowSwitch->actions()[4]->setEnabled(false);
+            //m_pMnuMultiRowSwitch->actions()[5]->setEnabled(false);
+
             break;
         case 2: // Complex
             m_pActCmplxSwitch->setEnabled(true);
@@ -1470,6 +1486,15 @@ void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
             m_pActRGBSwitch->setVisible(false);
             m_pMnuMultiRowSwitch->actions()[3]->setEnabled(true);
             m_pMnuMultiRowSwitch->actions()[4]->setEnabled(true);
+            /*
+            if(mode & 0xF0 == 0x10)
+            {
+                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(true);
+            }
+            else
+            {
+                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(false);
+            }*/
             break;
     }
 }

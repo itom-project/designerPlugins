@@ -455,7 +455,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
         {
-            if (!m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(2);
+            if (!m_cmplxState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(2 | (dims > 1 ? 0x10 : 0x00));
             m_cmplxState = true;
             m_colorState = false;
         }
@@ -467,7 +467,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else
         {
-            if (m_cmplxState || m_colorState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(0);
+            if (m_cmplxState || m_colorState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(0 | (dims > 1 ? 0x10 : 0x00));
             m_cmplxState = false;  
             m_colorState = false;
         }
@@ -595,6 +595,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         if (bounds.size() == 0)
         {
+            bool ignoreN = (m_colorState || m_pData->m_multiLine == MultiLayer);
             QVector<QPointF> pts(2);
 
             switch(multiLineMode)
@@ -607,8 +608,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));
-                    pts[1].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));
+                    pts[0].setX(dataObj->getPixToPhys(dims-1, ignoreN ? 0 : n, _unused));
+                    pts[1].setX(dataObj->getPixToPhys(dims-1, ignoreN ? 0 : n, _unused));
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
@@ -644,8 +645,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    pts[0].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));
-                    pts[1].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));
+                    pts[0].setY(dataObj->getPixToPhys(dims-2, ignoreN ? 0 : n, _unused));
+                    pts[1].setY(dataObj->getPixToPhys(dims-2, ignoreN ? 0 : n, _unused));
                     if (seriesData && seriesData->isDobjInit())
                     {
                         seriesData->updateDataObject(dataObj, pts);
