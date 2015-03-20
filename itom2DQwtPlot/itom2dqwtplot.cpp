@@ -1317,9 +1317,30 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
     }
 
     if (m_pContent) m_pContent->changePlane(idx);
-
+    
     QStringList paramNames;
-    paramNames << "displayed";
+    
+    if(m_pOutput["bounds"]->getLen() == 6)
+    {
+        paramNames << "bounds"  << "sourceout";
+        double * bounds = m_pOutput["bounds"]->getVal<double*>();
+
+        double newBounds[6];
+
+        for(int i = 2; i < 6;i ++)
+        {
+            newBounds[i] = bounds[i];
+        }
+        newBounds[0] = m_pContent->getCurrentPlane();
+        newBounds[1] = m_pContent->getCurrentPlane();
+        m_pOutput["bounds"]->setVal<double*>(newBounds, 6);
+    }
+    else
+    {
+        paramNames << "displayed" ;
+    }
+
+
     updateChannels(paramNames);
 
     updatePropertyDock();
