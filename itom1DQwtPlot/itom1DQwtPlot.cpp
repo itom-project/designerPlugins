@@ -546,17 +546,17 @@ void Itom1DQwtPlot::createActions()
     connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
 
     //m_pActRGBSwitch
-    m_pActRGBSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis/icons/rgb_plot.png"), tr("Switch Auto, gray, rgb, rgba, rgb-gray"), this);
+    m_pActRGBSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("Switch Auto, gray, rgb, rgba, rgb-gray"), this);
     m_pMnuRGBSwitch = new QMenu("Color Representation");
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgb_plot.png"), tr("auto value"));
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("auto value"));
     a->setData(0);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/gray_plot.png"), tr("gray value"));
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_Gray.png"), tr("gray value"));
     a->setData(1);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgb_plot.png"), tr("RGB-lines"));
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("RGB-lines"));
     a->setData(2);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgba_plot.png"), tr("RGBA-lines"));
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBA.png"), tr("RGBA-lines"));
     a->setData(3);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/rgbgray_plot.png"), tr("RGB + Gray"));
+    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBGray.png"), tr("RGB + Gray"));
     a->setData(4);
     m_pActRGBSwitch->setMenu(m_pMnuRGBSwitch);
     m_pActRGBSwitch->setVisible(false);

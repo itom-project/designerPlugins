@@ -62,5 +62,9 @@
         <file>icons/xv_plot.png</file>
         <file>icons/yv_plot.png</file>
         <file>icons/xvauto_plot.png</file>
+        <file>icons/RGB_RGBGray.png</file>
+        <file>icons/RGB_Gray.png</file>
+        <file>icons/RGBA_RGBA.png</file>
+        <file>icons/RGBA_RGB.png</file>        
     </qresource>
 </RCC>
