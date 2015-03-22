@@ -2300,3 +2300,88 @@ ito::RetVal Itom1DQwtPlot::setGeometricElementLabelVisible(int id, bool setVisib
     }
     return ito::retOk;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setPickerLabelVisible(const bool state)
+{
+    if(m_data) 
+    {
+        m_data->m_pickerLabelVisible = state;
+    }
+    if(m_pContent)
+    {
+        ((Plot1DWidget*)m_pContent)->updatePickerStyle();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom1DQwtPlot::getPickerLabelVisible() const
+{
+    if(!m_data) 
+    {
+        return false;
+    }
+    return m_data->m_pickerLabelVisible;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setPickerLabelOrientation(const Qt::Orientation val)
+{
+    if(m_data) 
+    {
+        m_data->m_pickerLabelOrientation = val;
+    }
+    if(m_pContent)
+    {
+        ((Plot1DWidget*)m_pContent)->updatePickerStyle();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+Qt::Orientation Itom1DQwtPlot::getPickerLabelOrientation() const
+{
+    if(!m_data) 
+    {
+        return Qt::Horizontal;
+    }
+    return m_data->m_pickerLabelOrientation;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setPickerLabelAlignment(const Qt::Alignment val)
+{
+    if(m_data) 
+    {
+        m_data->m_pickerLabelAlignment = val;
+    }
+    if(m_pContent)
+    {
+        ((Plot1DWidget*)m_pContent)->updatePickerStyle();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+Qt::Alignment Itom1DQwtPlot::getPickerLabelAlignment()const
+{
+    if(!m_data) 
+    {
+        return Qt::AlignRight;
+    }
+    return m_data->m_pickerLabelAlignment;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setPickerType(const PlotPickerType val)
+{
+    if(m_data) 
+    {
+        m_data->m_pickerType = (ItomPlotMarker::PlotType)val;
+    }
+    if(m_pContent)
+    {
+        ((Plot1DWidget*)m_pContent)->updatePickerStyle();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+Itom1DQwtPlot::PlotPickerType Itom1DQwtPlot::getPickerType() const
+{
+    if(!m_data) 
+    {
+        return Default;
+    }
+    return (Itom1DQwtPlot::PlotPickerType)m_data->m_pickerType;
+}
+//----------------------------------------------------------------------------------------------------------------------------------

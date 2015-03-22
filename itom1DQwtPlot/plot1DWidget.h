@@ -61,6 +61,89 @@ class Itom1DQwtPlot;
 class QwtLegend;
 struct InternalData;
 
+
+class ItomPlotMarker : public QwtPlotMarker
+{
+    public:
+
+    enum PlotType { Default, RangeMarker, Multiline };
+
+    ItomPlotMarker(bool labelState,  PlotType type, Qt::Alignment align, Qt::Orientation orient ) : QwtPlotMarker(), m_plotType(type), m_labelState(labelState)
+    { 
+        setLabelAlignment(align);
+        setLabelOrientation(orient);
+        setLabelEnabled(m_labelState);
+    }
+
+    void setPlotType(const PlotType value)
+    {
+        m_plotType = value;
+        switch(value)
+        {
+            case Default:
+                setLineStyle(QwtPlotMarker::NoLine);
+                break;
+            case Multiline:
+                setLineStyle(QwtPlotMarker::NoLine);
+                break;
+            case RangeMarker:
+                setLineStyle(QwtPlotMarker::VLine);
+                setLinePen( Qt::gray, 1.0, Qt::DashLine );
+                break;
+        }
+    }
+    int getPlotType() const {return m_plotType;}
+
+    void setLabelEnabled(const bool state)
+    {
+        m_labelState = state;
+        updateLabelValue();
+    }
+
+    void setXValue( double val)
+    {
+        QwtPlotMarker::setXValue(val);
+        updateLabelValue();
+    }
+    void setYValue( double val)
+    {
+        QwtPlotMarker::setYValue(val);
+        updateLabelValue();
+    }
+    void setValue( double valx, double valy)
+    {
+        QwtPlotMarker::setValue(valx, valy);
+        updateLabelValue();
+    }
+    void setValue( const QPointF & val)
+    {
+        QwtPlotMarker::setValue(val);
+        updateLabelValue();
+    }
+
+private:
+
+    void updateLabelValue()
+    {
+        if(m_labelState)
+        {
+            QwtText tmp(QString("%1\n%2").arg(this->xValue(),0,'g',4).arg(this->yValue(),0,'g',4 )  );
+            tmp.setBackgroundBrush(QBrush(QColor(255, 255, 255, 180), Qt::SolidPattern));
+            setLabel(tmp);
+        }
+        else
+        {
+            QwtText tmp;
+            tmp.setBackgroundBrush(QBrush(QColor(255, 255, 255, 0), Qt::SolidPattern));
+            setLabel(tmp);
+        }
+    }
+
+    PlotType m_plotType;
+    bool m_labelState;
+
+};
+
 class Plot1DWidget : public QwtPlot
 {
     Q_OBJECT
@@ -134,6 +217,7 @@ class Plot1DWidget : public QwtPlot
 
         void setState( tState state);
         void updateColors(void);
+        void updatePickerStyle(void);
 
         void setLineWidth(const qreal &width);
         void setLineStyle(const Qt::PenStyle &style);
@@ -144,7 +228,7 @@ class Plot1DWidget : public QwtPlot
         struct Picker
         {
             Picker() : item(NULL), active(0), curveIdx(0) {}
-            QwtPlotMarker *item;
+            ItomPlotMarker *item;
             bool active;
             int curveIdx;
         };
@@ -241,13 +325,18 @@ struct InternalData
     InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
         m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
         m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_elementsToPick(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
-        m_enablePlotting(true), m_keepAspect(false) 
+        m_enablePlotting(true), m_keepAspect(false)
     {
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
         m_multiLine = Plot1DWidget::Auto;
         m_colorLine = Plot1DWidget::AutoColor;
         m_pickerLimit = 2;
+
+        m_pickerLabelVisible = false;
+        m_pickerType = ItomPlotMarker::Default;
+        Qt::Orientation m_pickerLabelOrientation = Qt::Horizontal;
+        m_pickerLabelAlignment = Qt::AlignRight;
 
         m_axisColor = Qt::black;
         m_textColor = Qt::black;
@@ -299,6 +388,11 @@ struct InternalData
     int m_elementsToPick;
     bool m_enablePlotting;
     bool m_keepAspect;
+
+    bool m_pickerLabelVisible;
+    ItomPlotMarker::PlotType m_pickerType;
+    Qt::Orientation m_pickerLabelOrientation;
+    Qt::Alignment m_pickerLabelAlignment;
 
     QColor m_backgnd;           //!> plot background color
     QColor m_axisColor;         //!> color of axis

@@ -50,6 +50,7 @@
 #endif
 
 class Plot1DWidget;
+class ItomPlotMarker;
 struct InternalData;
 
 
@@ -73,12 +74,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
     Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio USER true)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
-    Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
+    Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false )
 
-    Q_PROPERTY(int columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true)
+    Q_PROPERTY(int columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
     
-    Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true)
-    Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false)
+    Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true USER true)
+    Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false USER true)
     Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
     
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
@@ -88,7 +89,13 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
     Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
 
+    Q_PROPERTY(bool pickerLabelVisible READ getPickerLabelVisible WRITE setPickerLabelVisible USER true);
+    Q_PROPERTY(Qt::Orientation pickerLabelOrientation READ getPickerLabelOrientation WRITE setPickerLabelOrientation USER true);
+    Q_PROPERTY(Qt::Alignment pickerLabelAlignment READ getPickerLabelAlignment WRITE setPickerLabelAlignment USER true);
+    Q_PROPERTY(PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
+
     Q_ENUMS(LegendPos);
+    Q_ENUMS(PlotPickerType);
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -120,6 +127,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
     Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the default titles 'curve 0', 'curve 1'... are taken.")
 
+    Q_CLASSINFO("prop://pickerLabelVisible", "Enable and disable the picker label.")
+    Q_CLASSINFO("prop://pickerLabelOrientation", "Get / Set label orintation for the picker-label.")
+    Q_CLASSINFO("prop://pickerLabelAlignment", "Get / Set label alignment for the picker-label.")
+    Q_CLASSINFO("prop://pickerType", "Get / Set the current picker type")
+
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
     //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
     Q_CLASSINFO("slot://plotMarkers", "Delete a specific marker")
@@ -146,6 +158,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         virtual ~Itom1DQwtPlot();
 
         enum LegendPos { Off = 0, Left = 1, Top = 2, Right = 3, Bottom = 4 };
+        enum PlotPickerType { Default, RangeMarker };
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         
@@ -258,6 +271,18 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         //!> return text color
         QColor getTextColor(void) const;
+
+        void setPickerLabelVisible(const bool state);
+        bool getPickerLabelVisible() const;
+
+        void setPickerLabelOrientation(const Qt::Orientation val);
+        Qt::Orientation getPickerLabelOrientation() const;
+
+        void setPickerLabelAlignment(const Qt::Alignment val);
+        Qt::Alignment getPickerLabelAlignment()const ;
+
+        PlotPickerType getPickerType() const;
+        void setPickerType(const PlotPickerType val);
 
         friend class Plot1DWidget;
 

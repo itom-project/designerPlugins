@@ -1094,7 +1094,10 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
             if (!closeToPicker && m_plotCurveItems.size() > 0 && m_pickers.size() < m_pData->m_pickerLimit)
             {
                 Picker picker;
-                picker.item = new QwtPlotMarker();
+                picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
+                                                 m_pData->m_pickerType, 
+                                                 m_pData->m_pickerLabelAlignment, 
+                                                 m_pData->m_pickerLabelOrientation );
                 picker.item->attach(this);
                 picker.active = true;
                 //marker.color = Qt::darkGreen;
@@ -1536,7 +1539,10 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
     {
         //prepend
         Picker picker;
-        picker.item = new QwtPlotMarker();
+        picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
+                                                 m_pData->m_pickerType, 
+                                                 m_pData->m_pickerLabelAlignment, 
+                                                 m_pData->m_pickerLabelOrientation );
         picker.item->attach(this);
         picker.active = false;
                 
@@ -1645,6 +1651,7 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir) //di
                     m->item->setYValue(p.ry());
                     found = true;
                 }
+                
             }
             else
             {
@@ -2707,7 +2714,7 @@ ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString sty
     {
         if (dObj->getSize(0) >= 8)
         {
-//            QwtPlotMarker *marker = NULL;
+//            ItomPlotMarker *marker = NULL;
             int nrOfMarkers = dObj->getSize(1);
             
             if (id == "") id = "unknown";
@@ -2909,7 +2916,10 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<int> &pxCords)
         if( i > m_pickers.size() - 1)
         {
                 Picker picker;
-                picker.item = new QwtPlotMarker();
+                picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
+                                                 m_pData->m_pickerType, 
+                                                 m_pData->m_pickerLabelAlignment, 
+                                                 m_pData->m_pickerLabelOrientation );
                 picker.item->attach(this);
                 picker.active = true;
                 //marker.color = Qt::darkGreen;
@@ -2942,7 +2952,10 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<float> &physCords)
         if( i > m_pickers.size() - 1)
         {
                 Picker picker;
-                picker.item = new QwtPlotMarker();
+                picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
+                                                 m_pData->m_pickerType, 
+                                                 m_pData->m_pickerLabelAlignment, 
+                                                 m_pData->m_pickerLabelOrientation );
                 picker.item->attach(this);
                 picker.active = true;
                 //picker.color = Qt::darkGreen;
@@ -3056,4 +3069,18 @@ void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
         replot();
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::updatePickerStyle(void)
+{
+    if(!m_pData) return;
+
+    foreach (Picker m, m_pickers)
+    {
+        m.item->setLabelAlignment(m_pData->m_pickerLabelAlignment);
+        m.item->setLabelOrientation(m_pData->m_pickerLabelOrientation);
+        m.item->setLabelEnabled(m_pData->m_pickerLabelVisible);
+        m.item->setPlotType(m_pData->m_pickerType);
+    }    
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 
