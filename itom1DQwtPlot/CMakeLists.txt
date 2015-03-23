@@ -82,12 +82,13 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h´
 )
 
 set(plugin_HEADERS_COPY
@@ -112,12 +113,14 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
+
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
