@@ -198,9 +198,9 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     rightAxis->setColorBarWidth(15);
 
     //rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
-    rightAxis->setFont(QFont("Verdana", 8, 1, true));
+    //rightAxis->setFont(QFont("Verdana", 8, 1, true));
 
-    rightAxis->setMargin(20); //margin to right border of window
+    rightAxis->setMargin(15); //margin to right border of window
     rightAxis->scaleDraw()->setLength(20);
     rightAxis->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,false);
 
@@ -343,6 +343,9 @@ void PlotCanvas::refreshStyles()
     axisTitle(QwtPlot::xBottom).setFont(axisFont);
     axisTitle(QwtPlot::yLeft).setFont(axisFont);
     axisTitle(QwtPlot::yRight).setFont(axisFont);
+    setAxisFont(QwtPlot::xBottom, axisFont);
+    setAxisFont(QwtPlot::yLeft, axisFont);
+    setAxisFont(QwtPlot::yRight, axisFont);
 
     QwtText t = axisWidget(QwtPlot::xBottom)->title();
     t.setFont(labelFont);
