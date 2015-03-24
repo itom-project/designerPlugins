@@ -20,8 +20,8 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef PLOT1DWIDGET_H
-#define PLOT1DWIDGET_H
+#ifndef ITOMPLOTPICKERMARKER_H
+#define ITOMPLOTPICKERMARKER_H
 
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
@@ -53,7 +53,7 @@ class ItomPlotMarker : public QwtPlotMarker
 
     ItomPlotMarker(bool labelState,  PlotType type, Qt::Alignment align, Qt::Orientation orient );
 
-    void setPlotType(const PlotType value):
+    void setPlotType(const PlotType value);
 
     int getPlotType() const {return m_plotType;}
 
@@ -92,3 +92,5 @@ private:
     bool m_labelState;
 
 };
+
+#endif //ITOMPLOTPICKERMARKER_H

@@ -88,7 +88,7 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h´
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
 )
 
 set(plugin_HEADERS_COPY
