@@ -3080,7 +3080,8 @@ void Plot1DWidget::updatePickerStyle(void)
         m.item->setLabelOrientation(m_pData->m_pickerLabelOrientation);
         m.item->setLabelEnabled(m_pData->m_pickerLabelVisible);
         m.item->setPlotType(m_pData->m_pickerType);
-    }    
+    } 
+    replot();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 

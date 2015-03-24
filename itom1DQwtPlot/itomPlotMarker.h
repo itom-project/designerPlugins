@@ -83,6 +83,9 @@ class ItomPlotMarker : public QwtPlotMarker
         QwtPlotMarker::setValue(val);
         updateLabelValue();
     }
+protected:
+    // taken form QWT: qwt_plot_marker.h
+    void drawLabel( QPainter * p, const QRectF &, const QPointF & ) const;
 
 private:
 
