@@ -755,14 +755,15 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
     {
         if(m_lastRasteredArea != area || m_lastRasteredRaster != raster)
         {
-            m_lastRasteredArea = area;
-            m_lastRasteredRaster = raster;
             deleteCache();
         }
     }
 
     if(m_rasteredLinePtr == NULL) //rebuild cache
     {
+        m_lastRasteredArea = area;
+        m_lastRasteredRaster = raster;
+
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
         //area is in scale coordinates
         qreal left = area.left() / m_D.m_xScaling + m_D.m_xOffset;
