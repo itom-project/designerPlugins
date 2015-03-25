@@ -39,7 +39,7 @@ struct InternalData;
 class DataObjRasterData : public QwtRasterData
 {
     public:
-        explicit DataObjRasterData(const InternalData *m_internalData, const bool overlay = true);
+        explicit DataObjRasterData(const InternalData *m_internalData, const bool isOverlayData = false);
         explicit DataObjRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending, const bool overlay = true);
         ~DataObjRasterData();
 
@@ -136,7 +136,7 @@ class DataObjRasterData : public QwtRasterData
 
         const InternalData *m_pInternalData;
 
-        bool m_notOverlay;
+        bool m_isOverlayData;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

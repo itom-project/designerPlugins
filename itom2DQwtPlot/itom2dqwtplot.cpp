@@ -2353,6 +2353,27 @@ QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
 {
+    if (m_dataPointer.contains("overlayImage"))
+    {
+        //check if pointer of shared incoming data object is different to pointer of previous data object
+        //if so, free previous
+        if (m_dataPointer["overlayImage"].data() != newOverlayObj.data())
+        {
+            QSharedPointer<ito::DataObject> oldSource = m_dataPointer["overlayImage"]; //possible backup for previous source, this backup must be alive until updateParam with the new one has been completely propagated
+            if (oldSource)
+                oldSource->lockWrite();
+            // sometimes crash here when replacing the source
+            m_dataPointer["overlayImage"] = newOverlayObj;
+            if (oldSource)
+                oldSource->unlock();
+        }  
+    }
+    else
+    {
+        m_dataPointer["overlayImage"] = newOverlayObj;
+    }
+
+
     if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
     updatePropertyDock();
 }

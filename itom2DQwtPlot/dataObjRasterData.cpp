@@ -31,7 +31,7 @@ double DataObjRasterData::quietNaN = std::numeric_limits<double>::quiet_NaN();
 QRgb DataObjRasterData::transparentColor = 0x00ffffff;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const bool overlay) :
+DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const bool isOverlayData /*= false*/) :
     QwtRasterData(),
     m_validData(false),
     m_rasteredLinePtr(NULL),
@@ -40,7 +40,7 @@ DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const b
     m_hashGenerator(QCryptographicHash::Md5),
     m_dataObjPlane(NULL),
     m_pInternalData(m_internalData),
-    m_notOverlay(overlay)
+    m_isOverlayData(isOverlayData)
 {
     m_D.m_planeIdx = 0;
     m_D.m_yScaling = 1.0;
@@ -178,7 +178,7 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
             deleteCache();
 
             m_dataObj = *dataObj;
-            m_plane = m_dataObj.getDims() > 1 ? (cv::Mat*)(m_dataObj.get_mdata()[ m_dataObj.seekMat( (int)m_D.m_planeIdx )]) : NULL;
+            m_plane = m_dataObj.getDims() > 1 ? m_dataObj.get_mdata()[ m_dataObj.seekMat( (int)m_D.m_planeIdx )] : NULL;
 
             if (m_dataObjPlane && dataObjPlaneWasShallow) //m_dataObjPlane was a shallow copy -> delete it
             {
@@ -210,7 +210,7 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                 m_dataObjPlane = &m_dataObj;
             }
 
-            if(m_notOverlay)
+            if(!m_isOverlayData)
             {
                 m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>((void*)&m_dataObj);
                 m_pInternalData->m_pConstOutput->operator[]("displayed")->setVal<void*>((void*)m_dataObjPlane);
@@ -226,7 +226,7 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
         ito::uint32 firstMax[3];
 
         
-        if ((m_pInternalData->m_valueScaleAuto && m_notOverlay) || (m_pInternalData->m_overlayScaleAuto && !m_notOverlay))
+        if ((m_pInternalData->m_valueScaleAuto && !m_isOverlayData) || (m_pInternalData->m_overlayScaleAuto && m_isOverlayData))
         {
             ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
 
@@ -274,8 +274,14 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
         }
         else
         {
-            if(m_notOverlay) setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_valueMin, m_pInternalData->m_valueMax));
-            else setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_overlayMin, m_pInternalData->m_overlayMax));
+            if(m_isOverlayData) 
+            {
+                setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_overlayMin, m_pInternalData->m_overlayMax));
+            }
+            else 
+            {
+                setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_valueMin, m_pInternalData->m_valueMax));
+            }
         }
     }
     else
@@ -287,7 +293,7 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
 
         m_dataObjPlane = NULL;
         m_dataObj = ito::DataObject();
-        if(m_notOverlay)
+        if(!m_isOverlayData)
         {
             m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>(NULL);
             m_pInternalData->m_pConstOutput->operator[]("output")->setVal<void*>(NULL);

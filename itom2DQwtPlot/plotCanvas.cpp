@@ -101,7 +101,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     //overlayobject ttem on canvas -> the data object
     m_dOverlayItem = new DataObjItem("Overlay Object");
     m_dOverlayItem->setRenderThreadCount(0);
-    m_rasterOverlayData = new DataObjRasterData(m_pData, false);
+    m_rasterOverlayData = new DataObjRasterData(m_pData, true);
     m_dOverlayItem->setData(m_rasterOverlayData);
     m_dOverlayItem->attach(this);
     m_dOverlayItem->setAlpha(m_pData->m_alpha);
@@ -3135,7 +3135,7 @@ QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> PlotCanvas::getDispledOverlayObject()
+QSharedPointer<ito::DataObject> PlotCanvas::getDisplayedOverlayObject()
 {
     if (!m_rasterOverlayData)
     {
