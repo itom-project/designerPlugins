@@ -24,38 +24,19 @@
 #define ITOMPLOTPICKERMARKER_H
 
 #include "common/sharedStructures.h"
-#include "DataObject/dataobj.h"
-#include "common/sharedStructuresPrimitives.h"
-
-#include <qwidget.h>
-#include <qstring.h>
-#include <qevent.h>
-#include <qpainter.h>
-#include <qpoint.h>
-#include <qtimer.h>
-#include <qcoreapplication.h>
-#include <qapplication.h>
-#include <qgraphicsview.h>
-#include <qgraphicsscene.h>
-#include <qgraphicsitem.h>
-#include <qqueue.h>
-#include <qmenu.h>
-
 #include <qwt_plot_marker.h>
 
-class Itom1DQwtPlot;
+#include "itom1DQwtPlotEnums.h"
 
 class ItomPlotMarker : public QwtPlotMarker
 {
     public:
 
-    enum PlotType { Default, RangeMarker, Multiline };
+    ItomPlotMarker(bool labelState,  Itom1DQwt::tPlotPickerType type, Qt::Alignment align, Qt::Orientation orient );
 
-    ItomPlotMarker(bool labelState,  PlotType type, Qt::Alignment align, Qt::Orientation orient );
+    void setPlotType(const Itom1DQwt::tPlotPickerType value);
 
-    void setPlotType(const PlotType value);
-
-    int getPlotType() const {return m_plotType;}
+    Itom1DQwt::tPlotPickerType getPlotType() const {return m_plotType;}
 
     void setLabelEnabled(const bool state)
     {
@@ -91,7 +72,7 @@ private:
 
     void updateLabelValue();
 
-    PlotType m_plotType;
+    Itom1DQwt::tPlotPickerType m_plotType;
     bool m_labelState;
 
 };

@@ -24,25 +24,25 @@
 #include <qwt_symbol.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomPlotMarker::ItomPlotMarker(bool labelState,  PlotType type, Qt::Alignment align, Qt::Orientation orient ) : QwtPlotMarker(), m_plotType(type), m_labelState(labelState)
+ItomPlotMarker::ItomPlotMarker(bool labelState,  Itom1DQwt::tPlotPickerType type, Qt::Alignment align, Qt::Orientation orient ) : QwtPlotMarker(), m_plotType(type), m_labelState(labelState)
 { 
     setLabelAlignment(align);
     setLabelOrientation(orient);
     setLabelEnabled(m_labelState);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomPlotMarker::setPlotType(const PlotType value)
+void ItomPlotMarker::setPlotType(const Itom1DQwt::tPlotPickerType value)
 {
     m_plotType = value;
     switch(value)
     {
-        case Default:
+        case Itom1DQwt::DefaultMarker:
             setLineStyle(QwtPlotMarker::NoLine);
             break;
-        case Multiline:
-            setLineStyle(QwtPlotMarker::NoLine);
-            break;
-        case RangeMarker:
+        //case Itom1DQwt::MultilineMarker:
+        //    setLineStyle(QwtPlotMarker::NoLine);
+        //    break;
+        case Itom1DQwt::RangeMarker:
             setLineStyle(QwtPlotMarker::VLine);
             setLinePen( Qt::gray, 1.0, Qt::DashLine );
             break;

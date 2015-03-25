@@ -474,34 +474,34 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             m_colorState = false;
         }
 
-        Plot1DWidget::MultiLineMode multiLineMode = m_pData->m_multiLine;
+        Itom1DQwt::tMultiLineMode multiLineMode = m_pData->m_multiLine;
 
         if(dataObj->getType() == ito::tRGBA32)
         {
             m_layerState = false;
-            if(bounds.size() == 0) m_pData->m_multiLine = width == 1 ? FirstCol : FirstRow;
+            if(bounds.size() == 0) m_pData->m_multiLine = width == 1 ? Itom1DQwt::FirstCol : Itom1DQwt::FirstRow;
             m_legendTitles.clear();
             switch(m_pData->m_colorLine)
             {
-                case Gray:
+                case Itom1DQwt::Gray:
                     numCurves = 1;
                     m_legendTitles << "gray";
                 break;
-                case RGB:
+                case Itom1DQwt::RGB:
                     numCurves = 3;
                     m_legendTitles << "blue" << "green" << "red";
                 break;
-                case RGBA:
+                case Itom1DQwt::RGBA:
                     numCurves = 4;
                     m_legendTitles << "blue" << "green" << "red" << "alpha";
                 break;
-                case RGBGray:
+                case Itom1DQwt::RGBGray:
                     numCurves = 4;
                     m_legendTitles << "blue" << "green" << "red" << "gray";
                 break;
                 default:
                     numCurves = 3;
-                    m_pData->m_colorLine = RGB;
+                    m_pData->m_colorLine = Itom1DQwt::RGB;
                     m_legendTitles << "blue" << "green" << "red";
                 break;
             }
@@ -509,37 +509,37 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else if (bounds.size() == 0)
         {
-            m_pData->m_colorLine = AutoColor;
+            m_pData->m_colorLine = Itom1DQwt::AutoColor;
             switch (m_pData->m_multiLine)
             {
-                case FirstRow:
-                case FirstCol:
+                case Itom1DQwt::FirstRow:
+                case Itom1DQwt::FirstCol:
                     m_layerState = false;
                     numCurves = 1;
                     break;
-                case MultiRows:
+                case Itom1DQwt::MultiRows:
                     m_layerState = false;
                     numCurves = height;
                     break;
-                case MultiCols:
+                case Itom1DQwt::MultiCols:
                     m_layerState = false;
                     numCurves = width;
                     break;
-                case MultiLayerAuto:
+                case Itom1DQwt::MultiLayerAuto:
                     if(width == 1 && height == 1)
                     {
-                        multiLineMode = MultiLayerRows;
+                        multiLineMode = Itom1DQwt::MultiLayerRows;
                     }
                     else if (width >= height)
                     {
-                        multiLineMode = MultiLayerRows;
+                        multiLineMode = Itom1DQwt::MultiLayerRows;
                     }
                     else
                     {
-                        multiLineMode = MultiLayerCols;
+                        multiLineMode = Itom1DQwt::MultiLayerCols;
                     }
-                case MultiLayerCols:
-                case MultiLayerRows:
+                case Itom1DQwt::MultiLayerCols:
+                case Itom1DQwt::MultiLayerRows:
                     numCurves = dims > 2 ? dataObj->getSize(dims - 3) : 1;
                     m_layerState = true;
                     break;
@@ -548,18 +548,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     m_layerState = false;
                     if(width == 1 && height == 1 && dims < 3)
                     {
-                        multiLineMode = MultiRows;
+                        multiLineMode = Itom1DQwt::MultiRows;
                         numCurves = height;
                     }
                     else if (width >= height)
                     {
                         numCurves = height;
-                        multiLineMode = MultiRows;
+                        multiLineMode = Itom1DQwt::MultiRows;
                     }
                     else
                     {
                         numCurves = width;
-                        multiLineMode = MultiCols;
+                        multiLineMode = Itom1DQwt::MultiCols;
                     }
                 }
             }
@@ -568,9 +568,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         {
             if(bounds.size() == 3)
             {
-                if(m_pData->m_multiLine == MultiLayerCols || 
-                   m_pData->m_multiLine == MultiLayerRows || 
-                   m_pData->m_multiLine == MultiLayerAuto)
+                if(m_pData->m_multiLine == Itom1DQwt::MultiLayerCols || 
+                   m_pData->m_multiLine == Itom1DQwt::MultiLayerRows || 
+                   m_pData->m_multiLine == Itom1DQwt::MultiLayerAuto)
                 {
                     m_layerState = true;
                     numCurves = dims > 2 ? dataObj->getSize(dims - 3) : 1;
@@ -586,7 +586,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 numCurves = 1;
                 m_layerState = false;
             }
-            m_pData->m_colorLine = AutoColor;
+            m_pData->m_colorLine = Itom1DQwt::AutoColor;
         }
 
         //check if current number of curves does not correspond to height. If so, adjust the number of curves to the required number
@@ -640,9 +640,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
             switch(multiLineMode)
             {
-            case MultiLayerCols:
-            case FirstCol:
-            case MultiCols:
+            case Itom1DQwt::MultiLayerCols:
+            case Itom1DQwt::FirstCol:
+            case Itom1DQwt::MultiCols:
                 if(m_layerState)
                 {
                     pts.resize(3);
@@ -683,9 +683,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     }
                     if(m_colorState)
                     {
-                        if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                        else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
-                        else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                        if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                        else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                        else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                     }
                 }
 
@@ -697,11 +697,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 break;
 
-            case Auto:
-            case MultiLayerAuto:
-            case MultiLayerRows:
-            case FirstRow:
-            case MultiRows:
+            case Itom1DQwt::AutoRowCol:
+            case Itom1DQwt::MultiLayerAuto:
+            case Itom1DQwt::MultiLayerRows:
+            case Itom1DQwt::FirstRow:
+            case Itom1DQwt::MultiRows:
 
                 if(m_layerState)
                 {
@@ -746,9 +746,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
                     if(m_colorState)
                     {
-                        if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                        else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
-                        else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                        if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                        else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                        else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                     }
                 }
 
@@ -784,9 +784,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 if(m_colorState)
                 {
-                    if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                    else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
-                    else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                    if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                    else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                    else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                 }
             }
 
@@ -815,9 +815,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
                 if(m_colorState)
                 {
-                    if(m_pData->m_colorLine == Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                    else if(m_pData->m_colorLine == RGB || m_pData->m_colorLine == RGBA) seriesData->setColorState(n);
-                    else if(m_pData->m_colorLine == RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                    if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                    else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                    else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                 }
             }
             if (numCurves > 0)

@@ -57,6 +57,7 @@
 #include "../sharedFiles/itomPlotMagnifier.h"
 #include "../sharedFiles/itomPlotZoomer.h"
 #include "itomPlotMarker.h"
+//#include "itom1DQwtPlotEnums.h"
 
 class Itom1DQwtPlot;
 class QwtLegend;
@@ -67,8 +68,6 @@ class Plot1DWidget : public QwtPlot
     Q_OBJECT
     public:
 
-        enum MultiLineMode { Auto, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
-        enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
         enum tState
         { 
             stateIdle   = 0, 
@@ -247,12 +246,12 @@ struct InternalData
     {
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
-        m_multiLine = Plot1DWidget::Auto;
-        m_colorLine = Plot1DWidget::AutoColor;
+        m_multiLine = Itom1DQwt::AutoRowCol;
+        m_colorLine = Itom1DQwt::AutoColor;
         m_pickerLimit = 2;
 
         m_pickerLabelVisible = false;
-        m_pickerType = ItomPlotMarker::Default;
+        m_pickerType = Itom1DQwt::DefaultMarker;
         Qt::Orientation m_pickerLabelOrientation = Qt::Horizontal;
         m_pickerLabelAlignment = Qt::AlignRight;
 
@@ -308,7 +307,7 @@ struct InternalData
     bool m_keepAspect;
 
     bool m_pickerLabelVisible;
-    ItomPlotMarker::PlotType m_pickerType;
+    Itom1DQwt::tPlotPickerType m_pickerType;
     Qt::Orientation m_pickerLabelOrientation;
     Qt::Alignment m_pickerLabelAlignment;
 
@@ -322,8 +321,8 @@ struct InternalData
     //boundaries if values of dataObject changed.
     bool m_forceValueParsing; 
 
-    Plot1DWidget::MultiLineMode m_multiLine;
-    Plot1DWidget::ColorHandling m_colorLine;
+    Itom1DQwt::tMultiLineMode m_multiLine;
+    Itom1DQwt::tColorHandling m_colorLine;
     QHash<int, DrawItem *> m_pDrawItems;
 };
 

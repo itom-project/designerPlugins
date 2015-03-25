@@ -31,7 +31,7 @@
 
 
 #include "plot/AbstractDObjFigure.h"
-
+#include "itom1DQwtPlotEnums.h"
 //#include "plot1DWidget.h"
 
 #include <qaction.h>
@@ -76,7 +76,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false )
 
-    Q_PROPERTY(int columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
+    Q_PROPERTY(Itom1DQwt::tMultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
     
     Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true USER true)
     Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false USER true)
@@ -92,10 +92,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(bool pickerLabelVisible READ getPickerLabelVisible WRITE setPickerLabelVisible USER true);
     Q_PROPERTY(Qt::Orientation pickerLabelOrientation READ getPickerLabelOrientation WRITE setPickerLabelOrientation USER true);
     Q_PROPERTY(Qt::Alignment pickerLabelAlignment READ getPickerLabelAlignment WRITE setPickerLabelAlignment USER true);
-    Q_PROPERTY(PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
+    Q_PROPERTY(Itom1DQwt::tPlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
 
     Q_ENUMS(LegendPos);
-    Q_ENUMS(PlotPickerType);
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -158,7 +157,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         virtual ~Itom1DQwtPlot();
 
         enum LegendPos { Off = 0, Left = 1, Top = 2, Right = 3, Bottom = 4 };
-        enum PlotPickerType { Default, RangeMarker };
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         
@@ -230,8 +228,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         int getSelectedElement(void) const;
         void setSelectedElement(const int idx);
 
-        int getRowPresentation(void) const;
-        void setRowPresentation(const int idx);
+        Itom1DQwt::tMultiLineMode getRowPresentation(void) const;
+        void setRowPresentation(const Itom1DQwt::tMultiLineMode idx);
         void resetRowPresentation(); 
 
         int getRGBPresentation(void) const;
@@ -281,8 +279,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void setPickerLabelAlignment(const Qt::Alignment val);
         Qt::Alignment getPickerLabelAlignment()const ;
 
-        PlotPickerType getPickerType() const;
-        void setPickerType(const PlotPickerType val);
+        Itom1DQwt::tPlotPickerType getPickerType() const;
+        void setPickerType(const Itom1DQwt::tPlotPickerType val);
 
         friend class Plot1DWidget;
 

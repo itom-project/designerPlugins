@@ -27,14 +27,13 @@ class PlotCanvas;
 
 #if defined(ITOMSHAREDDESIGNER)
     #define ITOM2DPLOT_EXPORT Q_DECL_EXPORT
-    
 #else
     #define ITOM2DPLOT_EXPORT Q_DECL_IMPORT
 #endif
 
 #include "plot/AbstractDObjFigure.h"
 #include "plot/AbstractNode.h"
-
+#include "itom2dqwtplotenums.h"
 //#include "plotCanvas.h"
 //#include <qwt_plot_shapeitem.h>
 
@@ -88,7 +87,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
-    Q_PROPERTY(int geometryModMode READ getModState WRITE setModState DESIGNABLE true)
+    Q_PROPERTY(Itom2DQwt::tModificationState geometryModMode READ getModState WRITE setModState DESIGNABLE true)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -124,7 +123,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
 
-    Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode.")
+    Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode (move, resize, rotate).")
 
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
@@ -152,6 +151,15 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Itom2dQwtPlot(QWidget *parent = 0);
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
+
+    enum GeometryModificationMode
+    {
+        tNextElementMode = 0,
+        tMoveGeometricElements = 1,
+        tRotateGeometricElements = 2,
+        tResizeGeometricElements = 3,
+        tModifyPoints   = 4
+    }; //!> This enum must be equal to the enum PlotCanvas::tModificationState, todo: find a better solution
 
     ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack = false);
 
@@ -278,8 +286,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     bool getMarkerLablesVisible(void) const;
     void setMarkerLablesVisible(const bool val);
 
-    int getModState() const;
-    void setModState(const int val);
+    Itom2DQwt::tModificationState getModState() const;
+    void setModState(const Itom2DQwt::tModificationState val);
 
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 

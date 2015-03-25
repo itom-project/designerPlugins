@@ -2509,7 +2509,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                     emit statusBarMessage(tr("Could not perform specific action on geomtric element, action not implemented."), 4000);
                     path = it.value()->shape();
                     break;
-                case tMoveGeometricElements:
+                case Itom2DQwt::tMoveGeometricElements:
                 {
 
                     ito::float32 lenx = it.value()->x2 - it.value()->x1; 
@@ -2626,10 +2626,10 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                 }
 
                 break;
-                case tResizeGeometricElements:
+                case Itom2DQwt::tResizeGeometricElements:
                     emit statusBarMessage(tr("Could not perform specific action on geomtric element, resize action not implemented yet."), 4000);
                     break;
-                case tModifyPoints:
+                case Itom2DQwt::tModifyPoints:
                 {
                     if(it.value()->m_flags & 0x07)
                     {

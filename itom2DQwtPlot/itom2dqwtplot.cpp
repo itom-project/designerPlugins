@@ -104,7 +104,7 @@ void Itom2dQwtPlot::constructor()
     pData->m_xaxisVisible = true;
     pData->m_yaxisVisible = true;
     pData->m_colorBarVisible = false;
-    pData->m_cmplxType = PlotCanvas::Abs;
+    pData->m_cmplxType = Itom2DQwt::Abs;
     pData->m_yaxisFlipped = false;
     pData->m_pConstOutput = &m_pOutput;
     pData->m_state = PlotCanvas::tIdle;
@@ -426,27 +426,27 @@ void Itom2dQwtPlot::createActions()
 
     m_pDrawModifyModeActGroup = new QActionGroup(this);
     a = m_pDrawModifyModeActGroup->addAction(tr("Move elements"));
-    a->setData(PlotCanvas::tMoveGeometricElements);
+    a->setData(Itom2DQwt::tMoveGeometricElements);
     a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
     m_pMnuDrawModifyMode->addAction(a);
     a->setCheckable(false);
 
     a = m_pDrawModifyModeActGroup->addAction(tr("Resize Elements"));
-    a->setData(PlotCanvas::tRotateGeometricElements);
+    a->setData(Itom2DQwt::tRotateGeometricElements);
     a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
     m_pMnuDrawModifyMode->addAction(a);
     a->setCheckable(false);
     a->setEnabled(false);
 
     a = m_pDrawModifyModeActGroup->addAction(tr("Rotate Elements"));
-    a->setData(PlotCanvas::tResizeGeometricElements);
+    a->setData(Itom2DQwt::tResizeGeometricElements);
     a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
     m_pMnuDrawModifyMode->addAction(a);
     a->setCheckable(false);
     a->setEnabled(false);
 
     a = m_pDrawModifyModeActGroup->addAction(tr("Modify Points"));
-    a->setData(PlotCanvas::tModifyPoints);
+    a->setData(Itom2DQwt::tModifyPoints);
     m_pMnuDrawModifyMode->addAction(a);
     a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
     a->setCheckable(false);
@@ -471,23 +471,23 @@ void Itom2dQwtPlot::createActions()
 
     QActionGroup *m_pCmplxActGroup = new QActionGroup(this);
     a = m_pCmplxActGroup->addAction(tr("Real"));
-    a->setData(PlotCanvas::Real);
+    a->setData(Itom2DQwt::Real);
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
 
     a = m_pCmplxActGroup->addAction(tr("Imag"));
-    a->setData(PlotCanvas::Imag);
+    a->setData(Itom2DQwt::Imag);
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
 
     a = m_pCmplxActGroup->addAction(tr("Abs"));
-    a->setData(PlotCanvas::Abs);
+    a->setData(Itom2DQwt::Abs);
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
     a->setChecked(true);
 
     a = m_pCmplxActGroup->addAction(tr("Pha"));
-    a->setData(PlotCanvas::Phase);
+    a->setData(Itom2DQwt::Phase);
     m_mnuCmplxSwitch->addAction(a);
     a->setCheckable(true);
 
@@ -1388,23 +1388,23 @@ void Itom2dQwtPlot::mnuDrawModifyMode(QAction *action)
     switch (action->data().toInt())
     {
         default:
-        case PlotCanvas::tMoveGeometricElements:
-            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tMoveGeometricElements;
+        case Itom2DQwt::tMoveGeometricElements:
+            ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tMoveGeometricElements;
             m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
         break;
 
-        case PlotCanvas::tResizeGeometricElements:
-            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tResizeGeometricElements;
+        case Itom2DQwt::tResizeGeometricElements:
+            ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tResizeGeometricElements;
             m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
         break;
 
-        case PlotCanvas::tRotateGeometricElements:
-            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tRotateGeometricElements;
+        case Itom2DQwt::tRotateGeometricElements:
+            ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tRotateGeometricElements;
             m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
         break;
 
-        case PlotCanvas::tModifyPoints:
-            ((InternalData*) m_pVData)->m_modState = PlotCanvas::tModifyPoints;
+        case Itom2DQwt::tModifyPoints:
+            ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tModifyPoints;
             m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
         break;
     }
@@ -1453,7 +1453,7 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuCmplxSwitch(QAction *action)
 {
-    setCmplxSwitch((PlotCanvas::ComplexType)(action->data().toInt()), true);
+    setCmplxSwitch((Itom2DQwt::tComplexType)(action->data().toInt()), true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1467,20 +1467,20 @@ void Itom2dQwtPlot::setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool vi
 
         if (visible)
         {
-            ((InternalData*) m_pVData)->m_cmplxType = (PlotCanvas::ComplexType)type;
+            ((InternalData*) m_pVData)->m_cmplxType = (Itom2DQwt::tComplexType)type;
 
             switch (type)
             {
-                case PlotCanvas::Imag:
+                case Itom2DQwt::Imag:
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
                 break;
-                case PlotCanvas::Real:
+                case Itom2DQwt::Real:
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
                 break;
-                case PlotCanvas::Phase:
+                case Itom2DQwt::Phase:
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
                 break;
-                case PlotCanvas::Abs:
+                case Itom2DQwt::Abs:
                     m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
                 break;
             }
@@ -2472,24 +2472,24 @@ void Itom2dQwtPlot::setMarkerLablesVisible(const bool val)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-int Itom2dQwtPlot::getModState(void) const
+Itom2DQwt::tModificationState Itom2dQwtPlot::getModState(void) const
 {
     if(!m_pVData) 
     {
-        return 0;
+        return Itom2DQwt::tMoveGeometricElements;
     }
-    return ((InternalData*)m_pVData)->m_modState;
+    return (((InternalData*)m_pVData)->m_modState);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setModState(const int val)
+void Itom2dQwtPlot::setModState(const Itom2DQwt::tModificationState val)
 {
     if(!m_pVData) 
     {
         return;
     }
-    if(val < 1 || val > 4) return;
+    //if(val < 1 || val > 4) return;
 
-    ((InternalData*)m_pVData)->m_modState = (PlotCanvas::tModificationState)val;
+    ((InternalData*)m_pVData)->m_modState = val;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -56,6 +56,8 @@
 #include <qcolor.h>
 #include <qmenu.h>
 
+#include "itom2dqwtplotenums.h"
+
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
 struct InternalData;
@@ -84,21 +86,6 @@ class PlotCanvas : public QwtPlot
             tCircle = ito::PrimitiveContainer::tCircle, 
             tPolygon = ito::PrimitiveContainer::tPolygon
         };
-
-        enum tModificationState
-        {
-            tNextElementMode = 0,
-            tMoveGeometricElements = 1,
-            tRotateGeometricElements = 2,
-            tResizeGeometricElements = 3,
-            tModifyPoints   = 4
-        };
-
-        enum ComplexType { 
-            Abs = 0, 
-            Imag = 1, 
-            Real = 2, 
-            Phase = 3 }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
 
         enum changeFlag {
             changeNo = 0,
@@ -280,9 +267,9 @@ struct InternalData
         m_yaxisVisible = 1;
 
         m_colorBarVisible = 0;
-        m_cmplxType = PlotCanvas::Real;
+        m_cmplxType = Itom2DQwt::Real;
         m_state = PlotCanvas::tIdle;
-        m_modState = PlotCanvas::tMoveGeometricElements;
+        m_modState = Itom2DQwt::tMoveGeometricElements;
         m_pConstOutput = NULL;
 
         m_elementsToPick = 0;
@@ -369,10 +356,10 @@ struct InternalData
     bool m_enablePlotting;
     bool m_showCenterMarker;
 
-    PlotCanvas::ComplexType m_cmplxType;
+    Itom2DQwt::tComplexType m_cmplxType;
 
     PlotCanvas::tState m_state;
-    PlotCanvas::tModificationState m_modState;
+    Itom2DQwt::tModificationState m_modState;
     const QHash<QString, ito::Param*> *m_pConstOutput;
 //    QVector<DrawItem *> m_pDrawItems;
     QHash<int, DrawItem *> m_pDrawItems;

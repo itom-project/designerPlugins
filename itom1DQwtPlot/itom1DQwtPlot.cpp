@@ -260,12 +260,12 @@ ito::RetVal Itom1DQwtPlot::init()
     return m_pContent->init(); 
 } //called when api-pointers are transmitted, directly after construction
 //----------------------------------------------------------------------------------------------------------------------------------
-int Itom1DQwtPlot::getRowPresentation(void) const
+Itom1DQwt::tMultiLineMode Itom1DQwtPlot::getRowPresentation(void) const
 {
     return m_data->m_multiLine;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::setRowPresentation(const int idx)
+void Itom1DQwtPlot::setRowPresentation(const Itom1DQwt::tMultiLineMode idx)
 {
     QAction *action = NULL;
     bool ok;
@@ -281,25 +281,14 @@ void Itom1DQwtPlot::setRowPresentation(const int idx)
 
     switch(idx)
     {
+        case Itom1DQwt::MultiLayerCols:
+        case Itom1DQwt::MultiLayerRows:
+            m_data->m_multiLine = Itom1DQwt::MultiLayerAuto;
+            break;        
         default:
-        case 0:
-            m_data->m_multiLine = Plot1DWidget::Auto;
+            m_data->m_multiLine = idx;
             break;
-        case 1:
-            m_data->m_multiLine = Plot1DWidget::FirstRow;
-            break;
-        case 2:
-            m_data->m_multiLine = Plot1DWidget::FirstCol;
-            break;
-        case 3:
-            m_data->m_multiLine = Plot1DWidget::MultiRows;
-            break;
-        case 4:
-            m_data->m_multiLine = Plot1DWidget::MultiCols;
-            break;
-        case 5:
-            m_data->m_multiLine = Plot1DWidget::MultiLayerAuto;
-            break;
+
     }
 
     if(m_pContent)
@@ -316,7 +305,7 @@ void Itom1DQwtPlot::setRowPresentation(const int idx)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetRowPresentation() 
 {
-    setRowPresentation(0);
+    setRowPresentation(Itom1DQwt::AutoRowCol);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getRGBPresentation(void) const
@@ -342,19 +331,19 @@ void Itom1DQwtPlot::setRGBPresentation(const int idx)
     {
         default:
         case 0:
-            m_data->m_colorLine = Plot1DWidget::AutoColor;
+            m_data->m_colorLine = Itom1DQwt::AutoColor;
             break;
         case 1:
-            m_data->m_colorLine = Plot1DWidget::Gray;
+            m_data->m_colorLine = Itom1DQwt::Gray;
             break;
         case 2:
-            m_data->m_colorLine = Plot1DWidget::RGB;
+            m_data->m_colorLine = Itom1DQwt::RGB;
             break;
         case 3:
-            m_data->m_colorLine = Plot1DWidget::RGBA;
+            m_data->m_colorLine = Itom1DQwt::RGBA;
             break;
         case 4:
-            m_data->m_colorLine = Plot1DWidget::RGBGray;
+            m_data->m_colorLine = Itom1DQwt::RGBGray;
             break;
     }
 
@@ -1389,7 +1378,7 @@ void Itom1DQwtPlot::mnuMultiRowSwitch(QAction *action)
 
     if (ok)
     {
-        setRowPresentation(idx);
+        setRowPresentation((Itom1DQwt::tMultiLineMode)idx);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2364,11 +2353,11 @@ Qt::Alignment Itom1DQwtPlot::getPickerLabelAlignment()const
     return m_data->m_pickerLabelAlignment;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::setPickerType(const PlotPickerType val)
+void Itom1DQwtPlot::setPickerType(const Itom1DQwt::tPlotPickerType val)
 {
     if(m_data) 
     {
-        m_data->m_pickerType = (ItomPlotMarker::PlotType)val;
+        m_data->m_pickerType = val;
     }
     if(m_pContent)
     {
@@ -2376,12 +2365,12 @@ void Itom1DQwtPlot::setPickerType(const PlotPickerType val)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-Itom1DQwtPlot::PlotPickerType Itom1DQwtPlot::getPickerType() const
+Itom1DQwt::tPlotPickerType Itom1DQwtPlot::getPickerType() const
 {
     if(!m_data) 
     {
-        return Default;
+        return Itom1DQwt::DefaultMarker;
     }
-    return (Itom1DQwtPlot::PlotPickerType)m_data->m_pickerType;
+    return m_data->m_pickerType;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
