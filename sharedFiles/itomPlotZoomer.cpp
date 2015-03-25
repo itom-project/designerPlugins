@@ -133,7 +133,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
         int invertedAxes = plt->axisScaleEngine(xAxisId)->testAttribute(QwtScaleEngine::Inverted) ? 1 : 0;
         invertedAxes += plt->axisScaleEngine(yAxisId)->testAttribute(QwtScaleEngine::Inverted) ? 2 : 0;
 
-        const QRectF &rect = isEnabled() ? zoomRect() : scaleRect();
+        const QRectF &rect = zoomRect();
         if ( rect != scaleRect() || (invertedAxes != m_invertedAxes))
         {
             m_invertedAxes = invertedAxes;
@@ -368,13 +368,13 @@ void ItomPlotZoomer::setEnabled(bool enabled)
 }
 
 //--------------------------------------------------------------------------------------
-void ItomPlotZoomer::canvasPanned(int dx, int dy) //connect this to panned signal of panner to synchronize both
+void ItomPlotZoomer::canvasPanned(int /*dx*/, int /*dy*/) //connect this to panned signal of panner to synchronize both
 {
     QStack<QRectF> currentStack = zoomStack();
 
     if (maxStackDepth() < 0 || currentStack.count() < maxStackDepth())
     {
-        currentStack.append(this->scaleRect());
+        currentStack.append(scaleRect());
         setZoomStack(currentStack);
     }
     else if (currentStack.count() >= 1)
@@ -382,7 +382,27 @@ void ItomPlotZoomer::canvasPanned(int dx, int dy) //connect this to panned signa
         //remove 2nd element (1st is base - do not change this) from stack and append this one to the end
         //since the max stack depth is reached.
         currentStack.remove(1);
-        currentStack.append(this->scaleRect());
+        currentStack.append(scaleRect());
+        setZoomStack(currentStack);
+    }
+}
+
+//--------------------------------------------------------------------------------------
+void ItomPlotZoomer::appendZoomStack(const QRectF &rect)
+{
+    QStack<QRectF> currentStack = zoomStack();
+
+    if (maxStackDepth() < 0 || currentStack.count() < maxStackDepth())
+    {
+        currentStack.append(rect);
+        setZoomStack(currentStack);
+    }
+    else if (currentStack.count() >= 1)
+    {
+        //remove 2nd element (1st is base - do not change this) from stack and append this one to the end
+        //since the max stack depth is reached.
+        currentStack.remove(1);
+        currentStack.append(rect);
         setZoomStack(currentStack);
     }
 }

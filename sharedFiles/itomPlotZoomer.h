@@ -46,6 +46,8 @@ public:
 
     virtual void rescale(bool resizeEvent);
 
+    void appendZoomStack(const QRectF &rect);
+
 public Q_SLOTS:
     void setEnabled(bool enabled);
 
