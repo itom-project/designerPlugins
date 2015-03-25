@@ -471,7 +471,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         }
         else
         {
-            m_pZoomer->rescale(true);
+            m_pZoomer->rescale(false);
         }
     }
     else
@@ -484,8 +484,6 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 void PlotCanvas::changePlane(int plane)
 {
     refreshPlot(m_dObjPtr, plane);
-    updateScaleValues(false, true); //no replot here
-    updateAxes();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

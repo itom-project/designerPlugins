@@ -133,7 +133,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
         int invertedAxes = plt->axisScaleEngine(xAxisId)->testAttribute(QwtScaleEngine::Inverted) ? 1 : 0;
         invertedAxes += plt->axisScaleEngine(yAxisId)->testAttribute(QwtScaleEngine::Inverted) ? 2 : 0;
 
-        const QRectF &rect = zoomRect();
+        const QRectF &rect = isEnabled() ? zoomRect() : scaleRect();
         if ( rect != scaleRect() || (invertedAxes != m_invertedAxes))
         {
             m_invertedAxes = invertedAxes;
