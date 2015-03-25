@@ -463,6 +463,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         updateScaleValues(false, updateState & changeData); //no replot here
         updateAxes();
 
+
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
         if (updateState & changeData)
         {
@@ -470,7 +471,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         }
         else
         {
-            m_pZoomer->rescale(false);
+            m_pZoomer->rescale(true);
         }
     }
     else
@@ -483,6 +484,8 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 void PlotCanvas::changePlane(int plane)
 {
     refreshPlot(m_dObjPtr, plane);
+    updateScaleValues(false, true); //no replot here
+    updateAxes();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
