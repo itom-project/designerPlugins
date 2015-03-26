@@ -463,6 +463,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         updateScaleValues(false, updateState & changeData); //no replot here
         updateAxes();
 
+
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
         if (updateState & changeData)
         {
@@ -1119,6 +1120,11 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
             {
                 setAxisScale(QwtPlot::yLeft, m_pData->m_yaxisMin, m_pData->m_yaxisMax);
             }
+
+            QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+            zoom = zoom.normalized();
+            m_pZoomer->appendZoomStack(zoom);
+
         }
     }
 
