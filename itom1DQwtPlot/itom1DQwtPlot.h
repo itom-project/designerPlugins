@@ -69,6 +69,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
 
+    Q_PROPERTY(tSymbol lineSymbol READ getLineSymbol WRITE setLineSymbol USER true);
+    Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true);
+
     // Properties related with geometric elements
     Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
     Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
@@ -94,8 +97,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(Qt::Alignment pickerLabelAlignment READ getPickerLabelAlignment WRITE setPickerLabelAlignment USER true);
     Q_PROPERTY(Itom1DQwt::tPlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
 
-    Q_ENUMS(LegendPos);
 
+    Q_ENUMS(LegendPos);
+    Q_ENUMS(tSymbol);
+    
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
     Q_CLASSINFO("prop://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
@@ -106,6 +111,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://lineWidth", "width of lines in pixel.")
     Q_CLASSINFO("prop://lineStyle", "style of lines.")
+
+    Q_CLASSINFO("prop://lineSymbol", "Get / Set the current line symbol type")
+    Q_CLASSINFO("prop://lineSymbolSize", "Get / Set the current line symbol size")
 
     Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
     Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
@@ -157,7 +165,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         virtual ~Itom1DQwtPlot();
 
         enum LegendPos { Off = 0, Left = 1, Top = 2, Right = 3, Bottom = 4 };
-
+        enum tSymbol
+        {
+            NoSymbol = -1, Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon
+        };
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         
         //properties
@@ -281,6 +292,14 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         Itom1DQwt::tPlotPickerType getPickerType() const;
         void setPickerType(const Itom1DQwt::tPlotPickerType val);
+
+        tSymbol getLineSymbol() const;
+        void setLineSymbol(const tSymbol symbol);
+        void resetLineSymbol();
+
+        int getLineSymbolSize() const;
+        void setLineSymbolSize(int size);
+        void resetLineSymbolSize();
 
         friend class Plot1DWidget;
 

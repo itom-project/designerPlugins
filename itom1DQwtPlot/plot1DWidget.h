@@ -49,6 +49,7 @@
 #include <qwt_plot_marker.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_magnifier.h>
+#include <qwt_symbol.h>
 
 #include "valuepicker1d.h"
 
@@ -112,6 +113,8 @@ class Plot1DWidget : public QwtPlot
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
+
+        void setSymbolStyle(const QwtSymbol::Style style, int size);
 
         friend class Itom1DQwtPlot;
         friend class DrawItem;      
@@ -242,7 +245,7 @@ struct InternalData
     InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
         m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
         m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_elementsToPick(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
-        m_enablePlotting(true), m_keepAspect(false)
+        m_enablePlotting(true), m_keepAspect(false), m_lineSymboleSize(1)
     {
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
@@ -258,6 +261,7 @@ struct InternalData
         m_axisColor = Qt::black;
         m_textColor = Qt::black;
         m_backgnd = Qt::white;
+        m_lineSymbole = QwtSymbol::NoSymbol;
     }
 
     ~InternalData()
@@ -324,6 +328,8 @@ struct InternalData
     Itom1DQwt::tMultiLineMode m_multiLine;
     Itom1DQwt::tColorHandling m_colorLine;
     QHash<int, DrawItem *> m_pDrawItems;
+    QwtSymbol::Style m_lineSymbole;
+    int m_lineSymboleSize;
 };
 
 #endif

@@ -362,6 +362,21 @@ void Plot1DWidget::setLineStyle(const Qt::PenStyle &style)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
+{
+    m_pData->m_lineSymbole = style;
+    m_pData->m_lineSymboleSize = size;
+    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    {
+        QPen pen = c->pen();
+        c->setSymbol(new QwtSymbol(m_pData->m_lineSymbole, QBrush(Qt::white), QPen(pen.color()),  QSize(m_pData->m_lineSymboleSize,m_pData->m_lineSymboleSize)));
+    }
+
+    replot();
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel)
 {
     QwtText t;
@@ -631,6 +646,13 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             plotPen.setStyle(m_lineStyle);
             plotPen.setWidth(m_lineWidth);
             dObjCurve->setPen(plotPen);
+
+            // Add Symbol here
+            if(m_pData->m_lineSymbole != QwtSymbol::NoSymbol)
+            {
+                dObjCurve->setSymbol(new QwtSymbol(m_pData->m_lineSymbole, QBrush(Qt::white), QPen(m_colorList[colorIndex]),  QSize(m_pData->m_lineSymboleSize,m_pData->m_lineSymboleSize)));
+            }
+
             m_plotCurveItems.append(dObjCurve);
         }
 

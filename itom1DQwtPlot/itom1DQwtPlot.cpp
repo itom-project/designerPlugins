@@ -44,6 +44,7 @@
 #include <qwt_plot_renderer.h>
 #include <qwt_text_label.h>
 #include <qwt_scale_widget.h>
+#include <qwt_symbol.h>
 
 using namespace ito;
 
@@ -923,12 +924,67 @@ void Itom1DQwtPlot::setLineStyle(const Qt::PenStyle &style)
 {
     if (m_pContent)
     {
-        if (style != Qt::NoPen && style != Qt::CustomDashLine)
+        if (/*style != Qt::NoPen &&*/ style != Qt::CustomDashLine)
         {
             m_pContent->setLineStyle(style);
         }
     }
 
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+Itom1DQwtPlot::tSymbol Itom1DQwtPlot::getLineSymbol() const
+{
+    return (tSymbol)(m_data->m_lineSymbole);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLineSymbol(const tSymbol symbol)
+{
+    if (m_pContent)
+    {
+        
+        if(symbol < QwtSymbol::Path && symbol > -2 )
+        {
+            m_pContent->setSymbolStyle((QwtSymbol::Style)symbol, m_data->m_lineSymboleSize);
+        }
+    }
+
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetLineSymbol()
+{
+    setLineSymbol(NoSymbol);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getLineSymbolSize() const
+{
+    return m_data->m_lineSymboleSize;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLineSymbolSize(const int size)
+{
+    if(size < 1 || size > 21)
+        return;
+
+    if (m_pContent)
+    {
+         m_pContent->setSymbolStyle(m_data->m_lineSymbole, size);
+    }
+    else
+    {
+        m_data->m_lineSymboleSize = size;
+    }
+
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetLineSymbolSize()
+{
+    if (m_pContent)
+    {
+        m_pContent->setSymbolStyle(m_data->m_lineSymbole, 1);
+    }
     updatePropertyDock();
 }
 
@@ -2300,6 +2356,7 @@ void Itom1DQwtPlot::setPickerLabelVisible(const bool state)
     {
         ((Plot1DWidget*)m_pContent)->updatePickerStyle();
     }
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getPickerLabelVisible() const
@@ -2321,6 +2378,7 @@ void Itom1DQwtPlot::setPickerLabelOrientation(const Qt::Orientation val)
     {
         ((Plot1DWidget*)m_pContent)->updatePickerStyle();
     }
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 Qt::Orientation Itom1DQwtPlot::getPickerLabelOrientation() const
@@ -2342,6 +2400,7 @@ void Itom1DQwtPlot::setPickerLabelAlignment(const Qt::Alignment val)
     {
         ((Plot1DWidget*)m_pContent)->updatePickerStyle();
     }
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 Qt::Alignment Itom1DQwtPlot::getPickerLabelAlignment()const
@@ -2363,6 +2422,7 @@ void Itom1DQwtPlot::setPickerType(const Itom1DQwt::tPlotPickerType val)
     {
         ((Plot1DWidget*)m_pContent)->updatePickerStyle();
     }
+    updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwt::tPlotPickerType Itom1DQwtPlot::getPickerType() const
