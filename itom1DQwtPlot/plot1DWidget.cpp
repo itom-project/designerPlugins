@@ -82,6 +82,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_gridEnabled(false),
         m_legendPosition(BottomLegend),
         m_legendVisible(false),
+        m_qwtCurveStyle(Itom1DQwt::Lines),
+        m_baseLine(0.0),
         m_pLegend(NULL)
 {
     this->setMouseTracking(false);
@@ -628,6 +630,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 dObjCurve = new QwtPlotCurveDataObject("");
             }
 
+    
             dObjCurve->setData(NULL);
             dObjCurve->attach(this);
 
@@ -653,6 +656,43 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 dObjCurve->setSymbol(new QwtSymbol(m_pData->m_lineSymbole, QBrush(Qt::white), QPen(m_colorList[colorIndex]),  QSize(m_pData->m_lineSymboleSize,m_pData->m_lineSymboleSize)));
             }
 
+            switch(m_qwtCurveStyle)
+            {
+                case Itom1DQwt::NoCurve:
+                    dObjCurve->setStyle(QwtPlotCurve::NoCurve);
+                break;
+                default:
+                case Itom1DQwt::Lines:
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+                    dObjCurve->setStyle(QwtPlotCurve::Lines);
+                    break;
+                case Itom1DQwt::FittedLines:
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, true);
+                    dObjCurve->setStyle(QwtPlotCurve::Lines);
+                break;
+                case Itom1DQwt::Steps:
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                    dObjCurve->setStyle(QwtPlotCurve::Steps);
+                break;
+                case Itom1DQwt::Steps_Inv:
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, true);
+                    dObjCurve->setStyle(QwtPlotCurve::Steps);
+                break;
+                case Itom1DQwt::Sticks_Hor:
+                    dObjCurve->setOrientation(Qt::Horizontal);
+                    dObjCurve->setStyle(QwtPlotCurve::Sticks);
+                break;
+                case Itom1DQwt::Sticks:
+                case Itom1DQwt::Sticks_Vert:
+                    dObjCurve->setOrientation(Qt::Vertical);
+                    dObjCurve->setStyle(QwtPlotCurve::Sticks);
+                break;
+                case Itom1DQwt::Dots:
+                    dObjCurve->setStyle(QwtPlotCurve::Dots);
+                break;
+            }
+
+            dObjCurve->setBaseline(m_baseLine);
             m_plotCurveItems.append(dObjCurve);
         }
 
@@ -3106,4 +3146,60 @@ void Plot1DWidget::updatePickerStyle(void)
     replot();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setQwtLineStyle(const Itom1DQwt::tCurveStyle &style)
+{
+    m_qwtCurveStyle = style;
 
+    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    {
+        switch(m_qwtCurveStyle)
+        {
+            case Itom1DQwt::NoCurve:
+                c->setStyle(QwtPlotCurve::NoCurve);
+            break;
+            default:
+            case Itom1DQwt::Lines:
+                c->setCurveAttribute(QwtPlotCurve::Fitted, false);
+                c->setStyle(QwtPlotCurve::Lines);
+                break;
+            case Itom1DQwt::FittedLines:
+                c->setCurveAttribute(QwtPlotCurve::Fitted, true);
+                c->setStyle(QwtPlotCurve::Lines);
+            break;
+            case Itom1DQwt::Steps:
+                c->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                c->setStyle(QwtPlotCurve::Steps);
+            break;
+            case Itom1DQwt::Steps_Inv:
+                c->setCurveAttribute(QwtPlotCurve::Inverted, true);
+                c->setStyle(QwtPlotCurve::Steps);
+            break;
+            case Itom1DQwt::Sticks_Hor:
+                c->setOrientation(Qt::Horizontal);
+                c->setStyle(QwtPlotCurve::Sticks);
+            break;
+            case Itom1DQwt::Sticks:
+            case Itom1DQwt::Sticks_Vert:
+                c->setOrientation(Qt::Vertical);
+                c->setStyle(QwtPlotCurve::Sticks);
+            break;
+            case Itom1DQwt::Dots:
+                c->setStyle(QwtPlotCurve::Dots);
+            break;
+        }
+    }
+
+    replot();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setBaseLine(const qreal &line)
+{
+    m_baseLine = line;
+
+    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    {
+        c->setBaseline(m_baseLine);
+    }
+
+    replot();
+}

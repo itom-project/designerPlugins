@@ -47,6 +47,8 @@ protected:
 
     void drawPolyline(QPainter *painter, QPolygonF &polyline, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect) const;
 
+    void drawSymbols( QPainter *p, const QwtSymbol & symbol,  const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+
 private:
     //this is a hack in order to access PrivateData
     QBrush m_privBrush;

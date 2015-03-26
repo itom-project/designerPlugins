@@ -33,6 +33,7 @@
 #include <qwt_curve_fitter.h>
 #include <qnumeric.h>
 #include <qwt_symbol.h>
+#include "qwt_point_mapper.h"
 
 static int verifyRange( int size, int &i1, int &i2 )
 {
@@ -230,4 +231,85 @@ void QwtPlotCurveDataObject::drawPolyline(QPainter *painter, QPolygonF &polyline
 
     if ( m_privBrush.style() != Qt::NoBrush )
         fillCurve( painter, xMap, yMap, canvasRect, polyline );
+}
+
+// Copied form QWT-PLOT and modified to fit ignore invalid pixel
+void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &symbol, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
+{
+    int size = to - from + 1;
+    if ( size <= 0 )
+        return;
+
+    const bool doAlign = QwtPainter::roundingAlignment( painter );
+
+    const int chunkSize = 500;
+
+    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
+
+    if(d_objseries->floatingPointValues())
+    {
+        QPolygonF polyline;
+        polyline.reserve(size);
+        QPointF sample;
+
+        for ( int i = from; i <= to; i++ )
+        {
+            sample = d_objseries->sample( i );
+
+            double x = xMap.transform( sample.x() );
+            double y = yMap.transform( sample.y() );
+            if ( doAlign )
+            {
+                x = qRound( x );
+                if(qIsFinite(y))
+                {
+                    y = qRound( y );
+                    sample.rx() = x;
+                    sample.ry() = y;
+                    polyline << sample;
+                }
+            }
+            else
+            {
+                if(qIsFinite(y))
+                {
+                    sample.rx() = x;
+                    sample.ry() = y;
+                    polyline << sample;
+                }
+            }
+        }
+
+        if(polyline.size() > 0)
+        {
+            symbol.drawSymbols( painter, polyline );
+            polyline.clear();
+        }
+    }
+    else
+    {
+        QPolygonF polyline( size );
+
+        QPointF *points = polyline.data();
+        for ( int i = from; i <= to; i++ )
+        {
+            const QPointF sample = d_objseries->sample( i );
+
+            double x = xMap.transform( sample.x() );
+            double y = yMap.transform( sample.y() );
+            if ( doAlign )
+            {
+                x = qRound( x );
+                //if(qIsFinite(y))
+                //{
+                y = qRound( y );
+                //}
+            }
+
+            points[i - from].rx() = x;
+            points[i - from].ry() = y;
+        }
+
+        symbol.drawSymbols( painter, polyline );
+    }
 }

@@ -884,7 +884,6 @@ void Itom1DQwtPlot::setGrid(const bool &enabled)
 
     updatePropertyDock();
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 qreal Itom1DQwtPlot::getLineWidth(void) const
 {
@@ -930,6 +929,24 @@ void Itom1DQwtPlot::setLineStyle(const Qt::PenStyle &style)
         }
     }
 
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+Itom1DQwt::tCurveStyle Itom1DQwtPlot::getCurveStyle(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_qwtCurveStyle;
+    }
+    return Itom1DQwt::Lines;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setCurveStyle(const Itom1DQwt::tCurveStyle state)
+{
+    if (m_pContent)
+    {
+        m_pContent->setQwtLineStyle(state);
+    }
     updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2432,5 +2449,23 @@ Itom1DQwt::tPlotPickerType Itom1DQwtPlot::getPickerType() const
         return Itom1DQwt::DefaultMarker;
     }
     return m_data->m_pickerType;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setBaseLine(const qreal val)
+{
+    if(m_pContent) 
+    {
+        return m_pContent->setBaseLine(val);
+    }
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+qreal Itom1DQwtPlot::getBaseLine() const
+{
+    if(m_pContent) 
+    {
+        return m_pContent->m_baseLine;
+    }
+    return 0.0;
 }
 //----------------------------------------------------------------------------------------------------------------------------------

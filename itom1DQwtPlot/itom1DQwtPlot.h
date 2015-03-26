@@ -68,6 +68,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
+    Q_PROPERTY(Itom1DQwt::tCurveStyle curveStyle READ getCurveStyle WRITE setCurveStyle USER true);
+
+    Q_PROPERTY(qreal baseLine READ getBaseLine WRITE setBaseLine USER true)
 
     Q_PROPERTY(tSymbol lineSymbol READ getLineSymbol WRITE setLineSymbol USER true);
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true);
@@ -111,9 +114,13 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://lineWidth", "width of lines in pixel.")
     Q_CLASSINFO("prop://lineStyle", "style of lines.")
+    Q_CLASSINFO("prop://curveStyle", "set the style of the qwt-plot according to curve styles.")
 
     Q_CLASSINFO("prop://lineSymbol", "Get / Set the current line symbol type")
     Q_CLASSINFO("prop://lineSymbolSize", "Get / Set the current line symbol size")
+
+    Q_CLASSINFO("prop://baseLine", "the baseline/reference for the curveStyle::sticks mode.")
+    //Q_CLASSINFO("prop://stickOrientation", "the orientation for the curveStyle::sticks mode.")
 
     Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
     Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
@@ -216,6 +223,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         Qt::PenStyle getLineStyle(void) const;
         void setLineStyle(const Qt::PenStyle &style);
 
+        Itom1DQwt::tCurveStyle getCurveStyle(void) const;
+        void setCurveStyle(const Itom1DQwt::tCurveStyle state);
+
         LegendPos getLegendPosition() const;
         void setLegendPosition(LegendPos legendPosition);
 
@@ -300,6 +310,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         int getLineSymbolSize() const;
         void setLineSymbolSize(int size);
         void resetLineSymbolSize();
+
+        void setBaseLine(const qreal val);
+        qreal getBaseLine() const;
 
         friend class Plot1DWidget;
 

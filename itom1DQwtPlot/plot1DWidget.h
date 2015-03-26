@@ -141,7 +141,9 @@ class Plot1DWidget : public QwtPlot
 
         void setLineWidth(const qreal &width);
         void setLineStyle(const Qt::PenStyle &style);
-
+        void setQwtLineStyle(const Itom1DQwt::tCurveStyle &style);
+        void setBaseLine(const qreal &line);
+        //void setStickOrientation(const qreal &line);
     private:
         QwtPlotRescaler* m_pRescaler;
 
@@ -218,6 +220,10 @@ class Plot1DWidget : public QwtPlot
 
         LegendPosition m_legendPosition;
         bool m_legendVisible;
+
+        Itom1DQwt::tCurveStyle m_qwtCurveStyle;
+
+        qreal m_baseLine;
 
     signals:
 
