@@ -36,7 +36,7 @@ Itom2dQwtPlotPlugin::Itom2dQwtPlotPlugin(QObject *parent)
     m_plotFeatures = ito::Static | ito::Live | ito::PlotImage | ito::PlotLine | ito::Cartesian;
 
     m_description = QObject::tr("ITOM widget for 2D-visualisation of 2D/3D DataObjects based on QWT.");
-    m_detaildescription = QObject::tr("");
+    m_detaildescription = QObject::tr("This designer plugin is a itom widget for image-like visualisation of DataObjects and live images. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).");
     m_author = "Marc Gronle, ITO";
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL, for Qwt see Qwt License");   
