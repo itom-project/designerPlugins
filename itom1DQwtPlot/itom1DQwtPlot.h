@@ -69,6 +69,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
     Q_PROPERTY(Itom1DQwt::tCurveStyle curveStyle READ getCurveStyle WRITE setCurveStyle USER true);
+    Q_PROPERTY(bool fillCurve READ getCurveFilled WRITE setCurveFilled USER true)
+    Q_PROPERTY(QColor curveFillColor READ getCurveFillColor WRITE setCurveFillColor RESET resetCurveFillColor USER true)
 
     Q_PROPERTY(qreal baseLine READ getBaseLine WRITE setBaseLine USER true)
 
@@ -313,6 +315,14 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         void setBaseLine(const qreal val);
         qreal getBaseLine() const;
+
+        QColor getCurveFillColor() const;
+        void setCurveFillColor(const QColor val);
+        void resetCurveFillColor();
+
+        bool getCurveFilled() const;
+        void setCurveFilled(const bool state);
+
 
         friend class Plot1DWidget;
 

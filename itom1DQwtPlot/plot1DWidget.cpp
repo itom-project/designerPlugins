@@ -84,6 +84,9 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_legendVisible(false),
         m_qwtCurveStyle(Itom1DQwt::Lines),
         m_baseLine(0.0),
+        m_fillCurveAlpa(128),
+        m_filledColor(QColor::Invalid),
+        m_curveFilled(false),
         m_pLegend(NULL)
 {
     this->setMouseTracking(false);
@@ -696,6 +699,23 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
 
             dObjCurve->setBaseline(m_baseLine);
+            if(m_curveFilled)
+            {
+                if(m_filledColor.isValid())
+                {
+                    dObjCurve->setBrush(QBrush(m_filledColor));
+                }
+                else
+                {
+                    QColor fill = m_colorList[colorIndex];
+                    fill.setAlpha(m_fillCurveAlpa);
+                    dObjCurve->setBrush(QBrush(fill));
+                }
+            }
+            else
+            {
+                dObjCurve->setBrush(Qt::NoBrush);
+            }
             m_plotCurveItems.append(dObjCurve);
         }
 
@@ -3205,6 +3225,35 @@ void Plot1DWidget::setBaseLine(const qreal &line)
     foreach(QwtPlotCurve *c, m_plotCurveItems)
     {
         c->setBaseline(m_baseLine);
+    }
+
+    replot();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setCurveFilled()
+{
+    int colorIndex = 0;
+    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    {
+        c->setBaseline(m_baseLine);
+        if(m_curveFilled)
+        {
+            if(m_filledColor.isValid())
+            {
+                ((QwtPlotCurveDataObject*)c)->setBrush(QBrush(m_filledColor));
+            }
+            else
+            {
+                QColor fill = m_colorList[colorIndex++];
+                colorIndex = colorIndex % m_colorList.size();
+                fill.setAlpha(m_fillCurveAlpa);
+                ((QwtPlotCurveDataObject*)c)->setBrush(QBrush(fill));
+            }
+        }
+        else
+        {
+            ((QwtPlotCurveDataObject*)c)->setBrush(Qt::NoBrush);
+        }
     }
 
     replot();

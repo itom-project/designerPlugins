@@ -2469,3 +2469,47 @@ qreal Itom1DQwtPlot::getBaseLine() const
     return 0.0;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+QColor Itom1DQwtPlot::getCurveFillColor() const
+{
+    if(m_pContent) 
+    {
+        return m_pContent->m_filledColor;
+    }
+    return QColor::Invalid;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setCurveFillColor(const QColor val)
+{
+    if(m_pContent) 
+    {
+        m_pContent->m_filledColor = val;
+        return m_pContent->setCurveFilled();
+    }
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetCurveFillColor()
+{
+    setCurveFillColor(QColor::Invalid);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom1DQwtPlot::getCurveFilled() const
+{
+    if(m_pContent) 
+    {
+
+        return m_pContent->m_curveFilled;
+    }
+    return false;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setCurveFilled(const bool state)
+{
+    if(m_pContent) 
+    {
+        m_pContent->m_curveFilled = state;
+        return m_pContent->setCurveFilled();
+    }
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------

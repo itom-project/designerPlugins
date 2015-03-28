@@ -143,6 +143,7 @@ class Plot1DWidget : public QwtPlot
         void setLineStyle(const Qt::PenStyle &style);
         void setQwtLineStyle(const Itom1DQwt::tCurveStyle &style);
         void setBaseLine(const qreal &line);
+        void setCurveFilled();
         //void setStickOrientation(const qreal &line);
     private:
         QwtPlotRescaler* m_pRescaler;
@@ -224,6 +225,10 @@ class Plot1DWidget : public QwtPlot
         Itom1DQwt::tCurveStyle m_qwtCurveStyle;
 
         qreal m_baseLine;
+
+        QColor m_filledColor;
+        bool m_curveFilled;
+        ito::uint8 m_fillCurveAlpa;
 
     signals:
 
