@@ -20,6 +20,19 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/* **********************************************************************
+
+   The code form this file is based on / partially copied from the code
+   of qwt_plot_curve.cpp / qwt_plot_curve.h in the QWT-Framework 
+
+     * Qwt Widget Library
+     * Copyright (C) 1997   Josef Wilgen
+     * Copyright (C) 2002   Uwe Rathmann
+     *
+     * This library is free software; you can redistribute it and/or
+     * modify it under the terms of the Qwt License, Version 1.0
+************************************************************************ */
+
 #include "qwtPlotCurveDataObject.h"
 
 #include "common/sharedStructures.h"
@@ -34,7 +47,7 @@
 #include <qnumeric.h>
 #include <qwt_symbol.h>
 #include "qwt_point_mapper.h"
-
+//----------------------------------------------------------------------------------------------------------------------------------
 static int verifyRange( int size, int &i1, int &i2 )
 {
     if ( size < 1 )
@@ -48,7 +61,7 @@ static int verifyRange( int size, int &i1, int &i2 )
 
     return ( i2 - i1 + 1 );
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::draw( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect ) const
 {
     DataObjectSeriesData *myData = NULL;
@@ -61,7 +74,7 @@ void QwtPlotCurveDataObject::draw( QPainter *painter, const QwtScaleMap &xMap, c
         myData->endSampling();
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::drawCurve( QPainter *painter, int style, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
 {
     switch ( style )
@@ -90,7 +103,7 @@ void QwtPlotCurveDataObject::drawCurve( QPainter *painter, int style, const QwtS
             break;
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::drawSeries( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
 {
     if ( !painter || dataSize() <= 0 )
@@ -123,7 +136,7 @@ void QwtPlotCurveDataObject::drawSeries( QPainter *painter, const QwtScaleMap &x
         }
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
 {
     int size = to - from + 1;
@@ -211,7 +224,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
         drawPolyline(painter, polyline, xMap, yMap, canvasRect);
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::drawPolyline(QPainter *painter, QPolygonF &polyline, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect) const
 {
     if ( testCurveAttribute(Fitted) && m_privCurveFitter ) //( d_data->attributes & Fitted ) && d_data->curveFitter )
@@ -232,8 +245,7 @@ void QwtPlotCurveDataObject::drawPolyline(QPainter *painter, QPolygonF &polyline
     if ( m_privBrush.style() != Qt::NoBrush )
         fillCurve( painter, xMap, yMap, canvasRect, polyline );
 }
-
-// Copied form QWT-PLOT and modified to fit ignore invalid pixel
+//----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &symbol, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
 {
     int size = to - from + 1;
@@ -313,3 +325,423 @@ void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &sy
         symbol.drawSymbols( painter, polyline );
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void QwtPlotCurveDataObject::drawSticks( QPainter *painter,  const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
+{
+    painter->save();
+    painter->setRenderHint( QPainter::Antialiasing, false );
+
+    const bool doAlign = QwtPainter::roundingAlignment( painter );
+
+    double x0 = xMap.transform( baseline());
+    double y0 = yMap.transform( baseline());
+    if ( doAlign )
+    {
+        x0 = qRound( x0 );
+        y0 = qRound( y0 );
+    }
+
+    const Qt::Orientation o = orientation();
+
+    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
+
+    if(d_objseries->floatingPointValues())
+    {
+        for ( int i = from; i <= to; i++ )
+        {
+            const QPointF sample = d_objseries->sample( i );
+            double xi = xMap.transform( sample.x() );
+
+            double yi = sample.y();
+            if(!qIsFinite(yi))
+            {
+                continue;
+            }
+
+            yi = yMap.transform( yi );
+
+            if ( doAlign )
+            {
+                xi = qRound( xi );
+                yi = qRound( yi );
+            }
+
+            if ( o == Qt::Horizontal )
+                QwtPainter::drawLine( painter, x0, yi, xi, yi );
+            else
+                QwtPainter::drawLine( painter, xi, y0, xi, yi );
+        }
+    }
+    else
+    {
+        for ( int i = from; i <= to; i++ )
+        {
+            const QPointF sample = d_objseries->sample( i );
+            double xi = xMap.transform( sample.x() );
+            double yi = yMap.transform( sample.y() );
+            if ( doAlign )
+            {
+                xi = qRound( xi );
+                yi = qRound( yi );
+            }
+
+            if ( o == Qt::Horizontal )
+                QwtPainter::drawLine( painter, x0, yi, xi, yi );
+            else
+                QwtPainter::drawLine( painter, xi, y0, xi, yi );
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
+{
+    int size = to - from + 1;
+    if ( size <= 0 )
+        return;
+
+    const QColor color = painter->pen().color();
+
+    if ( painter->pen().style() == Qt::NoPen || color.alpha() == 0 )
+    {
+        return;
+    }
+
+    const bool doFill =  (m_privBrush.style() != Qt::NoBrush ) && ( m_privBrush.color().alpha() > 0 );
+    const bool doAlign = QwtPainter::roundingAlignment( painter );
+
+    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
+/*
+    if ( testPaintAttribute(FilterPoints) )
+    {
+        if ( ( color.alpha() == 255 )
+            && !( painter->renderHints() & QPainter::Antialiasing ) )
+        {
+            mapper.setFlag( QwtPointMapper::WeedOutPoints, true );
+        }
+    }
+*/
+
+    if ( testPaintAttribute(ImageBuffer) )
+    {
+        QwtPointMapper mapper;
+        mapper.setBoundingRect( canvasRect );
+        mapper.setFlag( QwtPointMapper::RoundPoints, doAlign );
+
+        const QImage image = mapper.toImage( xMap, yMap,
+            data(), from, to, this->pen(), 
+            painter->testRenderHint( QPainter::Antialiasing ),
+            renderThreadCount() );
+
+        painter->drawImage( canvasRect.toAlignedRect(), image );
+    }
+    else if ( testPaintAttribute( MinimizeMemory ) )
+    {
+        const QwtSeriesData<QPointF> *series = data();
+
+        for ( int i = from; i <= to; i++ )
+        {
+            const QPointF sample = d_objseries->sample( i );
+
+            double xi = xMap.transform( sample.x() );
+            double yi = sample.y();
+
+            if(!qIsFinite(yi))
+            {
+                continue;
+            }
+
+            yi = yMap.transform( yi );
+            
+            if ( doAlign )
+            {
+                xi = qRound( xi );
+                yi = qRound( yi );
+            }
+
+            QwtPainter::drawPoint( painter, QPointF( xi, yi ) );
+        }
+    }
+    else
+    {
+        if(d_objseries->floatingPointValues())
+        {        
+            QPolygonF points;
+            points.reserve(size);
+            QPointF sample;
+            bool newPol = false;
+            for ( int i = from; i <= to; i++ )
+            {
+                QPointF sample = d_objseries->sample( i );
+
+                double xi = xMap.transform( sample.x() );
+                double yi = sample.y();
+
+                if(!qIsFinite(yi))
+                {
+                    newPol = true;
+                }
+
+                yi = yMap.transform( yi );
+            
+                if ( doAlign )
+                {
+                    xi = qRound( xi );
+                    yi = qRound( yi );
+                }
+
+                sample.rx() = xi;
+                sample.ry() = yi;
+
+                if(newPol)
+                {
+                    QwtPainter::drawPoints( painter, points );
+                    if ( doFill )
+                        fillCurve( painter, xMap, yMap, canvasRect, points );
+                    points.clear();
+                    newPol = false;
+                }
+                else
+                {
+                    points << sample;
+                }
+            }
+
+            if(points.size() > 0)
+            {
+                QwtPainter::drawPoints( painter, points );
+                if ( doFill )
+                    fillCurve( painter, xMap, yMap, canvasRect, points );  
+            }
+        }
+        else
+        {
+            QPolygonF points(size);
+            QPointF sample;
+
+            for ( int i = from; i <= to; i++ )
+            {
+                const QPointF sample = d_objseries->sample( i );
+
+                double xi = xMap.transform( sample.x() );
+                double yi = sample.y();
+
+                if(!qIsFinite(yi))
+                {
+                    continue;
+                }
+
+                yi = yMap.transform( yi );
+            
+                if ( doAlign )
+                {
+                    xi = qRound( xi );
+                    yi = qRound( yi );
+                }
+                points[i - from].rx() = xi;
+                points[i - from].ry() = yi;
+            }
+            QwtPainter::drawPoints( painter, points );
+            fillCurve( painter, xMap, yMap, canvasRect, points );
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void QwtPlotCurveDataObject::drawSteps( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
+{
+    const bool doAlign = QwtPainter::roundingAlignment( painter );
+    int size = to - from + 1;
+    if ( size <= 1 )
+        return;
+
+    bool inverted = orientation() == Qt::Vertical;
+    if ( testCurveAttribute(Inverted) )
+        inverted = !inverted;
+
+    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
+
+    if(d_objseries->floatingPointValues())
+    {
+        QPolygonF polyline;
+        polyline.reserve(2 * size - 1);
+        QPointF sample;
+        QPointF sample2;
+
+        int i;
+        for ( i = from; i <= to; i++)
+        {
+            sample = d_objseries->sample( i );
+
+            double x = xMap.transform( sample.x() );
+            double y = yMap.transform( sample.y() );
+            if ( doAlign )
+            {
+                x = qRound( x );
+                if(qIsFinite(y))
+                {
+                    y = qRound( y );
+                    sample.rx() = x;
+                    sample.ry() = y;
+                    
+
+                    if ( polyline.size() > 0 )
+                    {
+                        const QPointF &p0 = polyline.last();
+
+                        if ( inverted )
+                        {
+                            sample2.rx() = p0.x();
+                            sample2.ry() = y;
+                        }
+                        else
+                        {
+                            sample2.rx() = x;
+                            sample2.ry() = p0.y();
+                        }
+                        polyline << sample2;
+                    }
+                    polyline << sample;
+
+                }
+                else if(polyline.size() > 0)
+                {
+                    if ( this->testPaintAttribute(ClipPolygons) )
+                    {
+                        const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+
+                        QwtPainter::drawPolyline( painter, clipped );
+                    }
+                    else
+                    {
+                        QwtPainter::drawPolyline( painter, polyline );
+                    }
+
+                    if ( m_privBrush.style() != Qt::NoBrush )
+                        fillCurve( painter, xMap, yMap, canvasRect, polyline );
+
+                    polyline.clear();
+                }
+            }
+            else
+            {
+                if(qIsFinite(y))
+                {
+                    sample.rx() = x;
+                    sample.ry() = y;
+
+                    if ( polyline.size() > 0 )
+                    {
+                        const QPointF &p0 = polyline.last();
+
+                        if ( inverted )
+                        {
+                            sample2.rx() = p0.x();
+                            sample2.ry() = y;
+                        }
+                        else
+                        {
+                            sample2.rx() = x;
+                            sample2.ry() = p0.y();
+                        }
+                        polyline << sample2;
+                    }
+
+                    polyline << sample;
+                }
+                else if(polyline.size() > 0)
+                {
+                    if ( this->testPaintAttribute(ClipPolygons) )
+                    {
+                        const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+
+                        QwtPainter::drawPolyline( painter, clipped );
+                    }
+                    else
+                    {
+                        QwtPainter::drawPolyline( painter, polyline );
+                    }
+
+                    if ( m_privBrush.style() != Qt::NoBrush )
+                        fillCurve( painter, xMap, yMap, canvasRect, polyline );
+
+                    polyline.clear();
+                }
+            }
+        }
+
+        if(polyline.size() > 0)
+        {
+
+
+            if ( this->testPaintAttribute(ClipPolygons) )
+            {
+                const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+
+                QwtPainter::drawPolyline( painter, clipped );
+            }
+            else
+            {
+                QwtPainter::drawPolyline( painter, polyline );
+            }
+
+            if ( m_privBrush.style() != Qt::NoBrush )
+                fillCurve( painter, xMap, yMap, canvasRect, polyline );
+
+            polyline.clear();
+        }
+    }
+    else
+    {
+        QPolygonF polyline( 2 * size - 1 );
+
+        QPointF *points = polyline.data();
+        int i, ip;
+        for ( i = from, ip = 0; i <= to; i++, ip += 2 )
+        {
+            const QPointF sample = d_objseries->sample( i );
+
+            double x = xMap.transform( sample.x() );
+            double y = yMap.transform( sample.y() );
+            if ( doAlign )
+            {
+                x = qRound( x );
+                y = qRound( y );
+            }
+
+            if ( ip > 0 )
+            {
+                const QPointF &p0 = points[ip - 2];
+                QPointF &p = points[ip - 1];
+
+                if ( inverted )
+                {
+                    p.rx() = p0.x();
+                    p.ry() = y;
+                }
+                else
+                {
+                    p.rx() = x;
+                    p.ry() = p0.y();
+                }
+            }
+
+            points[ip].rx() = x;
+            points[ip].ry() = y;
+        }
+
+        if ( this->testPaintAttribute(ClipPolygons) )
+        {
+            const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+            QwtPainter::drawPolyline( painter, clipped );
+        }
+        else
+        {
+            QwtPainter::drawPolyline( painter, polyline );
+        }
+
+        if ( m_privBrush.style() != Qt::NoBrush )
+        {
+            fillCurve( painter, xMap, yMap, canvasRect, polyline );
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------

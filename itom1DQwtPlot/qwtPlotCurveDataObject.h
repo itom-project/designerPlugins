@@ -20,6 +20,20 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
+/* **********************************************************************
+
+   The code form this file is based on / partially copied from / derived 
+   from the code of qwt_plot_curve.cpp / qwt_plot_curve.h found 
+   in the QWT-Framework
+
+     * Qwt Widget Library
+     * Copyright (C) 1997   Josef Wilgen
+     * Copyright (C) 2002   Uwe Rathmann
+     *
+     * This library is free software; you can redistribute it and/or
+     * modify it under the terms of the Qwt License, Version 1.0
+************************************************************************ */
+
 #ifndef QWTPLOTCURVEDATAOBJECT
 #define QWTPLOTCURVEDATAOBJECT
 
@@ -47,7 +61,11 @@ protected:
 
     void drawPolyline(QPainter *painter, QPolygonF &polyline, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect) const;
 
-    void drawSymbols( QPainter *p, const QwtSymbol & symbol,  const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+    void drawSymbols( QPainter *painter, const QwtSymbol & symbol,  const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+
+    void drawSticks( QPainter *painter,  const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+    void drawDots( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
+    void drawSteps( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
 
 private:
     //this is a hack in order to access PrivateData
