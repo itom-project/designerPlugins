@@ -39,7 +39,7 @@ public:
     enum tMultiLineMode { AutoRowCol, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
     enum tColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
     enum tPlotPickerType { DefaultMarker, RangeMarker };
-    enum tCurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, Sticks_Hor, Sticks_Vert, Steps, Steps_Inv,  Dots };
+    enum tCurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, Sticks_Hor, Sticks_Vert, Steps, Steps_Inv, Steps_Centered,  Dots };
 };
 
 #endif //CONFIGSTRUCTQWT1D_H

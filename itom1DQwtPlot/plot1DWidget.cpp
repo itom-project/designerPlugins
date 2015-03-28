@@ -682,6 +682,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     dObjCurve->setOrientation(Qt::Horizontal);
                     dObjCurve->setStyle(QwtPlotCurve::Sticks);
                 break;
+                case Itom1DQwt::Steps_Centered:
+                    dObjCurve->setStyle(QwtPlotCurve::UserCurve );
+                break;
                 case Itom1DQwt::Sticks:
                 case Itom1DQwt::Sticks_Vert:
                     dObjCurve->setOrientation(Qt::Vertical);
@@ -3173,6 +3176,9 @@ void Plot1DWidget::setQwtLineStyle(const Itom1DQwt::tCurveStyle &style)
             case Itom1DQwt::Steps_Inv:
                 c->setCurveAttribute(QwtPlotCurve::Inverted, true);
                 c->setStyle(QwtPlotCurve::Steps);
+            break;
+            case Itom1DQwt::Steps_Centered:
+                c->setStyle(QwtPlotCurve::UserCurve );
             break;
             case Itom1DQwt::Sticks_Hor:
                 c->setOrientation(Qt::Horizontal);
