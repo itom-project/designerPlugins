@@ -969,3 +969,99 @@ void QwtPlotCurveDataObject::drawCenteredSteps( QPainter *painter, const QwtScal
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+/*!
+  Fill the area between the curve and the baseline with
+  the curve brush
+
+  \param painter Painter
+  \param xMap x map
+  \param yMap y map
+  \param canvasRect Contents rectangle of the canvas
+  \param polygon Polygon - will be modified !
+
+  \sa setBrush(), setBaseline(), setStyle()
+*/
+void QwtPlotCurveDataObject::fillCurve( QPainter *painter,
+    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+    const QRectF &canvasRect, QPolygonF &polygon ) const
+{
+    if ( m_privBrush == Qt::NoBrush )
+        return;
+
+    closePolyline( painter, xMap, yMap, polygon );
+    if ( polygon.count() <= 2 ) // a line can't be filled
+        return;
+
+    QBrush brush = m_privBrush;
+    if ( !brush.color().isValid() )
+        brush.setColor( pen().color() );
+
+    if ( testPaintAttribute(ClipPolygons) )
+        polygon = QwtClipper::clipPolygonF( canvasRect, polygon, true );
+
+    painter->save();
+
+    painter->setPen( Qt::NoPen );
+    painter->setBrush( brush );
+
+    QwtPainter::drawPolygon( painter, polygon );
+
+    painter->restore();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+/*!
+  \brief Complete a polygon to be a closed polygon including the 
+         area between the original polygon and the baseline.
+
+  \param painter Painter
+  \param xMap X map
+  \param yMap Y map
+  \param polygon Polygon to be completed
+*/
+void QwtPlotCurveDataObject::closePolyline( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, QPolygonF &polygon ) const
+{
+    if ( polygon.size() < 2 )
+        return;
+
+    const bool doAlign = QwtPainter::roundingAlignment( painter );
+    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
+
+    double baseline = this->baseline();
+    
+    if(Itom1DQwt::FillFromMax == m_curveFillState)
+    {
+        if ( orientation() == Qt::Vertical ) baseline = yMap.invTransform(yMap.p2());
+        else baseline = xMap.invTransform(xMap.p2());
+    }
+    else if(Itom1DQwt::FillFromMin == m_curveFillState)
+    {
+        if ( orientation() == Qt::Vertical ) baseline = yMap.invTransform(yMap.p1());
+        else baseline = xMap.invTransform(xMap.p1());
+    }
+
+    if ( orientation() == Qt::Vertical )
+    {
+        if ( yMap.transformation() )
+            baseline = yMap.transformation()->bounded( baseline );
+
+        double refY = yMap.transform( baseline );
+        if ( doAlign )
+            refY = qRound( refY );
+
+        polygon += QPointF( polygon.last().x(), refY );
+        polygon += QPointF( polygon.first().x(), refY );
+    }
+    else
+    {
+        if ( xMap.transformation() )
+            baseline = xMap.transformation()->bounded( baseline );
+
+        double refX = xMap.transform( baseline );
+        if ( doAlign )
+            refX = qRound( refX );
+
+        polygon += QPointF( refX, polygon.last().y() );
+        polygon += QPointF( refX, polygon.first().y() );
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------

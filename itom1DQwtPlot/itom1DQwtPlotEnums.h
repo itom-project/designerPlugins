@@ -32,7 +32,7 @@ class Itom1DQwt : public QObject
     Q_ENUMS(tMultiLineMode);    
     Q_ENUMS(tColorHandling ); 
     Q_ENUMS(tCurveStyle );
-
+    Q_ENUMS(tFillCurveStyle );
 
 public:
     Itom1DQwt(): QObject() {}
@@ -40,6 +40,7 @@ public:
     enum tColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
     enum tPlotPickerType { DefaultMarker, RangeMarker };
     enum tCurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, Sticks_Hor, Sticks_Vert, Steps, Steps_Inv, Steps_Centered,  Dots };
+    enum tFillCurveStyle {   NoCurveFill = -1,  FillBaseLine, FillFromMax, FillFromMin};
 };
 
 #endif //CONFIGSTRUCTQWT1D_H

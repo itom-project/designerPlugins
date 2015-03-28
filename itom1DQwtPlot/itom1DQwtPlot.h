@@ -69,8 +69,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
     Q_PROPERTY(Itom1DQwt::tCurveStyle curveStyle READ getCurveStyle WRITE setCurveStyle USER true);
-    Q_PROPERTY(bool fillCurve READ getCurveFilled WRITE setCurveFilled USER true)
+    Q_PROPERTY(Itom1DQwt::tFillCurveStyle fillCurve READ getCurveFilled WRITE setCurveFilled USER true)
     Q_PROPERTY(QColor curveFillColor READ getCurveFillColor WRITE setCurveFillColor RESET resetCurveFillColor USER true)
+    Q_PROPERTY(int curveFillAlpha READ getCurveFillAlpha WRITE setCurveFillAlpha USER true)
 
     Q_PROPERTY(qreal baseLine READ getBaseLine WRITE setBaseLine USER true)
 
@@ -117,6 +118,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://lineWidth", "width of lines in pixel.")
     Q_CLASSINFO("prop://lineStyle", "style of lines.")
     Q_CLASSINFO("prop://curveStyle", "set the style of the qwt-plot according to curve styles.")
+
+    Q_CLASSINFO("prop://fillCurve", "fill curve below / above or according to baseline.")
+    Q_CLASSINFO("prop://curveFillColor", "the fill color for the curve, invalid color leads to line color selection.")
+    Q_CLASSINFO("prop://curveFillAlpha", "set the alpha value for the curve fill color seperatly.")
 
     Q_CLASSINFO("prop://lineSymbol", "Get / Set the current line symbol type")
     Q_CLASSINFO("prop://lineSymbolSize", "Get / Set the current line symbol size")
@@ -320,9 +325,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void setCurveFillColor(const QColor val);
         void resetCurveFillColor();
 
-        bool getCurveFilled() const;
-        void setCurveFilled(const bool state);
+        Itom1DQwt::tFillCurveStyle getCurveFilled() const;
+        void setCurveFilled(const Itom1DQwt::tFillCurveStyle state);
 
+        void setCurveFillAlpha(const int val);
+        int getCurveFillAlpha() const;
 
         friend class Plot1DWidget;
 

@@ -86,7 +86,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_baseLine(0.0),
         m_fillCurveAlpa(128),
         m_filledColor(QColor::Invalid),
-        m_curveFilled(false),
+        m_curveFilled(Itom1DQwt::NoCurveFill),
         m_pLegend(NULL)
 {
     this->setMouseTracking(false);
@@ -699,7 +699,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
 
             dObjCurve->setBaseline(m_baseLine);
-            if(m_curveFilled)
+            dObjCurve->setCurveFilled(m_curveFilled);
+            if(m_curveFilled != Itom1DQwt::NoCurveFill)
             {
                 if(m_filledColor.isValid())
                 {
@@ -3236,7 +3237,8 @@ void Plot1DWidget::setCurveFilled()
     foreach(QwtPlotCurve *c, m_plotCurveItems)
     {
         c->setBaseline(m_baseLine);
-        if(m_curveFilled)
+        ((QwtPlotCurveDataObject*)c)->setCurveFilled(m_curveFilled);
+        if(m_curveFilled != Itom1DQwt::NoCurveFill)
         {
             if(m_filledColor.isValid())
             {

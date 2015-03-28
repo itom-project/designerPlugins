@@ -227,7 +227,7 @@ class Plot1DWidget : public QwtPlot
         qreal m_baseLine;
 
         QColor m_filledColor;
-        bool m_curveFilled;
+        Itom1DQwt::tFillCurveStyle m_curveFilled;
         ito::uint8 m_fillCurveAlpa;
 
     signals:

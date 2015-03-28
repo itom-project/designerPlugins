@@ -2483,6 +2483,7 @@ void Itom1DQwtPlot::setCurveFillColor(const QColor val)
     if(m_pContent) 
     {
         m_pContent->m_filledColor = val;
+        m_pContent->m_filledColor.setAlpha(m_pContent->m_fillCurveAlpa);
         return m_pContent->setCurveFilled();
     }
     updatePropertyDock();
@@ -2493,23 +2494,43 @@ void Itom1DQwtPlot::resetCurveFillColor()
     setCurveFillColor(QColor::Invalid);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-bool Itom1DQwtPlot::getCurveFilled() const
+Itom1DQwt::tFillCurveStyle Itom1DQwtPlot::getCurveFilled() const
 {
     if(m_pContent) 
     {
 
         return m_pContent->m_curveFilled;
     }
-    return false;
+    return Itom1DQwt::NoCurveFill;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::setCurveFilled(const bool state)
+void Itom1DQwtPlot::setCurveFilled(const Itom1DQwt::tFillCurveStyle state)
 {
     if(m_pContent) 
     {
         m_pContent->m_curveFilled = state;
-        return m_pContent->setCurveFilled();
+        m_pContent->setCurveFilled();
     }
     updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setCurveFillAlpha(const int val)
+{
+    if(m_pContent) 
+    {
+        m_pContent->m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(val);
+        m_pContent->m_filledColor.setAlpha(m_pContent->m_fillCurveAlpa);
+        m_pContent->setCurveFilled();
+    }
+    updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getCurveFillAlpha() const
+{
+    if(m_pContent) 
+    {
+        return m_pContent->m_fillCurveAlpa;
+    }
+    return 128;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
