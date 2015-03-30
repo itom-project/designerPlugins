@@ -236,6 +236,10 @@ ito::RetVal Plot1DWidget::init()
 
         m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, NULL).value<int>());
         m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, NULL).value<qreal>();
+
+        m_curveFilled = (Itom1DQwt::tFillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, NULL).value<int>();
+        m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, NULL).value<QColor>();
+        m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, NULL).value<int>());
     }
 
     
@@ -673,23 +677,28 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, true);
                     dObjCurve->setStyle(QwtPlotCurve::Lines);
                 break;
-                case Itom1DQwt::Steps:
+                case Itom1DQwt::StepsLeft:
+                    dObjCurve->setOrientation(Qt::Horizontal);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
                     dObjCurve->setStyle(QwtPlotCurve::Steps);
                 break;
-                case Itom1DQwt::Steps_Inv:
+                case Itom1DQwt::StepsRight:
+                    dObjCurve->setOrientation(Qt::Horizontal);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, true);
                     dObjCurve->setStyle(QwtPlotCurve::Steps);
                 break;
-                case Itom1DQwt::Sticks_Hor:
+                case Itom1DQwt::Steps:
+                    dObjCurve->setOrientation(Qt::Horizontal);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                    dObjCurve->setStyle(QwtPlotCurve::UserCurve );
+                break;
+                case Itom1DQwt::SticksHorizontal:
                     dObjCurve->setOrientation(Qt::Horizontal);
                     dObjCurve->setStyle(QwtPlotCurve::Sticks);
                 break;
-                case Itom1DQwt::Steps_Centered:
-                    dObjCurve->setStyle(QwtPlotCurve::UserCurve );
-                break;
+
                 case Itom1DQwt::Sticks:
-                case Itom1DQwt::Sticks_Vert:
+                case Itom1DQwt::SticksVertical:
                     dObjCurve->setOrientation(Qt::Vertical);
                     dObjCurve->setStyle(QwtPlotCurve::Sticks);
                 break;
@@ -3190,23 +3199,27 @@ void Plot1DWidget::setQwtLineStyle(const Itom1DQwt::tCurveStyle &style)
                 c->setCurveAttribute(QwtPlotCurve::Fitted, true);
                 c->setStyle(QwtPlotCurve::Lines);
             break;
-            case Itom1DQwt::Steps:
+            case Itom1DQwt::StepsLeft:
+                c->setOrientation(Qt::Horizontal);
                 c->setCurveAttribute(QwtPlotCurve::Inverted, false);
                 c->setStyle(QwtPlotCurve::Steps);
             break;
-            case Itom1DQwt::Steps_Inv:
+            case Itom1DQwt::StepsRight:
+                c->setOrientation(Qt::Horizontal);
                 c->setCurveAttribute(QwtPlotCurve::Inverted, true);
                 c->setStyle(QwtPlotCurve::Steps);
             break;
-            case Itom1DQwt::Steps_Centered:
+            case Itom1DQwt::Steps:
+                c->setOrientation(Qt::Horizontal);
+                c->setCurveAttribute(QwtPlotCurve::Inverted, false);
                 c->setStyle(QwtPlotCurve::UserCurve );
             break;
-            case Itom1DQwt::Sticks_Hor:
+            case Itom1DQwt::SticksHorizontal:
                 c->setOrientation(Qt::Horizontal);
                 c->setStyle(QwtPlotCurve::Sticks);
             break;
             case Itom1DQwt::Sticks:
-            case Itom1DQwt::Sticks_Vert:
+            case Itom1DQwt::SticksVertical:
                 c->setOrientation(Qt::Vertical);
                 c->setStyle(QwtPlotCurve::Sticks);
             break;

@@ -1028,12 +1028,12 @@ void QwtPlotCurveDataObject::closePolyline( QPainter *painter, const QwtScaleMap
 
     double baseline = this->baseline();
     
-    if(Itom1DQwt::FillFromMax == m_curveFillState)
+    if(Itom1DQwt::FillFromTop == m_curveFillState)
     {
         if ( orientation() == Qt::Vertical ) baseline = yMap.invTransform(yMap.p2());
         else baseline = xMap.invTransform(xMap.p2());
     }
-    else if(Itom1DQwt::FillFromMin == m_curveFillState)
+    else if(Itom1DQwt::FillFromBottom == m_curveFillState)
     {
         if ( orientation() == Qt::Vertical ) baseline = yMap.invTransform(yMap.p1());
         else baseline = xMap.invTransform(xMap.p1());
