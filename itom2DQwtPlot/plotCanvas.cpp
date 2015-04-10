@@ -75,7 +75,8 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
         m_pMultiPointPicker(NULL),
         m_activeDrawItem(-1),
         m_ignoreNextMouseEvent(false),
-        m_contextMenu(contextMenu)
+        m_contextMenu(contextMenu),
+        m_isRefreshingPlot(false)
         
 {
     setMouseTracking(false);
@@ -366,6 +367,13 @@ void PlotCanvas::refreshStyles()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 {
+    if (m_isRefreshingPlot)
+    {
+        return;
+    }
+
+    m_isRefreshingPlot = true;
+
     ito::uint8 updateState = 0; //changeNo (0): nothing changed, changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...), changeData (2): data changed (dimensions, sizes, other data object...)
 
     m_dObjPtr = dObj;
@@ -478,6 +486,8 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
     {
         replot();
     }
+
+    m_isRefreshingPlot = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

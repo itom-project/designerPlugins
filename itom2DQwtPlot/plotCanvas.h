@@ -216,6 +216,8 @@ class PlotCanvas : public QwtPlot
 
         QPoint m_initialMousePosition;
         QPointF m_initialMarkerPosition;
+
+        bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);

@@ -190,7 +190,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
             y1 = visibleContentsRect.top();
             y2 = visibleContentsRect.bottom();
 
-            if (m_fixedAspectRatio)
+            if (m_fixedAspectRatio && plt->isVisible()) //invisible plot might have completely wrong canvas size, once it becomes visible, this rescale method is automatically called again.
             {
 
                 //get effective area of the current plot (without margins, axes,...)
@@ -245,7 +245,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
                 y1 = zoomRect().top();
                 y2 = zoomRect().bottom();
 
-                if (m_fixedAspectRatio)
+                if (m_fixedAspectRatio && plt->isVisible()) //invisible plot might have completely wrong canvas size, once it becomes visible, this rescale method is automatically called again.
                 {
 
                     //get effective area of the current plot (without margins, axes,...)
@@ -312,10 +312,10 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
             plt->setAxisScale( yAxisId, y1, y2 );
             plt->setAxisScale( xAxisId, x1, x2 );
 
-            plt->setAutoReplot( doReplot );
-
             m_aspectRatioChanged = false; 
         }
+
+        plt->setAutoReplot( doReplot );
 
         plt->replot();
     }
