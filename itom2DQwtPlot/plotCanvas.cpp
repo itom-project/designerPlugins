@@ -76,7 +76,8 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
         m_activeDrawItem(-1),
         m_ignoreNextMouseEvent(false),
         m_contextMenu(contextMenu),
-        m_isRefreshingPlot(false)
+        m_isRefreshingPlot(false),
+        m_firstTimeVisible(false)
         
 {
     setMouseTracking(false);
@@ -3304,7 +3305,15 @@ void PlotCanvas::setVisible(bool visible)
     this->QwtPlot::setVisible(visible);
     if (visible)
     {
-        this->updateScaleValues(true, false);
+        if (!m_firstTimeVisible)
+        {
+            this->updateScaleValues(true, true);
+        }
+        else
+        {
+            this->updateScaleValues(true, false);
+        }
+        m_firstTimeVisible = true;
     }
 }
 

@@ -218,6 +218,7 @@ class PlotCanvas : public QwtPlot
         QPointF m_initialMarkerPosition;
 
         bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)
+        bool m_firstTimeVisible; //true if this plot becomes visible for the first time
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
