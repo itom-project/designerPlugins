@@ -90,9 +90,6 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_pLegend(NULL)
 {
     this->setMouseTracking(false);
-
-    //this is the border between the canvas and the axes and the overall mainwindow
-    setContentsMargins(5,5,5,5);
     
     m_inverseColor0 = Qt::green;
     m_inverseColor1 = Qt::blue;
@@ -130,6 +127,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
+    m_pZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton); //right click should open the context menu, not a zoom out to level 0 (Ctrl+0) if zoomer is enabled.
     //m_pZoomer->setFixedAspectRatio(true);
     //all others settings for zoomer are set in init (since they need access to the settings via api)
 
@@ -166,6 +164,26 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 
     setState((Plot1DWidget::tState)m_pData->m_state);
     updateColors();
+
+
+    //Geometry of the plot:
+    setContentsMargins(5,5,5,5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
+
+    canvas()->setContentsMargins(0,0,0,0); //border of the canvas (border between canvas and axes or title)
+
+    //left axis
+    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
+    leftAxis->setMargin(0);                 //distance backbone <-> canvas
+    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
+    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
+    leftAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
+
+    //bottom axis
+    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
+    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
+    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
+    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
+    bottomAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

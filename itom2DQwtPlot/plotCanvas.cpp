@@ -82,9 +82,6 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
 {
     setMouseTracking(false);
 
-    //this is the border between the canvas and the axes and the overall mainwindow
-    setContentsMargins(5,5,5,5);
-
     //canvas() is the real plotting area, where the plot is printed (without axes...)
     //canvas()->setFrameShadow(QFrame::Plain);
     //canvas()->setFrameShape(QFrame::NoFrame);
@@ -114,6 +111,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pZoomer->setEnabled(false);
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
+    m_pZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton); //right click should open the context menu, not a zoom out to level 0 (Ctrl+0) if zoomer is enabled.
 
     //pan tool
     m_pPanner = new QwtPlotPanner(canvas());
@@ -194,21 +192,39 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     //connect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon)));
     //connect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint)));
 
-    //prepare color bar
+    //Geometry of the plot:
+    setContentsMargins(5,5,5,5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
+
+    canvas()->setContentsMargins(0,0,0,0); //border of the canvas (border between canvas and axes or title)
+
+    //left axis
+    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
+    leftAxis->setMargin(0);                 //distance backbone <-> canvas
+    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
+    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
+    leftAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
+
+    //bottom axis
+    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
+    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
+    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
+    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
+    bottomAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
+
+    //right axis (color bar)
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
     rightAxis->setColorBarEnabled(true);
     rightAxis->setColorBarWidth(15);
-
-    //rightAxis->setColorMap(QwtInterval(0,1.0), new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
-    //rightAxis->setFont(QFont("Verdana", 8, 1, true));
-
-    rightAxis->setMargin(15); //margin to right border of window
-    rightAxis->scaleDraw()->setLength(20);
-    rightAxis->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,false);
-
     setAxisScale(QwtPlot::yRight, 0, 1.0);
     enableAxis(QwtPlot::yRight, m_pData->m_colorBarVisible);
     axisWidget(QwtPlot::yRight)->setLayoutFlag(QwtScaleWidget::TitleInverted, false); //let the label be in the same direction than on the left side
+
+    //rightAxis->scaleDraw()->setLength(20);
+    rightAxis->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,false); //disable backbone
+    rightAxis->setMargin(10);                       //distance colorbar <-> canvas
+    rightAxis->setSpacing(8);                       //distance tick labels <-> axis label && color bar -> ticks
+    rightAxis->scaleDraw()->setSpacing(6);          //distance tick labels <-> ticks
+    rightAxis->setContentsMargins(0,0,0,0);         //top and bottom offset
 
     configRescaler();
 
