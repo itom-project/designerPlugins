@@ -159,6 +159,7 @@ void Itom2dQwtPlot::constructor()
     QMenu *menuTools = new QMenu(tr("Tools"), this);
     menuTools->addAction(m_pActSave);
     menuTools->addAction(m_pActCopyClipboard);
+    menuTools->addAction(m_pActSendCurrentToWorkspace);
     menuTools->addSeparator();
     menuTools->addAction(m_pActValuePicker);
     menuTools->addAction(m_pActCntrMarker);
@@ -173,6 +174,7 @@ void Itom2dQwtPlot::constructor()
     QMenu *contextMenu = new QMenu(QObject::tr("plot2D"), this);
     contextMenu->addAction(m_pActSave);
     contextMenu->addAction(m_pActCopyClipboard);
+    contextMenu->addAction(m_pActSendCurrentToWorkspace);
     contextMenu->addSeparator();
     contextMenu->addAction(m_pActHome);
     contextMenu->addAction(m_pActPan);
@@ -281,8 +283,13 @@ void Itom2dQwtPlot::createActions()
     a->setToolTip(tr("Zoom to rectangle"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActZoom(bool)));
 
+    //m_pActSendCurrentToWorkspace
+    m_pActSendCurrentToWorkspace = a = new QAction(QIcon(":/plugins/icons/sendToPython.png"), tr("Send current view to workspace..."), this);
+    a->setObjectName("actSendCurrentToWorkspace");
+    connect(a, SIGNAL(triggered()), this, SLOT(mnuActSendCurrentToWorkspace()));
+
     //m_actScaleSetting
-    m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings..."), this);
+    m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale settings..."), this);
     a->setObjectName("actScaleSetting");
     a->setToolTip(tr("Set the ranges and offsets of this view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActScaleSettings()));
@@ -2634,6 +2641,7 @@ ito::RetVal Itom2dQwtPlot::setGeometricElementLabel(int id, QString label)
     }
     return ito::retOk;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::setGeometricElementLabelVisible(int id, bool setVisible)
 {
@@ -2655,4 +2663,46 @@ ito::RetVal Itom2dQwtPlot::setGeometricElementLabelVisible(int id, bool setVisib
         m_pContent->replot();
     }
     return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::mnuActSendCurrentToWorkspace()
+{
+    bool ok;
+    QString varname = QInputDialog::getText(this, tr("Current to workspace"), tr("Indicate the python variable name for the currently visible object"), QLineEdit::Normal, "zoom_object", &ok);
+    if (ok && varname != "")
+    {
+        QSharedPointer<ito::DataObject> obj = getDisplayed();
+        const ito::DataObject *dobj = &(*obj);
+        QSharedPointer<ito::ParamBase> obj_(new ito::ParamBase("displayed", ito::ParamBase::DObjPtr, (const char*)dobj));
+
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        ito::RetVal retval = apiSendParamToPyWorkspace(varname, obj_);
+
+        QApplication::restoreOverrideCursor();
+
+        if (retval.containsError())
+        {
+            QMessageBox msgBox;
+            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
+            if (retval.errorMessage())
+            {
+                msgBox.setInformativeText(retval.errorMessage());
+            }
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
+        }
+        else if (retval.containsWarning())
+        {
+            QMessageBox msgBox;
+            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
+            if (retval.errorMessage())
+            {
+                msgBox.setInformativeText(retval.errorMessage());
+            }
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
+    }
 }

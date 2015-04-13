@@ -313,6 +313,7 @@ private:
     QAction *m_pActHome;
     QAction *m_pActPan;
     QAction *m_pActZoom;
+    QAction *m_pActSendCurrentToWorkspace;
     QAction *m_pActAspectRatio;
     QAction *m_pActScaleSettings;
     QAction *m_pActColorPalette;
@@ -353,6 +354,8 @@ private:
 
 private slots:
     void mnuActSave();
+    void mnuActSendCurrentToWorkspace();
+
     void mnuActHome();
     void mnuActPan(bool checked);
     void mnuActZoom(bool checked);
@@ -364,6 +367,7 @@ private slots:
     void mnuActLineCut(bool checked);
     void mnuLineCutMode(QAction *action);
     void mnuActStackCut(bool checked);
+    
     
     void mnuActPlaneSelector(int plane);
     void mnuDrawModifyMode(QAction *action);
