@@ -792,6 +792,46 @@ void Itom1DQwtPlot::resetValueLabel()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+Itom1DQwt::ScaleEngine Itom1DQwtPlot::getValueScale() const
+{
+    if (m_pContent) 
+    {
+        return m_pContent->m_valueScale;
+    }
+    return Itom1DQwt::Linear;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setValueScale(const Itom1DQwt::ScaleEngine &scale)
+{
+    if (m_pContent)
+    {
+        m_pContent->setDefaultValueScaleEngine(scale);
+    }
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+Itom1DQwt::ScaleEngine Itom1DQwtPlot::getAxisScale() const
+{
+    if (m_pContent) 
+    {
+        return m_pContent->m_axisScale;
+    }
+    return Itom1DQwt::Linear;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setAxisScale(const Itom1DQwt::ScaleEngine &scale)
+{
+    if (m_pContent)
+    {
+        m_pContent->setDefaultAxisScaleEngine(scale);
+    }
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QFont Itom1DQwtPlot::getTitleFont(void) const
 {
     if (m_pContent)

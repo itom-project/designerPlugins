@@ -34,7 +34,6 @@
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
 #include <qwt_matrix_raster_data.h>
-#include <qwt_scale_widget.h>
 #include <qwt_plot_magnifier.h>
 #include <qwt_plot_panner.h>
 #include <qwt_plot_renderer.h>
@@ -46,6 +45,7 @@
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_engine.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -87,7 +87,9 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_fillCurveAlpa(128),
         m_filledColor(QColor::Invalid),
         m_curveFilled(Itom1DQwt::NoCurveFill),
-        m_pLegend(NULL)
+        m_pLegend(NULL),
+        m_valueScale(Itom1DQwt::Linear),
+        m_axisScale(Itom1DQwt::Linear)
 {
     this->setMouseTracking(false);
     
@@ -177,6 +179,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     leftAxis->setSpacing(6);                //distance tick labels <-> axis label
     leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
     leftAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
+    
 
     //bottom axis
     QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
@@ -283,6 +286,61 @@ ito::RetVal Plot1DWidget::init()
     axisWidget(QwtPlot::yLeft)->setTitle(t);
 
     return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setDefaultValueScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine)
+{
+    if (scaleEngine != m_valueScale)
+    {
+        if (scaleEngine == Itom1DQwt::Linear)
+        {
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
+        }
+        else
+        {
+            setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine((int)scaleEngine));
+        }
+
+        m_valueScale = scaleEngine;
+
+        bool recalculateBoundaries = false;
+
+        if (m_pData->m_valueScaleAuto == true || m_pData->m_axisScaleAuto == true)
+        {
+            recalculateBoundaries = true;
+        }
+
+        updateScaleValues(recalculateBoundaries);
+    }
+        
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setDefaultAxisScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine)
+{
+    if (scaleEngine != m_axisScale)
+    {
+        if (scaleEngine == Itom1DQwt::Linear)
+        {
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine());
+        }
+        else
+        {
+            setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine((int)scaleEngine));
+        }
+
+        m_axisScale = scaleEngine;
+
+        bool recalculateBoundaries = false;
+
+        if (m_pData->m_valueScaleAuto == true || m_pData->m_axisScaleAuto == true)
+        {
+            recalculateBoundaries = true;
+        }
+
+        updateScaleValues(recalculateBoundaries);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

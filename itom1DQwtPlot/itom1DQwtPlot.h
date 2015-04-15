@@ -103,6 +103,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(Qt::Alignment pickerLabelAlignment READ getPickerLabelAlignment WRITE setPickerLabelAlignment USER true);
     Q_PROPERTY(Itom1DQwt::tPlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
 
+    Q_PROPERTY(Itom1DQwt::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
+    Q_PROPERTY(Itom1DQwt::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
+
 
     Q_ENUMS(LegendPos);
     Q_ENUMS(tSymbol);
@@ -153,6 +156,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://pickerLabelAlignment", "Get / Set label alignment for the picker-label.")
     Q_CLASSINFO("prop://pickerType", "Get / Set the current picker type")
 
+    Q_CLASSINFO("prop://valueScale", "linear or logarithmic scale (various bases) can be chosen for the vertical axis (y-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
+    Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
+
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
     //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
     Q_CLASSINFO("slot://plotMarkers", "Delete a specific marker")
@@ -183,6 +189,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         {
             NoSymbol = -1, Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon
         };
+
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         
         //properties
@@ -211,6 +218,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         ito::AutoInterval getYAxisInterval(void) const;
         void setYAxisInterval(ito::AutoInterval);
+
+        Itom1DQwt::ScaleEngine getValueScale() const;
+        void setValueScale(const Itom1DQwt::ScaleEngine &scale);
+
+        Itom1DQwt::ScaleEngine getAxisScale() const;
+        void setAxisScale(const Itom1DQwt::ScaleEngine &scale);
 
         QFont getTitleFont(void) const;
         void setTitleFont(const QFont &font);

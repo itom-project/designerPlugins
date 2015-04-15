@@ -33,6 +33,7 @@ class Itom1DQwt : public QObject
     Q_ENUMS(tColorHandling ); 
     Q_ENUMS(tCurveStyle );
     Q_ENUMS(tFillCurveStyle );
+    Q_ENUMS(ScaleEngine );
 
 public:
     Itom1DQwt(): QObject() {}
@@ -41,6 +42,7 @@ public:
     enum tPlotPickerType { DefaultMarker, RangeMarker };
     enum tCurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, SticksHorizontal, SticksVertical, Steps, StepsRight, StepsLeft,  Dots };
     enum tFillCurveStyle {   NoCurveFill = -1,  FillBaseLine, FillFromTop, FillFromBottom};
+    enum ScaleEngine { Linear = 1, Log2 = 2, Log10 = 10, Log16 = 16 };
 };
 
 #endif //CONFIGSTRUCTQWT1D_H

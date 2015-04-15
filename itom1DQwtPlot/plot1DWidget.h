@@ -35,9 +35,6 @@
 #include <qtimer.h>
 #include <qcoreapplication.h>
 #include <qapplication.h>
-#include <qgraphicsview.h>
-#include <qgraphicsscene.h>
-#include <qgraphicsitem.h>
 #include <qqueue.h>
 #include <qmenu.h>
 
@@ -145,6 +142,9 @@ class Plot1DWidget : public QwtPlot
         void setBaseLine(const qreal &line);
         void setCurveFilled();
         //void setStickOrientation(const qreal &line);
+        void setDefaultValueScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine);
+        void setDefaultAxisScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine);
+
     private:
         QwtPlotRescaler* m_pRescaler;
 
@@ -229,6 +229,9 @@ class Plot1DWidget : public QwtPlot
         QColor m_filledColor;
         Itom1DQwt::tFillCurveStyle m_curveFilled;
         ito::uint8 m_fillCurveAlpa;
+
+        Itom1DQwt::ScaleEngine m_valueScale;
+        Itom1DQwt::ScaleEngine m_axisScale;
 
     signals:
 
