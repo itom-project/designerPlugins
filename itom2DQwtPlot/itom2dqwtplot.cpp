@@ -31,6 +31,9 @@
 #include <qwidgetaction.h>
 #include <qfiledialog.h>
 #include <qimagewriter.h>
+#include <qinputdialog.h>
+#include <qmessagebox.h>
+
 #include <qwt_plot_renderer.h>
 #include <qmenu.h>
 #include "dialog2DScale.h"
