@@ -336,7 +336,7 @@ void Plot1DWidget::setDefaultAxisScaleEngine(const Itom1DQwt::ScaleEngine &scale
         }
         else
         {
-            setAxisScaleEngine(QwtPlot::yLeft, new ItomLogLogScaleEngine((int)scaleEngine- 1000));
+            setAxisScaleEngine(QwtPlot::xBottom, new ItomLogLogScaleEngine((int)scaleEngine- 1000));
         }
 
         m_axisScale = scaleEngine;
