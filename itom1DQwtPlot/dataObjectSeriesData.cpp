@@ -255,22 +255,26 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     if(description == "") description = "y-axis";
                     if(unit == "")
                     {
-                        m_dObjAxisLabel = fromStdLatin1String(description);
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = "";
                     }
                     else
                     {
-                        m_dObjAxisLabel = QString("%1 [%2]").arg( fromStdLatin1String(description) ).arg( fromStdLatin1String(unit) );
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = fromStdLatin1String(unit);
                     }
                    
                     description = dataObj->getValueDescription();
                     unit = dataObj->getValueUnit();
                     if(unit == "")
                     {
-                        m_dObjValueLabel = fromStdLatin1String(description);
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = "";
                     }
                     else
                     {
-                        m_dObjValueLabel = QString("%1 [%2]").arg( fromStdLatin1String(description) ).arg( fromStdLatin1String(unit) );
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = fromStdLatin1String(unit);
                     }
                     
                 }
@@ -313,22 +317,26 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     if(description == "") description = "x-axis";
                     if(unit == "")
                     {
-                        m_dObjAxisLabel = fromStdLatin1String(description);
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = "";
                     }
                     else
                     {
-                        m_dObjAxisLabel = QString("%1 [%2]").arg( fromStdLatin1String(description) ).arg( fromStdLatin1String(unit) );
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = fromStdLatin1String(unit);
                     }
                    
                     description = dataObj->getValueDescription();
                     unit = dataObj->getValueUnit();
                     if(unit == "")
                     {
-                        m_dObjValueLabel = fromStdLatin1String(description);
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = "";
                     }
                     else
                     {
-                        m_dObjValueLabel = QString("%1 [%2]").arg( fromStdLatin1String(description) ).arg( fromStdLatin1String(unit) );
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = fromStdLatin1String(unit);
                     }
 
                 }
@@ -520,22 +528,26 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     {
                         if(unit == "" && unit2 == "")
                         {
-                            m_dObjAxisLabel = "x/y-axis";
+                            m_dObjAxisDescription = "x/y-axis";
+                            m_dObjAxisUnit = "";
                         }
                         else
                         {
-                            m_dObjAxisLabel = QString("x/y-axis [%1/%2]").arg( fromStdLatin1String(unit), fromStdLatin1String(unit2) );
+                            m_dObjAxisDescription = "x/y-axis";
+                            m_dObjAxisUnit = QString("%1/%2").arg( fromStdLatin1String(unit), fromStdLatin1String(unit2) );
                         }
                     }
                     else
                     {
                         if(unit == "" && unit2 == "")
                         {
-                            m_dObjAxisLabel = QString("%1/%2").arg( fromStdLatin1String(description), fromStdLatin1String(descr2) );
+                            m_dObjAxisDescription = QString("%1/%2").arg( fromStdLatin1String(description), fromStdLatin1String(descr2) );
+                            m_dObjAxisUnit = "";
                         }
                         else
                         {
-                            m_dObjAxisLabel = QString("%1/%2 [%3/%4]").arg( fromStdLatin1String(description), fromStdLatin1String(descr2), fromStdLatin1String(unit), fromStdLatin1String(unit2) );
+                            m_dObjAxisDescription = QString("%1/%2").arg( fromStdLatin1String(description), fromStdLatin1String(descr2) );
+                            m_dObjAxisUnit = QString("%1/%2").arg( fromStdLatin1String(unit), fromStdLatin1String(unit2) );
                         }
                     }
                    
@@ -543,11 +555,13 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     unit = dataObj->getValueUnit();
                     if(unit == "")
                     {
-                        m_dObjValueLabel = fromStdLatin1String(description);
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = "";
                     }
                     else
                     {
-                        m_dObjValueLabel = QString("%1 [%2]").arg( fromStdLatin1String(description) ).arg( fromStdLatin1String(unit) );
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = fromStdLatin1String(unit);
                     }
                 }
             }
@@ -595,22 +609,26 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                 if(description == "") description = "z-axis";
                 if(unit == "")
                 {
-                    m_dObjAxisLabel = fromStdLatin1String(description);
+                    m_dObjAxisDescription = fromStdLatin1String(description);
+                    m_dObjAxisUnit = "";
                 }
                 else
                 {
-                    m_dObjAxisLabel = QString("%1 [%2]").arg( fromStdLatin1String(description) ).arg( fromStdLatin1String(unit) );
+                    m_dObjAxisDescription = fromStdLatin1String(description);
+                    m_dObjAxisUnit = fromStdLatin1String(unit);
                 }
                    
                 description = dataObj->getValueDescription();
                 unit = dataObj->getValueUnit();
                 if(unit == "")
                 {
-                    m_dObjValueLabel = fromStdLatin1String(description);
+                    m_dObjValueDescription = fromStdLatin1String(description);
+                    m_dObjValueUnit = "";
                 }
                 else
                 {
-                    m_dObjValueLabel = QString("%1 [%2]").arg( fromStdLatin1String(description) ).arg( fromStdLatin1String(unit) );
+                    m_dObjValueDescription = fromStdLatin1String(description);
+                    m_dObjValueUnit = fromStdLatin1String(unit);
                 }
             }
 
@@ -2565,7 +2583,7 @@ QRectF DataObjectSeriesData::boundingRect() const
     return res;
 }
 
-
+//----------------------------------------------------------------------------------------------------------------------
 RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const
 {
     QRectF res;
@@ -2629,4 +2647,52 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
     }
     
     return retval;
+}
+
+//----------------------------------------------------------------------------------------------
+QString DataObjectSeriesData::getDObjValueLabel() const
+{
+    if (m_dObjValueUnit != "")
+    {
+        if (m_dObjValueDescription != "")
+        {
+            return QString("%1 [%2]").arg(m_dObjValueDescription, m_dObjValueUnit);
+        }
+        else
+        {
+            return QString("[%1]").arg(m_dObjValueUnit);
+        }
+    }
+    return m_dObjValueDescription;
+}
+
+//----------------------------------------------------------------------------------------------
+QString DataObjectSeriesData::getDObjAxisLabel()  const
+{
+    if (m_dObjAxisUnit != "")
+    {
+        if (m_dObjAxisDescription != "")
+        {
+            return QString("%1 [%2]").arg(m_dObjAxisDescription, m_dObjAxisUnit);
+        }
+        else
+        {
+            return QString("[%1]").arg(m_dObjAxisUnit);
+        }
+    }
+    return m_dObjAxisDescription;
+}
+
+//----------------------------------------------------------------------------------------------
+void DataObjectSeriesData::getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const
+{
+    description = m_dObjValueDescription.toStdString();
+    unit = m_dObjValueUnit.toStdString();
+}
+
+//----------------------------------------------------------------------------------------------
+void DataObjectSeriesData::getDObjAxisDescriptionAndUnit(std::string &description, std::string &unit) const
+{
+    description = m_dObjAxisDescription.toStdString();
+    unit = m_dObjAxisUnit.toStdString();
 }

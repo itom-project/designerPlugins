@@ -111,6 +111,8 @@ class Plot1DWidget : public QwtPlot
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
 
+        QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed();
+
         void setSymbolStyle(const QwtSymbol::Style style, int size);
 
         friend class Itom1DQwtPlot;
@@ -179,11 +181,8 @@ class Plot1DWidget : public QwtPlot
 
         QByteArray m_hash; //hash of recently loaded dataObject
 
-        //QwtPlotCurve **m_pContent; //content-element, added to canvas when first valid data object becomes available
         InternalData *m_pData;
 
-        //bool m_startScaledY;
-        //bool m_startScaledX;
         bool m_xDirect;
         bool m_yDirect;
         bool m_cmplxState;

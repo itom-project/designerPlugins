@@ -90,7 +90,6 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         QPointF sample(size_t n) const;
         QRectF boundingRect() const;
         RetVal getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const;
-        //QRectF boundingRectMax() const;
 
         size_t size() const;
 
@@ -99,6 +98,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         bool floatingPointValues() const;
 
         RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds);
+        const ito::DataObject* getDataObject() const { return m_pDataObj; }
 
         inline void setCmplxState(ComplexType state) { m_cmplxState = state; }
         inline ComplexType getCmplxState() const {return m_cmplxState; }
@@ -107,8 +107,10 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         int getPosToPix(const double phys);
         
-        QString getDObjValueLabel() const { return m_dObjValueLabel; }
-        QString getDObjAxisLabel()  const { return m_dObjAxisLabel;  }
+        QString getDObjValueLabel() const;
+        QString getDObjAxisLabel()  const;
+        void getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const;
+        void getDObjAxisDescriptionAndUnit(std::string &description, std::string &unit) const;
 
         void setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue);
 
@@ -139,8 +141,10 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         LineData m_d;
 
-        QString m_dObjValueLabel;
-        QString m_dObjAxisLabel;
+        QString m_dObjValueDescription;
+        QString m_dObjValueUnit;
+        QString m_dObjAxisDescription;
+        QString m_dObjAxisUnit;
 
 
         /*double m_startPos;

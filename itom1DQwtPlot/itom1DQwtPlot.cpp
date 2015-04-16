@@ -65,6 +65,7 @@ void Itom1DQwtPlot::constructor()
     QMenu *contextMenu = new QMenu(QObject::tr("plot1D"), this);
     contextMenu->addAction(m_pActSave);
     contextMenu->addAction(m_pActCopyClipboard);
+    contextMenu->addAction(m_pActSendCurrentToWorkspace);
     contextMenu->addSeparator();
     contextMenu->addAction(m_pActHome);
     contextMenu->addAction(m_pActScaleSetting);
@@ -148,6 +149,7 @@ void Itom1DQwtPlot::constructor()
     QMenu *menuTools = new QMenu(tr("Tools"), this);
     menuTools->addAction(m_pActSave);
     menuTools->addAction(m_pActCopyClipboard);
+    menuTools->addAction(m_pActSendCurrentToWorkspace);
     menuTools->addSeparator();
     menuTools->addAction(m_pActMarker);
     menuTools->addAction(m_pActSetMarker);
@@ -188,7 +190,8 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pDrawModeActGroup(NULL),
     m_pActProperties(NULL),
     m_pActMultiRowSwitch(NULL),
-    m_pMnuMultiRowSwitch(NULL)
+    m_pMnuMultiRowSwitch(NULL),
+    m_pActSendCurrentToWorkspace(NULL)
 {
     constructor();
 }
@@ -222,7 +225,8 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
     m_pDrawModeActGroup(NULL),
     m_pActProperties(NULL),
     m_pActMultiRowSwitch(NULL),
-    m_pMnuMultiRowSwitch(NULL)
+    m_pMnuMultiRowSwitch(NULL),
+    m_pActSendCurrentToWorkspace(NULL)
 {
     constructor();
 }
@@ -439,6 +443,11 @@ void Itom1DQwtPlot::createActions()
     a->setShortcut(QKeySequence::Save);
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuExport()));
+
+    //m_pActSendCurrentToWorkspace
+    m_pActSendCurrentToWorkspace = a = new QAction(QIcon(":/plugins/icons/sendToPython.png"), tr("Send current view to workspace..."), this);
+    a->setObjectName("actSendCurrentToWorkspace");
+    connect(a, SIGNAL(triggered()), this, SLOT(mnuActSendCurrentToWorkspace()));
 
     //m_actCopyClipboard
     m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
@@ -1613,55 +1622,10 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
     {
         return QSharedPointer<ito::DataObject>(); 
     }
-
-    ito::DataObject dataObjectOut;
-
-    if (m_pContent && m_pContent->m_plotCurveItems.size() > 0)
+    else
     {
-        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
-
-        if(seriesData->size() < 2)
-        {
-            return QSharedPointer<ito::DataObject>();
-        }
-
-        ito::float64 length = 0.0;
-
-        if(seriesData->floatingPointValues())
-        {
-            dataObjectOut = ito::DataObject(1, (int)seriesData->size(), ito::tFloat64);
-            ito::float64* rowPtr = ((cv::Mat*)dataObjectOut.get_mdata()[0])->ptr<ito::float64>();
-            QPointF curPos;
-            for(size_t i = 0; i < seriesData->size(); i++)
-            {
-                curPos = seriesData->sample(i);
-                //length += curPos.x();
-                rowPtr[i] = curPos.y();
-            }
-            length = seriesData->sample(seriesData->size()-1).x() - seriesData->sample(0).x();
-        }
-        else
-        {
-            dataObjectOut = ito::DataObject(1, (int)seriesData->size(), ito::tInt32);
-            ito::int32* rowPtr = ((cv::Mat*)dataObjectOut.get_mdata()[0])->ptr<ito::int32>();
-            QPointF curPos;            
-            for(size_t i = 0; i < seriesData->size(); i++)
-            {
-                curPos = seriesData->sample(i);
-                //length += curPos.x();
-                rowPtr[i] = (ito::int32)(curPos.y());
-            }
-            length = seriesData->sample(seriesData->size()-1).x() - seriesData->sample(0).x();
-        }
-
-        dataObjectOut.setAxisScale(1, length / (seriesData->size() - 1));
-
-        dataObjectOut.setAxisUnit(1, seriesData->getDObjAxisLabel().toLatin1().data());
-        dataObjectOut.setValueUnit(seriesData->getDObjValueLabel().toLatin1().data());
-
+        return m_pContent->getDisplayed();
     }
-
-    return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
@@ -2573,4 +2537,45 @@ int Itom1DQwtPlot::getCurveFillAlpha() const
     }
     return 128;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::mnuActSendCurrentToWorkspace()
+{
+    bool ok;
+    QString varname = QInputDialog::getText(this, tr("Current to workspace"), tr("Indicate the python variable name for the currently visible object"), QLineEdit::Normal, "displayed_line", &ok);
+    if (ok && varname != "")
+    {
+        QSharedPointer<ito::DataObject> obj = getDisplayed();
+        const ito::DataObject *dobj = &(*obj);
+        QSharedPointer<ito::ParamBase> obj_(new ito::ParamBase("displayed", ito::ParamBase::DObjPtr, (const char*)dobj));
+
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        ito::RetVal retval = apiSendParamToPyWorkspace(varname, obj_);
+
+        QApplication::restoreOverrideCursor();
+
+        if (retval.containsError())
+        {
+            QMessageBox msgBox;
+            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
+            if (retval.errorMessage())
+            {
+                msgBox.setInformativeText(retval.errorMessage());
+            }
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
+        }
+        else if (retval.containsWarning())
+        {
+            QMessageBox msgBox;
+            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
+            if (retval.errorMessage())
+            {
+                msgBox.setInformativeText(retval.errorMessage());
+            }
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
+    }
+}

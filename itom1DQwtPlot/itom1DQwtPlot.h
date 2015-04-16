@@ -361,6 +361,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction  *m_pActMarker;
         QAction *m_pActAspectRatio;
         QAction *m_pActSave;
+        QAction *m_pActSendCurrentToWorkspace;
         QAction *m_pActCopyClipboard;
         QAction *m_pActHome;
         QMenu    *m_pMnuSetMarker;
@@ -420,6 +421,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();
+        void mnuActSendCurrentToWorkspace();
 
         void mnuActRatio(bool checked);
         void mnuDrawMode(QAction *action);

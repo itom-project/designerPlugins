@@ -3349,3 +3349,159 @@ void Plot1DWidget::setCurveFilled()
 
     replot();
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
+{
+    ito::DataObject *displayed = NULL;
+
+    if (m_plotCurveItems.size() > 0)
+    {
+        const DataObjectSeriesData* seriesData = static_cast<const DataObjectSeriesData*>(m_plotCurveItems[0]->data());
+        ito::tDataType type = (seriesData->getDataObject() ? (ito::tDataType)seriesData->getDataObject()->getType() : ito::tUInt8);
+
+        foreach (const QwtPlotCurve *curve, m_plotCurveItems)
+        {
+            const DataObjectSeriesData* temp = static_cast<const DataObjectSeriesData*>(curve->data());
+            if (!temp->getDataObject() || temp->getDataObject()->getType() != type)
+            {
+                return QSharedPointer<ito::DataObject>();
+            }
+        }
+
+        //complex64 will be mapped to float32 and complex128 to float64
+        type = (type == ito::tComplex64) ? ito::tFloat32 : ((type == ito::tComplex128) ? ito::tFloat64 : type);
+
+        //until now, rgba32 will be mapped to uint8
+        type = (type == ito::tRGBA32) ? ito::tUInt8 : type;
+
+        //create data object according to first series data and set its axis scales and axis offsets values accordingly
+        QwtInterval ival = axisInterval(QwtPlot::xBottom);
+        unsigned int firstIdx = std::numeric_limits<unsigned int>::max();
+        unsigned int lastIdx = 0;
+
+        //get start and end index of sample within interval
+        for (size_t i = 0; i < seriesData->size(); ++i)
+        {
+            if (ival.contains(seriesData->sample(i).x()))
+            {
+                firstIdx = std::min(firstIdx, i);
+                lastIdx = std::max(lastIdx, i);
+            }
+        }
+
+        if (firstIdx == lastIdx)
+        {
+            return QSharedPointer<ito::DataObject>();
+        }
+
+        double lengthPhys = seriesData->sample(lastIdx).x() - seriesData->sample(firstIdx).x();
+        unsigned int lengthPx = lastIdx - firstIdx;
+
+        displayed = new ito::DataObject(m_plotCurveItems.size(), lastIdx - firstIdx + 1, type);
+
+        std::string descr, unit;
+        seriesData->getDObjValueDescriptionAndUnit(descr, unit);
+        displayed->setValueUnit(unit);
+        displayed->setValueDescription(descr);
+        seriesData->getDObjAxisDescriptionAndUnit(descr, unit);
+        displayed->setAxisUnit(1, unit);
+        displayed->setAxisDescription(1, descr);
+
+        if (lengthPx > 0)
+        {
+            displayed->setAxisScale(1, lengthPhys / lengthPx);
+            displayed->setAxisOffset(1, -(seriesData->sample(firstIdx).x() / lengthPhys) * lengthPx );
+        }
+        else
+        {
+            displayed->setAxisScale(1, 1.0);
+            displayed->setAxisOffset(1, -seriesData->sample(firstIdx).x());
+        }
+        
+
+        //put data in
+        for (int i = 0; i < m_plotCurveItems.size(); ++i)
+        {
+            seriesData = static_cast<const DataObjectSeriesData*>(m_plotCurveItems[i]->data());
+
+            switch (type)
+            {
+            case ito::tUInt8:
+                {
+                ito::uint8 *rowPtr = (ito::uint8*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            case ito::tInt8:
+                {
+                ito::int8 *rowPtr = (ito::int8*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            case ito::tUInt16:
+                {
+                ito::uint16 *rowPtr = (ito::uint16*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            case ito::tInt16:
+                {
+                ito::int16 *rowPtr = (ito::int16*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            case ito::tUInt32:
+                {
+                ito::uint32 *rowPtr = (ito::uint32*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            case ito::tInt32:
+                {
+                ito::int32 *rowPtr = (ito::int32*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            case ito::tFloat32:
+                {
+                ito::float32 *rowPtr = (ito::float32*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            case ito::tFloat64:
+                {
+                ito::float64 *rowPtr = (ito::float64*)displayed->rowPtr(0, i);
+                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->sample(n).ry());
+                }
+                }
+                break;
+            }
+        }
+    }
+
+    return QSharedPointer<ito::DataObject>(displayed);
+}
