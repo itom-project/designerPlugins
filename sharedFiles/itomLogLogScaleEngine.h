@@ -66,59 +66,6 @@ protected:
         QList<double> &minorTicks, QList<double> &mediumTicks ) const;
 };
 
-class ItomTransform: public QwtTransform
-{
-public:
-    ItomTransform();
-    virtual ~ItomTransform();
-
-    /*!
-       Modify value to be a valid value for the transformation.
-       The default implementation does nothing.
-     */
-    virtual double bounded( double value ) const;
-
-    /*!
-        Transformation function
-
-        \param value Value
-        \return Modified value
-
-        \sa invTransform()
-     */
-    virtual double transform( double value ) const = 0;
-
-    /*!
-        Inverse transformation function
-
-        \param value Value
-        \return Modified value
-
-        \sa transform()
-     */
-    virtual double invTransform( double value ) const = 0;
-
-    //! Virtualized copy operation
-    virtual ItomTransform *copy() const = 0;
-};
-
-/*!
-   \brief Null transformation
-
-   QwtNullTransform returns the values unmodified.
-   
- */
-class ItomNullTransform: public ItomTransform
-{
-public:
-    ItomNullTransform();
-    virtual ~ItomNullTransform();
-
-    virtual double transform( double value ) const;
-    virtual double invTransform( double value ) const;
-
-    virtual ItomTransform *copy() const;
-};
 /*!
    \brief Logarithmic transformation
 
@@ -128,7 +75,7 @@ public:
          has no effect on the mapping. So QwtLogTransform can be used 
          for log2(), log10() or any other logarithmic scale.
  */
-class ItomLogLogTransform: public ItomTransform
+class ItomLogLogTransform: public QwtTransform
 {   
 public:
     ItomLogLogTransform();
@@ -139,7 +86,7 @@ public:
 
     virtual double bounded( double value ) const;
 
-    virtual ItomTransform *copy() const;
+    virtual ItomLogLogTransform *copy() const;
 
 #if QT_VERSION >= 0x050400
     static const double LogMin;
@@ -150,27 +97,27 @@ public:
 #endif
 };
 
-/*!
-   \brief A transformation using pow()
-
-   QwtPowerTransform preserves the sign of a value. 
-   F.e. a transformation with a factor of 2
-   transforms a value of -3 to -9 and v.v. Thus QwtPowerTransform
-   can be used for scales including negative values.
- */
-class ItomPowerTransform: public ItomTransform
-{
-public:
-    ItomPowerTransform( double exponent );
-    virtual ~ItomPowerTransform();
-
-    virtual double transform( double value ) const;
-    virtual double invTransform( double value ) const;
-
-    virtual ItomTransform *copy() const;
-
-private:
-    const double d_exponent;
-};
+///*!
+//   \brief A transformation using pow()
+//
+//   QwtPowerTransform preserves the sign of a value. 
+//   F.e. a transformation with a factor of 2
+//   transforms a value of -3 to -9 and v.v. Thus QwtPowerTransform
+//   can be used for scales including negative values.
+// */
+//class ItomPowerTransform: public ItomTransform
+//{
+//public:
+//    ItomPowerTransform( double exponent );
+//    virtual ~ItomPowerTransform();
+//
+//    virtual double transform( double value ) const;
+//    virtual double invTransform( double value ) const;
+//
+//    virtual ItomTransform *copy() const;
+//
+//private:
+//    const double d_exponent;
+//};
 
 #endif

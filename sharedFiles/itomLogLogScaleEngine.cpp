@@ -59,30 +59,21 @@ QT_STATIC_CONST_IMPL double ItomLogLogTransform::LogMax = 1.0e150;
   \param base Base of the scale engine
   \sa setBase()
  */
-static inline double ItomLog( double base, double value )
+static inline double itomLogLog( double base, double value )
 {
-    return log( value ) / log( base );
+    return log(log(value) / log(base)) / log(base);
 }
 
-static inline QwtInterval ItomLogLogLogInterval( double base, const QwtInterval &interval )
+static inline QwtInterval itomLogLogInterval( double base, const QwtInterval &interval )
 {
-    return QwtInterval( ItomLog( base, interval.minValue() ),
-            ItomLog( base, interval.maxValue() ) );
+    return QwtInterval( itomLogLog( base, interval.minValue() ),
+            itomLogLog( base, interval.maxValue() ) );
 }
 
-static inline QwtInterval ItomPowerTransform( double base, const QwtInterval &interval ) 
+static inline QwtInterval itomPowerPowerInterval( double base, const QwtInterval &interval ) 
 {
-    return QwtInterval( qPow( base, interval.minValue() ),
-            qPow( base, interval.maxValue() ) );
-}
-
-static inline long double ItomLogLogIntervalWidthL( const QwtInterval &interval )
-{
-    if ( !interval.isValid() )
-        return 0.0;
-
-    return static_cast<long double>( interval.maxValue() )
-        - static_cast<long double>( interval.minValue() );
+    return QwtInterval( qPow( base, qPow( base, interval.minValue() )),
+            qPow(base, qPow( base, interval.maxValue() )) );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -118,8 +109,8 @@ void ItomLogLogScaleEngine::autoScale( int maxNumSteps,
 
     const double logBase = base();
 
-    QwtInterval interval( x1 / qPow( logBase, lowerMargin() ),
-        x2 * qPow( logBase, upperMargin() ) );
+    QwtInterval interval( x1 / qPow(logBase, qPow( logBase, lowerMargin() )),
+        x2 * qPow(logBase ,qPow( logBase, upperMargin() )) );
 
     if ( interval.maxValue() / interval.minValue() < logBase )
     {
@@ -139,9 +130,9 @@ void ItomLogLogScaleEngine::autoScale( int maxNumSteps,
         {
             // the aligned scale is still less than one step
             if ( stepSize < 0.0 )
-                stepSize = -ItomLog( logBase, qAbs( stepSize ) );
+                stepSize = -itomLogLog( logBase, qAbs( stepSize ) );
             else
-                stepSize = ItomLog( logBase, stepSize );
+                stepSize = itomLogLog( logBase, stepSize );
 
             return;
         }
@@ -166,7 +157,7 @@ void ItomLogLogScaleEngine::autoScale( int maxNumSteps,
     if ( interval.width() == 0.0 )
         interval = buildInterval( interval.minValue() );
 
-    stepSize = divideInterval( ItomLogLogLogInterval( logBase, interval ).width(), 
+    stepSize = divideInterval( itomLogLogInterval( logBase, interval ).width(), 
         qMax( maxNumSteps, 1 ) );
     if ( stepSize < 1.0 )
         stepSize = 1.0;
@@ -208,7 +199,7 @@ QwtScaleDiv ItomLogLogScaleEngine::divideScale( double x1, double x2,
 
     const double logBase = base();
 
-    if ( interval.maxValue() / interval.minValue() < logBase )
+    if ( interval.maxValue() / interval.minValue() < qPow(logBase, logBase) )
     {
         // scale width is less than one decade -> build linear scale
 
@@ -220,9 +211,9 @@ QwtScaleDiv ItomLogLogScaleEngine::divideScale( double x1, double x2,
         if ( stepSize != 0.0 )
         {
             if ( stepSize < 0.0 )
-                stepSize = -qPow( logBase, -stepSize );
+                stepSize = -qPow(logBase, qPow( logBase, -stepSize ));
             else
-                stepSize = qPow( logBase, stepSize );
+                stepSize = qPow(logBase, qPow( logBase, stepSize ));
         }
 
         return linearScaler.divideScale( x1, x2,
@@ -236,7 +227,7 @@ QwtScaleDiv ItomLogLogScaleEngine::divideScale( double x1, double x2,
             maxMajorSteps = 1;
 
         stepSize = divideInterval( 
-            ItomLogLogLogInterval( logBase, interval ).width(), maxMajorSteps );
+            itomLogLogInterval( logBase, interval ).width(), maxMajorSteps );
         if ( stepSize < 1.0 )
             stepSize = 1.0; // major step must be >= 1 decade
     }
@@ -298,14 +289,14 @@ void ItomLogLogScaleEngine::buildTicks(
 QList<double> ItomLogLogScaleEngine::buildMajorTicks(
     const QwtInterval &interval, double stepSize ) const
 {
-    double width = ItomLogLogLogInterval( base(), interval ).width();
+    double width = itomLogLogInterval( base(), interval ).width();
 
     int numTicks = qRound( width / stepSize ) + 1;
     if ( numTicks > 10000 )
         numTicks = 10000;
 
-    const double lxmin = ::log( interval.minValue() );
-    const double lxmax = ::log( interval.maxValue() );
+    const double lxmin = ::log(::log( interval.minValue() ));
+    const double lxmax = ::log(::log( interval.maxValue() ));
     const double lstep = ( lxmax - lxmin ) / double( numTicks - 1 );
 
     QList<double> ticks;
@@ -313,7 +304,7 @@ QList<double> ItomLogLogScaleEngine::buildMajorTicks(
     ticks += interval.minValue();
 
     for ( int i = 1; i < numTicks - 1; i++ )
-        ticks += qExp( lxmin + double( i ) * lstep );
+        ticks += qExp(qExp( lxmin + double( i ) * lstep ));
 
     ticks += interval.maxValue();
 
@@ -405,7 +396,7 @@ void ItomLogLogScaleEngine::buildMinorTicks(
             mediumTickIndex = numTicks / 2;
 
         // substep factor = base^substeps
-        const qreal minFactor = qMax( qPow( logBase, minStep ), qreal( logBase ) );
+        const qreal minFactor = qMax( qPow(logBase,qPow( logBase, minStep )), qreal( logBase ) );
 
         for ( int i = 0; i < majorTicks.count(); i++ )
         {
@@ -438,7 +429,7 @@ void ItomLogLogScaleEngine::buildMinorTicks(
 QwtInterval ItomLogLogScaleEngine::align(
     const QwtInterval &interval, double stepSize ) const
 {
-    const QwtInterval intv = ItomPowerTransform( base(), interval );
+    const QwtInterval intv = itomLogLogInterval( base(), interval );
 
     double x1 = QwtScaleArithmetic::floorEps( intv.minValue(), stepSize );
     if ( qwtFuzzyCompare( interval.minValue(), x1, stepSize ) == 0 )
@@ -448,66 +439,13 @@ QwtInterval ItomLogLogScaleEngine::align(
     if ( qwtFuzzyCompare( interval.maxValue(), x2, stepSize ) == 0 )
         x2 = interval.maxValue();
 
-    return ItomPowerTransform( base(), QwtInterval( x1, x2 ) );
+    return itomPowerPowerInterval( base(), QwtInterval( x1, x2 ) );
 }
 
-//! Constructor
-ItomTransform::ItomTransform()
-{
-}
-
-//! Destructor
-ItomTransform::~ItomTransform()
-{
-}
-
-/*! 
-  \param value Value to be bounded
-  \return value unmodified
- */
-double ItomTransform::bounded( double value ) const
-{
-    return value;
-}
-
-//! Constructor
-ItomNullTransform::ItomNullTransform():
-    ItomTransform()
-{
-}
-
-//! Destructor
-ItomNullTransform::~ItomNullTransform()
-{
-}
-
-/*! 
-  \param value Value to be transformed
-  \return value unmodified
- */
-double ItomNullTransform::transform( double value ) const
-{
-    return value;
-}
-
-/*! 
-  \param value Value to be transformed
-  \return value unmodified
- */
-double ItomNullTransform::invTransform( double value ) const
-{
-    return value;
-}
-
-//! \return Clone of the transformation
-ItomTransform *ItomNullTransform::copy() const
-{
-    return new ItomNullTransform();
-}
 
 //! Constructor
 ItomLogLogTransform::ItomLogLogTransform():
-    ItomTransform()
+    QwtTransform()
 {
 }
 
@@ -522,7 +460,7 @@ ItomLogLogTransform::~ItomLogLogTransform()
  */
 double ItomLogLogTransform::transform( double value ) const
 {
-    return ::log( value );
+    return ::log(::log( value ));
 }
 
 /*! 
@@ -531,7 +469,7 @@ double ItomLogLogTransform::transform( double value ) const
  */
 double ItomLogLogTransform::invTransform( double value ) const
 {
-    return qExp( value );
+    return qExp(qExp( value ));
 }
 
 /*! 
@@ -544,53 +482,59 @@ double ItomLogLogTransform::bounded( double value ) const
 }
 
 //! \return Clone of the transformation
-ItomTransform *ItomLogLogTransform::copy() const
+ItomLogLogTransform *ItomLogLogTransform::copy() const
 {
     return new ItomLogLogTransform();
 }
 
-/*!
-  Constructor
-  \param exponent Exponent
-*/
-ItomPowerTransform::ItomPowerTransform( double exponent ):
-    ItomTransform(),
-    d_exponent( exponent )
-{
-}
-
-//! Destructor
-ItomPowerTransform::~ItomPowerTransform()
-{
-}
-
-/*! 
-  \param value Value to be transformed
-  \return Exponentiation preserving the sign
- */
-double ItomPowerTransform::transform( double value ) const
-{
-    if ( value < 0.0 )
-        return -qPow( -value, 1.0 / d_exponent );
-    else
-        return qPow( value, 1.0 / d_exponent );
-    
-}
-
-/*! 
-  \param value Value to be transformed
-  \return Inverse exponentiation preserving the sign
- */
-double ItomPowerTransform::invTransform( double value ) const
-{
-    if ( value < 0.0 )
-        return -qPow( -value, d_exponent );
-    else
-        return qPow( value, d_exponent );
-}
-
-//! \return Clone of the transformation
-ItomTransform *ItomPowerTransform::copy() const
-{
-    return new ItomPowerTransform( d_exponent );
-}
+////! \return Clone of the transformation
+//ItomTransform *ItomLogLogTransform::copy() const
+//{
+//    return new ItomLogLogTransform();
+//}
+//
+///*!
+//  Constructor
+//  \param exponent Exponent
+//*/
+//ItomPowerTransform::ItomPowerTransform( double exponent ):
+//    ItomTransform(),
+//    d_exponent( exponent )
+//{
+//}
+//
+////! Destructor
+//ItomPowerTransform::~ItomPowerTransform()
+//{
+//}
+//
+///*! 
+//  \param value Value to be transformed
+//  \return Exponentiation preserving the sign
+// */
+//double ItomPowerTransform::transform( double value ) const
+//{
+//    if ( value < 0.0 )
+//        return -qPow( -value, 1.0 / d_exponent );
+//    else
+//        return qPow( value, 1.0 / d_exponent );
+//    
+//}
+//
+///*! 
+//  \param value Value to be transformed
+//  \return Inverse exponentiation preserving the sign
+// */
+//double ItomPowerTransform::invTransform( double value ) const
+//{
+//    if ( value < 0.0 )
+//        return -qPow( -value, d_exponent );
+//    else
+//        return qPow( value, d_exponent );
+//}
+//
+////! \return Clone of the transformation
+//ItomTransform *ItomPowerTransform::copy() const
+//{
+//    return new ItomPowerTransform( d_exponent );
+//}
