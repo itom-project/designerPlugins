@@ -30,6 +30,7 @@
 
 #include "common/sharedStructuresPrimitives.h"
 #include "../sharedFiles/multiPointPickerMachine.h"
+#include "../sharedFiles/itomLogLogScaleEngine.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -297,9 +298,13 @@ void Plot1DWidget::setDefaultValueScaleEngine(const Itom1DQwt::ScaleEngine &scal
         {
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
         }
-        else
+        else if ((int)scaleEngine < 1000)
         {
             setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine((int)scaleEngine));
+        }
+        else
+        {
+            setAxisScaleEngine(QwtPlot::yLeft, new ItomLogLogScaleEngine((int)scaleEngine) - 1000);
         }
 
         m_valueScale = scaleEngine;
@@ -325,9 +330,13 @@ void Plot1DWidget::setDefaultAxisScaleEngine(const Itom1DQwt::ScaleEngine &scale
         {
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine());
         }
-        else
+        else if ((int)scaleEngine < 1000)
         {
             setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine((int)scaleEngine));
+        }
+        else
+        {
+            setAxisScaleEngine(QwtPlot::yLeft, new ItomLogLogScaleEngine((int)scaleEngine) - 1000);
         }
 
         m_axisScale = scaleEngine;

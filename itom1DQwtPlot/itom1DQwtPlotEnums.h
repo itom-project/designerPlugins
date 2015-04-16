@@ -42,7 +42,7 @@ public:
     enum tPlotPickerType { DefaultMarker, RangeMarker };
     enum tCurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, SticksHorizontal, SticksVertical, Steps, StepsRight, StepsLeft,  Dots };
     enum tFillCurveStyle {   NoCurveFill = -1,  FillBaseLine, FillFromTop, FillFromBottom};
-    enum ScaleEngine { Linear = 1, Log2 = 2, Log10 = 10, Log16 = 16 };
+    enum ScaleEngine { Linear = 1, Log2 = 2, Log10 = 10, Log16 = 16, LogLog2 = 1002, LogLog10 = 1010, LogLog16 = 1016};
 };
 
 #endif //CONFIGSTRUCTQWT1D_H
