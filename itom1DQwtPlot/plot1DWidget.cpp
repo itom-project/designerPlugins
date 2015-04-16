@@ -3377,8 +3377,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
 
         //create data object according to first series data and set its axis scales and axis offsets values accordingly
         QwtInterval ival = axisInterval(QwtPlot::xBottom);
-        unsigned int firstIdx = std::numeric_limits<unsigned int>::max();
-        unsigned int lastIdx = 0;
+        size_t firstIdx = std::numeric_limits<size_t>::max();
+        size_t lastIdx = 0;
 
         //get start and end index of sample within interval
         for (size_t i = 0; i < seriesData->size(); ++i)
@@ -3396,9 +3396,9 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
         }
 
         double lengthPhys = seriesData->sample(lastIdx).x() - seriesData->sample(firstIdx).x();
-        unsigned int lengthPx = lastIdx - firstIdx;
+        size_t lengthPx = lastIdx - firstIdx;
 
-        displayed = new ito::DataObject(m_plotCurveItems.size(), lastIdx - firstIdx + 1, type);
+        displayed = new ito::DataObject((int)m_plotCurveItems.size(), lastIdx - firstIdx + 1, type);
 
         std::string descr, unit;
         seriesData->getDObjValueDescriptionAndUnit(descr, unit);
@@ -3430,7 +3430,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tUInt8:
                 {
                 ito::uint8 *rowPtr = (ito::uint8*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->sample(n).ry());
                 }
@@ -3439,7 +3439,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tInt8:
                 {
                 ito::int8 *rowPtr = (ito::int8*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->sample(n).ry());
                 }
@@ -3448,7 +3448,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tUInt16:
                 {
                 ito::uint16 *rowPtr = (ito::uint16*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->sample(n).ry());
                 }
@@ -3457,7 +3457,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tInt16:
                 {
                 ito::int16 *rowPtr = (ito::int16*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->sample(n).ry());
                 }
@@ -3466,7 +3466,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tUInt32:
                 {
                 ito::uint32 *rowPtr = (ito::uint32*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->sample(n).ry());
                 }
@@ -3475,7 +3475,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tInt32:
                 {
                 ito::int32 *rowPtr = (ito::int32*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->sample(n).ry());
                 }
@@ -3484,7 +3484,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tFloat32:
                 {
                 ito::float32 *rowPtr = (ito::float32*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->sample(n).ry());
                 }
@@ -3493,7 +3493,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             case ito::tFloat64:
                 {
                 ito::float64 *rowPtr = (ito::float64*)displayed->rowPtr(0, i);
-                for (unsigned int n = firstIdx; n <= lastIdx; ++n)
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
                     *(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->sample(n).ry());
                 }

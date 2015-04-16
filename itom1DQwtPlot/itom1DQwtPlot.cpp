@@ -34,6 +34,7 @@
 #include <qfiledialog.h>
 #include <qimagewriter.h>
 #include <qsharedpointer.h>
+#include <qinputdialog.h>
 
 #include <qwt_plot.h>
 #include <qgridlayout.h>

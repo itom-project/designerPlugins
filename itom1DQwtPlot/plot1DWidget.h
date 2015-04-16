@@ -55,7 +55,6 @@
 #include "../sharedFiles/itomPlotMagnifier.h"
 #include "../sharedFiles/itomPlotZoomer.h"
 #include "itomPlotMarker.h"
-//#include "itom1DQwtPlotEnums.h"
 
 class Itom1DQwtPlot;
 class QwtLegend;
