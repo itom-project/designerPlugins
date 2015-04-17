@@ -29,12 +29,15 @@
 #include <qwt_scale_engine.h>
 #include <QtCore/qmath.h>
 
+#define MAXRESCALESTACKDEPTH 20 //rescale might sometimes be called in a recursive call. This might crash the application. Therefore the recursion is limited to this number!
+
 //---------------------------------------------------------------------------
 ItomPlotZoomer::ItomPlotZoomer( QWidget *parent, bool doReplot /*= true*/ ) :
     QwtPlotZoomer(parent, doReplot),
     m_fixedAspectRatio(false),
     m_aspectRatioChanged(false),
-    m_invertedAxes(-1)
+    m_invertedAxes(-1),
+	m_nrOfRescaleCalls(0)
 {
 }
 
@@ -44,7 +47,8 @@ ItomPlotZoomer::ItomPlotZoomer( int xAxis, int yAxis,
     QwtPlotZoomer(xAxis, yAxis, parent, doReplot),
     m_fixedAspectRatio(false),
     m_aspectRatioChanged(false),
-    m_invertedAxes(-1)
+    m_invertedAxes(-1),
+	m_nrOfRescaleCalls(0)
 {
 }
 
@@ -121,6 +125,14 @@ bool ItomPlotZoomer::accept( QPolygon &pa ) const
 //---------------------------------------------------------------------------
 void ItomPlotZoomer::rescale(bool resizeEvent)
 {
+	if (m_nrOfRescaleCalls == MAXRESCALESTACKDEPTH)
+	{
+		qDebug() << "ItomPlotZoomer::rescale: maximum number of recursive calls reached.";
+		return;
+	}
+
+	m_nrOfRescaleCalls++;
+
     QwtPlot *plt = plot();
     if ( !plt )
         return;
@@ -319,6 +331,8 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
 
         plt->replot();
     }
+
+	m_nrOfRescaleCalls--;
 }
 
 //--------------------------------------------------------------------------------------
