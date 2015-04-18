@@ -88,7 +88,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
     Q_PROPERTY(Itom2DQwt::tModificationState geometryModMode READ getModState WRITE setModState DESIGNABLE true)
-
+    Q_PROPERTY(int staticLineCutID READ getStaticLineCutID WRITE setStaticLineCutID DESIGNABLE false USER true)
+    
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -283,6 +284,12 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     //!> return text color
     QColor getTextColor(void) const;
 
+    //!> set a line cut id
+    int getStaticLineCutID() const;
+
+    //!> return the current line cut id
+    void setStaticLineCutID(const int idx);
+
     bool getMarkerLablesVisible(void) const;
     void setMarkerLablesVisible(const bool val);
 
@@ -290,6 +297,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     void setModState(const Itom2DQwt::tModificationState val);
 
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
+
+
 
     friend class PlotCanvas;
 

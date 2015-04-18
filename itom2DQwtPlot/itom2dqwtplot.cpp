@@ -1568,8 +1568,6 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
             }
 
-            
-
             if (zStack)
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Z-Stack"));
@@ -1620,7 +1618,6 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
     return retval;
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 {
@@ -2457,6 +2454,54 @@ void Itom2dQwtPlot::setTextColor(const QColor newVal)
     if(m_pContent) m_pContent->updateColors();
 
     updatePropertyDock();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+
+int Itom2dQwtPlot::getStaticLineCutID() const
+{
+    if(m_pContent)  return this->m_pContent->m_lineCutUID;
+    else return 0;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setStaticLineCutID(const int idx)
+{
+    ito::RetVal retval = ito::retOk;
+    if(!ito::ITOM_API_FUNCS_GRAPH) return;
+    
+    if(m_pContent || idx > -1)
+    {
+        ito::uint32 thisID = 0;
+        retval += apiGetFigureIDbyHanlde(this, thisID);
+
+        if(idx == thisID || retval.containsError())
+        {
+            return;
+        }
+
+        QWidget *lineCutObj = NULL;
+        
+
+        this->m_pContent->m_lineCutUID = idx;
+        retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_lineCutUID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
+        if (lineCutObj && lineCutObj->inherits("ito::AbstractDObjFigure"))
+        {
+
+            ito::AbstractDObjFigure* figure = (ito::AbstractDObjFigure*)lineCutObj;
+            m_childFigures[lineCutObj] = this->m_pContent->m_lineCutUID;
+            connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
+
+            //((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
+            // otherwise simply pass on the displayed plane
+            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);        
+        }
+        else
+        {
+            this->m_pContent->m_lineCutUID = 0;
+        }
+
+
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getMarkerLablesVisible(void) const
