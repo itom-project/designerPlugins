@@ -2457,31 +2457,38 @@ void Itom2dQwtPlot::setTextColor(const QColor newVal)
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 
-int Itom2dQwtPlot::getStaticLineCutID() const
+ito::ItomPlotHandle Itom2dQwtPlot::getStaticLineCutID() const
 {
-    if(m_pContent)  return this->m_pContent->m_lineCutUID;
-    else return 0;
+    if(m_pContent && this->m_pContent->m_lineCutUID > 0)
+    {
+        return ito::ItomPlotHandle("ChildLinePlot", "Unknown", this->m_pContent->m_lineCutUID);
+    }
+    return ito::ItomPlotHandle(NULL, NULL, 0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setStaticLineCutID(const int idx)
+void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
 {
     ito::RetVal retval = ito::retOk;
     if(!ito::ITOM_API_FUNCS_GRAPH) return;
     
-    if(m_pContent || idx > -1)
+    if(m_pContent || idx.getObjectID() > -1)
     {
         ito::uint32 thisID = 0;
         retval += apiGetFigureIDbyHanlde(this, thisID);
 
-        if(idx == thisID || retval.containsError())
+        if(idx.getObjectID() == thisID || retval.containsError())
         {
             return;
+        }
+        else
+        {
+            thisID = idx.getObjectID();
         }
 
         QWidget *lineCutObj = NULL;
         
 
-        this->m_pContent->m_lineCutUID = idx;
+        this->m_pContent->m_lineCutUID = thisID;
         retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_lineCutUID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
         if (lineCutObj && lineCutObj->inherits("ito::AbstractDObjFigure"))
         {
