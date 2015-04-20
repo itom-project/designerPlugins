@@ -2474,7 +2474,7 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
     if(m_pContent || idx.getObjectID() > -1)
     {
         ito::uint32 thisID = 0;
-        retval += apiGetFigureIDbyHanlde(this, thisID);
+        retval += apiGetFigureIDbyHandle(this, thisID);
 
         if(idx.getObjectID() == thisID || retval.containsError())
         {
