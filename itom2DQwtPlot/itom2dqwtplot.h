@@ -37,6 +37,8 @@ class PlotCanvas;
 //#include "plotCanvas.h"
 //#include <qwt_plot_shapeitem.h>
 
+#include "common/itomPlotHandle.h"
+
 #include <qaction.h>
 #include <qwidgetaction.h>
 #include <qspinbox.h>
@@ -48,6 +50,12 @@ class PlotCanvas;
 #ifndef DECLAREMETADATAOBJECT
     Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
     #define DECLAREMETADATAOBJECT
+#endif
+
+
+#ifndef DECLAREMETAPLOTHANDLE
+    Q_DECLARE_METATYPE(ito::ItomPlotHandle)
+    #define DECLAREMETAPLOTHANDLE
 #endif
 
 class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
@@ -88,7 +96,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
     Q_PROPERTY(Itom2DQwt::tModificationState geometryModMode READ getModState WRITE setModState DESIGNABLE true)
-    Q_PROPERTY(int staticLineCutID READ getStaticLineCutID WRITE setStaticLineCutID DESIGNABLE false USER true)
+    Q_PROPERTY(ito::ItomPlotHandle staticLineCutID READ getStaticLineCutID WRITE setStaticLineCutID DESIGNABLE false USER true)
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -125,6 +133,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
 
     Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode (move, resize, rotate).")
+    Q_CLASSINFO("prop://staticLineCutID", "Set/Get the ui-Hanlde of the current line plot respective the destination line plot.")
+    
 
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
@@ -285,10 +295,10 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     QColor getTextColor(void) const;
 
     //!> set a line cut id
-    int getStaticLineCutID() const;
+    ito::ItomPlotHandle getStaticLineCutID() const;
 
     //!> return the current line cut id
-    void setStaticLineCutID(const int idx);
+    void setStaticLineCutID(const ito::ItomPlotHandle idx);
 
     bool getMarkerLablesVisible(void) const;
     void setMarkerLablesVisible(const bool val);
