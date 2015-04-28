@@ -17,15 +17,10 @@ OPTION(PLUGIN_dataObjectTable "Build with this solution." ON)
 OPTION(PLUGIN_dObMetaDataTable "Build with this solution." ON)
 OPTION(PLUGIN_evaluateGeometrics "Build with this solution." ON)
 OPTION(PLUGIN_vtk3dVisualizer "Build with this solution." OFF)
-OPTION(PLUGIN_colorWheel "Build with this solution." OFF)
 OPTION(PLUGIN_slider2D "Build with this solution." OFF)
 
 if (PLUGIN_itom1DQwtPlot OR PLUGIN_itom2DQwtPlot)
     ADD_SUBDIRECTORY(qwt)
-endif ()
-
-if (PLUGIN_colorWheel)
-    ADD_SUBDIRECTORY(colorWheel)
 endif ()
 
 if (PLUGIN_slider2D)
