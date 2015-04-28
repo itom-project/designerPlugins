@@ -110,7 +110,7 @@ class Plot1DWidget : public QwtPlot
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
 
-        QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed();
+        QSharedPointer<ito::DataObject> getDisplayed();
 
         void setSymbolStyle(const QwtSymbol::Style style, int size);
 
