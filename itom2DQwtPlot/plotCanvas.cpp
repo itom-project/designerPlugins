@@ -1109,16 +1109,16 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
         axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted, false);
     }
 
+    setAxisScale(QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
+    QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
+    if (widget)
+    {
+        QwtInterval ival(m_pData->m_valueMin, m_pData->m_valueMax);
+        axisWidget(QwtPlot::yRight)->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
+    }
+
     if (doZoomBase)
     {
-        setAxisScale(QwtPlot::yRight, m_pData->m_valueMin, m_pData->m_valueMax);
-        QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
-        if (widget)
-        {
-            QwtInterval ival(m_pData->m_valueMin, m_pData->m_valueMax);
-            axisWidget(QwtPlot::yRight)->setColorMap(ival, const_cast<QwtColorMap*>(widget->colorMap())); //the color map should be unchanged
-        }
-
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
         if (m_pZoomer->isEnabled())
         {
