@@ -35,10 +35,10 @@ class Slider2D : public QWidget
 {
     Q_OBJECT
 
-    Q_PROPERTY(qreal x_val READ x_val WRITE setX NOTIFY x_valChanged DESIGNABLE true )
-    Q_PROPERTY(qreal y_val READ y_val WRITE setY NOTIFY y_valChanged DESIGNABLE true )
-    Q_PROPERTY(QPoint x_range READ x_range WRITE set_xRange DESIGNABLE true )
-	Q_PROPERTY(QPoint y_range READ y_range WRITE set_yRange DESIGNABLE true )
+    Q_PROPERTY(qreal xVal READ xVal WRITE setX NOTIFY xValChanged DESIGNABLE true )
+    Q_PROPERTY(qreal yVal READ yVal WRITE setY NOTIFY yValChanged DESIGNABLE true )
+    Q_PROPERTY(QPoint xRange READ xRange WRITE setXRange DESIGNABLE true )
+	Q_PROPERTY(QPoint yRange READ yRange WRITE setYRange DESIGNABLE true )
 
 public:
 
@@ -49,19 +49,19 @@ public:
    // QSize sizeHint() const;
 
 
-    /// Get current x_val in the range [0-1]
-    qreal x_val() const;
+    /// Get current xVal in the range [0-1]
+    qreal xVal() const;
 
-    /// Get current y_val in the range [0-1]
-    qreal y_val() const;
+    /// Get current yVal in the range [0-1]
+    qreal yVal() const;
 
     /// Get the width in pixels of the outer wheel
-    QPoint x_range() const;
-	QPoint y_range() const;
+    QPoint xRange() const;
+	QPoint yRange() const;
 
     /// Set the width in pixels of the outer wheel
-    void set_xRange(QPoint x_range);
-	void set_yRange(QPoint y_range);
+    void setXRange(QPoint xRange);
+	void setYRange(QPoint yRange);
 
 
 public slots:
@@ -72,8 +72,8 @@ public slots:
 
 signals:
 
-	void x_valChanged(qreal);
-	void y_valChanged(qreal);
+	void xValChanged(qreal);
+	void yValChanged(qreal);
 
 
 protected:
