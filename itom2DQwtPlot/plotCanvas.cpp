@@ -396,7 +396,6 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
     m_dObjPtr = dObj;
 
     //QString valueLabel, axisLabel, title;
-
     if (dObj)
     {
         int dims = dObj->getDims();
@@ -920,7 +919,7 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             m_pLineCutLine->setSamples(pts);
             m_pLineCutLine->setVisible(true);
 
-            if(m_dObjPtr->getDims() > 2)
+            if(m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
@@ -1545,7 +1544,7 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
 
             ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
 
-            if(m_dObjPtr->getDims() > 2)
+            if(m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
@@ -1607,7 +1606,7 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
 
             ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
 
-            if(m_dObjPtr->getDims() > 2)
+            if(m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
@@ -1625,7 +1624,7 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
     QVector<QPointF> pts;
     pts.resize(2);
 
-    if (m_pData->m_state == tLineCut)
+    if (m_pData->m_state == tLineCut && m_dObjPtr)
     {
         pts[0].setY(invTransform(QwtPlot::yLeft, pt.y()));
         pts[0].setX(invTransform(QwtPlot::xBottom, pt.x()));
