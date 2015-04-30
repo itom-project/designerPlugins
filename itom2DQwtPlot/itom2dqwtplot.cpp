@@ -51,6 +51,7 @@
 void Itom2dQwtPlot::constructor()
 {
     // Basic settings
+    m_hasStaticLinePlot = false;
     m_pContent = NULL;
     m_pActSave = NULL;
     m_pActCopyClipboard = NULL;
@@ -523,6 +524,25 @@ void Itom2dQwtPlot::createActions()
 ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
     //displayed and sourceout is set by dataObjRasterData, since the data is analyzed there
+    if(m_hasStaticLinePlot && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
+    {
+        ito::DataObject* tmp = m_pInput["source"]->getVal<ito::DataObject*>();
+        int dims = tmp->getDims();
+        double bounds[6] = {0.0, 0.0, 0.0, 1.0, 0.5, 0.5};
+        if(dims > 1)
+        {
+            bounds[2] = tmp->getPixToPhys(dims-1, 0);
+            bounds[3] = tmp->getPixToPhys(dims-1, tmp->getSize(dims-1));
+            bounds[4] = tmp->getPixToPhys(dims-2, tmp->getSize(dims-2)/2);
+            bounds[5] = tmp->getPixToPhys(dims-2, tmp->getSize(dims-2)/2);
+        }
+        else
+        {
+        
+        }
+        m_pOutput["bounds"]->setVal<double*>(bounds, 6);
+    }
+
     m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>());
 
     return ito::retOk;
@@ -2507,8 +2527,9 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
             this->m_pContent->m_lineCutUID = 0;
         }
 
-
+        m_hasStaticLinePlot = this->m_pContent->m_lineCutUID != 0;
     }
+
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getMarkerLablesVisible(void) const
