@@ -90,7 +90,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 {
     //QLabel** elements = (QLabel**)calloc(5, sizeof(QLabel*));
 
-    ito::uint16 type = (ito::uint16)(((ito::uint32)(val[1])) & ito::PrimitiveContainer::tTypeMask);
+    ito::uint16 type = (ito::uint16)(((ito::uint32)(val[1])) & ito::tTypeMask);
 
     QString coordsString("[%1, %2, %3]");
 
@@ -113,42 +113,42 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         switch (type)
         {
             default:
-            case ito::PrimitiveContainer::tNoType:
+            case ito::tNoType:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/notype.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tPoint:
+            case ito::tPoint:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tLine:
+            case ito::tLine:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tCircle:
+            case ito::tCircle:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/circle.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tEllipse:
+            case ito::tEllipse:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tRectangle:
+            case ito::tRectangle:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tSquare:
+            case ito::tSquare:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/square.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tPolygon:
+            case ito::tPolygon:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/polygon.png"));
                 break;
@@ -156,13 +156,13 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
     }
 
-    switch (type & ito::PrimitiveContainer::tTypeMask)
+    switch (type & ito::tTypeMask)
     {
         default:
-        case ito::PrimitiveContainer::tNoType:
+        case ito::tNoType:
             break;
 
-        case ito::PrimitiveContainer::tPoint:
+        case ito::tPoint:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -181,7 +181,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
             break;
         }
-        case ito::PrimitiveContainer::tLine:
+        case ito::tLine:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -212,7 +212,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
             break;
         }
-        case ito::PrimitiveContainer::tCircle:
+        case ito::tCircle:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -239,7 +239,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
             break;
         }
-        case ito::PrimitiveContainer::tEllipse:
+        case ito::tEllipse:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -277,7 +277,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             }
             break;
         }
-        case ito::PrimitiveContainer::tRectangle:
+        case ito::tRectangle:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -320,7 +320,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             }
             break;
         }
-        case ito::PrimitiveContainer::tSquare:
+        case ito::tSquare:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -357,7 +357,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             }
             break;
         }
-        case ito::PrimitiveContainer::tPolygon:
+        case ito::tPolygon:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -488,7 +488,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     if (idx2 ==  keys[geo2])
                     {
                         //m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::PrimitiveContainer::tTypeMask;
+                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tTypeMask;
                     }
                 }
 
@@ -497,7 +497,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     if (idx2 ==  keys[geo2])
                     {
                         //m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::PrimitiveContainer::tTypeMask;
+                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tTypeMask;
                     }
                 }
 
@@ -731,15 +731,15 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle)
 {
-    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask);
-    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::PrimitiveContainer::tTypeMask);
+    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
+    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tTypeMask);
 
-    if (typeOne != ito::PrimitiveContainer::tLine)
+    if (typeOne != ito::tLine)
     {
         angle = quietNaN;
         return false;
     }
-    if (typeTwo != ito::PrimitiveContainer::tLine)
+    if (typeTwo != ito::tLine)
     {
         angle = quietNaN;
         return false;
@@ -772,12 +772,12 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     cv::Vec3f linePosVector;
     cv::Vec3f pointPosVector;
 
-    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask);
-    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::PrimitiveContainer::tTypeMask);
+    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
+    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tTypeMask);
 
     // distance of two points or two circles or combination
-    if ((typeOne == ito::PrimitiveContainer::tPoint || typeOne == ito::PrimitiveContainer::tCircle || typeOne == ito::PrimitiveContainer::tEllipse) &&
-       (typeTwo == ito::PrimitiveContainer::tPoint || typeTwo == ito::PrimitiveContainer::tCircle || typeOne == ito::PrimitiveContainer::tEllipse))
+    if ((typeOne == ito::tPoint || typeOne == ito::tCircle || typeOne == ito::tEllipse) &&
+       (typeTwo == ito::tPoint || typeTwo == ito::tCircle || typeOne == ito::tEllipse))
     {
         if (eval2D)
         {
@@ -793,15 +793,15 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     }
 
     // distance of line to points or circles
-    if (typeOne == ito::PrimitiveContainer::tLine && 
-        typeTwo == ito::PrimitiveContainer::tPoint)
+    if (typeOne == ito::tLine && 
+        typeTwo == ito::tPoint)
     {
         lineDirVector = cv::Vec3f(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
         linePosVector = cv::Vec3f(first[2], first[3], first[4]);
         pointPosVector = cv::Vec3f(second[2], second[3], second[4]);
     }
-    else if (typeTwo == ito::PrimitiveContainer::tLine && 
-            typeOne == ito::PrimitiveContainer::tPoint)
+    else if (typeTwo == ito::tLine && 
+            typeOne == ito::tPoint)
     {
         lineDirVector = cv::Vec3f(second[5] - second[2], second[6] - second[3], second[7] - second[4]);
         linePosVector = cv::Vec3f(second[2], second[3], second[4]);
@@ -836,14 +836,14 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask);
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
 
     switch(type)
     {
-        case ito::PrimitiveContainer::tCircle:
+        case ito::tCircle:
             radius = first[5];
             return true;
-        case ito::PrimitiveContainer::tEllipse:
+        case ito::tEllipse:
             radius = (first[5] +  first[6])/2;   
             return true;
         default:
@@ -856,7 +856,7 @@ bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length)
 {
-    if (((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask) != ito::PrimitiveContainer::tLine)
+    if (((ito::uint32)(first[1]) & ito::tTypeMask) != ito::tLine)
     {
         length = quietNaN;
         return false;
@@ -877,20 +877,20 @@ bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask);
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
 
     switch(type)
     {
-        case ito::PrimitiveContainer::tRectangle:
+        case ito::tRectangle:
             area = abs((first[5] - first[2]) * (first[6] - first[3]));
             return true;
-        case ito::PrimitiveContainer::tSquare:
+        case ito::tSquare:
             area = (first[5] * first[5]);
             return true;
-        case ito::PrimitiveContainer::tCircle:
+        case ito::tCircle:
             area = (first[5] * first[5])* GEO_PI;
             return true;
-        case ito::PrimitiveContainer::tEllipse:
+        case ito::tEllipse:
             area = (first[5] * first[6])* GEO_PI;
             return true;
         default:
@@ -904,17 +904,17 @@ bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &length)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask);
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
 
     switch(type)
     {
-        case ito::PrimitiveContainer::tRectangle:
+        case ito::tRectangle:
             length = abs(2 * (first[5] - first[2])) + abs (2 * (first[6] - first[3])); 
             return true;
-        case ito::PrimitiveContainer::tSquare:
+        case ito::tSquare:
             length = 4 * first[5];
             return true;
-        case ito::PrimitiveContainer::tCircle:
+        case ito::tCircle:
             length =  2 * first[5] * GEO_PI;
             return true;
         default:
@@ -929,7 +929,7 @@ bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &l
 bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point)
 {
 
-    if (((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask) != ito::PrimitiveContainer::tLine || ((ito::uint32)(second[1]) & ito::PrimitiveContainer::tTypeMask) != ito::PrimitiveContainer::tLine)
+    if (((ito::uint32)(first[1]) & ito::tTypeMask) != ito::tLine || ((ito::uint32)(second[1]) & ito::tTypeMask) != ito::tLine)
     {
         point[0] = quietNaN;
         point[1] = quietNaN;
@@ -1096,9 +1096,9 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
                         }
                     }
 
-                    if (!found && (((ito::int32)(srcPtr[1]) & ito::PrimitiveContainer::tTypeMask)!= 0))
+                    if (!found && (((ito::int32)(srcPtr[1]) & ito::tTypeMask)!= 0))
                     {
-                        geometricPrimitives newVal;
+                        ito::GeometricPrimitive newVal;
                         std::fill(newVal.cells, newVal.cells + PRIM_ELEMENTLENGTH, 0.0f);
                         changed = true;
                         memcpy(newVal.cells, srcPtr, sizeof(ito::float32) * cols);
@@ -1275,7 +1275,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
     {
         stream.writeAttribute("href", "http://www.ito.uni-stuttgart.de");
         
-        QHash<ito::int32, geometricPrimitives >::const_iterator curValue = m_rowHash.constBegin();
+        QHash<ito::int32, ito::GeometricPrimitive >::const_iterator curValue = m_rowHash.constBegin();
         for (int geo = 0; curValue !=  m_rowHash.end(); ++curValue, geo++)
         //for (int geo = 0; geo < m_rowHash.size(); geo++)
         {
@@ -1293,7 +1293,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
             }
 
-            ito::uint16 type = ((ito::int32)curValue->cells[1]) & ito::PrimitiveContainer::tTypeMask;
+            ito::uint16 type = ((ito::int32)curValue->cells[1]) & ito::tTypeMask;
 
             if (m_pData->m_primitivNames.contains(type))
             {
@@ -1301,19 +1301,19 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
             }
             else
             {
-                stream.writeAttribute("name", m_pData->m_primitivNames[ito::PrimitiveContainer::tNoType]);
+                stream.writeAttribute("name", m_pData->m_primitivNames[ito::tNoType]);
             }
 
             switch(type)
             {
-                case ito::PrimitiveContainer::tPoint:
+                case ito::tPoint:
                 {                    
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
                     stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
                 }
                 break;
-                case ito::PrimitiveContainer::tLine:
+                case ito::tLine:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1323,7 +1323,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                     stream.writeAttribute("z1", QString::number((ito::float32)curValue->cells[7]));
                 }
                 break;
-                case ito::PrimitiveContainer::tEllipse:
+                case ito::tEllipse:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1334,7 +1334,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::PrimitiveContainer::tCircle:
+                case ito::tCircle:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1343,7 +1343,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::PrimitiveContainer::tRectangle:
+                case ito::tRectangle:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1355,7 +1355,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::PrimitiveContainer::tSquare:
+                case ito::tSquare:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1365,7 +1365,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::PrimitiveContainer::tPolygon:
+                case ito::tPolygon:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1416,7 +1416,7 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
     QByteArray outBuffer;
     outBuffer.reserve(200);
 
-    QHash<ito::int32, geometricPrimitives >::const_iterator curValue = m_rowHash.constBegin();
+    QHash<ito::int32, ito::GeometricPrimitive >::const_iterator curValue = m_rowHash.constBegin();
     for (int geo = 0; curValue !=  m_rowHash.end(); ++curValue, geo++)
     //for (int geo = 0; geo < m_rowHash.size(); geo++)
     {

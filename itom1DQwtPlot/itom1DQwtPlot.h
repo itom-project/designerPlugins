@@ -379,6 +379,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction* m_pActDrawMode;
         QMenu *m_pMnuDrawMode;
         QAction *m_pActProperties;
+        QAction *m_pActMarkerLegend;
         QAction *m_pActGrid;
         QAction *m_pActGridSettings;
 

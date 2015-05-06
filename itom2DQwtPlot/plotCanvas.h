@@ -77,14 +77,14 @@ class PlotCanvas : public QwtPlot
             tPan = 3, 
             tLineCut = 4, 
             tStackCut = 5, 
-            tMultiPointPick = ito::PrimitiveContainer::tMultiPointPick, 
-            tPoint = ito::PrimitiveContainer::tPoint, 
-            tLine = ito::PrimitiveContainer::tLine, 
-            tRect = ito::PrimitiveContainer::tRectangle, 
-            tSquare = ito::PrimitiveContainer::tSquare,
-            tEllipse = ito::PrimitiveContainer::tEllipse, 
-            tCircle = ito::PrimitiveContainer::tCircle, 
-            tPolygon = ito::PrimitiveContainer::tPolygon
+            tMultiPointPick = ito::tMultiPointPick, 
+            tPoint = ito::tPoint, 
+            tLine = ito::tLine, 
+            tRect = ito::tRectangle, 
+            tSquare = ito::tSquare,
+            tEllipse = ito::tEllipse, 
+            tCircle = ito::tCircle, 
+            tPolygon = ito::tPolygon
         };
 
         enum changeFlag {

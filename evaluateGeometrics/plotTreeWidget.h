@@ -102,13 +102,13 @@ struct InternalInfo
 
         m_primitivNames.clear();
         m_primitivNames.insert(0, "none");
-        m_primitivNames.insert(ito::PrimitiveContainer::tPoint, QObject::tr("point"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tLine, QObject::tr("line"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tEllipse, QObject::tr("ellipse"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tCircle, QObject::tr("circle"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tRectangle, QObject::tr("rectangle"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tSquare, QObject::tr("square"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tPolygon, QObject::tr("polygon"));
+        m_primitivNames.insert(ito::tPoint, QObject::tr("point"));
+        m_primitivNames.insert(ito::tLine, QObject::tr("line"));
+        m_primitivNames.insert(ito::tEllipse, QObject::tr("ellipse"));
+        m_primitivNames.insert(ito::tCircle, QObject::tr("circle"));
+        m_primitivNames.insert(ito::tRectangle, QObject::tr("rectangle"));
+        m_primitivNames.insert(ito::tSquare, QObject::tr("square"));
+        m_primitivNames.insert(ito::tPolygon, QObject::tr("polygon"));
 
         static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};
 
@@ -126,7 +126,7 @@ struct InternalInfo
     QHash<ito::uint16, QString> m_primitivNames;     /*!< A hashTable containing all possible primites type in it */
     QStringList m_relationNames;                    /*!< A list with the relation names to be plotted. First 6 are protected other can be added but should be used with external defined values */
     QVector<relationsShip> m_relationsList;         /*!< A list with all relations to be evaluated for the figure*/
-    //QHash<int, geometricPrimitives> m_rowHash;    /*!< A hashList with all geometric elements to be evaluated for the figure*/
+    //QHash<int, ito::GeometricPrimitive> m_rowHash;    /*!< A hashList with all geometric elements to be evaluated for the figure*/
     ito::uint8 m_numberOfDigits;                    /*!< Number of digits to be plotted */
     bool m_consider2DOnly;                          /*!< Toggle wether only x and y or all coordinates of primitivs should be considered for evaluation of relations */
     bool m_coordsAs3D;                              /*!< Toggle wether only x and y or all coordinates of primitivs should be shown */
@@ -225,8 +225,8 @@ class PlotTreeWidget : public QTreeWidget
 
         InternalInfo *m_pData;                                                                                          /*! handle to the shared configuration struct */
 
-        //QVector<geometricPrimitives> m_rowHash;
-        QHash<ito::int32, geometricPrimitives> m_rowHash;                                                               /*! the hash table with data for all primitives */
+        //QVector<ito::GeometricPrimitive> m_rowHash;
+        QHash<ito::int32, ito::GeometricPrimitive> m_rowHash;                                                               /*! the hash table with data for all primitives */
 
         ito::RetVal updateElement(const ito::int32 &idx, const ito::int32 &flags,const QVector<ito::float32> &values);  /*! update a certain element of the hash table */
 

@@ -348,6 +348,7 @@ private:
     QActionGroup *m_pDrawModifyModeActGroup;
     QAction *m_pActClearDrawings;
     QAction *m_pActProperties;
+    QAction *m_pActMarkerLegend;
 
     QLabel *m_pCoordinates;
     QWidgetAction *m_pActCoordinates;

@@ -71,13 +71,13 @@ class Plot1DWidget : public QwtPlot
             statePanner = 1, 
             stateZoomer = 2, 
             statePicker = 3,             
-            tPoint = ito::PrimitiveContainer::tPoint, 
-            tLine = ito::PrimitiveContainer::tLine, 
-            tRect = ito::PrimitiveContainer::tRectangle, 
-//            tSquare = ito::PrimitiveContainer::tSquare,
-            tEllipse = ito::PrimitiveContainer::tEllipse, 
-//            tCircle = ito::PrimitiveContainer::tCircle, 
-            tPolygon = ito::PrimitiveContainer::tPolygon
+            tPoint = ito::tPoint, 
+            tLine = ito::tLine, 
+            tRect = ito::tRectangle, 
+//            tSquare = ito::tSquare,
+            tEllipse = ito::tEllipse, 
+//            tCircle = ito::tCircle, 
+            tPolygon = ito::tPolygon
         };
 
         Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
