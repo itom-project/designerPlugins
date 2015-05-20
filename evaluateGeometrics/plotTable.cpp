@@ -44,7 +44,7 @@ PlotTable::PlotTable(QMenu *contextMenu, InternalInfo *data, QWidget * parent) :
 {
     m_data = data;
     //this is the border between the canvas and the axes and the overall mainwindow
-	setContentsMargins(5,5,5,5);
+    setContentsMargins(5,5,5,5);
 
     m_firstTab = new QWidget();
     m_secondTab = new QWidget();

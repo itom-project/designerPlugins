@@ -59,7 +59,7 @@ public:
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
     enum Interpolation { Flat, Gouraud, Phong };
 
-	ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
+    ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
     ito::RetVal addCylinder(const pcl::ModelCoefficients &coefficients, const QColor &color);
     ito::RetVal addPyramid(const ito::DataObject *points, const QColor &color);
     ito::RetVal addCuboid(const ito::DataObject *points, const QColor &color);

@@ -59,9 +59,9 @@ public:
 private:
     QString parseHints(const QString& hints, const QChar component);
 
-    Property*	m_x;
-    Property*	m_y;
-    Property*	m_z;
+    Property*    m_x;
+    Property*    m_y;
+    Property*    m_z;
 };
 
 #endif

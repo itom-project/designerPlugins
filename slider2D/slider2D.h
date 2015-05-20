@@ -38,7 +38,7 @@ class Slider2D : public QWidget
     Q_PROPERTY(qreal xVal READ xVal WRITE setX NOTIFY xValChanged DESIGNABLE true )
     Q_PROPERTY(qreal yVal READ yVal WRITE setY NOTIFY yValChanged DESIGNABLE true )
     Q_PROPERTY(QPoint xRange READ xRange WRITE setXRange DESIGNABLE true )
-	Q_PROPERTY(QPoint yRange READ yRange WRITE setYRange DESIGNABLE true )
+    Q_PROPERTY(QPoint yRange READ yRange WRITE setYRange DESIGNABLE true )
 
 public:
 
@@ -57,11 +57,11 @@ public:
 
     /// Get the width in pixels of the outer wheel
     QPoint xRange() const;
-	QPoint yRange() const;
+    QPoint yRange() const;
 
     /// Set the width in pixels of the outer wheel
     void setXRange(QPoint xRange);
-	void setYRange(QPoint yRange);
+    void setYRange(QPoint yRange);
 
 
 public slots:
@@ -72,8 +72,8 @@ public slots:
 
 signals:
 
-	void xValChanged(qreal);
-	void yValChanged(qreal);
+    void xValChanged(qreal);
+    void yValChanged(qreal);
 
 
 protected:

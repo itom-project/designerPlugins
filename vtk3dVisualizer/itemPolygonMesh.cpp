@@ -74,7 +74,7 @@ void ItemPolygonMesh::setVisible(bool value)
 void ItemPolygonMesh::setRepresentation(Representation value)
 {
 //#if PCL_VERSION_COMPARE(>=,1,7,0)
-//	pcl::visualization::CloudActorMap *map = m_visualizer->getInteractorStyle()->getCloudActorMap().get();
+//    pcl::visualization::CloudActorMap *map = m_visualizer->getInteractorStyle()->getCloudActorMap().get();
 //#else
     pcl::visualization::CloudActorMap *map = m_visualizer->getCloudActorMap().get();
 //#endif
