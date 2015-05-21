@@ -1570,7 +1570,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             needChannelUpdate = true;
             m_zSliceType &= ~ito::AbstractFigure::tUninitilizedExtern;
             m_zSliceType |= ito::AbstractFigure::tExternChild;
-        }
+    }
     }
     else
     {
@@ -1669,9 +1669,9 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 {
                     m_zSliceType = ito::AbstractFigure::tOwnChild;
                     figure->show();
-                }
-                else
-                {
+        }
+        else
+        {
                     m_lineCutType = ito::AbstractFigure::tOwnChild;
                     figure->show();
                 }
@@ -2588,7 +2588,7 @@ ito::ItomPlotHandle Itom2dQwtPlot::getStaticZSliceID() const
     if(m_pContent && this->m_pContent->m_lineCutUID > 0)
     {
         return ito::ItomPlotHandle("ChildLinePlot", "Unknown", this->m_pContent->m_zstackCutUID);
-    }
+        }
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2619,7 +2619,7 @@ void Itom2dQwtPlot::setStaticZSliceID(const ito::ItomPlotHandle idx)
         if (!lineCutObj && !lineCutObj->inherits("ito::AbstractDObjFigure"))
         {
             this->m_pContent->m_zstackCutUID = 0;
-        }
+    }
 
         m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
