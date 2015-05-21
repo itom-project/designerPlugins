@@ -467,6 +467,13 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         {
             p->setColorDataTypeRepresentation(dObj->getType() == ito::tRGBA32);
 
+            if (dObj->getType() == ito::tRGBA32) //coloured objects have no color bar, therefore the value axis cropping is disabled
+            {
+                m_pData->m_valueScaleAuto = false;
+                m_pData->m_valueMin = std::numeric_limits<ito::uint8>::min();
+                m_pData->m_valueMax = std::numeric_limits<ito::uint8>::max();
+            }
+
             if (dObj->getType() == ito::tComplex128 || dObj->getType() == ito::tComplex64)
             {
                 p->setCmplxSwitch(m_pData->m_cmplxType, true);
@@ -1213,19 +1220,28 @@ void PlotCanvas::setInterval(Qt::Axis axis, const ito::AutoInterval &interval)
     }
     else if (axis == Qt::ZAxis)
     {
-        m_pData->m_valueScaleAuto = interval.isAuto();
-
-        if (m_pData->m_valueScaleAuto)
+        if (m_pData->m_dataType == ito::tRGBA32)
         {
-            internalDataUpdated();
-            QwtInterval ival = m_rasterData->interval(Qt::ZAxis);
-            m_pData->m_valueMin = ival.minValue();
-            m_pData->m_valueMax = ival.maxValue();
+            m_pData->m_valueScaleAuto = false;
+            m_pData->m_valueMin = std::numeric_limits<ito::uint8>::min();
+            m_pData->m_valueMax = std::numeric_limits<ito::uint8>::max();
         }
         else
         {
-            m_pData->m_valueMin = interval.minimum();
-            m_pData->m_valueMax = interval.maximum();
+            m_pData->m_valueScaleAuto = interval.isAuto();
+
+            if (m_pData->m_valueScaleAuto)
+            {
+                internalDataUpdated();
+                QwtInterval ival = m_rasterData->interval(Qt::ZAxis);
+                m_pData->m_valueMin = ival.minValue();
+                m_pData->m_valueMax = ival.maxValue();
+            }
+            else
+            {
+                m_pData->m_valueMin = interval.minimum();
+                m_pData->m_valueMax = interval.maximum();
+            }
         }
 
         QwtScaleWidget *widget = axisWidget(QwtPlot::yRight);
