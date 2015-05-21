@@ -1549,6 +1549,8 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     ito::uint32 newUniqueID = uniqueID;
     QWidget *lineCutObj = NULL;
 
+    bool needChannelUpdate = false;
+
     double *pointArr = new double[2 * bounds.size()];
     for (int np = 0; np < bounds.size(); np++)
     {
@@ -1562,6 +1564,10 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     }
     else
     {
+        if(m_hasStaticLinePlot && 2 * bounds.size() != m_pOutput["bounds"]->getLen() && uniqueID == newUniqueID)
+        {
+            needChannelUpdate = true;
+        }
         m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
     }
 
@@ -1573,19 +1579,34 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
     if (!retval.containsError())
     {
-        if (uniqueID != newUniqueID)
+        if (uniqueID != newUniqueID || needChannelUpdate)
         {
             uniqueID = newUniqueID;
             ito::AbstractDObjFigure* figure = NULL;
             if (lineCutObj->inherits("ito::AbstractDObjFigure"))
             {
                 figure = (ito::AbstractDObjFigure*)lineCutObj;
-                m_childFigures[lineCutObj] = newUniqueID;
-                connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
+                if(!needChannelUpdate)
+                {
+                    m_childFigures[lineCutObj] = newUniqueID;
+                    connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
+                }
             }
             else
             {
                 return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
+            }
+
+            if(needChannelUpdate)
+            {
+                ito::Channel *tempChannel;
+                foreach(tempChannel, m_pChannels)
+                {
+                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)figure)
+                    {
+                        removeChannel(tempChannel);
+                    }
+                }
             }
 
             if (zStack)
@@ -1616,7 +1637,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             retval += updateChannels(paramNames);
 
-            figure->show();
+            if(!needChannelUpdate) figure->show();
         }
         else
         {
@@ -2520,7 +2541,7 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
             //((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
             // otherwise simply pass on the displayed plane
             retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);        
+            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);        
         }
         else
         {
