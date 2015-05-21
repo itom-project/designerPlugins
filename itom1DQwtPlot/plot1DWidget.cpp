@@ -575,12 +575,14 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             if (!m_colorState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(1);
             m_colorState = true;
             m_cmplxState = false;
+            ((Itom1DQwtPlot*)m_pParent)->m_pRescaleParent->setEnabled(false); //a coloured data object has no color map and can therefore not be cropped.
         }
         else
         {
             if (m_cmplxState || m_colorState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(0 | (dims > 1 ? 0x10 : 0x00));
             m_cmplxState = false;  
             m_colorState = false;
+            ((Itom1DQwtPlot*)m_pParent)->m_pRescaleParent->setEnabled(true);
         }
 
         Itom1DQwt::tMultiLineMode multiLineMode = m_pData->m_multiLine;
