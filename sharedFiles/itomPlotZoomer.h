@@ -64,7 +64,7 @@ private:
     bool m_fixedAspectRatio;
     bool m_aspectRatioChanged;
     int m_invertedAxes; //this member remembers the inversion of the xBottom and yLeft axis
-	int m_nrOfRescaleCalls;
+    int m_nrOfRescaleCalls;
 };
 
 #endif //ITOMPLOTZOOMER_H

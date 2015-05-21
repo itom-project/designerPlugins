@@ -120,7 +120,7 @@ public slots:
 
     ito::RetVal addSphere(QVector<double> point, double radius, const QString &fullname, const QColor &color = Qt::red);
 
-	ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color = Qt::white);
+    ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color = Qt::white);
     ito::RetVal updateText(const QString &text, const int x, const int y, const int fontsize, const QString &name, const QColor &color = Qt::white, bool createIfNotExists = false);
 
     ito::RetVal deletePointCloud(const QString &name);

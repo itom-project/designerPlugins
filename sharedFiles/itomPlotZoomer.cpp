@@ -37,7 +37,7 @@ ItomPlotZoomer::ItomPlotZoomer( QWidget *parent, bool doReplot /*= true*/ ) :
     m_fixedAspectRatio(false),
     m_aspectRatioChanged(false),
     m_invertedAxes(-1),
-	m_nrOfRescaleCalls(0)
+    m_nrOfRescaleCalls(0)
 {
 }
 
@@ -48,7 +48,7 @@ ItomPlotZoomer::ItomPlotZoomer( int xAxis, int yAxis,
     m_fixedAspectRatio(false),
     m_aspectRatioChanged(false),
     m_invertedAxes(-1),
-	m_nrOfRescaleCalls(0)
+    m_nrOfRescaleCalls(0)
 {
 }
 
@@ -125,13 +125,13 @@ bool ItomPlotZoomer::accept( QPolygon &pa ) const
 //---------------------------------------------------------------------------
 void ItomPlotZoomer::rescale(bool resizeEvent)
 {
-	if (m_nrOfRescaleCalls == MAXRESCALESTACKDEPTH)
-	{
-		qDebug() << "ItomPlotZoomer::rescale: maximum number of recursive calls reached.";
-		return;
-	}
+    if (m_nrOfRescaleCalls == MAXRESCALESTACKDEPTH)
+    {
+        qDebug() << "ItomPlotZoomer::rescale: maximum number of recursive calls reached.";
+        return;
+    }
 
-	m_nrOfRescaleCalls++;
+    m_nrOfRescaleCalls++;
 
     QwtPlot *plt = plot();
     if ( !plt )
@@ -332,7 +332,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
         plt->replot();
     }
 
-	m_nrOfRescaleCalls--;
+    m_nrOfRescaleCalls--;
 }
 
 //--------------------------------------------------------------------------------------

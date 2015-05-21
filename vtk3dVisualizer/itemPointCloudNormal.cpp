@@ -313,9 +313,9 @@ void ItemPointCloudNormal::updatePointCloudNormal()
 
         vtkDataSetMapper *mapper = (vtkDataSetMapper*)it->second.actor->GetMapper();
 #if (VTK_MAJOR_VERSION == 5)
-		mapper->SetInput (polyData);
+        mapper->SetInput (polyData);
 #else
-		mapper->SetInputData (polyData);
+        mapper->SetInputData (polyData);
 #endif
         
         mapper->SetColorModeToMapScalars();

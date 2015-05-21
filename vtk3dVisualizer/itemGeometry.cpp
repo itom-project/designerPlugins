@@ -102,9 +102,9 @@ ito::RetVal ItemGeometry::addSphere(const pcl::PointXYZ &center, double radius, 
 ito::RetVal ItemGeometry::addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color)
 {
     m_geometryType = tText;
-	m_nrOfShapes = 1;
+    m_nrOfShapes = 1;
 
-	if (m_visualizer->addText(text.toStdString(), x, y, fontsize, color.redF(), color.greenF(), color.blueF(), m_name.toStdString() ))
+    if (m_visualizer->addText(text.toStdString(), x, y, fontsize, color.redF(), color.greenF(), color.blueF(), m_name.toStdString() ))
     {
         vtkProp *a = getLastActor();
         syncActorProperties(a);
@@ -436,7 +436,7 @@ ito::RetVal ItemGeometry::addLines(const ito::DataObject *points, const QColor &
     mesh.polygons.reserve(numLines);
 
     for (int idx=0; idx < numLines; ++idx)
-	{
+    {
         linePtr = (ito::float32*)points->rowPtr(0,idx);
 
         cloud.push_back(pcl::PointXYZ(linePtr[0], linePtr[1], linePtr[2]));
@@ -445,7 +445,7 @@ ito::RetVal ItemGeometry::addLines(const ito::DataObject *points, const QColor &
         indices.vertices[0] = pointsIndex ++;
         indices.vertices[1] = pointsIndex ++;
         mesh.polygons.push_back(indices);
-	}
+    }
 
     pcl::PCLPointCloud2 msg;
     pcl::toPCLPointCloud2(cloud, msg);

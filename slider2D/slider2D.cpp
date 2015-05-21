@@ -50,8 +50,8 @@ enum Mouse_Status
 {
     nothing,
     dragSquare,
-	dragX,
-	dragY
+    dragX,
+    dragY
 };
 
 
@@ -67,11 +67,11 @@ public:
 
     qreal xVal, yVal;
     QPoint xRange;
-	QPoint yRange;
+    QPoint yRange;
     Mouse_Status mouseStatus;
     QImage innerSelector;
-	QImage leftSliderBackgr;
-	QImage rightSliderBackgr;
+    QImage leftSliderBackgr;
+    QImage rightSliderBackgr;
 
 
 
@@ -98,13 +98,13 @@ public:
     {
         int sz = squareSize();
         innerSelector = QImage(sz, sz, QImage::Format_RGB32);
-		innerSelector.fill(qRgb(200, 200, 200));
+        innerSelector.fill(qRgb(200, 200, 200));
 
-		leftSliderBackgr = QImage(0.15*sz, sz, QImage::Format_RGB32);
-		leftSliderBackgr.fill(qRgb(220, 220, 220));
+        leftSliderBackgr = QImage(0.15*sz, sz, QImage::Format_RGB32);
+        leftSliderBackgr.fill(qRgb(220, 220, 220));
 
-		rightSliderBackgr = QImage(sz, 0.15*sz, QImage::Format_RGB32);
-		rightSliderBackgr.fill(qRgb(220, 220, 220));
+        rightSliderBackgr = QImage(sz, 0.15*sz, QImage::Format_RGB32);
+        rightSliderBackgr.fill(qRgb(220, 220, 220));
     }
 
 
@@ -120,7 +120,7 @@ public:
     /// Rotation of the selector image
     qreal selectorImageAngle()
     {
-		return 0;
+        return 0;
 
     }
 
@@ -152,7 +152,7 @@ qreal Slider2D::xVal() const
 
 qreal Slider2D::yVal() const
 {
-	return p->yVal; //color().valueF();
+    return p->yVal; //color().valueF();
 }
 
 QPoint Slider2D::xRange() const
@@ -167,21 +167,21 @@ QPoint Slider2D::yRange() const
 
 void Slider2D::setXRange(QPoint xr)
 {
-	p->xRange = xr;
+    p->xRange = xr;
     update();
 }
 
 void Slider2D::setYRange(QPoint yr)
 {
-	p->yRange = yr;
+    p->yRange = yr;
     update();
 }
 
 void Slider2D::paintEvent(QPaintEvent * )
 {
-	//QSlider *slider = new QSlider(Qt::Horizontal, this);
-	qreal xValRanged = (p->xVal - p->xRange.x())/(p->xRange.y() - p->xRange.x());		// transforms coordinate of range (xmin, xmax) to range (0,1)
-	qreal yValRanged = (p->yVal - p->yRange.y())/(p->yRange.x() - p->yRange.y());
+    //QSlider *slider = new QSlider(Qt::Horizontal, this);
+    qreal xValRanged = (p->xVal - p->xRange.x())/(p->xRange.y() - p->xRange.x());        // transforms coordinate of range (xmin, xmax) to range (0,1)
+    qreal yValRanged = (p->yVal - p->yRange.y())/(p->yRange.x() - p->yRange.y());
 
 
     QPainter painter(this);
@@ -189,7 +189,7 @@ void Slider2D::paintEvent(QPaintEvent * )
     painter.setRenderHint(QPainter::Antialiasing);
     painter.translate(geometry().width()/2,geometry().height()/2);
 
-	
+    
 
     if(p->innerSelector.isNull())
         p->renderBackground();
@@ -197,46 +197,46 @@ void Slider2D::paintEvent(QPaintEvent * )
     painter.translate(p->selectorImageOffset());
 
     QPointF selector2DPosition;
-	qreal side = p->squareSize();
+    qreal side = p->squareSize();
     selector2DPosition = QPointF(xValRanged*side, yValRanged*side);
 
-	QRectF text_rect_1 = QRectF(side*1.03, yValRanged*side - 0.075*side, 0.15*side, 0.15*side);
-	QRectF text_rect_2 = QRectF(xValRanged*side - 0.075*side, side*1.03 , 0.15*side, 0.15*side);
+    QRectF text_rect_1 = QRectF(side*1.03, yValRanged*side - 0.075*side, 0.15*side, 0.15*side);
+    QRectF text_rect_2 = QRectF(xValRanged*side - 0.075*side, side*1.03 , 0.15*side, 0.15*side);
 
-	QPainterPath path_tri_1;
-	path_tri_1.moveTo (side, yValRanged*side);
-	path_tri_1.lineTo (side*1.03, yValRanged*side - 0.075*side);
-	path_tri_1.lineTo (side*1.03,   yValRanged*side + 0.075*side);
-	path_tri_1.lineTo (side, yValRanged*side);
+    QPainterPath path_tri_1;
+    path_tri_1.moveTo (side, yValRanged*side);
+    path_tri_1.lineTo (side*1.03, yValRanged*side - 0.075*side);
+    path_tri_1.lineTo (side*1.03,   yValRanged*side + 0.075*side);
+    path_tri_1.lineTo (side, yValRanged*side);
 
-	QPainterPath path_tri_2;
-	path_tri_2.moveTo (xValRanged*side, side);
-	path_tri_2.lineTo (xValRanged*side - 0.075*side, side*1.03);
-	path_tri_2.lineTo (xValRanged*side + 0.075*side, side*1.03);
-	path_tri_2.lineTo (xValRanged*side, side);
+    QPainterPath path_tri_2;
+    path_tri_2.moveTo (xValRanged*side, side);
+    path_tri_2.lineTo (xValRanged*side - 0.075*side, side*1.03);
+    path_tri_2.lineTo (xValRanged*side + 0.075*side, side*1.03);
+    path_tri_2.lineTo (xValRanged*side, side);
 
 
     painter.drawImage(0,0,p->innerSelector);
-	painter.drawImage(side*1.03,0,p->leftSliderBackgr);
+    painter.drawImage(side*1.03,0,p->leftSliderBackgr);
 
-	painter.drawText(text_rect_1, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->yVal,'g',3));
-	painter.drawRect(text_rect_1);
+    painter.drawText(text_rect_1, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->yVal,'g',3));
+    painter.drawRect(text_rect_1);
 
-	painter.drawImage(0,side*1.03,p->rightSliderBackgr);
-	painter.drawText(text_rect_2, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->xVal,'g',3));
-	painter.drawRect(text_rect_2);
+    painter.drawImage(0,side*1.03,p->rightSliderBackgr);
+    painter.drawText(text_rect_2, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->xVal,'g',3));
+    painter.drawRect(text_rect_2);
 
     painter.setClipping(false);
 
     painter.setPen(QPen(Qt::black, 2)); 
     painter.setBrush(Qt::NoBrush);
-	painter.drawEllipse(selector2DPosition, 0.03*side, 0.03*side);
+    painter.drawEllipse(selector2DPosition, 0.03*side, 0.03*side);
 
-	painter.setPen(QPen(Qt::black, 2));  
-	painter.drawLine(0, yValRanged*side, side, yValRanged*side);
-	painter.drawLine(xValRanged*side, 0, xValRanged*side, side);
-	painter.fillPath (path_tri_1, QBrush (QColor ("black")));
-	painter.fillPath (path_tri_2, QBrush (QColor ("black")));
+    painter.setPen(QPen(Qt::black, 2));  
+    painter.drawLine(0, yValRanged*side, side, yValRanged*side);
+    painter.drawLine(xValRanged*side, 0, xValRanged*side, side);
+    painter.fillPath (path_tri_1, QBrush (QColor ("black")));
+    painter.fillPath (path_tri_2, QBrush (QColor ("black")));
 
 }
 
@@ -251,8 +251,8 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
      //   centerMouseLn.setAngle(centerMouseLn.angle());
         centerMouseLn.setP2(centerMouseLn.p2()-p->selectorImageOffset());
 
-		qreal xval_old = qBound(0.0, centerMouseLn.x2()/p->squareSize(), 1.0);
-		qreal yval_old = qBound(0.0, centerMouseLn.y2()/p->squareSize(), 1.0);
+        qreal xval_old = qBound(0.0, centerMouseLn.x2()/p->squareSize(), 1.0);
+        qreal yval_old = qBound(0.0, centerMouseLn.y2()/p->squareSize(), 1.0);
 
 
 
@@ -260,12 +260,12 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
         p->yVal =   yval_old*(p->yRange.x() - p->yRange.y()) + p->yRange.y();
 
 
-		emit xValChanged(xVal());
-		emit yValChanged(yVal());
+        emit xValChanged(xVal());
+        emit yValChanged(yVal());
         update();
     }
 
-	if(p->mouseStatus == dragY)
+    if(p->mouseStatus == dragY)
     {
         QLineF globMouseLn = p->lineToPoint(ev->pos());
         QLineF centerMouseLn ( QPointF(0,0),
@@ -274,15 +274,15 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
        // centerMouseLn.setAngle(centerMouseLn.angle());
         centerMouseLn.setP2(centerMouseLn.p2()-p->selectorImageOffset());
 
-		qreal yval_old = qBound(0.0, centerMouseLn.y2()/p->squareSize(), 1.0);  
+        qreal yval_old = qBound(0.0, centerMouseLn.y2()/p->squareSize(), 1.0);  
         
-		p->yVal =   yval_old*(p->yRange.x() - p->yRange.y()) + p->yRange.y();
+        p->yVal =   yval_old*(p->yRange.x() - p->yRange.y()) + p->yRange.y();
 
-		emit yValChanged(yVal());
+        emit yValChanged(yVal());
         update();
     }
 
-	if(p->mouseStatus == dragX)
+    if(p->mouseStatus == dragX)
     {
         QLineF globMouseLn = p->lineToPoint(ev->pos());
         QLineF centerMouseLn ( QPointF(0,0),
@@ -292,30 +292,30 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
         centerMouseLn.setP2(centerMouseLn.p2()-p->selectorImageOffset());
 
 
-		qreal xval_old = qBound(0.0, centerMouseLn.x2()/p->squareSize(), 1.0);
+        qreal xval_old = qBound(0.0, centerMouseLn.x2()/p->squareSize(), 1.0);
         p->xVal =   xval_old*(p->xRange.y() - p->xRange.x()) + p->xRange.x();
 
-		emit xValChanged(xVal());
+        emit xValChanged(xVal());
         update();
     }
 }
 
 void Slider2D::mousePressEvent(QMouseEvent *ev)
 {
-	
+    
     if ( ev->buttons() & Qt::LeftButton )
     {
-		qreal side = p->squareSize();
-		QPointF offset = p->selectorImageOffset();
+        qreal side = p->squareSize();
+        QPointF offset = p->selectorImageOffset();
         QLineF ray = p->lineToPoint(ev->pos());
         if ( abs(ray.dx()) <= (p->squareSize()/2)*1.1 && abs(ray.dy()) <= (p->squareSize()/2)*1.1)
-			QLineF ray_ = p->lineToPoint(ev->pos());
-			if (ev->x() > side*1.15)  //((abs(ev->x() - side*0.13 - p->xVal*side)> 0.1*side) && (abs(ev->y() - side*0.13 - p->yVal*side) < 0.06*side)) || 
-				p->mouseStatus = dragY;
-			else if (ev->y() > side*1.12) //(((abs(ev->y() - side*0.2 - p->yVal*side)> 0.1*side) && (abs(ev->x() - side*0.2 - p->xVal*side) < 0.06*side)) || 
-				p->mouseStatus = dragX;
-			else
-				p->mouseStatus = dragSquare;
+            QLineF ray_ = p->lineToPoint(ev->pos());
+            if (ev->x() > side*1.15)  //((abs(ev->x() - side*0.13 - p->xVal*side)> 0.1*side) && (abs(ev->y() - side*0.13 - p->yVal*side) < 0.06*side)) || 
+                p->mouseStatus = dragY;
+            else if (ev->y() > side*1.12) //(((abs(ev->y() - side*0.2 - p->yVal*side)> 0.1*side) && (abs(ev->x() - side*0.2 - p->xVal*side) < 0.06*side)) || 
+                p->mouseStatus = dragX;
+            else
+                p->mouseStatus = dragSquare;
     }
 }
 
@@ -334,16 +334,16 @@ void Slider2D::resizeEvent(QResizeEvent *)
 
 void Slider2D::setX(qreal s)
 {
-	qreal low = p->xRange.x();
-	qreal high = p->xRange.y();
+    qreal low = p->xRange.x();
+    qreal high = p->xRange.y();
     p->xVal = qBound(low, s, high);
     update();
 }
 
 void Slider2D::setY(qreal v)
-{	
-	qreal low = p->yRange.x();
-	qreal high = p->yRange.y();
+{    
+    qreal low = p->yRange.x();
+    qreal high = p->yRange.y();
     p->yVal = qBound(low, v, high);
     update();
 }

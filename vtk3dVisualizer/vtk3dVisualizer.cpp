@@ -57,7 +57,7 @@
 #include "common/apiFunctionsInc.h"
 
 #if PCL_VERSION_COMPARE(>=,1,7,0)
-	#include <vtkRenderWindow.h>
+    #include <vtkRenderWindow.h>
 #endif
 
 Q_DECLARE_METATYPE ( SharedItemPtr )
@@ -113,10 +113,10 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     //pcl::visualization::PCLVisualizer pviz ("PCLVisualizer", false);
     d->PCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualizer", false) );
 
-	/*Eigen::Vector4f v1;
-	Eigen::Quaternion<float,0> q;
-	vtkSmartPointer<vtkMatrix4x4> m;
-	pcl::visualization::PCLVisualizer::convertToVtkMatrix(v1, q, m);*/
+    /*Eigen::Vector4f v1;
+    Eigen::Quaternion<float,0> q;
+    vtkSmartPointer<vtkMatrix4x4> m;
+    pcl::visualization::PCLVisualizer::convertToVtkMatrix(v1, q, m);*/
     d->ui.statusbar->setVisible(false);
 
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
@@ -815,7 +815,7 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color /*= Qt::white*/)
 {
-	ito::RetVal retval;
+    ito::RetVal retval;
 
     QTreeWidgetItem *parent;
     QString name = fullname;
