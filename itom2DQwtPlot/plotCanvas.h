@@ -250,27 +250,27 @@ struct InternalData
         m_xaxisLabelDObj = "";
         m_yaxisLabelDObj = "";
         m_valueLabelDObj = "";
-        m_autoTitle = 1;
-        m_autoxAxisLabel = 1;
-        m_autoyAxisLabel = 1;
-        m_autoValueLabel = 1;
+        m_autoTitle = true;
+        m_autoxAxisLabel = true;
+        m_autoyAxisLabel = true;
+        m_autoValueLabel = true;
 
-        m_valueScaleAuto = 1;
+        m_valueScaleAuto = true;
         m_valueMin = 0;
         m_valueMax = 0;
 
-        m_xaxisScaleAuto = 1;
+        m_xaxisScaleAuto = true;
         m_xaxisMin = 0;
         m_xaxisMax = 0;
-        m_xaxisVisible = 1;
+        m_xaxisVisible = true;
 
-        m_yaxisScaleAuto = 1;
+        m_yaxisScaleAuto = true;
         m_yaxisMin = 0;
         m_yaxisMax = 0;
-        m_yaxisFlipped = 0;
-        m_yaxisVisible = 1;
+        m_yaxisFlipped = false;
+        m_yaxisVisible = true;
 
-        m_colorBarVisible = 0;
+        m_colorBarVisible = false;
         m_cmplxType = Itom2DQwt::Real;
         m_state = PlotCanvas::tIdle;
         m_modState = Itom2DQwt::tMoveGeometricElements;
@@ -284,7 +284,7 @@ struct InternalData
         m_showCenterMarker = false;
         m_alpha = 0;
 
-        m_overlayScaleAuto = 1;
+        m_overlayScaleAuto = true;
         m_overlayMin = 0;
         m_overlayMax = 0;
 
