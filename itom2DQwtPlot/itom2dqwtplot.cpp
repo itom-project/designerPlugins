@@ -1558,19 +1558,24 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
-    if(m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
-    {
-        needChannelUpdate = true;
-        m_lineCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
-        m_lineCutType |= ito::AbstractFigure::tExternChild;
-    }
-
     if (zStack)
     {
         m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
+        if(m_zSliceType & ito::AbstractFigure::tUninitilizedExtern)
+        {
+            needChannelUpdate = true;
+            m_zSliceType &= ~ito::AbstractFigure::tUninitilizedExtern;
+            m_zSliceType |= ito::AbstractFigure::tExternChild;
+        }
     }
     else
     {
+        if(m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
+        {
+            needChannelUpdate = true;
+            m_lineCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
+            m_lineCutType |= ito::AbstractFigure::tExternChild;
+        }
         m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
     }
 
@@ -1642,7 +1647,12 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             if(needChannelUpdate) // we have an updated plot and want to show it
             {
-                if(m_lineCutType & ito::AbstractFigure::tVisibleOnInit)
+                if (zStack && m_zSliceType & ito::AbstractFigure::tVisibleOnInit)
+                {
+                    m_zSliceType &= ~ito::AbstractFigure::tVisibleOnInit;
+                    figure->setVisible(true);
+                }
+                else if(!zStack && m_lineCutType & ito::AbstractFigure::tVisibleOnInit)
                 {
                     m_lineCutType &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
@@ -1651,8 +1661,17 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             }
             else// we do not have a plot so we have to show it and its child of this plot
             {
-                m_lineCutType = ito::AbstractFigure::tOwnChild;
-                figure->show();
+                if (zStack)
+                {
+                    m_zSliceType = ito::AbstractFigure::tOwnChild;
+                    figure->show();
+                }
+                else
+                {
+                    m_lineCutType = ito::AbstractFigure::tOwnChild;
+                    figure->show();
+                }
+
             }
             
             
@@ -2555,6 +2574,50 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
         }
 
         m_lineCutType = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
+    }
+
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+
+ito::ItomPlotHandle Itom2dQwtPlot::getStaticZSliceID() const
+{
+    if(m_pContent && this->m_pContent->m_lineCutUID > 0)
+    {
+        return ito::ItomPlotHandle("ChildLinePlot", "Unknown", this->m_pContent->m_zstackCutUID);
+    }
+    return ito::ItomPlotHandle(NULL, NULL, 0);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setStaticZSliceID(const ito::ItomPlotHandle idx)
+{
+    ito::RetVal retval = ito::retOk;
+    if(!ito::ITOM_API_FUNCS_GRAPH) return;
+    
+    if(m_pContent || idx.getObjectID() > -1)
+    {
+        ito::uint32 thisID = 0;
+        retval += apiGetFigureIDbyHandle(this, thisID);
+
+        if(idx.getObjectID() == thisID || retval.containsError())
+        {
+            return;
+        }
+        else
+        {
+            thisID = idx.getObjectID();
+        }
+
+        QWidget *lineCutObj = NULL;
+        
+
+        this->m_pContent->m_zstackCutUID = thisID;
+        retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_zstackCutUID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
+        if (!lineCutObj && !lineCutObj->inherits("ito::AbstractDObjFigure"))
+        {
+            this->m_pContent->m_zstackCutUID = 0;
+        }
+
+        m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 
 }
