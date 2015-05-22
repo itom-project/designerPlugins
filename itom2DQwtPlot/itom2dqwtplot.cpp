@@ -51,7 +51,6 @@
 void Itom2dQwtPlot::constructor()
 {
     // Basic settings
-    m_hasStaticLinePlot = false;
     m_pContent = NULL;
     m_pActSave = NULL;
     m_pActCopyClipboard = NULL;
@@ -528,7 +527,8 @@ void Itom2dQwtPlot::createActions()
 ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
     //displayed and sourceout is set by dataObjRasterData, since the data is analyzed there
-    if(m_hasStaticLinePlot && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
+    /*
+    if(m_lineCutType & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
     {
         ito::DataObject* tmp = m_pInput["source"]->getVal<ito::DataObject*>();
         int dims = tmp->getDims();
@@ -546,7 +546,7 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
         }
         m_pOutput["bounds"]->setVal<double*>(bounds, 6);
     }
-
+    */
     m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>());
 
     return ito::retOk;
@@ -1562,16 +1562,19 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
+    if(m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
+    {
+        needChannelUpdate = true;
+        m_lineCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
+        m_lineCutType |= ito::AbstractFigure::tExternChild;
+    }
+
     if (zStack)
     {
         m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
     }
     else
     {
-        if(m_hasStaticLinePlot && 2 * bounds.size() != m_pOutput["bounds"]->getLen() && uniqueID == newUniqueID)
-        {
-            needChannelUpdate = true;
-        }
         m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
     }
 
@@ -1625,7 +1628,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             else if(bounds.size() == 3) // its a 3D-Object
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
-                // otherwise simply pass on the displayed plane
+                // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "bounds"  << "sourceout";
@@ -1641,7 +1644,22 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             retval += updateChannels(paramNames);
 
-            if(!needChannelUpdate) figure->show();
+            if(needChannelUpdate) // we have an updated plot and want to show it
+            {
+                if(m_lineCutType & ito::AbstractFigure::tVisibleOnInit)
+                {
+                    m_lineCutType &= ~ito::AbstractFigure::tVisibleOnInit;
+                    figure->setVisible(true);
+                }
+                // Something to do?
+            }
+            else// we do not have a plot so we have to show it and its child of this plot
+            {
+                m_lineCutType = ito::AbstractFigure::tOwnChild;
+                figure->show();
+            }
+            
+            
         }
         else
         {
@@ -2535,24 +2553,12 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
 
         this->m_pContent->m_lineCutUID = thisID;
         retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_lineCutUID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
-        if (lineCutObj && lineCutObj->inherits("ito::AbstractDObjFigure"))
-        {
-
-            ito::AbstractDObjFigure* figure = (ito::AbstractDObjFigure*)lineCutObj;
-            m_childFigures[lineCutObj] = this->m_pContent->m_lineCutUID;
-            connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
-
-            //((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
-            // otherwise simply pass on the displayed plane
-            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-            retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);        
-        }
-        else
+        if (!lineCutObj && !lineCutObj->inherits("ito::AbstractDObjFigure"))
         {
             this->m_pContent->m_lineCutUID = 0;
         }
 
-        m_hasStaticLinePlot = this->m_pContent->m_lineCutUID != 0;
+        m_lineCutType = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 
 }

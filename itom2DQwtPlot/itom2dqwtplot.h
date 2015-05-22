@@ -372,8 +372,6 @@ private:
     ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
     ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
-    bool m_hasStaticLinePlot;
-
 private slots:
     void mnuActSave();
     void mnuActSendCurrentToWorkspace();
