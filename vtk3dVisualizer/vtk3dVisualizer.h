@@ -63,6 +63,28 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://enablePointPick", "if True, a click to any point of the canvas emits the signal pointPicked that emits the currently clicked 3d coordinate and the index of the closest point of the cloud / mesh that has been given as pickPointCloud or pickMesh.")
     Q_CLASSINFO("prop://pointPickSphereRadius", "If > 0, a sphere with the given radius is printed around the center point of the point pick event (if enabled)")
     Q_CLASSINFO("prop://pointPickSphereColor", "Color of the possible sphere of the point pick event (see pointPickShereRadius and enablePointPick)")
+
+    Q_CLASSINFO("slot://registerModel", "see addMesh")
+    Q_CLASSINFO("slot://addMesh", "add the given mesh to the tree with a key name (arguments: mesh, key)")
+    Q_CLASSINFO("slot://addPointCloud", "add the given cloud to the tree with a key name (arguments: cloud, key)")
+    Q_CLASSINFO("slot://addPointCloudNormal", "add the given cloud with normal vectors to the tree with a key name (arguments: cloud, key)")
+    Q_CLASSINFO("slot://updatePointCloud", "updates an existing cloud (arguments: cloud, key, createIfNotExists=false)")
+    Q_CLASSINFO("slot://addCylinder", "add a cylinder (arguments: (center_x, center_y, center_y), (orientation_x, orientation_y, orientation_z), radius, key, color=white)")
+    Q_CLASSINFO("slot://addPyramid", "add pyramid. The 5 corner points are given in a 3x5 data object (arguments: points, key, color=white)")
+    Q_CLASSINFO("slot://addCuboid", "add cube. The 8 corner points are given in a 3x8 data object (arguments: points, key, color=white)")
+    Q_CLASSINFO("slot://addCube", "add cube (arguments: [size_x, size_y, size_z], [t_x, t_y, t_z], [r_x, r_y, r_z], key, color=white)")
+    Q_CLASSINFO("slot://addLines", "add m lines to the canvas. The coordintates are given by a float32 data object [m x 6] where one row is (x0,y0,z0,x1,y1,z1) (arguments: points, key, color=red).")
+    Q_CLASSINFO("slot://addSphere", "add a sphere (arguments: [center_x, center_y, center_z], radius, key, color = red]).")
+    Q_CLASSINFO("slot://addText", "add a 2d text to a specific position (arguments: text, x, y, fontsize, key, color = white)")
+    Q_CLASSINFO("slot://updateText", "updates or creates new 2d text (arguments: text, x, y, fontsize, key, color = white, createIfNotExists = false)")
+    Q_CLASSINFO("slot://deletePointCloud", "delete the cloud with key")
+    Q_CLASSINFO("slot://deleteMesh", "delete the mesh with key")
+    Q_CLASSINFO("slot://deleteGeometry", "delete the geometry with key")
+    Q_CLASSINFO("slot://setGeometryPose", "moves and/or rotates a given geometry (arguments: key, (t_x, t_y, t_z), (r_x, r_y, r_z)")
+    Q_CLASSINFO("slot://setGeometriesPosition", "changes the position of various geometries (arguments: list of keys, list of (pos_x, pos_y, pos_z)")
+    Q_CLASSINFO("slot://setItemProperty", "set the property of an item (arguments: key, property-name, value)")
+    Q_CLASSINFO("slot://setPickPointCloud", "set cloud for pick point event. Nearest point from the position of the cursor (x,y,z) position is searched (arguments: cloud)")
+    Q_CLASSINFO("slot://setPickPointMesh", "set mesh for pick point event. The cloud of the mesh is used only (arguments: mesh)")
     
     DESIGNER_PLUGIN_ITOM_API
 
