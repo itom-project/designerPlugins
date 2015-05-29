@@ -68,6 +68,8 @@ Dialog2DScale::Dialog2DScale(const InternalData &data, QWidget *parent) :
 
     getDataTypeRange(data.m_dataType, min, max);
 
+    ui.groupValue->setEnabled(data.m_dataType != ito::tRGBA32); //rgba32 data objects have no color map and can therefore not be cropped.
+
     ui.doubleSpinMinValue->setMinimum(min);
     ui.doubleSpinMinValue->setMaximum(max);
     ui.doubleSpinMaxValue->setMinimum(min);
@@ -83,8 +85,8 @@ Dialog2DScale::Dialog2DScale(const InternalData &data, QWidget *parent) :
 void Dialog2DScale::getData(InternalData &data)
 {
     data.m_valueScaleAuto = ui.radioAutoCalcValue->isChecked();
-    data.m_valueMin = ui.doubleSpinMinValue->value();
-    data.m_valueMax = ui.doubleSpinMaxValue->value();
+    data.m_valueMin = std::min(ui.doubleSpinMinValue->value(), ui.doubleSpinMaxValue->value());
+    data.m_valueMax = std::max(ui.doubleSpinMinValue->value(), ui.doubleSpinMaxValue->value());
     
     data.m_xaxisScaleAuto = ui.radioAutoCalcX->isChecked();
     data.m_xaxisMin = ui.doubleSpinMinX->value();
@@ -105,6 +107,7 @@ void Dialog2DScale::getDataTypeRange(ito::tDataType type, double &min, double &m
         max = std::numeric_limits<ito::int8>::max();
         break;
     case ito::tUInt8:
+    case ito::tRGBA32:
         min = std::numeric_limits<ito::uint8>::min();
         max = std::numeric_limits<ito::uint8>::max();
         break;
@@ -134,5 +137,7 @@ void Dialog2DScale::getDataTypeRange(ito::tDataType type, double &min, double &m
         min = -std::numeric_limits<ito::float64>::max();
         max = -min;
         break;
+    default:
+        min = max = 0.0;
     }
 }
