@@ -1607,7 +1607,8 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
 
             ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
 
-            if(m_dObjPtr->getDims() > 2)
+            // check for m_dObjPtr first otherwise crash
+            if(m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
@@ -1647,7 +1648,8 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
 
         ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
 
-        if(m_dObjPtr->getDims() > 2)
+        // check for m_dObjPtr first otherwise crash
+        if(m_dObjPtr && m_dObjPtr->getDims() > 2)
         {
             pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
         }
