@@ -960,7 +960,7 @@ bool PlotWidget::setColorMap(QString colormap /*= "__next__"*/)
 
     if (retval.containsError() && retval.errorMessage() != NULL)
     {
-        emit statusBarMessage(QString("%1").arg(retval.errorMessage()), 4000);
+        emit statusBarMessage(QString("%1").arg(QLatin1String(retval.errorMessage())), 4000);
         return false;
     }
     else if (retval.containsError())

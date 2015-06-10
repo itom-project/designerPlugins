@@ -126,6 +126,12 @@ class DataObjectTable : public QTableView
     Q_CLASSINFO("prop://horizontalLabels", "list with labels for each column row");
     Q_CLASSINFO("prop://verticalLabels", "list with labels for each shown row");
 
+    Q_CLASSINFO("signal://activated", "signal emitted if a cell is activated. Arguments are (row,column) of the cell.")
+    Q_CLASSINFO("signal://clicked", "signal emitted if a cell is clicked by the mouse. Arguments are (row,column) of the cell.")
+    Q_CLASSINFO("signal://doubleClicked", "signal emitted if a cell is double clicked by the mouse. Arguments are (row,column) of the cell.")
+    Q_CLASSINFO("signal://entered", "signal emitted if a cell is entered by the mouse cursor. Arguments are (row,column) of the cell. Property 'mouseTracking' needs to be enabled for this feature to work.")
+    Q_CLASSINFO("signal://pressed", "signal emitted if a cell if the mouse is pressed on a cell. Arguments are (row,column) of the cell.")
+
 public:
     DataObjectTable(QWidget *parent = 0);
     ~DataObjectTable();
@@ -165,6 +171,20 @@ protected:
     DataObjectDelegate *m_pDelegate;
 
 private:
+
+private slots:
+    inline void _activated (const QModelIndex &index) { emit activated(index.row(), index.column()); }
+    inline void _clicked (const QModelIndex &index) { emit clicked(index.row(), index.column()); }
+    inline void _doubleClicked (const QModelIndex &index) { emit doubleClicked(index.row(), index.column()); }
+    inline void _entered (const QModelIndex &index) { emit entered(index.row(), index.column()); }
+    inline void _pressed (const QModelIndex &index) { emit pressed(index.row(), index.column()); }
+
+signals:
+    void activated (int row, int column);
+    void clicked (int row, int column);
+    void doubleClicked (int row, int column);
+    void entered (int row, int column);
+    void pressed (int row, int column);
 
 };
 

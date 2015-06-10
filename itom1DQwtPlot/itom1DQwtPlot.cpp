@@ -2568,7 +2568,7 @@ void Itom1DQwtPlot::mnuActSendCurrentToWorkspace()
             msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
             if (retval.errorMessage())
             {
-                msgBox.setInformativeText(retval.errorMessage());
+                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
             }
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.exec();
@@ -2579,7 +2579,7 @@ void Itom1DQwtPlot::mnuActSendCurrentToWorkspace()
             msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
             if (retval.errorMessage())
             {
-                msgBox.setInformativeText(retval.errorMessage());
+                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
             }
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();

@@ -1669,9 +1669,9 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 {
                     m_zSliceType = ito::AbstractFigure::tOwnChild;
                     figure->show();
-        }
-        else
-        {
+                }
+                else
+                {
                     m_lineCutType = ito::AbstractFigure::tOwnChild;
                     figure->show();
                 }
@@ -2541,9 +2541,13 @@ void Itom2dQwtPlot::setTextColor(const QColor newVal)
 
 ito::ItomPlotHandle Itom2dQwtPlot::getStaticLineCutID() const
 {
+    ito::ItomPlotHandle handle(NULL, NULL, 0);
     if(m_pContent && this->m_pContent->m_lineCutUID > 0)
     {
-        return ito::ItomPlotHandle("ChildLinePlot", "Unknown", this->m_pContent->m_lineCutUID);
+        if (apiGetItomPlotHandleByID(m_pContent->m_lineCutUID, handle) == ito::retOk)
+        {
+            return handle;
+    }
     }
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
@@ -2585,10 +2589,14 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
 
 ito::ItomPlotHandle Itom2dQwtPlot::getStaticZSliceID() const
 {
-    if(m_pContent && this->m_pContent->m_lineCutUID > 0)
+    ito::ItomPlotHandle handle(NULL, NULL, 0);
+    if(m_pContent && this->m_pContent->m_zstackCutUID > 0)
     {
-        return ito::ItomPlotHandle("ChildLinePlot", "Unknown", this->m_pContent->m_zstackCutUID);
+        if (apiGetItomPlotHandleByID(m_pContent->m_zstackCutUID, handle) == ito::retOk)
+        {
+            return handle;
         }
+    }
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2858,7 +2866,7 @@ void Itom2dQwtPlot::mnuActSendCurrentToWorkspace()
             msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
             if (retval.errorMessage())
             {
-                msgBox.setInformativeText(retval.errorMessage());
+                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
             }
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.exec();
@@ -2869,7 +2877,7 @@ void Itom2dQwtPlot::mnuActSendCurrentToWorkspace()
             msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
             if (retval.errorMessage())
             {
-                msgBox.setInformativeText(retval.errorMessage());
+                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
             }
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();
