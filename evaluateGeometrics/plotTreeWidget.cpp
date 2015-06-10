@@ -90,7 +90,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 {
     //QLabel** elements = (QLabel**)calloc(5, sizeof(QLabel*));
 
-    ito::uint16 type = (ito::uint16)(((ito::uint32)(val[1])) & ito::tTypeMask);
+    ito::uint16 type = (ito::uint16)(((ito::uint32)(val[1])) & ito::tGeoTypeMask);
 
     QString coordsString("[%1, %2, %3]");
 
@@ -113,42 +113,42 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         switch (type)
         {
             default:
-            case ito::tNoType:
+            case ito::tGeoNoType:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/notype.png"));
                 break;
             }
-            case ito::tPoint:
+            case ito::tGeoPoint:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
                 break;
             }
-            case ito::tLine:
+            case ito::tGeoLine:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
                 break;
             }
-            case ito::tCircle:
+            case ito::tGeoCircle:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/circle.png"));
                 break;
             }
-            case ito::tEllipse:
+            case ito::tGeoEllipse:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
                 break;
             }
-            case ito::tRectangle:
+            case ito::tGeoRectangle:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
                 break;
             }
-            case ito::tSquare:
+            case ito::tGeoSquare:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/square.png"));
                 break;
             }
-            case ito::tPolygon:
+            case ito::tGeoPolygon:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/polygon.png"));
                 break;
@@ -156,13 +156,13 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
     }
 
-    switch (type & ito::tTypeMask)
+    switch (type & ito::tGeoTypeMask)
     {
         default:
-        case ito::tNoType:
+        case ito::tGeoNoType:
             break;
 
-        case ito::tPoint:
+        case ito::tGeoPoint:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -181,7 +181,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
             break;
         }
-        case ito::tLine:
+        case ito::tGeoLine:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -212,7 +212,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
             break;
         }
-        case ito::tCircle:
+        case ito::tGeoCircle:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -239,7 +239,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 
             break;
         }
-        case ito::tEllipse:
+        case ito::tGeoEllipse:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -277,7 +277,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             }
             break;
         }
-        case ito::tRectangle:
+        case ito::tGeoRectangle:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -320,7 +320,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             }
             break;
         }
-        case ito::tSquare:
+        case ito::tGeoSquare:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -357,7 +357,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
             }
             break;
         }
-        case ito::tPolygon:
+        case ito::tGeoPolygon:
         {
             if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
@@ -488,7 +488,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     if (idx2 ==  keys[geo2])
                     {
                         //m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tTypeMask;
+                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tGeoTypeMask;
                     }
                 }
 
@@ -497,7 +497,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     if (idx2 ==  keys[geo2])
                     {
                         //m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tTypeMask;
+                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tGeoTypeMask;
                     }
                 }
 
@@ -731,15 +731,15 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle)
 {
-    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
-    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tTypeMask);
+    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
+    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tGeoTypeMask);
 
-    if (typeOne != ito::tLine)
+    if (typeOne != ito::tGeoLine)
     {
         angle = quietNaN;
         return false;
     }
-    if (typeTwo != ito::tLine)
+    if (typeTwo != ito::tGeoLine)
     {
         angle = quietNaN;
         return false;
@@ -772,12 +772,12 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     cv::Vec3f linePosVector;
     cv::Vec3f pointPosVector;
 
-    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
-    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tTypeMask);
+    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
+    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tGeoTypeMask);
 
     // distance of two points or two circles or combination
-    if ((typeOne == ito::tPoint || typeOne == ito::tCircle || typeOne == ito::tEllipse) &&
-       (typeTwo == ito::tPoint || typeTwo == ito::tCircle || typeOne == ito::tEllipse))
+    if ((typeOne == ito::tGeoPoint || typeOne == ito::tGeoCircle || typeOne == ito::tGeoEllipse) &&
+       (typeTwo == ito::tGeoPoint || typeTwo == ito::tGeoCircle || typeOne == ito::tGeoEllipse))
     {
         if (eval2D)
         {
@@ -793,15 +793,15 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
     }
 
     // distance of line to points or circles
-    if (typeOne == ito::tLine && 
-        typeTwo == ito::tPoint)
+    if (typeOne == ito::tGeoLine && 
+        typeTwo == ito::tGeoPoint)
     {
         lineDirVector = cv::Vec3f(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
         linePosVector = cv::Vec3f(first[2], first[3], first[4]);
         pointPosVector = cv::Vec3f(second[2], second[3], second[4]);
     }
-    else if (typeTwo == ito::tLine && 
-            typeOne == ito::tPoint)
+    else if (typeTwo == ito::tGeoLine && 
+            typeOne == ito::tGeoPoint)
     {
         lineDirVector = cv::Vec3f(second[5] - second[2], second[6] - second[3], second[7] - second[4]);
         linePosVector = cv::Vec3f(second[2], second[3], second[4]);
@@ -836,14 +836,14 @@ bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
 
     switch(type)
     {
-        case ito::tCircle:
+        case ito::tGeoCircle:
             radius = first[5];
             return true;
-        case ito::tEllipse:
+        case ito::tGeoEllipse:
             radius = (first[5] +  first[6])/2;   
             return true;
         default:
@@ -856,7 +856,7 @@ bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length)
 {
-    if (((ito::uint32)(first[1]) & ito::tTypeMask) != ito::tLine)
+    if (((ito::uint32)(first[1]) & ito::tGeoTypeMask) != ito::tGeoLine)
     {
         length = quietNaN;
         return false;
@@ -877,20 +877,20 @@ bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
 
     switch(type)
     {
-        case ito::tRectangle:
+        case ito::tGeoRectangle:
             area = abs((first[5] - first[2]) * (first[6] - first[3]));
             return true;
-        case ito::tSquare:
+        case ito::tGeoSquare:
             area = (first[5] * first[5]);
             return true;
-        case ito::tCircle:
+        case ito::tGeoCircle:
             area = (first[5] * first[5])* GEO_PI;
             return true;
-        case ito::tEllipse:
+        case ito::tGeoEllipse:
             area = (first[5] * first[6])* GEO_PI;
             return true;
         default:
@@ -904,17 +904,17 @@ bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &length)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tTypeMask);
+    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
 
     switch(type)
     {
-        case ito::tRectangle:
+        case ito::tGeoRectangle:
             length = abs(2 * (first[5] - first[2])) + abs (2 * (first[6] - first[3])); 
             return true;
-        case ito::tSquare:
+        case ito::tGeoSquare:
             length = 4 * first[5];
             return true;
-        case ito::tCircle:
+        case ito::tGeoCircle:
             length =  2 * first[5] * GEO_PI;
             return true;
         default:
@@ -929,7 +929,7 @@ bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &l
 bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point)
 {
 
-    if (((ito::uint32)(first[1]) & ito::tTypeMask) != ito::tLine || ((ito::uint32)(second[1]) & ito::tTypeMask) != ito::tLine)
+    if (((ito::uint32)(first[1]) & ito::tGeoTypeMask) != ito::tGeoLine || ((ito::uint32)(second[1]) & ito::tGeoTypeMask) != ito::tGeoLine)
     {
         point[0] = quietNaN;
         point[1] = quietNaN;
@@ -1096,7 +1096,7 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
                         }
                     }
 
-                    if (!found && (((ito::int32)(srcPtr[1]) & ito::tTypeMask)!= 0))
+                    if (!found && (((ito::int32)(srcPtr[1]) & ito::tGeoTypeMask)!= 0))
                     {
                         ito::GeometricPrimitive newVal;
                         std::fill(newVal.cells, newVal.cells + PRIM_ELEMENTLENGTH, 0.0f);
@@ -1293,7 +1293,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
             }
 
-            ito::uint16 type = ((ito::int32)curValue->cells[1]) & ito::tTypeMask;
+            ito::uint16 type = ((ito::int32)curValue->cells[1]) & ito::tGeoTypeMask;
 
             if (m_pData->m_primitivNames.contains(type))
             {
@@ -1301,19 +1301,19 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
             }
             else
             {
-                stream.writeAttribute("name", m_pData->m_primitivNames[ito::tNoType]);
+                stream.writeAttribute("name", m_pData->m_primitivNames[ito::tGeoNoType]);
             }
 
             switch(type)
             {
-                case ito::tPoint:
+                case ito::tGeoPoint:
                 {                    
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
                     stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
                 }
                 break;
-                case ito::tLine:
+                case ito::tGeoLine:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1323,7 +1323,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                     stream.writeAttribute("z1", QString::number((ito::float32)curValue->cells[7]));
                 }
                 break;
-                case ito::tEllipse:
+                case ito::tGeoEllipse:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1334,7 +1334,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::tCircle:
+                case ito::tGeoCircle:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1343,7 +1343,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::tRectangle:
+                case ito::tGeoRectangle:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1355,7 +1355,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::tSquare:
+                case ito::tGeoSquare:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
@@ -1365,7 +1365,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 }
                 break;
 
-                case ito::tPolygon:
+                case ito::tGeoPolygon:
                 {
                     stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
                     stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));

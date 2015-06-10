@@ -1814,8 +1814,8 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
             {
                 QPainterPath path;
                 DrawItem *newItem = NULL;                
-                unsigned short type = ((int)types[i]) & ito::tTypeMask;
-                unsigned char flags = (((int)types[i]) & ito::tFlagMask) >> 16;
+                unsigned short type = ((int)types[i]) & ito::tGeoTypeMask;
+                unsigned char flags = (((int)types[i]) & ito::tGeoFlagMask) >> 16;
                 switch (type)
                 {
                     case tPoint:
@@ -2271,8 +2271,8 @@ void PlotCanvas::multiPointActivated (bool on)
                     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
                     if (p)
                     {
-                        emit p->userInteractionDone(ito::tPoint, aborted, polygonScale);
-                        emit p->plotItemsFinished(ito::tPoint, aborted);
+                        emit p->userInteractionDone(ito::tGeoPoint, aborted, polygonScale);
+                        emit p->plotItemsFinished(ito::tGeoPoint, aborted);
                     }
 
                     setState(tIdle);
@@ -2343,15 +2343,15 @@ void PlotCanvas::multiPointActivated (bool on)
                             for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
                             {
                                 if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                                destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tLine));
+                                destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tGeoLine));
                                 destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
                                 destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
                                 destPolygon.append(QPointF(0.0, 0.0));
                             }
                             m_drawedIemsIndexes.clear();
 
-                            emit p->userInteractionDone(ito::tLine, aborted, destPolygon);
-                            emit p->plotItemsFinished(ito::tLine, aborted);
+                            emit p->userInteractionDone(ito::tGeoLine, aborted, destPolygon);
+                            emit p->plotItemsFinished(ito::tGeoLine, aborted);
                         }
                         setState(tIdle);
                         m_pMultiPointPicker->setEnabled(false);
@@ -2421,15 +2421,15 @@ void PlotCanvas::multiPointActivated (bool on)
                             for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
                             {
                                 if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                                destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tRectangle));
+                                destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tGeoRectangle));
                                 destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
                                 destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
                                 destPolygon.append(QPointF(0.0, 0.0));
                             }
                             m_drawedIemsIndexes.clear();
 
-                            emit p->userInteractionDone(ito::tRectangle, aborted, destPolygon);
-                            emit p->plotItemsFinished(ito::tRectangle, aborted);
+                            emit p->userInteractionDone(ito::tGeoRectangle, aborted, destPolygon);
+                            emit p->plotItemsFinished(ito::tGeoRectangle, aborted);
                         }
                         setState(tIdle);
                         m_pMultiPointPicker->setEnabled(false);
@@ -2499,15 +2499,15 @@ void PlotCanvas::multiPointActivated (bool on)
                             for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
                             {
                                 if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-                                destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tEllipse));
+                                destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tGeoEllipse));
                                 destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
                                 destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
                                 destPolygon.append(QPointF(0.0, 0.0));
                             }
                             m_drawedIemsIndexes.clear();
 
-                            emit p->userInteractionDone(ito::tEllipse, aborted, destPolygon);
-                            emit p->plotItemsFinished(ito::tEllipse, aborted);
+                            emit p->userInteractionDone(ito::tGeoEllipse, aborted, destPolygon);
+                            emit p->plotItemsFinished(ito::tGeoEllipse, aborted);
                         }
                         setState(tIdle);
                         m_pMultiPointPicker->setEnabled(false);
@@ -3092,14 +3092,14 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                 switch(it.value()->m_type)
                 {
                     case tPoint:
-                        type = ito::tPoint;
+                        type = ito::tGeoPoint;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
                     break;
 
                     case tLine:
-                        type = ito::tLine;
+                        type = ito::tGeoLine;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
@@ -3111,7 +3111,7 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                     // square is a rect
 //                    case tSquare:
                     case tRect:
-                        type = ito::tRectangle;
+                        type = ito::tGeoRectangle;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
@@ -3123,7 +3123,7 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                     // circle is an ellispe
 //                    case tCircle:
                     case tEllipse:
-                        type = ito::tEllipse;
+                        type = ito::tGeoEllipse;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
@@ -3134,7 +3134,7 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
 
 /*
                     case tCircle:
-                        type = ito::tCircle;
+                        type = ito::tGeoCircle;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
@@ -3144,7 +3144,7 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
 */
 /*
                     case tSquare:
-                        type = ito::tSquare;
+                        type = ito::tGeoSquare;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);

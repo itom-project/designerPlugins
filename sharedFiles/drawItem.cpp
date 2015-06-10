@@ -69,7 +69,7 @@ void DrawItem::setSelected(const bool selected)
 {
     m_selected = selected;
 
-    if(m_type == ito::tPoint && m_marker.size() > 0)
+    if(m_type == ito::tGeoPoint && m_marker.size() > 0)
     {
         QColor markerColor = m_marker[0]->linePen().color();
         m_marker[0]->setSymbol(new QwtSymbol(selected ? QwtSymbol::Rect : QwtSymbol::Triangle, QBrush(markerColor),
@@ -96,7 +96,7 @@ void DrawItem::setActive(int active)
     QColor markerColor = Qt::green;
     if(m_marker.size()) markerColor = m_marker[0]->linePen().color();
 
-    if(m_type == ito::tPoint)
+    if(m_type == ito::tGeoPoint)
     {
         for (int n = 0; n < m_marker.size(); n++)
         {
@@ -130,7 +130,7 @@ void DrawItem::setActive(int active)
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
 {
-    if(m_type == ito::tPoint)
+    if(m_type == ito::tGeoPoint)
     {
         for (int n = 0; n < m_marker.size(); n++)
         {
@@ -181,7 +181,7 @@ void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, cons
         marker = new QwtPlotMarker();
 
 
-        if(m_type == ito::tPoint)
+        if(m_type == ito::tGeoPoint)
         {
             marker->setLinePen(QPen(secondColor));
             marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle,QBrush(secondColor),
@@ -210,15 +210,15 @@ void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, cons
         switch (m_type)
         {
             default:
-            case ito::tPoint:
-            case ito::tLine:
-            case ito::tRectangle:
+            case ito::tGeoPoint:
+            case ito::tGeoLine:
+            case ito::tGeoRectangle:
                 el = path.elementAt(0);
                 x1 = el.x;
                 y1 = el.y;
             break;
 
-            case ito::tEllipse:
+            case ito::tGeoEllipse:
                 //if (path.length() >= 7) // len gives the physical length, not the number of elements!!!
                 if (numOfElements >= 7)
                 {
@@ -255,13 +255,13 @@ void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, cons
         switch (m_type)
         {
             default:
-            case ito::tLine:
+            case ito::tGeoLine:
                 el = path.elementAt(1);
                 x2 = el.x;
                 y2 = el.y;
             break;
 
-            case ito::tRectangle:
+            case ito::tGeoRectangle:
                 //if (path.length() >= 3) // len gives the physical length, not the number of elements!!!
                 if (numOfElements >= 3)
                 {
@@ -271,7 +271,7 @@ void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, cons
                 }
             break;
 
-            case ito::tEllipse:
+            case ito::tGeoEllipse:
                 el = path.elementAt(0);
                 x2 = el.x;
                 //if (path.length() >= 4) // len gives the physical length, not the number of elements!!!

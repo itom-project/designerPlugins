@@ -1733,13 +1733,13 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
         switch (it.value()->m_type)
         {
             case Plot1DWidget::tPoint:
-                rowPtr[1] = (ito::float32) ito::tPoint;
+                rowPtr[1] = (ito::float32) ito::tGeoPoint;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
             break;
 
             case Plot1DWidget::tLine:
-                rowPtr[1] = (ito::float32) ito::tLine;
+                rowPtr[1] = (ito::float32) ito::tGeoLine;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
                 rowPtr[5] = (ito::float32) (it.value()->x2);
@@ -1747,7 +1747,7 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case Plot1DWidget::tRect:
-                rowPtr[1] = (ito::float32) ito::tRectangle;
+                rowPtr[1] = (ito::float32) ito::tGeoRectangle;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
                 rowPtr[5] = (ito::float32) (it.value()->x2);
@@ -1755,7 +1755,7 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 
             case Plot1DWidget::tEllipse:
-                rowPtr[1] = (ito::float32) ito::tEllipse;
+                rowPtr[1] = (ito::float32) ito::tGeoEllipse;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
                 rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 2.0);
@@ -1763,14 +1763,14 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
             break;
 /*
             case Plot1DWidget::tCircle:
-                rowPtr[1] = (ito::float32) ito::tCircle;
+                rowPtr[1] = (ito::float32) ito::tGeoCircle;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
                 rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
             break;
 
             case Plot1DWidget::tSquare:
-                rowPtr[1] = (ito::float32) ito::tSquare;
+                rowPtr[1] = (ito::float32) ito::tGeoSquare;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
                 rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
@@ -1863,7 +1863,7 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 
         switch (type)
         {
-            case ito::tPoint:
+            case ito::tGeoPoint:
             {     
                 if(type == ito::tFloat64) // idx, type, x0, y0, z0
                 {
@@ -1881,7 +1881,7 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
             }
             break;
 
-            case ito::tLine:
+            case ito::tGeoLine:
             {
                 if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
                 {
@@ -1903,7 +1903,7 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
             }
             break;
 
-            case ito::tRectangle:
+            case ito::tGeoRectangle:
             {
 
                 if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
@@ -1926,9 +1926,9 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
             }
             break;
 
-            case ito::tSquare:
+            case ito::tGeoSquare:
             {
-                types[geoElement] = (ito::float32) ito::tRectangle;
+                types[geoElement] = (ito::float32) ito::tGeoRectangle;
 
                 ito::float32 xC, yC, a;
 
@@ -1955,7 +1955,7 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
             }
             break;
 
-            case ito::tEllipse:
+            case ito::tGeoEllipse:
             {
                 ito::float32 xC, yC, r1, r2;
 
@@ -1984,9 +1984,9 @@ void Itom1DQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
             }
             break;
 
-            case ito::tCircle:
+            case ito::tGeoCircle:
             {
-                types[geoElement] = (ito::float32) ito::tEllipse;
+                types[geoElement] = (ito::float32) ito::tGeoEllipse;
                 ito::float32 xC, yC, r;
 
                 if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a

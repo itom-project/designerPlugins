@@ -102,13 +102,13 @@ struct InternalInfo
 
         m_primitivNames.clear();
         m_primitivNames.insert(0, "none");
-        m_primitivNames.insert(ito::tPoint, QObject::tr("point"));
-        m_primitivNames.insert(ito::tLine, QObject::tr("line"));
-        m_primitivNames.insert(ito::tEllipse, QObject::tr("ellipse"));
-        m_primitivNames.insert(ito::tCircle, QObject::tr("circle"));
-        m_primitivNames.insert(ito::tRectangle, QObject::tr("rectangle"));
-        m_primitivNames.insert(ito::tSquare, QObject::tr("square"));
-        m_primitivNames.insert(ito::tPolygon, QObject::tr("polygon"));
+        m_primitivNames.insert(ito::tGeoPoint, QObject::tr("point"));
+        m_primitivNames.insert(ito::tGeoLine, QObject::tr("line"));
+        m_primitivNames.insert(ito::tGeoEllipse, QObject::tr("ellipse"));
+        m_primitivNames.insert(ito::tGeoCircle, QObject::tr("circle"));
+        m_primitivNames.insert(ito::tGeoRectangle, QObject::tr("rectangle"));
+        m_primitivNames.insert(ito::tGeoSquare, QObject::tr("square"));
+        m_primitivNames.insert(ito::tGeoPolygon, QObject::tr("polygon"));
 
         static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};
 

@@ -28,6 +28,8 @@
 #include "common/apiFunctionsGraphInc.h"
 #include "qnumeric.h"
 
+#include "MarkerLegend/markerLegendWidget.h"
+
 #include "common/sharedStructuresPrimitives.h"
 #include "../sharedFiles/multiPointPickerMachine.h"
 #include "../sharedFiles/itomLogLogScaleEngine.h"
@@ -1159,6 +1161,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                     it->item->detach();
                     delete it->item;
                     it = m_pickers.erase(it);
+                    ((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->removePickers();
                 }
                 else
                 {
@@ -1618,14 +1621,14 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
                 switch(it.value()->m_type)
                 {
                     case tPoint:
-                        type = ito::tPoint;
+                        type = ito::tGeoPoint;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
                     break;
 
                     case tLine:
-                        type = ito::tLine;
+                        type = ito::tGeoLine;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
@@ -1637,7 +1640,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
                     // square is a rect
 //                    case tSquare:
                     case tRect:
-                        type = ito::tRectangle;
+                        type = ito::tGeoRectangle;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
@@ -1649,7 +1652,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
                     // circle is an ellispe
 //                    case tCircle:
                     case tEllipse:
-                        type = ito::tEllipse;
+                        type = ito::tGeoEllipse;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
@@ -1660,7 +1663,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 
 /*
                     case tCircle:
-                        type = ito::tCircle;
+                        type = ito::tGeoCircle;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
@@ -1670,7 +1673,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 */
 /*
                     case tSquare:
-                        type = ito::tSquare;
+                        type = ito::tGeoSquare;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
                         values.append(0.0);
@@ -2157,12 +2160,17 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             delete m.item;
         }
         m_pickers.clear();
+        ((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->removePickers();
     }
 
     QColor colors[3] = { Qt::red, Qt::darkGreen, Qt::darkGray };
     int cur = 0;
     Picker *m;
-    QVector<QPointF> points;
+    QVector<QVector3D> points;
+    points.reserve(m_pickers.size());
+
+    QVector< int > idcs;
+    idcs.reserve(m_pickers.size());
 
     for (int i = 0 ; i < m_pickers.size() ; i++)
     {
@@ -2182,19 +2190,23 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
         }
 
         if (cur < 2) cur++;
-        points << QPointF(m_pickers[i].item->xValue(), m_pickers[i].item->yValue());       
+        points << QVector3D(m_pickers[i].item->xValue(), m_pickers[i].item->yValue(), 0.0);    
+        idcs << i;
     }
 
     QString coords, offsets;
     if (points.size() > 1)
     {
-        coords = QString("[%1; %2]\n [%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4 ).arg(points[1].rx(),0,'g',4 ).arg(points[1].ry(),0,'g',4 );
-        offsets = QString("dx = %1\n dy = %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
+        coords = QString("[%1; %2]\n [%3; %4]").arg(points[0].x(),0,'g',4).arg(points[0].y(),0,'g',4 ).arg(points[1].x(),0,'g',4 ).arg(points[1].y(),0,'g',4 );
+        offsets = QString("dx = %1\n dy = %2").arg(points[1].x() - points[0].x(),0,'g',4).arg(points[1].y() - points[0].y(), 0, 'g', 4);
+        ((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->updatePickers(idcs, points);
     }
     else if (points.size() == 1)
     {
-        coords = QString("[%1; %2]\n      ").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4 );
+        coords = QString("[%1; %2]\n      ").arg(points[0].x(),0,'g',4).arg(points[0].y(),0,'g',4 );
+        ((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->updatePickers(idcs, points);
     }
+
 
     emit setPickerText(coords,offsets);
 }
@@ -2576,8 +2588,8 @@ void Plot1DWidget::multiPointActivated (bool on)
 					if (p)
 					{
 
-						emit p->userInteractionDone(ito::tPoint, aborted, polygonScale);
-						emit p->plotItemsFinished(ito::tPoint, aborted);
+						emit p->userInteractionDone(ito::tGeoPoint, aborted, polygonScale);
+						emit p->plotItemsFinished(ito::tGeoPoint, aborted);
 					}
 
 					setState(stateIdle);
@@ -2648,14 +2660,14 @@ void Plot1DWidget::multiPointActivated (bool on)
 							for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
 							{
 								if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tLine));
+								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tGeoLine));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
 								destPolygon.append(QPointF(0.0, 0.0));
 							}
 							m_drawedIemsIndexes.clear();
-							emit p->userInteractionDone(ito::tLine, aborted, destPolygon);
-							emit p->plotItemsFinished(ito::tLine, aborted);
+							emit p->userInteractionDone(ito::tGeoLine, aborted, destPolygon);
+							emit p->plotItemsFinished(ito::tGeoLine, aborted);
 
 							
 						}
@@ -2728,15 +2740,15 @@ void Plot1DWidget::multiPointActivated (bool on)
 							for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
 							{
 								if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tRectangle));
+								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tGeoRectangle));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
 								destPolygon.append(QPointF(0.0, 0.0));
 							}
 							m_drawedIemsIndexes.clear();
 
-							emit p->userInteractionDone(ito::tRectangle, aborted, destPolygon);
-							emit p->plotItemsFinished(ito::tRectangle, aborted);
+							emit p->userInteractionDone(ito::tGeoRectangle, aborted, destPolygon);
+							emit p->plotItemsFinished(ito::tGeoRectangle, aborted);
 						}
 						setState(stateIdle);
 						m_pMultiPointPicker->setEnabled(false);
@@ -2814,15 +2826,15 @@ void Plot1DWidget::multiPointActivated (bool on)
 							for (int i = 0; i < m_drawedIemsIndexes.size(); i++)
 							{
 								if (!m_pData->m_pDrawItems.contains(m_drawedIemsIndexes[i])) continue;
-								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tEllipse));
+								destPolygon.append(QPointF(m_drawedIemsIndexes[i], ito::tGeoEllipse));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x1, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y1));
 								destPolygon.append(QPointF(m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->x2, m_pData->m_pDrawItems[m_drawedIemsIndexes[i]]->y2));
 								destPolygon.append(QPointF(0.0, 0.0));
 							}
 							m_drawedIemsIndexes.clear();
 
-							emit p->userInteractionDone(ito::tEllipse, aborted, destPolygon);
-							emit p->plotItemsFinished(ito::tEllipse, aborted);
+							emit p->userInteractionDone(ito::tGeoEllipse, aborted, destPolygon);
+							emit p->plotItemsFinished(ito::tGeoEllipse, aborted);
 						}
 						setState(stateIdle);
 						m_pMultiPointPicker->setEnabled(false);
