@@ -632,6 +632,12 @@ DataObjectTable::DataObjectTable(QWidget *parent /*= 0*/)
     setItemDelegate(m_pDelegate);
 
     setEditTriggers(QAbstractItemView::AnyKeyPressed | QAbstractItemView::DoubleClicked);
+
+    connect(this, SIGNAL(activated(QModelIndex)), this, SLOT(_activated(QModelIndex)));
+    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(_clicked(QModelIndex)));
+    connect(this, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(_doubleClicked(QModelIndex)));
+    connect(this, SIGNAL(entered(QModelIndex)), this, SLOT(_entered(QModelIndex)));
+    connect(this, SIGNAL(pressed(QModelIndex)), this, SLOT(_pressed(QModelIndex)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

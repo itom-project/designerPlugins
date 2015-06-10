@@ -576,7 +576,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 
     if (retval.containsError() && retval.errorMessage() != NULL)
     {
-        emit statusBarMessage(QString("%1").arg(retval.errorMessage()), 4000);
+        emit statusBarMessage(QString("%1").arg(QLatin1String(retval.errorMessage())), 4000);
         return false;
     }
     else if (retval.containsError())
@@ -739,7 +739,7 @@ bool PlotCanvas::setOverlayColorMap(QString colormap /*= "__next__"*/)
 
     if (retval.containsError() && retval.errorMessage() != NULL)
     {
-        emit statusBarMessage(QString("%1").arg(retval.errorMessage()), 4000);
+        emit statusBarMessage(QString("%1").arg(QLatin1String(retval.errorMessage())), 4000);
         return false;
     }
     else if (retval.containsError())
@@ -1622,6 +1622,7 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
 
             ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
 
+            // check for m_dObjPtr first otherwise crash
             if(m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
@@ -1662,7 +1663,8 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
 
         ((Itom2dQwtPlot*)parent())->setCoordinates(pts, true);
 
-        if(m_dObjPtr->getDims() > 2)
+        // check for m_dObjPtr first otherwise crash
+        if(m_dObjPtr && m_dObjPtr->getDims() > 2)
         {
             pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
         }
