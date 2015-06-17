@@ -1157,7 +1157,16 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
-            m_pZoomer->appendZoomStack(zoom);
+            
+            if (zoom == m_pZoomer->zoomRect())
+            {
+                m_pZoomer->zoom(zoom);
+                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+            }
+            else
+            {
+                m_pZoomer->appendZoomStack(zoom);
+            }
 
         }
     }
