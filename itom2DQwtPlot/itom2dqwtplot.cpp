@@ -2534,8 +2534,7 @@ void Itom2dQwtPlot::setTextColor(const QColor newVal)
     updatePropertyDock();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-
-ito::ItomPlotHandle Itom2dQwtPlot::getStaticLineCutID() const
+ito::ItomPlotHandle Itom2dQwtPlot::getLineCutPlotItem() const
 {
     ito::ItomPlotHandle handle(NULL, NULL, 0);
     if(m_pContent && this->m_pContent->m_lineCutUID > 0)
@@ -2548,7 +2547,7 @@ ito::ItomPlotHandle Itom2dQwtPlot::getStaticLineCutID() const
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
+void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle idx)
 {
     ito::RetVal retval = ito::retOk;
     if(!ito::ITOM_API_FUNCS_GRAPH) return;
@@ -2571,10 +2570,18 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
         
 
         this->m_pContent->m_lineCutUID = thisID;
-        retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_lineCutUID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
-        if (!lineCutObj && !lineCutObj->inherits("ito::AbstractDObjFigure"))
+        retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_lineCutUID, &lineCutObj, this);
+        if (lineCutObj == NULL || (!lineCutObj->inherits("ito::AbstractDObjFigure")))
         {
-            this->m_pContent->m_lineCutUID = 0;
+            m_pContent->m_lineCutUID = 0;
+        }
+        else
+        {
+            ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj);
+            if (af->getInputParam("bounds") == NULL || af->getInputParam("source") == NULL)
+            {
+                m_pContent->m_lineCutUID = 0;
+            }
         }
 
         m_lineCutType = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
@@ -2583,7 +2590,7 @@ void Itom2dQwtPlot::setStaticLineCutID(const ito::ItomPlotHandle idx)
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 
-ito::ItomPlotHandle Itom2dQwtPlot::getStaticZSliceID() const
+ito::ItomPlotHandle Itom2dQwtPlot::getZSlicePlotItem() const
 {
     ito::ItomPlotHandle handle(NULL, NULL, 0);
     if(m_pContent && this->m_pContent->m_zstackCutUID > 0)
@@ -2596,7 +2603,7 @@ ito::ItomPlotHandle Itom2dQwtPlot::getStaticZSliceID() const
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setStaticZSliceID(const ito::ItomPlotHandle idx)
+void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
 {
     ito::RetVal retval = ito::retOk;
     if(!ito::ITOM_API_FUNCS_GRAPH) return;
@@ -2617,12 +2624,19 @@ void Itom2dQwtPlot::setStaticZSliceID(const ito::ItomPlotHandle idx)
 
         QWidget *lineCutObj = NULL;
         
-
         this->m_pContent->m_zstackCutUID = thisID;
         retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_zstackCutUID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
-        if (!lineCutObj && !lineCutObj->inherits("ito::AbstractDObjFigure"))
+        if (lineCutObj == NULL || (!lineCutObj->inherits("ito::AbstractDObjFigure")))
         {
-            this->m_pContent->m_zstackCutUID = 0;
+            m_pContent->m_zstackCutUID = 0;
+        }
+        else
+        {
+            ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj);
+            if (af->getInputParam("bounds") == NULL || af->getInputParam("source") == NULL)
+            {
+                m_pContent->m_lineCutUID = 0;
+            }
         }
 
         m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
