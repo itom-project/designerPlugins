@@ -1077,7 +1077,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
     if(m_pContentDObj && xsizeObj && ysizeObj)
     {
         m_pContentWhileRastering = m_pContentDObj;
-        m_pContentWhileRastering->lockRead();
     }
 #ifdef USEPCL
     else if (m_pContentPC == NULL && m_pContentPM == NULL)
@@ -1147,7 +1146,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
         }
         break;
         default:
-            m_pContentWhileRastering->unlock();
             return ito::RetVal(ito::retError, 0, "Unknown DataObject-Type, calc triangles failed");
     }
 
@@ -1402,7 +1400,6 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
         m_isInit &= ~IS_CALCTRIANG;
     }
 
-    m_pContentWhileRastering->unlock();
     m_pContentWhileRastering.clear();
 
 CLEAREXIT:
@@ -1543,7 +1540,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         if( dims > 1)
         {
             m_pContentDObj = QSharedPointer<ito::DataObject>(new ito::DataObject(*dataObj));
-            m_pContentDObj->lockRead();
 
             if(dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
             {
@@ -1799,8 +1795,6 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
             m_windowXScale /= fabs(m_axisX.idx[1] - m_axisX.idx[0] + 1.0) * Sqrt2Div2;
             m_windowYScale /= fabs(m_axisY.idx[1] - m_axisY.idx[0] + 1.0) * Sqrt2Div2;
-
-            m_pContentDObj->unlock();
 
             if( m_NumElements == 0 || m_forceReplot == true)
             {
