@@ -26,6 +26,7 @@
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
 #include "common/sharedStructuresPrimitives.h"
+#include "plot/AbstractFigure.h"
 
 #include <qwidget.h>
 #include <qstring.h>
@@ -196,6 +197,8 @@ class Plot1DWidget : public QwtPlot
         qreal m_lineWidth;
         Qt::PenStyle m_lineStyle;
         int m_linePlotID;
+
+        ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
 
         int m_Curser[2];
         int m_actPickerIdx;

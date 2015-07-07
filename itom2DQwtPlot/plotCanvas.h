@@ -26,6 +26,7 @@
 #include "common/sharedStructures.h"
 #include "common/sharedStructuresPrimitives.h"
 #include "common/interval.h"
+#include "plot/AbstractFigure.h"
 
 #include "DataObject/dataobj.h"
 
@@ -190,6 +191,9 @@ class PlotCanvas : public QwtPlot
 
         int m_curColorMapIndex;
         int m_curOverlayColorMapIndex;
+
+        ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
+        bool m_unitLabelChanged;
 
         DataObjItem *m_dObjItem;
         DataObjItem *m_dOverlayItem;

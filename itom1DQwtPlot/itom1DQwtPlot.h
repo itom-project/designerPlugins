@@ -106,6 +106,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(Itom1DQwt::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
     Q_PROPERTY(Itom1DQwt::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
 
+    Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
 
     Q_ENUMS(LegendPos);
     Q_ENUMS(tSymbol);
@@ -158,6 +159,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://valueScale", "linear or logarithmic scale (various bases) can be chosen for the vertical axis (y-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
+
+    Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
 
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
     //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
@@ -251,6 +254,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         QStringList getLegendTitles() const;
         void setLegendTitles(const QStringList &legends);
+
+        ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
+        void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
 
         void setSource(QSharedPointer<ito::DataObject> source);
     

@@ -2464,6 +2464,32 @@ void Itom2dQwtPlot::resetOverlayImage(void)
 {
     if(m_pContent) m_pContent->setOverlayObject(NULL);
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::AbstractFigure::UnitLabelStyle Itom2dQwtPlot::getUnitLabelStyle() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_unitLabelStyle;
+    }
+    else
+    {
+        return AbstractFigure::UnitLabelSlash;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style)
+{
+    if (m_pContent)
+    {
+        m_pContent->m_unitLabelStyle = style;
+        m_pContent->m_unitLabelChanged = true;
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>());
+    }
+    updatePropertyDock();
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom2dQwtPlot::getBackgroundColor(void) const
 {

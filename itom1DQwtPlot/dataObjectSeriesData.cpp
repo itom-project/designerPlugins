@@ -2650,34 +2650,66 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
 }
 
 //----------------------------------------------------------------------------------------------
-QString DataObjectSeriesData::getDObjValueLabel() const
+QString DataObjectSeriesData::getDObjValueLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle) const
 {
     if (m_dObjValueUnit != "")
     {
         if (m_dObjValueDescription != "")
         {
-            return QString("%1 [%2]").arg(m_dObjValueDescription, m_dObjValueUnit);
+            switch (unitLabelStyle)
+            {
+                case AbstractFigure::UnitLabelSlash:
+                    return QString("%1 / %2").arg(m_dObjValueDescription, m_dObjValueUnit);
+                case AbstractFigure::UnitLabelKeywordIn:
+                    return QString("%1 in %2").arg(m_dObjValueDescription, m_dObjValueUnit);
+                case AbstractFigure::UnitLabelSquareBrackets:
+                    return QString("%1 [%2]").arg(m_dObjValueDescription, m_dObjValueUnit);
+            }
         }
         else
         {
-            return QString("[%1]").arg(m_dObjValueUnit);
+            switch (unitLabelStyle)
+            {
+                case AbstractFigure::UnitLabelSlash:
+                    return QString("%1").arg(m_dObjValueUnit); //is this right?
+                case AbstractFigure::UnitLabelKeywordIn:
+                    return QString("%1").arg(m_dObjValueUnit); //is this right?
+                case AbstractFigure::UnitLabelSquareBrackets:
+                    return QString("[%1]").arg(m_dObjValueUnit);
+            }
         }
     }
     return m_dObjValueDescription;
 }
 
 //----------------------------------------------------------------------------------------------
-QString DataObjectSeriesData::getDObjAxisLabel()  const
+QString DataObjectSeriesData::getDObjAxisLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle)  const
 {
     if (m_dObjAxisUnit != "")
     {
         if (m_dObjAxisDescription != "")
         {
-            return QString("%1 [%2]").arg(m_dObjAxisDescription, m_dObjAxisUnit);
+            switch (unitLabelStyle)
+            {
+                case AbstractFigure::UnitLabelSlash:
+                    return QString("%1 / %2").arg(m_dObjAxisDescription, m_dObjAxisUnit);
+                case AbstractFigure::UnitLabelKeywordIn:
+                    return QString("%1 in %2").arg(m_dObjAxisDescription, m_dObjAxisUnit);
+                case AbstractFigure::UnitLabelSquareBrackets:
+                    return QString("%1 [%2]").arg(m_dObjAxisDescription, m_dObjAxisUnit);
+            }
         }
         else
         {
-            return QString("[%1]").arg(m_dObjAxisUnit);
+            switch (unitLabelStyle)
+            {
+                case AbstractFigure::UnitLabelSlash:
+                    return QString("%1").arg(m_dObjAxisUnit); //is this right?
+                case AbstractFigure::UnitLabelKeywordIn:
+                    return QString("%1").arg(m_dObjAxisUnit); //is this right?
+                case AbstractFigure::UnitLabelSquareBrackets:
+                    return QString("[%1]").arg(m_dObjAxisUnit);
+            }
         }
     }
     return m_dObjAxisDescription;

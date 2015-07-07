@@ -99,6 +99,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false USER true)
     Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false USER true)
 
+    Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
+
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -137,6 +139,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode (move, resize, rotate).")
     Q_CLASSINFO("prop://lineCutPlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for lateral slicing.")
     Q_CLASSINFO("prop://zSlicePlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for z slicing.")
+
+    Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
 
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
@@ -267,6 +271,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     {
         setOverlayAlpha(0);
     }
+
+    ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
+    void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
 
     QSharedPointer< ito::DataObject > getOverlayImage() const;
     void setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj);

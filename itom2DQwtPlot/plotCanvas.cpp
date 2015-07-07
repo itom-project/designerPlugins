@@ -77,8 +77,8 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
         m_ignoreNextMouseEvent(false),
         m_contextMenu(contextMenu),
         m_isRefreshingPlot(false),
-        m_firstTimeVisible(false)
-        
+        m_firstTimeVisible(false),
+        m_unitLabelChanged(false)
 {
     setMouseTracking(false);
 
@@ -286,6 +286,8 @@ void PlotCanvas::refreshStyles()
     QSize centerMarkerSize = QSize(10, 10);
     QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);
 
+    m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
+
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
         rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red), 1, Qt::DashLine),NULL).value<QPen>();
@@ -301,6 +303,8 @@ void PlotCanvas::refreshStyles()
 
         centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", QSize(10, 10), NULL).value<QSize>();
         centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", QPen(QBrush(Qt::red), 1), NULL).value<QPen>();
+
+        m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
     }
 
 
@@ -404,8 +408,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
         updateState = m_rasterData->updateDataObject(dObj, plane);
 
-        if (updateState & changeData)
+        if (updateState & changeData || m_unitLabelChanged)
         {
+            m_unitLabelChanged = false;
             bool valid;
             ito::DataObjectTagType tag;
             std::string descr, unit;
@@ -418,7 +423,19 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
             if (unit != "")
             {
-                descr.append(" [" + unit + "]");
+                switch (m_unitLabelStyle)
+                {
+                    case ito::AbstractFigure::UnitLabelSlash:
+                        descr.append(descr != "" ? " / " + unit : unit);
+                        break;
+                    case ito::AbstractFigure::UnitLabelKeywordIn:
+                        descr.append(descr != "" ? " in " + unit : unit);
+                        break;
+                    case ito::AbstractFigure::UnitLabelSquareBrackets:
+                        descr.append(" [" + unit + "]");
+                        break;
+                }
+                
             }
             m_pData->m_valueLabelDObj = QString::fromLatin1(descr.data());
 
@@ -431,8 +448,20 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
                 if (unit != "")
                 {
-                    descr.append(" [" + unit + "]");
+                    switch (m_unitLabelStyle)
+                    {
+                        case ito::AbstractFigure::UnitLabelSlash:
+                            descr.append(descr != "" ? " / " + unit : unit);
+                            break;
+                        case ito::AbstractFigure::UnitLabelKeywordIn:
+                            descr.append(descr != "" ? " in " + unit : unit);
+                            break;
+                        case ito::AbstractFigure::UnitLabelSquareBrackets:
+                            descr.append(" [" + unit + "]");
+                            break;
+                    }
                 }
+
                 m_pData->m_xaxisLabelDObj = QString::fromLatin1(descr.data());
 
                 descr = dObj->getAxisDescription(dims-2, valid);
@@ -442,8 +471,20 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
                 if (unit != "")
                 {
-                    descr.append(" [" + unit + "]");
+                    switch (m_unitLabelStyle)
+                    {
+                        case ito::AbstractFigure::UnitLabelSlash:
+                            descr.append(descr != "" ? " / " + unit : unit);
+                            break;
+                        case ito::AbstractFigure::UnitLabelKeywordIn:
+                            descr.append(descr != "" ? " in " + unit : unit);
+                            break;
+                        case ito::AbstractFigure::UnitLabelSquareBrackets:
+                            descr.append(" [" + unit + "]");
+                            break;
+                    }
                 }
+
                 m_pData->m_yaxisLabelDObj = QString::fromLatin1(descr.data());
             }
             else

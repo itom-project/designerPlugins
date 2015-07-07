@@ -427,6 +427,34 @@ bool Itom1DQwtPlot::getEnabledPlotting(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::AbstractFigure::UnitLabelStyle Itom1DQwtPlot::getUnitLabelStyle() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_unitLabelStyle;
+    }
+    else
+    {
+        return AbstractFigure::UnitLabelSlash;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style)
+{
+    if (m_pContent)
+    {
+        m_pContent->m_unitLabelStyle = style;
+        QVector<QPointF> bounds = getBounds();
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+
+        //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
+        m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
+    }
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::createActions()
 {
     QAction *a = NULL;
