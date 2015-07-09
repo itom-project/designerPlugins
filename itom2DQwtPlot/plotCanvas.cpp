@@ -1098,8 +1098,8 @@ void PlotCanvas::synchronizeScaleValues()
     {
         ival = axisScaleDiv(xBottom).interval();
     }
-    m_pData->m_xaxisMin = ival.minValue();
-    m_pData->m_xaxisMax = ival.maxValue();
+    m_pData->m_xaxisMin = std::min(ival.minValue(), ival.maxValue());
+    m_pData->m_xaxisMax = std::max(ival.minValue(), ival.maxValue());
 
     if (m_pData->m_yaxisScaleAuto)
     {
@@ -1109,8 +1109,8 @@ void PlotCanvas::synchronizeScaleValues()
     {
         ival = axisScaleDiv(yLeft).interval();
     }
-    m_pData->m_yaxisMin = ival.minValue();
-    m_pData->m_yaxisMax = ival.maxValue();
+    m_pData->m_yaxisMin = std::min(ival.minValue(), ival.maxValue());
+    m_pData->m_yaxisMax = std::max(ival.minValue(), ival.maxValue());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
