@@ -24,6 +24,7 @@
 #define DATAOBJECTRASTERDATA_H
 
 #include "common/sharedStructures.h"
+#include "plot/AbstractFigure.h"
 #include "DataObject/dataobj.h"
 
 #include <qwt_series_data.h>
@@ -107,8 +108,8 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         int getPosToPix(const double phys);
         
-        QString getDObjValueLabel() const;
-        QString getDObjAxisLabel()  const;
+        QString getDObjValueLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle) const;
+        QString getDObjAxisLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle)  const;
         void getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const;
         void getDObjAxisDescriptionAndUnit(std::string &description, std::string &unit) const;
 
@@ -128,28 +129,14 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
 
         ColorType m_colorState;
-
         bool inSamplingMode;
-
-//        bool *m_pReplotPending;  /*!< pointer to m_refreshPending of plot2DImage (1 => update requested, 0 => repaint done or no update requested)*/
-
         int m_fast;
-
         QByteArray m_hash;
-
-        //QVector<PtsIdxAndWeights> m_pointsXY;
-
         LineData m_d;
-
         QString m_dObjValueDescription;
         QString m_dObjValueUnit;
         QString m_dObjAxisDescription;
         QString m_dObjAxisUnit;
-
-
-        /*double m_startPos;
-        double m_physLength;
-        double m_Scaling;*/
         bool m_autoScaleY;
         double m_minY;
         double m_maxY;
@@ -157,9 +144,6 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         double m_minX;
         double m_maxX;
         ComplexType m_cmplxState;
-
-        /*double m_startPhys;
-        double m_scale;*/
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

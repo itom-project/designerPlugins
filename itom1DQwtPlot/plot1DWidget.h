@@ -26,6 +26,7 @@
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
 #include "common/sharedStructuresPrimitives.h"
+#include "plot/AbstractFigure.h"
 
 #include <qwidget.h>
 #include <qstring.h>
@@ -114,6 +115,8 @@ class Plot1DWidget : public QwtPlot
 
         void setSymbolStyle(const QwtSymbol::Style style, int size);
 
+        void setVisible(bool visible);
+
         friend class Itom1DQwtPlot;
         friend class DrawItem;      
 
@@ -127,7 +130,7 @@ class Plot1DWidget : public QwtPlot
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
         void synchronizeCurrentScaleValues();
-        void updateScaleValues(bool recalculateBoundaries = false);
+        void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
 
         void configRescaler();
 
@@ -195,6 +198,8 @@ class Plot1DWidget : public QwtPlot
         Qt::PenStyle m_lineStyle;
         int m_linePlotID;
 
+        ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
+
         int m_Curser[2];
         int m_actPickerIdx;
 
@@ -230,6 +235,8 @@ class Plot1DWidget : public QwtPlot
 
         Itom1DQwt::ScaleEngine m_valueScale;
         Itom1DQwt::ScaleEngine m_axisScale;
+
+        bool m_firstTimeVisible; //true if this plot becomes visible for the first time
 
     signals:
 

@@ -430,6 +430,34 @@ bool Itom1DQwtPlot::getEnabledPlotting(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::AbstractFigure::UnitLabelStyle Itom1DQwtPlot::getUnitLabelStyle() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->m_unitLabelStyle;
+    }
+    else
+    {
+        return AbstractFigure::UnitLabelSlash;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style)
+{
+    if (m_pContent)
+    {
+        m_pContent->m_unitLabelStyle = style;
+        QVector<QPointF> bounds = getBounds();
+        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+
+        //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
+        m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
+    }
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::createActions()
 {
     QAction *a = NULL;
@@ -478,12 +506,14 @@ void Itom1DQwtPlot::createActions()
     a->setObjectName("actionForward");
     a->setEnabled(false);
     a->setToolTip(tr("Forward to next line"));
+    m_pActForward->setVisible(false);
 
     //m_actBack
     m_pActBack = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("Back"), this);
     a->setObjectName("actionBack");
     a->setEnabled(false);
     a->setToolTip(tr("Back to previous line"));
+    m_pActBack->setVisible(false);
 
     //m_actPan
     m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
@@ -1323,15 +1353,7 @@ void Itom1DQwtPlot::mnuScaleSetting()
     if (dlg->exec() == QDialog::Accepted)
     {
         dlg->getData((*m_data));
-
-        bool recalculateBoundaries = false;
-
-        if (m_data->m_valueScaleAuto == true || m_data->m_axisScaleAuto == true)
-        {
-            recalculateBoundaries = true;
-        }
-
-        m_pContent->updateScaleValues(recalculateBoundaries);
+        m_pContent->updateScaleValues();
     }
 
     delete dlg;

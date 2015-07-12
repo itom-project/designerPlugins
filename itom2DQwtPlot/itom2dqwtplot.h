@@ -96,8 +96,10 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
     Q_PROPERTY(Itom2DQwt::tModificationState geometryModMode READ getModState WRITE setModState DESIGNABLE true)
-    Q_PROPERTY(ito::ItomPlotHandle staticLineCutID READ getStaticLineCutID WRITE setStaticLineCutID DESIGNABLE false USER true)
-    Q_PROPERTY(ito::ItomPlotHandle staticZSliceID READ getStaticZSliceID WRITE setStaticZSliceID DESIGNABLE false USER true)
+    Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false USER true)
+    Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false USER true)
+
+    Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
 
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
@@ -135,8 +137,10 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
 
     Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode (move, resize, rotate).")
-    Q_CLASSINFO("prop://staticLineCutID", "Set/Get the ui-Hanlde of the current line plot respective the destination line plot for lateral slicing.")
-    Q_CLASSINFO("prop://staticZSliceID", "Set/Get the ui-Hanlde of the current line plot respective the destination line plot for z slicing.")
+    Q_CLASSINFO("prop://lineCutPlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for lateral slicing.")
+    Q_CLASSINFO("prop://zSlicePlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for z slicing.")
+
+    Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
 
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
@@ -268,6 +272,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
         setOverlayAlpha(0);
     }
 
+    ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
+    void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
+
     QSharedPointer< ito::DataObject > getOverlayImage() const;
     void setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj);
     void resetOverlayImage(void);
@@ -297,16 +304,16 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     QColor getTextColor(void) const;
 
     //!> set a line cut id for lateral slices
-    ito::ItomPlotHandle getStaticLineCutID() const;
+    ito::ItomPlotHandle getLineCutPlotItem() const;
 
     //!> return the current line cut id for lateral slices
-    void setStaticLineCutID(const ito::ItomPlotHandle idx);
+    void setLineCutPlotItem(const ito::ItomPlotHandle idx);
 
     //!> set a line cut id for zSlices
-    ito::ItomPlotHandle getStaticZSliceID() const;
+    ito::ItomPlotHandle getZSlicePlotItem() const;
 
     //!> return the current line cut id for zSlices
-    void setStaticZSliceID(const ito::ItomPlotHandle idx);
+    void setZSlicePlotItem(const ito::ItomPlotHandle idx);
     
     bool getMarkerLablesVisible(void) const;
     void setMarkerLablesVisible(const bool val);

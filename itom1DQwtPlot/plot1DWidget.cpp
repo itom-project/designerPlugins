@@ -92,7 +92,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_curveFilled(Itom1DQwt::NoCurveFill),
         m_pLegend(NULL),
         m_valueScale(Itom1DQwt::Linear),
-        m_axisScale(Itom1DQwt::Linear)
+        m_axisScale(Itom1DQwt::Linear),
+        m_firstTimeVisible(false)
 {
     this->setMouseTracking(false);
     
@@ -246,6 +247,7 @@ ito::RetVal Plot1DWidget::init()
     QFont titleFont = QFont("Helvetica",12);
     QFont labelFont =  QFont("Helvetica",12);
     QFont axisFont = QFont("Helvetica",10);
+    m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
 
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -264,6 +266,8 @@ ito::RetVal Plot1DWidget::init()
         m_curveFilled = (Itom1DQwt::tFillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, NULL).value<int>();
         m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, NULL).value<QColor>();
         m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, NULL).value<int>());
+
+        m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
     }
 
     
@@ -556,12 +560,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
     QwtLegendLabel *legendLabel = NULL;
     int index;
-//    bool gotNewObject = false;
-    //QString valueLabel, axisLabel, title;
 
     if (dataObj)
     {
-//        gotNewObject = true;
         int dims = dataObj->getDims();
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dataObj->getSize(dims - 2) : (width == 0) ? 0 : 1;
@@ -876,8 +877,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 if (numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
-                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
+                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
                 }
                 break;
 
@@ -939,8 +940,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 if (numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
-                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
+                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
                 }
                 break;
             } 
@@ -977,8 +978,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             if (numCurves > 0)
             {
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
-                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
+                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
             }
         }
         else if (bounds.size() == 1) //point in third dimension
@@ -1007,8 +1008,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             if (numCurves > 0)
             {
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel();
-                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel();
+                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
+                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
             }
         }
 
@@ -1050,9 +1051,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 m_pData->m_axisMax = rect.right();
             }
 
-            updateScaleValues(); //replot is done here
+            updateScaleValues(false, true); //replot is done here
 
-            m_pZoomer->setZoomBase(true);
+            m_pZoomer->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
         }
         else if (m_pData->m_forceValueParsing)
         {
@@ -1072,7 +1073,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 m_pData->m_axisMax = rect.right();
             }
 
-            updateScaleValues(); //replot is done here
+            updateScaleValues(false, false); //no replot is done here
+            m_pZoomer->rescale(false);
 
             m_pData->m_forceValueParsing = false;
         }
@@ -2111,9 +2113,13 @@ void Plot1DWidget::synchronizeCurrentScaleValues()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
+/*
+@param doReplot forces a replot of the content
+@param doZoomBase if true, the x/y-zoom is reverted to the full x-y-area of the manually set ranges (the same holds for the value range)
+*/
+void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/)
 {
-    if (recalculateBoundaries)
+    if (m_pData->m_valueScaleAuto || m_pData->m_axisScaleAuto)
     {
         QRectF rect;
 
@@ -2143,10 +2149,48 @@ void Plot1DWidget::updateScaleValues(bool recalculateBoundaries /*= false*/)
         }
     }
 
-    setAxisScale(QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax);
-    setAxisScale(QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax);
+    if (doZoomBase)
+    {
+        // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
+        if (m_pZoomer->isEnabled())
+        {
+            QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
+            zoom = zoom.normalized();
 
-    replot();
+            if (zoom == m_pZoomer->zoomRect())
+            {
+                m_pZoomer->zoom(zoom);
+                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+            }
+            else
+            {
+                m_pZoomer->zoom(zoom);
+            }
+        }
+        else
+        {
+            setAxisScale(QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax);
+            setAxisScale(QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax);
+
+            QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
+            zoom = zoom.normalized();
+
+            if (zoom == m_pZoomer->zoomRect())
+            {
+                m_pZoomer->zoom(zoom);
+                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+            }
+            else
+            {
+                m_pZoomer->appendZoomStack(zoom);
+            }
+        }
+    }
+
+    if (doReplot)
+    {
+        replot();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3527,4 +3571,22 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
     }
 
     return QSharedPointer<ito::DataObject>(displayed);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setVisible(bool visible)
+{    
+    this->QwtPlot::setVisible(visible);
+    if (visible)
+    {
+        if (!m_firstTimeVisible)
+        {
+            this->updateScaleValues(true, true);
+        }
+        else
+        {
+            this->updateScaleValues(true, false);
+        }
+        m_firstTimeVisible = true;
+    }
 }
