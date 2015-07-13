@@ -1557,7 +1557,10 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
         QwtInterval xInterval = m_rasterData->interval(Qt::XAxis); 
         QwtInterval yInterval = m_rasterData->interval(Qt::YAxis);
 
-        pts[0] = m_pLineCutLine->sample(0);
+        if (m_pLineCutLine->dataSize() > 0)
+            pts[0] = m_pLineCutLine->sample(0);
+        else
+            return;
 
         if (m_lineCutValidStart)
         {
