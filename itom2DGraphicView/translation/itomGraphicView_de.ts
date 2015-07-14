@@ -1,50 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de">
+<TS version="2.1" language="de">
 <context>
     <name>Dialog2DScale</name>
     <message>
-        <location filename="../dialog2DScale.ui"/>
+        <location filename="../dialog2DScale.ui" line="+14"/>
         <source>Plot Interval Settings</source>
         <translation>Skaleneinstellungen</translation>
     </message>
     <message>
-        <location/>
+        <location line="+9"/>
         <source>x-range</source>
         <translation>X-Anzeige</translation>
     </message>
     <message>
-        <location/>
+        <location line="+12"/>
+        <location line="+108"/>
+        <location line="+105"/>
         <source>auto calc once</source>
         <translation>Automatisch</translation>
     </message>
     <message>
-        <location/>
+        <location line="-206"/>
+        <location line="+108"/>
+        <location line="+105"/>
         <source>manual adjustment:</source>
         <translation>Manuelle Ausrichtung:</translation>
     </message>
     <message>
-        <location/>
+        <location line="-188"/>
+        <location line="+108"/>
+        <location line="+105"/>
+        <location line="+79"/>
         <source>from</source>
         <translation>von</translation>
     </message>
     <message>
-        <location/>
+        <location line="-256"/>
+        <location line="+108"/>
+        <location line="+111"/>
         <source>to</source>
         <translation>bis</translation>
     </message>
     <message>
-        <location/>
+        <location line="-191"/>
         <source>y-range</source>
         <translation>Y-Anzeige</translation>
     </message>
     <message>
-        <location/>
+        <location line="+105"/>
         <source>z-range</source>
         <translation>Z-Anzeige</translation>
     </message>
     <message>
-        <location/>
+        <location line="+114"/>
         <source>current plane</source>
         <translation>Aktuelle Ebene</translation>
     </message>
@@ -52,7 +61,7 @@
 <context>
     <name>GraphicViewPlot</name>
     <message>
-        <location filename="../graphicViewPlot.cpp" line="+63"/>
+        <location filename="../graphicViewPlot.cpp" line="+62"/>
         <source>Points for line plots from 2D objects</source>
         <translation type="unfinished">Punkte für Linienplot von 2D-Objekten</translation>
     </message>
@@ -82,7 +91,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+31"/>
         <source>home</source>
         <translation type="unfinished">Ansicht zurücksetzen</translation>
     </message>
@@ -112,7 +121,7 @@
         <translation type="unfinished">Einstellungen der Skalen...</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>move</source>
         <translation type="unfinished">Verschieben</translation>
     </message>
@@ -122,7 +131,7 @@
         <translation type="unfinished">Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>rectangle zoom</source>
         <translation type="unfinished">Zoom in Rechteck</translation>
     </message>
@@ -132,7 +141,7 @@
         <translation type="unfinished">Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>marker</source>
         <translation type="unfinished">Positionsanzeiger</translation>
     </message>
@@ -214,29 +223,29 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+461"/>
+        <location line="+485"/>
         <source>imaginary</source>
         <translation type="unfinished">Imaginär</translation>
     </message>
     <message>
-        <location line="-460"/>
-        <location line="+465"/>
+        <location line="-484"/>
+        <location line="+489"/>
         <source>real</source>
         <translation type="unfinished">Real</translation>
     </message>
     <message>
-        <location line="-464"/>
+        <location line="-488"/>
         <source>absolute</source>
         <translation type="unfinished">Absolut</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+468"/>
+        <location line="+492"/>
         <source>phase</source>
         <translation type="unfinished">Phase</translation>
     </message>
     <message>
-        <location line="-465"/>
+        <location line="-489"/>
         <source>Switch imaginary, real, absolute, phase</source>
         <translation type="unfinished">Komplexitätstyp</translation>
     </message>
@@ -257,35 +266,35 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+486"/>
+        <location line="+511"/>
         <source>falseColor, bitshift</source>
         <translation type="unfinished">Falschfarbe, Bitverschiebung</translation>
     </message>
     <message>
-        <location line="-485"/>
-        <location line="+489"/>
+        <location line="-510"/>
+        <location line="+514"/>
         <source>falseColor, scaled</source>
         <translation type="unfinished">Falschfarbe, skaliert</translation>
     </message>
     <message>
-        <location line="-488"/>
-        <location line="+492"/>
+        <location line="-513"/>
+        <location line="+517"/>
         <source>Color, 24-Bit</source>
         <translation type="unfinished">Farbe, 24-Bit</translation>
     </message>
     <message>
-        <location line="-491"/>
-        <location line="+495"/>
+        <location line="-516"/>
+        <location line="+520"/>
         <source>Color, 32-Bit</source>
         <translation type="unfinished">Farbe, 32-Bit</translation>
     </message>
     <message>
-        <location line="-493"/>
+        <location line="-518"/>
         <source>Switch index and direct color mode</source>
         <translation type="unfinished">Farbmodus</translation>
     </message>
     <message>
-        <location line="+295"/>
+        <location line="+320"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished">FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -310,25 +319,25 @@
         <translation type="unfinished">Speichern unter</translation>
     </message>
     <message>
-        <location line="+469"/>
-        <location line="+22"/>
-        <location line="+110"/>
+        <location line="+501"/>
+        <location line="+19"/>
+        <location line="+107"/>
+        <location line="+11"/>
+        <location line="+11"/>
         <location line="+12"/>
-        <location line="+12"/>
-        <location line="+14"/>
-        <location line="+25"/>
-        <location line="+13"/>
+        <location line="+23"/>
+        <location line="+11"/>
         <source>Not implemented yet.</source>
         <translation type="unfinished">Noch nicht implementiert.</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+49"/>
         <location line="+5"/>
         <source>Specified color type out of range [0, 4].</source>
         <translation type="unfinished">Definierter Farbtyp außerhalb des erlaubten Bereichs [0, 4].</translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="+121"/>
         <source>Export image failed, canvas handle not initilized</source>
         <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
     </message>
@@ -336,7 +345,7 @@
 <context>
     <name>PlotWidget</name>
     <message>
-        <location filename="../plotWidget.cpp" line="+887"/>
+        <location filename="../plotWidget.cpp" line="+935"/>
         <source>No color maps defined.</source>
         <translation type="unfinished">Kein Farbschema definiert.</translation>
     </message>
@@ -356,7 +365,7 @@
         <translation type="unfinished">Ausgewählte Farbleiste ist ungültig</translation>
     </message>
     <message>
-        <location line="+82"/>
+        <location line="+92"/>
         <location line="+6"/>
         <source>Not implemented yet.</source>
         <translation type="unfinished">Noch nicht implementiert.</translation>
@@ -365,7 +374,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+68"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+73"/>
         <source>Source data for plot</source>
         <translation>Quelldaten der Abbildung</translation>
     </message>
@@ -419,7 +428,7 @@
         <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
