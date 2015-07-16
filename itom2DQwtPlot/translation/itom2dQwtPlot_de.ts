@@ -622,12 +622,12 @@
     <message>
         <location line="+15"/>
         <source>Current to workspace</source>
-        <translation type="unfinished">Aktuelles an Workspace</translation>
+        <translation type="unfinished">Aktueller Plot in den Workspace</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Indicate the python variable name for the currently visible object</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Variablenname für die Übernahme in den Workspace</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -763,22 +763,22 @@
     <message>
         <location line="+102"/>
         <source>Could not perform specific action on geomtric element, action not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktion kann nicht durchgeführt werden, da diese nicht implementiert ist.</translation>
     </message>
     <message>
         <location line="+121"/>
         <source>Could not perform specific action on geomtric element, resize action not implemented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktion kann nicht durchgeführt werden, da diese nicht implementiert ist.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Could not change points of geomtric element, elemet is proteted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die Punkte des geometrischen Elements können nicht geändert werden, da es geschützt ist.</translation>
     </message>
     <message>
         <location line="+166"/>
         <source>Could not change geomtric element, elemet is read only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das geometrische Element kann nicht geändert werden, da es schreibgeschützt ist.</translation>
     </message>
 </context>
 <context>
@@ -845,12 +845,12 @@
     <message>
         <location filename="../itom2dqwtplot.cpp" line="-2826"/>
         <source>Points for line plots from 2d objects</source>
-        <translation>Punkte für Linien-Plots von 2D-Objekten</translation>
+        <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Points for z-stack cut in 3d objects</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Punkte für Z-Stapelschnitte in 3D-Objekten</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -860,17 +860,25 @@
     <message>
         <location line="+91"/>
         <source>plot2D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">2D-Plot</translation>
+    </message>
+    <message>
+        <source>ITOM widget for 2D-visualisation of 2D/3D DataObjects based on QWT.</source>
+        <translation type="vanished">itom-Widget für die 2D-Abbildung von 2D/3D-Datenobjekten basierend auf QWT.</translation>
+    </message>
+    <message>
+        <source>This designer plugin is a itom widget for image-like visualisation of DataObjects and live images. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
+        <translation type="obsolete">Dieses Designer-Plugin ist ein itom-Widget für &apos;image-like visualisation&apos; und Livebilder. Dieses Widget basiert teilweise auf der Arbeit von Qwt-Project (http://qwt.sf.net).</translation>
     </message>
     <message>
         <location filename="../itom2dqwtplotplugin.cpp" line="+38"/>
-        <source>ITOM widget for 2D-visualisation of 2D/3D DataObjects based on QWT.</source>
-        <translation>itom-Widget für die 2D-Abbildung von 2D/3D-Datenobjekten basierend auf QWT.</translation>
+        <source>itom widget for 2D-visualisation of 2D/3D dataObjects based on Qwt.</source>
+        <translation type="unfinished">Itom-Widget für die 2D-Visualisierung von 2D/3D-Datenobjekten basierend auf Qwt.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>This designer plugin is a itom widget for image-like visualisation of DataObjects and live images. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
-        <translation type="unfinished"></translation>
+        <source>This designer plugin is an itom widget for image-like visualisation of dataObjects and live images. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
+        <translation type="unfinished">Dieses Designer-Plugin ist ein itom-Widget für eine visuelle Darstellung von Datenobjekten und Livebildern. Dieses Widget basiert teilweise auf der Arbeit von Qwt-Project (http://qwt.sf.net).</translation>
     </message>
     <message>
         <location line="+3"/>

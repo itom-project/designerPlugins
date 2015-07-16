@@ -53,67 +53,67 @@
     <message>
         <location line="+6"/>
         <source>plot canvas size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plotgröße</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+108"/>
         <source>Width:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Breite:</translation>
     </message>
     <message>
         <location line="-95"/>
         <location line="+20"/>
         <source>0 px</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-13"/>
         <location line="+124"/>
         <source>Height:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Höhe:</translation>
     </message>
     <message>
         <location line="-101"/>
         <source>export resolution and size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Exportauflöstung und -größe</translation>
     </message>
     <message>
         <location line="+18"/>
         <location line="+146"/>
         <source> mm</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-115"/>
         <location line="+80"/>
         <source> px</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-51"/>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Resolution:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auflösung:</translation>
     </message>
     <message>
         <location line="+50"/>
         <source> dpi</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Continue</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Weiter</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abbruch</translation>
     </message>
     <message>
         <source>Width</source>
@@ -213,7 +213,7 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+313"/>
+        <location line="+321"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -297,40 +297,40 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+852"/>
+        <location line="+862"/>
         <source>To Min-Max</source>
         <translation>Min-Max</translation>
     </message>
     <message>
-        <location line="-847"/>
+        <location line="-857"/>
         <source>Switch Imag, Real, Abs, Pha</source>
         <translation>Bildmodus</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+934"/>
+        <location line="+944"/>
         <source>Imag</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-933"/>
-        <location line="+938"/>
+        <location line="-943"/>
+        <location line="+948"/>
         <source>Real</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-937"/>
+        <location line="-947"/>
         <source>Abs</source>
         <translation></translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+941"/>
+        <location line="+951"/>
         <source>Pha</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-895"/>
+        <location line="-905"/>
         <source>Point</source>
         <translation>Punkt</translation>
     </message>
@@ -359,7 +359,7 @@
         <translation>Löscht alle gesetzen Marker</translation>
     </message>
     <message>
-        <location line="+1180"/>
+        <location line="+1200"/>
         <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
         <translation>Objekt entspricht nicht den Kriterien: Zweidimensional, Objekte x 11, Fließkommewerte</translation>
     </message>
@@ -369,22 +369,22 @@
         <translation>Gelöschtes Objekt. Neue Objektliste ist leer</translation>
     </message>
     <message>
-        <location line="+208"/>
+        <location line="+202"/>
         <source>Could not convert elements, type undefined</source>
         <translation>Objekt kann nicht konvertiert werden: Unbekannter Typ</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+11"/>
         <source>Could not set elements</source>
         <translation>Element konnte nicht gesetzt werden</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+53"/>
         <source>Could not set active element, index out of range.</source>
         <translation>Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
     </message>
     <message>
-        <location line="-1451"/>
+        <location line="-1466"/>
         <source>Marker Positions</source>
         <translation>Positionsanzeiger</translation>
     </message>
@@ -401,17 +401,17 @@
     <message>
         <location line="+4"/>
         <source>Send current view to workspace...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktuelle Grafik an Workspace senden...</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">In die Zwischenablage kopieren</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Copies the current view to the clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktuelle Grafik in die Zwischenablage kopieren</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -451,7 +451,7 @@
     <message>
         <location line="+25"/>
         <source>Switch Auto, first row, first column, multi row, multi column</source>
-        <translation type="unfinished">Schalter für Zeilen und Spalten</translation>
+        <translation type="unfinished">Ansicht für Zeilen und Spalten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -481,37 +481,37 @@
     <message>
         <location line="+2"/>
         <source>multi layer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alle Schichten</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Switch Auto, gray, rgb, rgba, rgb-gray</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Farbwerte</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>auto value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Autowert</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>gray value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grauwert</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>RGB-lines</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RGB-Linien</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>RGBA-lines</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RGBA-Linien</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>RGB + Gray</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RGB + Grau</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -539,7 +539,7 @@
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+643"/>
+        <location line="+653"/>
         <source>PDF Documents (*.pdf)</source>
         <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -564,9 +564,9 @@
         <translation>Speichern unter</translation>
     </message>
     <message>
-        <location line="+856"/>
+        <location line="+866"/>
         <source>Export image failed, internal setting handle not initilized</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der Bildexport ist fehlgeschlagen, internes Setting-Handle wurde nicht inizialisiert</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -577,52 +577,52 @@
         <location line="+17"/>
         <location line="+16"/>
         <source>copy current view to clipboard...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren...</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>copy current view to clipboard. done.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren. - Beendet.</translation>
     </message>
     <message>
-        <location line="+86"/>
-        <location line="+9"/>
+        <location line="+87"/>
+        <location line="+10"/>
         <source>Set picker failed, canvas handle not initilized</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler: Canvas-Handle wurde nicht initialisiert</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <location line="+9"/>
+        <location line="+10"/>
+        <location line="+10"/>
         <source>Get picker failed, canvas handle not initilized.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler: Canvas-Handle wurde nicht initialisiert.</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <location line="+22"/>
+        <location line="+10"/>
+        <location line="+23"/>
         <source>Could not access internal data structur</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Es kann nicht auf die interne Datenstruktur zugegriffen werden</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <location line="+22"/>
+        <location line="-16"/>
+        <location line="+23"/>
         <source>Geometric element not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Geometisches Element wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+186"/>
+        <location line="+203"/>
         <source>Current to workspace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktueller Plot in den Workspace</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Indicate the python variable name for the currently visible object</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Variablenname für die Übernahme in den Workspace</translation>
     </message>
     <message>
         <location line="+16"/>
         <location line="+11"/>
         <source>Error sending data object to workspace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Senden des Datenobjekts an Workspace</translation>
     </message>
 </context>
 <context>
@@ -631,7 +631,7 @@
         <location filename="../plot1DWidget.cpp" line="+408"/>
         <location line="+309"/>
         <source>curve %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurve %1</translation>
     </message>
     <message>
         <location line="+1605"/>
@@ -772,24 +772,53 @@
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlot.cpp" line="-2529"/>
+        <location filename="../itom1DQwtPlot.cpp" line="-2580"/>
         <source>plot1D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../itom1DQwtPlotPlugin.cpp" line="+39"/>
         <source>itom widget for 1D DataObjects based on QWT.</source>
-        <translation>itom-Widget für die Abbildung von 1D-Datenobjekten basierend auf QWT.</translation>
+        <translation type="obsolete">itom-Widget für 1D-Datenobjekten basierend auf Qwt.</translation>
+    </message>
+    <message>
+        <source>This designer plugin is a itom widget for linewise / graph-based visualisation of DataObjects and live-outputs of spectrometers. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
+        <translation type="obsolete">Dieses Designer-Plugin ist ein itom-Widget für eine visuelle Darstellung von linien- und graphbasierten Datenobjekten und Livedaten von Spektrometern. Dieses Widget basiert teilweise auf der Arbeit von Qwt-Project (http://qwt.sf.net).</translation>
+    </message>
+    <message>
+        <location filename="../itom1DQwtPlotPlugin.cpp" line="+39"/>
+        <source>itom widget for 1D dataObjects based on Qwt.</source>
+        <translation type="unfinished">itom-Widget für 1D-Datenobjekten basierend auf Qwt.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>This designer plugin is a itom widget for linewise / graph-based visualisation of DataObjects and live-outputs of spectrometers. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
-        <translation type="unfinished"></translation>
+        <source>This designer plugin is an itom widget for linewise / graph-based visualisation of dataObjects and live-outputs of line cameras. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
+        <translation type="unfinished">Dieses Designer-Plugin ist ein itom-Widget für eine visuelle Darstellung von linien- oder graphbasierten Datenobjekten und Livedaten von Linienkameras. Dieses Widget basiert teilweise auf der Arbeit von Qwt-Project (http://qwt.sf.net).</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>LGPL, for Qwt see Qwt License</source>
         <translation>LGPL, für Qwt siehe Qwt-Lizenz</translation>
+    </message>
+    <message>
+        <location filename="../dataObjectSeriesData.cpp" line="+256"/>
+        <source>y-axis</source>
+        <translation>y-Achse</translation>
+    </message>
+    <message>
+        <location line="+64"/>
+        <source>x-axis</source>
+        <translation>x-Achse</translation>
+    </message>
+    <message>
+        <location line="+214"/>
+        <location line="+5"/>
+        <source>x/y-axis</source>
+        <translation>x/y-Achse</translation>
+    </message>
+    <message>
+        <location line="+75"/>
+        <source>z-axis</source>
+        <translation>z-Achse</translation>
     </message>
 </context>
 <context>
