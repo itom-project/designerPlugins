@@ -850,7 +850,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF DataObjectSeriesData::sample(size_t n) const
 {
-    cv::Mat *mat;
+    const cv::Mat *mat;
     const uchar* ptr[4];
     //float weights[4];
     float fPos;
@@ -863,19 +863,19 @@ QPointF DataObjectSeriesData::sample(size_t n) const
             {
                 case dirX:
                 case dirY:
-                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(m_d.plane) ]);
+                    mat = m_pDataObj->getCvPlaneMat(m_d.plane);
                     ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
                     fPos = m_d.startPhys + m_d.stepSizePhys * n;
                 break;
 
                 case dirZ:
-                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat((int)n) ]);
+                    mat = m_pDataObj->getCvPlaneMat((int)n);
                     ptr[0] = (mat->data + m_d.matOffset);
                     fPos = m_d.startPhys + m_d.stepSizePhys * n;
                 break;
 
                 case dirXY:
-                    mat = (cv::Mat*)(m_pDataObj->get_mdata()[ m_pDataObj->seekMat(m_d.plane) ]);
+                    mat = m_pDataObj->getCvPlaneMat(m_d.plane);
                     ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
                     fPos = m_d.startPhys + m_d.stepSizePhys * n;
                 break;
@@ -1779,7 +1779,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1792,12 +1792,11 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
             val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
-            ptr += d.matStepSize;
 
             if (val > max) { max = val; maxIdx = i; }
             if (val < min) { min = val; minIdx = i; }
@@ -1807,7 +1806,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
 
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
+            mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
             val = *(reinterpret_cast<_Tp*>(ptr));
 
@@ -1831,7 +1830,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1849,7 +1848,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1868,7 +1867,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
 
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
+            mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
             val = *(reinterpret_cast<float32*>(ptr));
 
@@ -1897,7 +1896,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1915,7 +1914,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1935,7 +1934,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
 
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
+            mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
             val = *(reinterpret_cast<float64*>(ptr));
 
@@ -1965,7 +1964,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -1999,7 +1998,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -2034,7 +2033,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
 
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
+            mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
             val_ = *(reinterpret_cast<complex64*>(ptr));
             switch(cmplxState)
@@ -2079,7 +2078,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -2112,7 +2111,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
         break;
 
     case DataObjectSeriesData::dirXY:
-        mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(d.plane) ]);
+        mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
@@ -2147,7 +2146,7 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
 
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            mat = (cv::Mat*)(obj->get_mdata()[ obj->seekMat(i) ]);
+            mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
             val_ = *(reinterpret_cast<complex128*>(ptr));
             switch(cmplxState)
