@@ -1,45 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de">
+<TS version="2.1" language="de">
 <context>
     <name>Dialog2DScale</name>
     <message>
-        <location filename="../dialog2DScale.ui"/>
+        <location filename="../dialog2DScale.ui" line="+26"/>
         <source>Interval Settings</source>
         <translation>Skaleneinstellungen</translation>
     </message>
     <message>
-        <location/>
+        <location line="+9"/>
         <source>x-range</source>
         <translation>X-Anzeige</translation>
     </message>
     <message>
-        <location/>
+        <location line="+21"/>
+        <location line="+109"/>
+        <location line="+109"/>
         <source>auto</source>
         <translation>Automatisch</translation>
     </message>
     <message>
-        <location/>
+        <location line="-208"/>
+        <location line="+109"/>
+        <location line="+109"/>
         <source>manual adjustment:</source>
         <translation>Manuelle Ausrichtung:</translation>
     </message>
     <message>
-        <location/>
+        <location line="-206"/>
+        <location line="+109"/>
+        <location line="+109"/>
         <source>from</source>
         <translation>von</translation>
     </message>
     <message>
-        <location/>
+        <location line="-186"/>
+        <location line="+109"/>
+        <location line="+109"/>
         <source>to</source>
         <translation>bis</translation>
     </message>
     <message>
-        <location/>
+        <location line="-184"/>
         <source>y-range</source>
         <translation>Y-Anzeige</translation>
     </message>
     <message>
-        <location/>
+        <location line="+109"/>
         <source>values</source>
         <translation>Werte</translation>
     </message>
@@ -47,55 +55,100 @@
 <context>
     <name>DialogExport2File</name>
     <message>
-        <location filename="../../sharedFiles/dialogExportProperties.ui"/>
+        <location filename="../../sharedFiles/dialogExportProperties.ui" line="+14"/>
         <source>Export Properties</source>
         <translation>Export-Einstellungen</translation>
     </message>
     <message>
-        <location/>
+        <location line="+6"/>
+        <source>plot canvas size</source>
+        <translation type="unfinished">Plotgröße</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location line="+108"/>
+        <source>Width:</source>
+        <translation type="unfinished">Breite:</translation>
+    </message>
+    <message>
+        <location line="-95"/>
+        <location line="+20"/>
+        <source>0 px</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="-13"/>
+        <location line="+124"/>
+        <source>Height:</source>
+        <translation type="unfinished">Höhe:</translation>
+    </message>
+    <message>
+        <location line="-101"/>
+        <source>export resolution and size</source>
+        <translation type="unfinished">Exportauflöstung und -größe</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <location line="+146"/>
+        <source> mm</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="-115"/>
+        <location line="+80"/>
+        <source> px</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="-51"/>
+        <source>Format:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+67"/>
+        <source>Resolution:</source>
+        <translation type="unfinished">Auflösung:</translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source> dpi</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <source>Continue</source>
+        <translation type="unfinished">Weiter</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbruch</translation>
+    </message>
+    <message>
         <source>Width</source>
-        <translation>Breite</translation>
+        <translation type="vanished">Breite</translation>
     </message>
     <message>
-        <location/>
-        <source>px</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Height</source>
-        <translation>Höhe</translation>
+        <translation type="vanished">Höhe</translation>
     </message>
     <message>
-        <location/>
         <source>Export to</source>
-        <translation>Export nach</translation>
+        <translation type="vanished">Export nach</translation>
     </message>
     <message>
-        <location/>
         <source>Resolution</source>
-        <translation>Auflösung</translation>
+        <translation type="vanished">Auflösung</translation>
     </message>
     <message>
-        <location/>
-        <source>dpi</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>User definitions</source>
-        <translation>Benutzerdefinitionen</translation>
-    </message>
-    <message>
-        <location/>
-        <source>mm</source>
-        <translation></translation>
+        <translation type="vanished">Benutzerdefinitionen</translation>
     </message>
 </context>
 <context>
     <name>DialogExportProperties</name>
     <message>
-        <location filename="../../sharedFiles/dialogExportProperties.cpp" line="+51"/>
+        <location filename="../../sharedFiles/dialogExportProperties.cpp" line="+37"/>
         <source>user defined</source>
         <translation>Benutzerdefiniert</translation>
     </message>
@@ -148,7 +201,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+215"/>
+        <location filename="../itom2dqwtplot.cpp" line="+251"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -169,7 +222,17 @@
         <translation>Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+4"/>
+        <source>Send current view to workspace...</source>
+        <translation type="unfinished">Aktuelle Grafik an Workspace senden...</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Scale settings...</source>
+        <translation type="unfinished">Skalen setzten...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Set the ranges and offsets of this view</source>
         <translation>Einstellungen der Skalen</translation>
     </message>
@@ -194,29 +257,39 @@
         <translation>Farbleiste ein- und ausblenden</translation>
     </message>
     <message>
-        <location line="-125"/>
+        <location line="-164"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location line="-27"/>
+        <location line="-28"/>
         <source>plotting tools</source>
         <translation>Symbolleiste Plot</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+44"/>
         <source>Tools</source>
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+75"/>
         <source>Save...</source>
         <translation>Speichern...</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Export current view...</source>
         <translation>Aktuelle Abbildung exportieren...</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Copy to clipboard</source>
+        <translation type="unfinished">In die Zwischenablage kopieren</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Copies the current view to the clipboard</source>
+        <translation type="unfinished">Aktuelle Grafik in die Zwischenablage kopieren</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -244,27 +317,83 @@
         <translation>Vollbild oder Seitenverhältnis beibehalten</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Scale Settings...</source>
-        <translation>Skaleneinstellungen...</translation>
+        <translation type="vanished">Skaleneinstellungen...</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+36"/>
         <source>Marker</source>
         <translation>Positionsanzeiger</translation>
     </message>
     <message>
         <location line="+7"/>
+        <location line="+1310"/>
+        <location line="+8"/>
         <source>Linecut</source>
         <translation>Linienschnitt</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-1315"/>
         <source>Show a in plane line cut</source>
         <translation>Linienschnitt der Ebene anzeigen</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
+        <source>Linecut Mode</source>
+        <translation type="unfinished">Linienschnittmodus</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>min &amp; max</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>line cut through global minimum and maximum value</source>
+        <translation type="unfinished">Globales Minimum und Maximum für Linienschnitt übernehmen</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>- &amp; min</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>horizontal line cut through global minimum value</source>
+        <translation type="unfinished">Globales Minimum für horizontalen Linienschnitt übernehmen</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>- &amp; max</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>horizontal line cut through global maximum value</source>
+        <translation type="unfinished">Globales Maximum für horizontalen Linienschnitt übernehmen</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>| &amp; min</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>vertical line cut through global minimum value</source>
+        <translation type="unfinished">Globales Minimum für vertikalen Linienschnitt übernehmen</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>| &amp; max</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>vertical line cut through global maximum value</source>
+        <translation type="unfinished">Globales Maximum für vertikalen Linienschnitt übernehmen</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Control alpha-value of overlay image</source>
         <translation type="unfinished">Steuerung für den Alpa-Wert des Overlay-Bilds</translation>
     </message>
@@ -319,6 +448,36 @@
         <translation>Ellipse</translation>
     </message>
     <message>
+        <location line="+11"/>
+        <source>Switch Element Modification Mode</source>
+        <translation type="unfinished">Elementausrichtung</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Elemet Modify Mode</source>
+        <translation type="unfinished">Elementausrichtung</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Move elements</source>
+        <translation type="unfinished">Elemente verschieben</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Resize Elements</source>
+        <translation type="unfinished">Elemente in Größe anpassen</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Rotate Elements</source>
+        <translation type="unfinished">Elemente rotieren</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Modify Points</source>
+        <translation type="unfinished">Modifikationspunkt</translation>
+    </message>
+    <message>
         <location line="+12"/>
         <source>Center marker</source>
         <translation>Mittelpunktsanzeige</translation>
@@ -359,7 +518,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+423"/>
+        <location line="+508"/>
         <source>PDF Documents (*.pdf)</source>
         <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -383,18 +542,23 @@
         <source>Export File Name</source>
         <translation>Speichern unter</translation>
     </message>
-    <message id="false">
-        <location line="+319"/>
+    <message>
+        <location line="+512"/>
         <source>Could not spawn lineCut due to missing API-handle</source>
         <translation type="unfinished">Linienschnitt konnte nicht erzeugt werden, API-Handle wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+60"/>
         <source>the opened figure is not inherited from ito::AbstractDObjFigure</source>
         <translation>Die geöffnete Abbildung wurde nicht von ito::AbstractDObjFigure vererbt</translation>
     </message>
     <message>
-        <location line="+302"/>
+        <location line="+17"/>
+        <source>Z-Stack</source>
+        <translation type="unfinished">Z-Stapel</translation>
+    </message>
+    <message>
+        <location line="+338"/>
         <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
         <translation>Objekt entspricht nicht den Kriterien: Zweidimensional, Objekte x 11, Fließkommewerte</translation>
     </message>
@@ -414,7 +578,7 @@
         <translation>Element konnte nicht gesetzt werden</translation>
     </message>
     <message>
-        <location line="+155"/>
+        <location line="+186"/>
         <source>Could not set active element, index out of range.</source>
         <translation>Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
     </message>
@@ -429,30 +593,71 @@
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Widget nicht bereit.</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+313"/>
         <source>Export image failed, canvas handle not initilized</source>
         <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>copy current view to clipboard...</source>
+        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren...</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>copy current view to clipboard. done.</source>
+        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren. - Beendet.</translation>
+    </message>
+    <message>
+        <location line="+82"/>
+        <location line="+23"/>
+        <source>Could not access internal data structur</source>
+        <translation type="unfinished">Es kann nicht auf die interne Datenstruktur zugegriffen werden</translation>
+    </message>
+    <message>
+        <location line="-16"/>
+        <location line="+23"/>
+        <source>Geometric element not found</source>
+        <translation type="unfinished">Geometisches Element wurde nicht gefunden</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Current to workspace</source>
+        <translation type="unfinished">Aktueller Plot in den Workspace</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Indicate the python variable name for the currently visible object</source>
+        <translation type="unfinished">Variablenname für die Übernahme in den Workspace</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <location line="+11"/>
+        <source>Error sending data object to workspace</source>
+        <translation type="unfinished">Fehler beim Senden des Datenobjekts an Workspace</translation>
     </message>
 </context>
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+502"/>
+        <location filename="../plotCanvas.cpp" line="+590"/>
+        <location line="+163"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="-155"/>
+        <location line="+163"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="-128"/>
+        <location line="+163"/>
         <source>Selected color map has less than two points.</source>
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="+724"/>
+        <location line="+972"/>
         <location line="+1"/>
         <source>Could not plot marker, api is missing</source>
         <translation>Die Position kann nicht angezeigt werden, API wurde nicht gefunden</translation>
@@ -463,13 +668,13 @@
         <translation>Das Tag-Format stimmt nicht mit dem benötigten Format überein</translation>
     </message>
     <message>
-        <location line="+69"/>
-        <location line="+29"/>
+        <location line="+76"/>
+        <location line="+30"/>
         <source>invalid marker type</source>
         <translation>Ungültiger Marker-Typ</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+56"/>
         <source>No marker with id &apos;%1&apos; found.</source>
         <translation>Der Marker mit der ID &apos;%1&apos; wurde nicht gefunden.</translation>
     </message>
@@ -555,11 +760,31 @@
         <source>%1 points have been selected.</source>
         <translation>%1 Punkt(e) wurden ausgewählt.</translation>
     </message>
+    <message>
+        <location line="+102"/>
+        <source>Could not perform specific action on geomtric element, action not implemented.</source>
+        <translation type="unfinished">Aktion kann nicht durchgeführt werden, da diese nicht implementiert ist.</translation>
+    </message>
+    <message>
+        <location line="+121"/>
+        <source>Could not perform specific action on geomtric element, resize action not implemented yet.</source>
+        <translation type="unfinished">Aktion kann nicht durchgeführt werden, da diese nicht implementiert ist.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Could not change points of geomtric element, elemet is proteted.</source>
+        <translation type="unfinished">Die Punkte des geometrischen Elements können nicht geändert werden, da es geschützt ist.</translation>
+    </message>
+    <message>
+        <location line="+166"/>
+        <source>Could not change geomtric element, elemet is read only.</source>
+        <translation type="unfinished">Das geometrische Element kann nicht geändert werden, da es schreibgeschützt ist.</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+68"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+73"/>
         <source>Source data for plot</source>
         <translation>Quelldaten der Abbildung</translation>
     </message>
@@ -613,14 +838,19 @@
         <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-1861"/>
+        <location filename="../itom2dqwtplot.cpp" line="-2826"/>
         <source>Points for line plots from 2d objects</source>
-        <translation>Punkte für Linien-Plots von 2D-Objekten</translation>
+        <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Points for z-stack cut in 3d objects</source>
+        <translation type="unfinished">Punkte für Z-Stapelschnitte in 3D-Objekten</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -628,12 +858,30 @@
         <translation>Referenz auf Eingangsobjekt</translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplotplugin.cpp" line="+38"/>
-        <source>ITOM widget for 2D-visualisation of 2D/3D DataObjects based on QWT.</source>
-        <translation>itom-Widget für die 2D-Abbildung von 2D/3D-Datenobjekten basierend auf QWT.</translation>
+        <location line="+91"/>
+        <source>plot2D</source>
+        <translation type="unfinished">2D-Plot</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <source>ITOM widget for 2D-visualisation of 2D/3D DataObjects based on QWT.</source>
+        <translation type="vanished">itom-Widget für die 2D-Abbildung von 2D/3D-Datenobjekten basierend auf QWT.</translation>
+    </message>
+    <message>
+        <source>This designer plugin is a itom widget for image-like visualisation of DataObjects and live images. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
+        <translation type="obsolete">Dieses Designer-Plugin ist ein itom-Widget für &apos;image-like visualisation&apos; und Livebilder. Dieses Widget basiert teilweise auf der Arbeit von Qwt-Project (http://qwt.sf.net).</translation>
+    </message>
+    <message>
+        <location filename="../itom2dqwtplotplugin.cpp" line="+38"/>
+        <source>itom widget for 2D-visualisation of 2D/3D dataObjects based on Qwt.</source>
+        <translation type="unfinished">Itom-Widget für die 2D-Visualisierung von 2D/3D-Datenobjekten basierend auf Qwt.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This designer plugin is an itom widget for image-like visualisation of dataObjects and live images. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).</source>
+        <translation type="unfinished">Dieses Designer-Plugin ist ein itom-Widget für eine visuelle Darstellung von Datenobjekten und Livebildern. Dieses Widget basiert teilweise auf der Arbeit von Qwt-Project (http://qwt.sf.net).</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>LGPL, for Qwt see Qwt License</source>
         <translation>LGPL, für Qwt siehe Qwt-Lizenz</translation>
     </message>

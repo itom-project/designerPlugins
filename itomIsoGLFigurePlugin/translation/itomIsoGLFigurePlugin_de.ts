@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de">
+<TS version="2.1" language="de">
 <context>
     <name>ItomIsoGLWidget</name>
     <message>
@@ -169,7 +169,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjPCLFigure.h" line="+76"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractDObjPCLFigure.h" line="+80"/>
         <location line="+2"/>
         <location line="+2"/>
         <source>Source data for plot</source>
@@ -224,7 +224,7 @@
         <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
@@ -260,20 +260,20 @@
 <context>
     <name>plotGLWidget</name>
     <message>
-        <location filename="../plotIsoGLWidget.cpp" line="+975"/>
-        <location line="+695"/>
+        <location filename="../plotIsoGLWidget.cpp" line="+980"/>
+        <location line="+691"/>
         <source>invalid point cloud</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ungültige Punktewolke</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>compiled without pointCloud support</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die Anwendung wurde ohne PCL (pointCloud) kompiliert</translation>
     </message>
     <message>
-        <location line="+166"/>
+        <location line="+164"/>
         <source>DataObject-Container empty and compiled without pointCloud support</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die Anwendung wurde ohne PCL (pointCloud) kompiliert und der Datenobjekt-Container ist leer</translation>
     </message>
 </context>
 </TS>

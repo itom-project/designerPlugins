@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de">
+<TS version="2.1" language="de">
 <context>
     <name>EvaluateGeometricsFigure</name>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="+52"/>
+        <location filename="../evaluateGeometrics.cpp" line="+53"/>
         <source>Points for line plots from 2d objects</source>
         <translation>Punkte für Linienplot von 2D-Objekten</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location line="+275"/>
+        <location line="+12"/>
+        <location line="+281"/>
         <source>table</source>
         <translation>Tabelle</translation>
     </message>
     <message>
-        <location line="-274"/>
+        <location line="-280"/>
         <source>tree</source>
         <translation>Baum</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+282"/>
+        <location line="+288"/>
         <source>list</source>
         <translation>Liste</translation>
     </message>
     <message>
-        <location line="-281"/>
-        <location line="+276"/>
+        <location line="-287"/>
+        <location line="+282"/>
         <source>xml</source>
         <translation>XML</translation>
     </message>
     <message>
-        <location line="-272"/>
+        <location line="-278"/>
         <source>system settings</source>
         <translation>Systemeinstellungen</translation>
     </message>
@@ -87,7 +87,7 @@
         <translation>Grundeinstellungen</translation>
     </message>
     <message>
-        <location line="+483"/>
+        <location line="+475"/>
         <location line="+90"/>
         <source>set relation failed due to invalid object type</source>
         <translation>Setzen einer Verknüpfung wegen eines unzulässigen Datentyps gescheitert</translation>
@@ -113,13 +113,13 @@
         <translation>Das Hinzufügen des Verknüpfungstypen wurde mit einer Warnung beendet: Verknüpfungstyp existiert bereits</translation>
     </message>
     <message>
-        <location line="-385"/>
+        <location line="-371"/>
         <location line="+45"/>
         <source>select destination file</source>
         <translation>Speichern unter</translation>
     </message>
     <message>
-        <location line="-340"/>
+        <location line="-346"/>
         <source>Save...</source>
         <translation>Speichern...</translation>
     </message>
@@ -129,7 +129,7 @@
         <translation>Export der aktuellen Daten als Tabelle, Baum, XML...</translation>
     </message>
     <message>
-        <location line="+512"/>
+        <location line="+504"/>
         <source>imported data was Null-pointer</source>
         <translation>Es wurde ein Null-Pointer übergeben</translation>
     </message>
@@ -193,7 +193,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+68"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+73"/>
         <source>Source data for plot</source>
         <translation>Quelldaten der Abbildung</translation>
     </message>
@@ -247,12 +247,12 @@
         <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
         <translation>Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="-595"/>
+        <location filename="../evaluateGeometrics.cpp" line="-587"/>
         <source>Calculate</source>
         <translation>Betrechne</translation>
     </message>
@@ -310,27 +310,27 @@
 <context>
     <name>UIDialogRelation</name>
     <message>
-        <location filename="../dialogRelation.ui"/>
+        <location filename="../dialogRelation.ui" line="+20"/>
         <source>Select relation type and the corresponding partners</source>
         <translation>Verknüpfungstyp und Abhängigkeiten auswählen</translation>
     </message>
     <message>
-        <location/>
+        <location line="+9"/>
         <source>relation type</source>
         <translation>Verknüpfungstyp</translation>
     </message>
     <message>
-        <location/>
+        <location line="+10"/>
         <source>first element</source>
         <translation>Erstes Element</translation>
     </message>
     <message>
-        <location/>
+        <location line="+10"/>
         <source>second element</source>
         <translation>Zweites Element</translation>
     </message>
     <message>
-        <location/>
+        <location line="-35"/>
         <source>Relation</source>
         <translation>Verknüpfung</translation>
     </message>
@@ -338,37 +338,37 @@
 <context>
     <name>UIDialogSettings</name>
     <message>
-        <location filename="../dialogSettings.ui"/>
+        <location filename="../dialogSettings.ui" line="+43"/>
         <source>relations:</source>
         <translation>Beziehungen:</translation>
     </message>
     <message>
-        <location/>
+        <location line="+26"/>
         <source>value unit:</source>
         <translation>Elementwert:</translation>
     </message>
     <message>
-        <location/>
+        <location line="+10"/>
         <source>number of digits:</source>
         <translation>Anzahl Stellen:</translation>
     </message>
     <message>
-        <location/>
+        <location line="+14"/>
         <source>geometric elements:</source>
         <translation>Geometische Elemente:</translation>
     </message>
     <message>
-        <location/>
+        <location line="+14"/>
         <source>consider only 2D</source>
         <translation>Nur 2D berücksichtigen</translation>
     </message>
     <message>
-        <location/>
+        <location line="+26"/>
         <source>relation names:</source>
         <translation>Beziehungsnamen:</translation>
     </message>
     <message>
-        <location/>
+        <location line="-119"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>

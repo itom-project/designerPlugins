@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de">
+<TS version="2.1" language="de">
 <context>
     <name>MatplotlibPlot</name>
     <message>
@@ -110,7 +110,7 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../../../Build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
+        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
         <translation type="unfinished">Live-Datenquelle für die Anzeige</translation>
     </message>
@@ -118,47 +118,47 @@
 <context>
     <name>frmMatplotlibSubfigConfig</name>
     <message>
-        <location filename="../matplotlibSubfigConfig.ui"/>
+        <location filename="../matplotlibSubfigConfig.ui" line="+14"/>
         <source>Subplot Configuration Tool</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location/>
+        <location line="+6"/>
         <source>Margins</source>
         <translation>Rand</translation>
     </message>
     <message>
-        <location/>
+        <location line="+6"/>
         <source>left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location/>
+        <location line="+23"/>
         <source>top</source>
         <translation>Oben</translation>
     </message>
     <message>
-        <location/>
+        <location line="+23"/>
         <source>bottom</source>
         <translation>Unten</translation>
     </message>
     <message>
-        <location/>
+        <location line="+26"/>
         <source>right</source>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location/>
+        <location line="+35"/>
         <source>Spacing</source>
         <translation>Abstand</translation>
     </message>
     <message>
-        <location/>
+        <location line="+6"/>
         <source>hspace</source>
         <translation>Horizontal</translation>
     </message>
     <message>
-        <location/>
+        <location line="+23"/>
         <source>wspace</source>
         <translation>Vertikal</translation>
     </message>

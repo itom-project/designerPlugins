@@ -36,9 +36,9 @@ Itom1DQwtPlotPlugin::Itom1DQwtPlotPlugin(QObject *parent)
     m_plotDataTypes = ito::DataObjLine | ito::DataObjPlane;
     m_plotFeatures = ito::Live | ito::Static |  ito::PlotImage | ito::PlotLine | ito::Cartesian;
 
-    m_description = QObject::tr("itom widget for 1D DataObjects based on QWT.");
-    m_detaildescription = QObject::tr("This designer plugin is a itom widget for linewise / graph-based visualisation of DataObjects and live-outputs of spectrometers. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).");
-    m_author = "Marc Gronle, ITO";
+    m_description = QObject::tr("itom widget for 1D dataObjects based on Qwt.");
+    m_detaildescription = QObject::tr("This designer plugin is an itom widget for linewise / graph-based visualisation of dataObjects and live-outputs of line cameras. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).");
+    m_author = "Marc Gronle, Wolfram Lyda, Christian Kohler, ITO, University Stuttgart";
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL, for Qwt see Qwt License");
 
