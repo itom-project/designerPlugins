@@ -26,7 +26,7 @@
 #include <qwt_painter.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-UserInteractionPlotPicker::UserInteractionPlotPicker( QWidget *canvas ) : QwtPlotPicker(canvas) 
+UserInteractionPlotPicker::UserInteractionPlotPicker(QWidget *canvas) : QwtPlotPicker(canvas) 
 { 
     init(); 
 }
@@ -37,14 +37,14 @@ UserInteractionPlotPicker::~UserInteractionPlotPicker()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-UserInteractionPlotPicker::UserInteractionPlotPicker( int xAxis, int yAxis, QWidget *widget ) : QwtPlotPicker(xAxis,yAxis,widget) 
+UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis, QWidget *widget) : QwtPlotPicker(xAxis,yAxis,widget) 
 { 
     init(); 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-UserInteractionPlotPicker::UserInteractionPlotPicker( int xAxis, int yAxis,
-    RubberBand rubberBand, DisplayMode trackerMode, QWidget *widget ) :
+UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis,
+    RubberBand rubberBand, DisplayMode trackerMode, QWidget *widget) :
     QwtPlotPicker(xAxis,yAxis,rubberBand,trackerMode,widget) 
 { 
     init(); 
@@ -57,6 +57,7 @@ void UserInteractionPlotPicker::reset()
     // send activated(false) such that itom is able to continue
     if (isEnabled() && !isActive())
     {
+        m_selection.clear();
         emit activated(false);
     }
 
@@ -72,9 +73,9 @@ void UserInteractionPlotPicker::init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void UserInteractionPlotPicker::setBackgroundFillBrush( const QBrush &brush )
+void UserInteractionPlotPicker::setBackgroundFillBrush(const QBrush &brush)
 {
-    if(brush != this->m_rectFillBrush)
+    if (brush != this->m_rectFillBrush)
     {
         m_rectFillBrush = brush;
         updateDisplay();
@@ -82,68 +83,68 @@ void UserInteractionPlotPicker::setBackgroundFillBrush( const QBrush &brush )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void UserInteractionPlotPicker::drawTracker( QPainter *painter ) const
+void UserInteractionPlotPicker::drawTracker(QPainter *painter) const
 {
-    const QRect textRect = trackerRect( painter->font() );
-    if ( !textRect.isEmpty() )
+    const QRect textRect = trackerRect(painter->font());
+    if (!textRect.isEmpty())
     {
-        const QwtText label = trackerText( trackerPosition() );
-        if ( !label.isEmpty() )
+        const QwtText label = trackerText(trackerPosition());
+        if (!label.isEmpty())
         {
             painter->fillRect(textRect, m_rectFillBrush);
-            label.draw( painter, textRect );
+            label.draw(painter, textRect);
         }
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
+void UserInteractionPlotPicker::drawRubberBand(QPainter *painter) const
 {
-    if ( !isActive() || rubberBand() == NoRubberBand ||
-        rubberBandPen().style() == Qt::NoPen )
+    if (!isActive() || rubberBand() == NoRubberBand ||
+        rubberBandPen().style() == Qt::NoPen)
     {
         return;
     }
 
-    const QPolygon pa = adjustedPoints( pickedPoints() );
+    const QPolygon pa = adjustedPoints(pickedPoints());
 
     QwtPickerMachine::SelectionType selectionType =
         QwtPickerMachine::NoSelection;
 
-    if ( stateMachine() )
+    if (stateMachine())
         selectionType = stateMachine()->selectionType();
 
-    switch ( selectionType )
+    switch (selectionType)
     {
         case QwtPickerMachine::NoSelection:
         case QwtPickerMachine::PointSelection:
         {
-            if ( pa.count() < 1 )
+            if (pa.count() < 1)
                 return;
 
             const QPoint pos = pa[0];
 
             const QRect pRect = pickArea().boundingRect().toRect();
-            switch ( rubberBand() )
+            switch (rubberBand())
             {
                 case VLineRubberBand:
                 {
-                    QwtPainter::drawLine( painter, pos.x(),
-                        pRect.top(), pos.x(), pRect.bottom() );
+                    QwtPainter::drawLine(painter, pos.x(),
+                        pRect.top(), pos.x(), pRect.bottom());
                     break;
                 }
                 case HLineRubberBand:
                 {
-                    QwtPainter::drawLine( painter, pRect.left(),
-                        pos.y(), pRect.right(), pos.y() );
+                    QwtPainter::drawLine(painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y());
                     break;
                 }
                 case CrossRubberBand:
                 {
-                    QwtPainter::drawLine( painter, pos.x(),
-                        pRect.top(), pos.x(), pRect.bottom() );
-                    QwtPainter::drawLine( painter, pRect.left(),
-                        pos.y(), pRect.right(), pos.y() );
+                    QwtPainter::drawLine(painter, pos.x(),
+                        pRect.top(), pos.x(), pRect.bottom());
+                    QwtPainter::drawLine(painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y());
                     break;
                 }
                 default:
@@ -153,20 +154,20 @@ void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
         }
         case QwtPickerMachine::RectSelection:
         {
-            if ( pa.count() < 2 )
+            if (pa.count() < 2)
                 return;
 
-            const QRect rect = QRect( pa.first(), pa.last() ).normalized();
-            switch ( rubberBand() )
+            const QRect rect = QRect(pa.first(), pa.last()).normalized();
+            switch (rubberBand())
             {
                 case EllipseRubberBand:
                 {
-                    QwtPainter::drawEllipse( painter, rect );
+                    QwtPainter::drawEllipse(painter, rect);
                     break;
                 }
                 case RectRubberBand:
                 {
-                    QwtPainter::drawRect( painter, rect );
+                    QwtPainter::drawRect(painter, rect);
                     break;
                 }
                 default:
@@ -176,11 +177,11 @@ void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
         }
         case QwtPickerMachine::PolygonSelection:
         {
-            if ( rubberBand() == PolygonRubberBand )
+            if (rubberBand() == PolygonRubberBand)
             {
-                painter->drawPolyline( pa );
+                painter->drawPolyline(pa);
             }
-            else if ( rubberBand() == QwtPicker::UserRubberBand )
+            else if (rubberBand() == QwtPicker::UserRubberBand)
             {
                 if (pa.size() > 0)
                 {
@@ -188,10 +189,10 @@ void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
 
                     const QRect pRect = pickArea().boundingRect().toRect();
 
-                    QwtPainter::drawLine( painter, pos.x(),
-                            pRect.top(), pos.x(), pRect.bottom() );
-                    QwtPainter::drawLine( painter, pRect.left(),
-                        pos.y(), pRect.right(), pos.y() );
+                    QwtPainter::drawLine(painter, pos.x(),
+                            pRect.top(), pos.x(), pRect.bottom());
+                    QwtPainter::drawLine(painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y());
                 }
                 break;
             }
@@ -203,13 +204,13 @@ void UserInteractionPlotPicker::drawRubberBand( QPainter *painter ) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void UserInteractionPlotPicker::selectionAppended( const QPointF &pos )
+void UserInteractionPlotPicker::selectionAppended(const QPointF &pos)
 {
     m_selection.append(pos);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void UserInteractionPlotPicker::selectionMoved( const QPointF &pos )
+void UserInteractionPlotPicker::selectionMoved(const QPointF &pos)
 {
     if (m_selection.size() > 0)
     {

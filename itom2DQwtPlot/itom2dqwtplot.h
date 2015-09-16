@@ -156,7 +156,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
     Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
 
-
     Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
     Q_CLASSINFO("signal://userInteractionDone", "")
     Q_CLASSINFO("signal://plotItemChanged", "")
@@ -324,7 +323,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
 
-
     friend class PlotCanvas;
 
 protected:
@@ -402,7 +400,6 @@ private slots:
     void mnuLineCutMode(QAction *action);
     void mnuActStackCut(bool checked);
     
-    
     void mnuActPlaneSelector(int plane);
     void mnuDrawModifyMode(QAction *action);
     void mnuDrawMode(QAction *action);
@@ -414,7 +411,6 @@ private slots:
     void mnuCmplxSwitch(QAction *action);
     void childFigureDestroyed(QObject *obj);
 
-private slots:
     void resizeEvent ( QResizeEvent * event );
 
     void setCoordinates(const QVector<QPointF> &pts, bool visible = true);

@@ -198,11 +198,13 @@ void Itom2dQwtPlot::constructor()
 
     setPropertyObservedObject(this);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(QWidget *parent): AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent)
 {
     constructor();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2dQwtPlot::Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjFigure(itomSettingsFile, windowMode, parent)
@@ -219,15 +221,17 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
         delete m_mnuCmplxSwitch;
         m_mnuCmplxSwitch = NULL;
     }
+
     m_pContent->deleteLater();
     m_pContent = NULL;
-
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::init() 
 { 
     return m_pContent->init(); 
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::createActions()
 {
@@ -400,7 +404,8 @@ void Itom2dQwtPlot::createActions()
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
 
     //m_actDrawMode
-    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/point.png"), tr("Switch Draw Mode"), this);
+    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+    m_pActDrawMode->setData(PlotCanvas::tPoint);
     m_pMnuDrawMode = new QMenu(tr("Draw Mode"), this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
@@ -408,7 +413,7 @@ void Itom2dQwtPlot::createActions()
     a->setData(PlotCanvas::tPoint);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
-    a->setChecked(true);
+//    a->setChecked(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Line"));
     a->setData(PlotCanvas::tLine);
@@ -524,12 +529,12 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
     //displayed and sourceout is set by dataObjRasterData, since the data is analyzed there
     /*
-    if(m_lineCutType & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
+    if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
     {
         ito::DataObject* tmp = m_pInput["source"]->getVal<ito::DataObject*>();
         int dims = tmp->getDims();
         double bounds[6] = {0.0, 0.0, 0.0, 1.0, 0.5, 0.5};
-        if(dims > 1)
+        if (dims > 1)
         {
             bounds[2] = tmp->getPixToPhys(dims-1, 0);
             bounds[3] = tmp->getPixToPhys(dims-1, tmp->getSize(dims-1));
@@ -574,7 +579,11 @@ QString Itom2dQwtPlot::getTitle() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setTitle(const QString &title)
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     if (title == "<auto>")
     {
         ((InternalData*) m_pVData)->m_autoTitle = true;
@@ -585,16 +594,26 @@ void Itom2dQwtPlot::setTitle(const QString &title)
         ((InternalData*) m_pVData)->m_title = title;
     }
 
-    if (m_pContent) m_pContent->updateLabels();
+    if (m_pContent)
+    {
+        m_pContent->updateLabels();
+    }
     updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetTitle()
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_autoTitle = true;
-    if (m_pContent) m_pContent->updateLabels();
+    if (m_pContent)
+    {
+        m_pContent->updateLabels();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -610,7 +629,11 @@ QString Itom2dQwtPlot::getxAxisLabel() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setxAxisLabel(const QString &label)
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     if (label == "<auto>")
     {
         ((InternalData*) m_pVData)->m_autoxAxisLabel = true;
@@ -627,9 +650,16 @@ void Itom2dQwtPlot::setxAxisLabel(const QString &label)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetxAxisLabel()
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_autoxAxisLabel = true;
-    if (m_pContent) m_pContent->updateLabels();
+    if (m_pContent)
+    {
+        m_pContent->updateLabels();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -645,7 +675,11 @@ QString Itom2dQwtPlot::getyAxisLabel() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setyAxisLabel(const QString &label)
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
+
     if (label == "<auto>")
     {
         ((InternalData*) m_pVData)->m_autoyAxisLabel = true;
@@ -655,16 +689,25 @@ void Itom2dQwtPlot::setyAxisLabel(const QString &label)
         ((InternalData*) m_pVData)->m_autoyAxisLabel = false;
         ((InternalData*) m_pVData)->m_yaxisLabel = label;
     }
-    if (m_pContent) m_pContent->updateLabels();
+    if (m_pContent)
+    {
+        m_pContent->updateLabels();
+    }
     updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetyAxisLabel()
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
     ((InternalData*) m_pVData)->m_autoyAxisLabel = true;
-    if (m_pContent) m_pContent->updateLabels();
+    if (m_pContent)
+    {
+        m_pContent->updateLabels();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -680,7 +723,11 @@ QString Itom2dQwtPlot::getValueLabel() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setValueLabel(const QString &label)
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
+
     if (label == "<auto>")
     {
         ((InternalData*) m_pVData)->m_autoValueLabel = true;
@@ -690,16 +737,26 @@ void Itom2dQwtPlot::setValueLabel(const QString &label)
         ((InternalData*) m_pVData)->m_autoValueLabel = false;
         ((InternalData*) m_pVData)->m_valueLabel = label;
     }
-    if (m_pContent) m_pContent->updateLabels();
+    if (m_pContent)
+    {
+        m_pContent->updateLabels();
+    }
     updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetValueLabel()
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_autoValueLabel = true;
-    if (m_pContent) m_pContent->updateLabels();
+    if (m_pContent)
+    {
+        m_pContent->updateLabels();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -711,7 +768,11 @@ bool Itom2dQwtPlot::getyAxisFlipped() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setyAxisFlipped(const bool &value)
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
+
     if (((InternalData*) m_pVData)->m_yaxisFlipped != value)
     {
         ((InternalData*) m_pVData)->m_yaxisFlipped = value;
@@ -734,10 +795,18 @@ bool Itom2dQwtPlot::getxAxisVisible() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setxAxisVisible(const bool &value)
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_xaxisVisible = value;
 
-    if (m_pContent) m_pContent->enableAxis(QwtPlot::xBottom, value);
+    if (m_pContent)
+    {
+        m_pContent->enableAxis(QwtPlot::xBottom, value);
+    }
+
     updatePropertyDock();
 }
 
@@ -750,10 +819,18 @@ bool Itom2dQwtPlot::getyAxisVisible() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setyAxisVisible(const bool &value)
 {
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_yaxisVisible = value;
 
-    if (m_pContent) m_pContent->enableAxis(QwtPlot::yLeft, value);
+    if (m_pContent)
+    {
+        m_pContent->enableAxis(QwtPlot::yLeft, value);
+    }
+
     updatePropertyDock();
 }
 
@@ -764,6 +841,7 @@ ito::AutoInterval Itom2dQwtPlot::getXAxisInterval(void) const
     {
         return m_pContent->getInterval(Qt::XAxis);
     }
+
     return ito::AutoInterval();
 }
 
@@ -785,6 +863,7 @@ ito::AutoInterval Itom2dQwtPlot::getYAxisInterval(void) const
     {
         return m_pContent->getInterval(Qt::YAxis);
     }
+
     return ito::AutoInterval();
 }
 
@@ -806,6 +885,7 @@ ito::AutoInterval Itom2dQwtPlot::getZAxisInterval(void) const
     {
         return m_pContent->getInterval(Qt::ZAxis);
     }
+
     return ito::AutoInterval();
 }
 
@@ -827,6 +907,7 @@ ito::AutoInterval Itom2dQwtPlot::getOverlayInterval(void) const
     {
         return m_pContent->getOverlayInterval(Qt::ZAxis);
     }
+
     return ito::AutoInterval();
 }
 
@@ -848,6 +929,7 @@ QString Itom2dQwtPlot::getColorMap() const
     {
         return m_pContent->colorMapName();
     }
+
     return "";
 }
 
@@ -869,6 +951,7 @@ QString Itom2dQwtPlot::getOverlayColorMap() const
     {
         return m_pContent->colorOverlayMapName();
     }
+
     return "";
 }
 
@@ -890,6 +973,7 @@ QFont Itom2dQwtPlot::getTitleFont(void) const
     {
         return m_pContent->titleLabel()->font();
     }
+
     return QFont();
 }
 
@@ -913,6 +997,7 @@ QFont Itom2dQwtPlot::getLabelFont(void) const
         QwtText t = m_pContent->axisWidget(QwtPlot::xBottom)->title();
         return t.font();
     }
+
     return QFont();
 }
 
@@ -945,6 +1030,7 @@ QFont Itom2dQwtPlot::getAxisFont(void) const
     {
         return m_pContent->axisFont(QwtPlot::xBottom);
     }
+
     return QFont();
 }
 
@@ -974,14 +1060,13 @@ void Itom2dQwtPlot::mnuActSave()
     if (dlg->exec() == QDialog::Accepted)
     {
         dlg->getData(curSize, resolution);
-
         abort = false;
     }
 
     delete dlg;
     dlg = NULL;
 
-    if(abort)
+    if (abort)
     {
         return;
     }
@@ -1046,7 +1131,10 @@ void Itom2dQwtPlot::mnuActSave()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActHome()
 {
-    if (m_pContent) m_pContent->m_pZoomer->zoom(0);
+    if (m_pContent)
+    {
+        m_pContent->m_pZoomer->zoom(0);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1094,7 +1182,6 @@ void Itom2dQwtPlot::mnuActScaleSettings()
     if (dlg->exec() == QDialog::Accepted)
     {
         dlg->getData(*((InternalData*)m_pVData));
-
         m_pContent->updateScaleValues();
     }
 
@@ -1105,13 +1192,19 @@ void Itom2dQwtPlot::mnuActScaleSettings()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActColorPalette()
 {
-    if (m_pContent) m_pContent->setColorMap("__next__");
+    if (m_pContent)
+    {
+        m_pContent->setColorMap("__next__");
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActToggleColorBar(bool checked)
 {
-    if (m_pContent) m_pContent->setColorBarVisible(checked);
+    if (m_pContent)
+    {
+        m_pContent->setColorBarVisible(checked);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1147,7 +1240,7 @@ void Itom2dQwtPlot::mnuActLineCut(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
 {
-    if(!m_pActLineCut->isChecked())
+    if (!m_pActLineCut->isChecked())
     {
         m_pActLineCut->setChecked(true);
     }
@@ -1166,23 +1259,23 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
     {
         default:
         case 0:
-            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
                 
                 double dy = maxLoc[1] - minLoc[1];
                 double dx = maxLoc[2] - minLoc[2];
 
-                if(!ito::dObjHelper::isNotZero(dy) && !ito::dObjHelper::isNotZero(dx))
+                if (!ito::dObjHelper::isNotZero(dy) && !ito::dObjHelper::isNotZero(dx))
                 {
                     y.setMinimum((y.rmin() + y.rmax()) / 2.0);
                     y.setMaximum(y.rmin());
                 }
-                else if(fabs(dx) < std::numeric_limits<double>::epsilon() * 100)
+                else if (fabs(dx) < std::numeric_limits<double>::epsilon() * 100)
                 {
                     y.setMinimum(minLoc[1]);
                     y.setMaximum(maxLoc[1]);
                 }
-                else if(fabs(dy) < std::numeric_limits<double>::epsilon() * 100)
+                else if (fabs(dy) < std::numeric_limits<double>::epsilon() * 100)
                 {
                     x.setMinimum(minLoc[2]);
                     x.setMaximum(maxLoc[2]);
@@ -1201,9 +1294,9 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
                     double ymin = xbmin * (dy / dx) + b;
                     double ymax = xbmax * (dy / dx) + b;
 
-                    if(dx / dy > 0)
+                    if (dx / dy > 0)
                     {
-                        if(xmin < xbmin)
+                        if (xmin < xbmin)
                         {
                             x.setMinimum(xbmin);
                             y.setMinimum(ymin);
@@ -1214,7 +1307,7 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
                             y.setMinimum(ybmin);                    
                         }
 
-                        if(xmax > xbmax)
+                        if (xmax > xbmax)
                         {
                             x.setMaximum(xbmax);
                             y.setMaximum(ymax);
@@ -1227,7 +1320,7 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
                     }
                     else
                     {
-                        if(xmin > xbmax)
+                        if (xmin > xbmax)
                         {
                             x.setMinimum(xbmin);
                             y.setMinimum(ymin);
@@ -1238,7 +1331,7 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
                             y.setMinimum(ybmin);                    
                         }
 
-                        if(xmax < xbmin)
+                        if (xmax < xbmin)
                         {
                             x.setMaximum(xbmax);
                             y.setMaximum(ymax);
@@ -1260,14 +1353,14 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
             }
         break;
         case 1:
-            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
                 y.setMinimum(minLoc[1]);
                 y.setMaximum(minLoc[1]);
             }
         break;
         case 2:
-            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
                 y.setMinimum(maxLoc[1]);
                 y.setMaximum(maxLoc[1]);
@@ -1275,7 +1368,7 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
         break;
 
         case 3:
-            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
                 x.setMinimum(minLoc[2]);
                 x.setMaximum(minLoc[2]);
@@ -1283,7 +1376,7 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
         break;
 
         case 4:
-            if( ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+            if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
             {
                 x.setMinimum(maxLoc[2]);
                 x.setMaximum(maxLoc[2]);
@@ -1293,8 +1386,6 @@ void Itom2dQwtPlot::mnuLineCutMode(QAction *action)
 
     setLinePlot(x.rmin(), y.rmin(), x.rmax(), y.rmax());
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActStackCut(bool checked)
@@ -1320,7 +1411,11 @@ void Itom2dQwtPlot::mnuActPlaneSelector(int plane)
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getPlaneIndex() const
 {
-    if (m_pContent) return m_pContent->getCurrentPlane();
+    if (m_pContent)
+    {
+        return m_pContent->getCurrentPlane();
+    }
+
     return 0;
 }
 
@@ -1346,18 +1441,21 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
         }
     }
 
-    if (m_pContent) m_pContent->changePlane(idx);
+    if (m_pContent)
+    {
+        m_pContent->changePlane(idx);
+    }
     
     QStringList paramNames;
     
-    if(m_pOutput["bounds"]->getLen() == 6)
+    if (m_pOutput["bounds"]->getLen() == 6)
     {
         paramNames << "bounds"  << "sourceout";
         double * bounds = m_pOutput["bounds"]->getVal<double*>();
 
         double newBounds[6];
 
-        for(int i = 2; i < 6;i ++)
+        for (int i = 2; i < 6;i ++)
         {
             newBounds[i] = bounds[i];
         }
@@ -1369,7 +1467,6 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
     {
         paramNames << "displayed" ;
     }
-
 
     updateChannels(paramNames);
 
@@ -1406,15 +1503,33 @@ void Itom2dQwtPlot::mnuDrawMode(bool checked)
         m_pActLineCut->setChecked(false);
         m_pActStackCut->setChecked(false);
         m_pActValuePicker->setChecked(false);
+
+        foreach(QAction *act, m_pDrawModeActGroup->actions())
+        {
+            act->setChecked(act->data() == m_pActDrawMode->data().toInt());
+            if (act->isChecked())
+            {
+                mnuDrawMode(act);
+            }
+        }
     }
-    // we need to find out which draw mode we should activate here ...
-//    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::tIdle);
+    else
+    {
+        if (m_pActDrawMode->isChecked())
+        {
+            m_pActDrawMode->setChecked(false);
+        }
+
+        foreach(QAction *act, m_pDrawModeActGroup->actions())
+        {
+            act->setChecked(false);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuDrawModifyMode(QAction *action)
 {
-
     switch (action->data().toInt())
     {
         default:
@@ -1440,7 +1555,6 @@ void Itom2dQwtPlot::mnuDrawModifyMode(QAction *action)
     }
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuDrawMode(QAction *action)
 {
@@ -1456,24 +1570,28 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
         default:
         case PlotCanvas::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tPoint, 1, 1);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
         break;
 
         case PlotCanvas::tLine:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tLine, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
         break;
 
         case PlotCanvas::tRect:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tRect, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
         break;
 
         case PlotCanvas::tEllipse:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tEllipse, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
         break;
@@ -1490,11 +1608,13 @@ void Itom2dQwtPlot::mnuCmplxSwitch(QAction *action)
 void Itom2dQwtPlot::setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool visible)
 {
     m_pActCmplxSwitch->setVisible(visible);
-    if(!m_pVData) return;
+    if (!m_pVData)
+    {
+        return;
+    }
 
     if (((InternalData*) m_pVData)->m_cmplxType != type)
     {
-
         if (visible)
         {
             ((InternalData*) m_pVData)->m_cmplxType = (Itom2DQwt::tComplexType)type;
@@ -1516,7 +1636,10 @@ void Itom2dQwtPlot::setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool vi
             }
         }
 
-        if (m_pContent) m_pContent->internalDataUpdated();
+        if (m_pContent)
+        {
+            m_pContent->internalDataUpdated();
+        }
     }
 }
 
@@ -1533,17 +1656,21 @@ void Itom2dQwtPlot::setColorDataTypeRepresentation(bool colorOn)
     {
         m_pActColorPalette->setVisible(true);
         m_pActToggleColorBar->setVisible(true);
-        if (m_pContent) m_pContent->setColorBarVisible(m_pActToggleColorBar->isChecked());
+        if (m_pContent)
+        {
+            m_pContent->setColorBarVisible(m_pActToggleColorBar->isChecked());
+        }
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack /*= false*/)
 {
-    if(!ito::ITOM_API_FUNCS_GRAPH)
+    if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         return ito::RetVal(ito::retError, 0, tr("Could not spawn lineCut due to missing API-handle").toLatin1().data());
     }
+
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
     ito::uint32 newUniqueID = uniqueID;
@@ -1561,7 +1688,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     if (zStack)
     {
         m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
-        if(m_zSliceType & ito::AbstractFigure::tUninitilizedExtern)
+        if (m_zSliceType & ito::AbstractFigure::tUninitilizedExtern)
         {
             needChannelUpdate = true;
             m_zSliceType &= ~ito::AbstractFigure::tUninitilizedExtern;
@@ -1570,7 +1697,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     }
     else
     {
-        if(m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
+        if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
         {
             needChannelUpdate = true;
             m_lineCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
@@ -1594,7 +1721,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             if (lineCutObj->inherits("ito::AbstractDObjFigure"))
             {
                 figure = (ito::AbstractDObjFigure*)lineCutObj;
-                if(!needChannelUpdate)
+                if (!needChannelUpdate)
                 {
                     m_childFigures[lineCutObj] = newUniqueID;
                     connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
@@ -1605,7 +1732,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
             }
 
-            if(needChannelUpdate)
+            if (needChannelUpdate)
             {
                 ito::Channel *tempChannel;
                 foreach(tempChannel, m_pChannels)
@@ -1626,7 +1753,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 retval += addChannel((ito::AbstractNode*)figure,  m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "zCutPoint"  << "sourceout";
             }
-            else if(bounds.size() == 3) // its a 3D-Object
+            else if (bounds.size() == 3) // its a 3D-Object
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
@@ -1645,14 +1772,14 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             retval += updateChannels(paramNames);
 
-            if(needChannelUpdate) // we have an updated plot and want to show it
+            if (needChannelUpdate) // we have an updated plot and want to show it
             {
                 if (zStack && m_zSliceType & ito::AbstractFigure::tVisibleOnInit)
                 {
                     m_zSliceType &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
-                else if(!zStack && m_lineCutType & ito::AbstractFigure::tVisibleOnInit)
+                else if (!zStack && m_lineCutType & ito::AbstractFigure::tVisibleOnInit)
                 {
                     m_lineCutType &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
@@ -1671,10 +1798,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                     m_lineCutType = ito::AbstractFigure::tOwnChild;
                     figure->show();
                 }
-
             }
-            
-            
         }
         else
         {
@@ -1682,7 +1806,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             {
                 paramNames << "zCutPoint"  << "sourceout";
             }
-            else if(bounds.size() == 3) // its a 3D-Object
+            else if (bounds.size() == 3) // its a 3D-Object
             {
                 paramNames << "bounds"  << "sourceout";
             }
@@ -1696,6 +1820,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
     return retval;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 {
@@ -1748,7 +1873,11 @@ ito::RetVal Itom2dQwtPlot::deleteMarkers(QString id)
 ito::RetVal Itom2dQwtPlot::deleteMarkers(int id)
 {
     ito::RetVal retVal = m_pContent->deleteMarkers(id);
-    if(!retVal.containsWarningOrError()) emit plotItemDeleted(id);
+    if (!retVal.containsWarningOrError())
+    {
+        emit plotItemDeleted(id);
+    }
+
     return retVal;
 }
 
@@ -1756,14 +1885,18 @@ ito::RetVal Itom2dQwtPlot::deleteMarkers(int id)
 ito::RetVal Itom2dQwtPlot::clearGeometricElements(void)
 {
     ito::RetVal retVal = ito::retOk;
-    if(!m_pVData) return retVal;
-    QList<int> keys = ((InternalData*) m_pVData)->m_pDrawItems.keys();
-    
+    if (!m_pVData)
+    {
+        return retVal;
+    }
 
-    for(int i = 0; i < keys.size(); i++)
+    QList<int> keys = ((InternalData*) m_pVData)->m_pDrawItems.keys();
+
+    for (int i = 0; i < keys.size(); i++)
     {
         retVal += m_pContent->deleteMarkers(keys[i]);
     }
+
     emit plotItemsDeleted();
     return retVal;
 }
@@ -1836,16 +1969,15 @@ void Itom2dQwtPlot::setCoordinates(const QVector<QPointF> &pts, bool visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Itom2dQwtPlot::getGeometricElements()
 {
-    if(m_pVData == NULL)
+    if (m_pVData == NULL)
     {
         return QSharedPointer< ito::DataObject >(new ito::DataObject());
     }    
 
-
     int ysize = ((InternalData*) m_pVData)->m_pDrawItems.size();
     int xsize = PRIM_ELEMENTLENGTH;
 
-    if(ysize == 0)
+    if (ysize == 0)
     {
         return QSharedPointer< ito::DataObject >(new ito::DataObject());
     }
@@ -1856,12 +1988,13 @@ QSharedPointer< ito::DataObject > Itom2dQwtPlot::getGeometricElements()
 
     return exportItem;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 {
     int ysize = dstObject->getSize(0);
 
-    if(ysize == 0 || ysize < ((InternalData*) m_pVData)->m_pDrawItems.size())
+    if (ysize == 0 || ysize < ((InternalData*) m_pVData)->m_pDrawItems.size())
     {
         return ito::retError;
     }
@@ -1874,14 +2007,14 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 
     QHash<int, DrawItem*>::Iterator it = ((InternalData*) m_pVData)->m_pDrawItems.begin();
 
-//    for(int y = 0; y < ysize; y++)
+//    for (int y = 0; y < ysize; y++)
 //    {
     int y = 0;
     for (; it != ((InternalData*) m_pVData)->m_pDrawItems.end(); it++)
     {
         rowPtr = tarMat->ptr<ito::float32>(y);
-        //if(((InternalData*) m_pVData)->m_pDrawItems[y] == NULL)
-        if(it.value() == NULL)
+        //if (((InternalData*) m_pVData)->m_pDrawItems[y] == NULL)
+        if (it.value() == NULL)
         {
             continue;
         }
@@ -1939,32 +2072,37 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
 
     return ito::retOk;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     QList<int> keys = ((InternalData*) m_pVData)->m_pDrawItems.keys();
     ito::RetVal retVal = ito::retOk;
 
-    for(int i = 0; i < keys.size(); i++)
+    for (int i = 0; i < keys.size(); i++)
     {
         retVal += m_pContent->deleteMarkers(keys[i]);
     }
     emit plotItemsDeleted();
 
-    if(geometricElements.isNull() || 
+    if (geometricElements.isNull() || 
        geometricElements->getDims() != 2 || 
        (geometricElements->getType() != ito::tFloat32 && geometricElements->getType() != ito::tFloat64) ||
        geometricElements->getSize(1) < PRIM_ELEMENTLENGTH)
     {
-        m_pContent->statusBarMessage(tr("Element container did not match criteria, 2 dims, elements x 11, floating point value"), 600 );
+        m_pContent->statusBarMessage(tr("Element container did not match criteria, 2 dims, elements x 11, floating point value"), 600);
         plotItemsFinished(0, true);
         return;
     }
 
-    if(geometricElements->getSize(0) == 0)
+    if (geometricElements->getSize(0) == 0)
     {
-        m_pContent->statusBarMessage(tr("Deleted element, new element list was empty"), 600 );
+        m_pContent->statusBarMessage(tr("Deleted element, new element list was empty"), 600);
         m_pContent->replot();
         return;
     }
@@ -1988,7 +2126,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
         
     int rowStep = static_cast<int>(((cv::Mat*)(geometricElements->get_mdata()[geometricElements->seekMat(0)]))->step[0]);
 
-    if(type == ito::tFloat64)
+    if (type == ito::tFloat64)
     {
         rowStep /= sizeof(ito::float64);
         ptrScr64 = ((cv::Mat*)(geometricElements->get_mdata()[geometricElements->seekMat(0)]))->ptr<ito::float64>(0);
@@ -2002,11 +2140,11 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     ito::float32* ptrCurScr32 = NULL;
     ito::float64* ptrCurScr64 = NULL;
 
-    for(int geoElement = 0; geoElement < ysize; geoElement++)
+    for (int geoElement = 0; geoElement < ysize; geoElement++)
     {
         int type = 0;
 
-        if(type == ito::tFloat64)
+        if (type == ito::tFloat64)
         {
             ptrCurScr64 =  &(ptrScr64[geoElement * rowStep]);
             type = static_cast<ito::int32>(ptrCurScr64[1]) & 0x0000FFFF;
@@ -2023,7 +2161,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
         {
             case ito::PrimitiveContainer::tPoint:
             {     
-                if(type == ito::tFloat64) // idx, type, x0, y0, z0
+                if (type == ito::tFloat64) // idx, type, x0, y0, z0
                 {
                     ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
                     xCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[2]);
@@ -2041,7 +2179,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 
             case ito::PrimitiveContainer::tLine:
             {
-                if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
+                if (type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
                 {
                     ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
                     xCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[2]);
@@ -2057,14 +2195,12 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                     xCoords1[geoElement] = ptrCurScr32[5];
                     yCoords1[geoElement] = ptrCurScr32[6];
                 }
-
             }
             break;
 
             case ito::PrimitiveContainer::tRectangle:
             {
-
-                if(type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
+                if (type == ito::tFloat64)   // idx, type, x0, y0, z0, x1, y1, z1
                 {
                     ids[geoElement]                      = static_cast<ito::float32>(ptrCurScr64[0]);
                     xCoords0[geoElement] = static_cast<ito::float64>(ptrCurScr64[2]);
@@ -2080,7 +2216,6 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                     xCoords1[geoElement] = ptrCurScr32[5];
                     yCoords1[geoElement] = ptrCurScr32[6];
                 }
-
             }
             break;
 
@@ -2090,7 +2225,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
 
                 ito::float32 xC, yC, a;
 
-                if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a
+                if (type == ito::tFloat64)   // idx, type, xC, yC, zC, a
                 {
                     ids[geoElement] = static_cast<ito::float32>(ptrCurScr64[0]);
                     xC              = static_cast<ito::float64>(ptrCurScr64[2]);
@@ -2109,7 +2244,6 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                 yCoords0[geoElement] = yC - a / 2.0;
                 xCoords1[geoElement] = xC + a / 2.0;
                 yCoords1[geoElement] = yC + a / 2.0;
-
             }
             break;
 
@@ -2117,7 +2251,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
             {
                 ito::float32 xC, yC, r1, r2;
 
-                if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a
+                if (type == ito::tFloat64)   // idx, type, xC, yC, zC, a
                 {
                     ids[geoElement] = static_cast<ito::float32>(ptrCurScr64[0]);
                     xC              = static_cast<ito::float64>(ptrCurScr64[2]);
@@ -2138,7 +2272,6 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                 yCoords0[geoElement] = yC - r2;
                 xCoords1[geoElement] = xC + r1;
                 yCoords1[geoElement] = yC + r2;
-
             }
             break;
 
@@ -2147,7 +2280,7 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                 types[geoElement] = (ito::float32) ito::PrimitiveContainer::tEllipse;
                 ito::float32 xC, yC, r;
 
-                if(type == ito::tFloat64)   // idx, type, xC, yC, zC, a
+                if (type == ito::tFloat64)   // idx, type, xC, yC, zC, a
                 {
                     ids[geoElement] = static_cast<ito::float32>(ptrCurScr64[0]);
                     xC              = static_cast<ito::float64>(ptrCurScr64[2]);
@@ -2166,25 +2299,23 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
                 yCoords0[geoElement] = yC - r;
                 xCoords1[geoElement] = xC + r;
                 yCoords1[geoElement] = yC + r;
-
             }
             break;
 
             default:
                 plotItemsFinished(0, true);
-                m_pContent->statusBarMessage(tr("Could not convert elements, type undefined"), 600 );
+                m_pContent->statusBarMessage(tr("Could not convert elements, type undefined"), 600);
                 return;    
         }
-
     }
 
     ito::RetVal retval = m_pContent->plotMarkers(&coords, "b", "", 0);
 
     m_pContent->replot();
 
-    if(retval.containsError())
+    if (retval.containsError())
     {
-        m_pContent->statusBarMessage(tr("Could not set elements"), 600 );
+        m_pContent->statusBarMessage(tr("Could not set elements"), 600);
         plotItemsFinished(0, true);
         return;    
     }
@@ -2192,11 +2323,13 @@ void Itom2dQwtPlot::setGeometricElements(QSharedPointer< ito::DataObject > geome
     plotItemsFinished(0, false);
     this->updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getkeepAspectRatio(void) const 
 {
     return ((InternalData*) m_pVData)->m_keepAspect;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 {
@@ -2204,34 +2337,48 @@ void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
     {
         m_pActAspectRatio->setChecked(keepAspectEnable);
     }
+
     mnuActRatio(keepAspectEnable);
     this->updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActRatio(bool checked)
 {
     /*((InternalData*) m_pVData)->m_keepAspect = checked;
     
-    if(m_pActZoom->isChecked()) m_pActZoom->setChecked(false);
-    if(m_pActPan->isChecked()) m_pActPan->setChecked(false);
+    if (m_pActZoom->isChecked()) m_pActZoom->setChecked(false);
+    if (m_pActPan->isChecked()) m_pActPan->setChecked(false);
     
     m_pActPan->setEnabled(!checked);
     m_pActZoom->setEnabled(!checked);
 
-    if(m_pContent)
+    if (m_pContent)
     {
         m_pContent->m_pZoomer->zoom(0);
         m_pContent->setState(PlotCanvas::tIdle);
         m_pContent->configRescaler();
     }*/
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_keepAspect = checked;
-    if(m_pContent) (m_pContent)->configRescaler();
+
+    if (m_pContent)
+    {
+        (m_pContent)->configRescaler();
+    }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::resizeEvent ( QResizeEvent * event )
+void Itom2dQwtPlot::resizeEvent (QResizeEvent * event)
 {
-    if(m_pContent) m_pContent->configRescaler();
+    if (m_pContent)
+    {
+        m_pContent->configRescaler();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2239,22 +2386,29 @@ void Itom2dQwtPlot::mnuActCenterMarker(bool checked)
 {
     setEnabledCenterMarker(checked);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getEnabledCenterMarker(void) const 
 {
     return ((InternalData*) m_pVData)->m_showCenterMarker;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     if (m_pActCntrMarker && m_pActCntrMarker->isChecked() != enabled) //if property is set in designer or by python, the action should represent the current status, too
     {
         m_pActCntrMarker->setChecked(enabled);
     }
 
     ((InternalData*) m_pVData)->m_showCenterMarker = enabled;
-    if(m_pContent)
+
+    if (m_pContent)
     {
         m_pContent->setState(((InternalData*) m_pVData)->m_state);
         m_pContent->replot();
@@ -2262,17 +2416,28 @@ void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
 
     this->updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getOverlayAlpha () const 
 {
     return ((InternalData*) m_pVData)->m_alpha;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setOverlayAlpha (const int alpha)
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_alpha = alpha > 0 && alpha < 255 ? alpha : ((InternalData*) m_pVData)->m_alpha;
-    if(m_pContent) m_pContent->alphaChanged();
+
+    if (m_pContent)
+    {
+        m_pContent->alphaChanged();
+    }
+
     this->m_pOverlaySlider->setValue(((InternalData*) m_pVData)->m_alpha);
     this->updatePropertyDock();
 }
@@ -2282,35 +2447,47 @@ bool Itom2dQwtPlot::getEnabledPlotting(void) const
 {
     return ((InternalData*) m_pVData)->m_enablePlotting;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setEnabledPlotting(const bool &enabled)
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
     ((InternalData*) m_pVData)->m_enablePlotting = enabled;
     m_pActClearDrawings->setEnabled(enabled);
     m_pActDrawMode->setEnabled(enabled);
-    if(m_pActDrawMode->isChecked() && !enabled) m_pActDrawMode->setChecked(enabled);
+
+    if (m_pActDrawMode->isChecked() && !enabled)
+    {
+        m_pActDrawMode->setChecked(enabled);
+    }
+
     this->updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
 {
-    if(!m_pContent)
+    if (!m_pContent)
     {
         return QSharedPointer<ito::DataObject>(); 
     }
 
     return m_pContent->getDisplayed();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayedLineCut(void)
 {
-    if(!m_pContent)
+    if (!m_pContent)
     {
         return QSharedPointer<ito::DataObject>(); 
     }
 
-    if(!ito::ITOM_API_FUNCS_GRAPH)
+    if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         return QSharedPointer<ito::DataObject>(); 
     }
@@ -2318,9 +2495,9 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayedLineCut(void)
     ito::AbstractDObjFigure* figure = NULL;
     QList<QObject*> keys = m_childFigures.keys();
 
-    for( int i = 0; i < keys.length(); i++)
+    for (int i = 0; i < keys.length(); i++)
     {
-        if( m_childFigures[keys[i]] == m_pContent->m_lineCutUID &&
+        if (m_childFigures[keys[i]] == m_pContent->m_lineCutUID &&
             keys[i]->inherits("ito::AbstractDObjFigure"))                        
         {
             return (qobject_cast<ito::AbstractDObjFigure*>(keys[i]))->getDisplayed();
@@ -2329,36 +2506,39 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayedLineCut(void)
 
     return QSharedPointer<ito::DataObject>(); 
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getSelectedElement(void)const
 {
     QHash<int, DrawItem*>::const_iterator it = ((InternalData*) m_pVData)->m_pDrawItems.begin();
     for (;it != ((InternalData*) m_pVData)->m_pDrawItems.end(); ++it)        
     {
-        if(it.value() != NULL && it.value()->selected() != 0)
+        if (it.value() != NULL && it.value()->selected() != 0)
         { 
             return it.value()->m_idx;
         }
     }
+
     return -1;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setSelectedElement(const int idx)
 {
-    if(m_pVData == NULL) return;
+    if (m_pVData == NULL) return;
     bool replot = false;
     bool failed = idx == -1 ? false : true;
     QHash<int, DrawItem*>::const_iterator it = ((InternalData*) m_pVData)->m_pDrawItems.begin();
     for (;it != ((InternalData*) m_pVData)->m_pDrawItems.end(); ++it)        
     {
-        if(it.value() != NULL && it.value()->m_idx == idx)
+        if (it.value() != NULL && it.value()->m_idx == idx)
         {
             it.value()->setSelected(true);
             failed = false;
             replot = true;
             continue;
         }
-        if(it.value() != NULL && (it.value()->m_active != 0 || it.value()->selected()))
+        if (it.value() != NULL && (it.value()->m_active != 0 || it.value()->selected()))
         { 
             replot = true;
             it.value()->m_active = 0;
@@ -2367,13 +2547,15 @@ void Itom2dQwtPlot::setSelectedElement(const int idx)
         }
     }
 
-    if(m_pContent)
+    if (m_pContent)
     {
-        if(replot) m_pContent->replot();
-        if(failed) emit m_pContent->statusBarMessage(tr("Could not set active element, index out of range."), 12000 );
+        if (replot) m_pContent->replot();
+        if (failed) emit m_pContent->statusBarMessage(tr("Could not set active element, index out of range."), 12000);
     }
+
     this->updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom2dQwtPlot::getGeometricElementsCount() const 
 { 
@@ -2383,7 +2565,7 @@ int Itom2dQwtPlot::getGeometricElementsCount() const
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const double x1, const double y1, const int /*destID*/)
 {
-    if(m_pActLineCut->isCheckable() && m_pActLineCut->isEnabled())
+    if (m_pActLineCut->isCheckable() && m_pActLineCut->isEnabled())
     {
         m_pActLineCut->setChecked(true);
         mnuActLineCut(true);
@@ -2393,7 +2575,7 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
         return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
     }
 
-    if(m_pContent)
+    if (m_pContent)
     {
         QPoint first(m_pContent->transform(QwtPlot::xBottom, x0), m_pContent->transform(QwtPlot::yLeft, y0));
         QPoint second(m_pContent->transform(QwtPlot::xBottom, x1), m_pContent->transform(QwtPlot::yLeft, y1));
@@ -2404,37 +2586,58 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
     {
         return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Widget not ready.").toLatin1().data());
     }
+
     return ito::retOk;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuOverlaySliderChanged(int value)
 {
-    if(m_pVData == NULL) return;
-    if(value != ((InternalData*) m_pVData)->m_alpha)
+    if (m_pVData == NULL)
+    {
+        return;
+    }
+
+    if (value != ((InternalData*) m_pVData)->m_alpha)
     {
         ((InternalData*) m_pVData)->m_alpha = value;
-        if(m_pContent) m_pContent->alphaChanged();
+        if (m_pContent) m_pContent->alphaChanged();
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getContextMenuEnabled() const
 {
-    if (m_pContent) return (m_pContent)->m_showContextMenu;
+    if (m_pContent)
+    {
+        return (m_pContent)->m_showContextMenu;
+    }
+
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setContextMenuEnabled(bool show)
 {
-    if (m_pContent) (m_pContent)->m_showContextMenu = show;
+    if (m_pContent)
+    {
+        (m_pContent)->m_showContextMenu = show;
+    }
+
     updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const 
 {
-    if (m_pContent) return m_pContent->getOverlayObject();
+    if (m_pContent)
+    {
+        return m_pContent->getOverlayObject();
+    }
+
     return QSharedPointer< ito::DataObject >(NULL); 
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
 {
@@ -2456,13 +2659,21 @@ void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlay
     }
 
 
-    if(m_pContent) m_pContent->setOverlayObject(newOverlayObj.data());
+    if (m_pContent)
+    {
+        m_pContent->setOverlayObject(newOverlayObj.data());
+    }
+
     updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::resetOverlayImage(void)
 {
-    if(m_pContent) m_pContent->setOverlayObject(NULL);
+    if (m_pContent)
+    {
+        m_pContent->setOverlayObject(NULL);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2487,80 +2698,102 @@ void Itom2dQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
         m_pContent->m_unitLabelChanged = true;
         m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>());
     }
+
     updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom2dQwtPlot::getBackgroundColor(void) const
 {
-    if(m_pVData) 
+    if (m_pVData) 
     {
         return ((InternalData*)m_pVData)->m_backgnd;
     }
     else
+    {
         return Qt::white;
+    }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setBackgroundColor(const QColor newVal)
 {
-    if(m_pVData) 
+    if (m_pVData) 
     {
         InternalData* intData = ((InternalData*)m_pVData);
         intData->m_backgnd = newVal.rgb() & 0x00FFFFFF;
     }
-    if(m_pContent) m_pContent->updateColors();
+
+    if (m_pContent)
+    {
+        m_pContent->updateColors();
+    }
 
     updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom2dQwtPlot::getAxisColor(void) const
 {
-    if(m_pVData) 
+    if (m_pVData) 
     {
         return ((InternalData*)m_pVData)->m_axisColor;
     }
     else
+    {
         return Qt::black;
+    }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setAxisColor(const QColor newVal)
 {
-    if(m_pVData) 
+    if (m_pVData) 
     {
         InternalData* intData = ((InternalData*)m_pVData);
         intData->m_axisColor = newVal.rgb() & 0x00FFFFFF;
     }
-    if(m_pContent) m_pContent->updateColors();
+
+    if (m_pContent) m_pContent->updateColors();
 
     updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom2dQwtPlot::getTextColor(void) const
 {
-    if(m_pVData) 
+    if (m_pVData) 
     {
         return ((InternalData*)m_pVData)->m_textColor;
     }
     else
+    {
         return Qt::black;
+    }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setTextColor(const QColor newVal)
 {
-    if(m_pVData) 
+    if (m_pVData) 
     {
         InternalData* intData = ((InternalData*)m_pVData);
         intData->m_textColor = newVal.rgb() & 0x00FFFFFF;
     }
-    if(m_pContent) m_pContent->updateColors();
+
+    if (m_pContent)
+    {
+        m_pContent->updateColors();
+    }
 
     updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::ItomPlotHandle Itom2dQwtPlot::getLineCutPlotItem() const
 {
     ito::ItomPlotHandle handle(NULL, NULL, 0);
-    if(m_pContent && this->m_pContent->m_lineCutUID > 0)
+    if (m_pContent && this->m_pContent->m_lineCutUID > 0)
     {
         if (apiGetItomPlotHandleByID(m_pContent->m_lineCutUID, handle) == ito::retOk)
         {
@@ -2569,18 +2802,22 @@ ito::ItomPlotHandle Itom2dQwtPlot::getLineCutPlotItem() const
     }
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle idx)
 {
     ito::RetVal retval = ito::retOk;
-    if(!ito::ITOM_API_FUNCS_GRAPH) return;
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return;
+    }
     
-    if(m_pContent || idx.getObjectID() > -1)
+    if (m_pContent || idx.getObjectID() > -1)
     {
         ito::uint32 thisID = 0;
         retval += apiGetFigureIDbyHandle(this, thisID);
 
-        if(idx.getObjectID() == thisID || retval.containsError())
+        if (idx.getObjectID() == thisID || retval.containsError())
         {
             return;
         }
@@ -2609,34 +2846,39 @@ void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle idx)
 
         m_lineCutType = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
-
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 
 ito::ItomPlotHandle Itom2dQwtPlot::getZSlicePlotItem() const
 {
     ito::ItomPlotHandle handle(NULL, NULL, 0);
-    if(m_pContent && this->m_pContent->m_zstackCutUID > 0)
+    if (m_pContent && this->m_pContent->m_zstackCutUID > 0)
     {
         if (apiGetItomPlotHandleByID(m_pContent->m_zstackCutUID, handle) == ito::retOk)
         {
             return handle;
         }
     }
+
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
 {
     ito::RetVal retval = ito::retOk;
-    if(!ito::ITOM_API_FUNCS_GRAPH) return;
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return;
+    }
     
-    if(m_pContent || idx.getObjectID() > -1)
+    if (m_pContent || idx.getObjectID() > -1)
     {
         ito::uint32 thisID = 0;
         retval += apiGetFigureIDbyHandle(this, thisID);
 
-        if(idx.getObjectID() == thisID || retval.containsError())
+        if (idx.getObjectID() == thisID || retval.containsError())
         {
             return;
         }
@@ -2664,48 +2906,58 @@ void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
 
         m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
-
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getMarkerLablesVisible(void) const
 {
-    if(m_pVData) 
+    if (m_pVData) 
     {
         return ((InternalData*)m_pVData)->m_markerLabelVisible;
     }
     else
-        return false;    
+    {
+        return false;
+    }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setMarkerLablesVisible(const bool val)
 {
-    if(!m_pVData) 
+    if (!m_pVData) 
     {
         return ;
     }
-    if(val != ((InternalData*)m_pVData)->m_markerLabelVisible)
+    if (val != ((InternalData*)m_pVData)->m_markerLabelVisible)
     {
         ((InternalData*)m_pVData)->m_markerLabelVisible = val;
-        if(m_pContent) m_pContent->updateLabelVisibility();
+
+        if (m_pContent)
+        {
+            m_pContent->updateLabelVisibility();
+        }
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom2DQwt::tModificationState Itom2dQwtPlot::getModState(void) const
 {
-    if(!m_pVData) 
+    if (!m_pVData) 
     {
         return Itom2DQwt::tMoveGeometricElements;
     }
+
     return (((InternalData*)m_pVData)->m_modState);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setModState(const Itom2DQwt::tModificationState val)
 {
-    if(!m_pVData) 
+    if (!m_pVData) 
     {
         return;
     }
-    //if(val < 1 || val > 4) return;
+    //if (val < 1 || val > 4) return;
 
     ((InternalData*)m_pVData)->m_modState = val;
 }
@@ -2713,12 +2965,12 @@ void Itom2dQwtPlot::setModState(const Itom2DQwt::tModificationState val)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
 {
-    if(!m_pContent)
+    if (!m_pContent)
     {
         return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
     }
 
-    if(curSize.height() == 0 || curSize.width() == 0)
+    if (curSize.height() == 0 || curSize.width() == 0)
     {
         curSize = m_pContent->size();
     }
@@ -2726,8 +2978,8 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
 
     QPalette curPalette = m_pContent->palette();
 
-    m_pContent->setAutoFillBackground( true );
-    m_pContent->setPalette( Qt::white );
+    m_pContent->setAutoFillBackground(true);
+    m_pContent->setPalette(Qt::white);
     m_pContent->setCanvasBackground(Qt::white);    
 
     m_pContent->replot();
@@ -2738,7 +2990,7 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
     //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
-    if(copyToClipboardNotFile)
+    if (copyToClipboardNotFile)
     {
         m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
 
@@ -2760,29 +3012,31 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
         renderer.renderDocument(m_pContent, fileName, curSize, resolution);
     }
 
-    m_pContent->setPalette( curPalette);
-    m_pContent->setCanvasBackground( curBrush);
+    m_pContent->setPalette(curPalette);
+    m_pContent->setCanvasBackground(curBrush);
 
     m_pContent->replot();
     return ito::retOk;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::copyToClipBoard()
 {
     return exportCanvas(true, "");
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
 {
     QSizeF curSize(xsize, ysize);
-    if(!m_pContent)
+    if (!m_pContent)
     {
         QSize myRect(curSize.width(), curSize.height());
         QPixmap destinationImage(myRect);
         return destinationImage;
     }
 
-    if(curSize.height() == 0 || curSize.width() == 0)
+    if (curSize.height() == 0 || curSize.width() == 0)
     {
         curSize = m_pContent->size();
     }
@@ -2794,7 +3048,7 @@ QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
 
     QPixmap destinationImage(myRect);
 
-    if(!m_pContent)
+    if (!m_pContent)
     {
         destinationImage.fill(Qt::red);
         return destinationImage;
@@ -2804,8 +3058,8 @@ QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
 
     QPalette curPalette = m_pContent->palette();
 
-    m_pContent->setAutoFillBackground( true );
-    m_pContent->setPalette( Qt::white );
+    m_pContent->setAutoFillBackground(true);
+    m_pContent->setPalette(Qt::white);
     m_pContent->setCanvasBackground(Qt::white);    
 
     m_pContent->replot();
@@ -2822,57 +3076,59 @@ QPixmap Itom2dQwtPlot::renderToPixMap(const int xsize, const int ysize, const in
     renderer.render(m_pContent, &painter, m_pContent->rect());
     //destinationImage.convertFromImage(img);
 
-
-    m_pContent->setPalette( curPalette);
-    m_pContent->setCanvasBackground( curBrush);
+    m_pContent->setPalette(curPalette);
+    m_pContent->setCanvasBackground(curBrush);
 
     m_pContent->replot();
 
     return destinationImage;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::setGeometricElementLabel(int id, QString label)
 {
-    if(!m_pVData) 
+    if (!m_pVData) 
     {
         return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
     }
 
     InternalData* pData = ((InternalData*)m_pVData);
 
-    if(!pData->m_pDrawItems.contains(id))
+    if (!pData->m_pDrawItems.contains(id))
     {
         return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
     }
 
     pData->m_pDrawItems[id]->setLabel(label);
-    if(m_pContent)
+    if (m_pContent)
     {
         m_pContent->replot();
     }
+
     return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::setGeometricElementLabelVisible(int id, bool setVisible)
 {
-    if(!m_pVData) 
+    if (!m_pVData) 
     {
         return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
     }
 
     InternalData* pData = ((InternalData*)m_pVData);
 
-    if(!pData->m_pDrawItems.contains(id))
+    if (!pData->m_pDrawItems.contains(id))
     {
         return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
     }
 
     pData->m_pDrawItems[id]->setLabelVisible(setVisible);
-    if(m_pContent)
+    if (m_pContent)
     {
         m_pContent->replot();
     }
+
     return ito::retOk;
 }
 
