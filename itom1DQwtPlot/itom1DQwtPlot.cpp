@@ -607,6 +607,7 @@ void Itom1DQwtPlot::createActions()
 
     //m_actDrawMode
     m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+    m_pActDrawMode->setData(Plot1DWidget::tPoint);
     m_pMnuDrawMode = new QMenu("Draw Mode", this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
@@ -614,7 +615,7 @@ void Itom1DQwtPlot::createActions()
     a->setData(Plot1DWidget::tPoint);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
-    a->setChecked(true);
+//    a->setChecked(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Line"));
     a->setData(Plot1DWidget::tLine);
@@ -1230,9 +1231,28 @@ void Itom1DQwtPlot::mnuDrawMode(bool checked)
         m_pActMarker->setChecked(false);
         m_pContent->setZoomerEnable(false);
         m_pContent->setState(m_pContent->stateIdle);
+
+        foreach(QAction *act, m_pDrawModeActGroup->actions())
+        {
+            act->setChecked(act->data() == m_pActDrawMode->data().toInt());
+            if (act->isChecked())
+            {
+                mnuDrawMode(act);
+            }
+        }
     }
-    // we need to find out which draw mode we should activate here ...
-//    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::stateIdle);
+    else
+    {
+        if (m_pActDrawMode->isChecked())
+        {
+            m_pActDrawMode->setChecked(false);
+        }
+
+        foreach(QAction *act, m_pDrawModeActGroup->actions())
+        {
+            act->setChecked(false);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1250,24 +1270,28 @@ void Itom1DQwtPlot::mnuDrawMode(QAction *action)
         default:
         case Plot1DWidget::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(Plot1DWidget::tPoint, 1, 1);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
         break;
 
         case Plot1DWidget::tLine:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(Plot1DWidget::tLine, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
         break;
 
         case Plot1DWidget::tRect:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(Plot1DWidget::tRect, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
         break;
 
         case Plot1DWidget::tEllipse:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
+            m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(Plot1DWidget::tEllipse, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
         break;

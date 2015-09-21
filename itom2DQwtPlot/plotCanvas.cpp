@@ -2231,7 +2231,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::multiPointActivated (bool on)
+void PlotCanvas::multiPointActivated(bool on)
 {
     if (m_pData)
     {
@@ -2581,7 +2581,7 @@ void PlotCanvas::multiPointActivated (bool on)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
+void PlotCanvas::mouseMoveEvent(QMouseEvent * event)
 {
     if(m_ignoreNextMouseEvent)
     {
@@ -3064,7 +3064,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mousePressEvent (QMouseEvent * event)
+void PlotCanvas::mousePressEvent(QMouseEvent * event)
 {
     if (m_pData->m_state == tIdle)
     {
@@ -3136,7 +3136,7 @@ void PlotCanvas::mousePressEvent (QMouseEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
+void PlotCanvas::mouseReleaseEvent(QMouseEvent * event)
 {
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
     if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
@@ -3159,7 +3159,6 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                         values.append(it.value()->y1);
                         values.append(0.0);
                         p->m_pActDrawMode->setChecked(false);
-//                        p->mnuDrawMode(false);
                     break;
 
                     case tLine:
@@ -3171,7 +3170,6 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                         values.append(it.value()->y2);
                         values.append(0.0);
                         p->m_pActDrawMode->setChecked(false);
-                        //p->mnuDrawMode(false);
                     break;
 
                     // square is a rect
@@ -3185,7 +3183,6 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                         values.append(it.value()->y2);
                         values.append(0.0);
                         p->m_pActDrawMode->setChecked(false);
-//                        p->mnuDrawMode(false);
                     break;
 
                     // circle is an ellispe
@@ -3199,7 +3196,6 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                         values.append(abs(it.value()->y1 - it.value()->y2)*0.5);
                         values.append(0.0);
                         p->m_pActDrawMode->setChecked(false);
-//                        p->mnuDrawMode(false);
                     break;
 
 /*
