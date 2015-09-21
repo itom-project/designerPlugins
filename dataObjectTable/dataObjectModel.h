@@ -29,6 +29,13 @@
 #include <qsharedpointer.h>
 #include <qstringlist.h>
 
+#ifndef DATAOBJECTMODEL_TYPEDEFINED
+#define DATAOBJECTMODEL_TYPEDEFINED
+    Q_DECLARE_METATYPE(ito::complex64);
+    Q_DECLARE_METATYPE(ito::complex128);
+    Q_DECLARE_METATYPE(ito::Rgba32);
+#endif
+
 class DataObjectModel : public QAbstractItemModel
 {
     Q_OBJECT

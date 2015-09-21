@@ -26,10 +26,6 @@
 
 #include "common/typeDefs.h"
 
-Q_DECLARE_METATYPE(ito::complex64);
-Q_DECLARE_METATYPE(ito::complex128);
-Q_DECLARE_METATYPE(ito::Rgba32);
-
 int DataObjectModel::displayRoleWithoutSuffix = Qt::UserRole+1;
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -150,9 +146,9 @@ QString DataObjectModel::getDisplayNumber(const ito::complex64 &number, const in
     {
         if (number.imag() >= 0)
         {
-            return QString("%L1i+%L2%3").arg(number.real(), 0, 'f', m_decimals).arg(number.imag(), 0, 'f', m_decimals).arg(suffix);
+            return QString("%L1+%L2i%3").arg(number.real(), 0, 'f', m_decimals).arg(number.imag(), 0, 'f', m_decimals).arg(suffix);
         }
-        return QString("%L1i-%L2%3").arg(number.real(), 0, 'f', m_decimals).arg(-number.imag(), 0, 'f', m_decimals).arg(suffix);
+        return QString("%L1-%L2i%3").arg(number.real(), 0, 'f', m_decimals).arg(-number.imag(), 0, 'f', m_decimals).arg(suffix);
     }
 }
 
@@ -181,9 +177,9 @@ QString DataObjectModel::getDisplayNumber(const ito::complex128 &number, const i
     {
         if (number.imag() >= 0)
         {
-            return QString("%L1i+%L2").arg(number.real(), 0, 'f', m_decimals).arg(number.imag(), 0, 'f', m_decimals);
+            return QString("%L1+%iL2").arg(number.real(), 0, 'f', m_decimals).arg(number.imag(), 0, 'f', m_decimals);
         }
-        return QString("%L1i-%L2").arg(number.real(), 0, 'f', m_decimals).arg(-number.imag(), 0, 'f', m_decimals);
+        return QString("%L1-%iL2").arg(number.real(), 0, 'f', m_decimals).arg(-number.imag(), 0, 'f', m_decimals);
     }
 }
 

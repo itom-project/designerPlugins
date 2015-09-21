@@ -25,6 +25,8 @@
 
 #include <qspinbox.h>
 #include <qitemdelegate.h>
+#include <qboxlayout.h>
+#include <qlabel.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DataObjectDelegate::DataObjectDelegate(QObject *parent /*= 0*/)
@@ -136,12 +138,72 @@ QWidget *DataObjectDelegate::createEditor(QWidget *parent, const QStyleOptionVie
         break;
     case ito::tComplex64:
         {
-            
+            QWidget *editor = new QWidget(parent);
+            QHBoxLayout *layout = new QHBoxLayout();
+            layout->setSpacing(0);
+            layout->setContentsMargins(0,0,0,0);
+
+            QDoubleSpinBox *realEditor = new QDoubleSpinBox(parent);
+            realEditor->setSuffix(suffix);
+            realEditor->setDecimals(m_editorDecimals);
+            realEditor->setMinimum(std::max(-std::numeric_limits<ito::float32>::max(), cv::saturate_cast<ito::float32>(m_min)));
+            realEditor->setMaximum(std::min(std::numeric_limits<ito::float32>::max(), cv::saturate_cast<ito::float32>(m_max)));
+            realEditor->setToolTip(tr("Real part"));
+            realEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+            QDoubleSpinBox *imagEditor = new QDoubleSpinBox(parent);
+            imagEditor->setSuffix(suffix);
+            imagEditor->setDecimals(m_editorDecimals);
+            imagEditor->setMinimum(std::max(-std::numeric_limits<ito::float32>::max(), cv::saturate_cast<ito::float32>(m_min)));
+            imagEditor->setMaximum(std::min(std::numeric_limits<ito::float32>::max(), cv::saturate_cast<ito::float32>(m_max)));
+            imagEditor->setToolTip(tr("Imaginary part"));
+            imagEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+            QLabel *label = new QLabel("+i");
+            label->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+            layout->addWidget(realEditor);
+            layout->addWidget(label);
+            layout->addWidget(imagEditor);
+
+            editor->setLayout(layout);
+
+            return editor;
         }
         break;
     case ito::tComplex128:
         {
-            
+            QWidget *editor = new QWidget(parent);
+            QHBoxLayout *layout = new QHBoxLayout();
+            layout->setSpacing(0);
+            layout->setContentsMargins(0,0,0,0);
+
+            QDoubleSpinBox *realEditor = new QDoubleSpinBox(parent);
+            realEditor->setSuffix(suffix);
+            realEditor->setDecimals(m_editorDecimals);
+            realEditor->setMinimum(std::max(-std::numeric_limits<ito::float64>::max(), cv::saturate_cast<ito::float64>(m_min)));
+            realEditor->setMaximum(std::min(std::numeric_limits<ito::float64>::max(), cv::saturate_cast<ito::float64>(m_max)));
+            realEditor->setToolTip(tr("Real part"));
+            realEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+            QDoubleSpinBox *imagEditor = new QDoubleSpinBox(parent);
+            imagEditor->setSuffix(suffix);
+            imagEditor->setDecimals(m_editorDecimals);
+            imagEditor->setMinimum(std::max(-std::numeric_limits<ito::float64>::max(), cv::saturate_cast<ito::float64>(m_min)));
+            imagEditor->setMaximum(std::min(std::numeric_limits<ito::float64>::max(), cv::saturate_cast<ito::float64>(m_max)));
+            imagEditor->setToolTip(tr("Imaginary part"));
+            imagEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+            QLabel *label = new QLabel("+i");
+            label->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+            layout->addWidget(realEditor);
+            layout->addWidget(label);
+            layout->addWidget(imagEditor);
+
+            editor->setLayout(layout);
+
+            return editor;
         }
         break;
     case ito::tRGBA32:
@@ -193,12 +255,22 @@ void DataObjectDelegate::setEditorData(QWidget *editor, const QModelIndex &index
         break;
     case ito::tComplex64:
         {
-            
+            QWidget *widget = static_cast<QWidget*>(editor);
+            ito::complex64 value = model->data(index, Qt::EditRole).value<ito::complex64>();
+            QDoubleSpinBox *realSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(0)->widget());
+            QDoubleSpinBox *imagSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(2)->widget());
+            realSpinBox->setValue(value.real());
+            imagSpinBox->setValue(value.imag());
         }
         break;
     case ito::tComplex128:
         {
-            
+            QWidget *widget = static_cast<QWidget*>(editor);
+            ito::complex128 value = model->data(index, Qt::EditRole).value<ito::complex128>();
+            QDoubleSpinBox *realSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(0)->widget());
+            QDoubleSpinBox *imagSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(2)->widget());
+            realSpinBox->setValue(value.real());
+            imagSpinBox->setValue(value.imag());
         }
         break;
     case ito::tRGBA32:
@@ -223,8 +295,7 @@ void DataObjectDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     case ito::tInt32:
         {
             QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-            int value = model->setData(index, spinBox->value(), Qt::EditRole); 
-            spinBox->setValue(value);
+            model->setData(index, spinBox->value(), Qt::EditRole); 
         }
         break;
 
@@ -233,8 +304,7 @@ void DataObjectDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     case ito::tUInt32:
         {
             QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-            int value = model->setData(index, spinBox->value(), Qt::EditRole); 
-            spinBox->setValue(value);
+            model->setData(index, spinBox->value(), Qt::EditRole); 
         }
         break;
 
@@ -242,18 +312,23 @@ void DataObjectDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     case ito::tFloat64:
         {
             QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
-            int value = model->setData(index, spinBox->value(), Qt::EditRole); 
-            spinBox->setValue(value);
+            model->setData(index, spinBox->value(), Qt::EditRole); 
         }
         break;
     case ito::tComplex64:
         {
-            
+            QWidget *widget = static_cast<QWidget*>(editor);
+            QDoubleSpinBox *realSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(0)->widget());
+            QDoubleSpinBox *imagSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(2)->widget());
+            model->setData(index, QVariant::fromValue<ito::complex64>(ito::complex64(realSpinBox->value(), imagSpinBox->value())), Qt::EditRole);
         }
         break;
     case ito::tComplex128:
         {
-            
+            QWidget *widget = static_cast<QWidget*>(editor);
+            QDoubleSpinBox *realSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(0)->widget());
+            QDoubleSpinBox *imagSpinBox = static_cast<QDoubleSpinBox*>(widget->layout()->itemAt(2)->widget());
+            model->setData(index, QVariant::fromValue<ito::complex128>(ito::complex128(realSpinBox->value(), imagSpinBox->value())), Qt::EditRole);
         }
         break;
     }
