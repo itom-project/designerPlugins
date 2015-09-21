@@ -20,36 +20,39 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef DATAOBJECTTABLEFACTORY_H
-#define DATAOBJECTTABLEFACTORY_H
+#ifndef DATAOBJECTDELEGATE_H
+#define DATAOBJECTDELEGATE_H
 
-#include <QtDesigner/QDesignerCustomWidgetInterface>
+#include "DataObject/dataobj.h"
 
-class DataObjectTableFactory : public QObject, public QDesignerCustomWidgetInterface
+#include <qtableview.h>
+#include <qabstractitemmodel.h>
+#include <qitemdelegate.h>
+#include <qsharedpointer.h>
+#include <qheaderview.h>
+#include <qstringlist.h>
+
+class DataObjectDelegate : public QItemDelegate
 {
     Q_OBJECT
-#if QT_VERSION >=  QT_VERSION_CHECK(5,0,0)
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" )
-#endif
-    Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-    DataObjectTableFactory(QObject *parent = 0);
+    DataObjectDelegate(QObject *parent = 0);
+    virtual ~DataObjectDelegate();
 
-    bool isContainer() const;
-    bool isInitialized() const;
-    QIcon icon() const;
-    QString domXml() const;
-    QString group() const;
-    QString includeFile() const;
-    QString name() const;
-    QString toolTip() const;
-    QString whatsThis() const;
-    QWidget *createWidget(QWidget *parent);
-    void initialize(QDesignerFormEditorInterface *core);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,  const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    friend class DataObjectTable;
 
 private:
-    bool initialized;
+    double m_min;
+    double m_max;
+    int m_editorDecimals;
+    QStringList m_suffixes;
+
 };
 
-#endif // DATAOBJECTTABLEFACTORY_H
+#endif //DATAOBJECTDELEGATE_H

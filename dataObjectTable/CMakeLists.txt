@@ -59,8 +59,14 @@ LINK_DIRECTORIES(
 
 set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectTable.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectDelegate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dataobjecttablefactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+)
+
+set(plugin_HEADERS_COPY
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectTable.h
 )
 
 set(plugin_UI
@@ -73,6 +79,8 @@ set(plugin_RCC
 
 set(plugin_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectTable.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectDelegate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectModel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataobjecttablefactory.cpp
 )
 
@@ -116,4 +124,5 @@ set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")
 ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
 ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
+ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
 POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
