@@ -53,7 +53,11 @@ DataObjectTable::DataObjectTable(QWidget *parent /*= 0*/)
     connect(this, SIGNAL(entered(QModelIndex)), this, SLOT(_entered(QModelIndex)));
     connect(this, SIGNAL(pressed(QModelIndex)), this, SLOT(_pressed(QModelIndex)));
 
+#if QT_VERSION < 0x050000
     horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+#else
+    horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#endif
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
 }
@@ -140,25 +144,41 @@ void DataObjectTable::setEditorDecimals(int value)
 //----------------------------------------------------------------------------------------------------------------------------------
 QHeaderView::ResizeMode DataObjectTable::getHorizontalResizeMode() const
 {
+#if QT_VERSION < 0x050000
     return horizontalHeader()->resizeMode(0);
+#else
+    return horizontalHeader()->sectionResizeMode(0);
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectTable::setHorizontalResizeMode(QHeaderView::ResizeMode mode)
 {
+#if QT_VERSION < 0x050000
     horizontalHeader()->setResizeMode(mode);
+#else
+    return horizontalHeader()->setSectionResizeMode(mode);
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QHeaderView::ResizeMode DataObjectTable::getVerticalResizeMode() const
 {
+#if QT_VERSION < 0x050000
     return verticalHeader()->resizeMode(0);
+#else
+    return verticalHeader()->sectionResizeMode(0);
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectTable::setVerticalResizeMode(QHeaderView::ResizeMode mode)
 {
+#if QT_VERSION < 0x050000
     verticalHeader()->setResizeMode(mode);
+#else
+    return verticalHeader()->setSectionResizeMode(mode);
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
