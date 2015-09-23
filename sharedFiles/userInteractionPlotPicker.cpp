@@ -53,12 +53,17 @@ UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis,
 //----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::reset()
 {
-    //at the beginning no point is clicked, nevertheless the Abort-Key should abort the selection and
-    // send activated(false) such that itom is able to continue
-    if (isEnabled() && !isActive())
+    if (isEnabled())
     {
+        // if the Abort-Key is pressed, we have to clear the selection
         m_selection.clear();
-        emit activated(false);
+
+        if (!isActive())
+        {
+            //at the beginning no point is clicked, nevertheless the Abort-Key should abort the selection and
+            // send activated(false) such that itom is able to continue
+            emit activated(false);
+        } 
     }
 
     QwtPlotPicker::reset();
