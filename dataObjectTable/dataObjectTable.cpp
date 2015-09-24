@@ -245,6 +245,18 @@ int DataObjectTable::getDefaultRows() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+Qt::Alignment DataObjectTable::getAlignment() const
+{
+    return m_pModel->getAlignment();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::setAlignment(Qt::Alignment alignment)
+{
+    m_pModel->setAlignment(alignment);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QSize DataObjectTable::sizeHint() const
 {
     QHeaderView *hHeader = horizontalHeader();

@@ -32,7 +32,8 @@ int DataObjectModel::displayRoleWithoutSuffix = Qt::UserRole+1;
 DataObjectModel::DataObjectModel() : 
     m_readOnly(false), m_defaultRows(3), m_defaultCols(3),
     m_decimals(2),
-    m_dummyData(true)
+    m_dummyData(true),
+    m_alignment(Qt::AlignLeft)
 {
     m_sharedDataObj = QSharedPointer<ito::DataObject>(new ito::DataObject());
     m_sharedDataObj->zeros(m_defaultRows, m_defaultCols, ito::tFloat32);
@@ -78,15 +79,15 @@ QString DataObjectModel::getDisplayNumber(const ito::float64 &number, const int 
 
     if (qIsNaN(number))
     {
-        return QString("NaN%1").arg(suffix);
+        return QString("NaN");
     }
     else if(std::numeric_limits<ito::float64>::infinity() == number)
     {
-        return QString("Inf%1").arg(suffix);
+        return QString("Inf");
     }
     else if(std::numeric_limits<ito::float64>::infinity() == -number)
     {
-        return QString("-Inf%1").arg(suffix);
+        return QString("-Inf");
     }
     else
     {
@@ -105,15 +106,15 @@ QString DataObjectModel::getDisplayNumber(const ito::float32 &number, const int 
 
     if (qIsNaN(number))
     {
-        return QString("NaN%1").arg(suffix);
+        return QString("NaN");
     }
     else if(std::numeric_limits<ito::float32>::infinity() == number)
     {
-        return QString("Inf%1").arg(suffix);
+        return QString("Inf");
     }
     else if(std::numeric_limits<ito::float32>::infinity() == -number)
     {
-        return QString("-Inf%1").arg(suffix);
+        return QString("-Inf");
     }
     else
     {
@@ -132,15 +133,15 @@ QString DataObjectModel::getDisplayNumber(const ito::complex64 &number, const in
 
     if (qIsNaN(number.real()))
     {
-        return QString("NaN%1").arg(suffix);
+        return QString("NaN");
     }
     else if(std::numeric_limits<ito::float32>::infinity() == number.real())
     {
-        return QString("Inf%1").arg(suffix);
+        return QString("Inf");
     }
     else if(std::numeric_limits<ito::float32>::infinity() == -number.real())
     {
-        return QString("-Inf%1").arg(suffix);
+        return QString("-Inf");
     }
     else
     {
@@ -163,15 +164,15 @@ QString DataObjectModel::getDisplayNumber(const ito::complex128 &number, const i
 
     if (qIsNaN(number.real()))
     {
-        return QString("NaN%1").arg(suffix);
+        return QString("NaN");
     }
     else if(std::numeric_limits<ito::float64>::infinity() == number.real())
     {
-        return QString("Inf%1").arg(suffix);
+        return QString("Inf");
     }
     else if(std::numeric_limits<ito::float64>::infinity() == -number.real())
     {
-        return QString("-Inf%1").arg(suffix);
+        return QString("-Inf");
     }
     else
     {
@@ -275,6 +276,10 @@ QVariant DataObjectModel::data(const QModelIndex &index, int role) const
         default:
             return QVariant();
         }
+    }
+    else if (role == Qt::TextAlignmentRole)
+    {
+        return (int)m_alignment;
     }
     else if (role == displayRoleWithoutSuffix)
     {
@@ -657,6 +662,14 @@ void DataObjectModel::setDefaultGrid(int rows, int cols)
         m_defaultCols = cols;
         endResetModel();
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectModel::setAlignment(const Qt::Alignment &alignment)
+{
+    beginResetModel();
+    m_alignment = alignment;
+    endResetModel();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

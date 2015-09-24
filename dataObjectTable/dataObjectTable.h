@@ -51,6 +51,7 @@ class DataObjectTable : public QTableView
     Q_PROPERTY(QStringList suffixes READ getSuffixes WRITE setSuffixes DESIGNABLE true);
     Q_PROPERTY(QHeaderView::ResizeMode horizontalResizeMode READ getHorizontalResizeMode WRITE setHorizontalResizeMode DESIGNABLE true);
     Q_PROPERTY(QHeaderView::ResizeMode verticalResizeMode READ getVerticalResizeMode WRITE setVerticalResizeMode DESIGNABLE true);
+    Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment DESIGNABLE true);
     
 
     Q_CLASSINFO("prop://data", "the dataObject to be shown");
@@ -66,6 +67,7 @@ class DataObjectTable : public QTableView
     Q_CLASSINFO("prop://suffixes", "list with suffixes for each columns. If less suffixes than columns are indicated, the last suffix is repeated.");
     Q_CLASSINFO("prop://horizontalResizeMode", "defines the mode how the rows can be resized or are stretched over the available space.");
     Q_CLASSINFO("prop://verticalResizeMode", "defines the mode how the columns can be resized or are stretched over the available space.");
+    Q_CLASSINFO("prop://alignment", "alignment of the text cells.");
 
     Q_CLASSINFO("signal://activated", "signal emitted if a cell is activated. Arguments are (row,column) of the cell.")
     Q_CLASSINFO("signal://clicked", "signal emitted if a cell is clicked by the mouse. Arguments are (row,column) of the cell.")
@@ -91,6 +93,9 @@ public:
 
     int getDecimals() const;
     void setDecimals(int value);
+
+    Qt::Alignment getAlignment() const;
+    void setAlignment(Qt::Alignment alignment);
 
     int getEditorDecimals() const;
     void setEditorDecimals(int value);

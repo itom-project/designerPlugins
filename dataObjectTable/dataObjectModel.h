@@ -77,6 +77,9 @@ public:
     void setSuffixes(const QStringList &suffixes);
     inline QStringList getSuffixes() const { return m_suffixes; }
 
+    void setAlignment(const Qt::Alignment &alignment);
+    inline Qt::Alignment getAlignment() const { return m_alignment; }
+
     static int displayRoleWithoutSuffix;
 
 protected:
@@ -99,6 +102,7 @@ private:
     bool m_readOnly;
     int m_decimals;
     QStringList m_suffixes;
+    Qt::Alignment m_alignment;
     
     bool m_dummyData;
 };
