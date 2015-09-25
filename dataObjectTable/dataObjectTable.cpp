@@ -319,7 +319,8 @@ void DataObjectTable::keyPressEvent(QKeyEvent *e)
 void DataObjectTable::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu contextMenu(this);
-    contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), "Copy", this, SLOT(copySelectionToClipboard()));
+    contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), "copy selection", this, SLOT(copySelectionToClipboard()));
+    contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), "copy all", this, SLOT(copyAllToClipboard()));
     contextMenu.exec(event->globalPos());
     
     event->accept();
@@ -379,3 +380,40 @@ void DataObjectTable::copySelectionToClipboard()
     }
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::copyAllToClipboard()
+{
+    int rows = m_pModel->rowCount();
+    int cols = m_pModel->columnCount();
+    
+    QStringList colHeaders;
+    colHeaders << ""; //for the top left corner
+    for (int i = 0; i < cols; ++i)
+    {
+        colHeaders << QString("\"%1\"").arg(m_pModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
+    }
+
+    QStringList rowHeaders;
+    for (int i = 0; i < rows; ++i)
+    {
+        rowHeaders << QString("\"%1\"").arg(m_pModel->headerData(i, Qt::Vertical, Qt::DisplayRole).toString());
+    }
+
+    QStringList final;
+    final << colHeaders.join(";");
+
+    for (int r = 0; r < rows; ++r)
+    {
+        QStringList rowData;
+        rowData << rowHeaders[r];
+
+        for (int c = 0; c < cols; ++c)
+        {
+            rowData << m_pModel->data(m_pModel->index(r,c), DataObjectModel::preciseDisplayRoleWithoutSuffix).toString();
+        }
+        final << rowData.join(";");
+    }
+
+    QApplication::clipboard()->setText(final.join("\n"));
+}

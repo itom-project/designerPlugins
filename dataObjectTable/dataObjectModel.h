@@ -81,16 +81,17 @@ public:
     inline Qt::Alignment getAlignment() const { return m_alignment; }
 
     static int displayRoleWithoutSuffix;
+    static int preciseDisplayRoleWithoutSuffix;
 
 protected:
     bool setValue(const int &row, const int &column, const QVariant &value);
 
     QString getDisplayNumber(const unsigned int &number, const int column) const;
     QString getDisplayNumber(const int &number, const int column) const;
-    QString getDisplayNumber(const ito::float64 &number, const int column) const;
-    QString getDisplayNumber(const ito::float32 &number, const int column) const;
-    QString getDisplayNumber(const ito::complex64 &number, const int column) const;
-    QString getDisplayNumber(const ito::complex128 &number, const int column) const;
+    QString getDisplayNumber(const ito::float64 &number, const int column, int decimals = -1) const;
+    QString getDisplayNumber(const ito::float32 &number, const int column, int decimals = -1) const;
+    QString getDisplayNumber(const ito::complex64 &number, const int column, int decimals = -1) const;
+    QString getDisplayNumber(const ito::complex128 &number, const int column, int decimals = -1) const;
 
     QSharedPointer<ito::DataObject> m_sharedDataObj;
 

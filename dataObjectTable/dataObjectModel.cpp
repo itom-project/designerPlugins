@@ -27,6 +27,7 @@
 #include "common/typeDefs.h"
 
 int DataObjectModel::displayRoleWithoutSuffix = Qt::UserRole+1;
+int DataObjectModel::preciseDisplayRoleWithoutSuffix = Qt::UserRole+2;
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DataObjectModel::DataObjectModel() : 
@@ -53,7 +54,16 @@ QString DataObjectModel::getDisplayNumber(const unsigned int &number, const int 
         suffix = m_suffixes[std::min(column, m_suffixes.size()-1)];
     }
 
-    return QString("%L1%2").arg(number).arg(suffix);
+    if (column >= 0)
+    {
+        //local style (dot might be replaced by dot...)
+        return QString("%L1%2").arg(number).arg(suffix);
+    }
+    else
+    {
+        //programm style, dot remains dot... (for copy to clipboard operations)
+        return QString("%1%2").arg(number).arg(suffix);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -65,17 +75,28 @@ QString DataObjectModel::getDisplayNumber(const int &number, const int column) c
         suffix = m_suffixes[std::min(column, m_suffixes.size()-1)];
     }
 
-    return QString("%L1%2").arg(number).arg(suffix);
+    if (column >= 0)
+    {
+        //local style (dot might be replaced by dot...)
+        return QString("%L1%2").arg(number).arg(suffix);
+    }
+    else
+    {
+        //programm style, dot remains dot... (for copy to clipboard operations)
+        return QString("%1%2").arg(number).arg(suffix);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString DataObjectModel::getDisplayNumber(const ito::float64 &number, const int column) const
+QString DataObjectModel::getDisplayNumber(const ito::float64 &number, const int column, int decimals /*= -1*/) const
 {
     QString suffix;
     if (m_suffixes.size() > 0 && column >= 0)
     {
         suffix = m_suffixes[std::min(column, m_suffixes.size()-1)];
     }
+
+    if (decimals < 0) decimals = m_decimals;
 
     if (qIsNaN(number))
     {
@@ -91,18 +112,29 @@ QString DataObjectModel::getDisplayNumber(const ito::float64 &number, const int 
     }
     else
     {
-        return QString("%L1%2").arg(number, 0, 'f', m_decimals).arg(suffix);
+        if (column >= 0)
+        {
+            //local style (dot might be replaced by dot...)
+            return QString("%L1%2").arg(number, 0, 'f', decimals).arg(suffix);
+        }
+        else
+        {
+            //programm style, dot remains dot... (for copy to clipboard operations)
+            return QString("%1%2").arg(number, 0, 'f', decimals).arg(suffix);
+        }
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString DataObjectModel::getDisplayNumber(const ito::float32 &number, const int column) const
+QString DataObjectModel::getDisplayNumber(const ito::float32 &number, const int column, int decimals /*= -1*/) const
 {
     QString suffix;
     if (m_suffixes.size() > 0 && column >= 0)
     {
         suffix = m_suffixes[std::min(column, m_suffixes.size()-1)];
     }
+
+    if (decimals < 0) decimals = m_decimals;
 
     if (qIsNaN(number))
     {
@@ -118,18 +150,29 @@ QString DataObjectModel::getDisplayNumber(const ito::float32 &number, const int 
     }
     else
     {
-        return QString("%L1%2").arg(number, 0, 'f', m_decimals).arg(suffix);
+        if (column >= 0)
+        {
+            //local style (dot might be replaced by dot...)
+            return QString("%L1%2").arg(number, 0, 'f', decimals).arg(suffix);
+        }
+        else
+        {
+            //programm style, dot remains dot... (for copy to clipboard operations)
+            return QString("%1%2").arg(number, 0, 'f', decimals).arg(suffix);
+        }
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString DataObjectModel::getDisplayNumber(const ito::complex64 &number, const int column) const
+QString DataObjectModel::getDisplayNumber(const ito::complex64 &number, const int column, int decimals /*= -1*/) const
 {
     QString suffix;
     if (m_suffixes.size() > 0 && column >= 0)
     {
         suffix = m_suffixes[std::min(column, m_suffixes.size()-1)];
     }
+
+    if (decimals < 0) decimals = m_decimals;
 
     if (qIsNaN(number.real()))
     {
@@ -145,22 +188,37 @@ QString DataObjectModel::getDisplayNumber(const ito::complex64 &number, const in
     }
     else
     {
-        if (number.imag() >= 0)
+        if (column >= 0)
         {
-            return QString("%L1+%L2i%3").arg(number.real(), 0, 'f', m_decimals).arg(number.imag(), 0, 'f', m_decimals).arg(suffix);
+            //local style (dot might be replaced by dot...)
+            if (number.imag() >= 0)
+            {
+                return QString("%L1+%L2i%3").arg(number.real(), 0, 'f', decimals).arg(number.imag(), 0, 'f', decimals).arg(suffix);
+            }
+            return QString("%L1-%L2i%3").arg(number.real(), 0, 'f', decimals).arg(-number.imag(), 0, 'f', decimals).arg(suffix);
         }
-        return QString("%L1-%L2i%3").arg(number.real(), 0, 'f', m_decimals).arg(-number.imag(), 0, 'f', m_decimals).arg(suffix);
+        else
+        {
+            //programm style, dot remains dot... (for copy to clipboard operations)
+            if (number.imag() >= 0)
+            {
+                return QString("%1+%2i%3").arg(number.real(), 0, 'f', decimals).arg(number.imag(), 0, 'f', decimals).arg(suffix);
+            }
+            return QString("%1-%2i%3").arg(number.real(), 0, 'f', decimals).arg(-number.imag(), 0, 'f', decimals).arg(suffix);
+        }
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString DataObjectModel::getDisplayNumber(const ito::complex128 &number, const int column) const
+QString DataObjectModel::getDisplayNumber(const ito::complex128 &number, const int column, int decimals /*= -1*/) const
 {
     QString suffix;
     if (m_suffixes.size() > 0 && column >= 0)
     {
         suffix = m_suffixes[std::min(column, m_suffixes.size()-1)];
     }
+
+    if (decimals < 0) decimals = m_decimals;
 
     if (qIsNaN(number.real()))
     {
@@ -176,11 +234,24 @@ QString DataObjectModel::getDisplayNumber(const ito::complex128 &number, const i
     }
     else
     {
-        if (number.imag() >= 0)
+        if (column >= 0)
         {
-            return QString("%L1+%iL2").arg(number.real(), 0, 'f', m_decimals).arg(number.imag(), 0, 'f', m_decimals);
+            //local style (dot might be replaced by dot...)
+            if (number.imag() >= 0)
+            {
+                return QString("%L1+%L2i%3").arg(number.real(), 0, 'f', decimals).arg(number.imag(), 0, 'f', decimals).arg(suffix);
+            }
+            return QString("%L1-%L2i%3").arg(number.real(), 0, 'f', decimals).arg(-number.imag(), 0, 'f', decimals).arg(suffix);
         }
-        return QString("%L1-%iL2").arg(number.real(), 0, 'f', m_decimals).arg(-number.imag(), 0, 'f', m_decimals);
+        else
+        {
+            //programm style, dot remains dot... (for copy to clipboard operations)
+            if (number.imag() >= 0)
+            {
+                return QString("%1+%2i%3").arg(number.real(), 0, 'f', decimals).arg(number.imag(), 0, 'f', decimals).arg(suffix);
+            }
+            return QString("%1-%2i%3").arg(number.real(), 0, 'f', decimals).arg(-number.imag(), 0, 'f', decimals).arg(suffix);
+        }
     }
 }
 
@@ -198,8 +269,10 @@ QVariant DataObjectModel::data(const QModelIndex &index, int role) const
     int row = index.row();
     int column = index.column();
 
-    if (role == Qt::DisplayRole)
+    if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
     {
+        int decimals = (role == Qt::DisplayRole) ? m_decimals : 2 * m_decimals; //show the tooltip text more precise than the display
+
         switch(m_sharedDataObj->getDims())
         {
         case 0:
@@ -222,13 +295,13 @@ QVariant DataObjectModel::data(const QModelIndex &index, int role) const
                 case ito::tUInt32:
                     return getDisplayNumber(m_sharedDataObj->at<ito::uint32>(row,column), column);
                 case ito::tFloat32:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::float32>(row,column), column);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::float32>(row,column), column, decimals);
                 case ito::tFloat64:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::float64>(row,column), column);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::float64>(row,column), column, decimals);
                 case ito::tComplex64:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::complex64>(row,column), column);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::complex64>(row,column), column, decimals);
                 case ito::tComplex128:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::complex128>(row,column), column);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::complex128>(row,column), column, decimals);
                 case ito::tRGBA32:
                     {
                         ito::Rgba32 c = m_sharedDataObj->at<ito::Rgba32>(row,column);
@@ -281,8 +354,10 @@ QVariant DataObjectModel::data(const QModelIndex &index, int role) const
     {
         return (int)m_alignment;
     }
-    else if (role == displayRoleWithoutSuffix)
+    else if (role == displayRoleWithoutSuffix || role == preciseDisplayRoleWithoutSuffix)
     {
+        int decimals = (role == Qt::DisplayRole) ? m_decimals : 2 * m_decimals; //show the tooltip text more precise than the display
+
         switch(m_sharedDataObj->getDims())
         {
         case 0:
@@ -305,13 +380,13 @@ QVariant DataObjectModel::data(const QModelIndex &index, int role) const
                 case ito::tUInt32:
                     return getDisplayNumber(m_sharedDataObj->at<ito::uint32>(row,column), -1);
                 case ito::tFloat32:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::float32>(row,column), -1);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::float32>(row,column), -1, decimals);
                 case ito::tFloat64:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::float64>(row,column), -1);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::float64>(row,column), -1, decimals);
                 case ito::tComplex64:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::complex64>(row,column), -1);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::complex64>(row,column), -1, decimals);
                 case ito::tComplex128:
-                    return getDisplayNumber(m_sharedDataObj->at<ito::complex128>(row,column), -1);
+                    return getDisplayNumber(m_sharedDataObj->at<ito::complex128>(row,column), -1, decimals);
                 case ito::tRGBA32:
                     {
                         ito::Rgba32 c = m_sharedDataObj->at<ito::Rgba32>(row,column);
