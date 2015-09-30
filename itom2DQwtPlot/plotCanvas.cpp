@@ -1241,7 +1241,7 @@ void PlotCanvas::setInterval(Qt::Axis axis, const ito::AutoInterval &interval)
     {
         m_pData->m_yaxisScaleAuto = interval.isAuto();
 
-        if (m_pData->m_xaxisScaleAuto)
+        if (m_pData->m_yaxisScaleAuto)
         {
             QwtInterval ival = m_rasterData->interval(Qt::YAxis);
             m_pData->m_yaxisMin = ival.minValue();
@@ -1336,7 +1336,10 @@ ito::AutoInterval PlotCanvas::getInterval(Qt::Axis axis) const
         }
     }
 
-    return ito::AutoInterval(i.minValue(), i.maxValue(), autoScale);
+    double minimum = i.minValue();
+    double maximum = i.maxValue();
+    if (maximum < minimum) std::swap(minimum, maximum);
+    return ito::AutoInterval(minimum, maximum, autoScale);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1358,7 +1361,10 @@ void PlotCanvas::setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &inte
 ito::AutoInterval PlotCanvas::getOverlayInterval(Qt::Axis axis) const
 {
     QwtInterval i = m_rasterOverlayData->interval(axis);
-    return ito::AutoInterval(i.minValue(), i.maxValue(), m_pData->m_overlayScaleAuto);
+    double minimum = i.minValue();
+    double maximum = i.maxValue();
+    if (maximum < minimum) std::swap(minimum, maximum);
+    return ito::AutoInterval(minimum, maximum, m_pData->m_overlayScaleAuto);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
