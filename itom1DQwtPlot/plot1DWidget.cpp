@@ -558,6 +558,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         int dims = dataObj->getDims();
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dataObj->getSize(dims - 2) : (width == 0) ? 0 : 1;
+		m_pData->m_dataType = (ito::tDataType)dataObj->getType();
 
         if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
         {
