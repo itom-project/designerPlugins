@@ -22,7 +22,7 @@ ENDIF(BUILD_SHARED_LIBS)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomWidgets REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 FIND_PACKAGE_QT(ON Core Widgets Xml Designer PrintSupport Svg LinguistTools)
 
