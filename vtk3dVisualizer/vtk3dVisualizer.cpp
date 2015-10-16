@@ -51,6 +51,7 @@
 #include "itemPointCloud.h"
 #include "itemPointCloudNormal.h"
 #include "item.h"
+#include "DataObject/dataObjectFuncs.h"
 
 #include "ui_vtk3dVisualizer.h"
 
@@ -804,6 +805,62 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
             connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
             ((ItemGeometry*)(i.data()))->addSphere(center, radius, color);
+        }
+
+        d->ui.pclCanvas->update();
+    }
+
+    return retval;
+}
+
+//-------------------------------------------------------------------------------------
+ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QString &fullname, const QColor &color /*= Qt::red*/)
+{
+    ito::RetVal retval;
+
+    ito::DataObject points2 = ito::dObjHelper::squeezeConvertCheck2DDataObject(&points, "points", ito::Range(1,std::numeric_limits<int>::max()), ito::Range(3,3), retval, ito::tFloat32, 0);
+    
+
+    if (!retval.containsError())
+    {
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
+        cloud->reserve(points2.getSize(0));
+        ito::float32 *ptr = NULL;
+        for (int r = 0; r < points2.getSize(0); ++r)
+        {
+            ptr = (ito::float32*)points2.rowPtr(0, r);
+            cloud->push_back(pcl::PointXYZ(ptr[0], ptr[1], ptr[2]));
+        }
+
+        QTreeWidgetItem *parent;
+        QString name = fullname;
+
+        retval += createRecursiveTree(name, d->geometryItem, &parent);
+
+        if (!retval.containsError())
+        {
+            //check if item already exists with this name
+            QTreeWidgetItem *item = NULL;
+            for (int i = 0; i < parent->childCount(); i++)
+            {
+                if (parent->child(i)->data(0, Qt::ToolTipRole) == fullname)
+                {
+                    item = parent->child(i);
+                    break;
+                }
+            }
+
+            if (!item)
+            {
+                item = new QTreeWidgetItem();
+                item->setData(0, Qt::DisplayRole, name);
+                item->setData(0, Qt::ToolTipRole, fullname);
+                parent->addChild(item);
+            }        
+            SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
+            item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            ((ItemGeometry*)(i.data()))->addPolygon(cloud, color);
         }
 
         d->ui.pclCanvas->update();

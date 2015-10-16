@@ -99,6 +99,24 @@ ito::RetVal ItemGeometry::addSphere(const pcl::PointXYZ &center, double radius, 
 }
 
 //-------------------------------------------------------------------------------------------
+ito::RetVal ItemGeometry::addPolygon(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr polygon, const QColor &color)
+{
+    m_geometryType = tPolygon;
+    m_nrOfShapes = 1;
+    if (m_visualizer->addPolygon<pcl::PointXYZ>(polygon, color.redF(), color.greenF(), color.blueF(), m_name.toStdString()))
+    {
+        vtkProp *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.clear();
+        m_actors.append(a);
+
+        m_lineColor = color;
+    }
+
+    return ito::retOk;
+}
+
+//-------------------------------------------------------------------------------------------
 ito::RetVal ItemGeometry::addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color)
 {
     m_geometryType = tText;

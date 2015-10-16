@@ -76,6 +76,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://addLines", "add m lines to the canvas. The coordintates are given by a float32 data object [m x 6] where one row is (x0,y0,z0,x1,y1,z1) (arguments: points, key, color=red).")
     Q_CLASSINFO("slot://addSphere", "add a sphere (arguments: [center_x, center_y, center_z], radius, key, color = red]).")
     Q_CLASSINFO("slot://addText", "add a 2d text to a specific position (arguments: text, x, y, fontsize, key, color = white)")
+    Q_CLASSINFO("slot://addPolygon", "adds a 2d polygon (arguments: points, key, color = white) where points is a Mx3 data object where each line is the (x,y,z) coordinate of a point of the polygon. The point values will internally be converted to float32.")
     Q_CLASSINFO("slot://updateText", "updates or creates new 2d text (arguments: text, x, y, fontsize, key, color = white, createIfNotExists = false)")
     Q_CLASSINFO("slot://deletePointCloud", "delete the cloud with key")
     Q_CLASSINFO("slot://deleteMesh", "delete the mesh with key")
@@ -141,6 +142,8 @@ public slots:
     ito::RetVal addLines(const ito::DataObject &points, const QString &fullname, const QColor &color = Qt::red);
 
     ito::RetVal addSphere(QVector<double> point, double radius, const QString &fullname, const QColor &color = Qt::red);
+
+    ito::RetVal addPolygon(const ito::DataObject &points, const QString &fullname, const QColor &color = Qt::red);
 
     ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color = Qt::white);
     ito::RetVal updateText(const QString &text, const int x, const int y, const int fontsize, const QString &name, const QColor &color = Qt::white, bool createIfNotExists = false);
