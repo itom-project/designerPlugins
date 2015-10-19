@@ -22,6 +22,8 @@
 
 #include "itemPointCloud.h"
 
+#include "pointCloudHandlerGenericFields.h"
+
 //-------------------------------------------------------------------------------------------
 ItemPointCloud::ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
     : Item(name, treeItem),
@@ -31,12 +33,153 @@ ItemPointCloud::ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualiz
     m_pointSize = 2;
     m_lineWidth = 1;
     m_type = "point cloud";
+    m_colorMode = ColorStatic;
+    m_color = QColor("white");
 }
 
 //-------------------------------------------------------------------------------------------
 ItemPointCloud::~ItemPointCloud()
 {
     m_visualizer->removePointCloud( m_name.toStdString() );
+}
+
+template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typename pcl::PointCloud<PointT>::Ptr cloud, bool update /*=false*/)
+{
+    ito::RetVal retval;
+    ColorMode mode = m_colorMode;
+    bool colorFound = false;
+
+    while (!colorFound)
+    {
+        switch (mode)
+        {
+        case ColorStatic:
+            {
+                pcl::visualization::PointCloudColorHandlerCustom<PointT> color_handler(cloud, m_color.red(), m_color.green(), m_color.blue());
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case ColorX:
+        case ColorY:
+        case ColorZ:
+        case ColorIntensity:
+        case ColorNormalX:
+        case ColorNormalY:
+        case ColorNormalZ:
+        case ColorCurvature:
+            {
+                std::string f = "x";
+                if (mode == ColorY) f = "y";
+                if (mode == ColorZ) f = "z";
+                if (mode == ColorIntensity) f = "intensity";
+                if (mode == ColorNormalX) f = "normal_x";
+                if (mode == ColorNormalY) f = "normal_y";
+                if (mode == ColorNormalZ) f = "normal_z";
+                if (mode == ColorCurvature) f = "curvature";
+                pcl::visualization::PointCloudColorHandlerGenericField<PointT> color_handler(cloud, f);
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case ColorRGB:
+            {
+                pcl::visualization::PointCloudColorHandlerRGBField<PointT> color_handler(cloud);
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case ColorAbsXYZ:
+            {
+                PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "x", "y", "z");
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case ColorNormalAbsXYZ:
+            {
+                PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "normal_x", "normal_y", "normal_z");
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        default:
+            {
+                if (update)
+                {
+                    m_visualizer->updatePointCloud<PointT>(cloud, m_name.toStdString());
+                }
+                else
+                {
+                    m_visualizer->addPointCloud<PointT>(cloud, m_name.toStdString());
+                }
+                colorFound = true;
+            }
+        }
+
+        if (!colorFound)
+        {
+            mode = ColorStatic;
+            m_colorMode = mode;
+        }
+    }
+
+    if (!retval.containsError())
+    {
+        m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
+    }
+
+    return retval;
 }
 
 //-------------------------------------------------------------------------------------------
@@ -47,72 +190,39 @@ ito::RetVal ItemPointCloud::addPointCloud(const ito::PCLPointCloud &cloud)
     if(cloud.getType() == ito::pclXYZ)
     {
         pcl::PointCloud<pcl::PointXYZ>::Ptr pc = cloud.toPointXYZ();
-
-        if(0)
-        {
-            pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(pc, 255, 255, 0);
-            m_visualizer->addPointCloud<pcl::PointXYZ>(pc, single_color, m_name.toStdString());
-        }
-        else if(1)
-        {
-            std::vector<int> indices;
-            //pcl::removeNaNFromPointCloud( *cloud, *cloud, indices );
-            pcl::visualization::PointCloudColorHandlerGenericField<pcl::PointXYZ> colorHandler(pc, "z");
-            m_visualizer->addPointCloud<pcl::PointXYZ>(pc, colorHandler, m_name.toStdString());
-        }
-        else
-        {
-            m_visualizer->addPointCloud<pcl::PointXYZ>(pc, m_name.toStdString());
-            setPointSize(2);
-        }
+        retval += addPointCloudTmpl<pcl::PointXYZ>(pc);
     }
     else if(cloud.getType() == ito::pclXYZI)
     {
         pcl::PointCloud<pcl::PointXYZI>::Ptr pc = cloud.toPointXYZI();
-
-        if(0)
-        {
-            pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZI> single_color(pc, 255, 255, 0);
-            m_visualizer->addPointCloud<pcl::PointXYZI>(pc, single_color, m_name.toStdString());
-        }
-        else if(1)
-        {
-            std::vector<int> indices;
-            //pcl::removeNaNFromPointCloud( *cloud, *cloud, indices );
-            pcl::visualization::PointCloudColorHandlerGenericField<pcl::PointXYZI> colorHandler(pc, "intensity");
-            m_visualizer->addPointCloud<pcl::PointXYZI>(pc, colorHandler, m_name.toStdString());
-        }
-        else
-        {
-            m_visualizer->addPointCloud<pcl::PointXYZI>(pc, m_name.toStdString());
-            setPointSize(2);
-        }
+        retval += addPointCloudTmpl<pcl::PointXYZI>(pc);
     }
     else if(cloud.getType() == ito::pclXYZNormal)
     {
         pcl::PointCloud<pcl::PointNormal>::Ptr pc = cloud.toPointXYZNormal();
-        m_visualizer->addPointCloud<pcl::PointNormal>(pc, m_name.toStdString());
-        //m_visualizer->addPointCloudNormals<pcl::PointNormal>(pc, 100 /*level*/, 0.02 /*scale*/, m_name.toStdString());
+        retval += addPointCloudTmpl<pcl::PointNormal>(pc);
     }
     else if(cloud.getType() == ito::pclXYZRGBNormal)
     {
         pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr pc = cloud.toPointXYZRGBNormal();
-        pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBNormal> colorHandler(pc);
-        m_visualizer->addPointCloud<pcl::PointXYZRGBNormal>(pc, colorHandler, m_name.toStdString());
+        retval += addPointCloudTmpl<pcl::PointXYZRGBNormal>(pc);
     }
     else if (cloud.getType() == ito::pclXYZRGBA)
     {
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc = cloud.toPointXYZRGBA();
-        pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> colorHandler(pc);
-        m_visualizer->addPointCloud<pcl::PointXYZRGBA>(pc, colorHandler, m_name.toStdString());
+        retval += addPointCloudTmpl<pcl::PointXYZRGBA>(pc);
     }
     else
     {
         retval += ito::RetVal(ito::retError,0,"type of point cloud not supported");
     }
+
+    m_cloud = cloud;
+
     return retval;
 }
 
+//-----------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItemPointCloud::updatePointCloud(const ito::PCLPointCloud &cloud)
 {
     ito::RetVal retval;
@@ -120,69 +230,35 @@ ito::RetVal ItemPointCloud::updatePointCloud(const ito::PCLPointCloud &cloud)
     if(cloud.getType() == ito::pclXYZ)
     {
         pcl::PointCloud<pcl::PointXYZ>::Ptr pc = cloud.toPointXYZ();
-
-        if(0)
-        {
-            pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_color(pc, 255, 255, 0);
-            m_visualizer->updatePointCloud<pcl::PointXYZ>(pc, single_color, m_name.toStdString());
-        }
-        else if(1)
-        {
-            std::vector<int> indices;
-            //pcl::removeNaNFromPointCloud( *cloud, *cloud, indices );
-            pcl::visualization::PointCloudColorHandlerGenericField<pcl::PointXYZ> colorHandler(pc, "z");
-            m_visualizer->updatePointCloud<pcl::PointXYZ>(pc, colorHandler, m_name.toStdString());
-        }
-        else
-        {
-            m_visualizer->updatePointCloud<pcl::PointXYZ>(pc, m_name.toStdString());
-            setPointSize(2);
-        }
+        retval += addPointCloudTmpl<pcl::PointXYZ>(pc, true);
     }
     else if(cloud.getType() == ito::pclXYZI)
     {
         pcl::PointCloud<pcl::PointXYZI>::Ptr pc = cloud.toPointXYZI();
-
-        if(0)
-        {
-            pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZI> single_color(pc, 255, 255, 0);
-            m_visualizer->updatePointCloud<pcl::PointXYZI>(pc, single_color, m_name.toStdString());
-        }
-        else if(1)
-        {
-            std::vector<int> indices;
-            //pcl::removeNaNFromPointCloud( *cloud, *cloud, indices );
-            pcl::visualization::PointCloudColorHandlerGenericField<pcl::PointXYZI> colorHandler(pc, "intensity");
-            m_visualizer->updatePointCloud<pcl::PointXYZI>(pc, colorHandler, m_name.toStdString());
-        }
-        else
-        {
-            m_visualizer->updatePointCloud<pcl::PointXYZI>(pc, m_name.toStdString());
-            setPointSize(2);
-        }
+        retval += addPointCloudTmpl<pcl::PointXYZI>(pc, true);
     }
     else if(cloud.getType() == ito::pclXYZNormal)
     {
         pcl::PointCloud<pcl::PointNormal>::Ptr pc = cloud.toPointXYZNormal();
-        m_visualizer->updatePointCloud<pcl::PointNormal>(pc, m_name.toStdString());
-        //m_visualizer->addPointCloudNormals<pcl::PointNormal>(pc, 100 /*level*/, 0.02 /*scale*/, m_name.toStdString());
+        retval += addPointCloudTmpl<pcl::PointNormal>(pc, true);
     }
     else if(cloud.getType() == ito::pclXYZRGBNormal)
     {
         pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr pc = cloud.toPointXYZRGBNormal();
-        pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBNormal> colorHandler(pc);
-        m_visualizer->updatePointCloud<pcl::PointXYZRGBNormal>(pc, colorHandler, m_name.toStdString());
+        retval += addPointCloudTmpl<pcl::PointXYZRGBNormal>(pc, true);
     }
     else if (cloud.getType() == ito::pclXYZRGBA)
     {
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc = cloud.toPointXYZRGBA();
-        pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> colorHandler(pc);
-        m_visualizer->updatePointCloud<pcl::PointXYZRGBA>(pc, colorHandler, m_name.toStdString());
+        retval += addPointCloudTmpl<pcl::PointXYZRGBA>(pc, true);
     }
     else
     {
         retval += ito::RetVal(ito::retError,0,"type of point cloud not supported");
     }
+
+    m_cloud = cloud;
+
     return retval;
 }
 
@@ -217,8 +293,31 @@ void ItemPointCloud::setLineWidth(int value)
 //-------------------------------------------------------------------------------------------
 void ItemPointCloud::setColor(QColor value)
 {
-    m_color = value;
-    m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_COLOR, value.red()/255.0, value.green()/255.0, value.blue()/255.0, m_name.toStdString() );
+    if (m_colorMode == ColorStatic && m_color != value)
+    {
+        m_color = value;
+        updatePointCloud(m_cloud);
+    }
+    else
+    {
+        m_color = value;
+    }
+    emit updateCanvasRequest();
+}
+
+//-------------------------------------------------------------------------------------------
+void ItemPointCloud::setColorMode(ColorMode mode)
+{
+    if (m_colorMode != mode)
+    {
+        m_colorMode = mode;
+        updatePointCloud(m_cloud);
+    }
+    else
+    {
+        m_colorMode = mode;
+    }
+    
     emit updateCanvasRequest();
 }
 

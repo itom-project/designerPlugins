@@ -63,8 +63,8 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
         LINK_DIRECTORIES(
             ${CMAKE_CURRENT_SOURCE_DIR}/..
-			${Boost_LIBRARY_DIR}
-			${VTK_DIR}
+            ${Boost_LIBRARY_DIR}
+            ${VTK_DIR}
         )
 
         set(plugin_HEADERS
@@ -81,6 +81,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPolygonMesh.h
             ${CMAKE_CURRENT_SOURCE_DIR}/Vec3fProperty.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/pointCloudHandlerGenericFields.h
         )
 
         set(plugin_HEADERS_COPY
