@@ -94,6 +94,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -115,6 +118,9 @@
          <widget class="DoubleSpinBox" name="doubleSpinMinX">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
           </property>
           <property name="toolTip">
            <string/>
@@ -183,6 +189,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -231,6 +240,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -275,8 +287,12 @@
  <tabstops>
   <tabstop>radioAutoCalcX</tabstop>
   <tabstop>radioManualX</tabstop>
+  <tabstop>doubleSpinMinX</tabstop>
+  <tabstop>doubleSpinMaxX</tabstop>
   <tabstop>radioAutoCalcY</tabstop>
   <tabstop>radioManualY</tabstop>
+  <tabstop>doubleSpinMinY</tabstop>
+  <tabstop>doubleSpinMaxY</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

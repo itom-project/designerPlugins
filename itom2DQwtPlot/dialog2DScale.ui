@@ -94,6 +94,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -115,6 +118,9 @@
          <widget class="DoubleSpinBox" name="doubleSpinMinX">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
           </property>
           <property name="decimals">
            <number>3</number>
@@ -206,6 +212,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -227,6 +236,9 @@
          <widget class="DoubleSpinBox" name="doubleSpinMaxY">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
           </property>
           <property name="decimals">
            <number>3</number>
@@ -318,6 +330,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
           <property name="decimals">
            <number>3</number>
           </property>
@@ -339,6 +354,9 @@
          <widget class="DoubleSpinBox" name="doubleSpinMaxValue">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
           </property>
           <property name="decimals">
            <number>3</number>
@@ -384,8 +402,16 @@
  <tabstops>
   <tabstop>radioAutoCalcX</tabstop>
   <tabstop>radioManualX</tabstop>
+  <tabstop>doubleSpinMinX</tabstop>
+  <tabstop>doubleSpinMaxX</tabstop>
   <tabstop>radioAutoCalcY</tabstop>
   <tabstop>radioManualY</tabstop>
+  <tabstop>doubleSpinMinY</tabstop>
+  <tabstop>doubleSpinMaxY</tabstop>
+  <tabstop>radioAutoCalcValue</tabstop>
+  <tabstop>radioManualValue</tabstop>
+  <tabstop>doubleSpinMinValue</tabstop>
+  <tabstop>doubleSpinMaxValue</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
