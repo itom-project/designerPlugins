@@ -102,6 +102,147 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
                 }
                 break;
             }
+        //the PointCloudColorHandlerRGBField does not compile if PointT is a point type without rgba information
+        /*case ColorRGB:
+            {
+                pcl::visualization::PointCloudColorHandlerRGBField<PointT> color_handler(cloud);
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }*/
+        case ColorAbsXYZ:
+            {
+                PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "x", "y", "z");
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case ColorNormalAbsXYZ:
+            {
+                PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "normal_x", "normal_y", "normal_z");
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        default:
+            {
+                if (update)
+                {
+                    m_visualizer->updatePointCloud<PointT>(cloud, m_name.toStdString());
+                }
+                else
+                {
+                    m_visualizer->addPointCloud<PointT>(cloud, m_name.toStdString());
+                }
+                colorFound = true;
+            }
+        }
+
+        if (!colorFound)
+        {
+            mode = ColorStatic;
+            m_colorMode = mode;
+        }
+    }
+
+    if (!retval.containsError())
+    {
+        m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
+    }
+
+    return retval;
+}
+
+
+template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typename pcl::PointCloud<PointT>::Ptr cloud, bool update /*=false*/)
+{
+    ito::RetVal retval;
+    ColorMode mode = m_colorMode;
+    bool colorFound = false;
+
+    while (!colorFound)
+    {
+        switch (mode)
+        {
+        case ColorStatic:
+            {
+                pcl::visualization::PointCloudColorHandlerCustom<PointT> color_handler(cloud, m_color.red(), m_color.green(), m_color.blue());
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case ColorX:
+        case ColorY:
+        case ColorZ:
+        case ColorIntensity:
+        case ColorNormalX:
+        case ColorNormalY:
+        case ColorNormalZ:
+        case ColorCurvature:
+            {
+                std::string f = "x";
+                if (mode == ColorY) f = "y";
+                if (mode == ColorZ) f = "z";
+                if (mode == ColorIntensity) f = "intensity";
+                if (mode == ColorNormalX) f = "normal_x";
+                if (mode == ColorNormalY) f = "normal_y";
+                if (mode == ColorNormalZ) f = "normal_z";
+                if (mode == ColorCurvature) f = "curvature";
+                pcl::visualization::PointCloudColorHandlerGenericField<PointT> color_handler(cloud, f);
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
         case ColorRGB:
             {
                 pcl::visualization::PointCloudColorHandlerRGBField<PointT> color_handler(cloud);
@@ -205,12 +346,12 @@ ito::RetVal ItemPointCloud::addPointCloud(const ito::PCLPointCloud &cloud)
     else if(cloud.getType() == ito::pclXYZRGBNormal)
     {
         pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr pc = cloud.toPointXYZRGBNormal();
-        retval += addPointCloudTmpl<pcl::PointXYZRGBNormal>(pc);
+        retval += addPointCloudTmplRgba<pcl::PointXYZRGBNormal>(pc);
     }
     else if (cloud.getType() == ito::pclXYZRGBA)
     {
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc = cloud.toPointXYZRGBA();
-        retval += addPointCloudTmpl<pcl::PointXYZRGBA>(pc);
+        retval += addPointCloudTmplRgba<pcl::PointXYZRGBA>(pc);
     }
     else
     {
@@ -245,12 +386,12 @@ ito::RetVal ItemPointCloud::updatePointCloud(const ito::PCLPointCloud &cloud)
     else if(cloud.getType() == ito::pclXYZRGBNormal)
     {
         pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr pc = cloud.toPointXYZRGBNormal();
-        retval += addPointCloudTmpl<pcl::PointXYZRGBNormal>(pc, true);
+        retval += addPointCloudTmplRgba<pcl::PointXYZRGBNormal>(pc, true);
     }
     else if (cloud.getType() == ito::pclXYZRGBA)
     {
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc = cloud.toPointXYZRGBA();
-        retval += addPointCloudTmpl<pcl::PointXYZRGBA>(pc, true);
+        retval += addPointCloudTmplRgba<pcl::PointXYZRGBA>(pc, true);
     }
     else
     {

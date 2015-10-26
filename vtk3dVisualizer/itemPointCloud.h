@@ -81,6 +81,7 @@ protected:
 
 
     template <typename PointT> ito::RetVal addPointCloudTmpl(typename pcl::PointCloud<PointT>::Ptr cloud, bool update = false);
+    template <typename PointT> ito::RetVal addPointCloudTmplRgba(typename pcl::PointCloud<PointT>::Ptr cloud, bool update = false);
 
 };
 
