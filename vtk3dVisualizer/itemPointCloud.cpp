@@ -26,9 +26,8 @@
 
 //-------------------------------------------------------------------------------------------
 ItemPointCloud::ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
-    : Item(name, treeItem),
+    : Item(name, Item::rttiPointCloud, treeItem),
     m_visualizer(visualizer)
-    //m_selected(false)
 {
     m_pointSize = 2;
     m_lineWidth = 1;
@@ -43,6 +42,7 @@ ItemPointCloud::~ItemPointCloud()
     m_visualizer->removePointCloud( m_name.toStdString() );
 }
 
+//-------------------------------------------------------------------------------------------
 template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typename pcl::PointCloud<PointT>::Ptr cloud, bool update /*=false*/)
 {
     ito::RetVal retval;
@@ -183,7 +183,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
     return retval;
 }
 
-
+//-------------------------------------------------------------------------------------------
 template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typename pcl::PointCloud<PointT>::Ptr cloud, bool update /*=false*/)
 {
     ito::RetVal retval;

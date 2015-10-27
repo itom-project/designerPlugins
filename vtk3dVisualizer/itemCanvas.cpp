@@ -27,7 +27,7 @@
 #include <pcl/visualization/common/common.h>
 
 ItemCanvas::ItemCanvas(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, QTreeWidgetItem *treeItem) :
-        Item("canvas", treeItem),
+        Item("canvas", Item::rttiCanvas, treeItem),
         m_visualizer(visualizer),
         m_showFPS(true),
         m_stereoType(No)

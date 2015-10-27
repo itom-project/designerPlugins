@@ -28,10 +28,11 @@
 
 Q_DECLARE_METATYPE ( SharedItemPtr )
 
-Item::Item(const QString &name, QTreeWidgetItem *treeItem) :
+Item::Item(const QString &name, rttiItem rtti, QTreeWidgetItem *treeItem) :
     m_name(name),
     m_visible(true),
-    m_treeItem(treeItem)
+    m_treeItem(treeItem),
+    m_rtti(rtti)
 {
     m_type = "";
 }

@@ -29,7 +29,7 @@
 
 //-------------------------------------------------------------------------------------------
 ItemPolygonMesh::ItemPolygonMesh(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
-    : Item(name, treeItem),
+    : Item(name, Item::rttiMesh, treeItem),
     m_visualizer(visualizer),
     m_representation(Surface),
     m_interpolation(Flat),

@@ -27,7 +27,7 @@
 
 //-------------------------------------------------------------------------------------------
 ItemGeometry::ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
-    : Item(name, treeItem),
+    : Item(name, Item::rttiGeometry, treeItem),
     m_visualizer(visualizer),
     m_representation(Wireframe),
     m_interpolation(Flat),

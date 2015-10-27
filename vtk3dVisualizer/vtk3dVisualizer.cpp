@@ -175,7 +175,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     //create root for meshes
     d->meshItem = new QTreeWidgetItem();
-    SharedItemPtr i1 = QSharedPointer<Item>( new Item("mesh",d->meshItem) );
+    SharedItemPtr i1 = QSharedPointer<Item>( new Item("mesh", Item::rttiRoot, d->meshItem) );
     connect(i1.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
     d->meshItem->setData(0, Qt::DisplayRole, "mesh");
     d->meshItem->setData(0, Item::itemRole, QVariant::fromValue(i1) );
@@ -183,7 +183,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     //create root for point clouds
     d->cloudItem = new QTreeWidgetItem();
-    SharedItemPtr i2 = QSharedPointer<Item>( new Item("clouds",d->cloudItem) );
+    SharedItemPtr i2 = QSharedPointer<Item>( new Item("clouds", Item::rttiRoot, d->cloudItem) );
     connect(i2.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
     d->cloudItem->setData(0, Qt::DisplayRole, "clouds");
     d->cloudItem->setData(0, Item::itemRole, QVariant::fromValue(i2) );
@@ -191,7 +191,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     //create root for geometries
     d->geometryItem = new QTreeWidgetItem();
-    SharedItemPtr i3 = QSharedPointer<Item>( new Item("geometries",d->geometryItem) );
+    SharedItemPtr i3 = QSharedPointer<Item>( new Item("geometries", Item::rttiRoot, d->geometryItem) );
     connect(i3.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
     d->geometryItem->setData(0, Qt::DisplayRole, "geometries");
     d->geometryItem->setData(0, Item::itemRole, QVariant::fromValue(i3) );
@@ -269,7 +269,7 @@ ito::RetVal Vtk3dVisualizer::createRecursiveTree(QString &path, QTreeWidgetItem 
         if (!found) //create new item
         {
             item = new QTreeWidgetItem();
-            _item = SharedItemPtr(new Item(first,item));
+            _item = SharedItemPtr(new Item(first,Item::rttiRoot, item));
             item->setData(0, Qt::DisplayRole, first);
             item->setData(0, Item::itemRole, QVariant::fromValue(_item) );
             currentParent->addChild(item);
@@ -489,8 +489,15 @@ ito::RetVal Vtk3dVisualizer::updatePointCloud(ito::PCLPointCloud pcl, const QStr
 
         if (i.data())
         {
-            ItemPointCloud *ipc = (ItemPointCloud*)(i.data());
-            retval += ipc->updatePointCloud(pcl);
+            if (i->rtti() == Item::rttiPointCloud)
+            {
+                ItemPointCloud *ipc = (ItemPointCloud*)(i.data());
+                retval += ipc->updatePointCloud(pcl);
+            }
+            else if (i->rtti() == Item::rttiPointCloudNormal)
+            {
+                retval += ito::RetVal(ito::retError, 0, "an item of type 'point cloud normal' cannot be updated");
+            }
         }
     }
     else if (createIfNotExists)
@@ -1092,39 +1099,47 @@ void Vtk3dVisualizer::registerModel(ito::PCLPolygonMesh mesh, QString modelName)
 ito::RetVal Vtk3dVisualizer::addMesh(ito::PCLPolygonMesh mesh, const QString &fullname)
 {
     ito::RetVal retval;
-    QTreeWidgetItem *parent;
-    QString name = fullname;
-    retval += createRecursiveTree(name, d->meshItem, &parent);
 
-    if (!retval.containsError())
+    if (mesh.valid() == false)
     {
-        //check if item already exists with this name
-        QTreeWidgetItem *item = NULL;
-        for (int i = 0; i < parent->childCount(); i++)
-        {
-            if (parent->child(i)->data(0, Qt::ToolTipRole) == fullname)
-            {
-                item = parent->child(i);
-                break;
-            }
-        }
-
-        if (!item)
-        {
-            item = new QTreeWidgetItem();
-            item->setData(0, Qt::DisplayRole, name);
-            item->setData(0, Qt::ToolTipRole, fullname);
-            parent->addChild(item);
-        }
-        
-        SharedItemPtr i = SharedItemPtr(new ItemPolygonMesh(d->PCLVis, fullname, item));
-        connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
-        retval += ((ItemPolygonMesh*)(i.data()))->addPolygonMesh(mesh);
-
-        item->setData(0, Item::itemRole, QVariant::fromValue(i));
+        retval += ito::RetVal(ito::retError, 0, "given mesh is not valid");
     }
+    else
+    {
+        QTreeWidgetItem *parent;
+        QString name = fullname;
+        retval += createRecursiveTree(name, d->meshItem, &parent);
 
-    d->ui.pclCanvas->update();
+        if (!retval.containsError())
+        {
+            //check if item already exists with this name
+            QTreeWidgetItem *item = NULL;
+            for (int i = 0; i < parent->childCount(); i++)
+            {
+                if (parent->child(i)->data(0, Qt::ToolTipRole) == fullname)
+                {
+                    item = parent->child(i);
+                    break;
+                }
+            }
+
+            if (!item)
+            {
+                item = new QTreeWidgetItem();
+                item->setData(0, Qt::DisplayRole, name);
+                item->setData(0, Qt::ToolTipRole, fullname);
+                parent->addChild(item);
+            }
+        
+            SharedItemPtr i = SharedItemPtr(new ItemPolygonMesh(d->PCLVis, fullname, item));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            retval += ((ItemPolygonMesh*)(i.data()))->addPolygonMesh(mesh);
+
+            item->setData(0, Item::itemRole, QVariant::fromValue(i));
+        }
+
+        d->ui.pclCanvas->update();
+    }
 
     return retval;
 }
