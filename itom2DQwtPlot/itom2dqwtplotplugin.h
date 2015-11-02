@@ -23,7 +23,12 @@
 #ifndef ITOM2DQWTPLOTPLUGIN_H
 #define ITOM2DQWTPLOTPLUGIN_H
 
+#include "qglobal.h"
+#if (QT_VERSION < QT_VERSION_CHECK(5, 5, 0))
 #include <QtDesigner/QDesignerCustomWidgetInterface>
+#else
+#include <QtUiPlugin/QDesignerCustomWidgetInterface>
+#endif
 #include "plot/AbstractItomDesignerPlugin.h"
 
 class Itom2dQwtPlotPlugin : public ito::AbstractItomDesignerPlugin /*, public QDesignerCustomWidgetInterface*/
