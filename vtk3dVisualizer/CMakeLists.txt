@@ -64,6 +64,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
         LINK_DIRECTORIES(
             ${CMAKE_CURRENT_SOURCE_DIR}/..
             ${Boost_LIBRARY_DIR}
+            ${BOOST_LIBRARYDIR}
             ${VTK_DIR}
         )
 
