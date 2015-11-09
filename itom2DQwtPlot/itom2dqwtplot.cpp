@@ -1571,29 +1571,25 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
         case PlotCanvas::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tPoint, 1, 1);
-//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
+            m_pContent->userInteractionStart(PlotCanvas::tPoint, true, 1);
         break;
 
         case PlotCanvas::tLine:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tLine, 1, 2);
-//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
+            m_pContent->userInteractionStart(PlotCanvas::tLine, true, 2);
         break;
 
         case PlotCanvas::tRect:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tRect, 1, 2);
-//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
+            m_pContent->userInteractionStart(PlotCanvas::tRect, true, 2);
         break;
 
         case PlotCanvas::tEllipse:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tEllipse, 1, 2);
-//            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
+            m_pContent->userInteractionStart(PlotCanvas::tEllipse, true, 2);
         break;
     }
 }

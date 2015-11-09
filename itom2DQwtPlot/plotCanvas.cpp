@@ -987,6 +987,7 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
     {
         event->ignore(); //Clearing the accept parameter indicates that the event receiver does not want the event. Unwanted events might be propagated to the parent widget.
     }
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2231,6 +2232,13 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
         }
         setState(tIdle);
         retval += ito::RetVal(ito::retError, 0, tr("Unknown type for userInteractionStart").toLatin1().data());
+    }
+
+    if (start)
+    {
+        //if spinbox for multiple planes has the focus, a possible ESC is not correctly caught.
+        //therefore set the focus to the canvas.
+        canvas()->setFocus();
     }
 
     return retval;

@@ -2483,6 +2483,13 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
         setState(stateIdle);
     }
 
+    if (start)
+    {
+        //if spinbox for multiple planes has the focus, a possible ESC is not correctly caught.
+        //therefore set the focus to the canvas.
+        canvas()->setFocus();
+    }
+
     return retval;
 }
 
