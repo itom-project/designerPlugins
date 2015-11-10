@@ -23,19 +23,39 @@
 #include "itemCanvas.h"
 
 #include "vtkRenderWindow.h"
+//#include "vtkCubeAxesActor.h"
 
 #include <pcl/visualization/common/common.h>
 
 ItemCanvas::ItemCanvas(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, QTreeWidgetItem *treeItem) :
-        Item("canvas", Item::rttiCanvas, treeItem),
-        m_visualizer(visualizer),
-        m_showFPS(true),
-        m_stereoType(No)
+Item("canvas", Item::rttiCanvas, treeItem),
+m_visualizer(visualizer),
+m_showFPS(true),
+m_stereoType(No)
 {
-    m_type = "canvas";
-    m_coordinateSysPos = Vec3f(0,0,0);
-    m_coordinateSysVisible = true;
-    m_coordinateSysScale = 1.0;
+	m_type = "canvas";
+	m_coordinateSysPos = Vec3f(0, 0, 0);
+	m_coordinateSysVisible = true;
+	m_coordinateSysScale = 1.0;
+
+
+	//    vtkSmartPointer<vtkCubeAxesActor> cubeAxesActor =
+	//    vtkSmartPointer<vtkCubeAxesActor>::New();
+	//  cubeAxesActor->SetBounds(0,5,-10,10,-2,2);
+	//  cubeAxesActor->SetCamera(m_visualizer->getRendererCollection()->GetFirstRenderer()->GetActiveCamera());
+	// 
+	//  cubeAxesActor->DrawXGridlinesOn();
+	//  cubeAxesActor->DrawYGridlinesOn();
+	//  cubeAxesActor->DrawZGridlinesOn();
+	//#if VTK_MAJOR_VERSION > 5
+	//  cubeAxesActor->SetGridLineLocation(VTK_GRID_LINES_FURTHEST);
+	//#endif
+	// 
+	//  cubeAxesActor->XAxisMinorTickVisibilityOff();
+	//  cubeAxesActor->YAxisMinorTickVisibilityOff();
+	//  cubeAxesActor->ZAxisMinorTickVisibilityOff();
+	// 
+	//  m_visualizer->getRendererCollection()->GetFirstRenderer()->AddActor(cubeAxesActor);
 }
 
 //-----------------------------------------------------------------------
