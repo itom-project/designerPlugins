@@ -83,6 +83,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/Vec3fProperty.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.h
             ${CMAKE_CURRENT_SOURCE_DIR}/pointCloudHandlerGenericFields.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/treeWidgetKeyEater.h
         )
 
         set(plugin_HEADERS_COPY
@@ -109,6 +110,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPolygonMesh.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/Vec3fProperty.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/treeWidgetKeyEater.cpp
         )
 
         #If you want to use automatical metadata for dlls under windows use the following if-case.

@@ -36,6 +36,7 @@
 #include <qcolor.h>
 #include <qdebug.h>
 #include <qstatusbar.h>
+#include <qevent.h>
 
 #include "QVTKWidget.h"
 
@@ -52,6 +53,7 @@
 #include "itemPointCloudNormal.h"
 #include "item.h"
 #include "DataObject/dataObjectFuncs.h"
+#include "treeWidgetKeyEater.h"
 
 #include "ui_vtk3dVisualizer.h"
 
@@ -100,6 +102,8 @@ public:
     bool pointPickSearchHasNormals;
     Ui::Vtk3dVisualizer ui;
 };
+
+
 
 
 
@@ -198,6 +202,8 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     d->ui.treeWidget->addTopLevelItem( d->geometryItem );
 
     connect(d->ui.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(itemClicked(QTreeWidgetItem*,int)));
+    TreeWidgetKeyEater *treeWidgetKeyEater = new TreeWidgetKeyEater(this, d->propertyWidget); //will be deleted upon deletion of this
+    d->ui.treeWidget->installEventFilter(treeWidgetKeyEater);
 
     d->ui.pclCanvas->update();
 }

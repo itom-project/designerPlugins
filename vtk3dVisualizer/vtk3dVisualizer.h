@@ -49,6 +49,7 @@
 
 class QPropertyEditorWidget; //forward declaration
 class Vtk3dVisualizerPrivate; //forward declaration
+class QEvent;
 
 class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjFigure
 {
