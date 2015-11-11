@@ -69,7 +69,7 @@ public:
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
     enum Interpolation { Flat, Gouraud, Phong };
     enum Culling { ShowAll, BackfaceOnly, FrontfaceOnly };
-    enum ColorMode { RGB, SolidColor, NormalX, NormalY, NormalZ, NormalMagnitude, X, Y, Z, XY, YZ, XZ, XYZ};
+    enum ColorMode { RGB, SolidColor, NormalX, NormalY, NormalZ, NormalMagnitude, X, Y, Z, XY, YZ, XZ, XYZ, Curvature};
     enum ColorMap { gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green};
 
     //properties

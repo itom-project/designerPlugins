@@ -612,6 +612,57 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                 emit updateCanvasRequest();
             }
         }
+		else if (mode == Curvature)
+		{
+			int c_idx = pcl::getFieldIndex(mesh->cloud, "curvature");
+
+			if (c_idx >= 0)
+			{
+				float limits[] = { std::numeric_limits<float>::max(), std::numeric_limits<float>::min() };
+
+				uint32_t cOffset = mesh->cloud.fields[c_idx].offset;
+
+				float r, g, b;
+
+				const std::vector<uchar>* cloudData = &(mesh->cloud.data);
+				const uchar* cloudDataPtr = cloudData->data();
+
+				int points = (mesh->cloud.height * mesh->cloud.width);
+				int point_size = points == 0 ? 0 : static_cast<int> (cloudData->size() / points);
+
+				vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+				colors->SetNumberOfComponents(3);
+
+				vtkProperty *prop = it->second.actor->GetProperty();
+				vtkPolyData *d = (vtkPolyData*)it->second.actor->GetMapper()->GetInput();
+
+				if (m_colorValueRange.isAuto())
+				{
+					for (int i = 0; i < points; ++i)
+					{
+						limits[0] = std::min(limits[0], *((float*)(cloudDataPtr + i * point_size + cOffset)));
+						limits[1] = std::max(limits[1], *((float*)(cloudDataPtr + i * point_size + cOffset)));
+					}
+				}
+				else
+				{
+					limits[0] = m_colorValueRange.minimum();
+					limits[1] = m_colorValueRange.maximum();
+				}
+
+				for (int i = 0; i < points; ++i)
+				{
+					evalColorMap(*((float*)(cloudDataPtr + i * point_size + cOffset)), r, g, b, limits);
+					colors->InsertNextTuple3(r, g, b);
+				}
+
+				colors->SetName("Colors");
+				d->GetPointData()->SetScalars(colors);
+				it->second.actor->Modified();
+
+				emit updateCanvasRequest();
+			}
+		}
         else if(mode == SolidColor)
         {
             setFaceColor(m_faceColor);
