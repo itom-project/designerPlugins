@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -140,7 +140,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     d->PCLVis->setupInteractor(interactor, d->ui.pclCanvas->GetRenderWindow());
     d->PCLVis->getInteractorStyle()->setKeyboardModifier(pcl::visualization::INTERACTOR_KB_MOD_SHIFT);
-    d->PCLVis->getRenderWindow()->Render(); //wichtig, dass dieser befehl vor dem ersten Hinzufügen von Elementen oder setzen von visuellen Eigenschaften kommt, da sonst addPointCloud crashed, alternativ kann auch setBackgroundColor gerufen werden, aber das ruft intern auch render() auf.
+    d->PCLVis->getRenderWindow()->Render(); //wichtig, dass dieser befehl vor dem ersten Hinzufuegen von Elementen oder setzen von visuellen Eigenschaften kommt, da sonst addPointCloud crashed, alternativ kann auch setBackgroundColor gerufen werden, aber das ruft intern auch render() auf.
 
     if (interactor->HasObserver(vtkCommand::ExitEvent))
     {
