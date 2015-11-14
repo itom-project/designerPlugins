@@ -24,6 +24,7 @@
 #define ITEMPOINTCLOUD_H
 
 #include "common/sharedStructures.h"
+#include "common/interval.h"
 #include "PointCloud/pclStructures.h"
 #include "pcl/visualization/pcl_visualizer.h"
 
@@ -47,7 +48,7 @@ public:
     ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
     virtual ~ItemPointCloud();
 
-    enum ColorMode { ColorStatic, ColorX, ColorY, ColorZ, ColorAbsXYZ, ColorIntensity, ColorNormalX, ColorNormalY, ColorNormalZ, ColorNormalAbsXYZ, ColorRGB, ColorCurvature };
+    enum ColorMode { SolidColor, X, Y, Z, XYZ, XY, YZ, XZ, Intensity, NormalX, NormalY, NormalZ, NormalXYZ, RGB, Curvature };
 
     ito::RetVal addPointCloud(const ito::PCLPointCloud &cloud);
 
@@ -78,6 +79,7 @@ protected:
     int m_lineWidth;
     QColor m_color;
     ColorMode m_colorMode;
+
 
 
     template <typename PointT> ito::RetVal addPointCloudTmpl(typename pcl::PointCloud<PointT>::Ptr cloud, bool update = false);

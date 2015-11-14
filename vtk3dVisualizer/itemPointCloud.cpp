@@ -32,7 +32,7 @@ ItemPointCloud::ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualiz
     m_pointSize = 2;
     m_lineWidth = 1;
     m_type = "point cloud";
-    m_colorMode = ColorStatic;
+    m_colorMode = SolidColor;
     m_color = QColor("white");
 }
 
@@ -53,7 +53,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
     {
         switch (mode)
         {
-        case ColorStatic:
+        case SolidColor:
             {
                 pcl::visualization::PointCloudColorHandlerCustom<PointT> color_handler(cloud, m_color.red(), m_color.green(), m_color.blue());
                 if (color_handler.isCapable())
@@ -70,23 +70,23 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
                 }
                 break;
             }
-        case ColorX:
-        case ColorY:
-        case ColorZ:
-        case ColorIntensity:
-        case ColorNormalX:
-        case ColorNormalY:
-        case ColorNormalZ:
-        case ColorCurvature:
+        case X:
+        case Y:
+        case Z:
+        case Intensity:
+        case NormalX:
+        case NormalY:
+        case NormalZ:
+        case Curvature:
             {
                 std::string f = "x";
-                if (mode == ColorY) f = "y";
-                if (mode == ColorZ) f = "z";
-                if (mode == ColorIntensity) f = "intensity";
-                if (mode == ColorNormalX) f = "normal_x";
-                if (mode == ColorNormalY) f = "normal_y";
-                if (mode == ColorNormalZ) f = "normal_z";
-                if (mode == ColorCurvature) f = "curvature";
+                if (mode == Y) f = "y";
+                if (mode == Z) f = "z";
+                if (mode == Intensity) f = "intensity";
+                if (mode == NormalX) f = "normal_x";
+                if (mode == NormalY) f = "normal_y";
+                if (mode == NormalZ) f = "normal_z";
+                if (mode == Curvature) f = "curvature";
                 pcl::visualization::PointCloudColorHandlerGenericField<PointT> color_handler(cloud, f);
                 if (color_handler.isCapable())
                 {
@@ -103,7 +103,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
                 break;
             }
         //the PointCloudColorHandlerRGBField does not compile if PointT is a point type without rgba information
-        /*case ColorRGB:
+        /*case RGB:
             {
                 pcl::visualization::PointCloudColorHandlerRGBField<PointT> color_handler(cloud);
                 if (color_handler.isCapable())
@@ -120,7 +120,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
                 }
                 break;
             }*/
-        case ColorAbsXYZ:
+        case XYZ:
             {
                 PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "x", "y", "z");
                 if (color_handler.isCapable())
@@ -137,7 +137,67 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
                 }
                 break;
             }
-        case ColorNormalAbsXYZ:
+        case XY:
+        {
+            std::vector<std::string> fields;
+            fields.push_back("x");
+            fields.push_back("y");
+            PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, fields);
+            if (color_handler.isCapable())
+            {
+                if (update)
+                {
+                    m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                }
+                else
+                {
+                    m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                }
+                colorFound = true;
+            }
+            break;
+        }
+        case YZ:
+        {
+            std::vector<std::string> fields;
+            fields.push_back("y");
+            fields.push_back("z");
+            PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, fields);
+            if (color_handler.isCapable())
+            {
+                if (update)
+                {
+                    m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                }
+                else
+                {
+                    m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                }
+                colorFound = true;
+            }
+            break;
+        }
+        case XZ:
+        {
+            std::vector<std::string> fields;
+            fields.push_back("x");
+            fields.push_back("z");
+            PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, fields);
+            if (color_handler.isCapable())
+            {
+                if (update)
+                {
+                    m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                }
+                else
+                {
+                    m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                }
+                colorFound = true;
+            }
+            break;
+        }
+        case NormalXYZ:
             {
                 PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "normal_x", "normal_y", "normal_z");
                 if (color_handler.isCapable())
@@ -170,7 +230,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
 
         if (!colorFound)
         {
-            mode = ColorStatic;
+            mode = SolidColor;
             m_colorMode = mode;
         }
     }
@@ -194,7 +254,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
     {
         switch (mode)
         {
-        case ColorStatic:
+        case SolidColor:
             {
                 pcl::visualization::PointCloudColorHandlerCustom<PointT> color_handler(cloud, m_color.red(), m_color.green(), m_color.blue());
                 if (color_handler.isCapable())
@@ -211,23 +271,23 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
                 }
                 break;
             }
-        case ColorX:
-        case ColorY:
-        case ColorZ:
-        case ColorIntensity:
-        case ColorNormalX:
-        case ColorNormalY:
-        case ColorNormalZ:
-        case ColorCurvature:
+        case X:
+        case Y:
+        case Z:
+        case Intensity:
+        case NormalX:
+        case NormalY:
+        case NormalZ:
+        case Curvature:
             {
                 std::string f = "x";
-                if (mode == ColorY) f = "y";
-                if (mode == ColorZ) f = "z";
-                if (mode == ColorIntensity) f = "intensity";
-                if (mode == ColorNormalX) f = "normal_x";
-                if (mode == ColorNormalY) f = "normal_y";
-                if (mode == ColorNormalZ) f = "normal_z";
-                if (mode == ColorCurvature) f = "curvature";
+                if (mode == Y) f = "y";
+                if (mode == Z) f = "z";
+                if (mode == Intensity) f = "intensity";
+                if (mode == NormalX) f = "normal_x";
+                if (mode == NormalY) f = "normal_y";
+                if (mode == NormalZ) f = "normal_z";
+                if (mode == Curvature) f = "curvature";
                 pcl::visualization::PointCloudColorHandlerGenericField<PointT> color_handler(cloud, f);
                 if (color_handler.isCapable())
                 {
@@ -243,7 +303,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
                 }
                 break;
             }
-        case ColorRGB:
+        case RGB:
             {
                 pcl::visualization::PointCloudColorHandlerRGBField<PointT> color_handler(cloud);
                 if (color_handler.isCapable())
@@ -260,7 +320,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
                 }
                 break;
             }
-        case ColorAbsXYZ:
+        case XYZ:
             {
                 PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "x", "y", "z");
                 if (color_handler.isCapable())
@@ -277,7 +337,67 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
                 }
                 break;
             }
-        case ColorNormalAbsXYZ:
+        case XY:
+            {
+                std::vector<std::string> fields;
+                fields.push_back("x");
+                fields.push_back("y");
+                PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, fields);
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case YZ:
+            {
+                std::vector<std::string> fields;
+                fields.push_back("y");
+                fields.push_back("z");
+                PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, fields);
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case XZ:
+            {
+                std::vector<std::string> fields;
+                fields.push_back("x");
+                fields.push_back("z");
+                PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, fields);
+                if (color_handler.isCapable())
+                {
+                    if (update)
+                    {
+                        m_visualizer->updatePointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    else
+                    {
+                        m_visualizer->addPointCloud<PointT>(cloud, color_handler, m_name.toStdString());
+                    }
+                    colorFound = true;
+                }
+                break;
+            }
+        case NormalXYZ:
             {
                 PointCloudColorHandlerGenericFields<PointT> color_handler(cloud, "normal_x", "normal_y", "normal_z");
                 if (color_handler.isCapable())
@@ -310,7 +430,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
 
         if (!colorFound)
         {
-            mode = ColorStatic;
+            mode = SolidColor;
             m_colorMode = mode;
         }
     }
@@ -434,7 +554,7 @@ void ItemPointCloud::setLineWidth(int value)
 //-------------------------------------------------------------------------------------------
 void ItemPointCloud::setColor(QColor value)
 {
-    if (m_colorMode == ColorStatic && m_color != value)
+    if (m_colorMode == SolidColor && m_color != value)
     {
         m_color = value;
         updatePointCloud(m_cloud);
@@ -461,6 +581,7 @@ void ItemPointCloud::setColorMode(ColorMode mode)
     
     emit updateCanvasRequest();
 }
+
 
 //-------------------------------------------------------------------------------------------
 //void ItemPointCloud::setSelected(bool value)
