@@ -708,7 +708,19 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             index = m_plotCurveItems.size();
             if (m_legendTitles.size() == 0)
             {
-                dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index));
+				bool valid;
+				ito::DataObjectTagType tag;
+
+				QString legendTitle = QString("legendTitle%1").arg(index);
+				tag = dataObj->getTag(legendTitle.toStdString(), valid);
+				if(valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
+				{
+					dObjCurve = new QwtPlotCurveDataObject(tr("%1").arg(QString::fromLatin1(tag.getVal_ToString().data())));
+				}
+				else // plots with empty tags: curce 0, curve 1, ...
+				{
+					dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index));
+				}			  
             }
             else if (m_legendTitles.size() > index)
             {
