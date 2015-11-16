@@ -1682,8 +1682,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             m_axisZ.phys[0] = zmin;
             m_axisZ.phys[1] = zmax;
 
-            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-                m_zAmpl = 0.000000001; // make sure µm can be displayed
+            if (m_zAmpl < 0.000000001) // make sure mu m can be displayed
+                m_zAmpl = 0.000000001; // make sure mu m can be displayed
 
             zs = m_axisZ.phys[1] - m_axisZ.phys[0];
             xs = m_axisX.phys[1] - m_axisX.phys[0];
@@ -1736,8 +1736,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
         if(!retval.containsError())
         {
-            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-                m_zAmpl = 0.000000001; // make sure µm can be displayed
+            if (m_zAmpl < 0.000000001) // make sure mu m can be displayed
+                m_zAmpl = 0.000000001; // make sure mu m can be displayed
 
             if(m_axisZ.isMetric) zs = m_axisZ.phys[1] - m_axisZ.phys[0];
 
@@ -2614,7 +2614,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
                 {
                     label.append(" in ");
 
-                    char sign[2] = {("afpnµm-kMGTPE"[al.unitydigit / 3 + 6]), 0};
+                    char sign[2] = {("afpn\u00B5m-kMGTPE"[al.unitydigit / 3 + 6]), 0};
                     label.append(sign);
 
                     if(alreadyScaled)
@@ -2780,7 +2780,7 @@ void plotGLWidget::paintAxisLabelOGL(const struct AxisLabel &axisLabel, const do
         else
         {
             int rest=firstdigit>0?firstdigit%3:2-(2-firstdigit)%3;
-            _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpnµm-kMGTPE"[(firstdigit - rest) / 3 + 6]);
+            _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpn\u00B5m-kMGTPE"[(firstdigit - rest) / 3 + 6]);
         }
     }
 
