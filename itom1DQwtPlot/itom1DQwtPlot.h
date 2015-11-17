@@ -150,7 +150,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
-    Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the default titles 'curve 0', 'curve 1'... are taken.")
+    Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the data object is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
 
     Q_CLASSINFO("prop://pickerLabelVisible", "Enable and disable the picker label.")
     Q_CLASSINFO("prop://pickerLabelOrientation", "Get / Set label orintation for the picker-label.")

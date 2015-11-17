@@ -390,17 +390,34 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setLegendTitles(const QStringList &legends)
+void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataObject *object)
 {
     int index = 0;
     m_legendTitles = legends;
 
-    QwtLegendLabel *legendLabel = NULL;
-    foreach (QwtPlotCurve *item, m_plotCurveItems)
+    bool valid = false;
+    ito::DataObjectTagType tag;
+    QwtPlotCurve *item = NULL;
+
+    for (int index = 0; index < m_plotCurveItems.size(); ++index)
     {
+        item = m_plotCurveItems[index];
         if (m_legendTitles.size() == 0)
         {
-            item->setTitle(tr("curve %1").arg(index));
+            if (object)
+            {
+                tag = object->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
+            }
+
+            if (valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
+            {
+                item->setTitle(QString::fromLatin1(tag.getVal_ToString().data()));
+            }
+            else // plots with empty tags: curce 0, curve 1, ...
+            {
+                item->setTitle(tr("curve %1").arg(index));
+            }
+            
         }
         else if (m_legendTitles.size() > index)
         {
@@ -703,19 +720,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             delete curve;
         }
 
+        bool valid;
+        ito::DataObjectTagType tag;
+
         while (m_plotCurveItems.size() < numCurves)
         {
             index = m_plotCurveItems.size();
             if (m_legendTitles.size() == 0)
             {
-				bool valid;
-				ito::DataObjectTagType tag;
-
-				QString legendTitle = QString("legendTitle%1").arg(index);
-				tag = dataObj->getTag(legendTitle.toStdString(), valid);
+                tag = dataObj->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
 				if(valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
 				{
-					dObjCurve = new QwtPlotCurveDataObject(tr("%1").arg(QString::fromLatin1(tag.getVal_ToString().data())));
+					dObjCurve = new QwtPlotCurveDataObject(QString::fromLatin1(tag.getVal_ToString().data()));
 				}
 				else // plots with empty tags: curce 0, curve 1, ...
 				{
@@ -1015,8 +1031,6 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
         }
 
-        bool valid;
-        ito::DataObjectTagType tag;
         tag = dataObj->getTag("title", valid);
         m_pData->m_titleDObj = valid? QString::fromLatin1(tag.getVal_ToString().data()) : "";
     } 

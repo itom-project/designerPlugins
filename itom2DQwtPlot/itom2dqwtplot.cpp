@@ -2990,8 +2990,7 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     {
         m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
 
-        qreal resFaktor = resolution / 72.0 + 0.5;
-        resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
+        qreal resFaktor = std::max(qRound(resolution / 72.0), 1);
 
         QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
         QClipboard *clipboard = QApplication::clipboard();
@@ -2999,7 +2998,9 @@ ito::RetVal Itom2dQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
         renderer.render(m_pContent, &painter, m_pContent->rect());
-        clipboard->setImage(img);    
+        img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
+        img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
+        clipboard->setImage(img);
 
         m_pContent->statusBarMessage(tr("copy current view to clipboard. done."), 1000);
     }

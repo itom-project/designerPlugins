@@ -106,7 +106,7 @@ class Plot1DWidget : public QwtPlot
         ito::RetVal setPicker(const QVector<float> &physCords);
 
         void setLegendPosition(LegendPosition position, bool visible);
-        void setLegendTitles(const QStringList &legends);
+        void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;

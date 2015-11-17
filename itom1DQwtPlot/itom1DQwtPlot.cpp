@@ -301,7 +301,7 @@ void Itom1DQwtPlot::setRowPresentation(const Itom1DQwt::tMultiLineMode idx)
     if (m_pContent)
     {
         QVector<QPointF> bounds = getBounds();
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
@@ -360,7 +360,7 @@ void Itom1DQwtPlot::setRGBPresentation(const int idx)
     if (m_pContent)
     {
         QVector<QPointF> bounds = getBounds();
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
@@ -454,7 +454,7 @@ void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
     {
         m_pContent->m_unitLabelStyle = style;
         QVector<QPointF> bounds = getBounds();
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
@@ -674,11 +674,11 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
-    if ((ito::DataObject*)m_pInput["source"]->getVal<void*>())
+    if (m_pInput["source"]->getVal<ito::DataObject*>())
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
         // why "source" is used here and not "displayed" .... ck 05/15/2013
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         ito::Channel* dataChannel = getInputChannel("source");
         m_pRescaleParent->setVisible(dataChannel && dataChannel->getParent());
@@ -1168,7 +1168,7 @@ void Itom1DQwtPlot::setLegendTitles(const QStringList &legends)
 {
     if (m_pContent)
     {
-        return m_pContent->setLegendTitles(legends);
+        return m_pContent->setLegendTitles(legends, m_pInput["source"]->getVal<ito::DataObject*>());
     }
 
     updatePropertyDock();
@@ -2255,9 +2255,8 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
     {
         m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
 
-        resFaktor = resFaktor = resolution / 72.0 + 0.5;;
-        resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
-        //m_pContent->setLineWidth(linewidth * resFaktor);
+        resFaktor = std::max(qRound(resolution / 72.0), 1);
+
     }
     m_pContent->replot();
 
@@ -2276,8 +2275,9 @@ ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
-        
         renderer.render(m_pContent, &painter, m_pContent->rect());
+        img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
+        img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
         clipboard->setImage(img);  
         
         m_pContent->statusBarMessage(tr("copy current view to clipboard. done."), 1000);
