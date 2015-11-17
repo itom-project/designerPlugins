@@ -427,7 +427,6 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
         {
             item->setTitle("");
         }
-        index++;
     }
     replot();
 }
