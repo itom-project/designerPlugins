@@ -2614,7 +2614,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
                 {
                     label.append(" in ");
 
-                    char sign[2] = {("afpn\u00B5m-kMGTPE"[al.unitydigit / 3 + 6]), 0};
+                    char sign[2] = {("afpn\u00B5m-kMGTPE"[al.unitydigit / 3 + 6]), 0}; // Ermittlung der Masseinheit
                     label.append(sign);
 
                     if(alreadyScaled)
@@ -2780,7 +2780,7 @@ void plotGLWidget::paintAxisLabelOGL(const struct AxisLabel &axisLabel, const do
         else
         {
             int rest=firstdigit>0?firstdigit%3:2-(2-firstdigit)%3;
-            _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpn\u00B5m-kMGTPE"[(firstdigit - rest) / 3 + 6]);
+            _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpn\u00B5m-kMGTPE"[(firstdigit - rest) / 3 + 6]); // Ermittlung der Masseinheit
         }
     }
 
