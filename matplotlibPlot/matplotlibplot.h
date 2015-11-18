@@ -17,6 +17,9 @@
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
 
+class MatplotlibSubfigConfig; //forward declaration
+class MatplotlibWidget; //forward declaration
+
 class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 {
     Q_OBJECT
@@ -60,8 +63,8 @@ private:
     QLabel *m_lblCoordinates;
     QToolBar *m_toolbar;
     QMenu *m_contextMenu;
-    void *m_pContent;
-    void *m_pMatplotlibSubfigConfig;
+    MatplotlibWidget *m_pContent;
+    MatplotlibSubfigConfig *m_pMatplotlibSubfigConfig;
     bool m_forceWindowResize;
 
 signals:
@@ -71,17 +74,17 @@ private slots:
     void mnuMarkerClick(bool /*checked*/);
     inline void mnuShowToolbar(bool /*checked*/) { setToolbarVisible(true); }
 
-    void subplotConfigSliderLeftChanged(int value);
-    void subplotConfigSliderTopChanged(int value);
-    void subplotConfigSliderRightChanged(int value);
-    void subplotConfigSliderBottomChanged(int value);
-    void subplotConfigSliderWSpaceChanged(int value);
-    void subplotConfigSliderHSpaceChanged(int value);
+    void subplotConfigSliderLeftChanged(double left);
+    void subplotConfigSliderRightChanged(double left);
+    void subplotConfigSliderBottomChanged(double bottom);
+    void subplotConfigSliderTopChanged(double top);
+    void subplotConfigSliderWSpaceChanged(double value);
+    void subplotConfigSliderHSpaceChanged(double value);
 
     void resetFixedSize() { setFixedSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX); }
 
 public slots:
-    void showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace);
+void showSubplotConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace);
     void setLabelText(QString text) { m_lblCoordinates->setText(text); }
 
 };

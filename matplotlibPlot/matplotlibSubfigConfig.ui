@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
-    <height>295</height>
+    <width>393</width>
+    <height>217</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,99 +28,61 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QSlider" name="sliderLeft">
-        <property name="maximum">
-         <number>999</number>
-        </property>
-        <property name="singleStep">
-         <number>5</number>
-        </property>
-        <property name="tracking">
-         <bool>false</bool>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>top</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSlider" name="sliderTop">
-        <property name="maximum">
-         <number>999</number>
-        </property>
-        <property name="singleStep">
-         <number>5</number>
-        </property>
-        <property name="tracking">
-         <bool>false</bool>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>bottom</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSlider" name="sliderBottom">
-        <property name="minimum">
+       <widget class="DoubleRangeWidget" name="dblRangeLeftRight">
+        <property name="decimals">
          <number>1</number>
         </property>
         <property name="maximum">
-         <number>1000</number>
+         <double>100.000000000000000</double>
         </property>
-        <property name="singleStep">
-         <number>5</number>
+        <property name="maximumValue">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="suffix">
+         <string> %</string>
         </property>
         <property name="tracking">
          <bool>false</bool>
         </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="0" column="2">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>right</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QSlider" name="sliderRight">
-        <property name="minimum">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>bottom</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="DoubleRangeWidget" name="dblRangeBottomTop">
+        <property name="decimals">
          <number>1</number>
         </property>
         <property name="maximum">
-         <number>1000</number>
+         <double>100.000000000000000</double>
         </property>
-        <property name="singleStep">
-         <number>5</number>
+        <property name="maximumValue">
+         <double>100.000000000000000</double>
         </property>
-        <property name="value">
-         <number>1</number>
-        </property>
-        <property name="sliderPosition">
-         <number>1</number>
+        <property name="suffix">
+         <string> %</string>
         </property>
         <property name="tracking">
          <bool>false</bool>
         </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>top</string>
         </property>
        </widget>
       </item>
@@ -136,46 +98,52 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>hspace</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSlider" name="sliderHSpace">
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="singleStep">
-         <number>5</number>
-        </property>
-        <property name="tracking">
-         <bool>false</bool>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <string>vertical space</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>wspace</string>
+         <string>horizontal space</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSlider" name="sliderWSpace">
-        <property name="maximum">
-         <number>1000</number>
+       <widget class="SliderWidget" name="sliderWSpace">
+        <property name="decimals">
+         <number>1</number>
         </property>
         <property name="singleStep">
-         <number>5</number>
+         <double>5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="suffix">
+         <string> %</string>
         </property>
         <property name="tracking">
          <bool>false</bool>
         </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="SliderWidget" name="sliderHSpace">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="singleStep">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="suffix">
+         <string> %</string>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -207,6 +175,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>doubleRangeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SliderWidget</class>
+   <extends>QWidget</extends>
+   <header>sliderWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
