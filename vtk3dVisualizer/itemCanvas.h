@@ -32,17 +32,14 @@
 #include "CustomTypes.h"
 
 
+
 class ItemCanvas : public Item
 {
     Q_OBJECT
-    Q_ENUMS(Stereo);
-
-    Q_PROPERTY(QColor BackgroundColor READ backgroundColor WRITE setBackgroundColor DESIGNABLE true USER true);
-
-    Q_PROPERTY(bool CoordSysVisible READ coordSysVisible WRITE setCoordSysVisible DESIGNABLE true USER true)
-    Q_PROPERTY(bool ShowFPS READ showFPS WRITE setShowFPS DESIGNABLE true USER true)
-    Q_PROPERTY(Stereo StereoType READ stereoType WRITE setStereoType DESIGNABLE true USER true)
+    
     Q_PROPERTY(double CoordSysScale READ coordSysScale WRITE setCoordSysScale DESIGNABLE true USER true)
+    Q_PROPERTY(bool CoordSysVisible READ coordSysVisible WRITE setCoordSysVisible DESIGNABLE true USER true)
+    
     Q_PROPERTY(Vec3f CoordSysPos READ coordSysPos WRITE setCoordSysPos DESIGNABLE true USER true)
     Q_CLASSINFO("CoordSysPos", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
     Q_PROPERTY(Vec3f CameraPosition READ cameraPosition WRITE setCameraPosition DESIGNABLE true USER true)
@@ -51,7 +48,7 @@ class ItemCanvas : public Item
     
 
 public:
-    enum Stereo { No, CrystalEyes, RedBlue, Interlaced, Left, Right, Dresden, Anaglyph, Checkerboard };
+    
 
     ItemCanvas(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, QTreeWidgetItem *treeItem);
 
@@ -59,24 +56,7 @@ public:
 
     boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer() const { return m_visualizer; }
 
-    //properties
-    QColor backgroundColor() const { return m_backgroundColor;}
-    void setBackgroundColor(const QColor& color);
-
-    Vec3f coordSysPos() const { return m_coordinateSysPos; }
-    void setCoordSysPos( const Vec3f& coordSysPos );
-
-    bool coordSysVisible() const { return m_coordinateSysVisible; }
-    void setCoordSysVisible( const bool& coordSysVisible );
-
-    double coordSysScale() const { return m_coordinateSysScale; }
-    void setCoordSysScale( const double& coordSysScale );
-
-    bool showFPS() const { return m_showFPS; }
-    void setShowFPS( const bool& showFPS );
-
-    Stereo stereoType() const { return m_stereoType; }
-    void setStereoType( const Stereo& stereoType );
+    
 
     Vec3f cameraPosition() const;
     void setCameraPosition( const Vec3f& cameraPosition );
@@ -87,6 +67,14 @@ public:
     Vec3f cameraFocalPoint() const;
     void setCameraFocalPoint( const Vec3f& focalPoint );
 
+    Vec3f coordSysPos() const { return m_coordinateSysPos; }
+    void setCoordSysPos(const Vec3f& coordSysPos);
+
+    bool coordSysVisible() const { return m_coordinateSysVisible;  }
+    void setCoordSysVisible(const bool& coordSysVisible);
+
+    double coordSysScale() const { return m_coordinateSysScale; }
+    void setCoordSysScale(const double& coordSysScale);
 
 
 protected:
@@ -94,13 +82,9 @@ protected:
 
 private:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
-
-    QColor m_backgroundColor;
-    bool m_coordinateSysVisible;
     double m_coordinateSysScale;
+    bool m_coordinateSysVisible;
     Vec3f m_coordinateSysPos; 
-    bool m_showFPS;
-    Stereo m_stereoType;
 };
 
 #endif

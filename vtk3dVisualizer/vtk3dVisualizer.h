@@ -24,9 +24,9 @@
 #define VTK3DVISUALIZER_H
 
 #if defined(ITOMSHAREDDESIGNER)
-    #define VTK3DVISUALIZER_EXPORT Q_DECL_EXPORT
+#define VTK3DVISUALIZER_EXPORT Q_DECL_EXPORT
 #else
-    #define VTK3DVISUALIZER_EXPORT Q_DECL_IMPORT
+#define VTK3DVISUALIZER_EXPORT Q_DECL_IMPORT
 #endif
 
 #include "plot/AbstractDObjPclFigure.h"
@@ -47,6 +47,7 @@
 
 
 
+
 class QPropertyEditorWidget; //forward declaration
 class Vtk3dVisualizerPrivate; //forward declaration
 class QEvent;
@@ -55,15 +56,84 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
 {
     Q_OBJECT
 
+    Q_ENUMS(FlyMode);
+    Q_ENUMS(TickLocation);
+    Q_ENUMS(Stereo);
+
     Q_PROPERTY(bool propertiesSorted READ propertiesSorted WRITE setPropertiesSorted DESIGNABLE true USER true);
     Q_PROPERTY(bool enablePointPick READ enablePointPick WRITE setEnablePointPick DESIGNABLE true USER true);
     Q_PROPERTY(double pointPickSphereRadius READ pointPickSphereRadius WRITE setPointPickSphereRadius DESIGNABLE true USER true);
     Q_PROPERTY(QColor pointPickSphereColor READ pointPickSphereColor WRITE setpointPickSphereColor DESIGNABLE true USER true);
+    
+    Q_PROPERTY(bool cubeAxesVisible READ getCubeAxesVisible WRITE setCubeAxesVisible USER true)
+    Q_PROPERTY(QColor cubeAxesColor READ getCubeAxesColor WRITE setCubeAxesColor USER true)
+    Q_PROPERTY(QColor cubeGridlinesColor READ getCubeGridlinesColor WRITE setCubeGridlinesColor USER true)
+    Q_PROPERTY(FlyMode cubeAxesFlyMode READ getCubeAxesFlyMode WRITE setCubeAxesFlyMode USER true)
+    Q_PROPERTY(TickLocation cubeAxesTickLocation READ getCubeAxesTickLocation WRITE setCubeAxesTickLocation USER true)
+    Q_PROPERTY(bool enableDistanceLOD READ getEnableDistanceLOD WRITE setEnableDistanceLOD USER true)
+    Q_PROPERTY(bool enableViewAngleLOD READ getEnableViewAngleLOD WRITE setEnableViewAngleLOD USER true)
+    
+    Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel USER true)
+    Q_PROPERTY(QString yAxisLabel READ getyAxisLabel WRITE setyAxisLabel USER true)
+    Q_PROPERTY(QString zAxisLabel READ getzAxisLabel WRITE setzAxisLabel USER true)
+
+    Q_PROPERTY(bool xAxisVisible READ getxAxisVisible WRITE setxAxisVisible USER true)
+    Q_PROPERTY(bool yAxisVisible READ getyAxisVisible WRITE setyAxisVisible USER true)
+    Q_PROPERTY(bool zAxisVisible READ getzAxisVisible WRITE setzAxisVisible USER true)
+
+    Q_PROPERTY(bool xDrawGridlines READ getDrawXGridlines WRITE setDrawXGridlines USER true)
+    Q_PROPERTY(bool yDrawGridlines READ getDrawYGridlines WRITE setDrawYGridlines USER true)
+    Q_PROPERTY(bool zDrawGridlines READ getDrawZGridlines WRITE setDrawZGridlines USER true)
+
+    Q_PROPERTY(bool xAxisTickVisibility READ getxTicksVisibility WRITE setxTicksVisibility USER true)
+    Q_PROPERTY(bool yAxisTickVisibility READ getyTicksVisibility WRITE setyTicksVisibility USER true)
+    Q_PROPERTY(bool zAxisTickVisibility READ getzTicksVisibility WRITE setzTicksVisibility USER true)
+
+    Q_PROPERTY(bool xAxisMinorTickVisibility READ getxMinorTicksVisibility WRITE setxMinorTicksVisibility USER true)
+    Q_PROPERTY(bool yAxisMinorTickVisibility READ getyMinorTicksVisibility WRITE setyMinorTicksVisibility USER true)
+    Q_PROPERTY(bool zAxisMinorTickVisibility READ getzMinorTicksVisibility WRITE setzMinorTicksVisibility USER true)
+
+    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor DESIGNABLE true USER true);
+    Q_PROPERTY(bool showFPS READ getShowFPS WRITE setShowFPS DESIGNABLE true USER true)
+    Q_PROPERTY(Stereo stereoType READ getStereoType WRITE setStereoType DESIGNABLE true USER true)
+        
 
     Q_CLASSINFO("prop://propertiesSorted", "sort the properties of one item in an alphabetical order or not")
     Q_CLASSINFO("prop://enablePointPick", "if True, a click to any point of the canvas emits the signal pointPicked that emits the currently clicked 3d coordinate and the index of the closest point of the cloud / mesh that has been given as pickPointCloud or pickMesh.")
     Q_CLASSINFO("prop://pointPickSphereRadius", "If > 0, a sphere with the given radius is printed around the center point of the point pick event (if enabled)")
     Q_CLASSINFO("prop://pointPickSphereColor", "Color of the possible sphere of the point pick event (see pointPickShereRadius and enablePointPick)")
+
+    Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis.")
+    Q_CLASSINFO("prop://yAxisLabel", "Label of the y-axis.")
+    Q_CLASSINFO("prop://zAxisLabel", "Label of the z-axis.")
+
+    Q_CLASSINFO("prop://xAxisVisible", "Sets the visibility of the x-axis.")
+    Q_CLASSINFO("prop://yAxisVisible", "Sets the visibility of the y-axis.")
+    Q_CLASSINFO("prop://zAxisVisible", "Sets the visibility of the z-axis.")
+
+    Q_CLASSINFO("prop://xDrawGridlines", "Sets the visibility of gridlines along the x-axis.")
+    Q_CLASSINFO("prop://yDrawGridlines", "Sets the visibility of gridlines along the y-axis.")
+    Q_CLASSINFO("prop://zDrawGridlines", "Sets the visibility of gridlines along the z-axis.")
+
+    Q_CLASSINFO("prop://xAxisTickVisibility", "Sets the visibility of major ticks along the x-axis.")
+    Q_CLASSINFO("prop://yAxisTickVisibility", "Sets the visibility of major ticks along the y-axis.")
+    Q_CLASSINFO("prop://zAxisTickVisibility", "Sets the visibility of major ticks along the z-axis.")
+
+    Q_CLASSINFO("prop://xAxisMinorTickVisibility", "Sets the visibility of minor ticks along the x-axis.")
+    Q_CLASSINFO("prop://yAxisMinorTickVisibility", "Sets the visibility of minor ticks along the y-axis.")
+    Q_CLASSINFO("prop://zAxisMinorTickVisibility", "Sets the visibility of minor ticks along the z-axis.")
+
+    Q_CLASSINFO("prop://cubeAxesVisible", "Overall visibility of the cube axes (must be set to True in order to see grids, labels, axes...)")
+    Q_CLASSINFO("prop://cubeAxesColor", "sets the color of the cube axes")
+    Q_CLASSINFO("prop://cubeGridlinesColor", "sets the color of the cube gridlines")
+    Q_CLASSINFO("prop://cubeAxesFlyMode", "defines how the cube axes are positioned depending on the current camera")
+    Q_CLASSINFO("prop://cubeAxesTickLocation", "defines the location of ticks for the cube axes")
+    Q_CLASSINFO("prop://enableDistanceLOD", "If enabled the actor will not be visible at a certain distance from the camera")
+    Q_CLASSINFO("prop://enableViewAngleLOD", "If enabled the actor will not be visible at a certain view angle")
+
+    Q_CLASSINFO("prop://backgroundColor", "background color of the canvas")
+    Q_CLASSINFO("prop://showFPS", "shows the FPS counter or not")
+    Q_CLASSINFO("prop://stereoType", "sets the stereo type of the canvas")
 
     Q_CLASSINFO("slot://registerModel", "see addMesh")
     Q_CLASSINFO("slot://addMesh", "add the given mesh to the tree with a key name (arguments: mesh, key)")
@@ -91,6 +161,11 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     DESIGNER_PLUGIN_ITOM_API
 
 public:
+    enum FlyMode { flyOuterEdges = 0, flyClostestTriad = 1, flyFurthestTriad = 2, flyStaticTriad = 3, flyStaticEdges = 4 };
+    enum TickLocation { ticksInside = 0, ticksOutside = 1, ticksBoth = 2 };
+    enum Stereo { No, CrystalEyes, RedBlue, Interlaced, Left, Right, Dresden, Anaglyph, Checkerboard };
+
+
     Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     virtual ~Vtk3dVisualizer();
 
@@ -111,6 +186,90 @@ public:
     bool getContextMenuEnabled() const { return false; };
     void setContextMenuEnabled(bool show) {}; 
 
+    virtual ito::AutoInterval getXAxisInterval(void) const;
+    virtual void setXAxisInterval(ito::AutoInterval interval);
+
+    virtual ito::AutoInterval getYAxisInterval(void) const;
+    virtual void setYAxisInterval(ito::AutoInterval interval);
+
+    virtual ito::AutoInterval getZAxisInterval(void) const;
+    virtual void setZAxisInterval(ito::AutoInterval interval);
+
+    bool getxAxisVisible() const;
+    void setxAxisVisible(const bool &value);
+
+    bool getyAxisVisible() const;
+    void setyAxisVisible(const bool &value);
+
+    bool getzAxisVisible() const;
+    void setzAxisVisible(const bool &value);
+
+    QString getxAxisLabel() const;
+    void setxAxisLabel(const QString &label);
+
+    QString getyAxisLabel() const;
+    void setyAxisLabel(const QString &label);
+
+    QString getzAxisLabel() const;
+    void setzAxisLabel(const QString &label);
+
+    bool getCubeAxesVisible() const;
+    void setCubeAxesVisible(const bool &visible);
+
+    QColor getCubeAxesColor() const;
+    void setCubeAxesColor(const QColor &color);
+
+    QColor getCubeGridlinesColor() const;
+    void setCubeGridlinesColor(const QColor &color);
+
+    bool getEnableDistanceLOD() const;
+    void setEnableDistanceLOD(const bool &enable);
+
+    bool getEnableViewAngleLOD() const;
+    void setEnableViewAngleLOD(const bool &enable);
+
+    bool getDrawXGridlines() const;
+    void setDrawXGridlines(const bool &draw);
+
+    bool getDrawYGridlines() const;
+    void setDrawYGridlines(const bool &draw);
+
+    bool getDrawZGridlines() const;
+    void setDrawZGridlines(const bool &draw);
+
+    bool getxTicksVisibility() const;
+    void setxTicksVisibility(const bool &visible);
+
+    bool getyTicksVisibility() const;
+    void setyTicksVisibility(const bool &visible);
+
+    bool getzTicksVisibility() const;
+    void setzTicksVisibility(const bool &visible);
+
+    bool getxMinorTicksVisibility() const;
+    void setxMinorTicksVisibility(const bool &visible);
+
+    bool getyMinorTicksVisibility() const;
+    void setyMinorTicksVisibility(const bool &visible);
+
+    bool getzMinorTicksVisibility() const;
+    void setzMinorTicksVisibility(const bool &visible);
+
+    FlyMode getCubeAxesFlyMode() const;
+    void setCubeAxesFlyMode(const FlyMode &mode);
+
+    TickLocation getCubeAxesTickLocation() const;
+    void setCubeAxesTickLocation(const TickLocation &location);
+
+    QColor getBackgroundColor() const;
+    void setBackgroundColor(const QColor& color);
+
+    bool getShowFPS() const;
+    void setShowFPS(const bool& showFPS);
+
+    Stereo getStereoType() const;
+    void setStereoType(const Stereo& stereoType);
+
 protected:
     ito::RetVal init();
 
@@ -122,6 +281,11 @@ private:
     ito::RetVal createRecursiveTree(QString &path, QTreeWidgetItem *currentParent, QTreeWidgetItem **newParent);
     ito::RetVal searchRecursiveTree(const QString &path, QTreeWidgetItem *currentParent, QTreeWidgetItem **item);
     ito::RetVal deleteItem(const QString &name, QTreeWidgetItem *rootItem);
+
+    QColor m_backgroundColor;
+    
+    bool m_showFPS;
+    Stereo m_stereoType;
 
 public slots:
     void registerModel(ito::PCLPolygonMesh mesh, QString modelName);

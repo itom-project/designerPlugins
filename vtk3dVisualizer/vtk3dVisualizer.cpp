@@ -43,6 +43,7 @@
 #include "itemCanvas.h"
 
 #include "vtkSmartPointer.h"
+#include "vtkCubeAxesActor.h"
 
 #include "QPropertyEditor/QPropertyEditorWidget.h"
 
@@ -91,6 +92,7 @@ public:
 
     QPropertyEditorWidget *propertyWidget;
     boost::shared_ptr<pcl::visualization::PCLVisualizer> PCLVis;
+    vtkSmartPointer<vtkCubeAxesActor> cubeAxesActor;
 
     QTreeWidget *treeWidget;
     QTreeWidgetItem *canvasItem;
@@ -110,33 +112,28 @@ public:
 //------------------------------------------------------------------------------------------------------------------------
 Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjPclFigure(itomSettingsFile, windowMode, parent),
-    d(NULL)
+    d(NULL),
+    m_showFPS(true),
+    m_stereoType(No),
+    m_backgroundColor(Qt::black)
 {
     d = new Vtk3dVisualizerPrivate();
 
     d->ui.setupUi(this);
 
-    //pcl::visualization::PCLVisualizer pviz ("PCLVisualizer", false);
     d->PCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualizer", false) );
 
-    /*Eigen::Vector4f v1;
-    Eigen::Quaternion<float,0> q;
-    vtkSmartPointer<vtkMatrix4x4> m;
-    pcl::visualization::PCLVisualizer::convertToVtkMatrix(v1, q, m);*/
     d->ui.statusbar->setVisible(false);
 
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
 
     win->SetStereoCapableWindow(1);
-    ////win->StereoCapableWindowOn();
-    //
-    //win->SetStereoTypeToCrystalEyes();
-    //win->SetStereoTypeToAnaglyph();
     win->StereoRenderOff();
-    ////win->StereoUpdate();
 
     d->ui.pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
     QVTKInteractor *interactor = d->ui.pclCanvas->GetInteractor();
+
+    d->PCLVis->setShowFPS(true);
     
 
     d->PCLVis->setupInteractor(interactor, d->ui.pclCanvas->GetRenderWindow());
@@ -147,13 +144,6 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     {
         interactor->RemoveObservers(vtkCommand::ExitEvent);
     }
-    
-
-    //win->SetStereoTypeToRedBlue();
-    //win->SetStereoTypeToCrystalEyes();
-    //win->SetStereoTypeToRedBlue();
-    //win->SetStereoTypeToInterlaced();
-    //win->SetStereoTypeToDresden();
 
     //m_pPCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualization") );
     d->PCLVis->initCameraParameters ();
@@ -171,7 +161,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     SharedItemPtr canvas( new ItemCanvas(d->PCLVis, d->canvasItem) );
     ItemCanvas *c = (ItemCanvas*)canvas.data();
     connect(c, SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
-    c->setBackgroundColor(QColor(0,0,0));
+    setBackgroundColor(QColor(0,0,0));
     c->setCoordSysVisible(true);
 
     d->canvasItem->setData(0, Qt::DisplayRole, "canvas");
@@ -206,7 +196,28 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     TreeWidgetKeyEater *treeWidgetKeyEater = new TreeWidgetKeyEater(this, d->propertyWidget); //will be deleted upon deletion of this
     d->ui.treeWidget->installEventFilter(treeWidgetKeyEater);
 
+
+    //create axes
+    d->cubeAxesActor = vtkSmartPointer<vtkCubeAxesActor>::New();
+    d->cubeAxesActor->SetBounds(-5, 5, -5, 5, -5, 5);
+    d->cubeAxesActor->SetCamera(d->PCLVis->getRendererCollection()->GetFirstRenderer()->GetActiveCamera());
+
+    d->cubeAxesActor->DrawXGridlinesOff();
+    d->cubeAxesActor->DrawYGridlinesOff();
+    d->cubeAxesActor->DrawZGridlinesOff();
+#if VTK_MAJOR_VERSION > 5
+    d->cubeAxesActor->SetGridLineLocation(VTK_GRID_LINES_FURTHEST);
+#endif
+
+    d->cubeAxesActor->XAxisMinorTickVisibilityOff();
+    d->cubeAxesActor->YAxisMinorTickVisibilityOff();
+    d->cubeAxesActor->ZAxisMinorTickVisibilityOff();
+
+    d->PCLVis->getRendererCollection()->GetFirstRenderer()->AddActor(d->cubeAxesActor);
+
     d->ui.pclCanvas->update();
+
+    setPropertyObservedObject(this);
 }
 
 //-------------------------------------------------------------------------------------
@@ -1580,4 +1591,526 @@ void Vtk3dVisualizer::itemClicked(QTreeWidgetItem *item, int column)
     {
         d->propertyWidget->setObject(NULL);
     }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::AutoInterval Vtk3dVisualizer::getXAxisInterval(void) const
+{
+    double *bounds = d->cubeAxesActor->GetBounds();
+    return ito::AutoInterval(bounds[0], bounds[1]);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setXAxisInterval(ito::AutoInterval interval)
+{
+    double bounds[6];
+    d->cubeAxesActor->GetBounds(bounds);
+    if (!interval.isAuto())
+    {
+        bounds[0] = interval.minimum();
+        bounds[1] = interval.maximum();
+        d->cubeAxesActor->SetBounds(bounds);
+    }
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::AutoInterval Vtk3dVisualizer::getYAxisInterval(void) const
+{
+    double *bounds = d->cubeAxesActor->GetBounds();
+    return ito::AutoInterval(bounds[2], bounds[3]);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setYAxisInterval(ito::AutoInterval interval)
+{
+    double bounds[6];
+    d->cubeAxesActor->GetBounds(bounds);
+    if (!interval.isAuto())
+    {
+        bounds[2] = interval.minimum();
+        bounds[3] = interval.maximum();
+        d->cubeAxesActor->SetBounds(bounds);
+    }
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::AutoInterval Vtk3dVisualizer::getZAxisInterval(void) const
+{
+    double *bounds = d->cubeAxesActor->GetBounds();
+    return ito::AutoInterval(bounds[4], bounds[5]);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setZAxisInterval(ito::AutoInterval interval)
+{
+    double bounds[6];
+    d->cubeAxesActor->GetBounds(bounds);
+    if (!interval.isAuto())
+    {
+        bounds[4] = interval.minimum();
+        bounds[5] = interval.maximum();
+        d->cubeAxesActor->SetBounds(bounds);
+    }
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getxAxisVisible() const
+{
+    return d->cubeAxesActor->GetXAxisVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setxAxisVisible(const bool &value)
+{
+    d->cubeAxesActor->SetXAxisVisibility(value);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getyAxisVisible() const
+{
+    return d->cubeAxesActor->GetYAxisVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setyAxisVisible(const bool &value)
+{
+    d->cubeAxesActor->SetYAxisVisibility(value);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getzAxisVisible() const
+{
+    return d->cubeAxesActor->GetZAxisVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setzAxisVisible(const bool &value)
+{
+    d->cubeAxesActor->SetZAxisVisibility(value);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QString Vtk3dVisualizer::getxAxisLabel() const
+{
+    return d->cubeAxesActor->GetXTitle();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setxAxisLabel(const QString &label)
+{
+    d->cubeAxesActor->SetXTitle(label.toLatin1().data());
+    d->cubeAxesActor->SetXAxisLabelVisibility(label != "");
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QString Vtk3dVisualizer::getyAxisLabel() const
+{
+    return d->cubeAxesActor->GetYTitle();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setyAxisLabel(const QString &label)
+{
+    d->cubeAxesActor->SetYTitle(label.toLatin1().data());
+    d->cubeAxesActor->SetYAxisLabelVisibility(label != "");
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QString Vtk3dVisualizer::getzAxisLabel() const
+{
+    return d->cubeAxesActor->GetYTitle();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setzAxisLabel(const QString &label)
+{
+    d->cubeAxesActor->SetZTitle(label.toLatin1().data());
+    d->cubeAxesActor->SetZAxisLabelVisibility(label != "");
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getCubeAxesVisible() const
+{
+    return d->cubeAxesActor->GetVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setCubeAxesVisible(const bool &visible)
+{
+    d->cubeAxesActor->SetVisibility(visible);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor Vtk3dVisualizer::getCubeAxesColor() const
+{
+    double *colors = d->cubeAxesActor->GetXAxesLinesProperty()->GetColor();
+    return QColor(colors[0] * 255, colors[1] * 255, colors[2] * 255);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setCubeAxesColor(const QColor &color)
+{
+    vtkProperty *prop = d->cubeAxesActor->GetXAxesLinesProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetXAxesLinesProperty(prop);
+
+    prop = d->cubeAxesActor->GetYAxesLinesProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetYAxesLinesProperty(prop);
+
+    prop = d->cubeAxesActor->GetZAxesLinesProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetZAxesLinesProperty(prop);
+
+    d->cubeAxesActor->GetLabelTextProperty(0)->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->GetLabelTextProperty(1)->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->GetLabelTextProperty(2)->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->GetTitleTextProperty(0)->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->GetTitleTextProperty(1)->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->GetTitleTextProperty(2)->SetColor(color.redF(), color.greenF(), color.blueF());
+
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor Vtk3dVisualizer::getCubeGridlinesColor() const
+{
+    double *colors = d->cubeAxesActor->GetXAxesGridlinesProperty()->GetColor();
+    return QColor(colors[0] * 255, colors[1] * 255, colors[2] * 255);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setCubeGridlinesColor(const QColor &color)
+{
+    vtkProperty *prop = d->cubeAxesActor->GetXAxesGridpolysProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetXAxesGridpolysProperty(prop);
+
+    prop = d->cubeAxesActor->GetYAxesGridpolysProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetYAxesGridpolysProperty(prop);
+
+    prop = d->cubeAxesActor->GetZAxesGridpolysProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetZAxesGridpolysProperty(prop);
+
+    prop = d->cubeAxesActor->GetXAxesGridlinesProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetXAxesGridlinesProperty(prop);
+
+    prop = d->cubeAxesActor->GetYAxesGridlinesProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetYAxesGridlinesProperty(prop);
+
+    prop = d->cubeAxesActor->GetZAxesGridlinesProperty();
+    prop->SetColor(color.redF(), color.greenF(), color.blueF());
+    d->cubeAxesActor->SetZAxesGridlinesProperty(prop);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+Vtk3dVisualizer::FlyMode Vtk3dVisualizer::getCubeAxesFlyMode() const
+{
+    return (FlyMode)d->cubeAxesActor->GetFlyMode();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setCubeAxesFlyMode(const FlyMode &mode)
+{
+    d->cubeAxesActor->SetFlyMode(mode);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+Vtk3dVisualizer::TickLocation Vtk3dVisualizer::getCubeAxesTickLocation() const
+{
+    return (TickLocation)d->cubeAxesActor->GetTickLocation();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setCubeAxesTickLocation(const TickLocation &location)
+{
+    d->cubeAxesActor->SetTickLocation(location);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getEnableDistanceLOD() const
+{
+    return d->cubeAxesActor->GetEnableDistanceLOD();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setEnableDistanceLOD(const bool &enable)
+{
+    d->cubeAxesActor->SetEnableDistanceLOD(enable);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getEnableViewAngleLOD() const
+{
+    return d->cubeAxesActor->GetEnableViewAngleLOD();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setEnableViewAngleLOD(const bool &enable)
+{
+    d->cubeAxesActor->SetEnableViewAngleLOD(enable);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getDrawXGridlines() const
+{
+    return d->cubeAxesActor->GetDrawXGridlines();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setDrawXGridlines(const bool &draw)
+{
+    d->cubeAxesActor->SetDrawXGridlines(draw);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getDrawYGridlines() const
+{
+    return d->cubeAxesActor->GetDrawYGridlines();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setDrawYGridlines(const bool &draw)
+{
+    d->cubeAxesActor->SetDrawYGridlines(draw);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getDrawZGridlines() const
+{
+    return d->cubeAxesActor->GetDrawZGridlines();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setDrawZGridlines(const bool &draw)
+{
+    d->cubeAxesActor->SetDrawZGridlines(draw);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getxTicksVisibility() const
+{
+    return d->cubeAxesActor->GetXAxisTickVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setxTicksVisibility(const bool &visible)
+{
+    d->cubeAxesActor->SetXAxisTickVisibility(visible);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getyTicksVisibility() const
+{
+    return d->cubeAxesActor->GetYAxisTickVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setyTicksVisibility(const bool &visible)
+{
+    d->cubeAxesActor->SetYAxisTickVisibility(visible);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getzTicksVisibility() const
+{
+    return d->cubeAxesActor->GetZAxisTickVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setzTicksVisibility(const bool &visible)
+{
+    d->cubeAxesActor->SetZAxisTickVisibility(visible);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getxMinorTicksVisibility() const
+{
+    return d->cubeAxesActor->GetXAxisMinorTickVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setxMinorTicksVisibility(const bool &visible)
+{
+    d->cubeAxesActor->SetXAxisMinorTickVisibility(visible);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getyMinorTicksVisibility() const
+{
+    return d->cubeAxesActor->GetYAxisMinorTickVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setyMinorTicksVisibility(const bool &visible)
+{
+    d->cubeAxesActor->SetYAxisMinorTickVisibility(visible);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Vtk3dVisualizer::getzMinorTicksVisibility() const
+{
+    return d->cubeAxesActor->GetZAxisMinorTickVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::setzMinorTicksVisibility(const bool &visible)
+{
+    d->cubeAxesActor->SetZAxisMinorTickVisibility(visible);
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+
+//-----------------------------------------------------------------------
+QColor Vtk3dVisualizer::getBackgroundColor() const
+{
+    return m_backgroundColor;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setBackgroundColor(const QColor& color)
+{
+    QRgb rgb = color.rgb();
+    double r = qRed(rgb) / 256.0;
+    double g = qGreen(rgb) / 256.0;
+    double b = qBlue(rgb) / 256.0;
+    d->PCLVis->setBackgroundColor(r, g, b);
+    m_backgroundColor = color;
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+
+//-----------------------------------------------------------------------
+bool Vtk3dVisualizer::getShowFPS() const
+{
+    return m_showFPS;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setShowFPS(const bool& showFPS)
+{
+    d->PCLVis->setShowFPS(showFPS);
+    m_showFPS = showFPS;
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
+}
+
+
+
+//-----------------------------------------------------------------------
+Vtk3dVisualizer::Stereo Vtk3dVisualizer::getStereoType() const
+{
+    return m_stereoType;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setStereoType(const Stereo& stereoType)
+{
+    int type;
+
+    switch (stereoType)
+    {
+    case No:
+        type = 0;
+        break;
+    case CrystalEyes:
+        type = VTK_STEREO_CRYSTAL_EYES;
+        break;
+    case RedBlue:
+        type = VTK_STEREO_RED_BLUE;
+        break;
+    case Interlaced:
+        type = VTK_STEREO_INTERLACED;
+        break;
+    case Left:
+        type = VTK_STEREO_LEFT;
+        break;
+    case Right:
+        type = VTK_STEREO_RIGHT;
+        break;
+    case Dresden:
+        type = VTK_STEREO_DRESDEN;
+        break;
+    case Anaglyph:
+        type = VTK_STEREO_ANAGLYPH;
+        break;
+    case Checkerboard:
+        type = VTK_STEREO_CHECKERBOARD;
+        break;
+    }
+
+    m_stereoType = stereoType;
+
+    vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
+
+    if (type != 0)
+    {
+        win->SetStereoType(type);
+        win->StereoRenderOn();
+        win->StereoUpdate();
+    }
+    else
+    {
+        win->StereoRenderOff();
+        win->StereoUpdate();
+    }
+
+    d->ui.pclCanvas->update();
+    updatePropertyDock();
 }

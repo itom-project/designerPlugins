@@ -23,156 +23,18 @@
 #include "itemCanvas.h"
 
 #include "vtkRenderWindow.h"
-//#include "vtkCubeAxesActor.h"
+
 
 #include <pcl/visualization/common/common.h>
 
 ItemCanvas::ItemCanvas(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, QTreeWidgetItem *treeItem) :
-Item("canvas", Item::rttiCanvas, treeItem),
-m_visualizer(visualizer),
-m_showFPS(true),
-m_stereoType(No)
+    Item("canvas", Item::rttiCanvas, treeItem),
+    m_visualizer(visualizer),
+    m_coordinateSysVisible(true)
 {
 	m_type = "canvas";
 	m_coordinateSysPos = Vec3f(0, 0, 0);
-	m_coordinateSysVisible = true;
-	m_coordinateSysScale = 1.0;
-
-
-	//    vtkSmartPointer<vtkCubeAxesActor> cubeAxesActor =
-	//    vtkSmartPointer<vtkCubeAxesActor>::New();
-	//  cubeAxesActor->SetBounds(0,5,-10,10,-2,2);
-	//  cubeAxesActor->SetCamera(m_visualizer->getRendererCollection()->GetFirstRenderer()->GetActiveCamera());
-	// 
-	//  cubeAxesActor->DrawXGridlinesOn();
-	//  cubeAxesActor->DrawYGridlinesOn();
-	//  cubeAxesActor->DrawZGridlinesOn();
-	//#if VTK_MAJOR_VERSION > 5
-	//  cubeAxesActor->SetGridLineLocation(VTK_GRID_LINES_FURTHEST);
-	//#endif
-	// 
-	//  cubeAxesActor->XAxisMinorTickVisibilityOff();
-	//  cubeAxesActor->YAxisMinorTickVisibilityOff();
-	//  cubeAxesActor->ZAxisMinorTickVisibilityOff();
-	// 
-	//  m_visualizer->getRendererCollection()->GetFirstRenderer()->AddActor(cubeAxesActor);
-}
-
-//-----------------------------------------------------------------------
-void ItemCanvas::setBackgroundColor(const QColor& color)
-{
-    QRgb rgb = color.rgb();
-    double r = qRed(rgb)/256.0;
-    double g = qGreen(rgb)/256.0;
-    double b = qBlue(rgb)/256.0;
-    m_visualizer->setBackgroundColor( r,g,b);
-    m_backgroundColor = color;
-
-    emit updateCanvasRequest();
-}
-
-//-----------------------------------------------------------------------
-void ItemCanvas::setCoordSysPos( const Vec3f& coordSysPos )
-{
-    m_coordinateSysPos = coordSysPos;
-    changeCoordSys();
-}
-
-//-----------------------------------------------------------------------
-void ItemCanvas::setCoordSysVisible( const bool& coordSysVisible )
-{
-    m_coordinateSysVisible = coordSysVisible;
-    changeCoordSys();
-}
-
-//-----------------------------------------------------------------------
-void ItemCanvas::setCoordSysScale( const double& coordSysScale )
-{
-    m_coordinateSysScale = coordSysScale;
-    changeCoordSys();
-}
-
-//-----------------------------------------------------------------------
-void ItemCanvas::setShowFPS( const bool& showFPS )
-{
-    m_visualizer->setShowFPS(showFPS);
-    m_showFPS = showFPS;
-}
-
-//-----------------------------------------------------------------------
-void ItemCanvas::changeCoordSys()
-{
-#if PCL_VERSION_COMPARE(>=,1,7,1)
-    m_visualizer->removeCoordinateSystem("mainCoordinateSystem");
-    if(m_coordinateSysVisible)
-    {
-        m_visualizer->addCoordinateSystem( m_coordinateSysScale, m_coordinateSysPos.X, m_coordinateSysPos.Y, m_coordinateSysPos.Z, "mainCoordinateSystem");
-    }
-#else
-    m_visualizer->removeCoordinateSystem();
-    if(m_coordinateSysVisible)
-    {
-        m_visualizer->addCoordinateSystem( m_coordinateSysScale, m_coordinateSysPos.X, m_coordinateSysPos.Y, m_coordinateSysPos.Z);
-    }
-#endif
-
-    emit updateCanvasRequest();
-}
-
-
-//-----------------------------------------------------------------------
-void ItemCanvas::setStereoType( const Stereo& stereoType )
-{
-    int type;
-
-    switch (stereoType)
-    {
-    case No:
-        type = 0;
-        break;
-    case CrystalEyes:
-        type = VTK_STEREO_CRYSTAL_EYES;
-        break;
-    case RedBlue:
-        type = VTK_STEREO_RED_BLUE;
-        break;
-    case Interlaced:
-        type = VTK_STEREO_INTERLACED;
-        break;
-    case Left:
-        type = VTK_STEREO_LEFT;
-        break;
-    case Right:
-        type = VTK_STEREO_RIGHT;
-        break;
-    case Dresden:
-        type = VTK_STEREO_DRESDEN;
-        break;
-    case Anaglyph:
-        type = VTK_STEREO_ANAGLYPH;
-        break;
-    case Checkerboard:
-        type = VTK_STEREO_CHECKERBOARD;
-        break;
-    }
-
-    m_stereoType = stereoType;
-
-    vtkSmartPointer<vtkRenderWindow> win = m_visualizer->getRenderWindow();
-
-    if (type != 0)
-    {
-        win->SetStereoType(type);
-        win->StereoRenderOn();
-        win->StereoUpdate();
-    }
-    else
-    {
-        win->StereoRenderOff();
-        win->StereoUpdate();
-    }
-
-    emit updateCanvasRequest();
+    m_coordinateSysScale = 1.0;
 }
 
 //-----------------------------------------------------------------------
@@ -254,4 +116,48 @@ void ItemCanvas::setCameraFocalPoint( const Vec3f& focalPoint )
                                         cameras[0].view[0], cameras[0].view[1], cameras[0].view[2]);
         emit updateCanvasRequest();
     } 
+}
+
+//-----------------------------------------------------------------------
+void ItemCanvas::setCoordSysPos(const Vec3f& coordSysPos)
+{
+    m_coordinateSysPos = coordSysPos;
+    changeCoordSys();
+    emit updateCanvasRequest();
+}
+
+//-----------------------------------------------------------------------
+void ItemCanvas::setCoordSysScale(const double& coordSysScale)
+{
+    m_coordinateSysScale = coordSysScale;
+    changeCoordSys();
+    emit updateCanvasRequest();
+}
+
+//-----------------------------------------------------------------------
+void ItemCanvas::changeCoordSys()
+{
+#if PCL_VERSION_COMPARE(>=,1,7,1)
+    m_visualizer->removeCoordinateSystem("mainCoordinateSystem");
+    if (m_coordinateSysVisible)
+    {
+        m_visualizer->addCoordinateSystem(m_coordinateSysScale, m_coordinateSysPos.X, m_coordinateSysPos.Y, m_coordinateSysPos.Z, "mainCoordinateSystem");
+    }
+#else
+    m_visualizer->removeCoordinateSystem();
+    if (m_coordinateSysVisible)
+    {
+        m_visualizer->addCoordinateSystem(m_coordinateSysScale, m_coordinateSysPos.X, m_coordinateSysPos.Y, m_coordinateSysPos.Z);
+    }
+#endif
+
+    emit updateCanvasRequest();
+}
+
+//-----------------------------------------------------------------------
+void ItemCanvas::setCoordSysVisible(const bool& coordSysVisible)
+{
+    m_coordinateSysVisible = coordSysVisible;
+    changeCoordSys();
+    emit updateCanvasRequest();
 }
