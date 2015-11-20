@@ -29,7 +29,7 @@
     #define VTK3DVISUALIZER_EXPORT Q_DECL_IMPORT
 #endif
 
-#include "plot/AbstractDObjFigure.h"
+#include "plot/AbstractDObjPclFigure.h"
 
 #include "common/sharedStructures.h"
 #include "PointCloud/pclStructures.h"
@@ -51,7 +51,7 @@ class QPropertyEditorWidget; //forward declaration
 class Vtk3dVisualizerPrivate; //forward declaration
 class QEvent;
 
-class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjFigure
+class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
 {
     Q_OBJECT
 

@@ -65,6 +65,7 @@
 
 Q_DECLARE_METATYPE ( SharedItemPtr )
 
+//------------------------------------------------------------------------------------------------------------------------
 class Vtk3dVisualizerPrivate 
 {
 public:
@@ -106,9 +107,9 @@ public:
 
 
 
-
+//------------------------------------------------------------------------------------------------------------------------
 Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
+    AbstractDObjPclFigure(itomSettingsFile, windowMode, parent),
     d(NULL)
 {
     d = new Vtk3dVisualizerPrivate();
@@ -225,7 +226,39 @@ Vtk3dVisualizer::~Vtk3dVisualizer()
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::applyUpdate()
 {
-    return ito::retOk;
+    ito::RetVal retval;
+    switch (m_inpType)
+    {
+    case ito::ParamBase::PointCloudPtr:
+        {
+            const ito::PCLPointCloud *cloud = m_pInput["pointCloud"]->getVal<const ito::PCLPointCloud*>();
+            if (cloud)
+            {
+                if (cloud->hasNormal())
+                {
+                    retval += this->addPointCloudNormal(*cloud, "source_cloud_normal");
+                }
+                else
+                {
+                    retval += this->addPointCloud(*cloud, "source_cloud_normal");
+                }
+            }
+        }
+        break;
+    case ito::ParamBase::PolygonMeshPtr:
+        {
+            const ito::PCLPolygonMesh *mesh = m_pInput["polygonMesh"]->getVal<const ito::PCLPolygonMesh*>();
+            if (mesh)
+            {
+                retval += this->addMesh(*mesh, "source_mesh");
+            }
+        }
+        break;
+    default:
+        retval += ito::RetVal(ito::retError, 0, "unsupported input type");
+    }
+    
+    return retval;
 }
 
 //-------------------------------------------------------------------------------------
