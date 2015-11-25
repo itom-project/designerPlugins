@@ -92,6 +92,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
     
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+    Q_PROPERTY(int buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
 
@@ -146,6 +147,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://picker", "Get picker defined by a float32[3] array for each element containing [pixelIndex, physIndex, value].")
 
     Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
+    Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
 
@@ -301,6 +303,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         //!> get current background color
         QColor getBackgroundColor(void) const;
 
+        //!> set new button set
+        void setButtonSet(const char newVal);
+
+        //!> get current button set
+        char getButtonSet(void) const;
+
         /** set color of axis
         *   @param [in] newVal  new axis color
         */
@@ -389,7 +397,20 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         QAction *m_pActGridSettings;
 
         QAction* m_pActMultiRowSwitch;
+        QAction* m_pActRGBA;
+        QAction* m_pActGray;
+        QAction* m_pActRGBL;
+        QAction* m_pActRGBAL;
+        QAction* m_pActRGBG;
         QMenu *m_pMnuMultiRowSwitch;
+        QAction* m_pActXVAuto;
+        QAction* m_pActXVFR;
+        QAction* m_pActXVFC;
+        QAction* m_pActXVMR;
+        QAction* m_pActXVMC;
+        QAction* m_pActXVML;
+
+        char m_buttonSet;           //!> button set used, i.e. for light or dark themes
 
         void constructor();
 

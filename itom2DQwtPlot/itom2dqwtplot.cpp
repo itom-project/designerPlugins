@@ -70,6 +70,10 @@ void Itom2dQwtPlot::constructor()
     m_pActCoordinates = NULL;
     m_pCoordinates = NULL;
     m_pActDrawMode = NULL;
+    m_pActMove = NULL;
+    m_pActResize = NULL;
+    m_pActRotate = NULL;
+    m_pActModify = NULL;
     m_pMnuDrawMode = NULL;
     m_pActCntrMarker = NULL;
     m_pActAspectRatio = NULL;
@@ -79,6 +83,7 @@ void Itom2dQwtPlot::constructor()
     m_pDrawModifyModeActGroup = NULL;
     m_pOverlaySlider = NULL;
     m_pActOverlaySlider = NULL;
+    m_buttonSet = 0;
 
     //bounds and zCutPoint are two different output connections, since it is possible to have a line cut and a z-stack cut visible at the same time.
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
@@ -238,28 +243,40 @@ void Itom2dQwtPlot::createActions()
     QAction *a = NULL;
 
     //m_actSave
-    m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
+    if (m_buttonSet == 0)
+        m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
+    else
+        m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/filesave_lt.png"), tr("Save..."), this);
     a->setShortcut(QKeySequence::Save);
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
 
     //m_actCopyClipboard
-    m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
+    if (m_buttonSet == 0)
+        m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
+    else
+        m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/clipboard_lt.png"), tr("Copy to clipboard"), this);
     a->setShortcut(QKeySequence::Copy);
     a->setObjectName("actCopyClipboard");
     a->setToolTip(tr("Copies the current view to the clipboard"));
     connect(a, SIGNAL(triggered()), this, SLOT(copyToClipBoard()));
 
     //m_actHome
-    m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
+    if (m_buttonSet == 0)
+        m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
+    else
+        m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/home_lt.png"), tr("Home"), this);
     a->setObjectName("actHome");
     a->setToolTip(tr("Reset original view"));
     a->setShortcut(Qt::CTRL + Qt::Key_0);
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActHome()));
 
     //m_actPan
-    m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
+    if (m_buttonSet == 0)
+        m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
+    else
+        m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"), tr("Move"), this);
     a->setObjectName("actPan");
     a->setCheckable(true);
     a->setChecked(false);
@@ -267,7 +284,10 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActPan(bool)));
 
     //m_pActClearDrawings
-    m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear markers"), this);
+    if (m_buttonSet == 0)
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear markers"), this);
+    else
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"), tr("Clear markers"), this);
     a->setObjectName("actClearGeometrics");
     a->setCheckable(false);
     a->setChecked(false);
@@ -275,7 +295,10 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered()), this, SLOT(clearGeometricElements()));
 
     //m_actApectRatio
-    m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("Lock aspect ratio"), this);
+    if (m_buttonSet == 0)
+        m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("Lock aspect ratio"), this);
+    else
+        m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect_lt/icons/AspRatio11_lt.png"), tr("Lock aspect ratio"), this);
     a->setObjectName("actRatio");
     a->setCheckable(true);
     a->setChecked(false);
@@ -283,7 +306,10 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
     //m_actZoom
-    m_pActZoom = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("Zoom to rectangle"), this);
+    if (m_buttonSet == 0)
+        m_pActZoom = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("Zoom to rectangle"), this);
+    else
+        m_pActZoom = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/zoom_to_rect_lt.png"), tr("Zoom to rectangle"), this);
     a->setObjectName("actZoom");
     a->setCheckable(true);
     a->setChecked(false);
@@ -296,33 +322,48 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSendCurrentToWorkspace()));
 
     //m_actScaleSetting
-    m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale settings..."), this);
+    if (m_buttonSet == 0)
+        m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale settings..."), this);
+    else
+        m_pActScaleSettings = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/autoscal_lt.png"), tr("Scale settings..."), this);
     a->setObjectName("actScaleSetting");
     a->setToolTip(tr("Set the ranges and offsets of this view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActScaleSettings()));
 
     //m_actPalette
-    m_pActColorPalette = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"), tr("Palette"), this);
+    if (m_buttonSet == 0)
+        m_pActColorPalette = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"), tr("Palette"), this);
+    else
+        m_pActColorPalette = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorPalette_lt.png"), tr("Palette"), this);
     a->setObjectName("actColorPalette");
     a->setToolTip(tr("Switch between color palettes"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActColorPalette()));
 
     //m_actToggleColorBar
-    m_pActToggleColorBar = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"), tr("Show Colorbar"), this);
+    if (m_buttonSet == 0)
+        m_pActToggleColorBar = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"), tr("Show Colorbar"), this);
+    else
+        m_pActToggleColorBar = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"), tr("Show Colorbar"), this);
     a->setCheckable(true);
     a->setObjectName("actShowColorBar");
     a->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
     connect(a,SIGNAL(toggled(bool)),this,SLOT(mnuActToggleColorBar(bool)));
 
     //m_actMarker
-    m_pActValuePicker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("Marker"), this);
+    if (m_buttonSet == 0)
+        m_pActValuePicker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("Marker"), this);
+    else
+        m_pActValuePicker = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"), tr("Marker"), this);
     a->setObjectName("actValuePicker");
     a->setCheckable(true);
     a->setChecked(false);
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActValuePicker(bool)));
 
     //m_actLineCut
-    m_pActLineCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Linecut"), this);
+    if (m_buttonSet == 0)
+        m_pActLineCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"), tr("Linecut"), this);
+    else
+        m_pActLineCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"), tr("Linecut"), this);
     a->setCheckable(true);
     a->setObjectName("actLineCut");
     a->setToolTip(tr("Show a in plane line cut"));
@@ -383,7 +424,10 @@ void Itom2dQwtPlot::createActions()
     
 
     //m_actStackCut
-    m_pActStackCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"), tr("Slice in z-direction"), this);
+    if (m_buttonSet == 0)
+        m_pActStackCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"), tr("Slice in z-direction"), this);
+    else
+        m_pActStackCut = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/zStack_lt.png"), tr("Slice in z-direction"), this);
     a->setObjectName("actStackCut");
     a->setToolTip(tr("Show a slice through z-stack"));
     a->setCheckable(true);
@@ -404,7 +448,10 @@ void Itom2dQwtPlot::createActions()
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuActPlaneSelector(int)));
 
     //m_actDrawMode
-    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+    if (m_buttonSet == 0)
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+    else
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"), tr("Switch Draw Mode"), this);
     m_pActDrawMode->setData(PlotCanvas::tPoint);
     m_pMnuDrawMode = new QMenu(tr("Draw Mode"), this);
 
@@ -436,35 +483,50 @@ void Itom2dQwtPlot::createActions()
     connect(m_pDrawModeActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuDrawMode(QAction*)));
     connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
 
-    m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"), tr("Switch Element Modification Mode"), this);
+    if (m_buttonSet == 0)
+        m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"), tr("Switch Element Modification Mode"), this);
+    else
+        m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"), tr("Switch Element Modification Mode"), this);
     m_pMnuDrawModifyMode = new QMenu(tr("Elemet Modify Mode"), this);
 
     m_pDrawModifyModeActGroup = new QActionGroup(this);
-    a = m_pDrawModifyModeActGroup->addAction(tr("Move elements"));
-    a->setData(Itom2DQwt::tMoveGeometricElements);
-    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
-    m_pMnuDrawModifyMode->addAction(a);
-    a->setCheckable(false);
+    m_pActMove = m_pDrawModifyModeActGroup->addAction(tr("Move elements"));
+    m_pActMove->setData(Itom2DQwt::tMoveGeometricElements);
+    if (m_buttonSet == 0)
+        m_pActMove->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
+    else
+        m_pActMove->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"));
+    m_pMnuDrawModifyMode->addAction(m_pActMove);
+    m_pActMove->setCheckable(false);
 
-    a = m_pDrawModifyModeActGroup->addAction(tr("Resize Elements"));
-    a->setData(Itom2DQwt::tRotateGeometricElements);
-    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
-    m_pMnuDrawModifyMode->addAction(a);
-    a->setCheckable(false);
-    a->setEnabled(false);
+    m_pActResize = m_pDrawModifyModeActGroup->addAction(tr("Resize Elements"));
+    m_pActResize->setData(Itom2DQwt::tRotateGeometricElements);
+    if (m_buttonSet == 0)
+        m_pActResize->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
+    else
+        m_pActResize->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosResize_lt.png"));
+    m_pMnuDrawModifyMode->addAction(m_pActResize);
+    m_pActResize->setCheckable(false);
+    m_pActResize->setEnabled(false);
 
-    a = m_pDrawModifyModeActGroup->addAction(tr("Rotate Elements"));
-    a->setData(Itom2DQwt::tResizeGeometricElements);
-    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
-    m_pMnuDrawModifyMode->addAction(a);
-    a->setCheckable(false);
-    a->setEnabled(false);
+    m_pActRotate = m_pDrawModifyModeActGroup->addAction(tr("Rotate Elements"));
+    m_pActRotate->setData(Itom2DQwt::tResizeGeometricElements);
+    if (m_buttonSet == 0)
+        m_pActRotate->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
+    else
+        m_pActRotate->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosRotate_lt.png"));
+    m_pMnuDrawModifyMode->addAction(m_pActRotate);
+    m_pActRotate->setCheckable(false);
+    m_pActRotate->setEnabled(false);
 
-    a = m_pDrawModifyModeActGroup->addAction(tr("Modify Points"));
-    a->setData(Itom2DQwt::tModifyPoints);
-    m_pMnuDrawModifyMode->addAction(a);
-    a->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
-    a->setCheckable(false);
+    m_pActModify = m_pDrawModifyModeActGroup->addAction(tr("Modify Points"));
+    m_pActModify->setData(Itom2DQwt::tModifyPoints);
+    m_pMnuDrawModifyMode->addAction(m_pActModify);
+    if (m_buttonSet == 0)
+        m_pActModify->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
+    else
+        m_pActModify->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosPoints_lt.png"));
+    m_pActModify->setCheckable(false);
 
     m_pActDrawModifyMode->setMenu(m_pMnuDrawModifyMode);
     m_pActDrawModifyMode->setVisible(true);
@@ -472,7 +534,10 @@ void Itom2dQwtPlot::createActions()
     connect(m_pDrawModifyModeActGroup, SIGNAL(triggered(QAction*)), this, SLOT(mnuDrawModifyMode(QAction*)));
 
     //m_pActCntrMarker
-    m_pActCntrMarker = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"), tr("Center marker"), this);
+    if (m_buttonSet == 0)
+        m_pActCntrMarker = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"), tr("Center marker"), this);
+    else
+        m_pActCntrMarker = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerCntr_lt.png"), tr("Center marker"), this);
     a->setObjectName("actCenterMarker");
     a->setToolTip(tr("Show a marker at data object center"));
     a->setCheckable(true);
@@ -481,7 +546,10 @@ void Itom2dQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActCenterMarker(bool)));
     
     //m_actCmplxSwitch
-    m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
+    if (m_buttonSet == 0)
+        m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
+    else
+        m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImRe_lt.png"), tr("Switch Imag, Real, Abs, Pha"), this);
     m_mnuCmplxSwitch = new QMenu(tr("Complex Switch"));
 
     QActionGroup *m_pCmplxActGroup = new QActionGroup(this);
@@ -1535,22 +1603,34 @@ void Itom2dQwtPlot::mnuDrawModifyMode(QAction *action)
         default:
         case Itom2DQwt::tMoveGeometricElements:
             ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tMoveGeometricElements;
-            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
+            else
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"));
         break;
 
         case Itom2DQwt::tResizeGeometricElements:
             ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tResizeGeometricElements;
-            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
+            else
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosResize_lt.png"));
         break;
 
         case Itom2DQwt::tRotateGeometricElements:
             ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tRotateGeometricElements;
-            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
+            else
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosRotate_lt.png"));
         break;
 
         case Itom2DQwt::tModifyPoints:
             ((InternalData*) m_pVData)->m_modState = Itom2DQwt::tModifyPoints;
-            m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
+            else
+                m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosPoints_lt.png"));
         break;
     }
 }
@@ -1569,25 +1649,37 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
     {
         default:
         case PlotCanvas::tPoint:
-            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+            else
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"));
             m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tPoint, true, 1);
         break;
 
         case PlotCanvas::tLine:
-            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+            else
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
             m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tLine, true, 2);
         break;
 
         case PlotCanvas::tRect:
-            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
+            else
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rectangle_lt.png"));
             m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tRect, true, 2);
         break;
 
         case PlotCanvas::tEllipse:
-            m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
+            if (m_buttonSet == 0)
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
+            else
+                m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/ellipse_lt.png"));
             m_pActDrawMode->setData(action->data());
             m_pContent->userInteractionStart(PlotCanvas::tEllipse, true, 2);
         break;
@@ -1618,16 +1710,28 @@ void Itom2dQwtPlot::setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool vi
             switch (type)
             {
                 case Itom2DQwt::Imag:
-                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
+                    if (m_buttonSet == 0)
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
+                    else
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReImag_lt.png"));
                 break;
                 case Itom2DQwt::Real:
-                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
+                    if (m_buttonSet == 0)
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal.png"));
+                    else
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReReal_lt.png"));
                 break;
                 case Itom2DQwt::Phase:
-                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
+                    if (m_buttonSet == 0)
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase.png"));
+                    else
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImRePhase_lt.png"));
                 break;
                 case Itom2DQwt::Abs:
-                    m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
+                    if (m_buttonSet == 0)
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
+                    else
+                        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReAbs_lt.png"));
                 break;
             }
         }
@@ -2727,6 +2831,73 @@ void Itom2dQwtPlot::setBackgroundColor(const QColor newVal)
 
     updatePropertyDock();
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom2dQwtPlot::getButtonSet(void) const
+{
+    return m_buttonSet;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setButtonSet(const int newVal)
+{
+    if (newVal == 0)
+    {
+        m_buttonSet = 0;
+        m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"));
+        m_pActCopyClipboard->setIcon(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"));
+        m_pActHome->setIcon(QIcon(":/itomDesignerPlugins/general/icons/home.png"));
+        m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general/icons/move.png"));
+        m_pActClearDrawings->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
+        m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
+        m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"));
+//        m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython.png"));
+        m_pActScaleSettings->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"));
+        m_pActColorPalette->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"));
+        m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
+        m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/marker.png"));
+        m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+        m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"));
+        m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+        m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
+        m_pActMove->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
+        m_pActResize->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
+        m_pActRotate->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
+        m_pActModify->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
+        m_pActCntrMarker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"));
+        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"));
+    }
+    else
+    {
+        m_buttonSet = 1;
+        m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/filesave_lt.png"));
+        m_pActCopyClipboard->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/clipboard_lt.png"));
+        m_pActHome->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/home_lt.png"));
+        m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"));
+        m_pActClearDrawings->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"));
+        m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect_lt/icons/AspRatio11_lt.png"));
+        m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/zoom_to_rect_lt.png"));
+        //        m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython_lt.png"));
+        m_pActScaleSettings->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/autoscal_lt.png"));
+        m_pActColorPalette->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorPalette_lt.png"));
+        m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"));
+        m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
+        m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
+        m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/zStack_lt.png"));
+        m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"));
+        m_pActDrawModifyMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"));
+        m_pActMove->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"));
+        m_pActResize->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosResize_lt.png"));
+        m_pActRotate->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosRotate_lt.png"));
+        m_pActModify->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosPoints_lt.png"));
+        m_pActCntrMarker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerCntr_lt.png"));
+        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImRe_lt.png"));
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom2dQwtPlot::getAxisColor(void) const

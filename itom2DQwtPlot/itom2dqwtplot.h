@@ -90,6 +90,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
 
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+    Q_PROPERTY(int buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
     
@@ -131,6 +132,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
     Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
+    Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
 
@@ -286,6 +288,12 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     //!> get current background color
     QColor getBackgroundColor(void) const;
 
+    //!> set new button set
+    void setButtonSet(const int newVal);
+
+    //!> get button set
+    int getButtonSet(void) const;
+
     /** set color of axis
     *   @param [in] newVal  new axis color
     */
@@ -373,6 +381,10 @@ private:
 
     QAction* m_pActDrawModifyMode;
     QMenu *m_pMnuDrawModifyMode;
+    QAction *m_pActMove;
+    QAction *m_pActResize;
+    QAction *m_pActRotate;
+    QAction *m_pActModify;
 
     QAction* m_pActCntrMarker;
 
@@ -380,6 +392,8 @@ private:
     QWidgetAction *m_pActOverlaySlider;
 
     QHash<QObject*,ito::uint32> m_childFigures;
+
+    char m_buttonSet;
 
     ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
     ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
