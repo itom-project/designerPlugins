@@ -95,6 +95,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
         set(plugin_RCC
             ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
+			${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.qrc
         )
 
         set(plugin_SOURCES 

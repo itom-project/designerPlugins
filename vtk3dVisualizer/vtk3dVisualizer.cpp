@@ -2325,5 +2325,7 @@ void Vtk3dVisualizer::createActions()
     d->actions["propertyDock"] = a = getPropertyDockWidget()->toggleViewAction();
     a->setIcon(QIcon(":/itomDesignerPlugins/general/icons/settings.png"));
     d->actions["settingsDock"] = a = d->dockSettings->toggleViewAction();
+    a->setIcon(QIcon(":/vtk3dVisualizer/icons/itemsSettings.png"));
     d->actions["itemsDock"] = a = d->dockItems->toggleViewAction();
+    a->setIcon(QIcon(":/vtk3dVisualizer/icons/items.png"));
 }
