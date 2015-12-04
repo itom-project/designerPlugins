@@ -44,6 +44,7 @@
 #include <qtreewidget.h>
 
 #include <string>
+#include <qvector3d>
 
 
 
@@ -96,6 +97,17 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor DESIGNABLE true USER true);
     Q_PROPERTY(bool showFPS READ getShowFPS WRITE setShowFPS DESIGNABLE true USER true)
     Q_PROPERTY(Stereo stereoType READ getStereoType WRITE setStereoType DESIGNABLE true USER true)
+    Q_PROPERTY(double coordSysScale READ getCoordSysScale WRITE setCoordSysScale DESIGNABLE true USER true)
+    Q_PROPERTY(bool coordSysVisible READ getCoordSysVisible WRITE setCoordSysVisible DESIGNABLE true USER true)
+
+    Q_PROPERTY(QVector3D coordSysPos READ getCoordSysPos WRITE setCoordSysPos DESIGNABLE true USER true)
+    Q_CLASSINFO("coordSysPos", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
+    Q_PROPERTY(QVector3D cameraPosition READ getCameraPosition WRITE setCameraPosition DESIGNABLE true USER true)
+    Q_CLASSINFO("cameraPosition", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
+    Q_PROPERTY(QVector3D cameraView READ getCameraView WRITE setCameraView DESIGNABLE true USER true)
+    Q_CLASSINFO("cameraView", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
+    Q_PROPERTY(QVector3D cameraFocalPoint READ getCameraFocalPoint WRITE setCameraFocalPoint DESIGNABLE true USER true)
+    Q_CLASSINFO("cameraFocalPoint", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
         
 
     Q_CLASSINFO("prop://propertiesSorted", "sort the properties of one item in an alphabetical order or not")
@@ -134,6 +146,13 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_CLASSINFO("prop://backgroundColor", "background color of the canvas")
     Q_CLASSINFO("prop://showFPS", "shows the FPS counter or not")
     Q_CLASSINFO("prop://stereoType", "sets the stereo type of the canvas")
+    Q_CLASSINFO("prop://coordSysScale", "sets the length / scaling of the coordinate axes")
+    Q_CLASSINFO("prop://coordSysVisible", "sets the visibility of a coordinate system")
+
+    Q_CLASSINFO("prop://coordSysPos", "position of the coordinate system")
+    Q_CLASSINFO("prop://cameraPosition", "position of the camera")
+    Q_CLASSINFO("prop://cameraView", "view direction of the camera")
+    Q_CLASSINFO("prop://cameraFocalPoint", "focal point of the camera")
 
     Q_CLASSINFO("slot://registerModel", "see addMesh")
     Q_CLASSINFO("slot://addMesh", "add the given mesh to the tree with a key name (arguments: mesh, key)")
@@ -270,8 +289,28 @@ public:
     Stereo getStereoType() const;
     void setStereoType(const Stereo& stereoType);
 
+    bool getCoordSysVisible() const;
+    void setCoordSysVisible(const bool& coordSysVisible);
+
+    double getCoordSysScale() const;
+    void setCoordSysScale(const double& coordSysScale);
+
+    QVector3D getCameraPosition() const;
+    void setCameraPosition(const QVector3D& cameraPosition);
+
+    QVector3D getCameraView() const;
+    void setCameraView(const QVector3D& cameraView);
+
+    QVector3D getCameraFocalPoint() const;
+    void setCameraFocalPoint(const QVector3D& focalPoint);
+
+    QVector3D getCoordSysPos() const;
+    void setCoordSysPos(const QVector3D& coordSysPos);
+
 protected:
     ito::RetVal init();
+
+    void createActions();
 
 private:
     Vtk3dVisualizerPrivate* d; /*! private data pointer of this class. */
@@ -281,11 +320,6 @@ private:
     ito::RetVal createRecursiveTree(QString &path, QTreeWidgetItem *currentParent, QTreeWidgetItem **newParent);
     ito::RetVal searchRecursiveTree(const QString &path, QTreeWidgetItem *currentParent, QTreeWidgetItem **item);
     ito::RetVal deleteItem(const QString &name, QTreeWidgetItem *rootItem);
-
-    QColor m_backgroundColor;
-    
-    bool m_showFPS;
-    Stereo m_stereoType;
 
 public slots:
     void registerModel(ito::PCLPolygonMesh mesh, QString modelName);

@@ -76,7 +76,6 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/coordSysProperty.h
             ${CMAKE_CURRENT_SOURCE_DIR}/CustomTypes.h
             ${CMAKE_CURRENT_SOURCE_DIR}/item.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/itemCanvas.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloud.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloudNormal.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPolygonMesh.h
@@ -104,7 +103,6 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/coordSysProperty.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/CustomTypes.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/item.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/itemCanvas.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloud.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloudNormal.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPolygonMesh.cpp

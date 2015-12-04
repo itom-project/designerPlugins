@@ -37,10 +37,10 @@
 #include <qdebug.h>
 #include <qstatusbar.h>
 #include <qevent.h>
+#include <qaction.h>
+#include <qmap.h>
 
 #include "QVTKWidget.h"
-
-#include "itemCanvas.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkCubeAxesActor.h"
@@ -48,7 +48,6 @@
 #include "QPropertyEditor/QPropertyEditorWidget.h"
 
 #include "itemGeometry.h"
-#include "itemCanvas.h"
 #include "itemPolygonMesh.h"
 #include "itemPointCloud.h"
 #include "itemPointCloudNormal.h"
@@ -56,7 +55,7 @@
 #include "DataObject/dataObjectFuncs.h"
 #include "treeWidgetKeyEater.h"
 
-#include "ui_vtk3dVisualizer.h"
+//#include "ui_vtk3dVisualizer.h"
 
 #include "common/apiFunctionsInc.h"
 
@@ -81,7 +80,13 @@ public:
         pointPickSphereColor(QColor(255,0,0)),
         pointPickSearch(pcl::octree::OctreePointCloudSearch<pcl::PointXYZ>(1.0)),
         pointPickSearchNormal(pcl::octree::OctreePointCloudSearch<pcl::PointNormal>(1.0)),
-        pointPickSearchHasNormals(false)
+        pointPickSearchHasNormals(false),
+        showFPS(true),
+        stereoType(Vtk3dVisualizer::No),
+        backgroundColor(Qt::black),
+        coordinateSysScale(1.0),
+        coordinateSysVisible(true),
+        coordinateSysPos(0,0,0)
     {}
     
     double pointPickSphereRadius;
@@ -89,6 +94,9 @@ public:
     std::string pointPickSphereName;
     std::string pointPickArrowName;
     boost::signals2::connection pointPickConnection;
+
+    QDockWidget *dockSettings;
+    QDockWidget *dockItems;
 
     QPropertyEditorWidget *propertyWidget;
     boost::shared_ptr<pcl::visualization::PCLVisualizer> PCLVis;
@@ -103,7 +111,19 @@ public:
     pcl::octree::OctreePointCloudSearch<pcl::PointXYZ> pointPickSearch;
     pcl::octree::OctreePointCloudSearch<pcl::PointNormal> pointPickSearchNormal;
     bool pointPickSearchHasNormals;
-    Ui::Vtk3dVisualizer ui;
+    
+    QVTKWidget *pclCanvas;
+
+    QColor backgroundColor;
+
+    bool showFPS;
+    Vtk3dVisualizer::Stereo stereoType;
+
+    double coordinateSysScale;
+    bool coordinateSysVisible;
+    QVector3D coordinateSysPos;
+
+    QMap<QByteArray, QAction*> actions;
 };
 
 
@@ -112,31 +132,30 @@ public:
 //------------------------------------------------------------------------------------------------------------------------
 Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractDObjPclFigure(itomSettingsFile, windowMode, parent),
-    d(NULL),
-    m_showFPS(true),
-    m_stereoType(No),
-    m_backgroundColor(Qt::black)
+    d(NULL)
 {
     d = new Vtk3dVisualizerPrivate();
 
-    d->ui.setupUi(this);
+    //d->ui.setupUi(this);
 
     d->PCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualizer", false) );
 
-    d->ui.statusbar->setVisible(false);
+    //this->statusBar()->setVisible(false);
 
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
 
     win->SetStereoCapableWindow(1);
     win->StereoRenderOff();
 
-    d->ui.pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
-    QVTKInteractor *interactor = d->ui.pclCanvas->GetInteractor();
+    d->pclCanvas = new QVTKWidget(this);
+    this->setCentralWidget(d->pclCanvas);
+    d->pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
+    QVTKInteractor *interactor = d->pclCanvas->GetInteractor();
 
     d->PCLVis->setShowFPS(true);
     
 
-    d->PCLVis->setupInteractor(interactor, d->ui.pclCanvas->GetRenderWindow());
+    d->PCLVis->setupInteractor(interactor, d->pclCanvas->GetRenderWindow());
     d->PCLVis->getInteractorStyle()->setKeyboardModifier(pcl::visualization::INTERACTOR_KB_MOD_SHIFT);
     d->PCLVis->getRenderWindow()->Render(); //wichtig, dass dieser befehl vor dem ersten Hinzufuegen von Elementen oder setzen von visuellen Eigenschaften kommt, da sonst addPointCloud crashed, alternativ kann auch setBackgroundColor gerufen werden, aber das ruft intern auch render() auf.
 
@@ -149,52 +168,56 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     d->PCLVis->initCameraParameters ();
     d->PCLVis->setCameraPosition(0.0, 0.0, 16.0, 0.0, -1.0, 0.0);
 
+    //create dock widgets
+    d->dockItems = new QDockWidget(this);
+    d->dockItems->setObjectName(QStringLiteral("dockItems"));
+    d->dockItems->setWindowTitle("Items");
+    d->dockItems->setVisible(false);
+    d->treeWidget = new QTreeWidget(d->dockItems);
+    d->treeWidget->setObjectName(QStringLiteral("treeWidget"));
+    d->treeWidget->setHeaderHidden(true);
+    d->dockItems->setWidget(d->treeWidget);
+    addToolbox(d->dockItems, "dockItems", Qt::LeftDockWidgetArea);
+
+    d->dockSettings = new QDockWidget(this);
+    d->dockSettings->setObjectName(QStringLiteral("itemsSettings"));
+    d->dockSettings->setWindowTitle("Items Settings");
+    d->dockSettings->setVisible(false);
+    addToolbox(d->dockSettings, "itemsSettings", Qt::LeftDockWidgetArea);
+
     //prepare QPropertyEditor for visualization
     CustomTypes::registerTypes();
-    d->propertyWidget = new QPropertyEditorWidget(this);
-    d->ui.dockSettings->setWidget(d->propertyWidget);
+    d->propertyWidget = new QPropertyEditorWidget(d->dockSettings);
+    d->dockSettings->setWidget(d->propertyWidget);
     d->propertyWidget->registerCustomPropertyCB( CustomTypes::createCustomProperty);
-
-    //create canvas item
-    d->canvasItem = new QTreeWidgetItem();
-
-    SharedItemPtr canvas( new ItemCanvas(d->PCLVis, d->canvasItem) );
-    ItemCanvas *c = (ItemCanvas*)canvas.data();
-    connect(c, SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
-    setBackgroundColor(QColor(0,0,0));
-    c->setCoordSysVisible(true);
-
-    d->canvasItem->setData(0, Qt::DisplayRole, "canvas");
-    d->canvasItem->setData(0, Item::itemRole, QVariant::fromValue(canvas) );
-    d->ui.treeWidget->addTopLevelItem( d->canvasItem );
 
     //create root for meshes
     d->meshItem = new QTreeWidgetItem();
     SharedItemPtr i1 = QSharedPointer<Item>( new Item("mesh", Item::rttiRoot, d->meshItem) );
-    connect(i1.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+    connect(i1.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
     d->meshItem->setData(0, Qt::DisplayRole, "mesh");
     d->meshItem->setData(0, Item::itemRole, QVariant::fromValue(i1) );
-    d->ui.treeWidget->addTopLevelItem( d->meshItem );
+    d->treeWidget->addTopLevelItem( d->meshItem );
 
     //create root for point clouds
     d->cloudItem = new QTreeWidgetItem();
     SharedItemPtr i2 = QSharedPointer<Item>( new Item("clouds", Item::rttiRoot, d->cloudItem) );
-    connect(i2.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+    connect(i2.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
     d->cloudItem->setData(0, Qt::DisplayRole, "clouds");
     d->cloudItem->setData(0, Item::itemRole, QVariant::fromValue(i2) );
-    d->ui.treeWidget->addTopLevelItem( d->cloudItem );
+    d->treeWidget->addTopLevelItem( d->cloudItem );
 
     //create root for geometries
     d->geometryItem = new QTreeWidgetItem();
     SharedItemPtr i3 = QSharedPointer<Item>( new Item("geometries", Item::rttiRoot, d->geometryItem) );
-    connect(i3.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+    connect(i3.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
     d->geometryItem->setData(0, Qt::DisplayRole, "geometries");
     d->geometryItem->setData(0, Item::itemRole, QVariant::fromValue(i3) );
-    d->ui.treeWidget->addTopLevelItem( d->geometryItem );
+    d->treeWidget->addTopLevelItem( d->geometryItem );
 
-    connect(d->ui.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(itemClicked(QTreeWidgetItem*,int)));
+    connect(d->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(itemClicked(QTreeWidgetItem*,int)));
     TreeWidgetKeyEater *treeWidgetKeyEater = new TreeWidgetKeyEater(this, d->propertyWidget); //will be deleted upon deletion of this
-    d->ui.treeWidget->installEventFilter(treeWidgetKeyEater);
+    d->treeWidget->installEventFilter(treeWidgetKeyEater);
 
 
     //create axes
@@ -212,12 +235,26 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     d->cubeAxesActor->XAxisMinorTickVisibilityOff();
     d->cubeAxesActor->YAxisMinorTickVisibilityOff();
     d->cubeAxesActor->ZAxisMinorTickVisibilityOff();
+    d->cubeAxesActor->SetVisibility(false);
+
+    setBackgroundColor(QColor(0, 0, 0));
+    setCoordSysVisible(true);
 
     d->PCLVis->getRendererCollection()->GetFirstRenderer()->AddActor(d->cubeAxesActor);
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
 
     setPropertyObservedObject(this);
+
+    //init actions
+    createActions();
+
+    //initialize actions
+    QToolBar *mainTb = new QToolBar(tr("toolbars"), this);
+    addToolBar(mainTb, "toolbars");
+    mainTb->addAction(d->actions["propertyDock"]);
+    mainTb->addAction(d->actions["settingsDock"]);
+    mainTb->addAction(d->actions["itemsDock"]);
 }
 
 //-------------------------------------------------------------------------------------
@@ -225,7 +262,7 @@ Vtk3dVisualizer::~Vtk3dVisualizer()
 {
     //this timerEvent must be removed, else crashes can occure in some situations if visualization is already destroyed 
     //and the timer event is fired afterwards.
-    d->ui.pclCanvas->GetInteractor()->RemoveObservers(vtkCommand::TimerEvent);
+    d->pclCanvas->GetInteractor()->RemoveObservers(vtkCommand::TimerEvent);
 
     d->PCLVis->getInteractorStyle()->SetEnabled(0);
 
@@ -459,12 +496,12 @@ ito::RetVal Vtk3dVisualizer::addPointCloud(ito::PCLPointCloud pc, const QString 
             retval += ((ItemPointCloud*)(i.data()))->addPointCloud(pc);
         }
 
-        connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+        connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
         item->setData(0, Item::itemRole, QVariant::fromValue(i));
 
     }
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
 
     return retval;
 }
@@ -513,13 +550,13 @@ ito::RetVal Vtk3dVisualizer::addPointCloudNormal(ito::PCLPointCloud pcl, const Q
 
         if (!retval.containsError())
         {
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             item->setData(0, Item::itemRole, QVariant::fromValue(i));
         }
 
     }
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
 
     return retval;
 }
@@ -605,11 +642,11 @@ ito::RetVal Vtk3dVisualizer::addCylinder(QVector<double> point, QVector<double> 
         }        
         SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
         item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-        connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+        connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
         ((ItemGeometry*)(i.data()))->addCylinder(coefficients, color);
     }
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
 
     return retval;
 }
@@ -650,11 +687,11 @@ ito::RetVal Vtk3dVisualizer::addPyramid(const ito::DataObject &points, const QSt
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             ((ItemGeometry*)(i.data()))->addPyramid(points2, color);
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 
     if (points2) delete points2;
@@ -698,11 +735,11 @@ ito::RetVal Vtk3dVisualizer::addCuboid(const ito::DataObject &points, const QStr
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             ((ItemGeometry*)(i.data()))->addCuboid(points2, color);
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 
     if (points2) delete points2;
@@ -785,11 +822,11 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             ((ItemGeometry*)(i.data()))->addCube(s, trafo, color);
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
         
         //Eigen::Matrix<float, 3, 8, Eigen::RowMajor> points;
@@ -860,11 +897,11 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             ((ItemGeometry*)(i.data()))->addSphere(center, radius, color);
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 
     return retval;
@@ -916,11 +953,11 @@ ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QSt
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             ((ItemGeometry*)(i.data()))->addPolygon(cloud, color);
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 
     return retval;
@@ -958,11 +995,11 @@ ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int
         }        
         SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
         item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-        connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+        connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
         ((ItemGeometry*)(i.data()))->addText(text, x, y, fontsize, color);
     }
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
 
     return retval;
 }
@@ -985,7 +1022,7 @@ ito::RetVal Vtk3dVisualizer::updateText(const QString &text, const int x, const 
             ItemGeometry *tg = (ItemGeometry*)(i.data());
             retval += tg->updateText(text, x, y, fontsize, color);
 
-            d->ui.pclCanvas->update();
+            d->pclCanvas->update();
         }
     }
     else if (createIfNotExists)
@@ -1033,11 +1070,11 @@ ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QStri
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             ((ItemGeometry*)(i.data()))->addLines(points2, color);
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 
     if (points2) delete points2;
@@ -1098,7 +1135,7 @@ ito::RetVal Vtk3dVisualizer::setGeometryPose(const QString &name, QVector<double
         {
             SharedItemPtr obj = item->data(0, Item::itemRole).value<SharedItemPtr>();
             retval += ((ItemGeometry*)(&(*obj)))->updatePose(trafo);
-            d->ui.pclCanvas->update();
+            d->pclCanvas->update();
         }
     }
 
@@ -1133,7 +1170,7 @@ ito::RetVal Vtk3dVisualizer::setGeometriesPosition(const QStringList &names, QVe
                 retval += ((ItemGeometry*)(&(*obj)))->updatePose(trafo);
             }
         }
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 
     return retval;
@@ -1182,13 +1219,13 @@ ito::RetVal Vtk3dVisualizer::addMesh(ito::PCLPolygonMesh mesh, const QString &fu
             }
         
             SharedItemPtr i = SharedItemPtr(new ItemPolygonMesh(d->PCLVis, fullname, item));
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->ui.pclCanvas, SLOT(update()));
+            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
             retval += ((ItemPolygonMesh*)(i.data()))->addPolygonMesh(mesh);
 
             item->setData(0, Item::itemRole, QVariant::fromValue(i));
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 
     return retval;
@@ -1229,7 +1266,7 @@ ito::RetVal Vtk3dVisualizer::deleteItem(const QString &name, QTreeWidgetItem *ro
         delete item;
     }
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
 
     return retval;
 }
@@ -1331,7 +1368,7 @@ ito::RetVal Vtk3dVisualizer::setItemProperty(const QString &name, const QByteArr
         }
     }
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
 
     return retval;
 }
@@ -1541,7 +1578,7 @@ void Vtk3dVisualizer::point_picking_callback (const pcl::visualization::PointPic
             d->pointPickArrowName = "";
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 }
 
@@ -1569,7 +1606,7 @@ void Vtk3dVisualizer::setEnablePointPick(bool enabled)
             d->pointPickArrowName = "";
         }
 
-        d->ui.pclCanvas->update();
+        d->pclCanvas->update();
     }
 }
 
@@ -1612,7 +1649,7 @@ void Vtk3dVisualizer::setXAxisInterval(ito::AutoInterval interval)
         bounds[1] = interval.maximum();
         d->cubeAxesActor->SetBounds(bounds);
     }
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1634,7 +1671,7 @@ void Vtk3dVisualizer::setYAxisInterval(ito::AutoInterval interval)
         bounds[3] = interval.maximum();
         d->cubeAxesActor->SetBounds(bounds);
     }
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1656,7 +1693,7 @@ void Vtk3dVisualizer::setZAxisInterval(ito::AutoInterval interval)
         bounds[5] = interval.maximum();
         d->cubeAxesActor->SetBounds(bounds);
     }
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1671,7 +1708,7 @@ bool Vtk3dVisualizer::getxAxisVisible() const
 void Vtk3dVisualizer::setxAxisVisible(const bool &value)
 {
     d->cubeAxesActor->SetXAxisVisibility(value);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1685,7 +1722,7 @@ bool Vtk3dVisualizer::getyAxisVisible() const
 void Vtk3dVisualizer::setyAxisVisible(const bool &value)
 {
     d->cubeAxesActor->SetYAxisVisibility(value);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1699,7 +1736,7 @@ bool Vtk3dVisualizer::getzAxisVisible() const
 void Vtk3dVisualizer::setzAxisVisible(const bool &value)
 {
     d->cubeAxesActor->SetZAxisVisibility(value);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1715,7 +1752,7 @@ void Vtk3dVisualizer::setxAxisLabel(const QString &label)
 {
     d->cubeAxesActor->SetXTitle(label.toLatin1().data());
     d->cubeAxesActor->SetXAxisLabelVisibility(label != "");
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1730,7 +1767,7 @@ void Vtk3dVisualizer::setyAxisLabel(const QString &label)
 {
     d->cubeAxesActor->SetYTitle(label.toLatin1().data());
     d->cubeAxesActor->SetYAxisLabelVisibility(label != "");
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1745,7 +1782,7 @@ void Vtk3dVisualizer::setzAxisLabel(const QString &label)
 {
     d->cubeAxesActor->SetZTitle(label.toLatin1().data());
     d->cubeAxesActor->SetZAxisLabelVisibility(label != "");
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1759,7 +1796,7 @@ bool Vtk3dVisualizer::getCubeAxesVisible() const
 void Vtk3dVisualizer::setCubeAxesVisible(const bool &visible)
 {
     d->cubeAxesActor->SetVisibility(visible);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1792,7 +1829,7 @@ void Vtk3dVisualizer::setCubeAxesColor(const QColor &color)
     d->cubeAxesActor->GetTitleTextProperty(1)->SetColor(color.redF(), color.greenF(), color.blueF());
     d->cubeAxesActor->GetTitleTextProperty(2)->SetColor(color.redF(), color.greenF(), color.blueF());
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1829,7 +1866,7 @@ void Vtk3dVisualizer::setCubeGridlinesColor(const QColor &color)
     prop = d->cubeAxesActor->GetZAxesGridlinesProperty();
     prop->SetColor(color.redF(), color.greenF(), color.blueF());
     d->cubeAxesActor->SetZAxesGridlinesProperty(prop);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1843,7 +1880,7 @@ Vtk3dVisualizer::FlyMode Vtk3dVisualizer::getCubeAxesFlyMode() const
 void Vtk3dVisualizer::setCubeAxesFlyMode(const FlyMode &mode)
 {
     d->cubeAxesActor->SetFlyMode(mode);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1857,7 +1894,7 @@ Vtk3dVisualizer::TickLocation Vtk3dVisualizer::getCubeAxesTickLocation() const
 void Vtk3dVisualizer::setCubeAxesTickLocation(const TickLocation &location)
 {
     d->cubeAxesActor->SetTickLocation(location);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1871,7 +1908,7 @@ bool Vtk3dVisualizer::getEnableDistanceLOD() const
 void Vtk3dVisualizer::setEnableDistanceLOD(const bool &enable)
 {
     d->cubeAxesActor->SetEnableDistanceLOD(enable);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1885,7 +1922,7 @@ bool Vtk3dVisualizer::getEnableViewAngleLOD() const
 void Vtk3dVisualizer::setEnableViewAngleLOD(const bool &enable)
 {
     d->cubeAxesActor->SetEnableViewAngleLOD(enable);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1899,7 +1936,7 @@ bool Vtk3dVisualizer::getDrawXGridlines() const
 void Vtk3dVisualizer::setDrawXGridlines(const bool &draw)
 {
     d->cubeAxesActor->SetDrawXGridlines(draw);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1913,7 +1950,7 @@ bool Vtk3dVisualizer::getDrawYGridlines() const
 void Vtk3dVisualizer::setDrawYGridlines(const bool &draw)
 {
     d->cubeAxesActor->SetDrawYGridlines(draw);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1927,7 +1964,7 @@ bool Vtk3dVisualizer::getDrawZGridlines() const
 void Vtk3dVisualizer::setDrawZGridlines(const bool &draw)
 {
     d->cubeAxesActor->SetDrawZGridlines(draw);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1941,7 +1978,7 @@ bool Vtk3dVisualizer::getxTicksVisibility() const
 void Vtk3dVisualizer::setxTicksVisibility(const bool &visible)
 {
     d->cubeAxesActor->SetXAxisTickVisibility(visible);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1955,7 +1992,7 @@ bool Vtk3dVisualizer::getyTicksVisibility() const
 void Vtk3dVisualizer::setyTicksVisibility(const bool &visible)
 {
     d->cubeAxesActor->SetYAxisTickVisibility(visible);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1969,7 +2006,7 @@ bool Vtk3dVisualizer::getzTicksVisibility() const
 void Vtk3dVisualizer::setzTicksVisibility(const bool &visible)
 {
     d->cubeAxesActor->SetZAxisTickVisibility(visible);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1983,7 +2020,7 @@ bool Vtk3dVisualizer::getxMinorTicksVisibility() const
 void Vtk3dVisualizer::setxMinorTicksVisibility(const bool &visible)
 {
     d->cubeAxesActor->SetXAxisMinorTickVisibility(visible);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -1997,7 +2034,7 @@ bool Vtk3dVisualizer::getyMinorTicksVisibility() const
 void Vtk3dVisualizer::setyMinorTicksVisibility(const bool &visible)
 {
     d->cubeAxesActor->SetYAxisMinorTickVisibility(visible);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -2011,7 +2048,7 @@ bool Vtk3dVisualizer::getzMinorTicksVisibility() const
 void Vtk3dVisualizer::setzMinorTicksVisibility(const bool &visible)
 {
     d->cubeAxesActor->SetZAxisMinorTickVisibility(visible);
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -2019,7 +2056,7 @@ void Vtk3dVisualizer::setzMinorTicksVisibility(const bool &visible)
 //-----------------------------------------------------------------------
 QColor Vtk3dVisualizer::getBackgroundColor() const
 {
-    return m_backgroundColor;
+    return d->backgroundColor;
 }
 
 //-----------------------------------------------------------------------
@@ -2030,8 +2067,8 @@ void Vtk3dVisualizer::setBackgroundColor(const QColor& color)
     double g = qGreen(rgb) / 256.0;
     double b = qBlue(rgb) / 256.0;
     d->PCLVis->setBackgroundColor(r, g, b);
-    m_backgroundColor = color;
-    d->ui.pclCanvas->update();
+    d->backgroundColor = color;
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -2039,15 +2076,15 @@ void Vtk3dVisualizer::setBackgroundColor(const QColor& color)
 //-----------------------------------------------------------------------
 bool Vtk3dVisualizer::getShowFPS() const
 {
-    return m_showFPS;
+    return d->showFPS;
 }
 
 //-----------------------------------------------------------------------
 void Vtk3dVisualizer::setShowFPS(const bool& showFPS)
 {
     d->PCLVis->setShowFPS(showFPS);
-    m_showFPS = showFPS;
-    d->ui.pclCanvas->update();
+    d->showFPS = showFPS;
+    d->pclCanvas->update();
     updatePropertyDock();
 }
 
@@ -2056,7 +2093,7 @@ void Vtk3dVisualizer::setShowFPS(const bool& showFPS)
 //-----------------------------------------------------------------------
 Vtk3dVisualizer::Stereo Vtk3dVisualizer::getStereoType() const
 {
-    return m_stereoType;
+    return d->stereoType;
 }
 
 //-----------------------------------------------------------------------
@@ -2095,7 +2132,7 @@ void Vtk3dVisualizer::setStereoType(const Stereo& stereoType)
         break;
     }
 
-    m_stereoType = stereoType;
+    d->stereoType = stereoType;
 
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
 
@@ -2111,6 +2148,182 @@ void Vtk3dVisualizer::setStereoType(const Stereo& stereoType)
         win->StereoUpdate();
     }
 
-    d->ui.pclCanvas->update();
+    d->pclCanvas->update();
     updatePropertyDock();
+}
+
+//-----------------------------------------------------------------------
+bool Vtk3dVisualizer::getCoordSysVisible() const
+{
+    return d->coordinateSysVisible;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setCoordSysVisible(const bool& coordSysVisible)
+{
+    d->coordinateSysVisible = coordSysVisible;
+#if PCL_VERSION_COMPARE(>=,1,7,1)
+    d->PCLVis->removeCoordinateSystem("mainCoordinateSystem");
+    if (d->coordinateSysVisible)
+    {
+        d->PCLVis->addCoordinateSystem(d->coordinateSysScale, d->coordinateSysPos.x(), d->coordinateSysPos.y(), d->coordinateSysPos.z(), "mainCoordinateSystem");
+    }
+#else
+    d->PCLVis->removeCoordinateSystem();
+    if (d->coordinateSysVisible)
+    {
+        d->PCLVis->addCoordinateSystem(d->coordinateSysScale, d->coordinateSysPos.x(), d->coordinateSysPos.y(), d->coordinateSysPos.z());
+    }
+#endif
+    d->pclCanvas->update();
+    updatePropertyDock();
+}
+
+//-----------------------------------------------------------------------
+double Vtk3dVisualizer::getCoordSysScale() const
+{
+    return d->coordinateSysScale;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setCoordSysScale(const double& coordSysScale)
+{
+    d->coordinateSysScale = coordSysScale;
+#if PCL_VERSION_COMPARE(>=,1,7,1)
+    d->PCLVis->removeCoordinateSystem("mainCoordinateSystem");
+    if (d->coordinateSysVisible)
+    {
+        d->PCLVis->addCoordinateSystem(d->coordinateSysScale, d->coordinateSysPos.x(), d->coordinateSysPos.y(), d->coordinateSysPos.z(), "mainCoordinateSystem");
+    }
+#else
+    d->PCLVis->removeCoordinateSystem();
+    if (d->coordinateSysVisible)
+    {
+        d->PCLVis->addCoordinateSystem(d->coordinateSysScale, d->coordinateSysPos.x(), d->coordinateSysPos.y(), d->coordinateSysPos.z());
+    }
+#endif
+    d->pclCanvas->update();
+    updatePropertyDock();
+}
+
+//-----------------------------------------------------------------------
+QVector3D Vtk3dVisualizer::getCameraPosition() const
+{
+    std::vector<pcl::visualization::Camera> cameras;
+    d->PCLVis->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        return QVector3D(cameras[0].pos[0], cameras[0].pos[1], cameras[0].pos[2]);
+    }
+
+    return QVector3D(0.0, 0.0, 0.0);
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setCameraPosition(const QVector3D& cameraPosition)
+{
+    std::vector<pcl::visualization::Camera> cameras;
+    d->PCLVis->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        d->PCLVis->setCameraPosition(cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), \
+            cameras[0].focal[0], cameras[0].focal[1], cameras[0].focal[2], \
+            cameras[0].view[0], cameras[0].view[1], cameras[0].view[2]);
+        d->pclCanvas->update();
+        updatePropertyDock();
+    }
+}
+
+//-----------------------------------------------------------------------
+QVector3D Vtk3dVisualizer::getCameraView() const
+{
+    std::vector<pcl::visualization::Camera> cameras;
+    d->PCLVis->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        return QVector3D(cameras[0].view[0], cameras[0].view[1], cameras[0].view[2]);
+    }
+
+    return QVector3D(0.0, 0.0, 0.0);
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setCameraView(const QVector3D& cameraView)
+{
+    std::vector<pcl::visualization::Camera> cameras;
+    d->PCLVis->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        d->PCLVis->setCameraPosition(cameras[0].pos[0], cameras[0].pos[1], cameras[0].pos[2], \
+            cameras[0].focal[0], cameras[0].focal[1], cameras[0].focal[2], \
+            cameraView.x(), cameraView.y(), cameraView.z());
+        d->pclCanvas->update();
+        updatePropertyDock();
+    }
+}
+
+//-----------------------------------------------------------------------
+QVector3D Vtk3dVisualizer::getCameraFocalPoint() const
+{
+    std::vector<pcl::visualization::Camera> cameras;
+    d->PCLVis->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        return QVector3D(cameras[0].focal[0], cameras[0].focal[1], cameras[0].focal[2]);
+    }
+
+    return QVector3D(0.0, 0.0, 0.0);
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setCameraFocalPoint(const QVector3D& focalPoint)
+{
+    std::vector<pcl::visualization::Camera> cameras;
+    d->PCLVis->getCameras(cameras);
+    if (cameras.size() > 0)
+    {
+        d->PCLVis->setCameraPosition(cameras[0].pos[0], cameras[0].pos[1], cameras[0].pos[2], \
+            focalPoint.x(), focalPoint.y(), focalPoint.z(), \
+            cameras[0].view[0], cameras[0].view[1], cameras[0].view[2]);
+        d->pclCanvas->update();
+        updatePropertyDock();
+    }
+}
+
+//-----------------------------------------------------------------------
+QVector3D Vtk3dVisualizer::getCoordSysPos() const
+{
+    return d->coordinateSysPos;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setCoordSysPos(const QVector3D& coordSysPos)
+{
+    d->coordinateSysPos = coordSysPos;
+#if PCL_VERSION_COMPARE(>=,1,7,1)
+    d->PCLVis->removeCoordinateSystem("mainCoordinateSystem");
+    if (d->coordinateSysVisible)
+    {
+        d->PCLVis->addCoordinateSystem(d->coordinateSysScale, d->coordinateSysPos.x(), d->coordinateSysPos.y(), d->coordinateSysPos.z(), "mainCoordinateSystem");
+    }
+#else
+    d->PCLVis->removeCoordinateSystem();
+    if (d->coordinateSysVisible)
+    {
+        d->PCLVis->addCoordinateSystem(d->coordinateSysScale, d->coordinateSysPos.x(), d->coordinateSysPos.y(), d->coordinateSysPos.z());
+    }
+#endif
+    d->pclCanvas->update();
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Vtk3dVisualizer::createActions()
+{
+    QAction *a = NULL;
+
+    d->actions["propertyDock"] = a = getPropertyDockWidget()->toggleViewAction();
+    a->setIcon(QIcon(":/itomDesignerPlugins/general/icons/settings.png"));
+    d->actions["settingsDock"] = a = d->dockSettings->toggleViewAction();
+    d->actions["itemsDock"] = a = d->dockItems->toggleViewAction();
 }
