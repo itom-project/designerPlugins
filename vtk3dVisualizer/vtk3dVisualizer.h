@@ -99,6 +99,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_PROPERTY(Stereo stereoType READ getStereoType WRITE setStereoType DESIGNABLE true USER true)
     Q_PROPERTY(double coordSysScale READ getCoordSysScale WRITE setCoordSysScale DESIGNABLE true USER true)
     Q_PROPERTY(bool coordSysVisible READ getCoordSysVisible WRITE setCoordSysVisible DESIGNABLE true USER true)
+    Q_PROPERTY(bool parallelProjection READ getParallelProjection WRITE setParallelProjection DESIGNABLE true USER true)
 
     Q_PROPERTY(QVector3D coordSysPos READ getCoordSysPos WRITE setCoordSysPos DESIGNABLE true USER true)
     Q_CLASSINFO("coordSysPos", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
@@ -153,6 +154,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_CLASSINFO("prop://cameraPosition", "position of the camera")
     Q_CLASSINFO("prop://cameraView", "view direction of the camera")
     Q_CLASSINFO("prop://cameraFocalPoint", "focal point of the camera")
+    Q_CLASSINFO("prop://parallelProjection", "if true a parallel projection is used, else the perspective projection")
 
     Q_CLASSINFO("slot://registerModel", "see addMesh")
     Q_CLASSINFO("slot://addMesh", "add the given mesh to the tree with a key name (arguments: mesh, key)")
@@ -306,6 +308,9 @@ public:
 
     QVector3D getCoordSysPos() const;
     void setCoordSysPos(const QVector3D& coordSysPos);
+
+    bool getParallelProjection() const;
+    void setParallelProjection(const bool& on);
 
 protected:
     ito::RetVal init();

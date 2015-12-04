@@ -44,6 +44,7 @@
 
 #include "vtkSmartPointer.h"
 #include "vtkCubeAxesActor.h"
+#include "vtkCamera.h"
 
 #include "QPropertyEditor/QPropertyEditorWidget.h"
 
@@ -2313,6 +2314,20 @@ void Vtk3dVisualizer::setCoordSysPos(const QVector3D& coordSysPos)
         d->PCLVis->addCoordinateSystem(d->coordinateSysScale, d->coordinateSysPos.x(), d->coordinateSysPos.y(), d->coordinateSysPos.z());
     }
 #endif
+    d->pclCanvas->update();
+    updatePropertyDock();
+}
+
+//-----------------------------------------------------------------------
+bool Vtk3dVisualizer::getParallelProjection() const
+{
+    return d->PCLVis->getRendererCollection()->GetFirstRenderer()->GetActiveCamera()->GetParallelProjection() > 0;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setParallelProjection(const bool& on)
+{
+    d->PCLVis->getRendererCollection()->GetFirstRenderer()->GetActiveCamera()->SetParallelProjection(on ? 1 : 0);
     d->pclCanvas->update();
     updatePropertyDock();
 }
