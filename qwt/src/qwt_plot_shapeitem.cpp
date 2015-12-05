@@ -392,7 +392,13 @@ void QwtPlotShapeItem::draw( QPainter *painter,
     const QRectF cRect = QwtScaleMap::invTransform(
         xMap, yMap, canvasRect.toRect() );
 
-    if ( d_data->boundingRect.intersects( cRect ) )
+    //verifies if d_data->boundingRect intersects with cRect even if d_data->boundingRect can have an area of zero in case of line shapes
+    if ( !cRect.isNull() && \
+         !d_data->boundingRect.isNull() && \
+         (cRect.x() + cRect.width()) >= d_data->boundingRect.x() && \
+         (d_data->boundingRect.x() + d_data->boundingRect.width()) >= cRect.x() && \
+         (cRect.y() + cRect.height()) >= d_data->boundingRect.y() && \
+         (d_data->boundingRect.y() + d_data->boundingRect.height()) >= cRect.y() )
     {
         const bool doAlign = QwtPainter::roundingAlignment( painter );
 
