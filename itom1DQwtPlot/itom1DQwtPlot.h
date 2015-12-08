@@ -29,10 +29,8 @@
     #define ITOM1DPLOT_EXPORT Q_DECL_IMPORT
 #endif
 
-
-#include "plot/AbstractDObjFigure.h"
+#include "itomQwtDObjFigure.h"
 #include "itom1DQwtPlotEnums.h"
-//#include "plot1DWidget.h"
 
 #include <qaction.h>
 #include <qsharedpointer.h>
@@ -40,21 +38,14 @@
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qpainter.h>
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/qlabel.h>
-#endif
-
-#ifndef DECLAREMETADATAOBJECT
-    Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
-    #define DECLAREMETADATAOBJECT
-#endif
+#include <qlabel.h>
 
 class Plot1DWidget;
 class ItomPlotMarker;
 struct InternalData;
 
 
-class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
+class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 {
     Q_OBJECT
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
@@ -165,10 +156,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
 
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
-    //Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker in pixel coordinates")  
     Q_CLASSINFO("slot://plotMarkers", "Delete a specific marker")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
-    Q_CLASSINFO("slot://copyToClipBoard", "")
+    
     Q_CLASSINFO("slot://userInteractionStart", "")  
     Q_CLASSINFO("slot://clearGeometricElements", "")
     Q_CLASSINFO("slot://getDisplayed", "")
@@ -176,13 +166,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
     Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
 
-    Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
-    Q_CLASSINFO("signal://userInteractionDone", "")
-    Q_CLASSINFO("signal://plotItemChanged", "")
-    Q_CLASSINFO("signal://plotItemDeleted", "")
-    Q_CLASSINFO("signal://plotItemsDeleted", "")
-
-    DESIGNER_PLUGIN_ITOM_API
+    
 
     public:
         Itom1DQwtPlot(QWidget *parent = 0);
@@ -291,8 +275,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
 
         int getPickerCount(void) const;
         QSharedPointer< ito::DataObject > getPicker() const;
-
-        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
@@ -415,17 +397,13 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void constructor();
 
         ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
-        ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
     public slots:
-        //ito::RetVal setPicker(const QVector<ito::int32> &pxCords);
-        //ito::RetVal setPicker(const QVector<ito::float32> &physCords);
         ito::RetVal setPicker(const QVector<int> &pxCords);
         ito::RetVal setPicker(const QVector<float> &physCords);
 
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);
-        ito::RetVal copyToClipBoard();
 
         void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
         ito::RetVal clearGeometricElements(void);
@@ -436,7 +414,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
 
     private slots:
-        void resizeEvent ( QResizeEvent * event );
 
         void mnuMarkerClick(bool checked);
         void mnuPanner(bool checked);
@@ -448,7 +425,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuSetMarker(QAction *action);
         void mnuZoomer(bool checked);
         void mnuExport();
-        void mnuActSendCurrentToWorkspace();
 
         void mnuActRatio(bool checked);
         void mnuDrawMode(QAction *action);
@@ -458,12 +434,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ito::AbstractDObjFigure
         void mnuHome();
         void setPickerText(const QString &coords, const QString &offsets);
 
-    signals:
-        void userInteractionDone(int type, bool aborted, QPolygonF points);
-        void plotItemChanged(int idx, int flags, QVector<float> values);
-        void plotItemDeleted(int idx);
-        void plotItemsDeleted();
-        void plotItemsFinished(int type, bool aborted);
 };
 //----------------------------------------------------------------------------------------------------------------------------------
 

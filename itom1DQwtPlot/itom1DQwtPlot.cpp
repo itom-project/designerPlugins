@@ -120,9 +120,7 @@ void Itom1DQwtPlot::constructor()
     m_data->m_forceValueParsing = false;
 
     m_pContent = new Plot1DWidget(contextMenu, m_data, this);
-
-    connect(m_pContent, SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
-    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
+    m_pBaseContent = m_pContent;
 
     m_pContent->setObjectName("canvasWidget");
 
@@ -164,7 +162,7 @@ void Itom1DQwtPlot::constructor()
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
+    ItomQwtDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_pActScaleSetting(NULL),
     m_pRescaleParent(NULL),
@@ -211,7 +209,7 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
-    AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
+    ItomQwtDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
     m_pContent(NULL),
     m_pActScaleSetting(NULL),
     m_pRescaleParent(NULL),
@@ -277,6 +275,8 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
     m_pContent->deleteLater();
 //    m_pContent = NULL;
     m_pContent = NULL;
+    m_pBaseContent = NULL;
+
     if (m_data)
         delete m_data;
     if (m_pMnuSetMarker)
@@ -448,7 +448,11 @@ int Itom1DQwtPlot::getGeometricElementsCount() const
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getkeepAspectRatio(void) const 
 {
-    return m_data->m_keepAspect;
+    if (m_pContent)
+    {
+        return m_pContent->keepAspectRatio();
+    }
+    return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -513,7 +517,7 @@ void Itom1DQwtPlot::createActions()
     //m_pActSendCurrentToWorkspace
     m_pActSendCurrentToWorkspace = a = new QAction(QIcon(":/plugins/icons/sendToPython.png"), tr("Send current view to workspace..."), this);
     a->setObjectName("actSendCurrentToWorkspace");
-    connect(a, SIGNAL(triggered()), this, SLOT(mnuActSendCurrentToWorkspace()));
+    connect(a, SIGNAL(triggered()), this, SLOT(sendCurrentToWorkspace()));
 
     //m_actCopyClipboard
     if (m_buttonSet == 0)
@@ -807,14 +811,14 @@ void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getContextMenuEnabled() const
 {
-    if (m_pContent) return (m_pContent)->m_showContextMenu;
+    if (m_pContent) return (m_pContent)->showContextMenu();
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setContextMenuEnabled(bool show)
 {
-    if (m_pContent) (m_pContent)->m_showContextMenu = show;
+    if (m_pContent) m_pContent->setShowContextMenu(show);
     updatePropertyDock();
 }
 
@@ -1807,28 +1811,7 @@ void Itom1DQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuActRatio(bool checked)
 {
-    m_data->m_keepAspect = checked;
-    if (m_pContent) m_pContent->configRescaler();
-
-    /*if (m_pActZoomToRect->isChecked()) m_pActZoomToRect->setChecked(false);
-    if (m_pActPan->isChecked()) m_pActPan->setChecked(false);
-    
-    m_pActPan->setEnabled(!checked);
-    m_pActZoomToRect->setEnabled(!checked);
-
-    if (m_pContent)
-    {
-        m_pContent->m_pZoomer->zoom(0);
-        m_pContent->setState(Plot1DWidget::stateIdle);
-        m_pContent->configRescaler();
-    }*/
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )
-{
-    //resizeEvent(event);
-    //if (m_pContent) m_pContent->configRescaler();
+    if (m_pContent) m_pContent->setKeepAspectRatio(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2402,141 +2385,6 @@ void Itom1DQwtPlot::setTextColor(const QColor newVal)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
-{
-    if (!m_data)
-    {
-        return ito::RetVal(ito::retError, 0, tr("Export image failed, internal setting handle not initilized").toLatin1().data());
-    }
-    if (!m_pContent)
-    {
-        return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
-    }
-    if (curSize.height() == 0 || curSize.width() == 0)
-    {
-        curSize = m_pContent->size();
-    }
-    QBrush curBrush = m_pContent->canvasBackground();
-
-    QPalette curPalette = m_pContent->palette();
-    //qreal linewidth = m_pContent->m_lineWidth;
-    m_pContent->setAutoFillBackground( true );
-    m_pContent->setPalette( Qt::white );
-    m_pContent->setCanvasBackground(Qt::white);
-    qreal resFaktor = 1.0;
-
-    if (copyToClipboardNotFile)
-    {
-        m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
-
-        resFaktor = std::max(qRound(resolution / 72.0), 1);
-
-    }
-    m_pContent->replot();
-
-    QwtPlotRenderer renderer;
-
-    // flags to make the document look like the widget
-    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-    //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
-    
-    if (copyToClipboardNotFile)
-    {
-        m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
-        QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
-        
-        QClipboard *clipboard = QApplication::clipboard();
-        QImage img(myRect, QImage::Format_ARGB32);
-        QPainter painter(&img);
-        painter.scale(resFaktor, resFaktor);
-        renderer.render(m_pContent, &painter, m_pContent->rect());
-        img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
-        img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
-        clipboard->setImage(img);  
-        
-        m_pContent->statusBarMessage(tr("copy current view to clipboard. done."), 1000);
-    }
-    else 
-    {
-        renderer.renderDocument((m_pContent), fileName, curSize, resolution);
-    }
-
-    m_pContent->setPalette( curPalette);
-    m_pContent->setCanvasBackground( curBrush);
-    //m_pContent->setLineWidth(linewidth);
-    m_pContent->replot();
-    return ito::retOk;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::copyToClipBoard()
-{
-    return exportCanvas(true, "");
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
-{
-
-    QSizeF curSize(xsize, ysize);
-    if (!m_pContent || !m_data)
-    {
-        QSize myRect(curSize.width(), curSize.height());
-        QPixmap destinationImage(myRect);
-        return destinationImage;
-    }
-
-    if (curSize.height() == 0 || curSize.width() == 0)
-    {
-        curSize = ((Plot1DWidget *)m_pContent)->size();
-    }
-    //qreal linewidth = m_pContent->m_lineWidth;
-    qreal resFaktor = resolution / 72.0 + 0.5;
-    resFaktor = resFaktor < 1 ? 1 : resFaktor;
-    resFaktor = resFaktor > 6 ? 6 : resFaktor;
-
-    QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
-
-    QPixmap destinationImage(myRect);
-
-    if (!m_pContent)
-    {
-        destinationImage.fill(Qt::red);
-        return destinationImage;
-    }
-    destinationImage.fill(Qt::white);
-    QBrush curBrush = m_pContent->canvasBackground();
-
-    QPalette curPalette = m_pContent->palette();
-
-    m_pContent->setAutoFillBackground( true );
-    m_pContent->setPalette( Qt::white );
-    m_pContent->setCanvasBackground(Qt::white);    
-    //m_pContent->setLineWidth(linewidth*resFaktor);
-    m_pContent->replot();
-
-    QwtPlotRenderer renderer;
-
-    // flags to make the document look like the widget
-    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-    //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
-
-    //QImage img(myRect, QImage::Format_ARGB32);
-    QPainter painter(&destinationImage);
-    painter.scale(resFaktor, resFaktor);
-    renderer.render(m_pContent, &painter, m_pContent->rect());
-    //destinationImage.convertFromImage(img);
-
-
-    m_pContent->setPalette( curPalette);
-    m_pContent->setCanvasBackground( curBrush);
-    //m_pContent->setLineWidth(linewidth);
-    m_pContent->replot();
-
-    return destinationImage;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::setPicker(const QVector<int> &pxCords)
 {
     if (!m_pContent)
@@ -2581,7 +2429,7 @@ ito::RetVal Itom1DQwtPlot::setGeometricElementLabel(int id, QString label)
 {
     if (!m_data) 
     {
-        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structure").toLatin1().data());
     }
 
     InternalData* pData = m_data;
@@ -2604,7 +2452,7 @@ ito::RetVal Itom1DQwtPlot::setGeometricElementLabelVisible(int id, bool setVisib
 {
     if (!m_data) 
     {
-        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structure").toLatin1().data());
     }
 
     InternalData* pData = m_data;
@@ -2808,46 +2656,4 @@ int Itom1DQwtPlot::getCurveFillAlpha() const
         return m_pContent->m_fillCurveAlpa;
     }
     return 128;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::mnuActSendCurrentToWorkspace()
-{
-    bool ok;
-    QString varname = QInputDialog::getText(this, tr("Current to workspace"), tr("Indicate the python variable name for the currently visible object"), QLineEdit::Normal, "displayed_line", &ok);
-    if (ok && varname != "")
-    {
-        QSharedPointer<ito::DataObject> obj = getDisplayed();
-        const ito::DataObject *dobj = &(*obj);
-        QSharedPointer<ito::ParamBase> obj_(new ito::ParamBase("displayed", ito::ParamBase::DObjPtr, (const char*)dobj));
-
-        QApplication::setOverrideCursor(Qt::WaitCursor);
-
-        ito::RetVal retval = apiSendParamToPyWorkspace(varname, obj_);
-
-        QApplication::restoreOverrideCursor();
-
-        if (retval.containsError())
-        {
-            QMessageBox msgBox;
-            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
-            if (retval.errorMessage())
-            {
-                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
-            }
-            msgBox.setIcon(QMessageBox::Critical);
-            msgBox.exec();
-        }
-        else if (retval.containsWarning())
-        {
-            QMessageBox msgBox;
-            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
-            if (retval.errorMessage())
-            {
-                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
-            }
-            msgBox.setIcon(QMessageBox::Warning);
-            msgBox.exec();
-        }
-    }
 }

@@ -29,7 +29,8 @@
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
 #include "valuePicker2d.h"
-#include "../sharedFiles/multiPointPickerMachine.h"
+#include "multiPointPickerMachine.h"
+#include "itomPlotZoomer.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -54,9 +55,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent /*= NULL*/) :
-        QwtPlot(parent),
-        m_pZoomer(NULL),
-        m_pPanner(NULL),
+        ItomQwtPlot(contextMenu, parent),
         m_pLineCutPicker(NULL),
         m_pCenterMarker(NULL),
 //        m_pStackCut(NULL),
@@ -75,12 +74,9 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
         m_pMultiPointPicker(NULL),
         m_activeDrawItem(-1),
         m_ignoreNextMouseEvent(false),
-        m_contextMenu(contextMenu),
         m_isRefreshingPlot(false),
-        m_firstTimeVisible(false),
         m_unitLabelChanged(false)
 {
-    setMouseTracking(false);
 
     //canvas() is the real plotting area, where the plot is printed (without axes...)
     //canvas()->setFrameShadow(QFrame::Plain);
@@ -107,25 +103,6 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_dOverlayItem->setColorMap(new QwtLinearColorMap(Qt::black, Qt::white, QwtColorMap::Indexed));
     m_colorOverlayMapName = "gray";
     m_dOverlayItem->setVisible(false);
-    //zoom tool
-    m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
-    m_pZoomer->setEnabled(false);
-    m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
-    m_pZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton); //right click should open the context menu, not a zoom out to level 0 (Ctrl+0) if zoomer is enabled.
-
-    //pan tool
-    m_pPanner = new QwtPlotPanner(canvas());
-    m_pPanner->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis
-    m_pPanner->setCursor(Qt::SizeAllCursor);
-    m_pPanner->setEnabled(false);
-    connect(m_pPanner, SIGNAL(panned(int,int)), m_pZoomer, SLOT(canvasPanned(int,int))); //if panner is moved, the new rect is added to the zoom stack for a synchronization of both tools
-
-    m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
-    m_pMagnifier->setEnabled(true);
-    m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yLeft,true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xBottom,true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis (color bar)
 
     //value picker
     m_pValuePicker = new ValuePicker2D(QwtPlot::xBottom, QwtPlot::yLeft, canvas(), m_rasterData, m_rasterOverlayData);
@@ -138,6 +115,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_pStackPicker->setTrackerMode(QwtPicker::AlwaysOn);
     m_pStackPicker->setRubberBand(QwtPicker::CrossRubberBand);
     m_pStackPicker->setEnabled(false);
+
     //disable key movements for the picker (the marker will be moved by the key-event of this widget)
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
@@ -153,7 +131,6 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_pStackCutMarker->setVisible(false);
 
     //marker for the camera center
-
     m_pCenterMarker = new QwtPlotMarker();
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green), 1),  QSize(11,11)));
     m_pCenterMarker->attach(this);
@@ -191,25 +168,6 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
     //connect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon)));
     //connect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint)));
-
-    //Geometry of the plot:
-    setContentsMargins(5,5,5,5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
-
-    canvas()->setContentsMargins(0,0,0,0); //border of the canvas (border between canvas and axes or title)
-
-    //left axis
-    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
-    leftAxis->setMargin(0);                 //distance backbone <-> canvas
-    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
-    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    leftAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
-
-    //bottom axis
-    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
-    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
-    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
-    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    bottomAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
 
     //right axis (color bar)
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
@@ -272,6 +230,8 @@ ito::RetVal PlotCanvas::init()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshStyles()
 {
+    ItomQwtPlot::loadStyles();
+
     QPen rubberBandPen = QPen(QBrush(Qt::red), 1, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
     QFont trackerFont = QFont("Verdana", 10);
@@ -320,10 +280,6 @@ void PlotCanvas::refreshStyles()
         trackerPen.setColor(m_inverseColor0);
         centerMarkerPen.setColor(m_inverseColor0);
     }
-
-    m_pZoomer->setRubberBandPen(rubberBandPen);
-    m_pZoomer->setTrackerFont(trackerFont);
-    m_pZoomer->setTrackerPen(trackerPen);
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
@@ -539,11 +495,11 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
         if (updateState & changeData)
         {
-            m_pZoomer->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
         }
         else
         {
-            m_pZoomer->rescale(false);
+            zoomer()->rescale(false);
         }
     }
     else
@@ -1168,19 +1124,19 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     if (doZoomBase)
     {
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
-        if (m_pZoomer->isEnabled())
+        if (zoomer()->isEnabled())
         {
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
 
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->zoom(zoom);
+                zoomer()->zoom(zoom);
             }
         }
         else
@@ -1199,14 +1155,14 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
             
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->appendZoomStack(zoom);
+                zoomer()->appendZoomStack(zoom);
             }
 
         }
@@ -1216,6 +1172,12 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     {
         replot();
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::home()
+{
+    zoomer()->zoom(0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1397,8 +1359,8 @@ void PlotCanvas::setState(tState state, ito::PrimitiveContainer::tPrimitive shap
             return; //multiPointPick needs to go back to idle
         }
 
-        if (m_pZoomer) m_pZoomer->setEnabled(state == tZoom);
-        if (m_pPanner) m_pPanner->setEnabled(state == tPan);
+        if (zoomer()) zoomer()->setEnabled(state == tZoom);
+        if (panner()) panner()->setEnabled(state == tPan);
         if (m_pValuePicker) m_pValuePicker->setEnabled(state == tValuePicker);
         if (m_pLineCutPicker) m_pLineCutPicker->setEnabled(state == tLineCut);
         if (m_pStackPicker) m_pStackPicker->setEnabled(state == tStackCut);
@@ -3223,12 +3185,6 @@ void PlotCanvas::mouseReleaseEvent(QMouseEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::configRescaler(void)
-{
-    m_pZoomer->setFixedAspectRatio(m_pData->m_keepAspect);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)
 {
     if (!m_rasterData)
@@ -3289,20 +3245,6 @@ void PlotCanvas::alphaChanged()
     m_dObjItem->setVisible(m_pData->m_alpha < 255);
     if(m_pValuePicker) m_pValuePicker->enableOverlay(m_pData->m_alpha > 0);
     replot();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
-{
-    if (m_showContextMenu && m_pPanner->isEnabled() == false)
-    {
-        event->accept();
-        m_contextMenu->exec(event->globalPos());
-    }
-    else
-    {
-        event->ignore();
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3385,24 +3327,6 @@ void PlotCanvas::updateColors(void)
     }
 
     return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setVisible(bool visible)
-{    
-    this->QwtPlot::setVisible(visible);
-    if (visible)
-    {
-        if (!m_firstTimeVisible)
-        {
-            this->updateScaleValues(true, true);
-        }
-        else
-        {
-            this->updateScaleValues(true, false);
-        }
-        m_firstTimeVisible = true;
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

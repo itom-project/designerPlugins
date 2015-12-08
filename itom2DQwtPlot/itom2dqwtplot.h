@@ -31,34 +31,19 @@ class PlotCanvas;
     #define ITOM2DPLOT_EXPORT Q_DECL_IMPORT
 #endif
 
-#include "plot/AbstractDObjFigure.h"
+#include "itomQwtDObjFigure.h"
 #include "plot/AbstractNode.h"
 #include "itom2dqwtplotenums.h"
-//#include "plotCanvas.h"
-//#include <qwt_plot_shapeitem.h>
-
-#include "common/itomPlotHandle.h"
 
 #include <qaction.h>
 #include <qwidgetaction.h>
 #include <qspinbox.h>
 #include <qslider.h>
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/qlabel.h>
-#endif
-
-#ifndef DECLAREMETADATAOBJECT
-    Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
-    #define DECLAREMETADATAOBJECT
-#endif
+#include <qlabel.h>
 
 
-#ifndef DECLAREMETAPLOTHANDLE
-    Q_DECLARE_METATYPE(ito::ItomPlotHandle)
-    #define DECLAREMETAPLOTHANDLE
-#endif
 
-class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
+class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 {
     Q_OBJECT
 
@@ -153,19 +138,11 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://getDisplayedLineCut", "")
     Q_CLASSINFO("slot://setLinePlot", "")
     Q_CLASSINFO("slot://removeOverlayImage", "")
-    Q_CLASSINFO("slot://copyToClipBoard", "")
 
     Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
     Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
 
-    Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
-    Q_CLASSINFO("signal://userInteractionDone", "")
-    Q_CLASSINFO("signal://plotItemChanged", "")
-    Q_CLASSINFO("signal://plotItemDeleted", "")
-    Q_CLASSINFO("signal://plotItemsDeleted", "")
-
-    DESIGNER_PLUGIN_ITOM_API
-    public:
+public:
     Itom2dQwtPlot(QWidget *parent = 0);
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
@@ -319,8 +296,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Itom2DQwt::tModificationState getModState() const;
     void setModState(const Itom2DQwt::tModificationState val);
 
-    QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
-
 
     friend class PlotCanvas;
 
@@ -386,11 +361,9 @@ private:
     char m_buttonSet;
 
     ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
-    ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
 private slots:
     void mnuActSave();
-    void mnuActSendCurrentToWorkspace();
 
     void mnuActHome();
     void mnuActPan(bool checked);
@@ -415,8 +388,6 @@ private slots:
     void mnuCmplxSwitch(QAction *action);
     void childFigureDestroyed(QObject *obj);
 
-    void resizeEvent ( QResizeEvent * event );
-
     void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
 
 public slots:
@@ -438,14 +409,8 @@ public slots:
     ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
-    ito::RetVal copyToClipBoard();
 
-signals:
-    void userInteractionDone(int type, bool aborted, QPolygonF points);
-    void plotItemChanged(int idx, int flags, QVector<float> values);
-    void plotItemDeleted(int idx);
-    void plotItemsDeleted();
-    void plotItemsFinished(int type, bool aborted);
+
 
 };
 

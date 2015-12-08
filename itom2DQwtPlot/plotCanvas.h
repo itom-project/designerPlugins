@@ -31,10 +31,10 @@
 #include "DataObject/dataobj.h"
 
 #include "dataObjItem.h"
+
+#include "../sharedFiles/itomQwtPlot.h"
 #include "../sharedFiles/userInteractionPlotPicker.h"
 #include "../sharedFiles/drawItem.h"
-#include "../sharedFiles/itomPlotZoomer.h"
-#include "../sharedFiles/itomPlotMagnifier.h"
 #include "../sharedFiles/itomPlotPicker.h"
 
 
@@ -49,8 +49,6 @@
 #include <qspinbox.h>
 #include <qhash.h>
 
-#include <qwt_plot.h>
-#include <qwt_plot_panner.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_shapeitem.h>
@@ -66,7 +64,7 @@ class DataObjRasterData;
 //class UserInteractionPlotPicker;
 
 
-class PlotCanvas : public QwtPlot
+class PlotCanvas : public ItomQwtPlot
 {
     Q_OBJECT
     public:
@@ -89,8 +87,6 @@ class PlotCanvas : public QwtPlot
 
         PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
-
-        bool m_showContextMenu;
 
         ito::RetVal init();
         void refreshPlot(const ito::DataObject *dObj, int plane = -1);
@@ -118,14 +114,11 @@ class PlotCanvas : public QwtPlot
         QSharedPointer<ito::DataObject> getOverlayObject(void);
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 
-        void setVisible(bool visible);
-
         friend class Itom2dQwtPlot;
 
     protected:
         void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc);
         void getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, double *maxPhysLoc);
-        void contextMenuEvent(QContextMenuEvent * event);
         void keyPressEvent ( QKeyEvent * event );
         void keyReleaseEvent ( QKeyEvent * event );
 
@@ -147,13 +140,13 @@ class PlotCanvas : public QwtPlot
         void mousePressEvent ( QMouseEvent * event );
         void mouseMoveEvent ( QMouseEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
-
-        void configRescaler(void);
         
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
         void updateColors();
         void updateLabelVisibility();
+
+        void home();
 
     private:
 
@@ -162,9 +155,8 @@ class PlotCanvas : public QwtPlot
 
         ito::DataObject randImg;
 
-        ItomPlotZoomer *m_pZoomer;
+        
         QwtPlotPanner *m_pPanner;
-        ItomPlotMagnifier *m_pMagnifier;
 
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
@@ -203,8 +195,6 @@ class PlotCanvas : public QwtPlot
         QColor m_inverseColor0, m_inverseColor1;
         int m_activeDrawItem;
 
-        QMenu *m_contextMenu;
-
         QVector<ito::uint16> m_drawedIemsIndexes;
         bool m_ignoreNextMouseEvent;
 
@@ -212,14 +202,10 @@ class PlotCanvas : public QwtPlot
         QPointF m_initialMarkerPosition;
 
         bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)
-        bool m_firstTimeVisible; //true if this plot becomes visible for the first time
 
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
-
-        void statusBarClear();
-        void statusBarMessage(const QString &message, int timeout = 0);
 
     private slots:
         void zStackCutTrackerMoved(const QPoint &pt);
@@ -273,7 +259,6 @@ struct InternalData
         m_elementsToPick = 0;
 
         m_pDrawItems.clear();
-        m_keepAspect = false;
         m_enablePlotting = true;
         m_showCenterMarker = false;
         m_alpha = 0;
@@ -318,7 +303,6 @@ struct InternalData
     QString m_yaxisLabelDObj;
     QString m_valueLabelDObj;
 
-    bool m_keepAspect;
     bool m_autoTitle;
     bool m_autoxAxisLabel;
     bool m_autoyAxisLabel;

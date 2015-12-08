@@ -29,8 +29,9 @@
 #include "qnumeric.h"
 
 #include "common/sharedStructuresPrimitives.h"
-#include "../sharedFiles/multiPointPickerMachine.h"
-#include "../sharedFiles/itomLogLogScaleEngine.h"
+#include "multiPointPickerMachine.h"
+#include "itomLogLogScaleEngine.h"
+#include "itomPlotZoomer.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -60,8 +61,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent) :
-        QwtPlot(parent),
-        m_contextMenu(contextMenu),
+        ItomQwtPlot(contextMenu, parent),
         m_pPlotGrid(NULL),
 //        m_startScaledX(false),
 //        m_startScaledY(false),
@@ -78,7 +78,6 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_layerState(false),
         m_pData(data),
         m_activeDrawItem(1),
-        m_pRescaler(NULL),
         m_ignoreNextMouseEvent(false),
         m_gridEnabled(false),
         m_legendPosition(BottomLegend),
@@ -90,10 +89,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_curveFilled(Itom1DQwt::NoCurveFill),
         m_pLegend(NULL),
         m_valueScale(Itom1DQwt::Linear),
-        m_axisScale(Itom1DQwt::Linear),
-        m_firstTimeVisible(false)
+        m_axisScale(Itom1DQwt::Linear)
 {
-    this->setMouseTracking(false);
     
     m_inverseColor0 = Qt::green;
     m_inverseColor1 = Qt::blue;
@@ -127,30 +124,6 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_colorList.append(tr("darkCyan"));
     m_colorList.append(tr("darkYellow"));
 
-    m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
-    m_pZoomer->setEnabled(false);
-    m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
-    m_pZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton); //right click should open the context menu, not a zoom out to level 0 (Ctrl+0) if zoomer is enabled.
-    //m_pZoomer->setFixedAspectRatio(true);
-    //all others settings for zoomer are set in init (since they need access to the settings via api)
-
-    m_pPanner = new QwtPlotPanner(canvas());
-    m_pPanner->setAxisEnabled(QwtPlot::yRight,false);
-    m_pPanner->setCursor(Qt::SizeAllCursor);
-    m_pPanner->setEnabled(false);
-    connect(m_pPanner, SIGNAL(panned(int,int)), m_pZoomer, SLOT(canvasPanned(int,int))); //if panner is moved, the new rect is added to the zoom stack for a synchronization of both tools
-
-    m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
-    m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
-    m_pMagnifier->setZoomInKey(Qt::Key_Plus, Qt::KeypadModifier);
-    m_pMagnifier->setZoomOutKey(Qt::Key_Minus, Qt::KeypadModifier);
-    m_pMagnifier->setMouseFactor(-m_pMagnifier->mouseFactor());
-    m_pMagnifier->setEnabled(true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, false);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yRight, false);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
-
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pValuePicker->setEnabled(false);
@@ -167,25 +140,6 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
 
     setState(m_pData->m_state);
     updateColors();
-
-    //Geometry of the plot:
-    setContentsMargins(5,5,5,5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
-
-    canvas()->setContentsMargins(0,0,0,0); //border of the canvas (border between canvas and axes or title)
-
-    //left axis
-    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
-    leftAxis->setMargin(0);                 //distance backbone <-> canvas
-    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
-    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    leftAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
-    
-    //bottom axis
-    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
-    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
-    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
-    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    bottomAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -212,12 +166,6 @@ Plot1DWidget::~Plot1DWidget()
         m_pPlotGrid = NULL;
     }
 
-    if (m_pRescaler != NULL)
-    {
-        m_pRescaler->deleteLater();
-        m_pRescaler = NULL;
-    }
-
     if (m_pMultiPointPicker != NULL) 
     {
         m_pMultiPointPicker->deleteLater();
@@ -234,7 +182,8 @@ Plot1DWidget::~Plot1DWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::init()
 {
-    QPen rubberBandPen = QPen(QBrush(Qt::red),2,Qt::DashLine);
+    ItomQwtPlot::loadStyles();
+
     QPen trackerPen = QPen(QBrush(Qt::red),2);
     QFont trackerFont = QFont("Verdana",10);
     QBrush trackerBg = QBrush(QColor(255,255,255,155), Qt::SolidPattern);
@@ -246,7 +195,6 @@ ito::RetVal Plot1DWidget::init()
 
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
-        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
         trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>();
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
@@ -264,10 +212,6 @@ ito::RetVal Plot1DWidget::init()
 
         m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
     }
-
-    m_pZoomer->setRubberBandPen(rubberBandPen);
-    m_pZoomer->setTrackerFont(trackerFont);
-    m_pZoomer->setTrackerPen(trackerPen);
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
@@ -1067,7 +1011,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
             updateScaleValues(false, true); //replot is done here
 
-            m_pZoomer->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
         }
         else if (m_pData->m_forceValueParsing)
         {
@@ -1087,7 +1031,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
 
             updateScaleValues(false, false); //no replot is done here
-            m_pZoomer->rescale(false);
+            zoomer()->rescale(false);
 
             m_pData->m_forceValueParsing = false;
         }
@@ -1974,19 +1918,6 @@ void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int curveIdx, int 
     }
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::contextMenuEvent(QContextMenuEvent * event)
-{
-    if (m_showContextMenu && m_pPanner->isEnabled() == false)
-    {
-        event->accept();
-        m_contextMenu->exec(event->globalPos());
-    }
-    else
-    {
-        event->ignore();
-    }
-}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
@@ -2037,24 +1968,24 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
 
         m_pData->m_state = stateZoomer;
 
-        m_pPanner->setEnabled(false);
+        panner()->setEnabled(false);
 
         DataObjectSeriesData *data = NULL;
 
         foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
             data = (DataObjectSeriesData *)curve->data();
-            m_pZoomer->setZoomBase(data->boundingRect());
+            zoomer()->setZoomBase(data->boundingRect());
         }
 
-        m_pZoomer->setEnabled(true);
+        zoomer()->setEnabled(true);
         canvas()->setCursor(Qt::CrossCursor);
     }
     else
     {
         m_pData->m_state = stateIdle;
 
-        m_pZoomer->setEnabled(false);
+        zoomer()->setEnabled(false);
         canvas()->setCursor(Qt::ArrowCursor);
 
         /*foreach(QwtPlotCurve *curve, m_plotCurveItems)
@@ -2107,7 +2038,7 @@ void Plot1DWidget::setPannerEnable(const bool checked)
         m_pData->m_state = stateIdle;
         canvas()->setCursor(Qt::ArrowCursor);
     }
-    m_pPanner->setEnabled(checked);
+    panner()->setEnabled(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2162,19 +2093,19 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
     if (doZoomBase)
     {
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
-        if (m_pZoomer->isEnabled())
+        if (zoomer()->isEnabled())
         {
             QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
             zoom = zoom.normalized();
 
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->zoom(zoom);
+                zoomer()->zoom(zoom);
             }
         }
         else
@@ -2185,14 +2116,14 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
             zoom = zoom.normalized();
 
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->appendZoomStack(zoom);
+                zoomer()->appendZoomStack(zoom);
             }
         }
     }
@@ -2254,54 +2185,6 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     }
 
     emit setPickerText(coords,offsets);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::configRescaler(void)
-{
-    //if (m_pData->m_keepAspect)
-    //{
-    //    //int height = plotLayout()->canvasRect().height();
-    //    //int width = plotLayout()->canvasRect().width();
-
-    //    int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
-    //    
-    //    if (m_pRescaler == NULL)
-    //    {
-    //        QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
-    //        QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
-
-    //        m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
-    //        m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-    //        m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
-    //        m_pRescaler->setAspectRatio(1.0);
-    //        m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
-    //        m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
-    //        //m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
-    //    }
-    //    else
-    //    {
-
-    //        m_pRescaler->setReferenceAxis(refAxis);
-    //    }
-    //    m_pRescaler->setEnabled(true);
-    //}
-    //else
-    //{
-    //    if (m_pRescaler != NULL)
-    //    {
-    //        m_pRescaler->setEnabled(false);
-    //        //m_pRescaler->deleteLater();
-    //        //m_pRescaler = NULL;
-    //    }
-    //    
-    //}
-    //if (m_pRescaler != NULL && m_pData->m_keepAspect)
-    //{
-    //    m_pRescaler->rescale();
-    //}
-    ////replot();
-    m_pZoomer->setFixedAspectRatio(m_pData->m_keepAspect);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2533,13 +2416,13 @@ void Plot1DWidget::setState(tState state, ito::PrimitiveContainer::tPrimitive sh
             return; //drawFunction needs to go back to idle
         }
 
-        if (m_pZoomer)
+        if (zoomer())
         {
-            m_pZoomer->setEnabled(state == stateZoomer);
+            zoomer()->setEnabled(state == stateZoomer);
             this->setZoomerEnable(state == stateZoomer);
         }
 
-        if (m_pPanner) m_pPanner->setEnabled(state == statePanner);
+        if (panner()) panner()->setEnabled(state == statePanner);
         if (m_pValuePicker) m_pValuePicker->setEnabled(state == statePicker);
 
         if (m_pData->m_state == stateDrawShape || state == stateIdle)
@@ -3052,7 +2935,7 @@ ito::RetVal Plot1DWidget::deleteMarkers(const int id)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::home()
 {
-    QStack<QRectF> currentZoomStack = m_pZoomer->zoomStack();
+    QStack<QRectF> currentZoomStack = zoomer()->zoomStack();
 
     //get total bounding box
     QRectF boundingRect;
@@ -3070,8 +2953,8 @@ void Plot1DWidget::home()
         currentZoomStack.first() = boundingRect;
     }
 
-    m_pZoomer->setZoomStack(currentZoomStack, 0);
-    m_pZoomer->zoom(0);
+    zoomer()->setZoomStack(currentZoomStack, 0);
+    zoomer()->zoom(0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3548,20 +3431,3 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
     return QSharedPointer<ito::DataObject>(displayed);
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setVisible(bool visible)
-{    
-    this->QwtPlot::setVisible(visible);
-    if (visible)
-    {
-        if (!m_firstTimeVisible)
-        {
-            this->updateScaleValues(true, true);
-        }
-        else
-        {
-            this->updateScaleValues(true, false);
-        }
-        m_firstTimeVisible = true;
-    }
-}
