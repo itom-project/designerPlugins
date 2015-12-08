@@ -78,14 +78,7 @@ class PlotCanvas : public QwtPlot
             tPan = 3, 
             tLineCut = 4, 
             tStackCut = 5, 
-            tMultiPointPick = ito::PrimitiveContainer::tMultiPointPick, 
-            tPoint = ito::PrimitiveContainer::tPoint, 
-            tLine = ito::PrimitiveContainer::tLine, 
-            tRect = ito::PrimitiveContainer::tRectangle, 
-            tSquare = ito::PrimitiveContainer::tSquare,
-            tEllipse = ito::PrimitiveContainer::tEllipse, 
-            tCircle = ito::PrimitiveContainer::tCircle, 
-            tPolygon = ito::PrimitiveContainer::tPolygon
+            tStateDrawShape = 6,
         };
 
         enum changeFlag {
@@ -107,7 +100,7 @@ class PlotCanvas : public QwtPlot
 
         void internalDataUpdated();
 
-        void setState( tState state);
+        void setState(tState state, ito::PrimitiveContainer::tPrimitive shape = ito::PrimitiveContainer::tNoType);
         void childFigureDestroyed(QObject* obj, ito::uint32 UID);
 
         ito::AutoInterval getInterval(Qt::Axis axis) const;
@@ -116,7 +109,7 @@ class PlotCanvas : public QwtPlot
         ito::AutoInterval getOverlayInterval(Qt::Axis axis) const;
         void setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval);
 
-        ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
+        ito::RetVal plotMarkers(const ito::DataObject *coords, const QString &style, const QString &id, int plane);
         ito::RetVal deleteMarkers(const QString &id);
         ito::RetVal deleteMarkers(const int id);
 
@@ -126,12 +119,8 @@ class PlotCanvas : public QwtPlot
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 
         void setVisible(bool visible);
-/*        
-        ito::RetVal addDrawItems(const ito::DataObject *items, QString style);
-        ito::RetVal delDrawItems(const ito::DataObject *items, QString style);
-*/        
+
         friend class Itom2dQwtPlot;
-        friend class DrawItem;
 
     protected:
         void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc);
@@ -165,6 +154,7 @@ class PlotCanvas : public QwtPlot
         void alphaChanged();
         void updateColors();
         void updateLabelVisibility();
+
     private:
 
         // a1 is line1 start, a2 is line1 end, b1 is line2 start, b2 is line2 end
@@ -297,6 +287,7 @@ struct InternalData
         m_backgnd = Qt::white;
 
         m_markerLabelVisible = false;
+        m_stateShapePrimitive = ito::PrimitiveContainer::tNoType;
     }
     ~InternalData()
     {
@@ -367,6 +358,7 @@ struct InternalData
     Itom2DQwt::tComplexType m_cmplxType;
 
     PlotCanvas::tState m_state;
+    ito::PrimitiveContainer::tPrimitive m_stateShapePrimitive; /*!< geometric shape that is active is m_state is stateShape */
     Itom2DQwt::tModificationState m_modState;
     const QHash<QString, ito::Param*> *m_pConstOutput;
 //    QVector<DrawItem *> m_pDrawItems;

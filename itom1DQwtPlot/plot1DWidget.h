@@ -72,13 +72,7 @@ class Plot1DWidget : public QwtPlot
             statePanner = 1, 
             stateZoomer = 2, 
             statePicker = 3,             
-            tPoint = ito::PrimitiveContainer::tPoint, 
-            tLine = ito::PrimitiveContainer::tLine, 
-            tRect = ito::PrimitiveContainer::tRectangle, 
-//            tSquare = ito::PrimitiveContainer::tSquare,
-            tEllipse = ito::PrimitiveContainer::tEllipse, 
-//            tCircle = ito::PrimitiveContainer::tCircle, 
-            tPolygon = ito::PrimitiveContainer::tPolygon
+            stateDrawShape = 4
         };
 
         Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
@@ -136,7 +130,7 @@ class Plot1DWidget : public QwtPlot
 
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
 
-        void setState( tState state);
+        void setState(tState state, ito::PrimitiveContainer::tPrimitive shape = ito::PrimitiveContainer::tNoType);
         void updateColors(void);
         void updatePickerStyle(void);
 
@@ -264,7 +258,7 @@ struct InternalData
     InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
         m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
         m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_elementsToPick(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
-        m_enablePlotting(true), m_keepAspect(false), m_lineSymboleSize(1)
+        m_enablePlotting(true), m_keepAspect(false), m_lineSymboleSize(1), m_stateShapePrimitive(ito::PrimitiveContainer::tNoType)
     {
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
@@ -301,8 +295,8 @@ struct InternalData
     }
     ito::tDataType m_dataType;
      
-//    Plot1DWidget::tState m_state;
-    int m_state;
+    Plot1DWidget::tState m_state; //
+    ito::PrimitiveContainer::tPrimitive m_stateShapePrimitive; /*!< geometric shape that is active is m_state is stateShape */
     int m_pickerLimit;
 
     QString m_title;

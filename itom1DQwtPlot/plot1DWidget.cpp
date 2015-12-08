@@ -165,7 +165,7 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_drawedIemsIndexes.clear();
     m_drawedIemsIndexes.reserve(10);
 
-    setState((Plot1DWidget::tState)m_pData->m_state);
+    setState(m_pData->m_state);
     updateColors();
 
     //Geometry of the plot:
@@ -1369,7 +1369,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                 QPainterPath path;
                 switch (it.value()->m_type)
                 {
-                    case tPoint:
+                    case ito::PrimitiveContainer::tPoint:
                         path.moveTo(canxpos, canypos);
                         path.lineTo(canxpos, canypos);
                         it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
@@ -1377,7 +1377,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x2;
@@ -1407,7 +1407,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = it.value()->x2 - canxpos;
@@ -1448,7 +1448,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = it.value()->x2 - canxpos;
@@ -1498,7 +1498,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                 QPainterPath path;
                 switch (it.value()->m_type)
                 {
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x1;
@@ -1527,7 +1527,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x1;
@@ -1566,7 +1566,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x1;
@@ -1617,8 +1617,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 {
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
-    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
-        || m_pData->m_state == tPoint || m_pData->m_state == stateIdle)
+    if (m_pData->m_state == stateDrawShape || m_pData->m_state == stateIdle)
     {
         QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
         for (;it != m_pData->m_pDrawItems.end(); ++it)        
@@ -1631,14 +1630,14 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
                 values.reserve(11);
                 switch(it.value()->m_type)
                 {
-                    case tPoint:
+                    case ito::PrimitiveContainer::tPoint:
                         type = ito::PrimitiveContainer::tPoint;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
                     break;
 
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         type = ito::PrimitiveContainer::tLine;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
@@ -1650,7 +1649,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 
                     // square is a rect
 //                    case tSquare:
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         type = ito::PrimitiveContainer::tRectangle;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
@@ -1662,7 +1661,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 
                     // circle is an ellispe
 //                    case tCircle:
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         type = ito::PrimitiveContainer::tEllipse;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
@@ -2313,10 +2312,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
     m_drawedIemsIndexes.clear();
     m_pMultiPointPicker->selection().clear();
 
-    if (type == tPoint) //multiPointPick
+    if (type == ito::PrimitiveContainer::tPoint) //multiPointPick
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tPoint);
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
@@ -2364,10 +2364,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             setState(stateIdle);
         }
     }
-    else if (type == tLine)
+    else if (type == ito::PrimitiveContainer::tLine)
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tLine);
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::PolygonRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -2386,7 +2387,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
             }
-            setState(tLine);
+            setState(stateDrawShape, ito::PrimitiveContainer::tLine);
         }
         else //start == false
         {
@@ -2408,10 +2409,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             setState(stateIdle);
         }
     }
-    else if (type == tRect)
+    else if (type == ito::PrimitiveContainer::tRectangle)
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tRectangle);
             //maxNrOfPoints = 2;
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
@@ -2430,7 +2432,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
             }
-            setState(tRect);
+            setState(stateDrawShape, ito::PrimitiveContainer::tRectangle);
         }
         else //start == false
         {
@@ -2452,10 +2454,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             setState(stateIdle);
         }
     }
-    else if (type == tEllipse)
+    else if (type == ito::PrimitiveContainer::tEllipse)
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tEllipse);
             //maxNrOfPoints = 2;
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
@@ -2474,7 +2477,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
             }
-            setState(tEllipse);
+            setState(stateDrawShape, ito::PrimitiveContainer::tEllipse);
         }
         else //start == false
         {
@@ -2519,15 +2522,13 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setState(tState state)
+void Plot1DWidget::setState(tState state, ito::PrimitiveContainer::tPrimitive shape /*= ito::PrimitiveContainer::tNoType*/)
 {
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(parent());
 
     if (m_pData->m_state != state)
     {
-        if ((m_pData->m_state == tPoint || m_pData->m_state == tLine || 
-             m_pData->m_state == tRect  || m_pData->m_state == tEllipse) 
-             && state != stateIdle)
+        if (m_pData->m_state == stateDrawShape && state != stateIdle)
         {
             return; //drawFunction needs to go back to idle
         }
@@ -2537,11 +2538,11 @@ void Plot1DWidget::setState(tState state)
             m_pZoomer->setEnabled(state == stateZoomer);
             this->setZoomerEnable(state == stateZoomer);
         }
+
         if (m_pPanner) m_pPanner->setEnabled(state == statePanner);
         if (m_pValuePicker) m_pValuePicker->setEnabled(state == statePicker);
 
-        if (m_pData->m_state == tPoint || m_pData->m_state == tLine
-            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == stateIdle)
+        if (m_pData->m_state == stateDrawShape || state == stateIdle)
         {
             if (p)
             {
@@ -2571,16 +2572,15 @@ void Plot1DWidget::setState(tState state)
                 canvas()->setCursor(Qt::CrossCursor);
             break;
 
-            case tPoint:
-            case tLine:
-            case tRect:
-            case tEllipse:
+            case stateDrawShape:
                 canvas()->setCursor(Qt::CrossCursor);
             break;
         }
 
         m_pData->m_state = state;
     }
+
+    m_pData->m_stateShapePrimitive = shape;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2590,9 +2590,9 @@ void Plot1DWidget::multiPointActivated (bool on)
     {
         Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 
-        switch(m_pData->m_state)
+        switch (m_pData->m_stateShapePrimitive)
         {
-            case tPoint:
+            case ito::PrimitiveContainer::tPoint:
                 if (!on)
                 {
                     p->mnuDrawMode(false);
@@ -2615,7 +2615,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                         {
                             QPainterPath path;
                             DrawItem *newItem = NULL;
-                            newItem = new DrawItem(this, tPoint);
+                            newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint);
                             path.moveTo(polygonScale[i].x(), polygonScale[i].y());
                             path.lineTo(polygonScale[i].x(), polygonScale[i].y());
 
@@ -2651,7 +2651,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 }
             break;
 
-            case tLine:
+            case ito::PrimitiveContainer::tLine:
                 if (!on)
                 {
                     p->mnuDrawMode(false);
@@ -2670,7 +2670,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
                         QPainterPath path;
                         DrawItem *newItem = NULL;
-                        newItem = new DrawItem(this, tLine);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tLine);
                         path.moveTo(polygonScale[0].x(), polygonScale[0].y());
                         path.lineTo(polygonScale[1].x(), polygonScale[1].y());
 
@@ -2731,7 +2731,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 }
             break;
 
-            case tRect:
+            case ito::PrimitiveContainer::tRectangle:
                 if (!on)
                 {
                     p->mnuDrawMode(false);
@@ -2750,7 +2750,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
                         QPainterPath path;
                         DrawItem *newItem = NULL;
-                        newItem = new DrawItem(this, tRect);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle);
                         path.addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
                                       polygonScale[1].y() - polygonScale[0].y());
 
@@ -2810,7 +2810,7 @@ void Plot1DWidget::multiPointActivated (bool on)
                 }
             break;
 
-            case tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
                 if (!on)
                 {
                     p->mnuDrawMode(false);
@@ -2829,7 +2829,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
                         QPainterPath path;
                         DrawItem *newItem = NULL;
-                        newItem = new DrawItem(this, tEllipse);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse);
                         path.addEllipse(polygonScale[0].x(), polygonScale[0].y(),
                                 (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
@@ -2903,162 +2903,112 @@ void Plot1DWidget::multiPointActivated (bool on)
 ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
 {
     ito::RetVal retval;
-    int limits[] = {2, 8, 0, 99999};
+    int limits[] = { 2, 8, 0, 99999 };
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
-        retval += ito::RetVal(ito::retError, 0, tr("Could not plot markers because api is missing").toLatin1().data());
+        emit statusBarMessage(tr("Could not plot marker, api is missing"), 4000);
+        return ito::RetVal(ito::retError, 0, tr("Could not plot marker, api is missing").toLatin1().data());
     }
 
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
-
-    QwtSymbol::Style symStyle = QwtSymbol::XCross;
-    QSize symSize(5, 5);
-    QBrush symBrush(Qt::NoBrush);
-    QPen symPen(Qt::red);
-
-    QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
-    if (rgexp.indexIn(style) != -1)
-    {
-//        QString s = rgexp.cap(1);
-        char s = rgexp.cap(1).toLatin1()[0];
-
-        if (s == 'b') symPen.setColor(Qt::blue);
-        else if (s == 'g') symPen.setColor(Qt::green);
-        else if (s == 'r') symPen.setColor(Qt::red);
-        else if (s == 'c') symPen.setColor(Qt::cyan);
-        else if (s == 'm') symPen.setColor(Qt::magenta);
-        else if (s == 'y') symPen.setColor(Qt::yellow);
-        else if (s == 'k') symPen.setColor(Qt::black);
-        else if (s == 'w') symPen.setColor(Qt::white);
-
-        s = rgexp.cap(2).toLatin1()[0];
-        bool ok;
-
-        if (s == '.') symStyle = QwtSymbol::Ellipse;
-        else if (s == 'o') symStyle = QwtSymbol::Ellipse;
-        else if (s == 's') symStyle = QwtSymbol::Rect;
-        else if (s == 'd') symStyle = QwtSymbol::Diamond;
-        else if (s == '>') symStyle = QwtSymbol::RTriangle;
-        else if (s == 'v') symStyle = QwtSymbol::DTriangle;
-        else if (s == '^') symStyle = QwtSymbol::UTriangle;
-        else if (s == '<') symStyle = QwtSymbol::LTriangle;
-        else if (s == 'x') symStyle = QwtSymbol::XCross;
-        else if (s == '*') symStyle = QwtSymbol::Star1;
-        else if (s == '+') symStyle = QwtSymbol::Cross;
-        else if (s == 'h') symStyle = QwtSymbol::Hexagon;
-
-        //s = rgexp.cap(3);
-        int size = rgexp.cap(3).toInt(&ok);
-        if (ok)
-        {
-            symSize = QSize(size,size);
-        }
-    }
-    else
-    {
-        retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format").toLatin1().data());
-    }
 
     if (!retval.containsError())
     {
         if (dObj->getSize(0) >= 8)
         {
-//            ItomPlotMarker *marker = NULL;
             int nrOfMarkers = dObj->getSize(1);
-            
-            if (id == "")
-            {
-                id = tr("unknown");
-            }
 
-            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 0);            
+            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 0);
             ito::float32 *types = (ito::float32*)dObj->rowPtr(0, 1);
             ito::float32 *xCoords1 = (ito::float32*)dObj->rowPtr(0, 2);
             ito::float32 *yCoords1 = (ito::float32*)dObj->rowPtr(0, 3);
+
             ito::float32 *xCoords2 = (ito::float32*)dObj->rowPtr(0, 4);
             ito::float32 *yCoords2 = (ito::float32*)dObj->rowPtr(0, 5);
-            
+
+            // The definition do not correspond to the definetion of primitiv elements
+
             for (int i = 0; i < nrOfMarkers; ++i)
             {
                 QPainterPath path;
-                DrawItem *newItem = NULL;                
-                
-                switch ((int)types[i])
+                DrawItem *newItem = NULL;
+                unsigned short type = ((int)types[i]) & ito::PrimitiveContainer::tTypeMask;
+                unsigned char flags = (((int)types[i]) & ito::PrimitiveContainer::tFlagMask) >> 16;
+                switch (type)
                 {
-                    case tPoint:
-                        path.moveTo(xCoords1[i], yCoords1[i]);
-                        path.lineTo(xCoords1[i], yCoords1[i]);
+                case ito::PrimitiveContainer::tPoint:
+                    path.moveTo(xCoords1[i], yCoords1[i]);
+                    path.lineTo(xCoords1[i], yCoords1[i]);
                     break;
-                        
-                    case tLine:
-                        path.moveTo(xCoords1[i], yCoords1[i]);
-                        path.lineTo(xCoords2[i], yCoords2[i]);                        
+
+                case ito::PrimitiveContainer::tLine:
+                    path.moveTo(xCoords1[i], yCoords1[i]);
+                    path.lineTo(xCoords2[i], yCoords2[i]);
                     break;
-                        
-                    case tRect:
-                        path.addRect(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
+
+                case ito::PrimitiveContainer::tRectangle:
+                    path.addRect(xCoords1[i], yCoords1[i], xCoords2[i] - xCoords1[i], yCoords2[i] - yCoords1[i]);
                     break;
-                        
-                    case tEllipse:
-                        path.addEllipse(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
+
+                case ito::PrimitiveContainer::tEllipse:
+                    path.addEllipse(xCoords1[i], yCoords1[i], xCoords2[i] - xCoords1[i], yCoords2[i] - yCoords1[i]);
                     break;
-                    
-                    default:
-                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
+
+                default:
+                    retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
                     break;
-                }                    
+                }
                 if (m_pData->m_pDrawItems.contains((int)ids[i]))
                 {
                     m_pData->m_pDrawItems[(int)ids[i]]->setShape(path, m_inverseColor0, m_inverseColor1);
+                    m_pData->m_pDrawItems[(int)ids[i]]->m_flags = flags;
                 }
                 else
                 {
-                    switch ((int)types[i])
+                    switch (type)
                     {
-                        case tPoint:                    
-                            newItem = new DrawItem(this, tPoint, (int)ids[i]);
+                    case ito::PrimitiveContainer::tMultiPointPick:
+                    case ito::PrimitiveContainer::tPoint:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint, (int)ids[i]);
                         break;
-                        
-                        case tLine:
-                            newItem = new DrawItem(this, tLine, (int)ids[i]);
+
+                    case ito::PrimitiveContainer::tLine:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tLine, (int)ids[i]);
                         break;
-                        
-                        case tRect:
-                            newItem = new DrawItem(this, tRect, (int)ids[i]);
+
+                    case ito::PrimitiveContainer::tRectangle:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle, (int)ids[i]);
                         break;
-                        
-                        case tEllipse:
-                            newItem = new DrawItem(this, tEllipse, (int)ids[i]);
+
+                    case ito::PrimitiveContainer::tEllipse:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse, (int)ids[i]);
                         break;
-                        
-                        default:
-                            retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
-                        break;                        
+
+                    default:
+                        retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
+                        break;
                     }
                     if (newItem)
                     {
                         newItem->setShape(path, m_inverseColor0, m_inverseColor1);
-                        
+
                         newItem->setVisible(true);
                         newItem->show();
                         newItem->attach(this);
-                        newItem->setSelected(true);
+                        newItem->m_flags = flags;
                         replot();
-                        //                m_pData->m_pDrawItems.append(newItem);
+
                         m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
                     }
-                }                
+                }
             }
         }
 
         replot();
     }
 
-    if (dObj)
-    {
-        delete dObj;
-    }
+    if (dObj) delete dObj;
 
     return retval;
 }

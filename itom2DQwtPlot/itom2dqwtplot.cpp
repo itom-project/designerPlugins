@@ -285,13 +285,13 @@ void Itom2dQwtPlot::createActions()
 
     //m_pActClearDrawings
     if (m_buttonSet == 0)
-        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear markers"), this);
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear geometric shapes"), this);
     else
-        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"), tr("Clear markers"), this);
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"), tr("Clear geometric shapes"), this);
     a->setObjectName("actClearGeometrics");
     a->setCheckable(false);
     a->setChecked(false);
-    a->setToolTip(tr("Clear all existing geometric elements"));
+    a->setToolTip(tr("Clear all existing geometric shapes"));
     connect(a, SIGNAL(triggered()), this, SLOT(clearGeometricElements()));
 
     //m_actApectRatio
@@ -449,31 +449,31 @@ void Itom2dQwtPlot::createActions()
 
     //m_actDrawMode
     if (m_buttonSet == 0)
-        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Draw geometric shape"), this);
     else
-        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"), tr("Switch Draw Mode"), this);
-    m_pActDrawMode->setData(PlotCanvas::tPoint);
-    m_pMnuDrawMode = new QMenu(tr("Draw Mode"), this);
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"), tr("Draw geometric shape"), this);
+    m_pActDrawMode->setData(ito::PrimitiveContainer::tPoint);
+    m_pMnuDrawMode = new QMenu(tr("Draw geometric shape"), this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
     a = m_pDrawModeActGroup->addAction(tr("Point"));
-    a->setData(PlotCanvas::tPoint);
+    a->setData(ito::PrimitiveContainer::tPoint);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 //    a->setChecked(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Line"));
-    a->setData(PlotCanvas::tLine);
+    a->setData(ito::PrimitiveContainer::tLine);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Rectangle"));
-    a->setData(PlotCanvas::tRect);
+    a->setData(ito::PrimitiveContainer::tRectangle);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Ellipse"));
-    a->setData(PlotCanvas::tEllipse);
+    a->setData(ito::PrimitiveContainer::tEllipse);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
@@ -484,10 +484,10 @@ void Itom2dQwtPlot::createActions()
     connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
 
     if (m_buttonSet == 0)
-        m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"), tr("Switch Element Modification Mode"), this);
+        m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"), tr("Geometric shape modification mode"), this);
     else
-        m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"), tr("Switch Element Modification Mode"), this);
-    m_pMnuDrawModifyMode = new QMenu(tr("Elemet Modify Mode"), this);
+        m_pActDrawModifyMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"), tr("Geometric shape modification mode"), this);
+    m_pMnuDrawModifyMode = new QMenu(tr("Geometric shape modification mode"), this);
 
     m_pDrawModifyModeActGroup = new QActionGroup(this);
     m_pActMove = m_pDrawModifyModeActGroup->addAction(tr("Move elements"));
@@ -499,7 +499,7 @@ void Itom2dQwtPlot::createActions()
     m_pMnuDrawModifyMode->addAction(m_pActMove);
     m_pActMove->setCheckable(false);
 
-    m_pActResize = m_pDrawModifyModeActGroup->addAction(tr("Resize Elements"));
+    m_pActResize = m_pDrawModifyModeActGroup->addAction(tr("Resize elements"));
     m_pActResize->setData(Itom2DQwt::tRotateGeometricElements);
     if (m_buttonSet == 0)
         m_pActResize->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
@@ -509,7 +509,7 @@ void Itom2dQwtPlot::createActions()
     m_pActResize->setCheckable(false);
     m_pActResize->setEnabled(false);
 
-    m_pActRotate = m_pDrawModifyModeActGroup->addAction(tr("Rotate Elements"));
+    m_pActRotate = m_pDrawModifyModeActGroup->addAction(tr("Rotate elements"));
     m_pActRotate->setData(Itom2DQwt::tResizeGeometricElements);
     if (m_buttonSet == 0)
         m_pActRotate->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
@@ -519,7 +519,7 @@ void Itom2dQwtPlot::createActions()
     m_pActRotate->setCheckable(false);
     m_pActRotate->setEnabled(false);
 
-    m_pActModify = m_pDrawModifyModeActGroup->addAction(tr("Modify Points"));
+    m_pActModify = m_pDrawModifyModeActGroup->addAction(tr("Modify points"));
     m_pActModify->setData(Itom2DQwt::tModifyPoints);
     m_pMnuDrawModifyMode->addAction(m_pActModify);
     if (m_buttonSet == 0)
@@ -1648,40 +1648,40 @@ void Itom2dQwtPlot::mnuDrawMode(QAction *action)
     switch (action->data().toInt())
     {
         default:
-        case PlotCanvas::tPoint:
+        case ito::PrimitiveContainer::tPoint:
             if (m_buttonSet == 0)
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
             else
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tPoint, true, 1);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tPoint, true, 1);
         break;
 
-        case PlotCanvas::tLine:
+        case ito::PrimitiveContainer::tLine:
             if (m_buttonSet == 0)
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
             else
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tLine, true, 2);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tLine, true, 2);
         break;
 
-        case PlotCanvas::tRect:
+        case ito::PrimitiveContainer::tRectangle:
             if (m_buttonSet == 0)
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
             else
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rectangle_lt.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tRect, true, 2);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tRectangle, true, 2);
         break;
 
-        case PlotCanvas::tEllipse:
+        case ito::PrimitiveContainer::tEllipse :
             if (m_buttonSet == 0)
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
             else
                 m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/ellipse_lt.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(PlotCanvas::tEllipse, true, 2);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tEllipse, true, 2);
         break;
     }
 }
@@ -1938,25 +1938,6 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
     m_childFigures.erase(it);
 }
 
-////----------------------------------------------------------------------------------------------------------------------------------
-//void Itom2dQwtPlot::setLinePlotCoordinates(const QVector<QPointF> pts)
-//{
-//    char buf[60] = {0};
-//    if (pts.size() > 1)
-//    {
-//        sprintf(buf, "[%.4g; %.4g]\n[%.4g; %.4g]", pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-//    }
-//    else if (pts.size() == 1)
-//    {
-//        sprintf(buf, "[%.4g; %.4g]\n[ - ; - ]", pts[0].x(), pts[0].y());
-//    }
-//    else
-//    {
-//        sprintf(buf, "[ - ; - ]\n[ - ; - ]");
-//    }
-//    m_lblCoordinates->setText(buf);
-//}
-
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
@@ -2016,30 +1997,23 @@ void Itom2dQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
         default:
             m_pContent->userInteractionStart(0, false, 0);
             break;
-        case PlotCanvas::tMultiPointPick:
-        case PlotCanvas::tPoint:
-            //m_pContent->m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+        case ito::PrimitiveContainer::tMultiPointPick:
+        case ito::PrimitiveContainer::tPoint:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints);
-            //m_pContent->m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
         break;
 
-        case PlotCanvas::tLine:
+        case ito::PrimitiveContainer::tLine:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
-        case PlotCanvas::tRect:
+        case ito::PrimitiveContainer::tRectangle:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
-        case PlotCanvas::tEllipse:
+        case ito::PrimitiveContainer::tEllipse:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
     }
-
-    //m_pContent->setWindowState((m_pContent->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-    //m_pContent->raise(); //for MacOS
-    //m_pContent->activateWindow(); //for Windows
-    //m_pContent->setFocus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2122,13 +2096,13 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
         rowPtr[0] = (ito::float32) (it.value()->m_idx);
         switch (it.value()->m_type)
         {
-            case PlotCanvas::tPoint:
+            case ito::PrimitiveContainer::tPoint:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tPoint;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
             break;
 
-            case PlotCanvas::tLine:
+            case ito::PrimitiveContainer::tLine:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tLine;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
@@ -2136,7 +2110,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
-            case PlotCanvas::tRect:
+            case ito::PrimitiveContainer::tRectangle:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRectangle;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
@@ -2144,7 +2118,7 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
-            case PlotCanvas::tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tEllipse;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
@@ -2152,14 +2126,14 @@ ito::RetVal Itom2dQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[6] = (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 2.0);
             break;
 /*
-            case PlotCanvas::tCircle:
+            case ito::PrimitiveContainer::tCircle:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tCircle;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
                 rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
             break;
 
-            case PlotCanvas::tSquare:
+            case ito::PrimitiveContainer::tSquare:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tSquare;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
@@ -2445,20 +2419,6 @@ void Itom2dQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::mnuActRatio(bool checked)
 {
-    /*((InternalData*) m_pVData)->m_keepAspect = checked;
-    
-    if (m_pActZoom->isChecked()) m_pActZoom->setChecked(false);
-    if (m_pActPan->isChecked()) m_pActPan->setChecked(false);
-    
-    m_pActPan->setEnabled(!checked);
-    m_pActZoom->setEnabled(!checked);
-
-    if (m_pContent)
-    {
-        m_pContent->m_pZoomer->zoom(0);
-        m_pContent->setState(PlotCanvas::tIdle);
-        m_pContent->configRescaler();
-    }*/
     if (m_pVData == NULL)
     {
         return;
@@ -2510,7 +2470,7 @@ void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
 
     if (m_pContent)
     {
-        m_pContent->setState(((InternalData*) m_pVData)->m_state);
+        m_pContent->setState(((InternalData*)m_pVData)->m_state, ((InternalData*)m_pVData)->m_stateShapePrimitive);
         m_pContent->replot();
     }
 

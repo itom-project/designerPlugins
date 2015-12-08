@@ -203,7 +203,8 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActXVMR(NULL),
     m_pActXVMC(NULL),
     m_pActXVML(NULL),
-    m_pActSendCurrentToWorkspace(NULL)
+    m_pActSendCurrentToWorkspace(NULL),
+    m_buttonSet(0)
 {
     constructor();
 }
@@ -707,31 +708,31 @@ void Itom1DQwtPlot::createActions()
 
     //m_actDrawMode
     if (m_buttonSet == 0)
-        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Draw geometric shape"), this);
     else
-        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"), tr("Switch Draw Mode"), this);
-    m_pActDrawMode->setData(Plot1DWidget::tPoint);
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"), tr("Draw geometric shape"), this);
+    m_pActDrawMode->setData(ito::PrimitiveContainer::tPoint);
     m_pMnuDrawMode = new QMenu("Draw Mode", this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
     a = m_pDrawModeActGroup->addAction(tr("Point"));
-    a->setData(Plot1DWidget::tPoint);
+    a->setData(ito::PrimitiveContainer::tPoint);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 //    a->setChecked(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Line"));
-    a->setData(Plot1DWidget::tLine);
+    a->setData(ito::PrimitiveContainer::tLine);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Rectangle"));
-    a->setData(Plot1DWidget::tRect);
+    a->setData(ito::PrimitiveContainer::tRectangle);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Ellipse"));
-    a->setData(Plot1DWidget::tEllipse);
+    a->setData(ito::PrimitiveContainer::tEllipse);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
@@ -744,13 +745,13 @@ void Itom1DQwtPlot::createActions()
     
     //m_pActClearDrawings
     if (m_buttonSet == 0)
-        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear Marker"), this);
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear geometric shapes"), this);
     else
-        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"), tr("Clear Marker"), this);
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"), tr("Clear geometric shapes"), this);
     a->setObjectName("actClearGeometricElements");
     a->setCheckable(false);
     a->setChecked(false);
-    a->setToolTip(tr("Clear all existing geometric elements"));
+    a->setToolTip(tr("Clear all existing geometric shapes"));
     connect(a, SIGNAL(triggered()), this, SLOT(clearGeometricElements()));
 
     //Labels for current cursor position
@@ -1339,7 +1340,7 @@ void Itom1DQwtPlot::mnuDrawMode(bool checked)
         m_pActZoomToRect->setChecked(false);
         m_pActMarker->setChecked(false);
         m_pContent->setZoomerEnable(false);
-        m_pContent->setState(m_pContent->stateIdle);
+        m_pContent->setState(Plot1DWidget::stateIdle);
 
         foreach(QAction *act, m_pDrawModeActGroup->actions())
         {
@@ -1377,31 +1378,31 @@ void Itom1DQwtPlot::mnuDrawMode(QAction *action)
     switch (action->data().toInt())
     {
         default:
-        case Plot1DWidget::tPoint:
+        case ito::PrimitiveContainer::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(Plot1DWidget::tPoint, 1, 1);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tPoint, 1, 1);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
         break;
 
-        case Plot1DWidget::tLine:
+        case ito::PrimitiveContainer::tLine:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(Plot1DWidget::tLine, 1, 2);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tLine, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
         break;
 
-        case Plot1DWidget::tRect:
+        case ito::PrimitiveContainer::tRectangle:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(Plot1DWidget::tRect, 1, 2);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tRectangle, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
         break;
 
-        case Plot1DWidget::tEllipse:
+        case ito::PrimitiveContainer::tEllipse:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
             m_pActDrawMode->setData(action->data());
-            m_pContent->userInteractionStart(Plot1DWidget::tEllipse, 1, 2);
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tEllipse, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
         break;
     }
@@ -1609,19 +1610,19 @@ void Itom1DQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     switch (type)
     {
         default:
-        case Plot1DWidget::tPoint:
+        case ito::PrimitiveContainer::tPoint:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints);
         break;
 
-        case Plot1DWidget::tLine:
+        case ito::PrimitiveContainer::tLine:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
-        case Plot1DWidget::tRect:
+        case ito::PrimitiveContainer::tRectangle:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
-        case Plot1DWidget::tEllipse:
+        case ito::PrimitiveContainer::tEllipse:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
     }
@@ -1908,13 +1909,13 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
         rowPtr[0] = (ito::float32) (it.value()->m_idx);
         switch (it.value()->m_type)
         {
-            case Plot1DWidget::tPoint:
+            case ito::PrimitiveContainer::tPoint:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tPoint;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
             break;
 
-            case Plot1DWidget::tLine:
+            case ito::PrimitiveContainer::tLine:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tLine;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
@@ -1922,7 +1923,7 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
-            case Plot1DWidget::tRect:
+            case ito::PrimitiveContainer::tRectangle:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRectangle;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
@@ -1930,7 +1931,7 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
-            case Plot1DWidget::tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
                 rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tEllipse;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);

@@ -170,15 +170,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
 
-    enum GeometryModificationMode
-    {
-        tNextElementMode = 0,
-        tMoveGeometricElements = 1,
-        tRotateGeometricElements = 2,
-        tResizeGeometricElements = 3,
-        tModifyPoints   = 4
-    }; //!> This enum must be equal to the enum PlotCanvas::tModificationState, todo: find a better solution
-
     ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack = false);
 
     ito::RetVal applyUpdate();  //!> does the real update work
@@ -345,7 +336,6 @@ private:
     void constructor();
 
     PlotCanvas *m_pContent;    
-//  InternalData m_data;
     void *m_pVData;
 
     QAction *m_pActSave;
@@ -436,10 +426,6 @@ public slots:
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
     ito::RetVal clearGeometricElements(void);
-//    void userInteractionEndRect(const QRectF &rect);
-//    void userInteractionEndEllipse(const QRectF &rect);    
-//    void userInteractionEndPt(const QVector<QPointF> &points);
-//    void userInteractionEndLine(const QVector<QPointF> &points);
 
     QSharedPointer<ito::DataObject> getDisplayed(void);
 
@@ -459,7 +445,6 @@ signals:
     void plotItemChanged(int idx, int flags, QVector<float> values);
     void plotItemDeleted(int idx);
     void plotItemsDeleted();
-    //void plotItemChanged(ito::int32 idx);
     void plotItemsFinished(int type, bool aborted);
 
 };
