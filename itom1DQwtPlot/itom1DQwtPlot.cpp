@@ -1522,18 +1522,6 @@ void Itom1DQwtPlot::mnuParentScaleSetting()
     {
         const QwtScaleDiv scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
         ito::AutoInterval bounds(scale.lowerBound(), scale.upperBound());
-        /*
-        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
-        int cmlpState = seriesData->getCmplxState();
-        ito::uint32  minLoc[3], maxLoc[3];
-        ito::float64 minVal, maxVal;
-
-        ito::DataObject temp = seriesData->getResampledDataObject();
-
-        if ((temp.getType() != ito::tFloat64) || (temp.getDims() == 0))
-            return;*/
-
-        //ito::dObjHelper::minMaxValueFunc<ito::float64>(&temp, minVal, minLoc, maxVal, maxLoc, true, cmlpState);
         
         ito::Channel* dataChannel = getInputChannel("source");
         if (dataChannel && dataChannel->getParent())
@@ -1552,8 +1540,6 @@ void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 
         if (action->text() == QString(tr("To Min-Max")))
         {
-//            DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
-
             ito::float64 minVal, maxVal;
             int minLoc, maxLoc;
             if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)

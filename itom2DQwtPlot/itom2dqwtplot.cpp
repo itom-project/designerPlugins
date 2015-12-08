@@ -3217,7 +3217,7 @@ ito::RetVal Itom2dQwtPlot::setGeometricElementLabel(int id, QString label)
 {
     if (!m_pVData) 
     {
-        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structure").toLatin1().data());
     }
 
     InternalData* pData = ((InternalData*)m_pVData);
@@ -3241,7 +3241,7 @@ ito::RetVal Itom2dQwtPlot::setGeometricElementLabelVisible(int id, bool setVisib
 {
     if (!m_pVData) 
     {
-        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structure").toLatin1().data());
     }
 
     InternalData* pData = ((InternalData*)m_pVData);

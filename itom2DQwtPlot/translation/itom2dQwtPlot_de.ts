@@ -610,7 +610,7 @@
     <message>
         <location line="+82"/>
         <location line="+23"/>
-        <source>Could not access internal data structur</source>
+        <source>Could not access internal data structure</source>
         <translation type="unfinished">Es kann nicht auf die interne Datenstruktur zugegriffen werden</translation>
     </message>
     <message>
