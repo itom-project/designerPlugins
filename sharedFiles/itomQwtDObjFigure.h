@@ -32,10 +32,13 @@
 #include "plot/AbstractDObjFigure.h"
 #include "common/RetVal.h"
 #include "common/itomPlotHandle.h"
+#include "DataObject/dataobj.h"
+#include "itomQwtPlotEnums.h"
 
 #include <qsize.h>
 #include <qstring.h>
 #include <qpixmap.h>
+#include <qsharedpointer.h>
 
 #ifndef DECLAREMETADATAOBJECT
     Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
@@ -54,8 +57,39 @@ class ItomQwtPlot;
 class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
+    Q_ENUMS(ButtonStyle)
+
+    Q_PROPERTY(ButtonStyle buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
+    Q_PROPERTY(bool keepAspectRatio READ getKeepAspectRatio WRITE setKeepAspectRatio USER true)
+
+    // Properties related with geometric elements
+    Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
+    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
+    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
+    Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
+    Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true)
+
+    Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::ModificationState geometryModMode READ getModState WRITE setModState DESIGNABLE true);
+
+    Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
+    Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
+    Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
+    Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
+    Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
+    Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
+    Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
+
+    Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
+    Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode (move, resize, rotate).")
 
     Q_CLASSINFO("slot://copyToClipBoard", "")
+    Q_CLASSINFO("slot://userInteractionStart", "")
+    Q_CLASSINFO("slot://clearGeometricElements", "")
+    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
+    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
+    Q_CLASSINFO("slot://plotMarkers", "")
+    Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")
 
     Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.")
     Q_CLASSINFO("signal://userInteractionDone", "")
@@ -66,25 +100,78 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     DESIGNER_PLUGIN_ITOM_API
 
 public:
+    enum ButtonStyle
+    {
+        StyleBright = 0,
+        StyleDark = 1
+    };
+
     explicit ItomQwtDObjFigure(QWidget *parent = NULL);
     explicit ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = NULL);
     virtual ~ItomQwtDObjFigure();
+
+    //!> set new button set
+    void setButtonSet(const ButtonStyle newVal);
+
+    //!> get current button set
+    ButtonStyle getButtonSet(void) const;
+
+    int getGeometricElementsCount() const;
+    void setGeometricElementsCount(const int value){ return; }
+
+    bool getKeepAspectRatio(void) const;
+    void setKeepAspectRatio(const bool &keepAspectEnable);
+
+    QSharedPointer< ito::DataObject > getGeometricElements();
+    //setter is a public slot
+
+    bool getEnabledPlotting(void) const;
+    void setEnabledPlotting(const bool &enabled);
+
+    int getSelectedElement(void) const;
+    void setSelectedElement(const int idx);
+
+    bool getMarkerLabelsVisible(void) const;
+    void setMarkerLabelsVisible(const bool &visible);
+
+    void setContextMenuEnabled(bool show); /*!< overloaded from AbstractFigure */
+    bool getContextMenuEnabled() const;    /*!< overloaded from AbstractFigure */
+
+    ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
+    virtual void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style) = 0;
+
+    ItomQwtPlotEnums::ModificationState getModState() const;
+    void setModState(const ItomQwtPlotEnums::ModificationState val);
+
+    friend ItomQwtPlot;
 
     
 public Q_SLOTS:
     ito::RetVal copyToClipBoard();
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
-protected Q_SLOTS:
-    void sendCurrentToWorkspace();
+    void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
+    ito::RetVal clearGeometricElements(void);
+    ito::RetVal deleteGeometricElement(int id);
+    ito::RetVal setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
+
+    ito::RetVal setGeometricElementLabel(int id, QString label);
+    ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
+
+    ito::RetVal plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id = QString::Null(), int plane = -1);
+    ito::RetVal deleteMarkers(QString id);
+    ito::RetVal deleteMarkers(int id); //deprecated
+    
 
     
 
 protected:
-    ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0, 0.0), const int resolution = 300);
+    void addToolbarsAndMenus();
+    
     ItomQwtPlot *m_pBaseContent;
 
 private:
+    
 
 signals :
     void userInteractionDone(int type, bool aborted, QPolygonF points);

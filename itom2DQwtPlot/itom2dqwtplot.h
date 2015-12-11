@@ -33,7 +33,6 @@ class PlotCanvas;
 
 #include "itomQwtDObjFigure.h"
 #include "plot/AbstractNode.h"
-#include "itom2dqwtplotenums.h"
 
 #include <qaction.h>
 #include <qwidgetaction.h>
@@ -41,7 +40,7 @@ class PlotCanvas;
 #include <qslider.h>
 #include <qlabel.h>
 
-
+class InternalData;
 
 class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 {
@@ -59,13 +58,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
-    Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
-    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
-    Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio USER true)
-    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(bool showCenterMarker READ getEnabledCenterMarker WRITE setEnabledCenterMarker USER true)
-    Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
-    Q_PROPERTY(bool markerLabelsVisible READ getMarkerLablesVisible WRITE setMarkerLablesVisible DESIGNABLE true)
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getOverlayAlpha WRITE setOverlayAlpha RESET resetOverlayAlpha USER true)
@@ -75,18 +68,14 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
 
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
-    Q_PROPERTY(int buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
     
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
-    Q_PROPERTY(Itom2DQwt::tModificationState geometryModMode READ getModState WRITE setModState DESIGNABLE true)
+    
     Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false USER true)
     Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false USER true)
-
-    Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
-
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -100,13 +89,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://titleFont", "Font for title.")
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
-    Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
-    Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
-    Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
-    Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
     Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
-    Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
-    Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels.")
 
     Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
@@ -117,30 +100,19 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
     Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
-    Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
 
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
 
-    Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode (move, resize, rotate).")
     Q_CLASSINFO("prop://lineCutPlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for lateral slicing.")
     Q_CLASSINFO("prop://zSlicePlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for z slicing.")
-
-    Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
-
-    Q_CLASSINFO("slot://plotMarkers", "")
-    Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
+      
     //Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")
-    Q_CLASSINFO("slot://userInteractionStart", "")  
-    Q_CLASSINFO("slot://clearGeometricElements", "")
     Q_CLASSINFO("slot://getDisplayed", "")  
     Q_CLASSINFO("slot://getDisplayedLineCut", "")
     Q_CLASSINFO("slot://setLinePlot", "")
     Q_CLASSINFO("slot://removeOverlayImage", "")
-
-    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
-    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
 
 public:
     Itom2dQwtPlot(QWidget *parent = 0);
@@ -152,9 +124,6 @@ public:
     ito::RetVal applyUpdate();  //!> does the real update work
 
     //properties (setter/getter)
-    void setContextMenuEnabled(bool show);
-    bool getContextMenuEnabled() const;
-
     bool colorBarVisible() const;
     void setColorBarVisible(bool value);
 
@@ -173,8 +142,6 @@ public:
     QString getValueLabel() const;
     void setValueLabel(const QString &label);
     void resetValueLabel();
-
-    int getGeometricElementsCount() const;
 
     bool getyAxisFlipped() const;
     void setyAxisFlipped(const bool &value);
@@ -195,7 +162,6 @@ public:
     void setPlaneIndex(const int &index);
     
     void setPlaneRange(int min, int max);
-    void setCmplxSwitch(/*PlotCanvas::ComplexType*/ int type, bool visible);
 
     virtual ito::AutoInterval getXAxisInterval(void) const;
     virtual void setXAxisInterval(ito::AutoInterval interval);
@@ -218,15 +184,6 @@ public:
     QFont getAxisFont(void) const;
     void setAxisFont(const QFont &font);
 
-    bool getkeepAspectRatio(void) const;
-    void setkeepAspectRatio(const bool &keepAspectEnable);
-
-    QSharedPointer< ito::DataObject > getGeometricElements();
-    void setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
-
-    bool getEnabledPlotting(void) const;
-    void setEnabledPlotting(const bool &enabled);
-
     bool getEnabledCenterMarker(void) const;
     void setEnabledCenterMarker(const bool &enabled);
 
@@ -241,26 +198,19 @@ public:
         setOverlayAlpha(0);
     }
 
-    ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
     void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
 
     QSharedPointer< ito::DataObject > getOverlayImage() const;
     void setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj);
     void resetOverlayImage(void);
 
-    void enableOverlaySlider(bool enabled) {m_pActOverlaySlider->setVisible(enabled);}
+    void enableOverlaySlider(bool enabled);
 
     //!> set new background color
     void setBackgroundColor(const QColor newVal);
 
     //!> get current background color
     QColor getBackgroundColor(void) const;
-
-    //!> set new button set
-    void setButtonSet(const int newVal);
-
-    //!> get button set
-    int getButtonSet(void) const;
 
     /** set color of axis
     *   @param [in] newVal  new axis color
@@ -289,12 +239,6 @@ public:
 
     //!> return the current line cut id for zSlices
     void setZSlicePlotItem(const ito::ItomPlotHandle idx);
-    
-    bool getMarkerLablesVisible(void) const;
-    void setMarkerLablesVisible(const bool val);
-
-    Itom2DQwt::tModificationState getModState() const;
-    void setModState(const Itom2DQwt::tModificationState val);
 
 
     friend class PlotCanvas;
@@ -302,101 +246,24 @@ public:
 protected:
     ito::RetVal init(); //called when api-pointers are transmitted, directly after construction
 
-    void createActions();
-
-    //void setLinePlotCoordinates(const QVector<QPointF> pts);
-    void setColorDataTypeRepresentation(bool colorOn);
-
 private:
     void constructor();
 
     PlotCanvas *m_pContent;    
-    void *m_pVData;
-
-    QAction *m_pActSave;
-    QAction *m_pActCopyClipboard;
-    QAction *m_pActHome;
-    QAction *m_pActPan;
-    QAction *m_pActZoom;
-    QAction *m_pActSendCurrentToWorkspace;
-    QAction *m_pActAspectRatio;
-    QAction *m_pActScaleSettings;
-    QAction *m_pActColorPalette;
-    QAction *m_pActToggleColorBar;
-    QAction *m_pActValuePicker;
-    QAction *m_pActLineCut;
-    QMenu *m_pActLineCutMode;
-    QActionGroup *m_pActLineCutGroup;
-
-    QAction *m_pActStackCut;
-    QWidgetAction *m_pActPlaneSelector;
-    QActionGroup *m_pDrawModeActGroup;
-    QActionGroup *m_pDrawModifyModeActGroup;
-    QAction *m_pActClearDrawings;
-    QAction *m_pActProperties;
-
-    QLabel *m_pCoordinates;
-    QWidgetAction *m_pActCoordinates;
-
-    QAction* m_pActCmplxSwitch;
-    QMenu *m_mnuCmplxSwitch;
-
-    QAction* m_pActDrawMode;
-    QMenu *m_pMnuDrawMode;
-
-    QAction* m_pActDrawModifyMode;
-    QMenu *m_pMnuDrawModifyMode;
-    QAction *m_pActMove;
-    QAction *m_pActResize;
-    QAction *m_pActRotate;
-    QAction *m_pActModify;
-
-    QAction* m_pActCntrMarker;
-
-    QSlider* m_pOverlaySlider;
-    QWidgetAction *m_pActOverlaySlider;
+    InternalData *m_pData;
 
     QHash<QObject*,ito::uint32> m_childFigures;
 
-    char m_buttonSet;
-
-    ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
-
 private slots:
-    void mnuActSave();
-
-    void mnuActHome();
-    void mnuActPan(bool checked);
-    void mnuActZoom(bool checked);
-    void mnuActRatio(bool checked);
-    void mnuActScaleSettings();
-    void mnuActColorPalette();
-    void mnuActToggleColorBar(bool checked);
-    void mnuActValuePicker(bool checked);
-    void mnuActLineCut(bool checked);
-    void mnuLineCutMode(QAction *action);
-    void mnuActStackCut(bool checked);
     
-    void mnuActPlaneSelector(int plane);
-    void mnuDrawModifyMode(QAction *action);
-    void mnuDrawMode(QAction *action);
-    void mnuDrawMode(bool checked);
-    void mnuOverlaySliderChanged(int value);
-
-    void mnuActCenterMarker(bool checked);
-
-    void mnuCmplxSwitch(QAction *action);
+    
+    
     void childFigureDestroyed(QObject *obj);
 
-    void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
+    
 
 public slots:
-    ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
-    ito::RetVal deleteMarkers(QString id);
-    ito::RetVal deleteMarkers(int id);
-
-    void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
-    ito::RetVal clearGeometricElements(void);
+    
 
     QSharedPointer<ito::DataObject> getDisplayed(void);
 
@@ -404,9 +271,6 @@ public slots:
 
     //this can be invoked by python to trigger a lineplot
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
-
-    ito::RetVal setGeometricElementLabel(int id, QString label);
-    ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
 

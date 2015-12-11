@@ -25,32 +25,97 @@
 
 #include <qwt_plot.h>
 
+#include "common/sharedStructuresPrimitives.h"
+#include "plot/AbstractFigure.h"
+#include "itomQwtPlotEnums.h"
+
+#include <qhash.h>
+#include <qcolor.h>
+#include <qvector.h>
+#include <qsharedpointer.h>
+#include <qsize.h>
+#include <qstring.h>
+
+#include "DataObject/dataobj.h"
+
 class QMenu;
 class ItomPlotZoomer;
 class ItomPlotMagnifier;
 class QwtPlotPanner;
+class QwtPlotMarker;
 class QContextMenuEvent;
 class QResizeEvent;
+class DrawItem;
+class QKeyEvent;
+class QMouseEvent;
+class QAction;
+class QActionGroup;
+class QToolBar;
+class UserInteractionPlotPicker;
+class ItomQwtDObjFigure;
 
 class ItomQwtPlot : public QwtPlot
 {
     Q_OBJECT
 
 public:
-    explicit ItomQwtPlot(QMenu *contextMenu, QWidget * parent = NULL);
+    enum State
+    {
+        stateIdle = 0,
+        stateZoom = 1,
+        statePan = 2,
+        stateValuePicker = 3,
+        stateLineCut = 4,
+        stateStackCut = 5,
+        stateDrawShape = 6,
+        stateMarkerPicker = 7,
+        stateUser = 100
+    };
+
+    explicit ItomQwtPlot(ItomQwtDObjFigure *parent = NULL);
     virtual ~ItomQwtPlot();
 
     bool showContextMenu() const { return m_showContextMenu; }
-    void setShowContextMenu(bool value) { m_showContextMenu = value;  }
-    
+    void setShowContextMenu(bool value) { m_showContextMenu = value; }
+
     bool keepAspectRatio() const { return m_keepAspectRatio; }
     void setKeepAspectRatio(bool keep);
 
+    bool markerLabelVisible() const { return m_markerLabelVisible; }
+    void setMarkerLabelVisible(bool visible);
+
+    virtual void setButtonStyle(int style); /*!< can be overwritten, however call this base implementation in the overloaded method, too.*/
+    int buttonStyle() const { return m_buttonStyle; }
+
+    virtual void setPlottingEnabled(bool enabled); /*!< can be overwritten, however call this base implementation in the overloaded method, too.*/
+    bool plottingEnabled() const { return m_plottingEnabled; }
+
+    ito::AbstractFigure::UnitLabelStyle unitLabelStyle() const { return m_unitLabelStyle; }
+    virtual void setUnitLabelStyle(ito::AbstractFigure::UnitLabelStyle style) { m_unitLabelStyle = style; };
+
+    ItomQwtPlotEnums::ModificationState shapeModificationType() const { return m_shapeModificationType; }
+    void setShapeModificationType(const ItomQwtPlotEnums::ModificationState &type);
+
     void setVisible(bool visible);
 
+    int countGeometricShapes() const { return m_pShapes.count(); }
+    int getSelectedGeometricShapeIdx() const;
+    void setSelectedGeometricShapeIdx(int idx);
+    ito::RetVal setGeometricShapes(const QSharedPointer<ito::DataObject> geometricShapes);
+    ito::RetVal deleteGeometricShape(const int id);
+    QSharedPointer<ito::DataObject> geometricShapes2DataObject();
+    ito::RetVal setGeometricShapeLabelVisible(int id, bool setVisible);
+    ito::RetVal setGeometricShapeLabel(int id, const QString &label);
 
-public Q_SLOTS:
+    ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
 
+    virtual QList<QToolBar*> getToolbars() { return m_toolbars; }
+    virtual QList<QMenu*> getMenus() { return m_menus; }
+
+    ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0, 0.0), const int resolution = 300);
+
+    ito::RetVal plotMarkers(const QSharedPointer<ito::DataObject> coordinates, const QString &style, const QString &id, int plane);
+    ito::RetVal deleteMarkers(const QString &id);
 
 protected:
     void loadStyles();
@@ -66,17 +131,106 @@ protected:
 
     virtual void contextMenuEvent(QContextMenuEvent * event);
     virtual void resizeEvent(QResizeEvent * event);
+    virtual void stateChanged(int state) {}; /*!< implement this function to get informed about changes in the state*/
+
+    ito::RetVal startOrStopDrawGeometricShape(bool start);
+
+    void setState(int state);
+    int state() const { return m_state; }
+
+    void setInverseColors(const QColor &color0, const QColor &color1);
+    QColor inverseColor0() const { return m_inverseColor0; }
+    QColor inverseColor1() const { return m_inverseColor1; }
+
+    virtual void home() = 0;
+    
+    void keyPressEvent(QKeyEvent * event);
+    void mousePressEvent(QMouseEvent * event);
+    void mouseMoveEvent(QMouseEvent * event);
+    void mouseReleaseEvent(QMouseEvent * event);
+
+
+    QAction *m_pActSave;        /*!< action to save the plot */
+    QAction *m_pActHome;          /*!< action for homing */
+    QAction *m_pActPan;         /*!< action for panner */
+    QAction *m_pActZoom;        /*!< action for zoomer */
+    QAction *m_pActAspectRatio; /*!< action to keep aspect ratio */
+    QAction *m_pActSendCurrentToWorkspace; /*!< action to send current view to workspace */
+    QAction *m_pActCopyClipboard; /*!< action to copy plot to clipboard */
+
+    QMenu   *m_pMenuShapeType;
+    QAction *m_pActShapeType;
+
+    QAction *m_pActClearShapes;
+
+    QMenu   *m_pMenuShapeModifyType;
+    QAction *m_pActShapeModifyType;
+
+    QAction *m_pActProperties;
+
+    QList<QToolBar*> m_toolbars;
+    QList<QMenu*> m_menus;
+    QMenu *m_pContextMenu;
+
+    
 
 private:
-    QMenu *m_pContextMenu;
+    void createBaseActions();
+
+    
     bool m_showContextMenu;
 
     ItomPlotZoomer *m_pZoomer;
     ItomPlotMagnifier *m_pMagnifier;
     QwtPlotPanner *m_pPanner;
+    UserInteractionPlotPicker *m_pMultiPointPicker;
+
+    //geometric shapes
+    QHash<int, DrawItem *> m_pShapes; /*!< hash table with all geometric shapes (besides marker sets) currently displayed */
+    int m_activeShapeIdx; //todo: necessary
+    QVector<int> m_currentShapeIndices; /*!< indices of all shapes that have already been drawn in the current collection, e.g. if 4 rectangles are requested, the four indices are stored until the last rectangle has been given.*/
+    int m_elementsToPick; /*!< number of shapes that should be picked in the current session. */
+    ito::PrimitiveContainer::tPrimitive m_currentShapeType;
+    ItomQwtPlotEnums::ModificationState m_shapeModificationType;
+    QPoint m_initialMousePosition;
+    QPointF m_initialMarkerPosition;
+
+    //markers
+    QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
+    bool m_markerLabelVisible;
+
+    bool m_ignoreNextMouseEvent; //todo: what is this?
+    QColor m_inverseColor0;
+    QColor m_inverseColor1;
 
     bool m_keepAspectRatio;
     bool m_firstTimeVisible; /*!< true if this plot becomes visible for the first time */
+    bool m_plottingEnabled;
+
+    int m_buttonStyle; /*!< 0: dark buttons for bright theme, 1: bright buttons for dark theme */
+    
+    int m_state; /*!< current state (value of enum State or stateUser + X) */
+    bool m_stateIsChanging;
+
+    ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
+
+    
+public slots:
+    void clearAllGeometricShapes();
+
+private slots:
+    void multiPointActivated(bool on);
+
+    void mnuActSave();
+    void mnuActHome();
+    void mnuActPan(bool checked);
+    void mnuActZoom(bool checked);
+    void mnuActRatio(bool checked);
+    void mnuGroupShapeModifyTypes(QAction *action);
+    void mnuGroupShapeTypes(QAction *action);
+    void mnuShapeType(bool checked);
+    void mnuCopyToClipboard();
+    void mnuSendCurrentToWorkspace();
 
 signals:
     void statusBarClear();

@@ -26,17 +26,17 @@
 #include "common/sharedStructures.h"
 #include <qwt_plot_marker.h>
 
-#include "itom1DQwtPlotEnums.h"
+#include "itomQwtPlotEnums.h"
 
 class ItomPlotMarker : public QwtPlotMarker
 {
     public:
 
-    ItomPlotMarker(bool labelState,  Itom1DQwt::tPlotPickerType type, Qt::Alignment align, Qt::Orientation orient );
+    ItomPlotMarker(bool labelState, ItomQwtPlotEnums::PlotPickerType type, Qt::Alignment align, Qt::Orientation orient);
 
-    void setPlotType(const Itom1DQwt::tPlotPickerType value);
+    void setPlotType(const ItomQwtPlotEnums::PlotPickerType value);
 
-    Itom1DQwt::tPlotPickerType getPlotType() const {return m_plotType;}
+    ItomQwtPlotEnums::PlotPickerType getPlotType() const { return m_plotType; }
 
     void setLabelEnabled(const bool state)
     {
@@ -72,7 +72,7 @@ private:
 
     void updateLabelValue();
 
-    Itom1DQwt::tPlotPickerType m_plotType;
+    ItomQwtPlotEnums::PlotPickerType m_plotType;
     bool m_labelState;
 
 };

@@ -32,13 +32,11 @@
 #include "itomQwtDObjFigure.h"
 #include "itom1DQwtPlotEnums.h"
 
-#include <qaction.h>
 #include <qsharedpointer.h>
-#include <qwidget.h>
-#include <qstyle.h>
-#include <qstyleoption.h>
-#include <qpainter.h>
-#include <qlabel.h>
+#include <qvector.h>
+#include <qpoint.h>
+#include <qstring.h>
+#include <qfont.h>
 
 class Plot1DWidget;
 class ItomPlotMarker;
@@ -59,31 +57,24 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
-    Q_PROPERTY(Itom1DQwt::tCurveStyle curveStyle READ getCurveStyle WRITE setCurveStyle USER true);
-    Q_PROPERTY(Itom1DQwt::tFillCurveStyle fillCurve READ getCurveFilled WRITE setCurveFilled USER true)
+    Q_PROPERTY(ItomQwtPlotEnums::CurveStyle curveStyle READ getCurveStyle WRITE setCurveStyle USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::FillCurveStyle fillCurve READ getCurveFilled WRITE setCurveFilled USER true)
     Q_PROPERTY(QColor curveFillColor READ getCurveFillColor WRITE setCurveFillColor RESET resetCurveFillColor USER true)
     Q_PROPERTY(int curveFillAlpha READ getCurveFillAlpha WRITE setCurveFillAlpha USER true)
 
     Q_PROPERTY(qreal baseLine READ getBaseLine WRITE setBaseLine USER true)
 
-    Q_PROPERTY(tSymbol lineSymbol READ getLineSymbol WRITE setLineSymbol USER true);
+    Q_PROPERTY(Symbol lineSymbol READ getLineSymbol WRITE setLineSymbol USER true);
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true);
 
-    // Properties related with geometric elements
-    Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
-    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
-    Q_PROPERTY(bool keepAspectRatio READ getkeepAspectRatio WRITE setkeepAspectRatio USER true)
-    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
-    Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false )
-
-    Q_PROPERTY(Itom1DQwt::tMultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
+    Q_PROPERTY(ItomQwtPlotEnums::MultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
     
     Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true USER true)
     Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false USER true)
     Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
     
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
-    Q_PROPERTY(int buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
+    
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
 
@@ -93,15 +84,15 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(bool pickerLabelVisible READ getPickerLabelVisible WRITE setPickerLabelVisible USER true);
     Q_PROPERTY(Qt::Orientation pickerLabelOrientation READ getPickerLabelOrientation WRITE setPickerLabelOrientation USER true);
     Q_PROPERTY(Qt::Alignment pickerLabelAlignment READ getPickerLabelAlignment WRITE setPickerLabelAlignment USER true);
-    Q_PROPERTY(Itom1DQwt::tPlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
 
-    Q_PROPERTY(Itom1DQwt::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
-    Q_PROPERTY(Itom1DQwt::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
 
-    Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
+    
 
     Q_ENUMS(LegendPos);
-    Q_ENUMS(tSymbol);
+    Q_ENUMS(Symbol);
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -125,11 +116,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://baseLine", "the baseline/reference for the curveStyle::sticks mode.")
     //Q_CLASSINFO("prop://stickOrientation", "the orientation for the curveStyle::sticks mode.")
 
-    Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
-    Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
-    Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
-    Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
-    Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
+    
 
     Q_CLASSINFO("prop://columnInterpretation", "Define the interpretation of M x N objects as Auto, FirstRow, FirstCol, MultiRows, MultiCols.")
     
@@ -138,7 +125,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://picker", "Get picker defined by a float32[3] array for each element containing [pixelIndex, physIndex, value].")
 
     Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
-    Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
+    
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
 
@@ -153,18 +140,13 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://valueScale", "linear or logarithmic scale (various bases) can be chosen for the vertical axis (y-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
 
-    Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
+    
 
     Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
     Q_CLASSINFO("slot://plotMarkers", "Delete a specific marker")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
     
-    Q_CLASSINFO("slot://userInteractionStart", "")  
-    Q_CLASSINFO("slot://clearGeometricElements", "")
     Q_CLASSINFO("slot://getDisplayed", "")
-
-    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
-    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
 
     
 
@@ -174,18 +156,17 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         virtual ~Itom1DQwtPlot();
 
         enum LegendPos { Off = 0, Left = 1, Top = 2, Right = 3, Bottom = 4 };
-        enum tSymbol
+        enum Symbol
         {
             NoSymbol = -1, Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon
         };
+        enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray };
+        enum PlotPickerType { DefaultMarker, RangeMarker };
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         
         //properties
-        bool getContextMenuEnabled() const;
-        void setContextMenuEnabled(bool show); 
-
-        QVector<QPointF> getBounds(void);
+        QVector<QPointF> getBounds(void) const;
         void setBounds(QVector<QPointF> bounds);
 
         void enableObjectGUIElements(const int mode);
@@ -208,11 +189,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         ito::AutoInterval getYAxisInterval(void) const;
         void setYAxisInterval(ito::AutoInterval);
 
-        Itom1DQwt::ScaleEngine getValueScale() const;
-        void setValueScale(const Itom1DQwt::ScaleEngine &scale);
+        ItomQwtPlotEnums::ScaleEngine getValueScale() const;
+        void setValueScale(const ItomQwtPlotEnums::ScaleEngine &scale);
 
-        Itom1DQwt::ScaleEngine getAxisScale() const;
-        void setAxisScale(const Itom1DQwt::ScaleEngine &scale);
+        ItomQwtPlotEnums::ScaleEngine getAxisScale() const;
+        void setAxisScale(const ItomQwtPlotEnums::ScaleEngine &scale);
 
         QFont getTitleFont(void) const;
         void setTitleFont(const QFont &font);
@@ -229,11 +210,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         qreal getLineWidth(void) const;
         void setLineWidth(const qreal &width);
 
-        Qt::PenStyle getLineStyle(void) const;
+        Qt::PenStyle getLineStyle() const;
         void setLineStyle(const Qt::PenStyle &style);
 
-        Itom1DQwt::tCurveStyle getCurveStyle(void) const;
-        void setCurveStyle(const Itom1DQwt::tCurveStyle state);
+        ItomQwtPlotEnums::CurveStyle getCurveStyle() const;
+        void setCurveStyle(const ItomQwtPlotEnums::CurveStyle state);
 
         LegendPos getLegendPosition() const;
         void setLegendPosition(LegendPos legendPosition);
@@ -241,39 +222,23 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         QStringList getLegendTitles() const;
         void setLegendTitles(const QStringList &legends);
 
-        ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
-        void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
-
         void setSource(QSharedPointer<ito::DataObject> source);
+
+        void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
     
-        int getGeometricElementsCount() const;
-        void setGeometricElementsCount(const int value){ return;}
-
-        bool getkeepAspectRatio(void) const;
-        void setkeepAspectRatio(const bool &keepAspectEnable);
-
-        QSharedPointer< ito::DataObject > getGeometricElements();
-        void setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
-
-        bool getEnabledPlotting(void) const;
-        void setEnabledPlotting(const bool &enabled);
-
-        int getSelectedElement(void) const;
-        void setSelectedElement(const int idx);
-
-        Itom1DQwt::tMultiLineMode getRowPresentation(void) const;
-        void setRowPresentation(const Itom1DQwt::tMultiLineMode idx);
+        ItomQwtPlotEnums::MultiLineMode getRowPresentation(void) const;
+        void setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx);
         void resetRowPresentation(); 
 
-        int getRGBPresentation(void) const;
-        void setRGBPresentation(const int idx);
+        int getRGBPresentation() const;
+        void setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx);
         void resetRGBPresentation(); 
 
-        int getPickerLimit(void) const;
+        int getPickerLimit() const;
         void setPickerLimit(const int idx);
         void resetPickerLimit(); 
 
-        int getPickerCount(void) const;
+        int getPickerCount() const;
         QSharedPointer< ito::DataObject > getPicker() const;
 
         QVector<int> getPickerPixel() const;
@@ -284,12 +249,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         //!> get current background color
         QColor getBackgroundColor(void) const;
-
-        //!> set new button set
-        void setButtonSet(const char newVal);
-
-        //!> get current button set
-        char getButtonSet(void) const;
 
         /** set color of axis
         *   @param [in] newVal  new axis color
@@ -316,11 +275,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         void setPickerLabelAlignment(const Qt::Alignment val);
         Qt::Alignment getPickerLabelAlignment()const ;
 
-        Itom1DQwt::tPlotPickerType getPickerType() const;
-        void setPickerType(const Itom1DQwt::tPlotPickerType val);
+        ItomQwtPlotEnums::PlotPickerType getPickerType() const;
+        void setPickerType(const ItomQwtPlotEnums::PlotPickerType val);
 
-        tSymbol getLineSymbol() const;
-        void setLineSymbol(const tSymbol symbol);
+        Symbol getLineSymbol() const;
+        void setLineSymbol(const Symbol symbol);
         void resetLineSymbol();
 
         int getLineSymbolSize() const;
@@ -334,69 +293,24 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         void setCurveFillColor(const QColor val);
         void resetCurveFillColor();
 
-        Itom1DQwt::tFillCurveStyle getCurveFilled() const;
-        void setCurveFilled(const Itom1DQwt::tFillCurveStyle state);
+        ItomQwtPlotEnums::FillCurveStyle getCurveFilled() const;
+        void setCurveFilled(const ItomQwtPlotEnums::FillCurveStyle state);
 
         void setCurveFillAlpha(const int val);
         int getCurveFillAlpha() const;
 
-        friend class Plot1DWidget;
+        friend Plot1DWidget;
 
     protected:
-        void createActions();
         ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
         Plot1DWidget *m_pContent;
-        InternalData *m_data;
+        InternalData *m_pData;
 
     private:
-        QAction* m_pActScaleSetting;
-        QAction* m_pRescaleParent;
-        QAction  *m_pActPan;
-        QAction  *m_pActZoomToRect;
-        QAction  *m_pActMarker;
-        QAction *m_pActAspectRatio;
-        QAction *m_pActSave;
-        QAction *m_pActSendCurrentToWorkspace;
-        QAction *m_pActCopyClipboard;
-        QAction *m_pActHome;
-        QMenu    *m_pMnuSetMarker;
-        QAction  *m_pActSetMarker;
-        QAction *m_pActForward;
-        QAction *m_pActBack;
-        QAction* m_pActCmplxSwitch;
-        QMenu *m_pMnuCmplxSwitch;
-        QAction *m_pActRGBSwitch;
-        QMenu *m_pMnuRGBSwitch;
-        QLabel *m_pLblMarkerOffsets;
-        QLabel *m_pLblMarkerCoords;
-        QActionGroup *m_pDrawModeActGroup;
-        QAction *m_pActClearDrawings;
-        QAction* m_pActDrawMode;
-        QMenu *m_pMnuDrawMode;
-        QAction *m_pActProperties;
-        QAction *m_pActGrid;
-        QAction *m_pActGridSettings;
-
-        QAction* m_pActMultiRowSwitch;
-        QAction* m_pActRGBA;
-        QAction* m_pActGray;
-        QAction* m_pActRGBL;
-        QAction* m_pActRGBAL;
-        QAction* m_pActRGBG;
-        QMenu *m_pMnuMultiRowSwitch;
-        QAction* m_pActXVAuto;
-        QAction* m_pActXVFR;
-        QAction* m_pActXVFC;
-        QAction* m_pActXVMR;
-        QAction* m_pActXVMC;
-        QAction* m_pActXVML;
-
-        char m_buttonSet;           //!> button set used, i.e. for light or dark themes
+        
 
         void constructor();
-
-        ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
 
     public slots:
         ito::RetVal setPicker(const QVector<int> &pxCords);
@@ -405,34 +319,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);
 
-        void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
-        ito::RetVal clearGeometricElements(void);
-
         QSharedPointer<ito::DataObject> getDisplayed(void);
-        
-        ito::RetVal setGeometricElementLabel(int id, QString label);
-        ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
 
     private slots:
-
-        void mnuMarkerClick(bool checked);
-        void mnuPanner(bool checked);
-        void mnuScaleSetting();
-        void mnuParentScaleSetting();
-        void mnuCmplxSwitch(QAction *action);
-        void mnuRGBSwitch(QAction *action);
-        void mnuMultiRowSwitch(QAction *action);
-        void mnuSetMarker(QAction *action);
-        void mnuZoomer(bool checked);
-        void mnuExport();
-
-        void mnuActRatio(bool checked);
-        void mnuDrawMode(QAction *action);
-        void mnuDrawMode(bool checked);
-
-        void mnuGridEnabled(bool checked);
-        void mnuHome();
-        void setPickerText(const QString &coords, const QString &offsets);
 
 };
 //----------------------------------------------------------------------------------------------------------------------------------

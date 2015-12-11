@@ -24,7 +24,7 @@
 #include "common/typeDefs.h"
 
 #include "DataObject/dataObjectFuncs.h"
-#include "itom2dqwtplotenums.h"
+#include "../sharedFiles/itomQwtPlotEnums.h"
 #include <qdebug.h>
 
 double DataObjRasterData::quietNaN = std::numeric_limits<double>::quiet_NaN();
@@ -380,38 +380,38 @@ double DataObjRasterData::value(double x, double y) const
                     }
                 case ito::tComplex64:
                     {
-                        if (m_pInternalData->m_cmplxType == Itom2DQwt::Real)
+                        if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                         {
                             return m_plane->at<ito::complex64>(m,n).real();
                         }
-                        if (m_pInternalData->m_cmplxType == Itom2DQwt::Imag)
+                        if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                         {
                             return m_plane->at<ito::complex64>(m,n).imag();
                         }
-                        if (m_pInternalData->m_cmplxType == Itom2DQwt::Phase)
+                        if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                         {
                             return std::arg( m_plane->at<ito::complex64>(m,n) );
                         }
-                        else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                        else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                         {
                             return std::abs( m_plane->at<ito::complex64>(m,n) );
                         }
                     }
                 case ito::tComplex128:
                     {                
-                        if (m_pInternalData->m_cmplxType == Itom2DQwt::Real)
+                        if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                         {
                             return m_plane->at<ito::complex128>(m,n).real();
                         }
-                        if (m_pInternalData->m_cmplxType == Itom2DQwt::Imag)
+                        if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                         {
                             return m_plane->at<ito::complex128>(m,n).imag();
                         }
-                        if (m_pInternalData->m_cmplxType == Itom2DQwt::Phase)
+                        if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                         {
                             return std::arg( m_plane->at<ito::complex128>(m,n) );
                         }
-                        else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                        else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                         {
                             return std::abs( m_plane->at<ito::complex128>(m,n) );
                         }
@@ -520,19 +520,19 @@ double DataObjRasterData::value2(int m, int n) const
                 if(!line) return quietNaN;
                 ito::complex64 i = line[ m_xIndizes[n] ];
 
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Real)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                 {
                     return line[ m_xIndizes[n] ].real();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Imag)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                 {
                     return line[ m_xIndizes[n] ].imag();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Phase)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                 {
                     return std::arg( line[ m_xIndizes[n] ] );
                 }
-                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                 {
                     return std::abs( line[ m_xIndizes[n] ] );
                 }
@@ -543,19 +543,19 @@ double DataObjRasterData::value2(int m, int n) const
                 if(!line) return quietNaN;
                 ito::complex128 i = line[ m_xIndizes[n] ];
                 
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Real)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                 {
                     return line[ m_xIndizes[n] ].real();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Imag)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                 {
                     return line[ m_xIndizes[n] ].imag();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Phase)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                 {
                     return std::arg( line[ m_xIndizes[n] ] );
                 }
-                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                 {
                     return std::abs( line[ m_xIndizes[n] ] );
                 }
@@ -639,19 +639,19 @@ double DataObjRasterData::value2_yinv(int m, int n) const
                 if(!line) return quietNaN;
                 ito::complex64 i = line[ m_xIndizes[n] ];
 
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Real)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                 {
                     return line[ m_xIndizes[n] ].real();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Imag)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                 {
                     return line[ m_xIndizes[n] ].imag();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Phase)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                 {
                     return std::arg( line[ m_xIndizes[n] ] );
                 }
-                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                 {
                     return std::abs( line[ m_xIndizes[n] ] );
                 }
@@ -662,19 +662,19 @@ double DataObjRasterData::value2_yinv(int m, int n) const
                 if(!line) return quietNaN;
                 ito::complex128 i = line[ m_xIndizes[n] ];
                 
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Real)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                 {
                     return line[ m_xIndizes[n] ].real();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Imag)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                 {
                     return line[ m_xIndizes[n] ].imag();
                 }
-                if (m_pInternalData->m_cmplxType == Itom2DQwt::Phase)
+                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                 {
                     return std::arg( line[ m_xIndizes[n] ] );
                 }
-                else //if (m_pInternalData->m_cmplxType == PlotCanvas::Abs)
+                else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                 {
                     return std::abs( line[ m_xIndizes[n] ] );
                 }

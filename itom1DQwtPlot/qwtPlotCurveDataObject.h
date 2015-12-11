@@ -40,21 +40,21 @@
 #include <qwt_plot_curve.h>
 #include <qpolygon.h>
 
-#include "itom1DQwtPlotEnums.h"
+#include "../sharedFiles/itomQwtPlotEnums.h"
 class QPainter;
 
 class QwtPlotCurveDataObject : public QwtPlotCurve
 {
 public:
 
-    explicit QwtPlotCurveDataObject( const QString &title = QString::null ) : QwtPlotCurve(title), m_privCurveFitter(NULL), m_curveFillState(Itom1DQwt::NoCurveFill) {}
+    explicit QwtPlotCurveDataObject( const QString &title = QString::null ) : QwtPlotCurve(title), m_privCurveFitter(NULL), m_curveFillState(ItomQwtPlotEnums::NoCurveFill) {}
     explicit QwtPlotCurveDataObject( const QwtText &title ) : QwtPlotCurve(title), m_privCurveFitter(NULL) {}
 
     virtual void draw( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect ) const;
 
     void setBrush( const QBrush &brush ) { m_privBrush = brush; QwtPlotCurve::setBrush(brush); }
     void setCurveFitter( QwtCurveFitter *curveFitter ) { m_privCurveFitter = curveFitter; QwtPlotCurve::setCurveFitter(curveFitter); }
-    void setCurveFilled(const Itom1DQwt::tFillCurveStyle state) {m_curveFillState = state;}
+    void setCurveFilled(const ItomQwtPlotEnums::FillCurveStyle state) {m_curveFillState = state;}
 
 protected:
     void drawSeries( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const;
@@ -76,7 +76,7 @@ private:
     //this is a hack in order to access PrivateData
     QBrush m_privBrush;
     QwtCurveFitter *m_privCurveFitter;
-    Itom1DQwt::tFillCurveStyle m_curveFillState;
+    ItomQwtPlotEnums::FillCurveStyle m_curveFillState;
 
 };
 

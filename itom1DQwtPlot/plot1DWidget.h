@@ -25,7 +25,6 @@
 
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
-#include "common/sharedStructuresPrimitives.h"
 #include "plot/AbstractFigure.h"
 
 #include <qwidget.h>
@@ -35,24 +34,21 @@
 #include <qpoint.h>
 #include <qtimer.h>
 #include <qcoreapplication.h>
-#include <qapplication.h>
 #include <qqueue.h>
 #include <qmenu.h>
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_grid.h>
-#include <qwt_plot_magnifier.h>
 #include <qwt_symbol.h>
 
 #include "valuepicker1d.h"
 
-#include "../sharedFiles/userInteractionPlotPicker.h"
-#include "../sharedFiles/drawItem.h"
 #include "../sharedFiles/itomQwtPlot.h"
 #include "itomPlotMarker.h"
 
 class Itom1DQwtPlot;
+class ItomQwtDObjFigure;
 class QwtLegend;
 struct InternalData;
 
@@ -61,16 +57,7 @@ class Plot1DWidget : public ItomQwtPlot
     Q_OBJECT
     public:
 
-        enum tState
-        { 
-            stateIdle   = 0, 
-            statePanner = 1, 
-            stateZoomer = 2, 
-            statePicker = 3,             
-            stateDrawShape = 4
-        };
-
-        Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
+        Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent = 0);
         ~Plot1DWidget();
 
         ito::RetVal init();
@@ -88,10 +75,10 @@ class Plot1DWidget : public ItomQwtPlot
         void setMainPickersToIndex(int idx1, int idx2, int curveIdx);
 
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
-        ito::RetVal deleteMarkers(const int id);
 
         ito::RetVal setPicker(const QVector<int> &pxCords);
         ito::RetVal setPicker(const QVector<float> &physCords);
+        ito::RetVal clearPickers();
 
         void setLegendPosition(LegendPosition position, bool visible);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
@@ -103,8 +90,20 @@ class Plot1DWidget : public ItomQwtPlot
 
         void setSymbolStyle(const QwtSymbol::Style style, int size);
 
-        friend class Itom1DQwtPlot;
-        friend class DrawItem;      
+        virtual void setButtonStyle(int style);
+
+        void synchronizeCurrentScaleValues();
+        void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
+        
+        void enableObjectGUIElements(const int mode);
+
+        int getPickerCount() const { return m_pickers.size(); }
+        QSharedPointer< ito::DataObject > getPlotPicker() const;
+
+        void setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx);
+        void setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx);
+
+        friend Itom1DQwtPlot;
 
     protected:
         void keyPressEvent ( QKeyEvent * event );
@@ -114,25 +113,25 @@ class Plot1DWidget : public ItomQwtPlot
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
-        void synchronizeCurrentScaleValues();
-        void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
+        void setPickerText(const QString &coords, const QString &offsets);
 
-        ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
+        
 
-        void setState(tState state, ito::PrimitiveContainer::tPrimitive shape = ito::PrimitiveContainer::tNoType);
         void updateColors(void);
         void updatePickerStyle(void);
 
         void setLineWidth(const qreal &width);
         void setLineStyle(const Qt::PenStyle &style);
-        void setQwtLineStyle(const Itom1DQwt::tCurveStyle &style);
+        void setQwtLineStyle(const ItomQwtPlotEnums::CurveStyle &style);
         void setBaseLine(const qreal &line);
         void setCurveFilled();
         //void setStickOrientation(const qreal &line);
-        void setDefaultValueScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine);
-        void setDefaultAxisScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine);
+        void setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
+        void setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
         void home();
+
+        void stateChanged(int state);
 
     private:
 
@@ -147,21 +146,12 @@ class Plot1DWidget : public ItomQwtPlot
         void stickPickerToXPx(Picker *m, double xScaleStart, int dir);
         void stickPickerToSampleIdx(Picker *m, int idx, int curveIdx, int dir);
         void updatePickerPosition(bool updatePositions, bool clear = false);
-
-        int getPickerCount() const {return m_pickers.size();}
-        QSharedPointer< ito::DataObject > getPlotPicker() const;
-
-        
+        void createActions();
 
         QList<QwtPlotCurve*> m_plotCurveItems;
-
         QwtPlotGrid *m_pPlotGrid;
-
         QwtLegend *m_pLegend;
         QStringList m_legendTitles;
-
-        QVector<ito::uint16> m_drawedIemsIndexes;
-
         QByteArray m_hash; //hash of recently loaded dataObject
 
         InternalData *m_pData;
@@ -178,7 +168,6 @@ class Plot1DWidget : public ItomQwtPlot
         qreal m_lineWidth;
         Qt::PenStyle m_lineStyle;
         int m_linePlotID;
-
         ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
 
         int m_Curser[2];
@@ -186,33 +175,57 @@ class Plot1DWidget : public ItomQwtPlot
 
         QStringList m_colorList;
 
-        QWidget *m_pParent;
-
         ValuePicker1D *m_pValuePicker;
 
         QList<Picker> m_pickers;
-
-        QMenu *m_pCmplxMenu;
-
-        QColor m_inverseColor0, m_inverseColor1;
-        int m_activeDrawItem;
-
-        UserInteractionPlotPicker *m_pMultiPointPicker;
-        bool m_ignoreNextMouseEvent;
-
+        
         LegendPosition m_legendPosition;
         bool m_legendVisible;
 
-        Itom1DQwt::tCurveStyle m_qwtCurveStyle;
+        ItomQwtPlotEnums::CurveStyle m_qwtCurveStyle;
 
         qreal m_baseLine;
+        bool m_hasParentForRescale;
+        int m_guiModeCache;
 
         QColor m_filledColor;
-        Itom1DQwt::tFillCurveStyle m_curveFilled;
+        ItomQwtPlotEnums::FillCurveStyle m_curveFilled;
         ito::uint8 m_fillCurveAlpa;
 
-        Itom1DQwt::ScaleEngine m_valueScale;
-        Itom1DQwt::ScaleEngine m_axisScale;
+        ItomQwtPlotEnums::ScaleEngine m_valueScale;
+        ItomQwtPlotEnums::ScaleEngine m_axisScale;
+
+        QVector<QPointF> m_currentBounds;
+
+        QAction* m_pActScaleSettings;
+        QAction* m_pRescaleParent;
+        QAction  *m_pActMarker;
+        QMenu    *m_pMnuSetMarker;
+        QAction  *m_pActSetMarker;
+        QAction *m_pActForward;
+        QAction *m_pActBack;
+        QAction *m_pActCmplxSwitch;
+        QMenu *m_pMnuCmplxSwitch;
+        QAction *m_pActRGBSwitch;
+        QMenu *m_pMnuRGBSwitch;
+        QLabel *m_pLblMarkerOffsets;
+        QLabel *m_pLblMarkerCoords;
+        QAction *m_pActGrid;
+        QAction *m_pActGridSettings;
+        QAction *m_pActMultiRowSwitch;
+        QMenu *m_pMnuMultiRowSwitch;
+
+        QAction* m_pActXVAuto;
+        QAction* m_pActXVFR;
+        QAction* m_pActXVFC;
+        QAction* m_pActXVMR;
+        QAction* m_pActXVMC;
+        QAction* m_pActXVML;
+        QAction* m_pActRGBA;
+        QAction* m_pActGray;
+        QAction* m_pActRGBL;
+        QAction* m_pActRGBAL;
+        QAction* m_pActRGBG;
 
     signals:
 
@@ -221,15 +234,20 @@ class Plot1DWidget : public ItomQwtPlot
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 
-        void setPickerText(const QString &coords, const QString &offsets);
-
     public slots:
         //void replot();
 
 
     private slots:
-        void multiPointActivated (bool on);
         void legendItemChecked(const QVariant &itemInfo, bool on);
+        void mnuCmplxSwitch(QAction*);
+        void mnuMultiRowSwitch(QAction*);
+        void mnuRGBSwitch(QAction*);
+        void mnuSetMarker(QAction *action);
+        void mnuParentScaleSetting();
+        void mnuGridEnabled(bool checked);
+        void mnuScaleSettings();
+        void mnuMarkerClick(bool checked);
         
 
 };
@@ -238,17 +256,15 @@ struct InternalData
 {
     InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
         m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
-        m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_elementsToPick(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
-        m_enablePlotting(true), m_lineSymboleSize(1), m_stateShapePrimitive(ito::PrimitiveContainer::tNoType)
+        m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0),  m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
+        m_lineSymboleSize(1), m_stateShapePrimitive(ito::PrimitiveContainer::tNoType)
     {
-        m_pDrawItems.clear();
-        m_state = Plot1DWidget::stateIdle;
-        m_multiLine = Itom1DQwt::AutoRowCol;
-        m_colorLine = Itom1DQwt::AutoColor;
+        m_multiLine = ItomQwtPlotEnums::AutoRowCol;
+        m_colorLine = ItomQwtPlotEnums::AutoColor;
         m_pickerLimit = 2;
 
         m_pickerLabelVisible = false;
-        m_pickerType = Itom1DQwt::DefaultMarker;
+        m_pickerType = ItomQwtPlotEnums::DefaultMarker;
         Qt::Orientation m_pickerLabelOrientation = Qt::Horizontal;
         m_pickerLabelAlignment = Qt::AlignRight;
 
@@ -259,24 +275,11 @@ struct InternalData
     }
 
     ~InternalData()
-    {
-        QList<int> keys = m_pDrawItems.keys();
-        for (int i = 0; i < keys.size(); i++)
-        {
-            if(m_pDrawItems[keys[i]] != NULL)
-            {
-                DrawItem *delItem = m_pDrawItems[keys[i]];
-                delItem->detach();
-                m_pDrawItems.remove(keys[i]);
-                delete delItem;          
-            }
-        }
-
-        m_pDrawItems.clear();    
+    { 
     }
+
     ito::tDataType m_dataType;
      
-    Plot1DWidget::tState m_state; //
     ito::PrimitiveContainer::tPrimitive m_stateShapePrimitive; /*!< geometric shape that is active is m_state is stateShape */
     int m_pickerLimit;
 
@@ -300,11 +303,8 @@ struct InternalData
     double m_axisMin;
     double m_axisMax;
 
-    int m_elementsToPick;
-    bool m_enablePlotting;
-
     bool m_pickerLabelVisible;
-    Itom1DQwt::tPlotPickerType m_pickerType;
+    ItomQwtPlotEnums::PlotPickerType m_pickerType;
     Qt::Orientation m_pickerLabelOrientation;
     Qt::Alignment m_pickerLabelAlignment;
 
@@ -318,9 +318,9 @@ struct InternalData
     //boundaries if values of dataObject changed.
     bool m_forceValueParsing; 
 
-    Itom1DQwt::tMultiLineMode m_multiLine;
-    Itom1DQwt::tColorHandling m_colorLine;
-    QHash<int, DrawItem *> m_pDrawItems;
+    ItomQwtPlotEnums::MultiLineMode m_multiLine;
+    ItomQwtPlotEnums::ColorHandling m_colorLine;
+    
     QwtSymbol::Style m_lineSymbole;
     int m_lineSymboleSize;
 };
