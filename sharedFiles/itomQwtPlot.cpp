@@ -1489,7 +1489,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                 if (m)
                 {
-                    m->setMaxNrItems(2);
+                    m->setMaxNrItems(1);
                     m_pMultiPointPicker->setEnabled(true);
 
                     if (!aborted)
