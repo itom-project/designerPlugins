@@ -90,8 +90,8 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_pActForward(NULL),
         m_pActBack(NULL),
         m_pActPicker(NULL),
-        m_pMnuSetMarker(NULL),
-        m_pActSetMarker(NULL),
+        m_pMnuSetPicker(NULL),
+        m_pActSetPicker(NULL),
         m_pMnuCmplxSwitch(NULL),
         m_pMnuRGBSwitch(NULL),
         m_pLblMarkerOffsets(NULL),
@@ -169,7 +169,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     // first block is zoom, scale settings, home
     mainTb->addSeparator();
     mainTb->addAction(m_pActPicker);
-    mainTb->addAction(m_pActSetMarker);
+    mainTb->addAction(m_pActSetPicker);
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
     mainTb->addAction(m_pActClearShapes);
@@ -209,7 +209,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuTools->addAction(m_pActSendCurrentToWorkspace);
     menuTools->addSeparator();
     menuTools->addAction(m_pActPicker);
-    menuTools->addAction(m_pActSetMarker);
+    menuTools->addAction(m_pActSetPicker);
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
     menuTools->addAction(m_pActClearShapes);
@@ -352,18 +352,26 @@ void Plot1DWidget::createActions()
     m_pActBack->setVisible(false);
 
     //m_actMarker
-    m_pActPicker = a = new QAction(tr("Marker"), p);
-    a->setObjectName("actionMarker");
+    m_pActPicker = a = new QAction(tr("Picker"), p);
+    a->setObjectName("actionPicker");
     a->setCheckable(true);
     a->setChecked(false);
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuPickerClick(bool)));
 
     //m_actSetMarker
-    m_pActSetMarker = new QAction(tr("Set Markers to"), p);
-    m_pMnuSetMarker = new QMenu("Marker Switch");
-    m_pMnuSetMarker->addAction(tr("To Min-Max"));
-    m_pActSetMarker->setMenu(m_pMnuSetMarker);
-    connect(m_pMnuSetMarker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetMarker(QAction*)));
+    m_pActSetPicker = new QAction(tr("Set Pickers..."), p);
+    m_pMnuSetPicker = new QMenu("Picker Switch");
+    m_pActSetPicker->setMenu(m_pMnuSetPicker);
+
+    a = m_pMnuSetPicker->addAction(tr("To Min-Max"));
+    a->setToolTip(tr("set two pickers to absolute minimum and maximum of (first) curve"));
+    a->setData(0);
+
+    a = m_pMnuSetPicker->addAction(tr("Delete Pickers"));
+    a->setToolTip(tr("delete all pickers"));
+    a->setData(1);
+    
+    connect(m_pMnuSetPicker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetPicker(QAction*)));
 
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(tr("Complex Switch"), p);
@@ -421,12 +429,12 @@ void Plot1DWidget::createActions()
 
     //Labels for current cursor position
     m_pLblMarkerCoords = new QLabel("    \n    ", p);
-    m_pLblMarkerCoords->setAlignment(Qt::AlignRight | Qt::AlignTop);
+    m_pLblMarkerCoords->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_pLblMarkerCoords->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
     m_pLblMarkerCoords->setObjectName(tr("Marker Positions"));
 
     m_pLblMarkerOffsets = new QLabel("    \n    ", p);
-    m_pLblMarkerOffsets->setAlignment(Qt::AlignRight | Qt::AlignTop);
+    m_pLblMarkerOffsets->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_pLblMarkerOffsets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
     m_pLblMarkerOffsets->setObjectName(tr("Marker Offsets"));
 
@@ -450,7 +458,8 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general/icons/forward.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general/icons/back.png"));
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker.png"));
-        m_pActSetMarker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
+        m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
+        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
         m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
@@ -491,7 +500,8 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/forward_lt.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"));
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_lt.png"));
-        m_pActSetMarker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
+        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_lt.png"));
+        m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
         m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yv_plot_lt.png"));
@@ -2083,8 +2093,8 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     QString coords, offsets;
     if (points.size() > 1)
     {
-        coords = QString("[%1; %2]\n [%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
-        offsets = QString("dx = %1\n dy = %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
+        coords = QString("[%1; %2]\n[%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
+        offsets = QString(" width: %1\n height: %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
     }
     else if (points.size() == 1)
     {
@@ -2092,6 +2102,8 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     }
 
     setPickerText(coords,offsets);
+
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2881,28 +2893,35 @@ void Plot1DWidget::mnuParentScaleSetting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mnuSetMarker(QAction *action)
+void Plot1DWidget::mnuSetPicker(QAction *action)
 {
-    if (m_plotCurveItems.size() > 0)
+    if (action->data().toInt() == 0) //set to min..max
     {
-        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-
-        if (action->text() == QString(tr("To Min-Max")))
+        if (m_plotCurveItems.size() > 0)
         {
-            ito::float64 minVal, maxVal;
-            int minLoc, maxLoc;
-            if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
+            DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
+
+            if (action->text() == QString(tr("To Min-Max")))
             {
-                if (minLoc < maxLoc)
+                ito::float64 minVal, maxVal;
+                int minLoc, maxLoc;
+                if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
                 {
-                    setMainPickersToIndex(minLoc, maxLoc, 0);
-                }
-                else
-                {
-                    setMainPickersToIndex(maxLoc, minLoc, 0);
+                    if (minLoc < maxLoc)
+                    {
+                        setMainPickersToIndex(minLoc, maxLoc, 0);
+                    }
+                    else
+                    {
+                        setMainPickersToIndex(maxLoc, minLoc, 0);
+                    }
                 }
             }
         }
+    }
+    else //delete
+    {
+        clearPicker(-1, true);
     }
 }
 

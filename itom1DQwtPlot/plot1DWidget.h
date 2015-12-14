@@ -197,8 +197,8 @@ class Plot1DWidget : public ItomQwtPlot
         QAction* m_pActScaleSettings;
         QAction* m_pRescaleParent;
         QAction  *m_pActPicker;
-        QMenu    *m_pMnuSetMarker;
-        QAction  *m_pActSetMarker;
+        QMenu    *m_pMnuSetPicker;
+        QAction  *m_pActSetPicker;
         QAction *m_pActForward;
         QAction *m_pActBack;
         QAction *m_pActCmplxSwitch;
@@ -240,7 +240,7 @@ class Plot1DWidget : public ItomQwtPlot
         void mnuCmplxSwitch(QAction*);
         void mnuMultiRowSwitch(QAction*);
         void mnuRGBSwitch(QAction*);
-        void mnuSetMarker(QAction *action);
+        void mnuSetPicker(QAction *action);
         void mnuParentScaleSetting();
         void mnuGridEnabled(bool checked);
         void mnuScaleSettings();
