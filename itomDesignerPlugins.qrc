@@ -43,6 +43,7 @@
         <file>icons/colorbar.png</file>
         <file>icons/colorPalette.png</file>
         <file>icons/marker.png</file>
+        <file>icons/picker.png</file>
         <file>icons/ellipse.png</file>
         <file>icons/rectangle.png</file>
         <file>icons/point.png</file>
@@ -67,6 +68,7 @@
         <file>icons/colorbar_lt.png</file>
         <file>icons/colorPalette_lt.png</file>
         <file>icons/marker_lt.png</file>
+        <file>icons/picker_lt.png</file>
         <file>icons/ellipse_lt.png</file>
         <file>icons/rectangle_lt.png</file>
         <file>icons/point_lt.png</file>
@@ -106,6 +108,7 @@
         <file>icons/forward_lt.png</file>
         <file>icons/home_lt.png</file>
         <file>icons/marker_lt.png</file>
+        <file>icons/crosshairs_lt.png</file>
         <file>icons/move_lt.png</file>
         <file>icons/subplots_lt.png</file>
         <file>icons/zoom_to_rect_lt.png</file>

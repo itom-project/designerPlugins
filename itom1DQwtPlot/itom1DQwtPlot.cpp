@@ -154,7 +154,7 @@ int Itom1DQwtPlot::getPickerLimit(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerLimit(const int idx)
 {
-    if (m_pData) m_pData->m_pickerLimit = idx;
+    if (m_pData) m_pData->m_pickerLimit = std::max(0,idx);
     updatePropertyDock();
 }
 
@@ -846,23 +846,33 @@ void Itom1DQwtPlot::setTextColor(const QColor newVal)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::setPicker(const QVector<int> &pxCords)
+ito::RetVal Itom1DQwtPlot::setPicker(const QVector<double> &coords, int curveIndex /*= 0*/, bool physicalCoordinates /*= true*/)
 {
     if (!m_pContent)
     {
-        return ito::RetVal(ito::retError, 0, tr("Set picker failed, canvas handle not initilized").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initilized").toLatin1().data());
     }
-    return m_pContent->setPicker(pxCords);
+    return m_pContent->setPicker(coords, curveIndex, physicalCoordinates, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::setPicker(const QVector<float> &physCords)
+ito::RetVal Itom1DQwtPlot::appendPicker(const QVector<double> &coords, int curveIndex /*= 0*/, bool physicalCoordinates /*= true*/)
 {
     if (!m_pContent)
     {
-        return ito::RetVal(ito::retError, 0, tr("Set picker failed, canvas handle not initilized").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initilized").toLatin1().data());
     }
-    return m_pContent->setPicker(physCords);
+    return m_pContent->setPicker(coords, curveIndex, physicalCoordinates, true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom1DQwtPlot::deletePicker(int id /*= -1*/)
+{
+    if (!m_pContent)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Delete picker failed, since canvas not initilized").toLatin1().data());
+    }
+    return m_pContent->clearPicker(id);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -89,7 +89,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_pRescaleParent(NULL),
         m_pActForward(NULL),
         m_pActBack(NULL),
-        m_pActMarker(NULL),
+        m_pActPicker(NULL),
         m_pMnuSetMarker(NULL),
         m_pActSetMarker(NULL),
         m_pMnuCmplxSwitch(NULL),
@@ -168,7 +168,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addAction(m_pActRGBSwitch);
     // first block is zoom, scale settings, home
     mainTb->addSeparator();
-    mainTb->addAction(m_pActMarker);
+    mainTb->addAction(m_pActPicker);
     mainTb->addAction(m_pActSetMarker);
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
@@ -208,7 +208,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuTools->addAction(m_pActCopyClipboard);
     menuTools->addAction(m_pActSendCurrentToWorkspace);
     menuTools->addSeparator();
-    menuTools->addAction(m_pActMarker);
+    menuTools->addAction(m_pActPicker);
     menuTools->addAction(m_pActSetMarker);
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
@@ -226,7 +226,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pContextMenu->addSeparator();
     m_pContextMenu->addAction(m_pActPan);
     m_pContextMenu->addAction(m_pActZoom);
-    m_pContextMenu->addAction(m_pActMarker);
+    m_pContextMenu->addAction(m_pActPicker);
     m_pContextMenu->addSeparator();
     m_pContextMenu->addAction(mainTb->toggleViewAction());
 }
@@ -352,11 +352,11 @@ void Plot1DWidget::createActions()
     m_pActBack->setVisible(false);
 
     //m_actMarker
-    m_pActMarker = a = new QAction(tr("Marker"), p);
+    m_pActPicker = a = new QAction(tr("Marker"), p);
     a->setObjectName("actionMarker");
     a->setCheckable(true);
     a->setChecked(false);
-    connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
+    connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuPickerClick(bool)));
 
     //m_actSetMarker
     m_pActSetMarker = new QAction(tr("Set Markers to"), p);
@@ -449,7 +449,7 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pRescaleParent->setIcon(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"));
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general/icons/forward.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general/icons/back.png"));
-        m_pActMarker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/marker.png"));
+        m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker.png"));
         m_pActSetMarker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
@@ -490,7 +490,7 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pRescaleParent->setIcon(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale_lt.png"));
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/forward_lt.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"));
-        m_pActMarker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
+        m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_lt.png"));
         m_pActSetMarker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
@@ -841,7 +841,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         //if this 1d plot is based on bounds (hence, a line cut or similar of a 2d cut, all pickers should be deleted if the boundaries changed)
         if (bounds.size() != m_currentBounds.size())
         {
-            clearPickers();
+            clearPicker(-1, false);
             m_currentBounds = bounds;
         }
         else
@@ -850,7 +850,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             {
                 if (bounds[i] != m_currentBounds[i])
                 {
-                    clearPickers();
+                    clearPicker(-1, false);
                     m_currentBounds = bounds;
                     break;
                 }
@@ -1420,7 +1420,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                 if (m->active)
                 {
                     m->curveIdx--;
-                    if (m->curveIdx <= 0) m->curveIdx = curves-1;
+                    if (m->curveIdx < 0) m->curveIdx = curves-1;
                     stickPickerToXPx(m, m->item->xValue(), 0);
                 }
             }
@@ -1466,7 +1466,7 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
         double xScale = invTransform(xBottom, xPx);
-//        double yScale = invTransform(yLeft, yPx);
+        //double yScale = invTransform(yLeft, yPx);
         bool closeToPicker = false;
 
         if (event->button() == Qt::LeftButton)
@@ -1497,8 +1497,26 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
                 picker.active = true;
                 //marker.color = Qt::darkGreen;
                 //marker.item->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::white), QPen(marker.color,1),  QSize(8,8)));
+
+                //check which curve is the closest to the cursor:
+                DataObjectSeriesData *data = NULL;
+                int sampleIdx;
+                int curveIdx = 0;
+                double dist = std::numeric_limits<double>::max();
+                double currentDist;
+                for (int i = 0; i < m_plotCurveItems.size(); ++i)
+                {
+                    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[i]->data());
+                    sampleIdx = qBound(0, data->getPosToPix(xScale), (int)data->size() - 1);
+                    currentDist = std::abs(transform(yLeft, data->sample(sampleIdx).ry()) - yPx);
+                    if (currentDist < dist)
+                    {
+                        dist = currentDist;
+                        curveIdx = i;
+                    }
+                }
                 
-                picker.curveIdx = 0;
+                picker.curveIdx = curveIdx;
                 stickPickerToXPx(&picker, xScale, 0);
 
                 picker.item->setVisible(true);
@@ -1617,12 +1635,12 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
         if (i == 0)
         {
             m_pickers[0].active = true;
-            stickPickerToSampleIdx(&(m_pickers[0]), idx1, curveIdx, 0);
+            stickPickerToSampleIdx(&(m_pickers[0]), idx1, 0);
         }
         else if (i == 1)
         {
             m_pickers[1].active = false;
-            stickPickerToSampleIdx(&(m_pickers[1]), idx2, curveIdx, 0);
+            stickPickerToSampleIdx(&(m_pickers[1]), idx2, 0);
         }
         else
         {
@@ -1754,9 +1772,9 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir) //di
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int curveIdx, int dir)
+void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int dir)
 {
-    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[curveIdx]->data());
+    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
 
     int thisIdx = idx;
     int s = (int)data->size();
@@ -2081,8 +2099,8 @@ void Plot1DWidget::stateChanged(int state)
 {
     if (m_pValuePicker) m_pValuePicker->setEnabled(state == stateValuePicker);
 
-    m_pActMarker->setEnabled(state != stateDrawShape);
-    m_pActMarker->setChecked(state == stateValuePicker);
+    m_pActPicker->setEnabled(state != stateDrawShape);
+    m_pActPicker->setChecked(state == stateValuePicker);
 
     switch (state)
     {
@@ -2130,31 +2148,32 @@ void Plot1DWidget::home()
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Plot1DWidget::getPlotPicker() const
 {
-    int ysize = m_pickers.size();
-    int xsize = 3;
-
-    if (ysize == 0)
+    if (m_pickers.size() == 0)
     {
         return QSharedPointer< ito::DataObject >(new ito::DataObject());
     }
 
-    ito::DataObject tmp(ysize, xsize, ito::tFloat32);
+    ito::DataObject tmp(m_pickers.size(), 4, ito::tFloat32);
+    ito::float32 *rowPtr;
 
-    for (int idx = 0; idx < ysize; idx++)
+    for (int idx = 0; idx < m_pickers.size(); idx++)
     {
+        rowPtr = tmp.rowPtr<ito::float32>(0, idx);
+
         ito::float64 xScaleStart = (m_pickers[idx]).item->xValue();
         ito::float64 yValue = (m_pickers[idx]).item->yValue();
-        tmp.at<ito::float32>(idx, 1) = cv::saturate_cast<ito::float32>(xScaleStart);
-        tmp.at<ito::float32>(idx, 2) = cv::saturate_cast<ito::float32>(yValue);
+        rowPtr[1] = cv::saturate_cast<ito::float32>(xScaleStart);
+        rowPtr[2] = cv::saturate_cast<ito::float32>(yValue);
+        rowPtr[3] = m_pickers[idx].curveIdx;
 
         if ((m_pickers[idx]).curveIdx < 0 || (m_pickers[idx]).curveIdx > m_plotCurveItems.size() - 1)
+        {
+            rowPtr[0] = std::numeric_limits<ito::float32>::quiet_NaN();
             continue;
+        }
 
         DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[(m_pickers[idx]).curveIdx]->data());
-
-        int thisIdx = data->getPosToPix(xScaleStart);
-        tmp.at<ito::float32>(idx, 0) = cv::saturate_cast<ito::float32>(thisIdx);
-
+        rowPtr[0] = cv::saturate_cast<ito::float32>(data->getPosToPix(xScaleStart));
     }
 
     QSharedPointer< ito::DataObject > exportItem(new ito::DataObject(tmp));
@@ -2163,83 +2182,105 @@ QSharedPointer< ito::DataObject > Plot1DWidget::getPlotPicker() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::setPicker(const QVector<int> &pxCords)
+ito::RetVal Plot1DWidget::setPicker(const QVector<double> &coords, int curveIndex /*= 0*/, bool physNotPix /*= true*/, bool append /*= false*/)
 {
-    int cnt = pxCords.size();
-    if (cnt < m_pData->m_pickerLimit)
-        cnt = m_pData->m_pickerLimit;
+    ito::RetVal retVal;
 
-    for (int i = 0; i < cnt; i++)
+    if (curveIndex < 0 || curveIndex >= m_plotCurveItems.size())
     {
-        if (i > m_pickers.size() - 1)
+        retVal += ito::RetVal::format(ito::retError, 0, "curveIndex out of bounds [0,%i]", m_plotCurveItems.size() - 1);
+    }
+    else if (!append)
+    {
+        retVal += clearPicker(-1, false);
+    }
+
+    if (coords.size() > (m_pData->m_pickerLimit - m_pickers.size()))
+    {
+        retVal += ito::RetVal::format(ito::retError, 0, "number of new pickers exceed the given picker limit of %i", m_pData->m_pickerLimit);
+    }
+
+    if (!retVal.containsError())
+    {
+        int cnt = std::min(coords.size(), m_pData->m_pickerLimit);
+        int coord_px;
+
+        for (int i = 0; i < cnt; i++)
         {
+            if (i > m_pickers.size() - 1)
+            {
                 Picker picker;
-                picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
-                                                 m_pData->m_pickerType, 
-                                                 m_pData->m_pickerLabelAlignment, 
-                                                 m_pData->m_pickerLabelOrientation);
+                picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible,
+                    m_pData->m_pickerType,
+                    m_pData->m_pickerLabelAlignment,
+                    m_pData->m_pickerLabelOrientation);
                 picker.item->attach(this);
                 picker.active = true;
-                //marker.color = Qt::darkGreen;
-                //marker.item->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::white), QPen(marker.color,1),  QSize(8,8)));
-                
-                picker.curveIdx = 0;
-                stickPickerToSampleIdx(&picker, pxCords[i] < 0 ? 0 : pxCords[i], 0, 0);
+                picker.curveIdx = curveIndex;
+
+                if (physNotPix)
+                {
+                    stickPickerToXPx(&picker, coords[i], 0);
+                }
+                else
+                {
+                    coord_px = qRound(coords[i]);
+                    stickPickerToSampleIdx(&picker, coord_px < 0 ? 0 : coord_px, 0);
+                }
+
                 picker.item->setVisible(true);
-                
+
                 m_pickers.append(picker);
-        }
-        else
-        {
-            stickPickerToSampleIdx(&(m_pickers[i]), pxCords[i] < 0 ? 0 : pxCords[i], 0, 0);
+            }
+            else
+            {
+                if (physNotPix)
+                {
+                    stickPickerToXPx(&(m_pickers[i]), coords[i], 0);
+                }
+                else
+                {
+                    coord_px = qRound(coords[i]);
+                    stickPickerToSampleIdx(&(m_pickers[i]), coord_px < 0 ? 0 : coord_px, 0);
+                }
+            }
         }
         
     }
+
     updatePickerPosition(false, false);
-    return ito::retOk;
+    replot();
+
+    return retVal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::setPicker(const QVector<float> &physCords)
+ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= true*/)
 {
-    int cnt = physCords.size();
-    if (cnt < m_pData->m_pickerLimit)
-        cnt = m_pData->m_pickerLimit;
-
-    for (int i = 0; i < cnt; i++)
+    if (id == -1)
     {
-        if (i > m_pickers.size() - 1)
+        foreach(Picker m, m_pickers)
         {
-                Picker picker;
-                picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
-                                                 m_pData->m_pickerType, 
-                                                 m_pData->m_pickerLabelAlignment, 
-                                                 m_pData->m_pickerLabelOrientation);
-                picker.item->attach(this);
-                picker.active = true;
-                //picker.color = Qt::darkGreen;
-                //picker.item->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::white), QPen(marker.color,1),  QSize(8,8)));
-                
-                picker.curveIdx = 0;
-                stickPickerToXPx(&picker, physCords[i], 0);
-
-                picker.item->setVisible(true);
-                
-                m_pickers.append(picker);
+            m.item->detach();
+            delete m.item;
         }
-        else
-        {
-            stickPickerToXPx(&(m_pickers[i]), physCords[i], 0);
-        }
+        m_pickers.clear();
     }
-    updatePickerPosition(false, false);
-    return ito::retOk;
-}
+    else if (id < 0 || id >= m_pickers.size())
+    {
+        return ito::RetVal::format(ito::retError, 0, "id out of range [0,%i]", m_pickers.size() - 1);
+    }
+    else
+    {
+        m_pickers[id].item->detach();
+        delete m_pickers[id].item;
+        m_pickers.removeAt(id);
+    }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::clearPickers()
-{
-    updatePickerPosition(false, true);
+    updatePickerPosition(false, false);
+    if (doReplot)
+        replot();
+
     return ito::retOk;
 }
 
@@ -2786,7 +2827,7 @@ void Plot1DWidget::mnuRGBSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mnuMarkerClick(bool checked)
+void Plot1DWidget::mnuPickerClick(bool checked)
 {
     if (checked)
     {

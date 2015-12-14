@@ -122,7 +122,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     
     Q_CLASSINFO("prop://pickerLimit", "Define the maximal number of picker for this plot.")
     Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
-    Q_CLASSINFO("prop://picker", "Get picker defined by a float32[3] array for each element containing [pixelIndex, physIndex, value].")
+    Q_CLASSINFO("prop://picker", "Get picker defined by a Mx4 float32 data object. Each row represents one picker and contains the following information: [pixelIndex, physIndex, value, curveIndex]. PixelIndex and physIndex are equal if axisScale = 1 and axisOffset = 0 for the corresponding dataObject.")
 
     Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
     
@@ -142,9 +142,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     
 
-    Q_CLASSINFO("slot://setPicker", "Set the position of a plot picker either in physical or in pixel coordinates")
-    Q_CLASSINFO("slot://plotMarkers", "Delete a specific marker")
+    Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical or in pixel coordinates. The coordinates are the axis positions only, the values are chosen from the curve values. Existing pickers are deleted at first.")
+    Q_CLASSINFO("slot://appendPicker", "Append plot pickers to a specific curve either in physical or in pixel coordinates. The coordinates are the axis positions only, the values are chosen from the curve values.")
+    Q_CLASSINFO("slot://plotMarkers", "Plot markers.")
     Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
+    Q_CLASSINFO("slot://deletePicker", "Delete a specific (id >= 0) or all pickers (id = -1)")
     
     Q_CLASSINFO("slot://getDisplayed", "")
 
@@ -313,11 +315,13 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         void constructor();
 
     public slots:
-        ito::RetVal setPicker(const QVector<int> &pxCords);
-        ito::RetVal setPicker(const QVector<float> &physCords);
+        ito::RetVal setPicker(const QVector<double> &coords, int curveIndex = 0, bool physicalCoordinates = true);
+        ito::RetVal appendPicker(const QVector<double> &coords, int curveIndex = 0, bool physicalCoordinates = true);
+        ito::RetVal deletePicker(int id = -1);
 
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);
+        
 
         QSharedPointer<ito::DataObject> getDisplayed(void);
 

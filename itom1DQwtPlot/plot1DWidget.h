@@ -76,9 +76,8 @@ class Plot1DWidget : public ItomQwtPlot
 
         ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
 
-        ito::RetVal setPicker(const QVector<int> &pxCords);
-        ito::RetVal setPicker(const QVector<float> &physCords);
-        ito::RetVal clearPickers();
+        ito::RetVal setPicker(const QVector<double> &coords, int curveIndex = 0, bool physNotPix = true, bool append = false);
+        ito::RetVal clearPicker(int id = -1, bool doReplot = true);
 
         void setLegendPosition(LegendPosition position, bool visible);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
@@ -115,8 +114,6 @@ class Plot1DWidget : public ItomQwtPlot
         void updateLabels();
         void setPickerText(const QString &coords, const QString &offsets);
 
-        
-
         void updateColors(void);
         void updatePickerStyle(void);
 
@@ -144,7 +141,7 @@ class Plot1DWidget : public ItomQwtPlot
         };
 
         void stickPickerToXPx(Picker *m, double xScaleStart, int dir);
-        void stickPickerToSampleIdx(Picker *m, int idx, int curveIdx, int dir);
+        void stickPickerToSampleIdx(Picker *m, int idx, int dir);
         void updatePickerPosition(bool updatePositions, bool clear = false);
         void createActions();
 
@@ -199,7 +196,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         QAction* m_pActScaleSettings;
         QAction* m_pRescaleParent;
-        QAction  *m_pActMarker;
+        QAction  *m_pActPicker;
         QMenu    *m_pMnuSetMarker;
         QAction  *m_pActSetMarker;
         QAction *m_pActForward;
@@ -247,7 +244,7 @@ class Plot1DWidget : public ItomQwtPlot
         void mnuParentScaleSetting();
         void mnuGridEnabled(bool checked);
         void mnuScaleSettings();
-        void mnuMarkerClick(bool checked);
+        void mnuPickerClick(bool checked);
         
 
 };
