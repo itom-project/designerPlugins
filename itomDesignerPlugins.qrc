@@ -90,6 +90,7 @@
         <file>icons/forward.png</file>
         <file>icons/home.png</file>
         <file>icons/marker.png</file>
+        <file>icons/crosshairs.png</file>
         <file>icons/move.png</file>
         <file>icons/subplots.png</file>
         <file>icons/zoom_to_rect.png</file>

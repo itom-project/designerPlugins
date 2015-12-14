@@ -366,7 +366,7 @@ void ItomQwtPlot::setButtonStyle(int style)
         {
             default:
             case ito::PrimitiveContainer::tPoint:
-                m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+                m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/point.png"));
                 break;
             case ito::PrimitiveContainer::tLine:
                 m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
@@ -399,7 +399,7 @@ void ItomQwtPlot::setButtonStyle(int style)
         {
         default:
         case ito::PrimitiveContainer::tPoint:
-            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker_lt.png"));
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/point_lt.png"));
             break;
         case ito::PrimitiveContainer::tLine:
             m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline_lt.png"));
@@ -664,7 +664,7 @@ void ItomQwtPlot::setState(int state)
                 {
                 default:
                 case ito::PrimitiveContainer::tPoint:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/marker.png" : ":/itomDesignerPlugins/plot/icons/marker_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/point.png" : ":/itomDesignerPlugins/plot/icons/point_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;

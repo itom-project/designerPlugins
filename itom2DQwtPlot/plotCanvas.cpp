@@ -435,11 +435,12 @@ void PlotCanvas::createActions()
     m_pActToggleColorBar = a = new QAction(tr("Show Colorbar"), p);
     a->setCheckable(true);
     a->setObjectName("actShowColorBar");
-    a->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
+    a->setToolTip(tr("Toggle visibility of the color bar on the right side"));
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuToggleColorBar(bool)));
 
     //m_actMarker
     m_pActValuePicker = a = new QAction(tr("Marker"), p);
+    a->setToolTip(tr("Show current coordinates at mouse cursor"));
     a->setObjectName("actValuePicker");
     a->setCheckable(true);
     a->setChecked(false);
@@ -449,7 +450,7 @@ void PlotCanvas::createActions()
     m_pActLineCut = a = new QAction(tr("Linecut"), p);
     a->setCheckable(true);
     a->setObjectName("actLineCut");
-    a->setToolTip(tr("Show a in plane line cut"));
+    a->setToolTip(tr("Show a 1D line cut (in-plane)"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuLineCut(bool)));
 
     //m_pActLineCutMode
@@ -505,7 +506,7 @@ void PlotCanvas::createActions()
     //m_pActCntrMarker
     m_pActCntrMarker = a = new QAction(tr("Center marker"), p);
     a->setObjectName("actCenterMarker");
-    a->setToolTip(tr("Show a marker at data object center"));
+    a->setToolTip(tr("Display a cross at data object's center"));
     a->setCheckable(true);
     a->setVisible(true);
     a->setChecked(false);
@@ -546,7 +547,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"));
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
-        m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/marker.png"));
+        m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
