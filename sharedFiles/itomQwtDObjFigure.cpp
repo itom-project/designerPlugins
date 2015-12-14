@@ -363,9 +363,6 @@ void ItomQwtDObjFigure::setMarkerLabelsVisible(const bool &visible)
     updatePropertyDock();
 }
 
-ito::RetVal plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id = QString::Null(), int plane = -1);
-ito::RetVal deleteMarkers(QString id);
-
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtDObjFigure::deleteMarkers(int id) //deprecated
 {
