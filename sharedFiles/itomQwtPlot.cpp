@@ -2538,7 +2538,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
 ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coordinates, const QString &style, const QString &id, int plane)
 {
     ito::RetVal retval;
-    int limits[] = { 0, std::numeric_limits<int>::max(), 2, 2 };
+    int limits[] = { 2, 2, 0, std::numeric_limits<int>::max() };
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -2546,19 +2546,7 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         return ito::RetVal(ito::retError, 0, tr("Could not plot marker, api is missing").toLatin1().data());
     }
 
-    ito::DataObject *dObj = NULL;
-
-    if (coordinates->getDims() == 2 && coordinates->getSize(0) == 2 && coordinates->getSize(1) != 2)
-    {
-        QString err = tr("Coordinates of markers must be a Nx2 data object where each line is the (x,y) coordinate of the marker. This behaviour changed since version 2.0 of itom1dqwtplot and itom2dqwtplot in order to unify all markers and geometric shapes.");
-        retval += ito::RetVal(ito::retWarning, 0, err.toLatin1().data());
-        ito::DataObject trans = coordinates.data()->trans();
-        dObj = apiCreateFromDataObject(&trans, 2, ito::tFloat32, limits, &retval);
-    }
-    else
-    {
-        dObj = apiCreateFromDataObject(coordinates.data(), 2, ito::tFloat32, limits, &retval);
-    }
+    ito::DataObject *dObj = apiCreateFromDataObject(coordinates.data(), 2, ito::tFloat32, limits, &retval);
 
     if (!retval.containsError())
     {
@@ -2616,18 +2604,18 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         }
 
         QwtPlotMarker *marker = NULL;
-        int nrOfMarkers = dObj->getSize(0);
+        int nrOfMarkers = dObj->getSize(1);
 
         const cv::Mat *mat = dObj->getCvPlaneMat(0);
 
-        const ito::float32 *row;
+        const ito::float32 *xRow = mat->ptr<const ito::float32>(0);
+        const ito::float32 *yRow = mat->ptr<const ito::float32>(1);
 
         for (int i = 0; i < nrOfMarkers; ++i)
         {
-            row = mat->ptr<const ito::float32>(i);
             marker = new QwtPlotMarker();
             marker->setSymbol(new QwtSymbol(symStyle, symBrush, symPen, symSize));
-            marker->setValue(row[0], row[1]);
+            marker->setValue(xRow[i], yRow[i]);
             marker->attach(this);
             if (m_markerLabelVisible)
             {

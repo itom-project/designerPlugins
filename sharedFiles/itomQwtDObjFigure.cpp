@@ -375,9 +375,9 @@ ito::RetVal ItomQwtDObjFigure::deleteMarkers(int id) //deprecated
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtDObjFigure::plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
-    if (coords->getDims() == 2 && coords->getSize(1) >= 6)
+    if (coords->getDims() == 2 && coords->getSize(0) != 2)
     {
-        ito::RetVal retval(ito::retWarning, 0, "slot 'plotMarkers' is deprecated for drawing geometric shapes. Use slot 'setGeometricElements' instead.");
+        ito::RetVal retval(ito::retWarning, 0, "The height of the given data object is != 2. This is not allowed to plot markers. If you intend to plot geometric shapes, use the slot 'setGeometricElements' instead.");
         retval += setGeometricElements(coords);
         return retval;
     }
