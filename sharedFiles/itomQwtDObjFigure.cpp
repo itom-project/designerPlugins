@@ -390,7 +390,7 @@ ito::RetVal ItomQwtDObjFigure::plotMarkers(QSharedPointer< ito::DataObject > coo
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::deleteMarkers(QString id)
+ito::RetVal ItomQwtDObjFigure::deleteMarkers(QString id /*= ""*/)
 {
     if (m_pBaseContent)
     {

@@ -89,7 +89,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
     Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
     Q_CLASSINFO("slot://plotMarkers", "")
-    Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")
+    Q_CLASSINFO("slot://deleteMarkers", "Delete all sets of markers with given name or all markers if no or an empty name is passed.")
 
     Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.")
     Q_CLASSINFO("signal://userInteractionDone", "")
@@ -159,7 +159,7 @@ public Q_SLOTS:
     ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
 
     ito::RetVal plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id = QString::Null(), int plane = -1);
-    ito::RetVal deleteMarkers(QString id);
+    ito::RetVal deleteMarkers(QString id = "");
     ito::RetVal deleteMarkers(int id); //deprecated
     
 
