@@ -187,9 +187,6 @@ public:
     bool getEnabledCenterMarker(void) const;
     void setEnabledCenterMarker(const bool &enabled);
 
-    int getSelectedElement(void) const;
-    void setSelectedElement(const int idx);
-
     int getOverlayAlpha () const;
     void setOverlayAlpha (const int alpha);
 

@@ -254,7 +254,7 @@ struct InternalData
     InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
         m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
         m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0),  m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
-        m_lineSymboleSize(1), m_stateShapePrimitive(ito::PrimitiveContainer::tNoType)
+        m_lineSymboleSize(1)
     {
         m_multiLine = ItomQwtPlotEnums::AutoRowCol;
         m_colorLine = ItomQwtPlotEnums::AutoColor;
@@ -277,7 +277,6 @@ struct InternalData
 
     ito::tDataType m_dataType;
      
-    ito::PrimitiveContainer::tPrimitive m_stateShapePrimitive; /*!< geometric shape that is active is m_state is stateShape */
     int m_pickerLimit;
 
     QString m_title;

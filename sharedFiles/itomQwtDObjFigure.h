@@ -34,6 +34,7 @@
 #include "common/itomPlotHandle.h"
 #include "DataObject/dataobj.h"
 #include "itomQwtPlotEnums.h"
+#include "common/shape.h"
 
 #include <qsize.h>
 #include <qstring.h>
@@ -63,10 +64,11 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(bool keepAspectRatio READ getKeepAspectRatio WRITE setKeepAspectRatio USER true)
 
     // Properties related with geometric elements
-    Q_PROPERTY(QSharedPointer< ito::DataObject > geometricElements READ getGeometricElements WRITE setGeometricElements DESIGNABLE false)
-    Q_PROPERTY(int geometricElementsCount READ getGeometricElementsCount DESIGNABLE false)
+    Q_PROPERTY(QVector<ito::Shape> geometricShapes READ getGeometricShapes WRITE setGeometricShapes DESIGNABLE false)
+    Q_PROPERTY(int geometricShapesCount READ getGeometricShapesCount DESIGNABLE false)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
-    Q_PROPERTY(int selectedGeometry READ getSelectedElement WRITE setSelectedElement DESIGNABLE false)
+    Q_PROPERTY(int selectedGeometricShape READ getSelectedGeometricShape WRITE setSelectedGeometricShape DESIGNABLE false)
+    
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true)
 
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
@@ -74,10 +76,10 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
 
     Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
-    Q_CLASSINFO("prop://geometricElements", "Geometric elements defined by a float32[11] array for each element.")
-    Q_CLASSINFO("prop://geometricElementsCount", "Number of currently existing geometric elements.")
+    Q_CLASSINFO("prop://geometricShapes", "Geometric shapes defined by a vector of itom.shape for each element.")
+    Q_CLASSINFO("prop://geometricShapesCount", "Number of currently existing geometric shapes.")
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
-    Q_CLASSINFO("prop://selectedGeometry", "Get or set the currently highlighted geometric element. After manipulation the last element stays selected.")
+    Q_CLASSINFO("prop://selectedGeometricShape", "Get or set the currently highlighted geometric shape. After manipulation the last element stays selected.")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
@@ -116,20 +118,19 @@ public:
     //!> get current button set
     ButtonStyle getButtonSet(void) const;
 
-    int getGeometricElementsCount() const;
-    void setGeometricElementsCount(const int value){ return; }
+    int getGeometricShapesCount() const;
 
     bool getKeepAspectRatio(void) const;
     void setKeepAspectRatio(const bool &keepAspectEnable);
 
-    QSharedPointer< ito::DataObject > getGeometricElements();
+    QVector< ito::Shape > getGeometricShapes();
     //setter is a public slot
 
     bool getEnabledPlotting(void) const;
     void setEnabledPlotting(const bool &enabled);
 
-    int getSelectedElement(void) const;
-    void setSelectedElement(const int idx);
+    int getSelectedGeometricShape(void) const;
+    void setSelectedGeometricShape(const int idx);
 
     bool getMarkerLabelsVisible(void) const;
     void setMarkerLabelsVisible(const bool &visible);
@@ -151,16 +152,15 @@ public Q_SLOTS:
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
-    ito::RetVal clearGeometricElements(void);
-    ito::RetVal deleteGeometricElement(int id);
-    ito::RetVal setGeometricElements(QSharedPointer< ito::DataObject > geometricElements);
+    ito::RetVal clearGeometricShapes(void);
+    ito::RetVal deleteGeometricShape(int id);
+    ito::RetVal setGeometricShapes(QVector< ito::Shape > geometricShapes);
 
-    ito::RetVal setGeometricElementLabel(int id, QString label);
-    ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
+    ito::RetVal setGeometricShapeLabel(int id, QString label);
+    ito::RetVal setGeometricShapeLabelVisible(int id, bool setVisible);
 
     ito::RetVal plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
-    ito::RetVal deleteMarkers(int id); //deprecated
     
 
     
@@ -174,11 +174,11 @@ private:
     
 
 signals :
-    void userInteractionDone(int type, bool aborted, QPolygonF points);
-    void plotItemChanged(int idx, int flags, QVector<float> values);
-    void plotItemDeleted(int idx);
-    void plotItemsDeleted();
-    void plotItemsFinished(int type, bool aborted);
+    void userInteractionDone(int type, bool aborted, QVector<ito::Shape> shapes);
+    void geometricShapeChanged(int idx, ito::Shape shape);
+    void geometricShapeDeleted(int idx);
+    void geometricShapesDeleted();
+    void geometricShapeFinished(int type, bool aborted);
     
 };
 

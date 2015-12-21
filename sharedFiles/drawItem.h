@@ -29,59 +29,50 @@
 
 #include <qpoint.h>
 #include <qpainterpath.h>
+#include <qpoint.h>
+
+#include "common/shape.h"
+#include "common/retVal.h"
+
+class DrawItemPrivate; //forward declaration
 
 class DrawItem : public QwtPlotShapeItem
 {
     public:
-        explicit DrawItem(QwtPlot *parent, char type, const int id = 0, const QString &label = QString::null);
+        explicit DrawItem(const ito::Shape &shape, QwtPlot *parent, ito::RetVal *retVal = NULL);
         virtual ~DrawItem();
-        void setRect(const QRectF &);
-        void setShape( const QPainterPath & , const QColor &, const QColor &);
-        void setActive(int active);
+        ito::RetVal setShape(const ito::Shape &shape);
+        ito::RetVal setShape(const ito::Shape &shape, const QColor &markerColor, const QColor &lineColor);
+        
         void setColor(const QColor &markerColor, const QColor &lineColor);
         
+        bool getSelected() const;
         void setSelected(const bool selected);
-        bool selected() const;
+        
+        QString getLabel() const;
+        void setLabel(const QString &label);
 
-        void setLabel(const QString newLabel);
-        QString getLabel() const {return m_label;}
+        const ito::Shape &getShape() const;
+        int getIndex() const;
+        bool getAutoColor() const;
 
-        void setLabelVisible(const bool labelVisible) {m_labelVisible = labelVisible;}
-        bool getLabelVisible() const {return m_labelVisible;}
+        QPointF getPoint1() const;
+        QPointF getPoint2() const;
 
-        QVector<QwtPlotMarker *> m_marker;
-        double x1, y1, x2, y2;
-        char m_active;
-        char m_type;
-        unsigned char m_flags;
+        char getActive() const;
+        void setActive(char active); /*0: not active, 1: first point active, 2: second point active*/
+
+        void setLabelVisible(const bool labelVisible);
+        bool getLabelVisible() const;
+
         static QVector<int> idxVec;
-        int m_idx;
 
-        bool m_autoColor;
-        QString m_label;
-        bool m_labelVisible;
-    //    virtual QwtText trackerTextF( const QPointF &pos ) const;
-    //    void drawTracker( QPainter *painter ) const;
-    //    void setBackgroundFillBrush( const QBrush &brush );
-
-        void draw( QPainter *painter, 
+        virtual void draw(QPainter *painter,
             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
             const QRectF &canvasRect ) const;
 
     private:
-        QPen m_markerPen;
-        QBrush m_markerBrush;
-        QPen m_linePen;
-        QwtPlot *m_pparent;
-
-        bool m_selected;
-
-    signals:
-
-    public slots:
-
-    private slots:
-
+        DrawItemPrivate *d;
 };
 
 #endif //DRAWITEM_H

@@ -25,7 +25,6 @@
 
 #include <qwt_plot.h>
 
-#include "common/sharedStructuresPrimitives.h"
 #include "plot/AbstractFigure.h"
 #include "itomQwtPlotEnums.h"
 
@@ -37,6 +36,7 @@
 #include <qstring.h>
 
 #include "DataObject/dataobj.h"
+#include "common/shape.h"
 
 class QMenu;
 class ItomPlotZoomer;
@@ -101,9 +101,9 @@ public:
     int countGeometricShapes() const { return m_pShapes.count(); }
     int getSelectedGeometricShapeIdx() const;
     void setSelectedGeometricShapeIdx(int idx);
-    ito::RetVal setGeometricShapes(const QSharedPointer<ito::DataObject> geometricShapes);
+    ito::RetVal setGeometricShapes(const QVector<ito::Shape> &geometricShapes);
     ito::RetVal deleteGeometricShape(const int id);
-    QSharedPointer<ito::DataObject> geometricShapes2DataObject();
+    QVector<ito::Shape> getGeometricShapes();
     ito::RetVal setGeometricShapeLabelVisible(int id, bool setVisible);
     ito::RetVal setGeometricShapeLabel(int id, const QString &label);
 
@@ -190,7 +190,7 @@ private:
     int m_activeShapeIdx; //todo: necessary
     QVector<int> m_currentShapeIndices; /*!< indices of all shapes that have already been drawn in the current collection, e.g. if 4 rectangles are requested, the four indices are stored until the last rectangle has been given.*/
     int m_elementsToPick; /*!< number of shapes that should be picked in the current session. */
-    ito::PrimitiveContainer::tPrimitive m_currentShapeType;
+    ito::Shape::ShapeType m_currentShapeType;
     ItomQwtPlotEnums::ModificationState m_shapeModificationType;
     QPoint m_initialMousePosition;
     QPointF m_initialMarkerPosition;

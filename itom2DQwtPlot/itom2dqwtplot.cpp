@@ -44,7 +44,6 @@
 
 #include <qwt_plot_layout.h>
 
-#include "common/sharedStructuresPrimitives.h"
 #include "DataObject/dataObjectFuncs.h"
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::constructor()

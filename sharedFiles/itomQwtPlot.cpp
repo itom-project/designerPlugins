@@ -70,7 +70,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_inverseColor0(Qt::green),
     m_inverseColor1(Qt::blue),
     m_elementsToPick(1),
-    m_currentShapeType(ito::PrimitiveContainer::tPoint),
+    m_currentShapeType(ito::Shape::Point),
     m_buttonStyle(0),
     m_plottingEnabled(true),
     m_markerLabelVisible(false),
@@ -246,26 +246,26 @@ void ItomQwtPlot::createBaseActions()
     m_pActShapeType->setMenu(m_pMenuShapeType);
 
     a = m_pMenuShapeType->addAction(tr("Point"));
-    a->setData(ito::PrimitiveContainer::tPoint);
+    a->setData(ito::Shape::Point);
     m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Line"));
-    a->setData(ito::PrimitiveContainer::tLine);
+    a->setData(ito::Shape::Line);
     m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Rectangle"));
-    a->setData(ito::PrimitiveContainer::tRectangle);
+    a->setData(ito::Shape::Rectangle);
     m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Ellipse"));
-    a->setData(ito::PrimitiveContainer::tEllipse);
+    a->setData(ito::Shape::Ellipse);
     m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
-    m_pActShapeType->setData(ito::PrimitiveContainer::tPoint);
+    m_pActShapeType->setData(ito::Shape::Point);
     m_pActShapeType->setVisible(true);
     m_pActShapeType->setCheckable(true);
     connect(m_pMenuShapeType, SIGNAL(triggered(QAction*)), this, SLOT(mnuGroupShapeTypes(QAction*)));
@@ -336,7 +336,7 @@ void ItomQwtPlot::loadStyles()
     QHash<int, DrawItem*>::iterator it = m_pShapes.begin();
     for (; it != m_pShapes.end(); ++it)
     {
-        if (it.value() != NULL && it.value()->m_autoColor)
+        if (it.value() != NULL && it.value()->getAutoColor())
         {
             it.value()->setColor(m_inverseColor1, m_inverseColor0);
         }
@@ -365,16 +365,16 @@ void ItomQwtPlot::setButtonStyle(int style)
         switch (m_currentShapeType)
         {
             default:
-            case ito::PrimitiveContainer::tPoint:
+            case ito::Shape::Point:
                 m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/point.png"));
                 break;
-            case ito::PrimitiveContainer::tLine:
+            case ito::Shape::Line:
                 m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
                 break;
-            case ito::PrimitiveContainer::tRectangle:
+            case ito::Shape::Rectangle:
                 m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
                 break;
-            case ito::PrimitiveContainer::tEllipse:
+            case ito::Shape::Ellipse:
                 m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
                 break;
         }
@@ -398,16 +398,16 @@ void ItomQwtPlot::setButtonStyle(int style)
         switch (m_currentShapeType)
         {
         default:
-        case ito::PrimitiveContainer::tPoint:
+        case ito::Shape::Point:
             m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/point_lt.png"));
             break;
-        case ito::PrimitiveContainer::tLine:
+        case ito::Shape::Line:
             m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline_lt.png"));
             break;
-        case ito::PrimitiveContainer::tRectangle:
+        case ito::Shape::Rectangle:
             m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle_lt.png"));
             break;
-        case ito::PrimitiveContainer::tEllipse:
+        case ito::Shape::Ellipse:
             m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse_lt.png"));
             break;
         }
@@ -535,20 +535,20 @@ void ItomQwtPlot::mnuGroupShapeTypes(QAction *action)
 {
     switch (action->data().toInt())
     {
-    case ito::PrimitiveContainer::tPoint:
-        m_currentShapeType = ito::PrimitiveContainer::tPoint;
+    case ito::Shape::Point:
+        m_currentShapeType = ito::Shape::Point;
         break;
-    case ito::PrimitiveContainer::tLine:
-        m_currentShapeType = ito::PrimitiveContainer::tLine;
+    case ito::Shape::Line:
+        m_currentShapeType = ito::Shape::Line;
         break;
-    case ito::PrimitiveContainer::tRectangle:
-        m_currentShapeType = ito::PrimitiveContainer::tRectangle;
+    case ito::Shape::Rectangle:
+        m_currentShapeType = ito::Shape::Rectangle;
         break;
-    case ito::PrimitiveContainer::tEllipse:
-        m_currentShapeType = ito::PrimitiveContainer::tEllipse;
+    case ito::Shape::Ellipse:
+        m_currentShapeType = ito::Shape::Ellipse;
         break;
     default:
-        m_currentShapeType = ito::PrimitiveContainer::tNoType;
+        m_currentShapeType = ito::Shape::Invalid;
         break;
     }
 
@@ -663,25 +663,25 @@ void ItomQwtPlot::setState(int state)
                 switch (m_currentShapeType)
                 {
                 default:
-                case ito::PrimitiveContainer::tPoint:
+                case ito::Shape::Point:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/point.png" : ":/itomDesignerPlugins/plot/icons/point_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
-                case ito::PrimitiveContainer::tLine:
+                case ito::Shape::Line:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/pntline.png" : ":/itomDesignerPlugins/plot/icons/pntline_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
-                case ito::PrimitiveContainer::tRectangle:
+                case ito::Shape::Rectangle:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/rectangle.png" : ":/itomDesignerPlugins/plot/icons/rectangle_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
-                case ito::PrimitiveContainer::tEllipse:
+                case ito::Shape::Ellipse:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/ellipse.png" : ":/itomDesignerPlugins/plot/icons/ellipse_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
@@ -738,6 +738,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
         int canypos = event->y() - canvas()->y();
 
         QHash<int, DrawItem*>::iterator it;
+        QPointF p1, p2;
         for (it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
         {
             if (it.value() == NULL)
@@ -745,32 +746,35 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                 continue;
             }
 
-            if (fabs(transform(QwtPlot::xBottom, it.value()->x1) - canxpos) < 10
-                && fabs(transform(QwtPlot::yLeft, it.value()->y1) - canypos) < 10)
+            p1 = it.value()->getPoint1();
+            p2 = it.value()->getPoint2();
+
+            if (fabs(transform(QwtPlot::xBottom, p1.x()) - canxpos) < 10
+                && fabs(transform(QwtPlot::yLeft, p1.y()) - canypos) < 10)
             {
-                it.value()->m_active = 1;
-                m_activeShapeIdx = it.value()->m_idx;
+                it.value()->setActive(1);
+                m_activeShapeIdx = it.value()->getIndex();
                 it.value()->setActive(1);
                 it.value()->setSelected(true);
 
                 m_initialMousePosition.setX(event->x());
                 m_initialMousePosition.setY(event->y());
-                m_initialMarkerPosition.setX(it.value()->x1);
-                m_initialMarkerPosition.setY(it.value()->y1);
+                m_initialMarkerPosition.setX(p1.x());
+                m_initialMarkerPosition.setY(p1.y());
                 ++it;
                 break;
             }
-            else if (fabs(transform(QwtPlot::xBottom, it.value()->x2) - canxpos) < 10
-                && fabs(transform(QwtPlot::yLeft, it.value()->y2) - canypos) < 10)
+            else if (fabs(transform(QwtPlot::xBottom, p2.x()) - canxpos) < 10
+                && fabs(transform(QwtPlot::yLeft, p2.y()) - canypos) < 10)
             {
-                it.value()->m_active = 2;
-                m_activeShapeIdx = it.value()->m_idx;
+                it.value()->setActive(2);
+                m_activeShapeIdx = it.value()->getIndex();
                 it.value()->setActive(2);
                 it.value()->setSelected(true);
                 m_initialMousePosition.setX(event->x());
                 m_initialMousePosition.setY(event->y());
-                m_initialMarkerPosition.setX(it.value()->x1);
-                m_initialMarkerPosition.setY(it.value()->y1);
+                m_initialMarkerPosition.setX(p1.x());
+                m_initialMarkerPosition.setY(p1.y());
                 ++it;
                 break;
             }
@@ -819,31 +823,21 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
         bool modificationDone = false;
 
         QHash<int, DrawItem*>::Iterator it = m_pShapes.begin();
+        ito::Shape shape;
+        double dx, dy;
+
         for (; it != m_pShapes.end(); it++)
         {
-            if (it.value() == NULL)
+            if (it.value() == NULL || it.value()->getActive() == 0)
             {
                 continue;
             }
 
-            if (it.value()->m_active == 0)
-            {
-                continue;
-            }
+            shape = it.value()->getShape();
 
-            ito::float32 dx, dy;
-            QPainterPath path;
-
-            switch (m_shapeModificationType)
+            if (m_shapeModificationType == ItomQwtPlotEnums::MoveGeometricElements)
             {
-            default:
-                emit statusBarMessage(tr("Could not perform specific action on geomtric element, action not implemented."), 4000);
-                path = it.value()->shape();
-                break;
-            case ItomQwtPlotEnums::MoveGeometricElements:
-            {
-                ito::float32 lenx = it.value()->x2 - it.value()->x1;
-                ito::float32 leny = it.value()->y2 - it.value()->y1;
+                QPointF len = it.value()->getPoint2() - it.value()->getPoint1();
 
                 if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                 {
@@ -852,7 +846,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                     dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
                     dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                    if (it.value()->m_active == 1)
+                    if (it.value()->getActive() == 1)
                     {
                         if (fabs(dx) > fabs(dy))
                         {
@@ -870,12 +864,12 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                     {
                         if (fabs(dx) > fabs(dy))
                         {
-                            dx = canxpos - m_initialMarkerPosition.x() - lenx;
+                            dx = canxpos - m_initialMarkerPosition.x() - len.rx();
                             dy = 0.0;
                         }
                         else
                         {
-                            dy = canypos - m_initialMarkerPosition.y() - leny;
+                            dy = canypos - m_initialMarkerPosition.y() - len.ry();
                             dx = 0.0;
                         }
                     }
@@ -884,399 +878,351 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                 {
                     dx = 0.0;
                     dy = 0.0;
-                    if (it.value()->m_active == 2)
+                    if (it.value()->getActive() == 2)
                     {
-                        canxpos -= lenx;
-                        canypos -= leny;
+                        canxpos -= len.rx();
+                        canypos -= len.ry();
                     }
                 }
 
-                switch (it.value()->m_type)
+                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                 {
-                case ito::PrimitiveContainer::tPoint:
-                {
-                    if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                    {
-                        path.moveTo(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy);
-                        path.lineTo(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy);
-                    }
-                    else
-                    {
-                        path.moveTo(canxpos, canypos);
-                        path.lineTo(canxpos, canypos);
-                    }
+                    QPointF dest(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy);
+                    shape.point1MoveTo(dest);
                 }
-                break;
-                case ito::PrimitiveContainer::tLine:
+                else
                 {
-                    if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                    {
-                        path.moveTo(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy);
-                        path.lineTo(m_initialMarkerPosition.x() + dx + lenx, m_initialMarkerPosition.y() + dy + leny);
-                    }
-                    else
-                    {
-                        path.moveTo(canxpos, canypos);
-                        path.lineTo(canxpos + lenx, canypos + leny);
-                    }
+                    QPointF dest(canxpos, canypos);
+                    shape.point1MoveTo(dest);
                 }
-                break;
 
-                case ito::PrimitiveContainer::tRectangle:
-                {
-                    if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                    {
-                        path.addRect(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy, lenx, leny);
-                    }
-                    else
-                    {
-                        path.addRect(canxpos, canypos, lenx, leny);
-                    }
-                }
-                break;
-
-                case ito::PrimitiveContainer::tEllipse:
-                {
-                    if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                    {
-                        path.addEllipse(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy, lenx, leny);
-                    }
-                    else
-                    {
-                        path.addEllipse(canxpos, canypos, lenx, leny);
-                    }
-                }
-                break;
-                }
-                it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                it.value()->setActive(it.value()->m_active);
+                it.value()->setShape(shape);
                 replot();
             }
-
-            break;
-            case ItomQwtPlotEnums::ResizeGeometricElements:
-                emit statusBarMessage(tr("Could not perform specific action on geomtric element, resize action not implemented yet."), 4000);
-                break;
-            case ItomQwtPlotEnums::ModifyPoints:
+            else if (m_shapeModificationType == ItomQwtPlotEnums::ResizeGeometricElements)
             {
-                if (it.value()->m_flags & 0x07)
+                emit statusBarMessage(tr("Could not perform specific action on geometric shapes, resize action not implemented yet."), 4000);
+            }
+            else if (m_shapeModificationType == ItomQwtPlotEnums::ModifyPoints)
+            {
+                if (it.value()->getShape().flags() & ito::Shape::ResizeLock)
                 {
-                    emit statusBarMessage(tr("Could not change points of geomtric element, elemet is proteted."), 4000);
+                    emit statusBarMessage(tr("Could not change points of geometric shapes, shape is protected."), 4000);
                     break;
                 }
 
-                if (it.value()->m_active == 1)
+                switch (shape.type())
                 {
-
-
-                    switch (it.value()->m_type)
-                    {
-                    case ito::PrimitiveContainer::tPoint:
-
-                        path.moveTo(canxpos, canypos);
-                        path.lineTo(canxpos, canypos);
-
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        replot();
-                        break;
-
-                    case ito::PrimitiveContainer::tLine:
-
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)       // draw line horizontal or vertical with second point fixed
-                        {
-
-                            dx = canxpos - it.value()->x2;
-                            dy = it.value()->y2 - canypos;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) > fabs(dy))
-                            {
-                                path.moveTo(canxpos, it.value()->y2);
-                                path.lineTo(it.value()->x2, it.value()->y2);
-                            }
-                            else
-                            {
-                                path.moveTo(it.value()->x2, canypos);
-                                path.lineTo(it.value()->x2, it.value()->y2);
-                            }
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)    // move line without resize
-                        {
-
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
-
-                            path.moveTo(canxpos, canypos);
-                            path.lineTo(canxpos + dx, canypos + dy);
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::AltModifier)      // keep linesize constant and second point fixed
-                        {
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
-
-                            ito::float32 length = sqrt(dx * dx + dy * dy);
-
-                            dx = canxpos - it.value()->x2;
-                            dy = canypos - it.value()->y2;
-
-                            ito::float32 alpha = atan2(dy, dx);
-
-                            dx = cos(alpha) * length;
-                            dy = sin(alpha) * length;
-
-                            path.moveTo(it.value()->x2 + dx, it.value()->y2 + dy);
-                            path.lineTo(it.value()->x2, it.value()->y2);
-                        }
-                        else                                                                // just draw line
-                        {
-                            path.moveTo(canxpos, canypos);
-                            path.lineTo(it.value()->x2, it.value()->y2);
-                        }
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        replot();
-                        break;
-
-                    case ito::PrimitiveContainer::tRectangle:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = it.value()->x2 - canxpos;
-                            dy = canypos - it.value()->y2;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) < fabs(dy))
-                            {
-                                //canypos = it.value()->x2 - dx;
-                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            else
-                            {
-                                //canxpos = it.value()->x2 - dy;
-                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
-                            }
-
-                            m_ignoreNextMouseEvent = true;
-                        }
-
-                        path.addRect(canxpos, canypos,
-                            it.value()->x2 - canxpos,
-                            it.value()->y2 - canypos);
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-
-                        if (m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
-
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                            this->cursor().setPos(dst);
-                        }
-                        replot();
-                        break;
-
-                    case ito::PrimitiveContainer::tEllipse:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = it.value()->x2 - canxpos;
-                            dy = canypos - it.value()->y2;
-
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                            if (fabs(dx) < fabs(dy))
-                            {
-                                //canypos = it.value()->x2 - dx;
-                                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            else
-                            {
-                                //canxpos = it.value()->x2 - dy;
-                                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            m_ignoreNextMouseEvent = true;
-                        }
-                        path.addEllipse(canxpos,
-                            canypos,
-                            it.value()->x2 - canxpos,
-                            it.value()->y2 - canypos);
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-
-                        if (m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
-
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                            this->cursor().setPos(dst);
-                        }
-                        replot();
-                        break;
-                    }
+                case ito::Shape::Point:
+                {
+                    QPointF dest(canxpos, canypos);
+                    shape.point1MoveTo(dest);
+                    it.value()->setShape(shape);
+                    replot();
                 }
-                else if (it.value()->m_active == 2)
-                {
+                break;
 
-                    if (it.value()->m_flags & 0x07)
-                    {
-                        emit statusBarMessage(tr("Could not change geomtric element, elemet is read only."), 4000);
-                        break;
-                    }
+                //case ito::Shape::Line:
+                //{
+                //    QPointF p1 = it.value()->getPoint1();
+                //    QPointF p2 = it.value()->getPoint2();
+                //    QTransform inv = shape.rtransform().inverted();
 
-                    ito::float32 dx, dy;
+                //    if (QApplication::keyboardModifiers() == Qt::ControlModifier)       // draw line horizontal or vertical with second point fixed
+                //    {
+                //        dx = canxpos - (it.value()->getActive() == 1 ? p2.x() : p1.x());
+                //        dy = (it.value()->getActive() == 1 ? p2.y() : p1.y()) - canypos;
 
-                    QPainterPath path;
-                    switch (it.value()->m_type)
-                    {
-                    case ito::PrimitiveContainer::tLine:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = canxpos - it.value()->x1;
-                            dy = it.value()->y1 - canypos;
+                //        dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                //        dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                            if (fabs(dx) > fabs(dy))
-                            {
-                                path.moveTo(it.value()->x1, it.value()->y1);
-                                path.lineTo(canxpos, it.value()->y1);
-                            }
-                            else
-                            {
-                                path.moveTo(it.value()->x1, it.value()->y1);
-                                path.lineTo(it.value()->x1, canypos);
-                            }
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
-                        {
+                //        if (fabs(dx) > fabs(dy))
+                //        {
+                //            shape.rbasePoints()[0] = 
+                //            path.moveTo(canxpos, it.value()->y2);
+                //            path.lineTo(it.value()->x2, it.value()->y2);
+                //        }
+                //        else
+                //        {
+                //            path.moveTo(it.value()->x2, canypos);
+                //            path.lineTo(it.value()->x2, it.value()->y2);
+                //        }
+                //    }
+                //    else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)    // move line without resize
+                //    {
 
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
+                //        dx = it.value()->x2 - it.value()->x1;
+                //        dy = it.value()->y2 - it.value()->y1;
 
-                            path.moveTo(canxpos - dx, canypos - dy);
-                            path.lineTo(canxpos, canypos);
-                        }
-                        else if (QApplication::keyboardModifiers() == Qt::AltModifier)
-                        {
-                            dx = it.value()->x2 - it.value()->x1;
-                            dy = it.value()->y2 - it.value()->y1;
+                //        path.moveTo(canxpos, canypos);
+                //        path.lineTo(canxpos + dx, canypos + dy);
+                //    }
+                //    else if (QApplication::keyboardModifiers() == Qt::AltModifier)      // keep linesize constant and second point fixed
+                //    {
+                //        dx = it.value()->x2 - it.value()->x1;
+                //        dy = it.value()->y2 - it.value()->y1;
 
-                            ito::float32 length = sqrt(dx * dx + dy * dy);
+                //        ito::float32 length = sqrt(dx * dx + dy * dy);
 
-                            dx = it.value()->x1 - canxpos;
-                            dy = it.value()->y1 - canypos;
+                //        dx = canxpos - it.value()->x2;
+                //        dy = canypos - it.value()->y2;
 
-                            ito::float32 alpha = atan2(dy, dx);
+                //        ito::float32 alpha = atan2(dy, dx);
 
-                            dx = cos(alpha) * length;
-                            dy = sin(alpha) * length;
+                //        dx = cos(alpha) * length;
+                //        dy = sin(alpha) * length;
 
-                            path.moveTo(it.value()->x1, it.value()->y1);
-                            path.lineTo(it.value()->x1 - dx, it.value()->y1 - dy);
-                        }
-                        else
-                        {
-                            path.moveTo(it.value()->x1, it.value()->y1);
-                            path.lineTo(canxpos, canypos);
-                        }
+                //        path.moveTo(it.value()->x2 + dx, it.value()->y2 + dy);
+                //        path.lineTo(it.value()->x2, it.value()->y2);
+                //    }
+                //    else                                                                // just draw line
+                //    {
+                //        path.moveTo(canxpos, canypos);
+                //        path.lineTo(it.value()->x2, it.value()->y2);
+                //    }
+                //    it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                //    it.value()->setActive(it.value()->getActive());
+                //    replot();
+                //    break;
 
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        //if (p) emit p->plotItemChanged(n);
-                        replot();
-                        break;
+                //    case ito::Shape::Rectangle:
+                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                //        {
+                //            dx = it.value()->x2 - canxpos;
+                //            dy = canypos - it.value()->y2;
 
-                    case ito::PrimitiveContainer::tRectangle:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = canxpos - it.value()->x1;
-                            dy = it.value()->y1 - canypos;
+                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
+                //            if (fabs(dx) < fabs(dy))
+                //            {
+                //                //canypos = it.value()->x2 - dx;
+                //                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
+                //            }
+                //            else
+                //            {
+                //                //canxpos = it.value()->x2 - dy;
+                //                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
+                //            }
 
-                            if (fabs(dx) < fabs(dy))
-                            {
-                                //canypos = it.value()->y1 + dx;
-                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            else
-                            {
-                                //canypos = it.value()->x1 + dy;
-                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            m_ignoreNextMouseEvent = true;
-                        }
-                        path.addRect(it.value()->x1, it.value()->y1,
-                            canxpos - it.value()->x1,
-                            canypos - it.value()->y1);
-                        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        //if (p) emit p->plotItemChanged(n);
-                        if (m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+                //            m_ignoreNextMouseEvent = true;
+                //        }
 
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+                //        path.addRect(canxpos, canypos,
+                //            it.value()->x2 - canxpos,
+                //            it.value()->y2 - canypos);
+                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                //        it.value()->setActive(it.value()->getActive());
 
-                            this->cursor().setPos(dst);
-                        }
-                        replot();
-                        break;
+                //        if (m_ignoreNextMouseEvent)
+                //        {
+                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
 
-                    case ito::PrimitiveContainer::tEllipse:
-                        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                        {
-                            dx = canxpos - it.value()->x1;
-                            dy = it.value()->y1 - canypos;
+                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
 
-                            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
+                //            this->cursor().setPos(dst);
+                //        }
+                //        replot();
+                //        break;
 
-                            if (fabs(dx) < fabs(dy))
-                            {
-                                //canypos = it.value()->y1 + dx;
-                                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            else
-                            {
-                                //canypos = it.value()->x1 + dy;
-                                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
-                            }
-                            m_ignoreNextMouseEvent = true;
+                //    case ito::Shape::Ellipse:
+                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                //        {
+                //            dx = it.value()->x2 - canxpos;
+                //            dy = canypos - it.value()->y2;
 
-                        }
-                        path.addEllipse(it.value()->x1,
-                            it.value()->y1,
-                            canxpos - it.value()->x1,
-                            canypos - it.value()->y1),
-                            it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                        it.value()->setActive(it.value()->m_active);
-                        //if (p) emit p->plotItemChanged(n);
-                        if (m_ignoreNextMouseEvent)
-                        {
-                            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
 
-                            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+                //            if (fabs(dx) < fabs(dy))
+                //            {
+                //                //canypos = it.value()->x2 - dx;
+                //                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
+                //            }
+                //            else
+                //            {
+                //                //canxpos = it.value()->x2 - dy;
+                //                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
+                //            }
+                //            m_ignoreNextMouseEvent = true;
+                //        }
+                //        path.addEllipse(canxpos,
+                //            canypos,
+                //            it.value()->x2 - canxpos,
+                //            it.value()->y2 - canypos);
+                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                //        it.value()->setActive(it.value()->getActive());
 
-                            this->cursor().setPos(dst);
-                        }
-                        replot();
-                        break;
-                    }
+                //        if (m_ignoreNextMouseEvent)
+                //        {
+                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+
+                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                //            this->cursor().setPos(dst);
+                //        }
+                //        replot();
+                //        break;
+                //    }
+                //}
+                //else if (it.value()->getActive() == 2)
+                //{
+
+                //    if (it.value()->getShape().flags() & 0x07)
+                //    {
+                //        emit statusBarMessage(tr("Could not change geomtric element, elemet is read only."), 4000);
+                //        break;
+                //    }
+
+                //    ito::float32 dx, dy;
+
+                //    QPainterPath path;
+                //    switch (it.value()->getShape.type())
+                //    {
+                //    case ito::Shape::Line:
+                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                //        {
+                //            dx = canxpos - it.value()->x1;
+                //            dy = it.value()->y1 - canypos;
+
+                //            if (fabs(dx) > fabs(dy))
+                //            {
+                //                path.moveTo(it.value()->x1, it.value()->y1);
+                //                path.lineTo(canxpos, it.value()->y1);
+                //            }
+                //            else
+                //            {
+                //                path.moveTo(it.value()->x1, it.value()->y1);
+                //                path.lineTo(it.value()->x1, canypos);
+                //            }
+                //        }
+                //        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
+                //        {
+
+                //            dx = it.value()->x2 - it.value()->x1;
+                //            dy = it.value()->y2 - it.value()->y1;
+
+                //            path.moveTo(canxpos - dx, canypos - dy);
+                //            path.lineTo(canxpos, canypos);
+                //        }
+                //        else if (QApplication::keyboardModifiers() == Qt::AltModifier)
+                //        {
+                //            dx = it.value()->x2 - it.value()->x1;
+                //            dy = it.value()->y2 - it.value()->y1;
+
+                //            ito::float32 length = sqrt(dx * dx + dy * dy);
+
+                //            dx = it.value()->x1 - canxpos;
+                //            dy = it.value()->y1 - canypos;
+
+                //            ito::float32 alpha = atan2(dy, dx);
+
+                //            dx = cos(alpha) * length;
+                //            dy = sin(alpha) * length;
+
+                //            path.moveTo(it.value()->x1, it.value()->y1);
+                //            path.lineTo(it.value()->x1 - dx, it.value()->y1 - dy);
+                //        }
+                //        else
+                //        {
+                //            path.moveTo(it.value()->x1, it.value()->y1);
+                //            path.lineTo(canxpos, canypos);
+                //        }
+
+                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                //        it.value()->setActive(it.value()->getActive());
+                //        //if (p) emit p->plotItemChanged(n);
+                //        replot();
+                //        break;
+
+                //    case ito::Shape::Rectangle:
+                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                //        {
+                //            dx = canxpos - it.value()->x1;
+                //            dy = it.value()->y1 - canypos;
+
+                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                //            if (fabs(dx) < fabs(dy))
+                //            {
+                //                //canypos = it.value()->y1 + dx;
+                //                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
+                //            }
+                //            else
+                //            {
+                //                //canypos = it.value()->x1 + dy;
+                //                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
+                //            }
+                //            m_ignoreNextMouseEvent = true;
+                //        }
+                //        path.addRect(it.value()->x1, it.value()->y1,
+                //            canxpos - it.value()->x1,
+                //            canypos - it.value()->y1);
+                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                //        it.value()->setActive(it.value()->getActive());
+                //        //if (p) emit p->plotItemChanged(n);
+                //        if (m_ignoreNextMouseEvent)
+                //        {
+                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+
+                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                //            this->cursor().setPos(dst);
+                //        }
+                //        replot();
+                //        break;
+
+                //    case ito::Shape::Ellipse:
+                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                //        {
+                //            dx = canxpos - it.value()->x1;
+                //            dy = it.value()->y1 - canypos;
+
+                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
+                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
+
+                //            if (fabs(dx) < fabs(dy))
+                //            {
+                //                //canypos = it.value()->y1 + dx;
+                //                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
+                //            }
+                //            else
+                //            {
+                //                //canypos = it.value()->x1 + dy;
+                //                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
+                //            }
+                //            m_ignoreNextMouseEvent = true;
+
+                //        }
+                //        path.addEllipse(it.value()->x1,
+                //            it.value()->y1,
+                //            canxpos - it.value()->x1,
+                //            canypos - it.value()->y1),
+                //            it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
+                //        it.value()->setActive(it.value()->getActive());
+                //        //if (p) emit p->plotItemChanged(n);
+                //        if (m_ignoreNextMouseEvent)
+                //        {
+                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
+                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
+
+                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
+
+                //            this->cursor().setPos(dst);
+                //        }
+                //        replot();
+                //        break;
+                //    }
                 }
             }
-            break;
+            else
+            {
+                emit statusBarMessage(tr("Could not perform specific action on geometric shapes, action not implemented."), 4000);
             }
-            break;
         }
     }
 
@@ -1294,87 +1240,20 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
         //modification of shape finished
         event->accept();
         QHash<int, DrawItem*>::iterator it = m_pShapes.begin();
+        ito::Shape oldShape;
+
         for (; it != m_pShapes.end(); ++it)
         {
-            if (it.value() != NULL && it.value()->m_active != 0)
+            if (it.value() != NULL && it.value()->getActive() != 0)
             {
-                int type = 0;
-                QVector<ito::float32> values;
-                values.reserve(11);
-                switch (it.value()->m_type)
-                {
-                case ito::PrimitiveContainer::tPoint:
-                    type = ito::PrimitiveContainer::tPoint;
-                    values.append(it.value()->x1);
-                    values.append(it.value()->y1);
-                    values.append(0.0);
-                    break;
-
-                case ito::PrimitiveContainer::tLine:
-                    type = ito::PrimitiveContainer::tLine;
-                    values.append(it.value()->x1);
-                    values.append(it.value()->y1);
-                    values.append(0.0);
-                    values.append(it.value()->x2);
-                    values.append(it.value()->y2);
-                    values.append(0.0);
-                    break;
-
-                    // square is a rect
-                    //                    case tSquare:
-                case ito::PrimitiveContainer::tRectangle:
-                    type = ito::PrimitiveContainer::tRectangle;
-                    values.append(it.value()->x1);
-                    values.append(it.value()->y1);
-                    values.append(0.0);
-                    values.append(it.value()->x2);
-                    values.append(it.value()->y2);
-                    values.append(0.0);
-                    break;
-
-                    // circle is an ellispe
-                    //                    case tCircle:
-                case ito::PrimitiveContainer::tEllipse:
-                    type = ito::PrimitiveContainer::tEllipse;
-                    values.append((it.value()->x1 + it.value()->x2)*0.5);
-                    values.append((it.value()->y1 + it.value()->y2)*0.5);
-                    values.append(0.0);
-                    values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
-                    values.append(abs(it.value()->y1 - it.value()->y2)*0.5);
-                    values.append(0.0);
-                    break;
-
-                    /*
-                    case tCircle:
-                    type = ito::PrimitiveContainer::tCircle;
-                    values.append((it.value()->x1 + it.value()->x2)*0.5);
-                    values.append((it.value()->y1 + it.value()->y2)*0.5);
-                    values.append(0.0);
-                    values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
-                    values.append(0.0);
-                    break;
-                    */
-                    /*
-                    case tSquare:
-                    type = ito::PrimitiveContainer::tSquare;
-                    values.append((it.value()->x1 + it.value()->x2)*0.5);
-                    values.append((it.value()->y1 + it.value()->y2)*0.5);
-                    values.append(0.0);
-                    values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
-                    values.append(0.0);
-                    break;
-                    */
-                }
-
                 ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
                 if (p)
                 {
-                    emit p->plotItemChanged(it.value()->m_idx, type, values);
+                    emit p->geometricShapeChanged(it.value()->getIndex(), it.value()->getShape());
                 }
             }
             if (it.value())
             {
-                it.value()->m_active = 0;
                 it.value()->setActive(0);
             }
         }
@@ -1390,10 +1269,11 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
 void ItomQwtPlot::multiPointActivated(bool on)
 {
     ItomQwtDObjFigure *p = (ItomQwtDObjFigure*)(this->parent());
+    QVector<ito::Shape> shapes;
 
     switch (m_currentShapeType)
     {
-    case ito::PrimitiveContainer::tMultiPointPick:
+    case ito::Shape::MultiPointPick:
         if (!on)
         {
             QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
@@ -1412,36 +1292,15 @@ void ItomQwtPlot::multiPointActivated(bool on)
             if (!aborted && polygonScale.size() > 1)
             {
                 polygonScale.pop_back(); //the last item is only the current position of the cursor, erase it.
-                for (int i = 0; i < polygonScale.size(); i++)
-                {
-                    QPainterPath path;
-                    DrawItem *newItem = NULL;
-                    newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint);
-                    path.moveTo(polygonScale[i].x(), polygonScale[i].y());
-                    path.lineTo(polygonScale[i].x(), polygonScale[i].y());
-
-                    newItem->setShape(path, m_inverseColor0, m_inverseColor1);
-
-                    if (this->m_inverseColor0.isValid())
-                    {
-                        newItem->setPen(QPen(m_inverseColor0));
-                    }
-                    else newItem->setPen(QPen(Qt::green));
-
-                    newItem->setVisible(true);
-                    newItem->show();
-                    newItem->attach(this);
-                    newItem->setSelected(true);
-                    m_pShapes.insert(newItem->m_idx, newItem);
-                }
+                shapes.push_back(ito::Shape::fromMultipoint(polygonScale));
                 replot();
             }
 
             if (p)
             {
 
-                emit p->userInteractionDone(ito::PrimitiveContainer::tMultiPointPick, aborted, polygonScale);
-                emit p->plotItemsFinished(ito::PrimitiveContainer::tMultiPointPick, aborted);
+                emit p->userInteractionDone(ito::Shape::MultiPointPick, aborted, shapes);
+                emit p->geometricShapeFinished(ito::Shape::MultiPointPick, aborted);
             }
 
             m_pMultiPointPicker->setEnabled(false);
@@ -1449,7 +1308,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
         }
         break;
 
-    case ito::PrimitiveContainer::tPoint:
+    case ito::Shape::Point:
         if (!on)
         {
             QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
@@ -1465,20 +1324,21 @@ void ItomQwtPlot::multiPointActivated(bool on)
             {
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
-                QPainterPath path;
-                DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint);
-                path.moveTo(polygonScale[0].x(), polygonScale[0].y());
-                path.lineTo(polygonScale[0].x(), polygonScale[0].y());
-
-                newItem->setShape(path, m_inverseColor0, m_inverseColor1);
+                ito::Shape shape = ito::Shape::fromPoint(polygonScale[0]);
+                DrawItem *newItem = new DrawItem(shape, this);
+                newItem->setColor(m_inverseColor0, m_inverseColor1);
+                if (this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
 
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
                 newItem->setSelected(true);
-                m_pShapes.insert(newItem->m_idx, newItem);
-                m_currentShapeIndices.append(newItem->m_idx);
+                m_pShapes.insert(newItem->getIndex(), newItem);
+                m_currentShapeIndices.append(newItem->getIndex());
                 replot();
             }
 
@@ -1509,14 +1369,11 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     for (int i = 0; i < m_currentShapeIndices.size(); i++)
                     {
                         if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
-                        destPolygon.append(QPointF(m_currentShapeIndices[i], ito::PrimitiveContainer::tPoint));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x1, m_pShapes[m_currentShapeIndices[i]]->y1));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x2, m_pShapes[m_currentShapeIndices[i]]->y2));
-                        destPolygon.append(QPointF(0.0, 0.0));
+                        shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::PrimitiveContainer::tPoint, aborted, destPolygon);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tPoint, aborted);
+                    emit p->userInteractionDone(ito::Shape::Point, aborted, shapes);
+                    emit p->geometricShapeFinished(ito::Shape::Point, aborted);
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1525,7 +1382,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
         }
         break;
 
-    case ito::PrimitiveContainer::tLine:
+    case ito::Shape::Line:
         if (!on)
         {
             QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
@@ -1541,20 +1398,21 @@ void ItomQwtPlot::multiPointActivated(bool on)
             {
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
-                QPainterPath path;
-                DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, ito::PrimitiveContainer::tLine);
-                path.moveTo(polygonScale[0].x(), polygonScale[0].y());
-                path.lineTo(polygonScale[1].x(), polygonScale[1].y());
-
-                newItem->setShape(path, m_inverseColor0, m_inverseColor1);
+                ito::Shape shape = ito::Shape::fromLine(polygonScale[0], polygonScale[1]);
+                DrawItem *newItem = new DrawItem(shape, this);
+                newItem->setColor(m_inverseColor0, m_inverseColor1);
+                if (this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
 
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
                 newItem->setSelected(true);
-                m_pShapes.insert(newItem->m_idx, newItem);
-                m_currentShapeIndices.append(newItem->m_idx);
+                m_pShapes.insert(newItem->getIndex(), newItem);
+                m_currentShapeIndices.append(newItem->getIndex());
                 replot();
             }
 
@@ -1585,25 +1443,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     for (int i = 0; i < m_currentShapeIndices.size(); i++)
                     {
                         if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
-                        destPolygon.append(QPointF(m_currentShapeIndices[i], ito::PrimitiveContainer::tLine));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x1, m_pShapes[m_currentShapeIndices[i]]->y1));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x2, m_pShapes[m_currentShapeIndices[i]]->y2));
-                        destPolygon.append(QPointF(0.0, 0.0));
+                        shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::PrimitiveContainer::tLine, aborted, destPolygon);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tLine, aborted);
-
-
+                    emit p->userInteractionDone(ito::Shape::Line, aborted, shapes);
+                    emit p->geometricShapeFinished(ito::Shape::Line, aborted);
                 }
-                
+
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
         }
         break;
 
-    case ito::PrimitiveContainer::tRectangle:
+    case ito::Shape::Rectangle:
         if (!on)
         {
             QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
@@ -1619,17 +1472,21 @@ void ItomQwtPlot::multiPointActivated(bool on)
             {
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
-                QPainterPath path;
-                DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle);
-                path.addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(), polygonScale[1].y() - polygonScale[0].y());
-                newItem->setShape(path, m_inverseColor0, m_inverseColor1);
+                ito::Shape shape = ito::Shape::fromRectangle(QRectF(polygonScale[0], polygonScale[1]));
+                DrawItem *newItem = new DrawItem(shape, this);
+                newItem->setColor(m_inverseColor0, m_inverseColor1);
+                if (this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
                 newItem->setVisible(true);
                 newItem->show();
                 newItem->attach(this);
                 newItem->setSelected(true);
-                m_pShapes.insert(newItem->m_idx, newItem);
-                m_currentShapeIndices.append(newItem->m_idx);
+                m_pShapes.insert(newItem->getIndex(), newItem);
+                m_currentShapeIndices.append(newItem->getIndex());
                 replot();
             }
 
@@ -1655,20 +1512,15 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_elementsToPick = 0;
                 if (p)
                 {
-                    QPolygonF destPolygon;
-                    destPolygon.reserve(4);
+                    QPolygonF destPolygon(0);
                     for (int i = 0; i < m_currentShapeIndices.size(); i++)
                     {
                         if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
-                        destPolygon.append(QPointF(m_currentShapeIndices[i], ito::PrimitiveContainer::tRectangle));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x1, m_pShapes[m_currentShapeIndices[i]]->y1));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x2, m_pShapes[m_currentShapeIndices[i]]->y2));
-                        destPolygon.append(QPointF(0.0, 0.0));
+                        shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-
-                    emit p->userInteractionDone(ito::PrimitiveContainer::tRectangle, aborted, destPolygon);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tRectangle, aborted);
+                    emit p->userInteractionDone(ito::Shape::Rectangle, aborted, shapes);
+                    emit p->geometricShapeFinished(ito::Shape::Rectangle, aborted);
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1677,7 +1529,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
         }
         break;
 
-    case ito::PrimitiveContainer::tEllipse:
+    case ito::Shape::Ellipse:
         if (!on)
         {
             QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
@@ -1693,14 +1545,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
             {
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
-                QPainterPath path;
-                DrawItem *newItem = NULL;
-                newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse);
-                path.addEllipse(polygonScale[0].x(), polygonScale[0].y(),
-                    (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
-
-                newItem->setShape(path, m_inverseColor0, m_inverseColor1);
-
+                ito::Shape shape = ito::Shape::fromEllipse(QRectF(polygonScale[0], polygonScale[1]));
+                DrawItem *newItem = new DrawItem(shape, this);
+                newItem->setColor(m_inverseColor0, m_inverseColor1);
                 if (this->m_inverseColor0.isValid())
                 {
                     newItem->setPen(QPen(m_inverseColor0));
@@ -1711,8 +1558,8 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 newItem->show();
                 newItem->attach(this);
                 newItem->setSelected(true);
-                m_pShapes.insert(newItem->m_idx, newItem);
-                m_currentShapeIndices.append(newItem->m_idx);
+                m_pShapes.insert(newItem->getIndex(), newItem);
+                m_currentShapeIndices.append(newItem->getIndex());
                 replot();
             }
 
@@ -1738,22 +1585,17 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_elementsToPick = 0;
                 if (p)
                 {
-                    QPolygonF destPolygon;
-                    destPolygon.reserve(4);
+                    QPolygonF destPolygon(0);
                     for (int i = 0; i < m_currentShapeIndices.size(); i++)
                     {
                         if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
-                        destPolygon.append(QPointF(m_currentShapeIndices[i], ito::PrimitiveContainer::tEllipse));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x1, m_pShapes[m_currentShapeIndices[i]]->y1));
-                        destPolygon.append(QPointF(m_pShapes[m_currentShapeIndices[i]]->x2, m_pShapes[m_currentShapeIndices[i]]->y2));
-                        destPolygon.append(QPointF(0.0, 0.0));
+                        shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-
-                    emit p->userInteractionDone(ito::PrimitiveContainer::tEllipse, aborted, destPolygon);
-                    emit p->plotItemsFinished(ito::PrimitiveContainer::tEllipse, aborted);
+                    emit p->userInteractionDone(ito::Shape::Ellipse, aborted, shapes);
+                    emit p->geometricShapeFinished(ito::Shape::Ellipse, aborted);
                 }
-                
+
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
@@ -1771,13 +1613,13 @@ ito::RetVal ItomQwtPlot::userInteractionStart(int type, bool start, int maxNrOfP
 
     if (start)
     {
-        if (type == ito::PrimitiveContainer::tMultiPointPick || \
-            type == ito::PrimitiveContainer::tPoint || \
-            type == ito::PrimitiveContainer::tLine || \
-            type == ito::PrimitiveContainer::tRectangle || \
-            type == ito::PrimitiveContainer::tEllipse)
+        if (type == ito::Shape::MultiPointPick || \
+            type == ito::Shape::Point || \
+            type == ito::Shape::Line || \
+            type == ito::Shape::Rectangle || \
+            type == ito::Shape::Ellipse)
         {
-            m_currentShapeType = (ito::PrimitiveContainer::tPrimitive)type;
+            m_currentShapeType = (ito::Shape::ShapeType)type;
             m_elementsToPick = maxNrOfPoints;
             setState(stateDrawShape); //this calls startOrStopDrawGeometricShape if everything is ok
         }
@@ -1804,7 +1646,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
     m_currentShapeIndices.clear();
     m_pMultiPointPicker->selection().clear();
 
-    if (m_currentShapeType == ito::PrimitiveContainer::tMultiPointPick) //multiPointPick
+    if (m_currentShapeType == ito::Shape::MultiPointPick) //multiPointPick
     {
         if (start)
         {
@@ -1838,13 +1680,13 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 
             if (p)
             {
-                QPolygonF polygonScale;
-                emit p->userInteractionDone(m_currentShapeType, true, polygonScale);
+                QVector<ito::Shape> shapes;
+                emit p->userInteractionDone(m_currentShapeType, true, shapes);
             }
             setState(stateIdle);
         }
     }
-    else if (m_currentShapeType == ito::PrimitiveContainer::tPoint)
+    else if (m_currentShapeType == ito::Shape::Point)
     {
         if (start)
         {
@@ -1870,13 +1712,13 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 
             if (p)
             {
-                QPolygonF polygonScale;
-                emit p->userInteractionDone(m_currentShapeType, true, polygonScale);
+                QVector<ito::Shape> shapes;
+                emit p->userInteractionDone(m_currentShapeType, true, shapes);
             }
             setState(stateIdle);
         }
     }
-    else if (m_currentShapeType == ito::PrimitiveContainer::tLine)
+    else if (m_currentShapeType == ito::Shape::Line)
     {
         if (start)
         {
@@ -1903,13 +1745,13 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 
             if (p)
             {
-                QPolygonF polygonScale;
-                emit p->userInteractionDone(m_currentShapeType, true, polygonScale);
+                QVector<ito::Shape> shapes;
+                emit p->userInteractionDone(m_currentShapeType, true, shapes);
             }
             setState(stateIdle);
         }
     }
-    else if (m_currentShapeType == ito::PrimitiveContainer::tRectangle)
+    else if (m_currentShapeType == ito::Shape::Rectangle)
     {
         if (start)
         {
@@ -1932,13 +1774,13 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 
             if (p)
             {
-                QPolygonF polygonScale;
-                emit p->userInteractionDone(m_currentShapeType, true, polygonScale);
+                QVector<ito::Shape> shapes;
+                emit p->userInteractionDone(m_currentShapeType, true, shapes);
             }
             setState(stateIdle);
         }
     }
-    else if (m_currentShapeType == ito::PrimitiveContainer::tEllipse)
+    else if (m_currentShapeType == ito::Shape::Ellipse)
     {
         if (start)
         {
@@ -1961,8 +1803,8 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 
             if (p)
             {
-                QPolygonF polygonScale;
-                emit p->userInteractionDone(m_currentShapeType, true, polygonScale);
+                QVector<ito::Shape> shapes;
+                emit p->userInteractionDone(m_currentShapeType, true, shapes);
             }
             setState(stateIdle);
         }
@@ -1973,8 +1815,8 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         
         if (p)
         {
-            QPolygonF polygonScale;
-            emit p->userInteractionDone(m_currentShapeType, true, polygonScale);
+            QVector<ito::Shape> shapes;
+            emit p->userInteractionDone(m_currentShapeType, true, shapes);
         }
         setState(stateIdle);
         retval += ito::RetVal(ito::retError, 0, tr("Unknown type for userInteractionStart").toLatin1().data());
@@ -2017,7 +1859,7 @@ void ItomQwtPlot::clearAllGeometricShapes()
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
     if (p && thingsToDo)
     {
-        emit p->plotItemsDeleted();
+        emit p->geometricShapesDeleted();
         p->updatePropertyDock();
     }
 }
@@ -2047,7 +1889,7 @@ ito::RetVal ItomQwtPlot::deleteGeometricShape(const int id)
         replot();
 
         ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
-        if (p) emit  p->plotItemDeleted(id);
+        if (p) emit  p->geometricShapeDeleted(id);
     }
 
     return retVal;
@@ -2059,9 +1901,9 @@ int ItomQwtPlot::getSelectedGeometricShapeIdx() const
     QHash<int, DrawItem*>::const_iterator it;
     for (it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
     {
-        if (it.value() != NULL && it.value()->selected() != 0)
+        if (it.value() != NULL && it.value()->getSelected() != 0)
         {
-            return it.value()->m_idx;
+            return it.value()->getIndex();
         }
     }
 
@@ -2076,17 +1918,16 @@ void ItomQwtPlot::setSelectedGeometricShapeIdx(int idx)
     QHash<int, DrawItem*>::const_iterator it = m_pShapes.begin();
     for (; it != m_pShapes.end(); ++it)
     {
-        if (it.value() != NULL && it.value()->m_idx == idx)
+        if (it.value() != NULL && it.value()->getIndex() == idx)
         {
             it.value()->setSelected(true);
             failed = false;
             do_replot = true;
             continue;
         }
-        if (it.value() != NULL && (it.value()->m_active != 0 || it.value()->selected()))
+        if (it.value() != NULL && (it.value()->getActive() != 0 || it.value()->getSelected()))
         {
             do_replot = true;
-            it.value()->m_active = 0;
             it.value()->setActive(0);
             it.value()->setSelected(false);
         }
@@ -2097,7 +1938,7 @@ void ItomQwtPlot::setSelectedGeometricShapeIdx(int idx)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::setGeometricShapes(const QSharedPointer<ito::DataObject> geometricShapes)
+ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometricShapes)
 {
     ito::RetVal retVal;
     clearAllGeometricShapes();
@@ -2108,109 +1949,55 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QSharedPointer<ito::DataObject
     {
         retVal += ito::RetVal(ito::retError, 0, tr("Could not plot marker, api is missing").toLatin1().data());
     }
-    else if (geometricShapes.isNull())
-    {
-        retVal += ito::RetVal(ito::retError, 0, tr("no geometric shapes given").toLatin1().data());
-    }
     else
     {
-        int limits[] = { 0, std::numeric_limits<int>::max(), 6, 11 };
-
-        ito::DataObject *dObj = apiCreateFromDataObject(geometricShapes.data(), 2, ito::tFloat32, limits, &retVal);
-
-        if (!retVal.containsError())
-        {
-            int nrOfShapes = dObj->getSize(0);
+        int nrOfShapes = geometricShapes.size();
             
-            DrawItem *newItem = NULL;
-            unsigned short type;
-            unsigned char flags;
-            // The definition do not correspond to the definetion of primitiv elements
+        DrawItem *newItem = NULL;
+        // The definition do not correspond to the definetion of primitiv elements
 
-            for (int i = 0; i < nrOfShapes; ++i)
+        foreach(const ito::Shape &shape, geometricShapes)
+        for (int i = 0; i < geometricShapes.size(); ++i)
+        {
+            if (m_pShapes.contains(shape.index()))
             {
-                QPainterPath path; //this must be inside of for loop, else it is not cleared for every new shape
-                newItem = NULL;
-                const ito::float32 *row = dObj->rowPtr<const ito::float32>(0, i);
-                int idx = (int)row[0];
-                int t = (int)row[1];
-
-                type = t & ito::PrimitiveContainer::tTypeMask;
-                flags = (t & ito::PrimitiveContainer::tFlagMask) >> 16;
-
-                switch (type)
+                m_pShapes[shape.index()]->setShape(shape, m_inverseColor0, m_inverseColor1);
+            }
+            else
+            {
+                switch (shape.type())
                 {
-                case ito::PrimitiveContainer::tPoint:
-                    path.moveTo(row[2], row[3]);
-                    path.lineTo(row[2], row[3]);
-                    break;
-
-                case ito::PrimitiveContainer::tLine:
-                    path.moveTo(row[2], row[3]);
-                    path.lineTo(row[4], row[5]);
-                    break;
-
-                case ito::PrimitiveContainer::tRectangle:
-                    path.addRect(row[2], row[3], row[4] - row[2], row[5] - row[3]);
-                    break;
-
-                case ito::PrimitiveContainer::tEllipse:
-                    path.addEllipse(row[2], row[3], row[4] - row[2], row[5] - row[3]);
-                    break;
-
-                default:
-                    retVal += ito::RetVal(ito::retError, 0, tr("invalid geometric shape type").toLatin1().data());
-                    break;
-                }
-
-                if (m_pShapes.contains(idx))
-                {
-                    m_pShapes[idx]->setShape(path, m_inverseColor0, m_inverseColor1);
-                    m_pShapes[idx]->m_flags = flags;
-                }
-                else
-                {
-                    switch (type)
+                case ito::Shape::MultiPointPick:
+                case ito::Shape::Point:
+                case ito::Shape::Line:
+                case ito::Shape::Rectangle:
+                case ito::Shape::Square:
+                case ito::Shape::Ellipse:
+                case ito::Shape::Circle:
+                    newItem = new DrawItem(shape, this, &retVal);
+                    if (!retVal.containsError())
                     {
-                    case ito::PrimitiveContainer::tMultiPointPick:
-                    case ito::PrimitiveContainer::tPoint:
-                        newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint, idx);
-                        break;
-
-                    case ito::PrimitiveContainer::tLine:
-                        newItem = new DrawItem(this, ito::PrimitiveContainer::tLine, idx);
-                        break;
-
-                    case ito::PrimitiveContainer::tRectangle:
-                        newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle, idx);
-                        break;
-
-                    case ito::PrimitiveContainer::tEllipse:
-                        newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse, idx);
-                        break;
-
-                    default:
-                        retVal += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
-                        break;
-                    }
-
-                    if (newItem)
-                    {
-                        newItem->setShape(path, m_inverseColor0, m_inverseColor1);
-
+                        newItem->setColor(m_inverseColor0, m_inverseColor1);
                         newItem->setVisible(true);
                         newItem->show();
                         newItem->attach(this);
-                        newItem->m_flags = flags;
-                        m_pShapes.insert(newItem->m_idx, newItem);
+                        m_pShapes.insert(newItem->getIndex(), newItem);
                     }
+                    break;
+
+                default:
+                    retVal += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
+                    break;
+                }
+
+                if (newItem)
+                {
+                    
                 }
             }
 
             replot();
         }
-
-        if (dObj) delete dObj;
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
@@ -2221,83 +2008,33 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QSharedPointer<ito::DataObject
         
     }
     
-    if (p) emit  p->plotItemsFinished(0, retVal.containsError());
+    if (p) emit  p->geometricShapeFinished(0, retVal.containsError());
 
     return retVal;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> ItomQwtPlot::geometricShapes2DataObject()
+QVector<ito::Shape> ItomQwtPlot::getGeometricShapes()
 {
-    QSharedPointer<ito::DataObject> obj(new ito::DataObject());
-    obj->zeros(m_pShapes.size(), PRIM_ELEMENTLENGTH, ito::tFloat32);
-
+    QVector<ito::Shape> shapes;
+    shapes.reserve(m_pShapes.size());
     QHash<int, DrawItem*>::Iterator it = m_pShapes.begin();
-    ito::float32 *rowPtr;
 
-    int idx = 0;
     for (; it != m_pShapes.end(); it++)
     {
         if (it.value() == NULL)
         {
-            continue;
+            shapes.append(ito::Shape());
+
         }
-
-        rowPtr = obj->rowPtr<ito::float32>(0, idx);
-        rowPtr[0] = (ito::float32) (it.value()->m_idx);
-
-        switch (it.value()->m_type)
+        else
         {
-        case ito::PrimitiveContainer::tPoint:
-            rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tPoint;
-            rowPtr[2] = (ito::float32) (it.value()->x1);
-            rowPtr[3] = (ito::float32) (it.value()->y1);
-            break;
-
-        case ito::PrimitiveContainer::tLine:
-            rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tLine;
-            rowPtr[2] = (ito::float32) (it.value()->x1);
-            rowPtr[3] = (ito::float32) (it.value()->y1);
-            rowPtr[5] = (ito::float32) (it.value()->x2);
-            rowPtr[6] = (ito::float32) (it.value()->y2);
-            break;
-
-        case ito::PrimitiveContainer::tRectangle:
-            rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tRectangle;
-            rowPtr[2] = (ito::float32) (it.value()->x1);
-            rowPtr[3] = (ito::float32) (it.value()->y1);
-            rowPtr[5] = (ito::float32) (it.value()->x2);
-            rowPtr[6] = (ito::float32) (it.value()->y2);
-            break;
-
-        case ito::PrimitiveContainer::tEllipse:
-            rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tEllipse;
-            rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
-            rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
-            rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 2.0);
-            rowPtr[6] = (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 2.0);
-            break;
-            /*
-            case Plot1DWidget::tCircle:
-            rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tCircle;
-            rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
-            rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
-            rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
-            break;
-
-            case Plot1DWidget::tSquare:
-            rowPtr[1] = (ito::float32) ito::PrimitiveContainer::tSquare;
-            rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
-            rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
-            rowPtr[5] = (abs((ito::float32)it.value()->x1 - (ito::float32)it.value()->x2) / 4.0) + (abs((ito::float32)it.value()->y1 - (ito::float32)it.value()->y2) / 4.0);
-            break;
-            */
+            shapes.append(it.value()->getShape());
         }
-        idx++;
     }
 
-    return obj;
+    return shapes;
 }
 
 

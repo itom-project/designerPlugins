@@ -25,8 +25,6 @@
 #include "plot1DWidget.h"
 #include "DataObject/dataobj.h"
 
-#include "common/sharedStructuresPrimitives.h"
-
 #include <qsharedpointer.h>
 
 #include <qwt_plot.h>

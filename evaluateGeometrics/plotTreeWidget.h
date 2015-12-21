@@ -25,6 +25,7 @@
 
 #include "common/sharedStructures.h"
 #include "common/sharedStructuresPrimitives.h"
+#include "common/shape.h"
 #include "DataObject/dataobj.h"
 
 
@@ -102,12 +103,12 @@ struct InternalInfo
 
         m_primitivNames.clear();
         m_primitivNames.insert(0, "none");
-        m_primitivNames.insert(ito::PrimitiveContainer::tPoint, QObject::tr("point"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tLine, QObject::tr("line"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tEllipse, QObject::tr("ellipse"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tCircle, QObject::tr("circle"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tRectangle, QObject::tr("rectangle"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tSquare, QObject::tr("square"));
+        m_primitivNames.insert(ito::Shape::Point, QObject::tr("point"));
+        m_primitivNames.insert(ito::Shape::Line, QObject::tr("line"));
+        m_primitivNames.insert(ito::Shape::Ellipse, QObject::tr("ellipse"));
+        m_primitivNames.insert(ito::Shape::Circle, QObject::tr("circle"));
+        m_primitivNames.insert(ito::Shape::Rectangle, QObject::tr("rectangle"));
+        m_primitivNames.insert(ito::Shape::Square, QObject::tr("square"));
         m_primitivNames.insert(ito::PrimitiveContainer::tPolygon, QObject::tr("polygon"));
 
         static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};

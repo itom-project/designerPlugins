@@ -24,7 +24,6 @@
 #define PLOTCANVAS_H
 
 #include "common/sharedStructures.h"
-#include "common/sharedStructuresPrimitives.h"
 #include "common/interval.h"
 #include "plot/AbstractFigure.h"
 

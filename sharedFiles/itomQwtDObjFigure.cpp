@@ -165,20 +165,20 @@ void ItomQwtDObjFigure::userInteractionStart(int type, bool start, int maxNrOfPo
         default:
             m_pBaseContent->userInteractionStart(0, false, 0);
             break;
-        case ito::PrimitiveContainer::tMultiPointPick:
-        case ito::PrimitiveContainer::tPoint:
+        case ito::Shape::MultiPointPick:
+        case ito::Shape::Point:
             m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
             break;
 
-        case ito::PrimitiveContainer::tLine:
+        case ito::Shape::Line:
             m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
             break;
 
-        case ito::PrimitiveContainer::tRectangle:
+        case ito::Shape::Rectangle:
             m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
             break;
 
-        case ito::PrimitiveContainer::tEllipse:
+        case ito::Shape::Ellipse:
             m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
             break;
         }
@@ -186,7 +186,7 @@ void ItomQwtDObjFigure::userInteractionStart(int type, bool start, int maxNrOfPo
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::clearGeometricElements(void)
+ito::RetVal ItomQwtDObjFigure::clearGeometricShapes(void)
 {
     if (m_pBaseContent)
     {
@@ -197,7 +197,7 @@ ito::RetVal ItomQwtDObjFigure::clearGeometricElements(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::deleteGeometricElement(int id)
+ito::RetVal ItomQwtDObjFigure::deleteGeometricShape(int id)
 {
     if (m_pBaseContent)
     {
@@ -207,7 +207,7 @@ ito::RetVal ItomQwtDObjFigure::deleteGeometricElement(int id)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::setGeometricElementLabel(int id, QString label)
+ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabel(int id, QString label)
 {
     if (m_pBaseContent)
         return m_pBaseContent->setGeometricShapeLabel(id, label);
@@ -216,7 +216,7 @@ ito::RetVal ItomQwtDObjFigure::setGeometricElementLabel(int id, QString label)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::setGeometricElementLabelVisible(int id, bool setVisible)
+ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabelVisible(int id, bool setVisible)
 {
     if (m_pBaseContent)
         return m_pBaseContent->setGeometricShapeLabelVisible(id, setVisible);
@@ -309,21 +309,21 @@ void ItomQwtDObjFigure::setModState(const ItomQwtPlotEnums::ModificationState va
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer< ito::DataObject > ItomQwtDObjFigure::getGeometricElements()
+QVector<ito::Shape> ItomQwtDObjFigure::getGeometricShapes()
 {
     if (m_pBaseContent)
-        return m_pBaseContent->geometricShapes2DataObject();
-    return QSharedPointer<ito::DataObject>();
+        return m_pBaseContent->getGeometricShapes();
+    return QVector<ito::Shape>();
 }
 
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::setGeometricElements(QSharedPointer< ito::DataObject > geometricElements)
+ito::RetVal ItomQwtDObjFigure::setGeometricShapes(QVector<ito::Shape> geometricShapes)
 {
     if (m_pBaseContent)
     {
-        ito::RetVal retval = m_pBaseContent->setGeometricShapes(geometricElements);
+        ito::RetVal retval = m_pBaseContent->setGeometricShapes(geometricShapes);
         updatePropertyDock();
         return retval;
     }
@@ -331,21 +331,21 @@ ito::RetVal ItomQwtDObjFigure::setGeometricElements(QSharedPointer< ito::DataObj
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int ItomQwtDObjFigure::getSelectedElement(void)const
+int ItomQwtDObjFigure::getSelectedGeometricShape(void)const
 {
     if (m_pBaseContent) return m_pBaseContent->getSelectedGeometricShapeIdx();
     return -1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtDObjFigure::setSelectedElement(const int idx)
+void ItomQwtDObjFigure::setSelectedGeometricShape(const int idx)
 {
     if (m_pBaseContent) return m_pBaseContent->setSelectedGeometricShapeIdx(idx);
     updatePropertyDock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int ItomQwtDObjFigure::getGeometricElementsCount() const
+int ItomQwtDObjFigure::getGeometricShapesCount() const
 {
     return m_pBaseContent ? m_pBaseContent->countGeometricShapes() : 0;
 }
@@ -364,24 +364,9 @@ void ItomQwtDObjFigure::setMarkerLabelsVisible(const bool &visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::deleteMarkers(int id) //deprecated
-{
-    ito::RetVal retval(ito::retWarning, 0, "slot 'deleteMarkers' is deprecated for deletion of geometric shapes. Use slot 'deleteGeometricElement' instead.");
-
-    retval += deleteGeometricElement(id);
-    return retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtDObjFigure::plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
-    if (coords->getDims() == 2 && coords->getSize(0) != 2)
-    {
-        ito::RetVal retval(ito::retWarning, 0, "The height of the given data object is != 2. This is not allowed to plot markers. If you intend to plot geometric shapes, use the slot 'setGeometricElements' instead.");
-        retval += setGeometricElements(coords);
-        return retval;
-    }
-    else if (m_pBaseContent)
+    if (m_pBaseContent)
     {
         return m_pBaseContent->plotMarkers(coords, style, id, plane);
     }

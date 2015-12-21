@@ -21,30 +21,71 @@
  *********************************************************************** */
 
 #include "drawItem.h"
-#include "common/sharedStructuresPrimitives.h"
 #include "qwt_scale_map.h"
 #include <qwt_symbol.h>
 
+#include <qrect.h>
+
 QVector<int> DrawItem::idxVec;
 
-//----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &label) : QwtPlotShapeItem(label), m_pparent(parent), m_type(type), m_active(0), m_idx(0), x1(-1), y1(-1), m_autoColor(true),
-    x2(-1), y2(-1), m_selected(false), m_flags(0), m_label(label), m_labelVisible(false)
+class DrawItemPrivate
 {
+public:
+    DrawItemPrivate() : m_pparent(NULL) {}
+    ~DrawItemPrivate() {};
 
-    if (id <= 0)
+    ito::Shape m_shape;
+    QPen m_markerPen;
+    QBrush m_markerBrush;
+    QPen m_linePen;
+    QwtPlot *m_pparent;
+
+    bool m_selected;
+
+    QVector<QwtPlotMarker *> m_marker;
+    char m_active;
+    char m_type;    
+
+    bool m_autoColor;
+    bool m_labelVisible;
+
+    QColor m_markerColor;
+    QColor m_lineColor;
+
+    QPointF m_point1;
+    QPointF m_point2;
+};
+
+//----------------------------------------------------------------------------------------------------------------------------------
+DrawItem::DrawItem(const ito::Shape &shape, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/) : QwtPlotShapeItem(shape.name()), d(NULL)
+{
+    d = new DrawItemPrivate();
+    if (retVal)
+    {
+        *retVal += setShape(shape);
+    }
+    else
+    {
+        setShape(shape);
+    }
+    d->m_pparent = parent;
+    d->m_active = 0;
+    d->m_autoColor = true;
+    d->m_selected = false;
+    d->m_labelVisible = false;
+
+    if (shape.index() < 0)
     {
         int idxCtr = 0;
         do 
             idxCtr++;
         while (idxVec.contains(idxCtr));
-        m_idx = idxCtr;
-        idxVec.append(m_idx);
+        d->m_shape.setIndex(idxCtr);
+        idxVec.append(idxCtr);
     }
     else 
     {
-        m_idx = id;
-        idxVec.append(id);
+        idxVec.append(shape.index());
     }
 
     setRenderHint( QwtPlotItem::RenderAntialiased, true); //set AntiAliasing of geometric objects to true in order to plot them smoother
@@ -54,245 +95,302 @@ DrawItem::DrawItem(QwtPlot *parent, char type, int id, const QString &label) : Q
 DrawItem::~DrawItem()
 {
     detach();
-    for (int n = 0; n < m_marker.size(); n++)
+    for (int n = 0; n < d->m_marker.size(); n++)
     {
-        m_marker[n]->detach();
+        d->m_marker[n]->detach();
 //        m_marker.remove(n);
-        delete m_marker[n];
+        delete d->m_marker[n];
     }
-    m_marker.clear();
-    idxVec.remove(idxVec.indexOf(m_idx));
+    d->m_marker.clear();
+    idxVec.remove(idxVec.indexOf(d->m_shape.index()));
+
+    delete d;
+    d = NULL;
     
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setSelected(const bool selected)
 {
-    m_selected = selected;
+    d->m_selected = selected;
 
-    if(m_type == ito::PrimitiveContainer::tPoint && m_marker.size() > 0)
+    if (d->m_shape.type() == ito::Shape::Point && d->m_marker.size() > 0)
     {
-        QColor markerColor = m_marker[0]->linePen().color();
-        m_marker[0]->setSymbol(new QwtSymbol(selected ? QwtSymbol::Rect : QwtSymbol::Triangle, QBrush(markerColor),
+        QColor markerColor = d->m_marker[0]->linePen().color();
+        d->m_marker[0]->setSymbol(new QwtSymbol(selected ? QwtSymbol::Rect : QwtSymbol::Triangle, QBrush(markerColor),
             QPen(QBrush(markerColor), 1), selected ? QSize(9,9) : QSize(7,7) ));
     }
-    setPen(pen().color(), m_selected ? 3 : 1);
+    setPen(pen().color(), d->m_selected ? 3 : 1);
     return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool DrawItem::selected() const
+bool DrawItem::getSelected() const
 {
-    return m_selected;
+    return d->m_selected;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setLabel(const QString newLabel) 
+void DrawItem::setLabel(const QString &label)
 {
-    m_label = newLabel;
-    QwtPlotShapeItem::setTitle(m_label);
+    d->m_shape.setName(label);
+    QwtPlotShapeItem::setTitle(label);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setActive(int active)
+QString DrawItem::getLabel() const
+{
+    return d->m_shape.name();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setLabelVisible(const bool labelVisible)
+{
+    d->m_labelVisible = labelVisible;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool DrawItem::getLabelVisible() const
+{
+    return d->m_labelVisible;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int DrawItem::getIndex() const
+{
+    return d->m_shape.index();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool DrawItem::getAutoColor() const
+{
+    return d->m_autoColor;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+const ito::Shape &DrawItem::getShape() const
+{
+    return d->m_shape;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QPointF DrawItem::getPoint1() const
+{
+    return d->m_point1;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QPointF DrawItem::getPoint2() const
+{
+    return d->m_point2;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+char DrawItem::getActive() const
+{
+    return d->m_active;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setActive(char active)
 {
     QColor markerColor = Qt::green;
-    if(m_marker.size()) markerColor = m_marker[0]->linePen().color();
+    if (d->m_marker.size()) markerColor = d->m_marker[0]->linePen().color();
 
-    if(m_type == ito::PrimitiveContainer::tPoint)
+    if (d->m_shape.type() == ito::Shape::Point)
     {
-        for (int n = 0; n < m_marker.size(); n++)
+        for (int n = 0; n < d->m_marker.size(); n++)
         {
-            m_marker[n]->setLinePen(QPen(markerColor));
-            m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Triangle,QBrush(markerColor),
+            d->m_marker[n]->setLinePen(QPen(markerColor));
+            d->m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(markerColor),
                 QPen(QBrush(markerColor), 1),  QSize(7,7) ));
         }
     }
     else
     {
-        for (int n = 0; n < m_marker.size(); n++)
+        for (int n = 0; n < d->m_marker.size(); n++)
         {
-            m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(markerColor),
+            d->m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond, QBrush(markerColor),
                 QPen(QBrush(markerColor), 1),  QSize(7,7) ));
         }
     }
 
     if (active == 1)
     {
-        if (m_marker.size() >= 1)
-            m_marker[0]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
+        if (d->m_marker.size() >= 1)
+            d->m_marker[0]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
                 QPen(QBrush(markerColor), 1),  QSize(9,9) ));
     }
     else if (active == 2)
     {
-        if (m_marker.size() >= 2)
-            m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
+        if (d->m_marker.size() >= 2)
+            d->m_marker[1]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
                 QPen(QBrush(markerColor), 1),  QSize(9,9) ));
     }
+
+    d->m_active = active;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
 {
-    if(m_type == ito::PrimitiveContainer::tPoint)
+    if(d->m_shape.type() == ito::Shape::Point)
     {
-        for (int n = 0; n < m_marker.size(); n++)
+        for (int n = 0; n < d->m_marker.size(); n++)
         {
-            m_marker[n]->setLinePen(QPen(markerColor));
-            m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Triangle,QBrush(markerColor),
+            d->m_marker[n]->setLinePen(QPen(markerColor));
+            d->m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(markerColor),
                 QPen(QBrush(markerColor), 1),  QSize(7,7) ));
         }
     }
     else
     {
-        for (int n = 0; n < m_marker.size(); n++)
+        for (int n = 0; n < d->m_marker.size(); n++)
         {
-            m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(markerColor),
+            d->m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond, QBrush(markerColor),
                 QPen(QBrush(markerColor), 1),  QSize(7,7) ));
         }
     }
-    setPen(QColor(lineColor), m_selected ? 3 : 1);
+    setPen(QColor(lineColor), d->m_selected ? 3 : 1);
+
+    d->m_markerColor = markerColor;
+    d->m_lineColor = lineColor;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setShape(const QPainterPath &path, const QColor &firstColor, const QColor &secondColor)
+ito::RetVal DrawItem::setShape(const ito::Shape &shape)
 {
-    QwtPlotMarker *marker = NULL;
-    int numOfElements = path.elementCount();
+    ito::RetVal retVal;
 
-    if (numOfElements <= 0)
-        return;
-    
-    setPen(firstColor, m_selected ? 3 : 1);
+    //create QPainterPath from shape
+    QPainterPath path; //this must be inside of for loop, else it is not cleared for every new shape
+    d->m_point1 = QPointF();
+    d->m_point2 = QPointF();
 
-    QwtPlotShapeItem::setShape(path);
-    QwtPlotShapeItem::setTitle(m_label);
-    
-    if (m_marker.size() > 0)
+    switch (shape.type())
     {
-
-        for (int n = 0; n < m_marker.size(); n++)
-        {
-            m_marker[n]->detach();
-//            m_marker.remove(n);
-            delete m_marker[n];
-        }
-        m_marker.clear();
+    case ito::Shape::Point:
+    {
+        d->m_point1 = shape.transform().map(shape.basePoints()[0]);
+        path.moveTo(d->m_point1);
+        path.lineTo(d->m_point1);
     }
-    //if (path.length() >= 1) // len gives the physical length, not the number of elements!!!
-    if (numOfElements >= 1)
+    break;
+
+    case ito::Shape::Line:
     {
-        QPainterPath::Element el;
-        marker = new QwtPlotMarker();
+        d->m_point1 = shape.transform().map(shape.basePoints()[0]);
+        d->m_point2 = shape.transform().map(shape.basePoints()[1]);
+        path.moveTo(d->m_point1);
+        path.lineTo(d->m_point2);
+    }
+    break;
 
-
-        if(m_type == ito::PrimitiveContainer::tPoint)
+    case ito::Shape::Rectangle:
+    case ito::Shape::Square:
+        if (!shape.transform().isRotating())
         {
-            marker->setLinePen(QPen(secondColor));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle,QBrush(secondColor),
-                QPen(QBrush(secondColor), 1),  QSize(7,7) ));
+            d->m_point1 = shape.transform().map(shape.basePoints()[0]);
+            d->m_point2 = shape.transform().map(shape.basePoints()[1]);
+            QRectF rect(d->m_point1, d->m_point2);
+            path.addRect(rect);
         }
         else
         {
-            marker->setLinePen(QPen(secondColor));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(secondColor),
-                QPen(QBrush(secondColor), 1),  QSize(7,7) ));
-            
+            retVal += ito::RetVal(ito::retError, 0, QObject::tr("rotated shapes are currently not supported.").toLatin1().data());
         }
-
-        /*
-        if (secondColor.isValid())
-        {
-            marker->setLinePen(QPen(secondColor));
-        }
-        else
-        {
-            marker->setLinePen(QPen(Qt::green));
-        }
-        */
-
-
-        switch (m_type)
-        {
-            default:
-            case ito::PrimitiveContainer::tPoint:
-            case ito::PrimitiveContainer::tLine:
-            case ito::PrimitiveContainer::tRectangle:
-                el = path.elementAt(0);
-                x1 = el.x;
-                y1 = el.y;
-            break;
-
-            case ito::PrimitiveContainer::tEllipse:
-                //if (path.length() >= 7) // len gives the physical length, not the number of elements!!!
-                if (numOfElements >= 7)
-                {
-                    el = path.elementAt(6);
-                    x1 = el.x;
-                }
-                //if (path.length() >= 10) // len gives the physical length, not the number of elements!!!
-                if (numOfElements >= 10)
-                {
-                    el = path.elementAt(9);
-                    y1 = el.y;
-                }
-            break;
-
-        }
-
-        marker->setXValue(x1);
-        marker->setYValue(y1);
-        marker->setVisible(true);
-        marker->attach(m_pparent);
-        m_marker.append(marker);
-//        m_active = 1;
-    }
-    //if (path.length() >= 2) // len gives the physical length, not the number of elements!!!
-    if (numOfElements >= 2)
-    {
-        QPainterPath::Element el;
-        marker = new QwtPlotMarker();
-        marker->setLinePen(QPen(secondColor));
-        marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(secondColor),
-            QPen(QBrush(secondColor), 1),  QSize(7,7) ));
         
+        break;
 
-        switch (m_type)
+    case ito::Shape::Ellipse:
+    case ito::Shape::Circle:
+        if (!shape.transform().isRotating())
         {
-            default:
-            case ito::PrimitiveContainer::tLine:
-                el = path.elementAt(1);
-                x2 = el.x;
-                y2 = el.y;
-            break;
-
-            case ito::PrimitiveContainer::tRectangle:
-                //if (path.length() >= 3) // len gives the physical length, not the number of elements!!!
-                if (numOfElements >= 3)
-                {
-                    el = path.elementAt(2);
-                    x2 = el.x;
-                    y2 = el.y;
-                }
-            break;
-
-            case ito::PrimitiveContainer::tEllipse:
-                el = path.elementAt(0);
-                x2 = el.x;
-                //if (path.length() >= 4) // len gives the physical length, not the number of elements!!!
-                if (numOfElements >= 4)
-                {
-                    el = path.elementAt(3);
-                    y2 = el.y;
-                }
-            break;
-
+            d->m_point1 = shape.transform().map(shape.basePoints()[0]);
+            d->m_point2 = shape.transform().map(shape.basePoints()[1]);
+            QRectF rect(d->m_point1, d->m_point2);
+            path.addEllipse(rect);
+        }
+        else
+        {
+            retVal += ito::RetVal(ito::retError, 0, QObject::tr("rotated shapes are currently not supported.").toLatin1().data());
         }
 
-        marker->setXValue(x2);
-        marker->setYValue(y2);
-        marker->setVisible(true);
-        marker->attach(m_pparent);
-        m_marker.append(marker);
-//        m_active = 2;
+        break;
+
+    default:
+        retVal += ito::RetVal(ito::retError, 0, QObject::tr("invalid geometric shape type").toLatin1().data());
+        break;
     }
 
+    if (!retVal.containsError() && path.elementCount() > 0)
+    {
+        d->m_shape = shape;
+        QwtPlotMarker *marker = NULL;
+        int numOfElements = path.elementCount();
+
+        QwtPlotShapeItem::setShape(path);
+        QwtPlotShapeItem::setTitle(d->m_shape.name());
+
+        if (d->m_marker.size() > 0)
+        {
+
+            for (int n = 0; n < d->m_marker.size(); n++)
+            {
+                d->m_marker[n]->detach();
+                delete d->m_marker[n];
+            }
+            d->m_marker.clear();
+        }
+
+        if (!d->m_point1.isNull())
+        {
+            marker = new QwtPlotMarker();
+
+            if (shape.type() == ito::Shape::Point)
+            {
+                marker->setLinePen(QPen(d->m_markerColor));
+                marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor),
+                    QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
+            }
+            else
+            {
+                marker->setLinePen(QPen(d->m_markerColor));
+                marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond, QBrush(d->m_markerColor),
+                    QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
+            }
+
+            marker->setXValue(d->m_point1.x());
+            marker->setYValue(d->m_point1.y());
+            marker->setVisible(true);
+            marker->attach(d->m_pparent);
+            d->m_marker.append(marker);
+        }
+
+        if (!d->m_point2.isNull())
+        {
+            marker = new QwtPlotMarker();
+            marker->setLinePen(QPen(d->m_lineColor));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond, QBrush(d->m_lineColor),
+                QPen(QBrush(d->m_lineColor), 1), QSize(7, 7)));
+
+            marker->setXValue(d->m_point2.x());
+            marker->setYValue(d->m_point2.y());
+            marker->setVisible(true);
+            marker->attach(d->m_pparent);
+            d->m_marker.append(marker);
+        }
+    }
+
+    return retVal;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal DrawItem::setShape(const ito::Shape &shape, const QColor &firstColor, const QColor &secondColor)
+{
+    setColor(firstColor, secondColor);
+    return setShape(shape);
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::draw( QPainter *painter, 
             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
@@ -301,23 +399,23 @@ void DrawItem::draw( QPainter *painter,
     QwtPlotShapeItem::draw(painter, xMap, yMap, canvasRect);
 
     //const QRectF cRect = QwtScaleMap::invTransform(xMap, yMap, canvasRect.toRect() );
-    if(!m_label.isEmpty() && m_labelVisible)
+    if(!d->m_shape.name().isEmpty() && d->m_labelVisible)
     {
         QRectF myRect(0, 0, 0, 0);
     
-        const QwtText label(m_label);
+        const QwtText label(d->m_shape.name());
 
         const QSizeF textSize = label.textSize( painter->font() );
 
         const QPointF textSizeScales = QPointF(textSize.width() * fabs(xMap.sDist()/xMap.pDist()), textSize.height() * fabs(yMap.sDist()/yMap.pDist()));
 
-        if(m_marker.size() == 1 && m_marker[0] != NULL)
+        if (d->m_marker.size() == 1 && d->m_marker[0] != NULL)
         {
-            myRect = QRectF(m_marker[0]->xValue(), m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
+            myRect = QRectF(d->m_marker[0]->xValue(), d->m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
         }
-        else if(m_marker.size() > 1)
+        else if (d->m_marker.size() > 1)
         {
-            myRect = QRectF(m_marker[0]->xValue(), m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
+            myRect = QRectF(d->m_marker[0]->xValue(), d->m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
         }
         const QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect );
 
