@@ -33,13 +33,14 @@
 
 #include "common/shape.h"
 #include "common/retVal.h"
+#include "itomQwtPlotEnums.h"
 
 class DrawItemPrivate; //forward declaration
 
 class DrawItem : public QwtPlotShapeItem
 {
     public:
-        explicit DrawItem(const ito::Shape &shape, QwtPlot *parent, ito::RetVal *retVal = NULL);
+        explicit DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal = NULL, bool labelVisible = false);
         virtual ~DrawItem();
         ito::RetVal setShape(const ito::Shape &shape);
         ito::RetVal setShape(const ito::Shape &shape, const QColor &markerColor, const QColor &lineColor);
@@ -55,6 +56,8 @@ class DrawItem : public QwtPlotShapeItem
         const ito::Shape &getShape() const;
         int getIndex() const;
         bool getAutoColor() const;
+
+        void setModificationModes(const ItomQwtPlotEnums::ModificationModes &modes);
 
         QPointF getPoint1() const;
         QPointF getPoint2() const;

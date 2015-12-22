@@ -109,7 +109,7 @@ struct InternalInfo
         m_primitivNames.insert(ito::Shape::Circle, QObject::tr("circle"));
         m_primitivNames.insert(ito::Shape::Rectangle, QObject::tr("rectangle"));
         m_primitivNames.insert(ito::Shape::Square, QObject::tr("square"));
-        m_primitivNames.insert(ito::PrimitiveContainer::tPolygon, QObject::tr("polygon"));
+        m_primitivNames.insert(ito::Shape::Polygon, QObject::tr("polygon"));
 
         static char const* primitivNames[] = {"none", "point", "line", "elipse", "circle", "rectangle", "square", "err", "err", "polygon"};
 

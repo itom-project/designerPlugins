@@ -173,7 +173,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
     mainTb->addAction(m_pActClearShapes);
-    mainTb->addAction(m_pActShapeModifyType);
 
     // Add labels to toolbar
     QAction *lblAction = mainTb->addWidget(m_pLblMarkerCoords);
@@ -213,7 +212,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
     menuTools->addAction(m_pActClearShapes);
-    menuTools->addAction(m_pActShapeModifyType);
     m_menus.append(menuTools);
 
     m_pContextMenu = new QMenu(QObject::tr("plot1D"), guiParent);

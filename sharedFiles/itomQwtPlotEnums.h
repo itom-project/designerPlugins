@@ -38,6 +38,8 @@ class ItomQwtPlotEnums : public QObject
     Q_ENUMS(FillCurveStyle);
     Q_ENUMS(ScaleEngine);
 
+    Q_FLAGS(ModificationMode ModificationModes)
+
 public:
     
     enum ComplexType 
@@ -48,14 +50,13 @@ public:
         CmplxArg = 3 
     }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
     
-    enum ModificationState
+    enum ModificationMode
     {
-        NextElementMode = 0,
-        MoveGeometricElements = 1,
-        RotateGeometricElements = 2,
-        ResizeGeometricElements = 3,
-        ModifyPoints = 4
+        Move = 0x01,
+        Rotate = 0x02,
+        Resize = 0x04
     };
+    Q_DECLARE_FLAGS(ModificationModes, ModificationMode)
     
     enum MultiLineMode { AutoRowCol, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
     enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};

@@ -223,7 +223,6 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
     mainTb->addAction(m_pActClearShapes);
-    mainTb->addAction(m_pActShapeModifyType);
     mainTb->addSeparator();
     mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
@@ -257,7 +256,6 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
     menuTools->addAction(m_pActClearShapes);
-    menuTools->addAction(m_pActShapeModifyType);
     m_menus.append(menuTools);
 
     m_pContextMenu = new QMenu(QObject::tr("plot2D"), guiParent);

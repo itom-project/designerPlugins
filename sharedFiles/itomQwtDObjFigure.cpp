@@ -287,22 +287,22 @@ void ItomQwtDObjFigure::setContextMenuEnabled(bool show)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtPlotEnums::ModificationState ItomQwtDObjFigure::getModState() const
+ItomQwtPlotEnums::ModificationModes ItomQwtDObjFigure::getModificationModes() const
 {
     if (m_pBaseContent)
     {
-        return m_pBaseContent->shapeModificationType();
+        return m_pBaseContent->shapeModificationModes();
     }
 
-    return ItomQwtPlotEnums::ModifyPoints;
+    return ItomQwtPlotEnums::Move | ItomQwtPlotEnums::Resize | ItomQwtPlotEnums::Rotate;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtDObjFigure::setModState(const ItomQwtPlotEnums::ModificationState val)
+void ItomQwtDObjFigure::setModificationModes(const ItomQwtPlotEnums::ModificationModes modes)
 {
     if (m_pBaseContent)
     {
-        m_pBaseContent->setShapeModificationType(val);
+        m_pBaseContent->setShapeModificationModes(modes);
     }
 
     updatePropertyDock();
@@ -315,8 +315,6 @@ QVector<ito::Shape> ItomQwtDObjFigure::getGeometricShapes()
         return m_pBaseContent->getGeometricShapes();
     return QVector<ito::Shape>();
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtDObjFigure::setGeometricShapes(QVector<ito::Shape> geometricShapes)
@@ -360,6 +358,19 @@ bool ItomQwtDObjFigure::getMarkerLabelsVisible(void) const
 void ItomQwtDObjFigure::setMarkerLabelsVisible(const bool &visible)
 {
     if (m_pBaseContent) return m_pBaseContent->setMarkerLabelVisible(visible);
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool ItomQwtDObjFigure::getShapesLabelsVisible(void) const
+{
+    return m_pBaseContent ? m_pBaseContent->shapesLabelVisible() : false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setShapesLabelsVisible(const bool &visible)
+{
+    if (m_pBaseContent) return m_pBaseContent->setShapesLabelVisible(visible);
     updatePropertyDock();
 }
 

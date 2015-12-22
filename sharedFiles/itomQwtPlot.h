@@ -84,6 +84,9 @@ public:
     bool markerLabelVisible() const { return m_markerLabelVisible; }
     void setMarkerLabelVisible(bool visible);
 
+    bool shapesLabelVisible() const { return m_shapesLabelVisible; }
+    void setShapesLabelVisible(bool visible);
+
     virtual void setButtonStyle(int style); /*!< can be overwritten, however call this base implementation in the overloaded method, too.*/
     int buttonStyle() const { return m_buttonStyle; }
 
@@ -93,8 +96,8 @@ public:
     ito::AbstractFigure::UnitLabelStyle unitLabelStyle() const { return m_unitLabelStyle; }
     virtual void setUnitLabelStyle(ito::AbstractFigure::UnitLabelStyle style) { m_unitLabelStyle = style; };
 
-    ItomQwtPlotEnums::ModificationState shapeModificationType() const { return m_shapeModificationType; }
-    void setShapeModificationType(const ItomQwtPlotEnums::ModificationState &type);
+    ItomQwtPlotEnums::ModificationModes shapeModificationModes() const { return m_shapeModificationModes; }
+    void setShapeModificationModes(const ItomQwtPlotEnums::ModificationModes &modes);
 
     void setVisible(bool visible);
 
@@ -163,9 +166,6 @@ protected:
 
     QAction *m_pActClearShapes;
 
-    QMenu   *m_pMenuShapeModifyType;
-    QAction *m_pActShapeModifyType;
-
     QAction *m_pActProperties;
 
     QList<QToolBar*> m_toolbars;
@@ -197,9 +197,8 @@ private:
     QVector<int> m_currentShapeIndices; /*!< indices of all shapes that have already been drawn in the current collection, e.g. if 4 rectangles are requested, the four indices are stored until the last rectangle has been given.*/
     int m_elementsToPick; /*!< number of shapes that should be picked in the current session. */
     ito::Shape::ShapeType m_currentShapeType;
-    ItomQwtPlotEnums::ModificationState m_shapeModificationType;
-    //QPoint m_initialMousePosition;
-    //QPointF m_initialMarkerPosition;
+    ItomQwtPlotEnums::ModificationModes m_shapeModificationModes;
+    bool m_shapesLabelVisible;
 
     //markers
     QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
@@ -232,7 +231,6 @@ private slots:
     void mnuActPan(bool checked);
     void mnuActZoom(bool checked);
     void mnuActRatio(bool checked);
-    void mnuGroupShapeModifyTypes(QAction *action);
     void mnuGroupShapeTypes(QAction *action);
     void mnuShapeType(bool checked);
     void mnuCopyToClipboard();

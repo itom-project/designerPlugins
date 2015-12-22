@@ -66,7 +66,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_stateIsChanging(false),
     m_selectedShape(NULL),
     m_ignoreNextMouseEvent(false),
-    m_shapeModificationType(ItomQwtPlotEnums::ModifyPoints),
+    m_shapeModificationModes(ItomQwtPlotEnums::Move | ItomQwtPlotEnums::Rotate | ItomQwtPlotEnums::Resize),
     m_inverseColor0(Qt::green),
     m_inverseColor1(Qt::blue),
     m_elementsToPick(1),
@@ -74,6 +74,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_buttonStyle(0),
     m_plottingEnabled(true),
     m_markerLabelVisible(false),
+    m_shapesLabelVisible(false),
     m_unitLabelStyle(ito::AbstractFigure::UnitLabelSlash),
     m_pActSave(NULL),
     m_pActHome(NULL),
@@ -84,10 +85,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pActCopyClipboard(NULL),
     m_pMenuShapeType(NULL),
     m_pActClearShapes(NULL),
-    m_pMenuShapeModifyType(NULL),
     m_pActProperties(NULL),
-    m_pActShapeType(NULL),
-    m_pActShapeModifyType(NULL)
+    m_pActShapeType(NULL)
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -270,39 +269,6 @@ void ItomQwtPlot::createBaseActions()
     m_pActShapeType->setCheckable(true);
     connect(m_pMenuShapeType, SIGNAL(triggered(QAction*)), this, SLOT(mnuGroupShapeTypes(QAction*)));
     connect(m_pActShapeType, SIGNAL(triggered(bool)), this, SLOT(mnuShapeType(bool)));
-
-
-    //m_pMenuShapeModifyType
-    m_pActShapeModifyType = new QAction(tr("Geometric shape modification mode"), p);
-    m_pMenuShapeModifyType = new QMenu(tr("Geometric shape modification mode"), p);
-    m_pActShapeModifyType->setMenu(m_pMenuShapeModifyType);
-
-    a = m_pMenuShapeModifyType->addAction(tr("Move elements"));
-    a->setData(ItomQwtPlotEnums::MoveGeometricElements);
-    m_pMenuShapeModifyType->addAction(a);
-    a->setCheckable(false);
-
-    a = m_pMenuShapeModifyType->addAction(tr("Resize elements"));
-    a->setData(ItomQwtPlotEnums::RotateGeometricElements);
-    m_pMenuShapeModifyType->addAction(a);
-    a->setCheckable(false);
-    a->setEnabled(false);
-
-    a = m_pMenuShapeModifyType->addAction(tr("Rotate elements"));
-    a->setData(ItomQwtPlotEnums::ResizeGeometricElements);
-    m_pMenuShapeModifyType->addAction(a);
-    a->setCheckable(false);
-    a->setEnabled(false);
-
-    a = m_pMenuShapeModifyType->addAction(tr("Modify points"));
-    a->setData(ItomQwtPlotEnums::ModifyPoints);
-    m_pMenuShapeModifyType->addAction(a);
-    m_pMenuShapeModifyType->setDefaultAction(a);
-    a->setCheckable(false);
-
-    m_pActShapeModifyType->setVisible(true);
-    m_pActShapeModifyType->setCheckable(true);
-    connect(m_pMenuShapeModifyType, SIGNAL(triggered(QAction*)), this, SLOT(mnuGroupShapeModifyTypes(QAction*)));
 }
 
 //---------------------------------------------------------------------------
@@ -333,12 +299,11 @@ void ItomQwtPlot::loadStyles()
     m_pMultiPointPicker->setTrackerPen(trackerPen);
     m_pMultiPointPicker->setBackgroundFillBrush(trackerBg);
 
-    QHash<int, DrawItem*>::iterator it = m_pShapes.begin();
-    for (; it != m_pShapes.end(); ++it)
+    foreach(DrawItem *item, m_pShapes)
     {
-        if (it.value() != NULL && it.value()->getAutoColor())
+        if (item && item->getAutoColor())
         {
-            it.value()->setColor(m_inverseColor1, m_inverseColor0);
+            item->setColor(m_inverseColor0, m_inverseColor1);
         }
     }
 }
@@ -356,11 +321,6 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
         m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"));
         m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython.png"));
-        m_pMenuShapeModifyType->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosMove.png"));
-        m_pMenuShapeModifyType->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosResize.png"));
-        m_pMenuShapeModifyType->actions()[2]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosRotate.png"));
-        m_pMenuShapeModifyType->actions()[3]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/geosPoints.png"));
-        m_pActShapeModifyType->setIcon(m_pMenuShapeModifyType->defaultAction()->icon());
 
         switch (m_currentShapeType)
         {
@@ -389,11 +349,6 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect_lt/icons/AspRatio11_lt.png"));
         m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/zoom_to_rect_lt.png"));
         m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython_lt.png"));
-        m_pMenuShapeModifyType->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosMove_lt.png"));
-        m_pMenuShapeModifyType->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosResize_lt.png"));
-        m_pMenuShapeModifyType->actions()[2]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosRotate_lt.png"));
-        m_pMenuShapeModifyType->actions()[3]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/geosPoints_lt.png"));
-        m_pActShapeModifyType->setIcon(m_pMenuShapeModifyType->defaultAction()->icon());
 
         switch (m_currentShapeType)
         {
@@ -421,6 +376,14 @@ void ItomQwtPlot::setInverseColors(const QColor &color0, const QColor &color1)
 {
     m_inverseColor0 = color0;
     m_inverseColor1 = color1;
+
+    foreach(DrawItem *item, m_pShapes)
+    {
+        if (item && item->getAutoColor())
+        {
+            item->setColor(m_inverseColor0, m_inverseColor1);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -481,52 +444,13 @@ void ItomQwtPlot::mnuActZoom(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtPlot::setShapeModificationType(const ItomQwtPlotEnums::ModificationState &type)
+void ItomQwtPlot::setShapeModificationModes(const ItomQwtPlotEnums::ModificationModes &modes)
 {
-    switch (type)
-    {
-    default:
-    case ItomQwtPlotEnums::MoveGeometricElements:
-        m_shapeModificationType = ItomQwtPlotEnums::MoveGeometricElements;
-        m_pMenuShapeModifyType->setDefaultAction(m_pMenuShapeModifyType->actions()[0]);
-        m_pMenuShapeModifyType->setIcon(m_pMenuShapeModifyType->defaultAction()->icon());
-        break;
-    case ItomQwtPlotEnums::ResizeGeometricElements:
-        m_shapeModificationType = ItomQwtPlotEnums::ResizeGeometricElements;
-        m_pMenuShapeModifyType->setDefaultAction(m_pMenuShapeModifyType->actions()[1]);
-        m_pMenuShapeModifyType->setIcon(m_pMenuShapeModifyType->defaultAction()->icon());
-        break;
-    case ItomQwtPlotEnums::RotateGeometricElements:
-        m_shapeModificationType = ItomQwtPlotEnums::RotateGeometricElements;
-        m_pMenuShapeModifyType->setDefaultAction(m_pMenuShapeModifyType->actions()[2]);
-        m_pMenuShapeModifyType->setIcon(m_pMenuShapeModifyType->defaultAction()->icon());
-        break;
-    case ItomQwtPlotEnums::ModifyPoints:
-        m_shapeModificationType = ItomQwtPlotEnums::ModifyPoints;
-        m_pMenuShapeModifyType->setDefaultAction(m_pMenuShapeModifyType->actions()[3]);
-        m_pMenuShapeModifyType->setIcon(m_pMenuShapeModifyType->defaultAction()->icon());
-        break;
-    }
-}
+    m_shapeModificationModes = modes;
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtPlot::mnuGroupShapeModifyTypes(QAction *action)
-{
-    switch (action->data().toInt())
+    foreach(DrawItem *d, this->m_pShapes)
     {
-    default:
-    case ItomQwtPlotEnums::MoveGeometricElements:
-        setShapeModificationType(ItomQwtPlotEnums::MoveGeometricElements);
-        break;
-    case ItomQwtPlotEnums::ResizeGeometricElements:
-        setShapeModificationType(ItomQwtPlotEnums::ResizeGeometricElements);
-        break;
-    case ItomQwtPlotEnums::RotateGeometricElements:
-        setShapeModificationType(ItomQwtPlotEnums::RotateGeometricElements);
-        break;
-    case ItomQwtPlotEnums::ModifyPoints:
-        setShapeModificationType(ItomQwtPlotEnums::ModifyPoints);
-        break;
+        d->setModificationModes(modes);
     }
 }
 
@@ -977,7 +901,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
                 ito::Shape shape = ito::Shape::fromPoint(polygonScale[0]);
-                DrawItem *newItem = new DrawItem(shape, this);
+                DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
                 newItem->setColor(m_inverseColor0, m_inverseColor1);
                 if (this->m_inverseColor0.isValid())
                 {
@@ -1051,7 +975,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
                 ito::Shape shape = ito::Shape::fromLine(polygonScale[0], polygonScale[1]);
-                DrawItem *newItem = new DrawItem(shape, this);
+                DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
                 newItem->setColor(m_inverseColor0, m_inverseColor1);
                 if (this->m_inverseColor0.isValid())
                 {
@@ -1125,7 +1049,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
                 ito::Shape shape = ito::Shape::fromRectangle(QRectF(polygonScale[0], polygonScale[1]));
-                DrawItem *newItem = new DrawItem(shape, this);
+                DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
                 newItem->setColor(m_inverseColor0, m_inverseColor1);
                 if (this->m_inverseColor0.isValid())
                 {
@@ -1198,7 +1122,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
 
                 ito::Shape shape = ito::Shape::fromEllipse(QRectF(polygonScale[0], polygonScale[1]));
-                DrawItem *newItem = new DrawItem(shape, this);
+                DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
                 newItem->setColor(m_inverseColor0, m_inverseColor1);
                 if (this->m_inverseColor0.isValid())
                 {
@@ -1622,7 +1546,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                 case ito::Shape::Square:
                 case ito::Shape::Ellipse:
                 case ito::Shape::Circle:
-                    newItem = new DrawItem(shape, this, &retVal);
+                    newItem = new DrawItem(shape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
                     if (!retVal.containsError())
                     {
                         newItem->setColor(m_inverseColor0, m_inverseColor1);
@@ -2079,4 +2003,20 @@ void ItomQwtPlot::setMarkerLabelVisible(bool visible)
     }
 
     m_markerLabelVisible = visible;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setShapesLabelVisible(bool visible)
+{
+    if (m_shapesLabelVisible != visible)
+    {
+        foreach(DrawItem* d, m_pShapes)
+        {
+            d->setLabelVisible(visible);
+        }
+
+        replot();
+    }
+
+    m_shapesLabelVisible = visible;
 }

@@ -40,7 +40,7 @@ class PlotCanvas;
 #include <qslider.h>
 #include <qlabel.h>
 
-class InternalData;
+struct InternalData;
 
 class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 {

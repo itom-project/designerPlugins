@@ -53,17 +53,21 @@ public:
 
     QPointF m_point1;
     QPointF m_point2;
+
+    ItomQwtPlotEnums::ModificationModes m_modificationModes;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(const ito::Shape &shape, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/) : QwtPlotShapeItem(shape.name()), d(NULL)
+DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/, bool labelVisible /*= false*/) : 
+    QwtPlotShapeItem(shape.name()), d(NULL)
 {
     d = new DrawItemPrivate();
     
     d->m_pparent = parent;
     d->m_autoColor = true;
     d->m_selected = false;
-    d->m_labelVisible = false;
+    d->m_labelVisible = labelVisible;
+    d->m_modificationModes = modificationModes;
 
     if (retVal)
     {
@@ -106,16 +110,23 @@ DrawItem::~DrawItem()
     idxVec.remove(idxVec.indexOf(d->m_shape.index()));
 
     delete d;
-    d = NULL;
-    
+    d = NULL; 
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setModificationModes(const ItomQwtPlotEnums::ModificationModes &modes)
+{
+    d->m_modificationModes = modes;
+    setSelected(d->m_selected);
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setSelected(const bool selected)
 {
     d->m_selected = selected;
     int flags = d->m_shape.flags();
-    bool moveable = !(flags & ito::Shape::MoveLock);
-    bool resizeable = !(flags & ito::Shape::ResizeLock);
+    bool moveable = !(flags & ito::Shape::MoveLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Move);
+    bool resizeable = !(flags & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
     QwtPlotMarker *marker = NULL;
 
     switch (d->m_shape.type())
@@ -131,7 +142,7 @@ void DrawItem::setSelected(const bool selected)
                 foreach(QwtPlotMarker* marker, d->m_marker)
                 {
                     marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Rect : QwtSymbol::Triangle, QBrush(d->m_markerColor),
-                        QPen(QBrush(d->m_markerColor), 1), selected ? QSize(9, 9) : QSize(7, 7)));
+                        QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
                 }
             }
             else
@@ -354,11 +365,79 @@ QPointF DrawItem::getPoint2() const
 //----------------------------------------------------------------------------------------------------------------------------------
 QPointF DrawItem::getMarkerPosScale(int index) const
 {
-    if (index < 0 || index >= d->m_marker.size())
+    if (index >= 0 && index < d->m_marker.size())
     {
-        return QPointF();
+        return QPointF(d->m_marker[index]->xValue(), d->m_marker[index]->yValue());
     }
-    return QPointF(d->m_marker[index]->xValue(), d->m_marker[index]->yValue());
+    
+    //marker not available (e.g. no resize mode allowed, there we need to calculate the positions by hand...)
+
+    switch (d->m_shape.type())
+    {
+    case ito::Shape::Invalid:
+        return QPointF();
+    case ito::Shape::Point:
+    case ito::Shape::Line:
+    case ito::Shape::Polygon:
+    case ito::Shape::MultiPointPick:
+        if (index >= 0 || index < d->m_shape.rbasePoints().size())
+        {
+            return d->m_shape.rtransform().map(d->m_shape.rbasePoints()[0]);
+        }
+        else
+        {
+            return QPointF();
+        }
+    case ito::Shape::Rectangle:
+    case ito::Shape::Ellipse:
+    case ito::Shape::Square:
+    case ito::Shape::Circle:
+    {
+        QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
+        bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
+        QTransform &trafo = d->m_shape.rtransform();
+        QPointF pt;
+
+        if (keepAspect)
+        {
+            switch (index)
+            {
+            case 0:
+                return trafo.map(box.topLeft());
+            case 1:
+                return trafo.map(box.topRight());
+            case 2:
+                return trafo.map(box.bottomRight());
+            case 3:
+                return trafo.map(box.bottomLeft());
+            }
+        }
+        else
+        {
+            switch (index)
+            {
+            case 0:
+                return trafo.map(box.topLeft());
+            case 1:
+                return trafo.map(0.5 * (box.topRight() + box.topLeft()));
+            case 2:
+                return trafo.map(box.topRight());
+            case 3:
+                return trafo.map(0.5 * (box.bottomRight() + box.topRight()));
+            case 4:
+                return trafo.map(box.bottomRight());
+            case 5:
+                return trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
+            case 6:
+                return trafo.map(box.bottomLeft());
+            case 7:
+                return trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
+            }
+        }
+    }
+    }
+
+    return QPointF();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -394,26 +473,27 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
             {
                 if (markerIdx == 1)
                 {
-                    QLineF line(basePoints[2], newPoint);
+                    QLineF line(basePoints[1], newPoint);
+                    double angle = 45.0 * qRound(line.angle() / 45.0);
+                    line.setAngle(angle);
+                    basePoints[0] = line.p2();
+                    success = true;
+                }
+                else if (markerIdx == 2)
+                {
+                    QLineF line(newPoint, basePoints[0]);
                     double angle = 45.0 * qRound(line.angle() / 45.0);
                     line.setAngle(angle);
                     basePoints[1] = line.p2();
                     success = true;
                 }
-                else if (markerIdx == 2)
-                {
-                    QLineF line(newPoint, basePoints[1]);
-                    double angle = 45.0 * qRound(line.angle() / 45.0);
-                    line.setAngle(angle);
-                    basePoints[2] = line.p2();
-                    success = true;
-                }
             }
             else if (markerIdx == 1 || markerIdx == 2)
             {
-                basePoints[markerIdx] = newPoint;
+                basePoints[markerIdx-1] = newPoint;
                 success = true;
             }
+            break;
         }
         case ito::Shape::Point:
         case ito::Shape::MultiPointPick:
@@ -421,7 +501,7 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
         {
             if (markerIdx >= 0 && markerIdx < basePoints.size())
             {
-                basePoints[markerIdx] = invTrafo.map(markerScaleCoordinate);
+                basePoints[markerIdx-1] = invTrafo.map(markerScaleCoordinate);
                 success = true;
             }
             break;
@@ -515,37 +595,12 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
 {
-    if (d->m_selected == false)
-    {
-        if (d->m_shape.type() == ito::Shape::Point)
-        {
-            for (int n = 0; n < d->m_marker.size(); n++)
-            {
-                d->m_marker[n]->setLinePen(QPen(markerColor));
-                d->m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(markerColor),
-                    QPen(QBrush(markerColor), 1), QSize(7, 7)));
-            }
-        }
-        else
-        {
-            for (int n = 0; n < d->m_marker.size(); n++)
-            {
-                d->m_marker[n]->setSymbol(new QwtSymbol(QwtSymbol::Diamond, QBrush(markerColor),
-                    QPen(QBrush(markerColor), 1), QSize(7, 7)));
-            }
-        }
-    }
-    else if (d->m_selected)
-    {
-        if (d->m_marker.size() >= 1)
-            d->m_marker[0]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(markerColor),
-            QPen(QBrush(markerColor), 1), QSize(9, 9)));
-    }
-
     setPen(lineColor, d->m_selected ? 3 : 1);
 
     d->m_markerColor = markerColor;
     d->m_lineColor = lineColor;
+
+    setSelected(d->m_selected);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -561,10 +616,38 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
     switch (shape.type())
     {
     case ito::Shape::Point:
+    case ito::Shape::MultiPointPick:
     {
-        d->m_point1 = shape.transform().map(shape.basePoints()[0]);
-        path.moveTo(d->m_point1);
-        path.lineTo(d->m_point1);
+        int num = shape.basePoints().size();
+        d->m_point1 = shape.transform().map(shape.rbasePoints()[0]);
+        //path.moveTo(d->m_point1);
+        //path.lineTo(d->m_point1);
+
+        //delete markers, since deselected
+        for (int n = num; n < d->m_marker.size(); n++)
+        {
+            d->m_marker[n]->detach();
+            delete d->m_marker[n];
+            d->m_marker.pop_back();
+        }
+
+        QwtPlotMarker *marker;
+
+        while (d->m_marker.size() < num)
+        {
+            marker = new QwtPlotMarker();
+            marker->setLinePen(QPen(d->m_markerColor));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_lineColor), QPen(QBrush(d->m_lineColor), 1), QSize(7, 7)));
+            marker->attach(d->m_pparent);
+            d->m_marker.append(marker);
+        }
+
+        for (int i = 0; i < num; ++i)
+        {
+            d->m_marker[i]->setXValue(shape.transform().map(shape.rbasePoints()[i]).x());
+            d->m_marker[i]->setYValue(shape.transform().map(shape.rbasePoints()[i]).y());
+            d->m_marker[i]->setVisible(true);
+        }
     }
     break;
 
@@ -614,7 +697,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
         break;
     }
 
-    if (!retVal.containsError() && path.elementCount() > 0)
+    if (!retVal.containsError())
     {
         d->m_shape = shape;
         QwtPlotShapeItem::setShape(path);
@@ -641,25 +724,26 @@ void DrawItem::draw( QPainter *painter,
 {
     QwtPlotShapeItem::draw(painter, xMap, yMap, canvasRect);
 
-    //const QRectF cRect = QwtScaleMap::invTransform(xMap, yMap, canvasRect.toRect() );
-    if(!d->m_shape.name().isEmpty() && d->m_labelVisible)
+    if(d->m_labelVisible)
     {
         QRectF myRect(0, 0, 0, 0);
-    
-        const QwtText label(d->m_shape.name());
+        
+        QwtText label(d->m_shape.name());
+        if (label.isEmpty())
+        {
+            label.setText( QString("(%1)").arg(d->m_shape.index()) );
+        }
 
         const QSizeF textSize = label.textSize( painter->font() );
-
         const QPointF textSizeScales = QPointF(textSize.width() * fabs(xMap.sDist()/xMap.pDist()), textSize.height() * fabs(yMap.sDist()/yMap.pDist()));
+        QPointF marker0Position = this->getMarkerPosScale(0);
 
-        if (d->m_marker.size() == 1 && d->m_marker[0] != NULL)
+        if (marker0Position.isNull() == false)
         {
-            myRect = QRectF(d->m_marker[0]->xValue(), d->m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
+            myRect = QRectF(marker0Position - textSizeScales, marker0Position);
+            myRect.moveCenter(QPointF(-10, -10));
         }
-        else if (d->m_marker.size() > 1)
-        {
-            myRect = QRectF(d->m_marker[0]->xValue(), d->m_marker[0]->yValue(), textSizeScales.x(), textSizeScales.y());
-        }
+
         const QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect );
 
         if ( !cRect.isEmpty() )
@@ -679,8 +763,17 @@ void DrawItem::draw( QPainter *painter,
 //----------------------------------------------------------------------------------------------------------------------------------
 bool DrawItem::hitLine(const QPointF &point_transformed, const QLineF &line, double tol_x, double tol_y) const
 {
-    
+    //check small circles around end points
+    if (std::abs(point_transformed.x() - line.p1().x()) <= tol_x && std::abs(point_transformed.y() - line.p1().y()) <= tol_y)
+    {
+        return true;
+    }
+    else if (std::abs(point_transformed.x() - line.p2().x()) <= tol_x && std::abs(point_transformed.y() - line.p2().y()) <= tol_y)
+    {
+        return true;
+    }
 
+    //check line between end points
     QLineF normal = line.normalVector();
     normal.translate(-line.p1() + point_transformed);
 
@@ -714,7 +807,7 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
     case ito::Shape::Point:
     {
         QLineF line(point_trafo, shape.basePoints()[0]);
-        hitEdge = std::abs(line.dx() <= tol_x) && std::abs(line.dy() <= tol_y);
+        hitEdge = (std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y);
     }
     break;
 
@@ -739,18 +832,31 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
     case ito::Shape::Ellipse:
     case ito::Shape::Circle:
     {
+        //if selected, some markers are out of the circle, therefore their area must be checked separately
+        if (d->m_selected)
+        {
+            for (int i = 0; i < d->m_marker.size(); ++i)
+            {
+                if (std::abs(d->m_marker[i]->xValue() - point_trafo.x()) < tol_x && std::abs(d->m_marker[i]->yValue() - point_trafo.y()) < tol_y)
+                {
+                    hitEdge = true;
+                    break;
+                }
+            }
+        }
+
         //inverse transform point
         QPointF size = shape.basePoints()[1] - shape.basePoints()[0];
-        double a = size.x()/2.0 + tol_x;
-        double b = size.y()/2.0 + tol_y;
+        double a = std::abs(size.x())/2.0 + tol_x;
+        double b = std::abs(size.y())/2.0 + tol_y;
         QPointF center = (shape.basePoints()[0] + shape.basePoints()[1]) / 2.0;
         double x = point_trafo.x() - center.x();
         double y = point_trafo.y() - center.y();
 
         if ((((x*x) / (a*a)) + ((y*y) / (b*b))) <= 1.0)
         {
-            a = size.x() / 2.0 - tol_x;
-            b = size.y() / 2.0 - tol_y;
+            a -= 2 * tol_x;
+            b -= 2 * tol_y;
             hitEdge =((((x*x) / (a*a)) + ((y*y) / (b*b))) > 1.0);
         }
     }
@@ -778,24 +884,38 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
     if (hitEdge)
     {
         int flags = d->m_shape.flags();
-        bool moveable = !(flags & ito::Shape::MoveLock);
-        bool resizeable = !(flags & ito::Shape::ResizeLock);
+        bool moveable = !(flags & ito::Shape::MoveLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Move);
+        bool resizeable = !(flags & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
 
-        if (resizeable)
+        if (d->m_shape.type() == ito::Shape::Point)
         {
-            for (int i = 0; i < d->m_marker.size(); ++i)
+            if (moveable)
             {
-                if (std::abs(d->m_marker[i]->xValue() - point.x()) <= tol_x && \
-                    std::abs(d->m_marker[i]->yValue() - point.y()) <= tol_y)
-                {
-                    return (i + 1);
-                }
+                return 0;
             }
         }
-
-        if (moveable)
+        else
         {
-            return 0;
+            if (resizeable)
+            {
+                qreal dist_x, dist_y;
+
+                for (int i = 0; i < d->m_marker.size(); ++i)
+                {
+                    dist_x = std::abs(d->m_marker[i]->xValue() - point.x());
+                    dist_y = std::abs(d->m_marker[i]->yValue() - point.y());
+                    if (dist_x <= tol_x && \
+                        dist_y <= tol_y)
+                    {
+                        return (i + 1);
+                    }
+                }
+            }
+
+            if (moveable)
+            {
+                return 0;
+            }
         }
     }
 

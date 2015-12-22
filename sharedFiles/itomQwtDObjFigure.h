@@ -64,26 +64,30 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(bool keepAspectRatio READ getKeepAspectRatio WRITE setKeepAspectRatio USER true)
 
     // Properties related with geometric elements
-    Q_PROPERTY(QVector<ito::Shape> geometricShapes READ getGeometricShapes WRITE setGeometricShapes DESIGNABLE false)
-    Q_PROPERTY(int geometricShapesCount READ getGeometricShapesCount DESIGNABLE false)
+    Q_PROPERTY(QVector<ito::Shape> geometricShapes READ getGeometricShapes WRITE setGeometricShapes DESIGNABLE false USER false)
+    Q_PROPERTY(int geometricShapesCount READ getGeometricShapesCount DESIGNABLE false USER false)
     Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
-    Q_PROPERTY(int selectedGeometricShape READ getSelectedGeometricShape WRITE setSelectedGeometricShape DESIGNABLE false)
+    Q_PROPERTY(int selectedGeometricShape READ getSelectedGeometricShape WRITE setSelectedGeometricShape DESIGNABLE false USER true)
     
-    Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true)
+    Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
+    Q_PROPERTY(bool geometricShapesLabelsVisible READ getShapesLabelsVisible WRITE setShapesLabelsVisible DESIGNABLE true USER true)
 
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
-    Q_PROPERTY(ItomQwtPlotEnums::ModificationState geometryModMode READ getModState WRITE setModState DESIGNABLE true);
+    Q_PROPERTY(ItomQwtPlotEnums::ModificationModes geometryModificationModes READ getModificationModes WRITE setModificationModes DESIGNABLE true USER true);
 
     Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
     Q_CLASSINFO("prop://geometricShapes", "Geometric shapes defined by a vector of itom.shape for each element.")
     Q_CLASSINFO("prop://geometricShapesCount", "Number of currently existing geometric shapes.")
+    Q_CLASSINFO("prop://geometricShapesLabelsVisible", "Toggle visibility of shape labels, the label is the name of the shape.")
+
     Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
+
     Q_CLASSINFO("prop://selectedGeometricShape", "Get or set the currently highlighted geometric shape. After manipulation the last element stays selected.")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
-    Q_CLASSINFO("prop://geometryModMode", "Change the geometry modification mode (move, resize, rotate).")
+    Q_CLASSINFO("prop://geometryModificationModes", "Bitmask to globally change how geometric shapes can be modified. The possible modes of a shape are both restricted by the shape's flags and the allowed modes of the plot (move: 0x01, rotate: 0x02, resize: 0x04)")
 
     Q_CLASSINFO("slot://copyToClipBoard", "")
     Q_CLASSINFO("slot://userInteractionStart", "")
@@ -135,14 +139,17 @@ public:
     bool getMarkerLabelsVisible(void) const;
     void setMarkerLabelsVisible(const bool &visible);
 
+    bool getShapesLabelsVisible(void) const;
+    void setShapesLabelsVisible(const bool &visible);
+
     void setContextMenuEnabled(bool show); /*!< overloaded from AbstractFigure */
     bool getContextMenuEnabled() const;    /*!< overloaded from AbstractFigure */
 
     ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
     virtual void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style) = 0;
 
-    ItomQwtPlotEnums::ModificationState getModState() const;
-    void setModState(const ItomQwtPlotEnums::ModificationState val);
+    ItomQwtPlotEnums::ModificationModes getModificationModes() const;
+    void setModificationModes(const ItomQwtPlotEnums::ModificationModes modes);
 
     friend ItomQwtPlot;
 
