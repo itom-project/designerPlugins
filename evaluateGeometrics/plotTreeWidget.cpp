@@ -90,7 +90,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
 {
     //QLabel** elements = (QLabel**)calloc(5, sizeof(QLabel*));
 
-    ito::uint16 type = (ito::uint16)(((ito::uint32)(val[1])) & ito::PrimitiveContainer::tTypeMask);
+    ito::uint16 type = (ito::uint16)(((ito::uint32)(val[1])) & ito::Shape::TypeMask);
 
     QString coordsString("[%1, %2, %3]");
 
@@ -113,7 +113,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         switch (type)
         {
             default:
-            case ito::PrimitiveContainer::tNoType:
+            case ito::Shape::Invalid:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/notype.png"));
                 break;
@@ -148,7 +148,7 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/square.png"));
                 break;
             }
-            case ito::PrimitiveContainer::tPolygon:
+            case ito::Shape::Polygon:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/polygon.png"));
                 break;
@@ -156,10 +156,10 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
     }
 
-    switch (type & ito::PrimitiveContainer::tTypeMask)
+    switch (type & ito::Shape::TypeMask)
     {
         default:
-        case ito::PrimitiveContainer::tNoType:
+        case ito::Shape::Invalid:
             break;
 
         case ito::Shape::Point:

@@ -58,9 +58,12 @@ class DrawItem : public QwtPlotShapeItem
 
         QPointF getPoint1() const;
         QPointF getPoint2() const;
+        QPointF getMarkerPosScale(int index) const;
 
-        char getActive() const;
-        void setActive(char active); /*0: not active, 1: first point active, 2: second point active*/
+        bool shapeMoveTo(const QPointF &marker1ScaleCoordinate);
+        bool shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers = Qt::NoModifier);
+
+        char hitEdge(const QPointF &point, double tol_x, double tol_y) const;
 
         void setLabelVisible(const bool labelVisible);
         bool getLabelVisible() const;
@@ -73,6 +76,8 @@ class DrawItem : public QwtPlotShapeItem
 
     private:
         DrawItemPrivate *d;
+
+        bool hitLine(const QPointF &point_transformed, const QLineF &line, double tol_x, double tol_y) const;
 };
 
 #endif //DRAWITEM_H

@@ -64,7 +64,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_firstTimeVisible(false),
     m_state(-1),
     m_stateIsChanging(false),
-    m_activeShapeIdx(-1),
+    m_selectedShape(NULL),
     m_ignoreNextMouseEvent(false),
     m_shapeModificationType(ItomQwtPlotEnums::ModifyPoints),
     m_inverseColor0(Qt::green),
@@ -736,9 +736,15 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
 
         int canxpos = event->x() - canvas()->x();
         int canypos = event->y() - canvas()->y();
+        QPointF scalePos(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+        double tol_x = std::abs(invTransform(QwtPlot::xBottom, 15) - invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
+        double tol_y = std::abs(invTransform(QwtPlot::yLeft, 15) - invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
+        char hitType;
+
+        m_selectedShape = NULL;
+        m_selectedShapeHitType = -1;
 
         QHash<int, DrawItem*>::iterator it;
-        QPointF p1, p2;
         for (it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
         {
             if (it.value() == NULL)
@@ -746,42 +752,30 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                 continue;
             }
 
-            p1 = it.value()->getPoint1();
-            p2 = it.value()->getPoint2();
-
-            if (fabs(transform(QwtPlot::xBottom, p1.x()) - canxpos) < 10
-                && fabs(transform(QwtPlot::yLeft, p1.y()) - canypos) < 10)
+            hitType = it.value()->hitEdge(scalePos, tol_x, tol_y);
+            if (hitType >= 0)
             {
-                it.value()->setActive(1);
-                m_activeShapeIdx = it.value()->getIndex();
-                it.value()->setActive(1);
                 it.value()->setSelected(true);
+                m_selectedShape = it.value();
+                m_selectedShapeHitType = hitType;
+                m_startMouseScale = scalePos;
+                m_startMousePx = event->pos();
+                m_mouseDragReplotCounter = 0;
 
-                m_initialMousePosition.setX(event->x());
-                m_initialMousePosition.setY(event->y());
-                m_initialMarkerPosition.setX(p1.x());
-                m_initialMarkerPosition.setY(p1.y());
-                ++it;
-                break;
-            }
-            else if (fabs(transform(QwtPlot::xBottom, p2.x()) - canxpos) < 10
-                && fabs(transform(QwtPlot::yLeft, p2.y()) - canypos) < 10)
-            {
-                it.value()->setActive(2);
-                m_activeShapeIdx = it.value()->getIndex();
-                it.value()->setActive(2);
-                it.value()->setSelected(true);
-                m_initialMousePosition.setX(event->x());
-                m_initialMousePosition.setY(event->y());
-                m_initialMarkerPosition.setX(p1.x());
-                m_initialMarkerPosition.setY(p1.y());
+                if (hitType == 0)
+                {
+                    m_startMouseScaleDiff = m_startMouseScale - m_selectedShape->getMarkerPosScale(0);
+                }
+                else
+                {
+                    m_startMouseScaleDiff = m_startMouseScale - m_selectedShape->getMarkerPosScale(hitType - 1);
+                }
                 ++it;
                 break;
             }
             else
             {
                 it.value()->setSelected(false);
-                it.value()->setActive(0);
             }
         }
 
@@ -792,7 +786,6 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                 continue;
             }
             it.value()->setSelected(false);
-            it.value()->setActive(0);
         }
         replot();
     }
@@ -812,416 +805,73 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
         return;
     }
 
-    //    Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
-    if (m_state == stateIdle)
+    if (m_state == stateIdle && m_selectedShape != NULL)
     {
-        event->accept();
+        QPointF mousePosScale(invTransform(QwtPlot::xBottom, event->x() - canvas()->x()), invTransform(QwtPlot::yLeft, event->y() - canvas()->y()));
 
-        ito::float32 canxpos = invTransform(QwtPlot::xBottom, event->x() - canvas()->x());
-        ito::float32 canypos = invTransform(QwtPlot::yLeft, event->y() - canvas()->y());
-
-        bool modificationDone = false;
-
-        QHash<int, DrawItem*>::Iterator it = m_pShapes.begin();
-        ito::Shape shape;
-        double dx, dy;
-
-        for (; it != m_pShapes.end(); it++)
+        if (m_selectedShapeHitType == 0) //mouse move
         {
-            if (it.value() == NULL || it.value()->getActive() == 0)
+            if (event->modifiers() == Qt::ControlModifier)
             {
-                continue;
-            }
-
-            shape = it.value()->getShape();
-
-            if (m_shapeModificationType == ItomQwtPlotEnums::MoveGeometricElements)
-            {
-                QPointF len = it.value()->getPoint2() - it.value()->getPoint1();
-
-                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+                //only move horizontally or vertically
+                QPointF diff = event->pos() - m_startMousePx;
+                if (std::abs(diff.x()) > std::abs(diff.y()))
                 {
-                    dx = invTransform(QwtPlot::xBottom, event->x()) - invTransform(QwtPlot::xBottom, m_initialMousePosition.x());
-                    dy = invTransform(QwtPlot::yLeft, event->y()) - invTransform(QwtPlot::yLeft, m_initialMousePosition.y());
-                    dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                    dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                    if (it.value()->getActive() == 1)
-                    {
-                        if (fabs(dx) > fabs(dy))
-                        {
-                            dx = canxpos - m_initialMarkerPosition.x();
-                            dy = 0.0;
-                        }
-                        else
-                        {
-                            dy = canypos - m_initialMarkerPosition.y();
-                            dx = 0.0;
-                        }
-
-                    }
-                    else
-                    {
-                        if (fabs(dx) > fabs(dy))
-                        {
-                            dx = canxpos - m_initialMarkerPosition.x() - len.rx();
-                            dy = 0.0;
-                        }
-                        else
-                        {
-                            dy = canypos - m_initialMarkerPosition.y() - len.ry();
-                            dx = 0.0;
-                        }
-                    }
+                    mousePosScale = QPointF(mousePosScale.x(), m_startMouseScale.y());
                 }
                 else
                 {
-                    dx = 0.0;
-                    dy = 0.0;
-                    if (it.value()->getActive() == 2)
-                    {
-                        canxpos -= len.rx();
-                        canypos -= len.ry();
-                    }
+                    mousePosScale = QPointF(m_startMouseScale.x(), mousePosScale.y());
                 }
 
-                if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                {
-                    QPointF dest(m_initialMarkerPosition.x() + dx, m_initialMarkerPosition.y() + dy);
-                    shape.point1MoveTo(dest);
-                }
-                else
-                {
-                    QPointF dest(canxpos, canypos);
-                    shape.point1MoveTo(dest);
-                }
-
-                it.value()->setShape(shape);
-                replot();
             }
-            else if (m_shapeModificationType == ItomQwtPlotEnums::ResizeGeometricElements)
+
+            if (m_selectedShape->shapeMoveTo(mousePosScale - m_startMouseScaleDiff))
             {
-                emit statusBarMessage(tr("Could not perform specific action on geometric shapes, resize action not implemented yet."), 4000);
-            }
-            else if (m_shapeModificationType == ItomQwtPlotEnums::ModifyPoints)
-            {
-                if (it.value()->getShape().flags() & ito::Shape::ResizeLock)
-                {
-                    emit statusBarMessage(tr("Could not change points of geometric shapes, shape is protected."), 4000);
-                    break;
-                }
-
-                switch (shape.type())
-                {
-                case ito::Shape::Point:
-                {
-                    QPointF dest(canxpos, canypos);
-                    shape.point1MoveTo(dest);
-                    it.value()->setShape(shape);
-                    replot();
-                }
-                break;
-
-                //case ito::Shape::Line:
-                //{
-                //    QPointF p1 = it.value()->getPoint1();
-                //    QPointF p2 = it.value()->getPoint2();
-                //    QTransform inv = shape.rtransform().inverted();
-
-                //    if (QApplication::keyboardModifiers() == Qt::ControlModifier)       // draw line horizontal or vertical with second point fixed
-                //    {
-                //        dx = canxpos - (it.value()->getActive() == 1 ? p2.x() : p1.x());
-                //        dy = (it.value()->getActive() == 1 ? p2.y() : p1.y()) - canypos;
-
-                //        dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                //        dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                //        if (fabs(dx) > fabs(dy))
-                //        {
-                //            shape.rbasePoints()[0] = 
-                //            path.moveTo(canxpos, it.value()->y2);
-                //            path.lineTo(it.value()->x2, it.value()->y2);
-                //        }
-                //        else
-                //        {
-                //            path.moveTo(it.value()->x2, canypos);
-                //            path.lineTo(it.value()->x2, it.value()->y2);
-                //        }
-                //    }
-                //    else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)    // move line without resize
-                //    {
-
-                //        dx = it.value()->x2 - it.value()->x1;
-                //        dy = it.value()->y2 - it.value()->y1;
-
-                //        path.moveTo(canxpos, canypos);
-                //        path.lineTo(canxpos + dx, canypos + dy);
-                //    }
-                //    else if (QApplication::keyboardModifiers() == Qt::AltModifier)      // keep linesize constant and second point fixed
-                //    {
-                //        dx = it.value()->x2 - it.value()->x1;
-                //        dy = it.value()->y2 - it.value()->y1;
-
-                //        ito::float32 length = sqrt(dx * dx + dy * dy);
-
-                //        dx = canxpos - it.value()->x2;
-                //        dy = canypos - it.value()->y2;
-
-                //        ito::float32 alpha = atan2(dy, dx);
-
-                //        dx = cos(alpha) * length;
-                //        dy = sin(alpha) * length;
-
-                //        path.moveTo(it.value()->x2 + dx, it.value()->y2 + dy);
-                //        path.lineTo(it.value()->x2, it.value()->y2);
-                //    }
-                //    else                                                                // just draw line
-                //    {
-                //        path.moveTo(canxpos, canypos);
-                //        path.lineTo(it.value()->x2, it.value()->y2);
-                //    }
-                //    it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                //    it.value()->setActive(it.value()->getActive());
-                //    replot();
-                //    break;
-
-                //    case ito::Shape::Rectangle:
-                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                //        {
-                //            dx = it.value()->x2 - canxpos;
-                //            dy = canypos - it.value()->y2;
-
-                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                //            if (fabs(dx) < fabs(dy))
-                //            {
-                //                //canypos = it.value()->x2 - dx;
-                //                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-                //            else
-                //            {
-                //                //canxpos = it.value()->x2 - dy;
-                //                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-
-                //            m_ignoreNextMouseEvent = true;
-                //        }
-
-                //        path.addRect(canxpos, canypos,
-                //            it.value()->x2 - canxpos,
-                //            it.value()->y2 - canypos);
-                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                //        it.value()->setActive(it.value()->getActive());
-
-                //        if (m_ignoreNextMouseEvent)
-                //        {
-                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
-
-                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                //            this->cursor().setPos(dst);
-                //        }
-                //        replot();
-                //        break;
-
-                //    case ito::Shape::Ellipse:
-                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                //        {
-                //            dx = it.value()->x2 - canxpos;
-                //            dy = canypos - it.value()->y2;
-
-                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                //            if (fabs(dx) < fabs(dy))
-                //            {
-                //                //canypos = it.value()->x2 - dx;
-                //                canypos = it.value()->y2 + dx * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-                //            else
-                //            {
-                //                //canxpos = it.value()->x2 - dy;
-                //                canxpos = it.value()->x2 - dy * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-                //            m_ignoreNextMouseEvent = true;
-                //        }
-                //        path.addEllipse(canxpos,
-                //            canypos,
-                //            it.value()->x2 - canxpos,
-                //            it.value()->y2 - canypos);
-                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                //        it.value()->setActive(it.value()->getActive());
-
-                //        if (m_ignoreNextMouseEvent)
-                //        {
-                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
-
-                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                //            this->cursor().setPos(dst);
-                //        }
-                //        replot();
-                //        break;
-                //    }
-                //}
-                //else if (it.value()->getActive() == 2)
-                //{
-
-                //    if (it.value()->getShape().flags() & 0x07)
-                //    {
-                //        emit statusBarMessage(tr("Could not change geomtric element, elemet is read only."), 4000);
-                //        break;
-                //    }
-
-                //    ito::float32 dx, dy;
-
-                //    QPainterPath path;
-                //    switch (it.value()->getShape.type())
-                //    {
-                //    case ito::Shape::Line:
-                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                //        {
-                //            dx = canxpos - it.value()->x1;
-                //            dy = it.value()->y1 - canypos;
-
-                //            if (fabs(dx) > fabs(dy))
-                //            {
-                //                path.moveTo(it.value()->x1, it.value()->y1);
-                //                path.lineTo(canxpos, it.value()->y1);
-                //            }
-                //            else
-                //            {
-                //                path.moveTo(it.value()->x1, it.value()->y1);
-                //                path.lineTo(it.value()->x1, canypos);
-                //            }
-                //        }
-                //        else if (QApplication::keyboardModifiers() == Qt::ShiftModifier)
-                //        {
-
-                //            dx = it.value()->x2 - it.value()->x1;
-                //            dy = it.value()->y2 - it.value()->y1;
-
-                //            path.moveTo(canxpos - dx, canypos - dy);
-                //            path.lineTo(canxpos, canypos);
-                //        }
-                //        else if (QApplication::keyboardModifiers() == Qt::AltModifier)
-                //        {
-                //            dx = it.value()->x2 - it.value()->x1;
-                //            dy = it.value()->y2 - it.value()->y1;
-
-                //            ito::float32 length = sqrt(dx * dx + dy * dy);
-
-                //            dx = it.value()->x1 - canxpos;
-                //            dy = it.value()->y1 - canypos;
-
-                //            ito::float32 alpha = atan2(dy, dx);
-
-                //            dx = cos(alpha) * length;
-                //            dy = sin(alpha) * length;
-
-                //            path.moveTo(it.value()->x1, it.value()->y1);
-                //            path.lineTo(it.value()->x1 - dx, it.value()->y1 - dy);
-                //        }
-                //        else
-                //        {
-                //            path.moveTo(it.value()->x1, it.value()->y1);
-                //            path.lineTo(canxpos, canypos);
-                //        }
-
-                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                //        it.value()->setActive(it.value()->getActive());
-                //        //if (p) emit p->plotItemChanged(n);
-                //        replot();
-                //        break;
-
-                //    case ito::Shape::Rectangle:
-                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                //        {
-                //            dx = canxpos - it.value()->x1;
-                //            dy = it.value()->y1 - canypos;
-
-                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                //            if (fabs(dx) < fabs(dy))
-                //            {
-                //                //canypos = it.value()->y1 + dx;
-                //                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-                //            else
-                //            {
-                //                //canypos = it.value()->x1 + dy;
-                //                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-                //            m_ignoreNextMouseEvent = true;
-                //        }
-                //        path.addRect(it.value()->x1, it.value()->y1,
-                //            canxpos - it.value()->x1,
-                //            canypos - it.value()->y1);
-                //        it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                //        it.value()->setActive(it.value()->getActive());
-                //        //if (p) emit p->plotItemChanged(n);
-                //        if (m_ignoreNextMouseEvent)
-                //        {
-                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
-
-                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                //            this->cursor().setPos(dst);
-                //        }
-                //        replot();
-                //        break;
-
-                //    case ito::Shape::Ellipse:
-                //        if (QApplication::keyboardModifiers() == Qt::ControlModifier)
-                //        {
-                //            dx = canxpos - it.value()->x1;
-                //            dy = it.value()->y1 - canypos;
-
-                //            dx = fabs(dx) <= std::numeric_limits<ito::float32>::epsilon() ? std::numeric_limits<ito::float32>::epsilon() : dx;
-                //            dy = fabs(dy) <= std::numeric_limits<ito::float32>::epsilon() ? -std::numeric_limits<ito::float32>::epsilon() : dy;
-
-                //            if (fabs(dx) < fabs(dy))
-                //            {
-                //                //canypos = it.value()->y1 + dx;
-                //                canypos = it.value()->y1 - dx * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-                //            else
-                //            {
-                //                //canypos = it.value()->x1 + dy;
-                //                canxpos = it.value()->x1 + dy * dx / fabs(dx) * dy / fabs(dy);
-                //            }
-                //            m_ignoreNextMouseEvent = true;
-
-                //        }
-                //        path.addEllipse(it.value()->x1,
-                //            it.value()->y1,
-                //            canxpos - it.value()->x1,
-                //            canypos - it.value()->y1),
-                //            it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
-                //        it.value()->setActive(it.value()->getActive());
-                //        //if (p) emit p->plotItemChanged(n);
-                //        if (m_ignoreNextMouseEvent)
-                //        {
-                //            ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
-                //            ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
-
-                //            QPoint dst = canvas()->mapToGlobal(QPoint(destPosX, destPosY));
-
-                //            this->cursor().setPos(dst);
-                //        }
-                //        replot();
-                //        break;
-                //    }
-                }
+                event->accept();
             }
             else
             {
-                emit statusBarMessage(tr("Could not perform specific action on geometric shapes, action not implemented."), 4000);
+                event->ignore();
+            }
+        }
+        else if (m_selectedShapeHitType > 0) //rescale
+        {
+            if (event->modifiers() == Qt::ControlModifier && \
+                (m_selectedShape->getShape().type() == ito::Shape::Point || \
+                m_selectedShape->getShape().type() == ito::Shape::MultiPointPick))
+            {
+                //only move horizontally or vertically
+                QPointF diff = event->pos() - m_startMousePx;
+                if (std::abs(diff.x()) > std::abs(diff.y()))
+                {
+                    mousePosScale = QPointF(mousePosScale.x(), m_startMouseScale.y());
+                }
+                else
+                {
+                    mousePosScale = QPointF(m_startMouseScale.x(), mousePosScale.y());
+                }
+
+            }
+
+            //todo: line + alt: leep line size constant
+            if (m_selectedShape->shapeResize(m_selectedShapeHitType, mousePosScale - m_startMouseScaleDiff, event->modifiers()))
+            {
+                event->accept();
+            }
+            else
+            {
+                event->ignore();
+            }
+        }
+
+        if (event->isAccepted())
+        {
+            m_mouseDragReplotCounter++;
+            if (m_mouseDragReplotCounter % 2 == 0)
+            {
+                replot();
+                m_mouseDragReplotCounter = 0;
             }
         }
     }
@@ -1240,22 +890,24 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
         //modification of shape finished
         event->accept();
         QHash<int, DrawItem*>::iterator it = m_pShapes.begin();
-        ito::Shape oldShape;
+        bool found = false;
 
         for (; it != m_pShapes.end(); ++it)
         {
-            if (it.value() != NULL && it.value()->getActive() != 0)
+            if (it.value() != NULL && it.value()->getSelected())
             {
+                found = true;
                 ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
                 if (p)
                 {
                     emit p->geometricShapeChanged(it.value()->getIndex(), it.value()->getShape());
                 }
             }
-            if (it.value())
-            {
-                it.value()->setActive(0);
-            }
+        }
+
+        if (found)
+        {
+            replot();
         }
     }
 
@@ -1839,13 +1491,10 @@ void ItomQwtPlot::clearAllGeometricShapes()
 
     //delete all geometric shapes and marker sets
     QHashIterator<int, DrawItem *> i(m_pShapes);
-    DrawItem *shape;
     while (i.hasNext())
     {
         i.next();
-        shape = i.value();
-        shape->detach();
-        delete shape;
+        delete i.value();
     }
     m_pShapes.clear();
 
@@ -1925,10 +1574,9 @@ void ItomQwtPlot::setSelectedGeometricShapeIdx(int idx)
             do_replot = true;
             continue;
         }
-        if (it.value() != NULL && (it.value()->getActive() != 0 || it.value()->getSelected()))
+        if (it.value() != NULL && (it.value()->getSelected()))
         {
             do_replot = true;
-            it.value()->setActive(0);
             it.value()->setSelected(false);
         }
     }

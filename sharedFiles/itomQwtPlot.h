@@ -187,13 +187,19 @@ private:
 
     //geometric shapes
     QHash<int, DrawItem *> m_pShapes; /*!< hash table with all geometric shapes (besides marker sets) currently displayed */
-    int m_activeShapeIdx; //todo: necessary
+    DrawItem *m_selectedShape;
+    char m_selectedShapeHitType; /*!< 0: edge only, 1..8 marker number */
+    QPointF m_startMouseScale; /*!< position of mouse click on mousePressEvent based on scale coordinate system */
+    QPoint m_startMousePx; /*!< position of mouse click on mousePressEvent based on screen coordinate system */
+    QPointF m_startMouseScaleDiff; /*!< difference from startMouseScale to marker1..marker8 (edge is marker1, too)*/
+    int m_mouseDragReplotCounter; /*!< a replot during mouse movement is time consuming, therefore only replot it every 2nd or 3rd movement */
+
     QVector<int> m_currentShapeIndices; /*!< indices of all shapes that have already been drawn in the current collection, e.g. if 4 rectangles are requested, the four indices are stored until the last rectangle has been given.*/
     int m_elementsToPick; /*!< number of shapes that should be picked in the current session. */
     ito::Shape::ShapeType m_currentShapeType;
     ItomQwtPlotEnums::ModificationState m_shapeModificationType;
-    QPoint m_initialMousePosition;
-    QPointF m_initialMarkerPosition;
+    //QPoint m_initialMousePosition;
+    //QPointF m_initialMarkerPosition;
 
     //markers
     QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
