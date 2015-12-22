@@ -741,20 +741,19 @@ void DrawItem::draw( QPainter *painter,
         if (marker0Position.isNull() == false)
         {
             myRect = QRectF(marker0Position - textSizeScales, marker0Position);
-            myRect.moveCenter(QPointF(-10, -10));
-        }
+            
+            QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect);
+            cRect.translate(QPoint(-10, -10));
 
-        const QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect );
-
-        if ( !cRect.isEmpty() )
-        {
-            if ( !label.isEmpty() )
+            if (!label.isEmpty())
             {
-                QBrush myBrush = QBrush(QColor(255, 255, 255, 170),Qt::SolidPattern);
+                QBrush myBrush = QBrush(QColor(255, 255, 255, 170), Qt::SolidPattern);
                 painter->fillRect(cRect, myBrush);
-                label.draw( painter, cRect );
+                label.draw(painter, cRect);
             }
         }
+
+        
     }
 
     return;
