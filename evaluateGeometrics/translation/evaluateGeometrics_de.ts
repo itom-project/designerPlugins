@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de">
 <context>
-    <name>EvaluateGeometricsFigure</name>
+    <name>EvaluateGeometrics</name>
     <message>
         <location filename="../evaluateGeometrics.cpp" line="+53"/>
         <source>Points for line plots from 2d objects</source>

@@ -39,8 +39,6 @@ DialogSettings::DialogSettings(const InternalInfo &data, const int &geometicElem
     ui.lineEditValueUnit->setText(data.m_valueUnit);
     ui.spinBoxNumberDigits->setValue(data.m_numberOfDigits);
 
-    ui.checkBoxtTwoDThreeD->setChecked(data.m_consider2DOnly);
-
     QString relationString = data.m_relationNames[0];
 
     for(int i = 1; i < data.m_relationNames.size(); i++)
@@ -59,6 +57,4 @@ void DialogSettings::getData(InternalInfo &data)
 {
     data.m_valueUnit = ui.lineEditValueUnit->text();
     data.m_numberOfDigits = ui.spinBoxNumberDigits->value();
-
-    data.m_consider2DOnly = ui.checkBoxtTwoDThreeD->isChecked();
 }

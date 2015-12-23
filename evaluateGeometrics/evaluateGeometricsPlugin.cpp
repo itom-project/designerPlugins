@@ -38,11 +38,11 @@ EvaluateGeometricsPlugin::EvaluateGeometricsPlugin(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
     m_plotDataFormats = ito::Format_Float32;
-    m_plotDataTypes = 0; //ito::DataObjPlane;
-    m_plotFeatures = 0; //ito::Static | ito::Cartesian;
+    m_plotDataTypes = 0;
+    m_plotFeatures = 0;
 
     m_description = QObject::tr("itom measurement widget");
-    m_detaildescription = QObject::tr("The evaluate geometrics plugin can be used to evaluate geometric parameters of primitives drawn in itom plots.");
+    m_detaildescription = QObject::tr("The evaluate geometrics plugin can be used to evaluate geometric parameters of shapes drawn in itom plots.");
     m_author = "Christian Kohler and Wolfram Lyda, twip OS";
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL 2.0");
@@ -65,17 +65,17 @@ bool EvaluateGeometricsPlugin::isInitialized() const
 //---------------------------------------------------------------------------------------------------------------
 QWidget *EvaluateGeometricsPlugin::createWidget(QWidget *parent)
 {
-    return new EvaluateGeometricsFigure(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
+    return new EvaluateGeometrics(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
 }
 //---------------------------------------------------------------------------------------------------------------
 QWidget *EvaluateGeometricsPlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
 {
-    return new EvaluateGeometricsFigure(m_itomSettingsFile, winMode, parent);
+    return new EvaluateGeometrics(m_itomSettingsFile, winMode, parent);
 }
 //---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::name() const
 {
-    return "EvaluateGeometricsFigure";
+    return "EvaluateGeometrics";
 }
 //---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::group() const
@@ -105,7 +105,7 @@ bool EvaluateGeometricsPlugin::isContainer() const
 //---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::domXml() const
 {
-    return "<widget class=\"EvaluateGeometricsFigure\" name=\"EvaluateGeometricsFigure\">\n"
+    return "<widget class=\"EvaluateGeometrics\" name=\"EvaluateGeometrics\">\n"
         " <property name=\"geometry\">\n"
         "  <rect>\n"
         "   <x>0</x>\n"
@@ -123,5 +123,5 @@ QString EvaluateGeometricsPlugin::includeFile() const
 }
 //---------------------------------------------------------------------------------------------------------------
 #if QT_VERSION < 0x050000
-    Q_EXPORT_PLUGIN2(EvaluateGeometricsFigure, EvaluateGeometricsPlugin)
+    Q_EXPORT_PLUGIN2(EvaluateGeometrics, EvaluateGeometricsPlugin)
 #endif
