@@ -37,7 +37,7 @@
 using namespace ito;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-EvaluateGeometrics::EvaluateGeometrics(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
+EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
     AbstractFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_actSetting(NULL),
@@ -127,7 +127,7 @@ EvaluateGeometrics::EvaluateGeometrics(const QString &itomSettingsFile, Abstract
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-EvaluateGeometrics::~EvaluateGeometrics()
+EvaluateGeometricsFigure::~EvaluateGeometricsFigure()
 {
     if(m_pInfo)
     {
@@ -173,13 +173,13 @@ EvaluateGeometrics::~EvaluateGeometrics()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometrics::applyUpdate()
+ito::RetVal EvaluateGeometricsFigure::applyUpdate()
 {
     return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QVector<ito::Shape> EvaluateGeometrics::getGeometricShapes() const
+QVector<ito::Shape> EvaluateGeometricsFigure::getGeometricShapes() const
 {
     QVector<ito::Shape> shapes;
 
@@ -190,6 +190,7 @@ QVector<ito::Shape> EvaluateGeometrics::getGeometricShapes() const
         while (it != m_pContent->m_rowHash.constEnd())
         {
             shapes << it.value();
+            ++it;
         }
     }
     
@@ -197,7 +198,7 @@ QVector<ito::Shape> EvaluateGeometrics::getGeometricShapes() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setGeometricShapes(QVector<ito::Shape> shapes)
+void EvaluateGeometricsFigure::setGeometricShapes(QVector<ito::Shape> shapes)
 {
     if (m_pContent)
     {
@@ -206,7 +207,7 @@ void EvaluateGeometrics::setGeometricShapes(QVector<ito::Shape> shapes)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool EvaluateGeometrics::getContextMenuEnabled() const
+bool EvaluateGeometricsFigure::getContextMenuEnabled() const
 {
     if (m_pContent)
     {
@@ -216,7 +217,7 @@ bool EvaluateGeometrics::getContextMenuEnabled() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setContextMenuEnabled(bool show)
+void EvaluateGeometricsFigure::setContextMenuEnabled(bool show)
 {
     if (m_pContent)
     {
@@ -225,13 +226,13 @@ void EvaluateGeometrics::setContextMenuEnabled(bool show)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QString EvaluateGeometrics::getValueUnit() const
+QString EvaluateGeometricsFigure::getValueUnit() const
 {
     return m_pInfo->m_valueUnit;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setValueUnit(const QString &label)
+void EvaluateGeometricsFigure::setValueUnit(const QString &label)
 {
     m_pInfo->m_valueUnit = label;
     if (m_pContent)
@@ -242,7 +243,7 @@ void EvaluateGeometrics::setValueUnit(const QString &label)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::resetValueUnit()
+void EvaluateGeometricsFigure::resetValueUnit()
 {
     m_pInfo->m_valueUnit = "";
     if (m_pContent)
@@ -253,7 +254,7 @@ void EvaluateGeometrics::resetValueUnit()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::mnuExport(QAction* action)
+void EvaluateGeometricsFigure::mnuExport(QAction* action)
 {
     QString fileName = 0;
 
@@ -302,7 +303,7 @@ void EvaluateGeometrics::mnuExport(QAction* action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometrics::exportData(QString fileName, int exportFlag)
+ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, int exportFlag)
 {
     ito::RetVal retVal = ito::retOk;
 
@@ -350,7 +351,7 @@ ito::RetVal EvaluateGeometrics::exportData(QString fileName, int exportFlag)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::mnuSetting()
+void EvaluateGeometricsFigure::mnuSetting()
 {
     DialogSettings *dlg = new DialogSettings(*m_pInfo, this->m_pContent->m_rowHash.size(), this);
     if (dlg->exec() == QDialog::Accepted)
@@ -366,7 +367,7 @@ void EvaluateGeometrics::mnuSetting()
 }  
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setRelations(QSharedPointer<ito::DataObject> importedData)
+void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> importedData)
 {
     int dims = 0;
 
@@ -462,7 +463,7 @@ void EvaluateGeometrics::setRelations(QSharedPointer<ito::DataObject> importedDa
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 
-ito::RetVal EvaluateGeometrics::modifyRelation(const int idx, QSharedPointer<ito::DataObject> relation)
+ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPointer<ito::DataObject> relation)
 {
     int dims = 0;
 
@@ -546,7 +547,7 @@ ito::RetVal EvaluateGeometrics::modifyRelation(const int idx, QSharedPointer<ito
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
-QSharedPointer<ito::DataObject> EvaluateGeometrics::getRelations(void) const
+QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) const
 {
     if (m_pInfo->m_relationsList.size() == 0)
     {
@@ -570,7 +571,7 @@ QSharedPointer<ito::DataObject> EvaluateGeometrics::getRelations(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometrics::addRelation(QSharedPointer<ito::DataObject> relation)
+ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relation)
 {
     relationsShip newRelation;
             
@@ -627,7 +628,7 @@ ito::RetVal EvaluateGeometrics::addRelation(QSharedPointer<ito::DataObject> rela
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometrics::addRelationName(const QString newName)
+ito::RetVal EvaluateGeometricsFigure::addRelationName(const QString newName)
 {
     ito::RetVal retval(ito::retOk);
 
@@ -652,7 +653,7 @@ ito::RetVal EvaluateGeometrics::addRelationName(const QString newName)
 }
 
 //---------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometrics::geometricShapeChanged(int idx, ito::Shape shape)
+ito::RetVal EvaluateGeometricsFigure::geometricShapeChanged(int idx, ito::Shape shape)
 {
     if (m_pContent)
     {
@@ -662,7 +663,7 @@ ito::RetVal EvaluateGeometrics::geometricShapeChanged(int idx, ito::Shape shape)
 }
 
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::mnuAddRelation()
+void EvaluateGeometricsFigure::mnuAddRelation()
 {
     DialogAddRelation *dlg = new DialogAddRelation(*m_pInfo, this);
     if (dlg->exec() == QDialog::Accepted)
@@ -677,7 +678,7 @@ void EvaluateGeometrics::mnuAddRelation()
 }
 
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::mnuDeleteRelation()
+void EvaluateGeometricsFigure::mnuDeleteRelation()
 {
     DialogDeleteRelation *dlg = new DialogDeleteRelation(*m_pInfo, this);
     if (dlg->exec() == QDialog::Accepted)
@@ -692,7 +693,7 @@ void EvaluateGeometrics::mnuDeleteRelation()
 }
 
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::mnuUpdate()
+void EvaluateGeometricsFigure::mnuUpdate()
 {
     if (m_pContent)
     {
@@ -701,7 +702,7 @@ void EvaluateGeometrics::mnuUpdate()
 }
 
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::mnuAutoFitCols()
+void EvaluateGeometricsFigure::mnuAutoFitCols()
 {
     if (m_pContent)
     {
@@ -710,7 +711,7 @@ void EvaluateGeometrics::mnuAutoFitCols()
 }
 
 //---------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometrics::clearAll(void) 
+ito::RetVal EvaluateGeometricsFigure::clearAll(void) 
 {
     m_pInfo->m_relationsList.clear();
 
@@ -723,7 +724,7 @@ ito::RetVal EvaluateGeometrics::clearAll(void)
 }
 
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setRelationNames(const QStringList input)
+void EvaluateGeometricsFigure::setRelationNames(const QStringList input)
 {
     if(input.size() < 7)
     {
@@ -760,23 +761,23 @@ void EvaluateGeometrics::setRelationNames(const QStringList input)
     return;
 }
 //---------------------------------------------------------------------------------------------------------
-QStringList EvaluateGeometrics::getRelationNames(void) const 
+QStringList EvaluateGeometricsFigure::getRelationNames(void) const 
 {
     return m_pInfo->m_relationNames;
 }
 
 //---------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometrics::init() //called when api-pointers are transmitted, directly after construction
+ito::RetVal EvaluateGeometricsFigure::init() //called when api-pointers are transmitted, directly after construction
 {
     return m_pContent->init(); 
 }
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::clearRelation(const bool apply)
+void EvaluateGeometricsFigure::clearRelation(const bool apply)
 {
     m_pInfo->m_relationsList.clear();
 }
 //---------------------------------------------------------------------------------------------------------
-QPixmap EvaluateGeometrics::renderToPixMap(const int xsize, const int ysize, const int resolution)
+QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysize, const int resolution)
 {
     QSizeF curSize(xsize, ysize);
     if(curSize.height() == 0 || curSize.width() == 0)
@@ -861,12 +862,12 @@ QPixmap EvaluateGeometrics::renderToPixMap(const int xsize, const int ysize, con
     return destinationImage;
 }
 //---------------------------------------------------------------------------------------------------------
-int EvaluateGeometrics::getNumberOfDigits() const
+int EvaluateGeometricsFigure::getNumberOfDigits() const
 {
     return m_pInfo->m_numberOfDigits;
 }
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setNumberOfDigits(const int val)
+void EvaluateGeometricsFigure::setNumberOfDigits(const int val)
 {
     if(val < 0 || val > 6)
     {
@@ -875,12 +876,12 @@ void EvaluateGeometrics::setNumberOfDigits(const int val)
     m_pInfo->m_numberOfDigits = val;
 }
 //---------------------------------------------------------------------------------------------------------
-int EvaluateGeometrics::getPrintRowSpacing(void) const
+int EvaluateGeometricsFigure::getPrintRowSpacing(void) const
 {
     return m_pInfo->m_rowPrintSpacing;
 }
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setPrintRowSpacing(const int val)
+void EvaluateGeometricsFigure::setPrintRowSpacing(const int val)
 {
     if(val < 0 || val > 20)
     {
@@ -889,12 +890,12 @@ void EvaluateGeometrics::setPrintRowSpacing(const int val)
     m_pInfo->m_rowPrintSpacing = val;
 }
 //---------------------------------------------------------------------------------------------------------
-int EvaluateGeometrics::getPrintTopLevelRowSpacing(void) const
+int EvaluateGeometricsFigure::getPrintTopLevelRowSpacing(void) const
 {
     return m_pInfo->m_tpPrintSpacing;
 }
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setPrintTopLevelRowSpacing(const int val)
+void EvaluateGeometricsFigure::setPrintTopLevelRowSpacing(const int val)
 {
     if(val < 0 || val > 20)
     {
@@ -903,12 +904,12 @@ void EvaluateGeometrics::setPrintTopLevelRowSpacing(const int val)
     m_pInfo->m_tpPrintSpacing = val;
 }
 //---------------------------------------------------------------------------------------------------------
-int EvaluateGeometrics::getPrintColumnSpacing(void) const
+int EvaluateGeometricsFigure::getPrintColumnSpacing(void) const
 {
     return m_pInfo->m_columnPrintSpacing;
 }
 //---------------------------------------------------------------------------------------------------------
-void EvaluateGeometrics::setPrintColumnSpacing(const int val)
+void EvaluateGeometricsFigure::setPrintColumnSpacing(const int val)
 {
     if(val < 0 || val > 20)
     {

@@ -49,7 +49,7 @@
 #include <qwidget.h>
 
 /*!
-* \class EvaluateGeometrics
+* \class EvaluateGeometricsFigure
 * \brief The container class for the evaluate geometric widget.
 * \detail This container contains the toolbar, context menu, setter- / getter-functions for the properties and slots.
 *          It manages most of the relevant communication to the itom surface. For visualisation, it contains a plotTreeWidget.
@@ -60,7 +60,7 @@
 class PlotTreeWidget;
 struct InternalInfo;
 
-class EVALUATEGEOMETRICS_EXPORT EvaluateGeometrics : public ito::AbstractFigure
+class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractFigure
 {
     Q_OBJECT
 
@@ -97,8 +97,8 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometrics : public ito::AbstractFigure
     DESIGNER_PLUGIN_ITOM_API
 
     public:
-        EvaluateGeometrics(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
-        virtual ~EvaluateGeometrics();
+        EvaluateGeometricsFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
+        virtual ~EvaluateGeometricsFigure();
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         ito::RetVal update(void) { return ito::retOk;  };

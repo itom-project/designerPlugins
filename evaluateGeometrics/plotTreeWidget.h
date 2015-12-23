@@ -47,7 +47,7 @@ class EvaluateGeomatricsFigure;
 * \struct relationsShip
 * \brief  This struct defines the geometric elements.
 *
-* \sa PlotTreeWidget, EvaluateGeometrics, PlotTreeWidget::tMeasurementType
+* \sa PlotTreeWidget, EvaluateGeometricsFigure, PlotTreeWidget::tMeasurementType
 */
 
 struct relationsShip
@@ -64,9 +64,9 @@ struct relationsShip
 
 /*!
 * \struct InternalInfo
-* \brief  This struct contains most of the shared data for PlotTreeWidget and EvaluateGeometrics.
+* \brief  This struct contains most of the shared data for PlotTreeWidget and EvaluateGeometricsFigure.
 *
-* \sa PlotTreeWidget, EvaluateGeometrics, relationsShip
+* \sa PlotTreeWidget, EvaluateGeometricsFigure, relationsShip
 */
 
 struct InternalInfo
@@ -118,14 +118,14 @@ struct InternalInfo
 * \detail The PlotTreeWidget visualisated the geometric primitives and the relations between different relativs.
 *         It is inheritad from QTreeWidget.
 *
-* \sa EvaluateGeometricsPlugin, EvaluateGeometrics
+* \sa EvaluateGeometricsPlugin, EvaluateGeometricsFigure
 */
 
 class PlotTreeWidget : public QTreeWidget
 {
     Q_OBJECT
 
-        friend class EvaluateGeometrics;
+        friend class EvaluateGeometricsFigure;
 
     public:
         PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget * parent = 0); /*!< Class constructor */
@@ -176,7 +176,7 @@ class PlotTreeWidget : public QTreeWidget
 
         QMenu *m_contextMenu;                                                                                           /*! handle to the internal context menu */
 
-        QWidget *m_pParent;                                                                                             /*! handle to the parent widget of this (see EvaluateGeometrics) */
+        QWidget *m_pParent;                                                                                             /*! handle to the parent widget of this (see EvaluateGeometricsFigure) */
 
         State m_state;                                                                                                  /*! current state for the state maschine */
 

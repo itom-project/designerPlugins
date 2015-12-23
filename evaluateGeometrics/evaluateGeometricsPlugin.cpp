@@ -65,17 +65,17 @@ bool EvaluateGeometricsPlugin::isInitialized() const
 //---------------------------------------------------------------------------------------------------------------
 QWidget *EvaluateGeometricsPlugin::createWidget(QWidget *parent)
 {
-    return new EvaluateGeometrics(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
+    return new EvaluateGeometricsFigure(m_itomSettingsFile, ito::AbstractFigure::ModeStandaloneInUi, parent);
 }
 //---------------------------------------------------------------------------------------------------------------
 QWidget *EvaluateGeometricsPlugin::createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent)
 {
-    return new EvaluateGeometrics(m_itomSettingsFile, winMode, parent);
+    return new EvaluateGeometricsFigure(m_itomSettingsFile, winMode, parent);
 }
 //---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::name() const
 {
-    return "EvaluateGeometrics";
+    return "EvaluateGeometricsFigure";
 }
 //---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::group() const
@@ -105,7 +105,7 @@ bool EvaluateGeometricsPlugin::isContainer() const
 //---------------------------------------------------------------------------------------------------------------
 QString EvaluateGeometricsPlugin::domXml() const
 {
-    return "<widget class=\"EvaluateGeometrics\" name=\"EvaluateGeometrics\">\n"
+    return "<widget class=\"EvaluateGeometricsFigure\" name=\"EvaluateGeometricsFigure\">\n"
         " <property name=\"geometry\">\n"
         "  <rect>\n"
         "   <x>0</x>\n"
@@ -123,5 +123,5 @@ QString EvaluateGeometricsPlugin::includeFile() const
 }
 //---------------------------------------------------------------------------------------------------------------
 #if QT_VERSION < 0x050000
-    Q_EXPORT_PLUGIN2(EvaluateGeometrics, EvaluateGeometricsPlugin)
+    Q_EXPORT_PLUGIN2(EvaluateGeometricsFigure, EvaluateGeometricsPlugin)
 #endif

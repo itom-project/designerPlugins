@@ -630,7 +630,7 @@ bool PlotTreeWidget::calculateDistance(const ito::Shape &first, const ito::Shape
         }
 
         QPointF dist_points = p1 - line.p1();
-        distance = (line_vector.x() * dist_points.y() - line_vector.y() * dist_points.x()) / std::sqrt(line_vector.x()*line_vector.x() + line_vector.y()*line_vector.y());
+        distance = std::abs((line_vector.x() * dist_points.y() - line_vector.y() * dist_points.x()) / std::sqrt(line_vector.x()*line_vector.x() + line_vector.y()*line_vector.y()));
         return true;
     }
 
@@ -646,8 +646,8 @@ bool PlotTreeWidget::calculateRadius(const ito::Shape &first, ito::float32 &radi
         case ito::Shape::Circle:
         case ito::Shape::Ellipse:
         {
-            QPointF rad = 0.5 * (first.rbasePoints()[0] + first.rbasePoints()[1]);
-            radius = (0.5 * (rad.x() + rad.y()));
+            QPointF rad = 0.5 * (first.rbasePoints()[1] - first.rbasePoints()[0]);
+            radius = 0.5 * (std::abs(rad.x()) + std::abs(rad.y()));
             return true;
         }
         default:
@@ -1178,6 +1178,7 @@ void PlotTreeWidget::updateGeometricShapes()
     {
         displayShape(c, true, it.value());
         c++;
+        ++it;
     }  
 }
 
@@ -1240,9 +1241,19 @@ void PlotTreeWidget::autoFitCols()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx, const ito::Shape &shape)
 {
-    if (m_rowHash.contains(idx))
+    QHash<ito::int32, ito::Shape>::iterator it = m_rowHash.begin();
+    int c = 0;
+    while (it != m_rowHash.end())
     {
-        m_rowHash[idx] = shape;
+        if (it.value().index() == idx)
+        {
+            it.value() = shape;
+            displayShape(c, true, shape);
+            break;
+        }
+        
+        c++;
+        ++it;
     }
 
     updateRelationShips(true);

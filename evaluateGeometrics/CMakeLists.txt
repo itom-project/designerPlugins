@@ -1,5 +1,5 @@
 SET (target_name evaluateGeometrics)
-SET (figure_name EvaluateGeometrics)
+SET (figure_name EvaluateGeometricsFigure)
 project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)

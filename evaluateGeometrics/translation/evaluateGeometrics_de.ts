@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de">
 <context>
-    <name>EvaluateGeometrics</name>
+    <name>EvaluateGeometricsFigure</name>
     <message>
         <location filename="../evaluateGeometrics.cpp" line="+53"/>
         <source>Points for line plots from 2d objects</source>
@@ -264,7 +264,7 @@
     <message>
         <location line="+1"/>
         <source>The evaluate geometrics plugin can be used to evaluate geometric parameters of primitives drawn in itom plots.</source>
-        <translation>Das EvaluateGeometrics-Plugin kann zum Auswerten geometrischer Parameter aus itom-Abbildungen genutzt werden.</translation>
+        <translation>Das EvaluateGeometricsFigure-Plugin kann zum Auswerten geometrischer Parameter aus itom-Abbildungen genutzt werden.</translation>
     </message>
     <message>
         <location line="+3"/>
