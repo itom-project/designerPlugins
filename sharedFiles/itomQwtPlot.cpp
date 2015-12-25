@@ -1529,7 +1529,6 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
         // The definition do not correspond to the definetion of primitiv elements
 
         foreach(const ito::Shape &shape, geometricShapes)
-        for (int i = 0; i < geometricShapes.size(); ++i)
         {
             if (m_pShapes.contains(shape.index()))
             {
@@ -2003,6 +2002,8 @@ void ItomQwtPlot::setMarkerLabelVisible(bool visible)
     }
 
     m_markerLabelVisible = visible;
+
+    replot();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

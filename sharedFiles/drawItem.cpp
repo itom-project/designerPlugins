@@ -556,23 +556,25 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
             QPointF newPoint = invTrafo.map(markerScaleCoordinate);
             QRectF baseRect(basePoints[0], basePoints[1]);
             QPointF diff = newPoint - baseRect.center();
-            qreal equal_diff = 0.5*(diff.x() + diff.y());
-            newPoint = baseRect.center() + QPointF(equal_diff, equal_diff);
+            qreal sign_x = (diff.x() >= 0 ? 1.0 : -1.0);
+            qreal sign_y = (diff.y() >= 0 ? 1.0 : -1.0);
+            qreal equal_diff = 0.5*(std::abs(diff.x()) + std::abs(diff.y()));
+            newPoint = baseRect.center() + QPointF(sign_x * equal_diff, sign_y * equal_diff);
             success = true;
 
             switch (markerIdx)
             {
             case 1: //top, left
-                baseRect.setBottomLeft(newPoint);
+                baseRect.setTopLeft(newPoint);
                 break;
             case 2: //top, right
-                baseRect.setBottomRight(newPoint);
-                break;
-            case 3: //bottom, right
                 baseRect.setTopRight(newPoint);
                 break;
+            case 3: //bottom, right
+                baseRect.setBottomRight(newPoint);
+                break;
             case 4: //bottom, left
-                baseRect.setTopLeft(newPoint);
+                baseRect.setBottomLeft(newPoint);
                 break;
             default:
                 success = false;
@@ -908,6 +910,14 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
                     {
                         return (i + 1);
                     }
+                }
+
+                //if not yet selected, but not moveable. The user clicked any part of the
+                //contour but not the corner squares, nevertheless, the item should be
+                //selected for any resize operation.
+                if (!d->m_selected && !moveable)
+                {
+                    return 0;
                 }
             }
 
