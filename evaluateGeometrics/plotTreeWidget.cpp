@@ -33,6 +33,7 @@
 #include <qfile.h>
 #include <QXmlStreamWriter>
 #include <QCoreApplication>
+#include <qtransform.h>
 
 #define GEO_PI 3.14159265358979323846
 
@@ -43,7 +44,6 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     QTreeWidget(parent),
     m_contextMenu(contextMenu),
     m_pParent(parent),
-    m_state(stateIdle),
     m_lastRetVal(ito::retOk)
 {
     m_pData = data;
@@ -55,9 +55,6 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     
     m_rowHash.clear();
-    //m_rowHash.reserve(24);
-    //m_pData->m_rowHash.clear();
-    //m_pData->m_rowHash.reserve(24);
 
     setColumnCount(5);
     setColumnWidth(0, 142);
@@ -86,69 +83,60 @@ ito::RetVal PlotTreeWidget::init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::float32 *val)
+void PlotTreeWidget::displayShape(const int row, const bool update, const ito::Shape &shape)
 {
-    //QLabel** elements = (QLabel**)calloc(5, sizeof(QLabel*));
-
-    ito::uint16 type = (ito::uint16)(((ito::uint32)(val[1])) & ito::tGeoTypeMask);
-
-    QString coordsString("[%1, %2, %3]");
-
-    if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
-    {
-        coordsString = "[%1, %2]";
-    }
+    QString coordsString("[%1, %2]");
 
     if (!update)
     {
-        if (m_pData->m_primitivNames.contains(type))
+        if (m_pData->m_shapeTypeNames.contains(shape.type()))
         {
-            topLevelItem(row)->setText(0, tr("%1 %2").arg(m_pData->m_primitivNames[type]).arg(QString::number((ito::uint32)(val[0]))));
+            topLevelItem(row)->setText(0, tr("%1 (%2)").arg(m_pData->m_shapeTypeNames[shape.type()]).arg(shape.index()));
         }
         else
         {
-            topLevelItem(row)->setText(0, tr("notype %1").arg(QString::number((ito::uint32)(val[0]))));
+            topLevelItem(row)->setText(0, tr("unknown type (%1)").arg(shape.index()));
         }
         
-        switch (type)
+        switch (shape.type())
         {
             default:
-            case ito::tGeoNoType:
+            case ito::Shape::Invalid:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/notype.png"));
                 break;
             }
-            case ito::tGeoPoint:
+            case ito::Shape::Point:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
                 break;
             }
-            case ito::tGeoLine:
+            case ito::Shape::Line:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
                 break;
             }
-            case ito::tGeoCircle:
+            case ito::Shape::Circle:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/circle.png"));
                 break;
             }
-            case ito::tGeoEllipse:
+            case ito::Shape::Ellipse:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
                 break;
             }
-            case ito::tGeoRectangle:
+            case ito::Shape::Rectangle:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
                 break;
             }
-            case ito::tGeoSquare:
+            case ito::Shape::Square:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/square.png"));
                 break;
             }
-            case ito::tGeoPolygon:
+            case ito::Shape::Polygon:
             {
                 topLevelItem(row)->setIcon(0, QIcon(":/itomDesignerPlugins/plot/icons/polygon.png"));
                 break;
@@ -156,254 +144,155 @@ void PlotTreeWidget::setPrimitivElement(const int row, const bool update, ito::f
         }
     }
 
-    switch (type & ito::tGeoTypeMask)
+    QPolygonF contour;
+    const QTransform &trafo = shape.rtransform();
+    const QPolygonF &basePoints = shape.rbasePoints();
+
+    switch (shape.type())
     {
         default:
-        case ito::tGeoNoType:
+        case ito::Shape::Invalid:
             break;
 
-        case ito::tGeoPoint:
+        case ito::Shape::Point:
         {
-            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
+            contour = shape.contour(true);
+            topLevelItem(row)->setText(1, QString(coordsString)
+                .arg(QString::number(contour[0].x(), 'f', m_pData->m_numberOfDigits))
+                .arg(QString::number(contour[0].y(), 'f', m_pData->m_numberOfDigits)));
+
+            break;
+        }
+        case ito::Shape::Line:
+        {
+            contour = shape.contour(true);
+            topLevelItem(row)->setText(1, QString(coordsString)
+                .arg(QString::number(contour[0].x(), 'f', m_pData->m_numberOfDigits))
+                .arg(QString::number(contour[0].y(), 'f', m_pData->m_numberOfDigits)));
+
+            topLevelItem(row)->setText(2, QString(coordsString)
+                .arg(QString::number(contour[1].x(), 'f', m_pData->m_numberOfDigits))
+                .arg(QString::number(contour[1].y(), 'f', m_pData->m_numberOfDigits)));
+            break;
+        }
+        case ito::Shape::Circle:
+        {
             {
+                QPointF center = 0.5 * (trafo.map(basePoints[0]) + trafo.map(basePoints[1]));
+                QPointF radius = 0.5 * (trafo.map(basePoints[1]) - trafo.map(basePoints[0]));
                 topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
-            }
-            else
-            {
-            //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
+                    .arg(QString::number(center.x(), 'f', m_pData->m_numberOfDigits))
+                    .arg(QString::number(center.y(), 'f', m_pData->m_numberOfDigits)));
+
+                topLevelItem(row)->setText(2, QString("r = %1 %2")
+                    .arg(QString::number(std::abs(radius.x()), 'f', m_pData->m_numberOfDigits))
+                    .arg(m_pData->m_valueUnit));
             }
 
             break;
         }
-        case ito::tGeoLine:
+        case ito::Shape::Ellipse:
         {
-            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+                QPointF center = 0.5 * (trafo.map(basePoints[0]) + trafo.map(basePoints[1]));
+                QPointF radius = 0.5 * (trafo.map(basePoints[1]) - trafo.map(basePoints[0]));
                 topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
+                    .arg(QString::number(center.x(), 'f', m_pData->m_numberOfDigits))
+                    .arg(QString::number(center.y(), 'f', m_pData->m_numberOfDigits)));
 
-                //elements[2]->setText(QString(coordsString).arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-                topLevelItem(row)->setText(2, QString(coordsString)
-                                            .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits)));
+                topLevelItem(row)->setText(2, QString("a,b = %1 %3, %2 %3")
+                    .arg(QString::number(std::abs(radius.x()), 'f', m_pData->m_numberOfDigits))
+                    .arg(QString::number(std::abs(radius.y()), 'f', m_pData->m_numberOfDigits))
+                    .arg(m_pData->m_valueUnit));
+
+                if (trafo.isRotating())
+                {
+                    topLevelItem(row)->setText(3, QString("alpha = %1%2")
+                        .arg(QString::number(shape.rotationAngleDeg(), 'f', m_pData->m_numberOfDigits))
+                        .arg(QChar(0x00B0)));
+                }
+                else
+                {
+                    topLevelItem(row)->setText(3, "");
+                }
+                break;
             }
-            else
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
-
-                //elements[2]->setText(QString(coordsString).arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-                topLevelItem(row)->setText(2, QString(coordsString)
-                                            .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits)));
-            }
-
-            break;
         }
-        case ito::tGeoCircle:
+        case ito::Shape::Rectangle:
         {
-            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+                QPointF p1 = trafo.map(basePoints[0]);
+                QPointF p2 = trafo.map(basePoints[1]);
                 topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
-            }
-            else
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
+                    .arg(QString::number(p1.x(), 'f', m_pData->m_numberOfDigits))
+                    .arg(QString::number(p1.y(), 'f', m_pData->m_numberOfDigits)));
 
-                
-            }
+                topLevelItem(row)->setText(2, QString(coordsString)
+                    .arg(QString::number(p2.x(), 'f', m_pData->m_numberOfDigits))
+                    .arg(QString::number(p2.y(), 'f', m_pData->m_numberOfDigits)));
 
-            //elements[2]->setText(QString("r = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
-            topLevelItem(row)->setText(2, QString("r = %1 %2")
-                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                        .arg(m_pData->m_valueUnit));
-
-            break;
-        }
-        case ito::tGeoEllipse:
-        {
-            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
-            }
-            else
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
-            }
-
-            //elements[2]->setText(QString("a,b = %1 %2 in %3").arg(QString::number(val[5])).arg(QString::number(val[6])).arg(m_pData->m_valueUnit));
-            topLevelItem(row)->setText(2, QString("a,b = %1 %3, %2 %3")
-                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                        .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
-                                        .arg(m_pData->m_valueUnit));
-
-            if (ito::dObjHelper::isFinite(val[7]))
-            {
-                //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[7])).arg(QChar((uchar)248)));
-                topLevelItem(row)->setText(3, QString("alpha = %1%2")
-                                            .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QChar(0x00B0)));
-            }
-            else
-            {
-                //elements[3]->setText("");
-                 topLevelItem(row)->setText(3, "");
+                if (trafo.isRotating())
+                {
+                    topLevelItem(row)->setText(3, QString("alpha = %1%2")
+                        .arg(QString::number(shape.rotationAngleDeg(), 'f', m_pData->m_numberOfDigits))
+                        .arg(QChar(0x00B0)));
+                }
+                else
+                {
+                    topLevelItem(row)->setText(3, "");
+                }
             }
             break;
         }
-        case ito::tGeoRectangle:
+        case ito::Shape::Square:
         {
-            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
             {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
+                QPointF center = 0.5 * (trafo.map(basePoints[0]) + trafo.map(basePoints[1]));
                 topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
+                    .arg(QString::number(center.x(), 'f', m_pData->m_numberOfDigits))
+                    .arg(QString::number(center.y(), 'f', m_pData->m_numberOfDigits)));
 
-                //elements[2]->setText(QString(coordsString).arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-                topLevelItem(row)->setText(2, QString(coordsString)
-                                            .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits)));
-            }
-            else
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
+                topLevelItem(row)->setText(2, QString("a = %1 %2")
+                    .arg(QString::number(std::abs((basePoints[1] - basePoints[0]).x()), 'f', m_pData->m_numberOfDigits))
+                    .arg(m_pData->m_valueUnit));
 
-                //elements[2]->setText(QString(coordsString).arg(QString::number(val[5])).arg(QString::number(val[6])).arg(QString::number(val[7])));
-                topLevelItem(row)->setText(2, QString(coordsString)
-                                            .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits)));
-            }
-
-            if (ito::dObjHelper::isFinite(val[8]))
-            {
-                //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[8])).arg(QChar((uchar)248)));
-                 topLevelItem(row)->setText(3, QString("alpha = %1%2")
-                                             .arg(QString::number(val[8], 'f', m_pData->m_numberOfDigits))
-                                             .arg(QChar(0x00B0)));
-            }
-            else
-            {
-                //elements[3]->setText("");
-                 topLevelItem(row)->setText(3, "");
+                if (trafo.isRotating())
+                {
+                    topLevelItem(row)->setText(3, QString("alpha = %1%2")
+                        .arg(QString::number(shape.rotationAngleDeg(), 'f', m_pData->m_numberOfDigits))
+                        .arg(QChar(0x00B0)));
+                }
+                else
+                {
+                    topLevelItem(row)->setText(3, "");
+                }
             }
             break;
         }
-        case ito::tGeoSquare:
+        case ito::Shape::Polygon:
         {
-            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
-            }
-            else
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
-            }
+            /*topLevelItem(row)->setText(1, QString(coordsString)
+                                        .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
 
-            //elements[2]->setText(QString("a = %1 %2").arg(QString::number(val[5])).arg(m_pData->m_valueUnit));
-            topLevelItem(row)->setText(2, QString("a = %1 %2")
-                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                        .arg(m_pData->m_valueUnit));
+            topLevelItem(row)->setText(2, QString(coordsString)
+                                        .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits))
+                                        .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits)));
+            
 
-            if (ito::dObjHelper::isFinite(val[6]))
-            {
-                //elements[3]->setText(QString("alpha = %1%2").arg(QString::number(val[6])).arg(QChar((uchar)248)));
-                 topLevelItem(row)->setText(3, QString("alpha = %1%2")
-                                             .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits))
-                                             .arg(QChar(0x00B0)));
-            }
-            else
-            {
-                //elements[3]->setText("");
-                 topLevelItem(row)->setText(3, "");
-            }
-            break;
-        }
-        case ito::tGeoPolygon:
-        {
-            if (m_pData->m_consider2DOnly &&  !m_pData->m_coordsAs3D)
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits)));
-
-                //elements[2]->setText(QString(coordsString).arg(QString::number(val[4])).arg(QString::number(val[5])).arg(QString::number(val[6])));
-                topLevelItem(row)->setText(2, QString(coordsString)
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits)));
-            }
-            else
-            {
-                //elements[1]->setText(QString(coordsString).arg(QString::number(val[2])).arg(QString::number(val[3])).arg(QString::number(val[4])));
-                topLevelItem(row)->setText(1, QString(coordsString)
-                                            .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[3], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits)));
-
-                //elements[2]->setText(QString(coordsString).arg(QString::number(val[4])).arg(QString::number(val[5])).arg(QString::number(val[6])));
-                topLevelItem(row)->setText(2, QString(coordsString)
-                                            .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits))
-                                            .arg(QString::number(val[6], 'f', m_pData->m_numberOfDigits)));
-            }
-
-            //elements[3]->setText(QString("%1 [%2]").arg(QString::number(val[7])).arg(QString::number(val[8])));
              topLevelItem(row)->setText(3, QString("%1 [%2]")
                                          .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits))
-                                         .arg(QString::number(val[8], 'f', m_pData->m_numberOfDigits)));
+                                         .arg(QString::number(val[8], 'f', m_pData->m_numberOfDigits)));*/
             break;
         }
     }
-
-    //free(elements);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 {
-    //QLabel** elements = (QLabel**)calloc(5, sizeof(QLabel*));
 
     QStringList tempList;
-
     tempList << QString("") << QString("") << QString("") << QString("") << QString("");
 
     if (fastUpdate)
@@ -416,8 +305,6 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         for (int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
         {
             m_pData->m_relationsList[rel].myWidget = NULL;
-            //m_pData->m_relationsList[rel].firstElementRow = -1;
-            //m_pData->m_relationsList[rel].secondElementRow = -1;
         }
 
         for (int geo = 0; geo < keys.size(); geo++)
@@ -445,23 +332,6 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
             for (int childIdx = 0; childIdx < currentGeometry->childCount(); childIdx++)
             {
-                /*
-                for (int i = 0; i < 5; i++)
-                {
-                    elements[i] = (QLabel*) (itemWidget(currentGeometry->child(childIdx), i));
-                    if (elements[i] == NULL)
-                    {
-                        
-                        elements[i]  = new QLabel("", this, 0);
-                        setItemWidget(currentGeometry->child(childIdx), i, elements[i]);
-                    }
-                    else
-                    {
-                        elements[i]->setText("");
-                    }
-                }
-                */
-
                 for (int i = 0; i < 5; i++)
                 {
                     currentGeometry->child(childIdx)->setText(i, "");
@@ -473,22 +343,17 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 int idx = m_pData->m_relationsList[curRel].type & 0x0FFF;
 
                 idx = idx < m_pData->m_relationNames.length() ? idx : 0;
-                //elements[0]->setText(m_pData->m_relationNames[idx]);
                 currentGeometry->child(childIdx)->setText(0, m_pData->m_relationNames[idx]);
 
                 int idx2 = m_pData->m_relationsList[curRel].secondElementIdx;
 
                 int secondType = 0;
 
-                //m_pData->m_relationsList[curRel].firstElementRow = geo;
-                //m_pData->m_relationsList[curRel].secondElementRow = -1;
-
                 for (int geo2 = 0; geo2 < geo; geo2++)
                 {
                     if (idx2 ==  keys[geo2])
                     {
-                        //m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tGeoTypeMask;
+                        secondType = m_rowHash[keys[geo2]].type();
                     }
                 }
 
@@ -496,19 +361,13 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 {
                     if (idx2 ==  keys[geo2])
                     {
-                        //m_pData->m_relationsList[curRel].secondElementRow = geo2;
-                        secondType = (ito::int32)(m_rowHash[keys[geo2]].cells[1]) & ito::tGeoTypeMask;
+                        secondType = m_rowHash[keys[geo2]].type();
                     }
                 }
 
-                //secondType = secondType > 11 ? 0 : secondType; 
-
-                //if (idx2 > - 1 && secondType > 0) elements[1]->setText(QString(primitivNames[secondType]).append(QString::number(idx2)));
-                //else elements[1]->setText("");
-
-                if (idx2 > - 1 && secondType > 0 && m_pData->m_primitivNames.contains(secondType))
+                if (idx2 > - 1 && secondType > 0 && m_pData->m_shapeTypeNames.contains(secondType))
                 {
-                    currentGeometry->child(childIdx)->setText(1, QString(m_pData->m_primitivNames[secondType]).append(QString::number(idx2)));
+                    currentGeometry->child(childIdx)->setText(1, QString(m_pData->m_shapeTypeNames[secondType]).append(QString::number(idx2)));
                 }
                 else
                 {
@@ -590,24 +449,10 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
     for (int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
     {
-        ito::float32* first;
-        ito::float32* second;
+        ito::Shape first;
+        ito::Shape second;
         bool check;
-        
-        /*
-        for (int col = 1; col < 5; col++)
-        {
-            elements[col] = (QLabel*) (itemWidget(m_pData->m_relationsList[rel].myWidget, col));
-        }
-        */
         resultString = "NaN";
-
-        /*
-        if (elements[2] == NULL)
-        {
-            continue;
-        }
-        */
 
         if (m_pData->m_relationsList[rel].myWidget == NULL)
         {
@@ -619,19 +464,15 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                            .arg(m_pData->m_valueUnit);
 
-            //elements[2]->setText(resultString);
             m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
             continue;
         }
-        //else if (m_pData->m_relationsList[rel].firstElementRow > -1)
         else if (m_rowHash.contains(m_pData->m_relationsList[rel].firstElementIdx))
         {
-            //first = m_rowHash[m_pData->m_relationsList[rel].firstElementRow].cells;
-            first = m_rowHash[m_pData->m_relationsList[rel].firstElementIdx].cells;
+            first = m_rowHash[m_pData->m_relationsList[rel].firstElementIdx];
         }
         else
         {
-            //elements[2]->setText(resultString);
             m_pData->m_relationsList[rel].myWidget->setText(2, resultString);
             m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
             continue;
@@ -639,47 +480,39 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
         if (m_pData->m_relationsList[rel].type == tRadius)
         {
-            //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
             check = calculateRadius(first, m_pData->m_relationsList[rel].extValue);
 
             resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                            .arg(m_pData->m_valueUnit);
-
-            //elements[1]->setText("");
-            //m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
         }
         else if (m_pData->m_relationsList[rel].type == tLength)
         {
-            //m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
-            check = calculateLength(first, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+            check = calculateLength(first, m_pData->m_relationsList[rel].extValue);
             resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                            .arg(m_pData->m_valueUnit);
-            //m_pData->m_relationsList[rel].myWidget->setText(1, ""); 
         }
         else if (m_pData->m_relationsList[rel].type == tArea)
         {
-            check = calculateArea(first, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+            check = calculateArea(first, m_pData->m_relationsList[rel].extValue);
             resultString = QString("%1 %2%3").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                             .arg(m_pData->m_valueUnit)
-                                            .arg(QChar(0x00B2));
-            //m_pData->m_relationsList[rel].myWidget->setText(1, "");       
+                                            .arg(QChar(0x00B2));      
         }
         else
         {
-            //if (m_pData->m_relationsList[rel].secondElementRow > -1)
             if (m_rowHash.contains(m_pData->m_relationsList[rel].secondElementIdx))
             {
-                second = m_rowHash[m_pData->m_relationsList[rel].secondElementIdx].cells;
+                second = m_rowHash[m_pData->m_relationsList[rel].secondElementIdx];
 
                 switch(m_pData->m_relationsList[rel].type & 0x0FFF)
                 {
                 case tAngle:
-                    check = calculateAngle(first, second, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+                    check = calculateAngle(first, second, m_pData->m_relationsList[rel].extValue);
                     resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                                   .arg(QChar(0x00B0));
                     break;
                 case tDistance:
-                    check = calculateDistance(first, second, m_pData->m_consider2DOnly, m_pData->m_relationsList[rel].extValue);
+                    check = calculateDistance(first, second, m_pData->m_relationsList[rel].extValue);
                     resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                                   .arg(m_pData->m_valueUnit);
                     break;
@@ -687,7 +520,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 case tIntersection:
                 {
                     cv::Vec3f val;
-                    check = calculateIntersections(first, second, m_pData->m_consider2DOnly, val);
+                    check = calculateIntersections(first, second, val);
                     if (m_pData->m_consider2DOnly)
                     {
                         resultString = QString("%1, %2 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
@@ -729,123 +562,94 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateAngle(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &angle)
+bool PlotTreeWidget::calculateAngle(const ito::Shape &first, const ito::Shape &second, ito::float32 &angle)
 {
-    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
-    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tGeoTypeMask);
-
-    if (typeOne != ito::tGeoLine)
-    {
-        angle = quietNaN;
-        return false;
-    }
-    if (typeTwo != ito::tGeoLine)
+    if (first.type() != ito::Shape::Line || second.type() != ito::Shape::Line)
     {
         angle = quietNaN;
         return false;
     }
 
-    cv::Vec3f firstVector(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
-    cv::Vec3f secondVector(second[5] - second[2], second[6] - second[3], second[7] - second[4]);
+    QPolygonF contour1 = first.contour(true);
+    QPolygonF contour2 = second.contour(true);
+    QLineF line1(contour1[0], contour1[1]);
+    QLineF line2(contour2[0], contour2[1]);
+    QPointF intersection;
 
-    if (eval2D)
+    if (line1.intersect(line2, &intersection) != QLineF::NoIntersection)
     {
-        firstVector[2] = 0.0;
-        secondVector[2] = 0.0;
+        angle = line1.angleTo(line2);
+        return true;
     }
 
-    ito::float32 abs = (sqrt(pow(firstVector[0],2) + pow(firstVector[1],2) + pow(firstVector[2],2)) * sqrt(pow(secondVector[0],2) + pow(secondVector[1],2) + pow(secondVector[2],2)));
-
-    if (ito::dObjHelper::isNotZero(abs))
-    {
-        angle = acos(firstVector.dot(secondVector) / abs) * 180 / GEO_PI;
-        return true;    
-    }
     angle = quietNaN;
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateDistance(ito::float32 *first, ito::float32 *second, const bool eval2D, ito::float32 &distance)
+bool PlotTreeWidget::calculateDistance(const ito::Shape &first, const ito::Shape &second, ito::float32 &distance)
 {
-    cv::Vec3f lineDirVector;
-    cv::Vec3f linePosVector;
-    cv::Vec3f pointPosVector;
+    QPointF p1, p2;
 
-    ito::uint16 typeOne = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
-    ito::uint16 typeTwo = (ito::uint16)((ito::uint32)(second[1]) & ito::tGeoTypeMask);
-
-    // distance of two points or two circles or combination
-    if ((typeOne == ito::tGeoPoint || typeOne == ito::tGeoCircle || typeOne == ito::tGeoEllipse) &&
-       (typeTwo == ito::tGeoPoint || typeTwo == ito::tGeoCircle || typeOne == ito::tGeoEllipse))
+    switch (first.type())
     {
-        if (eval2D)
+    case ito::Shape::Point:
+        p1 = first.rtransform().map(first.rbasePoints()[0]);
+        break;
+    case ito::Shape::Circle:
+    case ito::Shape::Ellipse:
+        p1 = first.rtransform().map(0.5 * (first.rbasePoints()[0] + first.rbasePoints()[1]));
+        break;
+    }
+
+    switch (second.type())
+    {
+    case ito::Shape::Point:
+        p2 = second.rtransform().map(second.rbasePoints()[0]);
+        break;
+    case ito::Shape::Circle:
+    case ito::Shape::Ellipse:
+        p2 = second.rtransform().map(0.5 * (second.rbasePoints()[0] + second.rbasePoints()[1]));
+        break;
+    }
+
+    if (!p1.isNull() && !p2.isNull())
+    {
+        distance = std::abs(QLineF(p1, p2).length());
+        return true;
+    }
+    else if (!p1.isNull() && second.type() == ito::Shape::Line)
+    {
+        QLineF line(second.rtransform().map(second.rbasePoints()[0]), second.rtransform().map(second.rbasePoints()[1]));
+        QPointF line_vector = second.rtransform().map(second.rbasePoints()[1]) - second.rtransform().map(second.rbasePoints()[0]);
+
+        if (line_vector.manhattanLength() == 0.0)
         {
-            pointPosVector = cv::Vec3f(first[2] - second[2], first[3] - second[3], 0.0);
-        }
-        else
-        {
-            pointPosVector = cv::Vec3f(first[2] - second[2], first[3] - second[3], first[4] - second[4]);
+            distance = quietNaN;
+            return false;
         }
 
-        distance = sqrt(pow(pointPosVector[0],2) + pow(pointPosVector[1],2) + pow(pointPosVector[2],2));
+        QPointF dist_points = p1 - line.p1();
+        distance = std::abs((line_vector.x() * dist_points.y() - line_vector.y() * dist_points.x()) / std::sqrt(line_vector.x()*line_vector.x() + line_vector.y()*line_vector.y()));
         return true;
     }
 
-    // distance of line to points or circles
-    if (typeOne == ito::tGeoLine && 
-        typeTwo == ito::tGeoPoint)
-    {
-        lineDirVector = cv::Vec3f(first[5] - first[2], first[6] - first[3], first[7] - first[4]);
-        linePosVector = cv::Vec3f(first[2], first[3], first[4]);
-        pointPosVector = cv::Vec3f(second[2], second[3], second[4]);
-    }
-    else if (typeTwo == ito::tGeoLine && 
-            typeOne == ito::tGeoPoint)
-    {
-        lineDirVector = cv::Vec3f(second[5] - second[2], second[6] - second[3], second[7] - second[4]);
-        linePosVector = cv::Vec3f(second[2], second[3], second[4]);
-        pointPosVector = cv::Vec3f(first[2], first[3], first[4]);
-    }
-    else
-    {
-        distance = quietNaN;
-        return false;
-    }
-
-    if (eval2D)
-    {
-        lineDirVector[2] = 0.0;
-        linePosVector[2] = 0.0;
-        pointPosVector[2] = 0.0;
-    }
-
-    if (!ito::dObjHelper::isNotZero(lineDirVector[0]) && !ito::dObjHelper::isNotZero(lineDirVector[1]) && !ito::dObjHelper::isNotZero(lineDirVector[2]))
-    {
-        distance = quietNaN;
-        return false;
-    }
-
-    ito::float32 lambda = (pointPosVector - linePosVector).dot(lineDirVector) / lineDirVector.dot(lineDirVector);
-    cv::Vec3f temp = pointPosVector - (linePosVector + lambda * lineDirVector);
-    distance = sqrt(temp.dot(temp));
-
-    return true;
+    distance = quietNaN;
+    return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
+bool PlotTreeWidget::calculateRadius(const ito::Shape &first, ito::float32 &radius)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
-
-    switch(type)
+    switch (first.type())
     {
-        case ito::tGeoCircle:
-            radius = first[5];
+        case ito::Shape::Circle:
+        case ito::Shape::Ellipse:
+        {
+            QPointF rad = 0.5 * (first.rbasePoints()[1] - first.rbasePoints()[0]);
+            radius = 0.5 * (std::abs(rad.x()) + std::abs(rad.y()));
             return true;
-        case ito::tGeoEllipse:
-            radius = (first[5] +  first[6])/2;   
-            return true;
+        }
         default:
             radius = quietNaN;
             return false;
@@ -854,44 +658,29 @@ bool PlotTreeWidget::calculateRadius(ito::float32 *first, ito::float32 &radius)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateLength(ito::float32 *first, const bool eval2D, ito::float32 &length)
+bool PlotTreeWidget::calculateLength(const ito::Shape &first, ito::float32 &length)
 {
-    if (((ito::uint32)(first[1]) & ito::tGeoTypeMask) != ito::tGeoLine)
+    if (first.type() != ito::Shape::Line)
     {
         length = quietNaN;
         return false;
     }
 
-    if (eval2D)
-    {
-        length = sqrt(pow(first[2] - first[5], 2)  + pow(first[3] - first[6], 2));
-    }
-    else
-    {
-        length = sqrt(pow(first[2] - first[5], 2)  + pow(first[3] - first[6], 2) + pow(first[4] - first[7], 2));
-    }
-
+    length = std::abs((QLineF(first.rbasePoints()[0], first.rbasePoints()[1])).length());
     return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::float32 &area)
+bool PlotTreeWidget::calculateArea(const ito::Shape &first, ito::float32 &area)
 {
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
-
-    switch(type)
+    switch(first.type())
     {
-        case ito::tGeoRectangle:
-            area = abs((first[5] - first[2]) * (first[6] - first[3]));
-            return true;
-        case ito::tGeoSquare:
-            area = (first[5] * first[5]);
-            return true;
-        case ito::tGeoCircle:
-            area = (first[5] * first[5])* GEO_PI;
-            return true;
-        case ito::tGeoEllipse:
-            area = (first[5] * first[6])* GEO_PI;
+        case ito::Shape::Rectangle:
+        case ito::Shape::Square:
+        case ito::Shape::Circle:
+        case ito::Shape::Ellipse:
+        case ito::Shape::Polygon:
+            area = first.area();
             return true;
         default:
             area = quietNaN;
@@ -902,34 +691,11 @@ bool PlotTreeWidget::calculateArea(ito::float32 *first, const bool eval2D, ito::
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotTreeWidget::calculateCircumference(ito::float32 *first, ito::float32 &length)
-{
-    ito::uint16 type = (ito::uint16)((ito::uint32)(first[1]) & ito::tGeoTypeMask);
-
-    switch(type)
-    {
-        case ito::tGeoRectangle:
-            length = abs(2 * (first[5] - first[2])) + abs (2 * (first[6] - first[3])); 
-            return true;
-        case ito::tGeoSquare:
-            length = 4 * first[5];
-            return true;
-        case ito::tGeoCircle:
-            length =  2 * first[5] * GEO_PI;
-            return true;
-        default:
-            length = quietNaN;
-            return false;
-    }
-    return false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 /*
 bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point)
 {
 
-    if (((ito::uint32)(first[1]) & ito::tGeoTypeMask) != ito::tGeoLine || ((ito::uint32)(second[1]) & ito::tGeoTypeMask) != ito::tGeoLine)
+    if (((ito::uint32)(first[1]) & ito::PrimitiveContainer::tTypeMask) != ito::Shape::Line || ((ito::uint32)(second[1]) & ito::PrimitiveContainer::tTypeMask) != ito::Shape::Line)
     {
         point[0] = quietNaN;
         point[1] = quietNaN;
@@ -999,7 +765,7 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
 }
 */
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
+void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
 {
     bool changed = false;
     bool clear = false;
@@ -1007,107 +773,76 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
     int cols = 0;
     int dims = 0;
    
-    if (dataObj)
+    identical = true;
+    QList<ito::int32> hashKeys = m_rowHash.keys();
+
+    bool found = false;
+
+    if (shapes.size() == hashKeys.size())
     {
-        dims = dataObj->getDims();
-        identical = true;
-        if (dataObj->getDims() == 0)
+        for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
         {
-            clear = true;
-            identical = false;
-        }
-        else if (dataObj->getType() != ito::tFloat32)
-        {
-            m_lastRetVal = ito::RetVal(ito::retError, 0,tr("DataObject must be ito::float32").toLatin1().data());
-            identical = false;            
-        }
-        else if (dataObj->getSize(dims-1) < 2)
-        {
-            m_lastRetVal = ito::RetVal(ito::retError, 0,tr("DataObject has not enough columns").toLatin1().data());
-            identical = false;
-        }
-        else
-        {
-            QList<ito::int32> hashKeys = m_rowHash.keys();
-            cv::Mat* scrMat = (cv::Mat*)(dataObj->get_mdata()[dataObj->seekMat(0)]);
-
-            bool found = false;
-            
-            cols = std::min(scrMat->cols, PRIM_ELEMENTLENGTH);
-
-            ito::float32* srcPtr;
-
-            if (scrMat->rows == hashKeys.size())
-            {
-                for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
-                {
-                    srcPtr = scrMat->ptr<ito::float32>(dcnt);
-                    if ((hashKeys[dcnt] != (ito::int32)srcPtr[0]) || ((ito::int32)m_rowHash[hashKeys[dcnt]].cells[1] != (ito::int32)srcPtr[1]))
-                    {
-                        identical = false;
-                        break;
-                    }
-                }
-            }
-            else
+            if ((hashKeys[dcnt] != shapes[dcnt].index()) || ((ito::int32)m_rowHash[hashKeys[dcnt]].type() != shapes[dcnt].type()))
             {
                 identical = false;
+                break;
+            }
+        }
+    }
+    else
+    {
+        identical = false;
+    }
+
+    if (!identical)
+    {
+        for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
+        {
+            found = false;
+            for (int scnt = 0; scnt < shapes.size(); scnt++)
+            {
+                if (hashKeys[dcnt] == shapes[dcnt].index())
+                {
+                    found = true;
+                    break;
+                }
             }
 
-            if (!identical)
+            if (!found)
             {
-                for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
+                changed = true;
+                m_rowHash.remove(hashKeys[dcnt]);
+            }
+        }
+
+        if (changed)
+        {
+            hashKeys = m_rowHash.keys();
+        }
+
+        for (int scnt = 0; scnt < shapes.size(); scnt++)
+        {
+            found = false;
+            for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
+            {
+                if (hashKeys[dcnt] == shapes[scnt].index())
                 {
-                    found = false;
-                    for (int scnt = 0; scnt < scrMat->rows; scnt++)
-                    {
-                        srcPtr = scrMat->ptr<ito::float32>(scnt);
-                        if (hashKeys[dcnt] == (ito::int32)srcPtr[0])
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                    {
-                        changed = true;
-                        m_rowHash.remove(hashKeys[dcnt]);
-                    }
+                    m_rowHash[hashKeys[dcnt]] = shapes[scnt];
+                    found = true;
+                    break;
                 }
+            }
 
-                if (changed)
+            if (!found && shapes[scnt].type() != ito::Shape::Invalid)
+            {
+                changed = true;
+
+                int idx = 0;
+                if (shapes[scnt].index() < 65355 && shapes[scnt].index() > -1)
                 {
-                    hashKeys = m_rowHash.keys();
+                    idx = shapes[scnt].index();
                 }
-
-                for (int scnt = 0; scnt < scrMat->rows; scnt++)
-                {
-                    found = false;
-                    srcPtr = scrMat->ptr<ito::float32>(scnt);
-                    for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
-                    {
-                        if (hashKeys[dcnt] == (ito::int32)srcPtr[0])
-                        {
-                            std::fill(m_rowHash[hashKeys[dcnt]].cells, m_rowHash[hashKeys[dcnt]].cells + PRIM_ELEMENTLENGTH, quietNaN);
-                            memcpy(m_rowHash[hashKeys[dcnt]].cells, srcPtr, sizeof(ito::float32) * cols);
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found && (((ito::int32)(srcPtr[1]) & ito::tGeoTypeMask)!= 0))
-                    {
-                        ito::GeometricPrimitive newVal;
-                        std::fill(newVal.cells, newVal.cells + PRIM_ELEMENTLENGTH, 0.0f);
-                        changed = true;
-                        memcpy(newVal.cells, srcPtr, sizeof(ito::float32) * cols);
-
-                        int idx = 0;
-                        if (ito::dObjHelper::isFinite(newVal.cells[0]) && newVal.cells[0] < 65355 && newVal.cells[0] > -1) idx = (ito::int32)newVal.cells[0];
-                        m_rowHash.insert(idx, newVal);
-                    }
-                }
+                m_rowHash.insert(idx, shapes[scnt]);
             }
         }
     }
@@ -1123,19 +858,15 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
         m_pData->m_relationsList.clear();
         this->clear();
     }
+
     if (identical)
     {
-        cv::Mat* scrMat = (cv::Mat*)(dataObj->get_mdata()[dataObj->seekMat(0)]);
-        ito::float32* srcPtr;
-
         QList<ito::int32> hashTags = m_rowHash.keys();
 
         for (int dcnt = 0; dcnt < hashTags.size(); dcnt++)
         {
-            srcPtr = scrMat->ptr<ito::float32>(dcnt);
-            std::fill(m_rowHash[hashTags[dcnt]].cells, m_rowHash[hashTags[dcnt]].cells + PRIM_ELEMENTLENGTH, 0.0f);
-            memcpy(m_rowHash[hashTags[dcnt]].cells, srcPtr, sizeof(ito::float32) * cols);
-            setPrimitivElement(dcnt, true, m_rowHash[hashTags[dcnt]].cells);
+            m_rowHash[hashTags[dcnt]] = shapes[dcnt];
+            displayShape(dcnt, true, m_rowHash[hashTags[dcnt]]);
         }
         updateRelationShips(true);
     }
@@ -1149,7 +880,7 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
             tempList << QString("") << QString("") << QString("") << QString("") << QString("");
             QTreeWidgetItem* temp = new QTreeWidgetItem(this, tempList);
             addTopLevelItem(temp);
-            setPrimitivElement(dcnt, false, m_rowHash[hashTags[dcnt]].cells);
+            displayShape(dcnt, false, m_rowHash[hashTags[dcnt]]);
         }
 
         updateRelationShips(false);
@@ -1161,22 +892,6 @@ void PlotTreeWidget::refreshPlot(const ito::DataObject* dataObj)
 
     expandAll();
     repaint();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx,const ito::int32 &flags,const QVector<ito::float32> &values)
-{
-    if (m_rowHash.contains(idx))
-    {        
-        if ((ito::int32)m_rowHash[idx].cells[1] ==  flags)
-        {  
-            std::fill(&(m_rowHash[idx].cells[2]), m_rowHash[idx].cells + PRIM_ELEMENTLENGTH, 0.0f);
-            memcpy(&(m_rowHash[idx].cells[2]), values.data(), sizeof(ito::float32) * std::min(values.size(), PRIM_ELEMENTLENGTH -2));
-            setPrimitivElement(m_rowHash.keys().indexOf(idx), true, m_rowHash[idx].cells);
-        }
-    }
-    updateRelationShips(true);
-    return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1271,110 +986,107 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
     stream.setAutoFormatting(true);
 
     stream.writeStartDocument();
-    stream.writeStartElement("itomGeometricElements");
+    stream.writeStartElement("itomGeometricShapes");
     {
         stream.writeAttribute("href", "http://www.ito.uni-stuttgart.de");
         
-        QHash<ito::int32, ito::GeometricPrimitive >::const_iterator curValue = m_rowHash.constBegin();
+        QHash<ito::int32, ito::Shape >::const_iterator curValue = m_rowHash.constBegin();
         for (int geo = 0; curValue !=  m_rowHash.end(); ++curValue, geo++)
-        //for (int geo = 0; geo < m_rowHash.size(); geo++)
         {
+            const ito::Shape &shape = curValue.value();
+            const QTransform &trafo = shape.rtransform();
+            const QPolygonF &bp = shape.rbasePoints();
+
             stream.writeStartElement(QString::number(geo));
-            stream.writeAttribute("index", QString::number((ito::int32)curValue->cells[0]));
-            stream.writeAttribute("flags", QString::number((ito::int32)curValue->cells[1]));
+            stream.writeAttribute("index", QString::number(shape.index()));
+            stream.writeAttribute("flags", QString::number(shape.flags()));
 
             QVector<ito::int16> relationIdxVec;
             relationIdxVec.reserve(24);
             for (int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
             {
-                if (m_pData->m_relationsList[rel].firstElementIdx == (ito::uint32)(curValue->cells[0]) && m_pData->m_relationsList[rel].type != 0)
+                if (m_pData->m_relationsList[rel].firstElementIdx == shape.index() && m_pData->m_relationsList[rel].type != 0)
                 {
                     relationIdxVec.append(rel);
                 }
             }
 
-            ito::uint16 type = ((ito::int32)curValue->cells[1]) & ito::tGeoTypeMask;
-
-            if (m_pData->m_primitivNames.contains(type))
+            if (m_pData->m_shapeTypeNames.contains(shape.type()))
             {
-                stream.writeAttribute("name", m_pData->m_primitivNames[type]);
+                stream.writeAttribute("name", m_pData->m_shapeTypeNames[shape.type()]);
             }
             else
             {
-                stream.writeAttribute("name", m_pData->m_primitivNames[ito::tGeoNoType]);
+                stream.writeAttribute("name", m_pData->m_shapeTypeNames[ito::Shape::Invalid]);
             }
 
-            switch(type)
+            switch(shape.type())
             {
-                case ito::tGeoPoint:
+                case ito::Shape::Point:
                 {                    
-                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
+                    QPointF p = trafo.map(bp[0]);
+                    stream.writeAttribute("x0", QString::number(p.x()));
+                    stream.writeAttribute("y0", QString::number(p.y()));
                 }
                 break;
-                case ito::tGeoLine:
+                case ito::Shape::Line:
                 {
-                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
-                    stream.writeAttribute("x1", QString::number((ito::float32)curValue->cells[5]));
-                    stream.writeAttribute("y1", QString::number((ito::float32)curValue->cells[6]));
-                    stream.writeAttribute("z1", QString::number((ito::float32)curValue->cells[7]));
+                    QPointF p1 = trafo.map(bp[0]);
+                    QPointF p2 = trafo.map(bp[1]);
+                    stream.writeAttribute("x0", QString::number(p1.x()));
+                    stream.writeAttribute("y0", QString::number(p1.y()));
+                    stream.writeAttribute("x1", QString::number(p2.x()));
+                    stream.writeAttribute("y1", QString::number(p2.x()));
                 }
                 break;
-                case ito::tGeoEllipse:
+                case ito::Shape::Ellipse:
                 {
-                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
-                    stream.writeAttribute("r1", QString::number((ito::float32)curValue->cells[5]));
-                    stream.writeAttribute("r2", QString::number((ito::float32)curValue->cells[6]));
-                    stream.writeAttribute("alpha", QString::number((ito::float32)curValue->cells[7]));
-                }
-                break;
-
-                case ito::tGeoCircle:
-                {
-                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
-                    stream.writeAttribute("r1", QString::number((ito::float32)curValue->cells[5]));
+                    QPointF p1 = trafo.map(0.5 * (bp[0] + bp[1]));
+                    QPointF r = trafo.map(0.5 * (bp[1] - bp[0]));
+                    stream.writeAttribute("x0", QString::number(p1.x()));
+                    stream.writeAttribute("y0", QString::number(p1.y()));
+                    stream.writeAttribute("r1", QString::number(std::abs(r.x())));
+                    stream.writeAttribute("r2", QString::number(std::abs(r.y())));
+                    stream.writeAttribute("alpha", QString::number(shape.rotationAngleDeg()));
                 }
                 break;
 
-                case ito::tGeoRectangle:
+                case ito::Shape::Circle:
                 {
-                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
-                    stream.writeAttribute("x1", QString::number((ito::float32)curValue->cells[5]));
-                    stream.writeAttribute("y1", QString::number((ito::float32)curValue->cells[6]));
-                    stream.writeAttribute("z1", QString::number((ito::float32)curValue->cells[7]));
-                    stream.writeAttribute("alpha", QString::number((ito::float32)curValue->cells[8]));
+                    QPointF p1 = trafo.map(0.5 * (bp[0] + bp[1]));
+                    QPointF r = trafo.map(0.5 * (bp[1] - bp[0]));
+                    stream.writeAttribute("x0", QString::number(p1.x()));
+                    stream.writeAttribute("y0", QString::number(p1.y()));
+                    stream.writeAttribute("r1", QString::number(std::abs(r.x())));
                 }
                 break;
 
-                case ito::tGeoSquare:
+                case ito::Shape::Rectangle:
                 {
-                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
-                    stream.writeAttribute("a", QString::number((ito::float32)curValue->cells[5]));
-                    stream.writeAttribute("alpha", QString::number((ito::float32)curValue->cells[6]));
+                    QPointF p1 = trafo.map(0.5 * (bp[0] + bp[1]));
+                    QPointF r = trafo.map(0.5 * (bp[1] - bp[0]));
+                    stream.writeAttribute("x0", QString::number(p1.x()));
+                    stream.writeAttribute("y0", QString::number(p1.y()));
+                    stream.writeAttribute("x1", QString::number(std::abs(r.x())));
+                    stream.writeAttribute("y1", QString::number(std::abs(r.y())));
+                    stream.writeAttribute("alpha", QString::number(shape.rotationAngleDeg()));
                 }
                 break;
 
-                case ito::tGeoPolygon:
+                case ito::Shape::Square:
                 {
-                    stream.writeAttribute("x0", QString::number((ito::float32)curValue->cells[2]));
-                    stream.writeAttribute("y0", QString::number((ito::float32)curValue->cells[3]));
-                    stream.writeAttribute("z0", QString::number((ito::float32)curValue->cells[4]));
-                    stream.writeAttribute("xDir", QString::number((ito::float32)curValue->cells[5]));
-                    stream.writeAttribute("yDir", QString::number((ito::float32)curValue->cells[6]));
-                    stream.writeAttribute("zDir", QString::number((ito::float32)curValue->cells[7]));
-                    stream.writeAttribute("No", QString::number((ito::float32)curValue->cells[8]));
-                    stream.writeAttribute("Total", QString::number((ito::float32)curValue->cells[9]));
+                    QPointF p1 = trafo.map(0.5 * (bp[0] + bp[1]));
+                    QPointF r = trafo.map(0.5 * (bp[1] - bp[0]));
+                    stream.writeAttribute("x0", QString::number(p1.x()));
+                    stream.writeAttribute("y0", QString::number(p1.y()));
+                    stream.writeAttribute("a", QString::number(std::abs(r.x())));
+                    stream.writeAttribute("alpha", QString::number(shape.rotationAngleDeg()));
+                }
+                break;
+
+                case ito::Shape::Polygon:
+                {
+                    stream.writeAttribute("Total", QString::number(bp.size()));
                 }
                 break; 
             }
@@ -1416,17 +1128,24 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
     QByteArray outBuffer;
     outBuffer.reserve(200);
 
-    QHash<ito::int32, ito::GeometricPrimitive >::const_iterator curValue = m_rowHash.constBegin();
+    QHash<ito::int32, ito::Shape >::const_iterator curValue = m_rowHash.constBegin();
     for (int geo = 0; curValue !=  m_rowHash.end(); ++curValue, geo++)
-    //for (int geo = 0; geo < m_rowHash.size(); geo++)
     {
+        const ito::Shape &shape = curValue.value();
+        const QTransform &trafo = shape.rtransform();
+        const QPolygonF &bp = shape.rbasePoints();
+
         outBuffer.clear();
-        outBuffer.append(QByteArray::number((ito::int32)curValue->cells[0]));
-        for (int i = 1; i < PRIM_ELEMENTLENGTH; i++)
+        outBuffer.append(QByteArray::number(shape.index()));
+        for (int i = 0; i < bp.size(); i++)
         {
             outBuffer.append(", ");
-            outBuffer.append(QByteArray::number(curValue->cells[i]));
+            outBuffer.append(QByteArray::number(bp[i].x()));
+            outBuffer.append(", ");
+            outBuffer.append(QByteArray::number(bp[i].y()));
         }
+        outBuffer.append(", ");
+        outBuffer.append(QByteArray::number(shape.rotationAngleDeg()));
         outBuffer.append('\n');
         saveFile.write(outBuffer);
     }
@@ -1450,52 +1169,17 @@ ito::RetVal PlotTreeWidget::writeToRAW(const QFileInfo &fileName)
     return ito::retOk;
 }
 
-/*
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::keyPressEvent (QKeyEvent * event)
+void PlotTreeWidget::updateGeometricShapes()
 {
-    
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::mousePressEvent (QMouseEvent * event)
-{
-   
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::mouseMoveEvent (QMouseEvent * event)
-{
-   
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::mouseReleaseEvent (QMouseEvent * event)
-{
-    
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::contextMenuEvent(QContextMenuEvent * event)
-{
-
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::setPannerEnable(const bool checked)
-{
-   
-}
-*/
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotTreeWidget::updatePrimitives()
-{
-    QList<ito::int32> hashKeys = m_rowHash.keys();
-    for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
+    QHash<ito::int32, ito::Shape>::const_iterator it = m_rowHash.constBegin();
+    int c = 0;
+    while (it != m_rowHash.constEnd())
     {
-        setPrimitivElement(dcnt, true, m_rowHash[hashKeys[dcnt]].cells);
-    }   
+        displayShape(c, true, it.value());
+        c++;
+        ++it;
+    }  
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1553,4 +1237,25 @@ void PlotTreeWidget::autoFitCols()
         setColumnWidth(col, max);
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx, const ito::Shape &shape)
+{
+    QHash<ito::int32, ito::Shape>::iterator it = m_rowHash.begin();
+    int c = 0;
+    while (it != m_rowHash.end())
+    {
+        if (it.value().index() == idx)
+        {
+            it.value() = shape;
+            displayShape(c, true, shape);
+            break;
+        }
+        
+        c++;
+        ++it;
+    }
+
+    updateRelationShips(true);
+    return ito::retOk;
+}

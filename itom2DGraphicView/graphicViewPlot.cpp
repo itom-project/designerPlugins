@@ -188,7 +188,7 @@ void GraphicViewPlot::createActions()
     m_pActScaleSetting->setObjectName("actScaleSetting");
     m_pActScaleSetting->setToolTip(tr("Set the ranges and offsets of this view..."));
     m_pActScaleSetting->setVisible(false);
-    connect(m_pActScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
+    connect(m_pActScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSettings()));
 
     //m_pActPan
     m_pActPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
@@ -658,7 +658,7 @@ void GraphicViewPlot::mnuActSave()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void GraphicViewPlot::mnuScaleSetting()
+void GraphicViewPlot::mnuScaleSettings()
 {
 /*
     DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(((PlotWidget*)m_pContent)->m_pContent->data());

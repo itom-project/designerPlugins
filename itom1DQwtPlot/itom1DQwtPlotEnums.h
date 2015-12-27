@@ -23,26 +23,4 @@
 #ifndef CONFIGSTRUCTQWT1D_H
 #define CONFIGSTRUCTQWT1D_H
 
-#include <QObject>    
-
-class Itom1DQwt : public QObject
-{
-    Q_OBJECT
-    Q_ENUMS(tPlotPickerType);
-    Q_ENUMS(tMultiLineMode);    
-    Q_ENUMS(tColorHandling ); 
-    Q_ENUMS(tCurveStyle );
-    Q_ENUMS(tFillCurveStyle );
-    Q_ENUMS(ScaleEngine );
-
-public:
-    Itom1DQwt(): QObject() {}
-    enum tMultiLineMode { AutoRowCol, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
-    enum tColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
-    enum tPlotPickerType { DefaultMarker, RangeMarker };
-    enum tCurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, SticksHorizontal, SticksVertical, Steps, StepsRight, StepsLeft,  Dots };
-    enum tFillCurveStyle {   NoCurveFill = -1,  FillBaseLine, FillFromTop, FillFromBottom};
-    enum ScaleEngine { Linear = 1, Log2 = 2, Log10 = 10, Log16 = 16, LogLog2 = 1002, LogLog10 = 1010, LogLog16 = 1016};
-};
-
 #endif //CONFIGSTRUCTQWT1D_H

@@ -205,7 +205,7 @@ class ItomIsoGLWidget : public ito::AbstractDObjPclFigure
         void mnuLinePicker(bool checked);
         */
 
-        void mnuScaleSetting();
+        void mnuScaleSettings();
         void mnuPalette();
         void mnuColorBar();
         void mnuToggleBPColor();

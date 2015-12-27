@@ -215,7 +215,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
     connect(m_actSave, SIGNAL(triggered()), this, SLOT(mnuActSave()));
     connect(m_actHome, SIGNAL(triggered()), this, SLOT(mnuHome()));
 
-    //connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
+    //connect(m_actScaleSetting, SIGNAL(triggered()), this, SLOT(mnuScaleSettings()));
     //connect(m_actPan, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
     //connect(m_actZoomToRect, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
     //connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuValuePicker(bool)));
@@ -533,7 +533,7 @@ void ItomIsoGLWidget::mnuActSave()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomIsoGLWidget::mnuScaleSetting()
+void ItomIsoGLWidget::mnuScaleSettings()
 {
 /*
     DataObjectRasterData* rasterData = static_cast<DataObjectRasterData*>(((plotGLWidget*)m_pContent)->m_pContent->data());

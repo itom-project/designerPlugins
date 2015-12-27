@@ -24,7 +24,6 @@
 #define PLOTCANVAS_H
 
 #include "common/sharedStructures.h"
-#include "common/sharedStructuresPrimitives.h"
 #include "common/interval.h"
 #include "plot/AbstractFigure.h"
 
@@ -53,14 +52,15 @@
 #include <qwt_plot_marker.h>
 #include <qwt_plot_shapeitem.h>
 #include <qcolor.h>
-#include <qmenu.h>
-
-#include "itom2dqwtplotenums.h"
 
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
 struct InternalData;
 class DataObjRasterData;
+class QWidgetAction;
+class QMenu;
+class QSlider;
+
 //class UserInteractionPlotPicker;
 
 
@@ -68,24 +68,13 @@ class PlotCanvas : public ItomQwtPlot
 {
     Q_OBJECT
     public:
-        enum tState 
-        { 
-            tIdle = 0, 
-            tZoom = 1, 
-            tValuePicker = 2, 
-            tPan = 3, 
-            tLineCut = 4, 
-            tStackCut = 5, 
-            tStateDrawShape = 6,
-        };
-
         enum changeFlag {
             changeNo = 0,
             changeAppearance = 1,
             changeData = 2
         };
 
-        PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent = NULL);
+        PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent = NULL);
         ~PlotCanvas();
 
         ito::RetVal init();
@@ -96,27 +85,31 @@ class PlotCanvas : public ItomQwtPlot
 
         void internalDataUpdated();
 
-        void setState(tState state, ito::PrimitiveContainer::tPrimitive shape = ito::PrimitiveContainer::tNoType);
+        virtual void setButtonStyle(int style);
+
         void childFigureDestroyed(QObject* obj, ito::uint32 UID);
 
         ito::AutoInterval getInterval(Qt::Axis axis) const;
         void setInterval(Qt::Axis axis, const ito::AutoInterval &interval);
 
+        bool showCenterMarker() const { return m_showCenterMarker; }
+        void setShowCenterMarker(bool show);
+
         ito::AutoInterval getOverlayInterval(Qt::Axis axis) const;
         void setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval);
-
-        ito::RetVal plotMarkers(const ito::DataObject *coords, const QString &style, const QString &id, int plane);
-        ito::RetVal deleteMarkers(const QString &id);
-        ito::RetVal deleteMarkers(const int id);
 
         ito::int32 getCurrentPlane() const;
         QSharedPointer<ito::DataObject> getDisplayed(void);
         QSharedPointer<ito::DataObject> getOverlayObject(void);
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 
+        ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
+
         friend class Itom2dQwtPlot;
 
     protected:
+        virtual void stateChanged(int state);
+
         void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc);
         void getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, double *maxPhysLoc);
         void keyPressEvent ( QKeyEvent * event );
@@ -134,29 +127,22 @@ class PlotCanvas : public ItomQwtPlot
         inline QString colorOverlayMapName() const { return m_colorOverlayMapName; }
 
         void refreshStyles();
-
-        ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
-
-        void mousePressEvent ( QMouseEvent * event );
-        void mouseMoveEvent ( QMouseEvent * event );
-        void mouseReleaseEvent ( QMouseEvent * event );
         
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
         void updateColors();
-        void updateLabelVisibility();
 
         void home();
+        void setColorDataTypeRepresentation(bool colorOn);
 
     private:
+        void createActions();
 
         // a1 is line1 start, a2 is line1 end, b1 is line2 start, b2 is line2 end
         bool lineIntersection(const QPointF &a1, const QPointF &a2, const QPointF &b1, const QPointF &b2, QPointF &intersection);
+        void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
 
         ito::DataObject randImg;
-
-        
-        QwtPlotPanner *m_pPanner;
 
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
@@ -165,16 +151,13 @@ class PlotCanvas : public ItomQwtPlot
         QwtPlotMarker *m_pStackCutMarker;
         QwtPlotMarker *m_pCenterMarker;
 
-        UserInteractionPlotPicker *m_pMultiPointPicker;
-
         QString m_colorOverlayMapName;
         QString m_colorMapName;
-        QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
+        
 
         int m_curColorMapIndex;
         int m_curOverlayColorMapIndex;
 
-        ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
         bool m_unitLabelChanged;
 
         DataObjItem *m_dObjItem;
@@ -192,16 +175,24 @@ class PlotCanvas : public ItomQwtPlot
 
         Qt::KeyboardModifiers m_activeModifiers;
 
-        QColor m_inverseColor0, m_inverseColor1;
-        int m_activeDrawItem;
-
-        QVector<ito::uint16> m_drawedIemsIndexes;
-        bool m_ignoreNextMouseEvent;
-
-        QPoint m_initialMousePosition;
-        QPointF m_initialMarkerPosition;
-
         bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)
+        bool m_showCenterMarker;
+
+        QAction *m_pActScaleSettings; //
+        QAction *m_pActColorPalette;  //
+        QAction *m_pActToggleColorBar;
+        QAction *m_pActValuePicker;
+        QAction *m_pActLineCut;
+        QMenu *m_pMnuLineCutMode;
+        QAction *m_pActStackCut; //
+        QWidgetAction *m_pActPlaneSelector; //
+        QLabel *m_pCoordinates; //
+        QWidgetAction *m_pActCoordinates; //
+        QAction *m_pActCmplxSwitch; //
+        QMenu *m_pMnuCmplxSwitch; //
+        QAction* m_pActCntrMarker; //
+        QSlider* m_pOverlaySlider;
+        QWidgetAction *m_pActOverlaySlider;
 
     signals:
         void spawnNewChild(QVector<QPointF>);
@@ -213,9 +204,18 @@ class PlotCanvas : public ItomQwtPlot
         void lineCutMoved(const QPoint &pt);
         void lineCutAppended(const QPoint &pt);
 
-        void multiPointActivated (bool on);
-        //void multiPointSelected (const QPolygon &polygon);
-        //void multiPointAppended (const QPoint &pos);
+        void mnuScaleSettings();
+        void mnuCmplxSwitch(QAction*);
+        void mnuColorPalette();
+        void mnuToggleColorBar(bool checked);
+        void mnuValuePicker(bool checked);
+        void mnuLineCut(bool checked);
+        void mnuLineCutMode(QAction *action);
+        void mnuStackCut(bool checked);
+        void mnuPlaneSelector(int plane);
+        void mnuOverlaySliderChanged(int value);
+        void mnuCenterMarker(bool checked);
+
 };
 
 struct InternalData
@@ -251,16 +251,9 @@ struct InternalData
         m_yaxisVisible = true;
 
         m_colorBarVisible = false;
-        m_cmplxType = Itom2DQwt::Real;
-        m_state = PlotCanvas::tIdle;
-        m_modState = Itom2DQwt::tMoveGeometricElements;
+        m_cmplxType = ItomQwtPlotEnums::CmplxReal;
         m_pConstOutput = NULL;
-
-        m_elementsToPick = 0;
-
-        m_pDrawItems.clear();
-        m_enablePlotting = true;
-        m_showCenterMarker = false;
+        
         m_alpha = 0;
 
         m_overlayScaleAuto = true;
@@ -270,27 +263,11 @@ struct InternalData
         m_axisColor = Qt::black;
         m_textColor = Qt::black;
         m_backgnd = Qt::white;
-
-        m_markerLabelVisible = false;
-        m_stateShapePrimitive = ito::PrimitiveContainer::tNoType;
     }
     ~InternalData()
     {
-        QList<int> keys = m_pDrawItems.keys();
-        for (int i = 0; i < keys.size(); i++)
-        {
-            if(m_pDrawItems[keys[i]] != NULL)
-            {
-                DrawItem *delItem = m_pDrawItems[keys[i]];
-                delItem->detach();
-                m_pDrawItems.remove(keys[i]);
-                delete delItem;
-                
-            }
-        }
-   
-        m_pDrawItems.clear();
     }
+
     ito::tDataType m_dataType;
 
     QString m_title;
@@ -328,25 +305,15 @@ struct InternalData
     bool m_yaxisVisible;
 
     bool m_colorBarVisible;
-    bool m_markerLabelVisible;
-    int m_elementsToPick;
     unsigned char m_alpha;
 
     QColor m_backgnd;           //!> plot background color
     QColor m_axisColor;         //!> color of axis
     QColor m_textColor;         //!> text color
 
-    bool m_enablePlotting;
-    bool m_showCenterMarker;
+    ItomQwtPlotEnums::ComplexType m_cmplxType;
 
-    Itom2DQwt::tComplexType m_cmplxType;
-
-    PlotCanvas::tState m_state;
-    ito::PrimitiveContainer::tPrimitive m_stateShapePrimitive; /*!< geometric shape that is active is m_state is stateShape */
-    Itom2DQwt::tModificationState m_modState;
     const QHash<QString, ito::Param*> *m_pConstOutput;
-//    QVector<DrawItem *> m_pDrawItems;
-    QHash<int, DrawItem *> m_pDrawItems;
 };
 
 

@@ -29,59 +29,58 @@
 
 #include <qpoint.h>
 #include <qpainterpath.h>
+#include <qpoint.h>
+
+#include "common/shape.h"
+#include "common/retVal.h"
+#include "itomQwtPlotEnums.h"
+
+class DrawItemPrivate; //forward declaration
 
 class DrawItem : public QwtPlotShapeItem
 {
     public:
-        explicit DrawItem(QwtPlot *parent, char type, const int id = 0, const QString &label = QString::null);
+        explicit DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal = NULL, bool labelVisible = false);
         virtual ~DrawItem();
-        void setRect(const QRectF &);
-        void setShape( const QPainterPath & , const QColor &, const QColor &);
-        void setActive(int active);
+        ito::RetVal setShape(const ito::Shape &shape);
+        ito::RetVal setShape(const ito::Shape &shape, const QColor &markerColor, const QColor &lineColor);
+        
         void setColor(const QColor &markerColor, const QColor &lineColor);
         
+        bool getSelected() const;
         void setSelected(const bool selected);
-        bool selected() const;
+        
+        QString getLabel() const;
+        void setLabel(const QString &label);
 
-        void setLabel(const QString newLabel);
-        QString getLabel() const {return m_label;}
+        const ito::Shape &getShape() const;
+        int getIndex() const;
+        bool getAutoColor() const;
 
-        void setLabelVisible(const bool labelVisible) {m_labelVisible = labelVisible;}
-        bool getLabelVisible() const {return m_labelVisible;}
+        void setModificationModes(const ItomQwtPlotEnums::ModificationModes &modes);
 
-        QVector<QwtPlotMarker *> m_marker;
-        double x1, y1, x2, y2;
-        char m_active;
-        char m_type;
-        unsigned char m_flags;
+        QPointF getPoint1() const;
+        QPointF getPoint2() const;
+        QPointF getMarkerPosScale(int index) const;
+
+        bool shapeMoveTo(const QPointF &marker1ScaleCoordinate);
+        bool shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers = Qt::NoModifier);
+
+        char hitEdge(const QPointF &point, double tol_x, double tol_y) const;
+
+        void setLabelVisible(const bool labelVisible);
+        bool getLabelVisible() const;
+
         static QVector<int> idxVec;
-        int m_idx;
 
-        bool m_autoColor;
-        QString m_label;
-        bool m_labelVisible;
-    //    virtual QwtText trackerTextF( const QPointF &pos ) const;
-    //    void drawTracker( QPainter *painter ) const;
-    //    void setBackgroundFillBrush( const QBrush &brush );
-
-        void draw( QPainter *painter, 
+        virtual void draw(QPainter *painter,
             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
             const QRectF &canvasRect ) const;
 
     private:
-        QPen m_markerPen;
-        QBrush m_markerBrush;
-        QPen m_linePen;
-        QwtPlot *m_pparent;
+        DrawItemPrivate *d;
 
-        bool m_selected;
-
-    signals:
-
-    public slots:
-
-    private slots:
-
+        bool hitLine(const QPointF &point_transformed, const QLineF &line, double tol_x, double tol_y) const;
 };
 
 #endif //DRAWITEM_H

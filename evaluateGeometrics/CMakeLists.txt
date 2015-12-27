@@ -1,5 +1,5 @@
 SET (target_name evaluateGeometrics)
-SET (figure_name evaluateGeometricsFigure)
+SET (figure_name EvaluateGeometricsFigure)
 project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
@@ -64,16 +64,6 @@ LINK_DIRECTORIES(
 )
 
 set(plugin_HEADERS
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/typeDefs.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresPrimitives.h
-    ${ITOM_SDK_INCLUDE_DIR}/DataObject/dataObjectFuncs.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractItomDesignerPlugin.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotTreeWidget.h

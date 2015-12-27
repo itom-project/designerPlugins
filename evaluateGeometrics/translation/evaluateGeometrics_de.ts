@@ -264,7 +264,7 @@
     <message>
         <location line="+1"/>
         <source>The evaluate geometrics plugin can be used to evaluate geometric parameters of primitives drawn in itom plots.</source>
-        <translation>Das EvaluateGeometrics-Plugin kann zum Auswerten geometrischer Parameter aus itom-Abbildungen genutzt werden.</translation>
+        <translation>Das EvaluateGeometricsFigure-Plugin kann zum Auswerten geometrischer Parameter aus itom-Abbildungen genutzt werden.</translation>
     </message>
     <message>
         <location line="+3"/>

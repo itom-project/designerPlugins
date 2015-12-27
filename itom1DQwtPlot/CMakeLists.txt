@@ -74,7 +74,6 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlotEnums.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
@@ -84,11 +83,12 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomLogLogScaleEngine.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
 )
 
 set(plugin_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlotEnums.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
 )
 

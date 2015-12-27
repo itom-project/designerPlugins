@@ -36,7 +36,7 @@ DataObjectSeriesData::DataObjectSeriesData(const int fastmode) :
     m_autoScaleX(true),
     m_minX(-1.0),
     m_maxX(1.0),
-    m_cmplxState(DataObjectSeriesData::cmplxAbs),
+    m_cmplxState(ItomQwtPlotEnums::CmplxAbs),
     m_pDataObj(NULL),
     inSamplingMode(false),
     m_colorState(grayColor)
@@ -913,16 +913,16 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                     switch (m_cmplxState)
                     {
                     default:
-                    case cmplxAbs:
+                    case ItomQwtPlotEnums::CmplxAbs:
                         return QPointF(fPos, abs(val));
                     break;
-                    case cmplxReal:
+                    case ItomQwtPlotEnums::CmplxReal:
                         return QPointF(fPos, val.real());
                     break;
-                    case cmplxImag:
+                    case ItomQwtPlotEnums::CmplxImag:
                         return QPointF(fPos, val.imag());
                     break;
-                    case cmplxArg:
+                    case ItomQwtPlotEnums::CmplxArg:
                         return QPointF(fPos, arg(val));
                     break;
                     }
@@ -934,16 +934,16 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                     switch (m_cmplxState)
                     {
                         default:
-                        case cmplxAbs:
+                    case ItomQwtPlotEnums::CmplxAbs:
                             return QPointF(fPos, abs(val));
                         break;
-                        case cmplxReal:
+                    case ItomQwtPlotEnums::CmplxReal:
                             return QPointF(fPos, val.real());
                         break;
-                        case cmplxImag:
+                    case ItomQwtPlotEnums::CmplxImag:
                             return QPointF(fPos, val.imag());
                         break;
-                        case cmplxArg:
+                    case ItomQwtPlotEnums::CmplxArg:
                             return QPointF(fPos, arg(val));
                         break;
                     }
@@ -1767,7 +1767,7 @@ ito::DataObject DataObjectSeriesData::getResampledDataObject()
 //}
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState = DataObjectSeriesData::cmplxAbs)
+template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState = ItomQwtPlotEnums::CmplxAbs)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -1818,7 +1818,7 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
+template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -1884,7 +1884,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
+template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -1951,7 +1951,7 @@ template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
+template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -1971,16 +1971,16 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
             val_ = *(reinterpret_cast<complex64*>(ptr));
             switch(cmplxState)
             {
-            case DataObjectSeriesData::cmplxAbs:
+            case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
                 break;
-            case DataObjectSeriesData::cmplxReal:
+            case ItomQwtPlotEnums::CmplxReal:
                 val = val_.real();
                 break;
-            case DataObjectSeriesData::cmplxImag:
+            case ItomQwtPlotEnums::CmplxImag:
                 val = val_.imag();
                 break;
-            case DataObjectSeriesData::cmplxArg:
+            case ItomQwtPlotEnums::CmplxArg:
                 val = arg(val_);
                 break;
             }
@@ -2005,16 +2005,16 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
             val_ = *(reinterpret_cast<complex64*>(ptr + d.matSteps[i]));
             switch(cmplxState)
             {
-            case DataObjectSeriesData::cmplxAbs:
+            case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
                 break;
-            case DataObjectSeriesData::cmplxReal:
+            case ItomQwtPlotEnums::CmplxReal:
                 val = val_.real();
                 break;
-            case DataObjectSeriesData::cmplxImag:
+            case ItomQwtPlotEnums::CmplxImag:
                 val = val_.imag();
                 break;
-            case DataObjectSeriesData::cmplxArg:
+            case ItomQwtPlotEnums::CmplxArg:
                 val = arg(val_);
                 break;
             }
@@ -2038,16 +2038,16 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
             val_ = *(reinterpret_cast<complex64*>(ptr));
             switch(cmplxState)
             {
-            case DataObjectSeriesData::cmplxAbs:
+            case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
                 break;
-            case DataObjectSeriesData::cmplxReal:
+            case ItomQwtPlotEnums::CmplxReal:
                 val = val_.real();
                 break;
-            case DataObjectSeriesData::cmplxImag:
+            case ItomQwtPlotEnums::CmplxImag:
                 val = val_.imag();
                 break;
-            case DataObjectSeriesData::cmplxArg:
+            case ItomQwtPlotEnums::CmplxArg:
                 val = arg(val_);
                 break;
             }
@@ -2065,7 +2065,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ComplexType cmplxState)
+template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -2085,16 +2085,16 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
             val_ = *(reinterpret_cast<complex128*>(ptr));
             switch(cmplxState)
             {
-            case DataObjectSeriesData::cmplxAbs:
+            case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
                 break;
-            case DataObjectSeriesData::cmplxReal:
+            case ItomQwtPlotEnums::CmplxReal:
                 val = val_.real();
                 break;
-            case DataObjectSeriesData::cmplxImag:
+            case ItomQwtPlotEnums::CmplxImag:
                 val = val_.imag();
                 break;
-            case DataObjectSeriesData::cmplxArg:
+            case ItomQwtPlotEnums::CmplxArg:
                 val = arg(val_);
                 break;
             }
@@ -2118,16 +2118,16 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
             val_ = *(reinterpret_cast<complex128*>(ptr + d.matSteps[i]));
             switch(cmplxState)
             {
-            case DataObjectSeriesData::cmplxAbs:
+            case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
                 break;
-            case DataObjectSeriesData::cmplxReal:
+            case ItomQwtPlotEnums::CmplxReal:
                 val = val_.real();
                 break;
-            case DataObjectSeriesData::cmplxImag:
+            case ItomQwtPlotEnums::CmplxImag:
                 val = val_.imag();
                 break;
-            case DataObjectSeriesData::cmplxArg:
+            case ItomQwtPlotEnums::CmplxArg:
                 val = arg(val_);
                 break;
             }
@@ -2151,16 +2151,16 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
             val_ = *(reinterpret_cast<complex128*>(ptr));
             switch(cmplxState)
             {
-            case DataObjectSeriesData::cmplxAbs:
+            case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
                 break;
-            case DataObjectSeriesData::cmplxReal:
+            case ItomQwtPlotEnums::CmplxReal:
                 val = val_.real();
                 break;
-            case DataObjectSeriesData::cmplxImag:
+            case ItomQwtPlotEnums::CmplxImag:
                 val = val_.imag();
                 break;
-            case DataObjectSeriesData::cmplxArg:
+            case ItomQwtPlotEnums::CmplxArg:
                 val = arg(val_);
                 break;
             }

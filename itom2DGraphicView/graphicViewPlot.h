@@ -250,7 +250,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         void mnuValuePicker(bool checked);
         void mnuAScanPicker(bool checked);
         void mnuLinePicker(bool checked);
-        void mnuScaleSetting();
+        void mnuScaleSettings();
         void mnuColorBar(bool checked);
         void mnuCmplxSwitch(QAction *action);
         void mnuAspectSwitch(QAction *action);

@@ -26,6 +26,7 @@
 #include "common/sharedStructures.h"
 #include "plot/AbstractFigure.h"
 #include "DataObject/dataobj.h"
+#include "../sharedFiles/itomQwtPlotEnums.h"
 
 #include <qwt_series_data.h>
 #include <qlist.h>
@@ -41,7 +42,6 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
     public:
 
         enum ColorType { grayColor = 4, blueColor = 0, greenColor = 1, redColor = 2, alphaColor = 3 };
-        enum ComplexType { cmplxAbs = 0, cmplxReal = 1, cmplxImag = 2, cmplxArg = 3 };
         enum Direction { dirX = 0, dirY = 1, dirZ = 2, dirXY = 3 };
 
         struct PtsWeighted {
@@ -101,8 +101,8 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds);
         const ito::DataObject* getDataObject() const { return m_pDataObj; }
 
-        inline void setCmplxState(ComplexType state) { m_cmplxState = state; }
-        inline ComplexType getCmplxState() const {return m_cmplxState; }
+        inline void setCmplxState(ItomQwtPlotEnums::ComplexType state) { m_cmplxState = state; }
+        inline ItomQwtPlotEnums::ComplexType getCmplxState() const { return m_cmplxState; }
 
         ito::DataObject getResampledDataObject();
 
@@ -143,7 +143,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         bool m_autoScaleX;
         double m_minX;
         double m_maxX;
-        ComplexType m_cmplxState;
+        ItomQwtPlotEnums::ComplexType m_cmplxState;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
