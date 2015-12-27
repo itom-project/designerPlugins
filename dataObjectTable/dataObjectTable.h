@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of itom.
 
@@ -21,85 +21,18 @@
 *********************************************************************** */
 
 #ifndef DATAOBJECTTABLE_H
-#define DATAOBJECT_H
+#define DATAOBJECTTABLE_H
 
 #include "DataObject/dataobj.h"
 
 #include <qtableview.h>
-#include <qabstractitemmodel.h>
-#include <qitemdelegate.h>
 #include <qsharedpointer.h>
+#include <qheaderview.h>
 
-class DataObjectModel : public QAbstractItemModel
-{
-    Q_OBJECT
-
-public:
-    DataObjectModel();
-    ~DataObjectModel();
-
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
-
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    Qt::ItemFlags flags ( const QModelIndex & index ) const;
-
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
-    void setHeaderLabels(Qt::Orientation orientation, const QStringList &labels);
-
-    void setDataObject(QSharedPointer<ito::DataObject> dataObj);
-    inline QSharedPointer<ito::DataObject> getDataObject() const { return m_sharedDataObj; };
-
-    inline int getType() const { return m_sharedDataObj.data() ? m_sharedDataObj->getType() : ito::tUInt8; }
-
-protected:
-    friend class DataObjectTable;
-
-    QVariant at(const int row, const int column) const;
-    bool setValue(const int &row, const int &column, const QVariant &value);
-
-    void setReadOnly(bool value);
-    inline bool getReadOnly() const { return m_readOnly; };
-
-    void setDefaultGrid(int rows, int cols);
-
-    QStringList m_verticalHeader;
-    QStringList m_horizontalHeader;
-
-    int m_defaultRows;
-    int m_defaultCols;
-
-
-    QSharedPointer<ito::DataObject> m_sharedDataObj;
-
-private:
-    bool m_readOnly;
-};
-
-class DataObjectDelegate : public QItemDelegate
-{
-    Q_OBJECT
-
-public:
-    DataObjectDelegate(QObject *parent = 0);
-
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,  const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-    friend class DataObjectTable;
-
-private:
-    double m_min;
-    double m_max;
-    int m_decimals;
-
-};
+class QKeyEvent;
+class QContextMenuEvent;
+class DataObjectModel;
+class DataObjectDelegate;
 
 class DataObjectTable : public QTableView
 {
@@ -110,21 +43,31 @@ class DataObjectTable : public QTableView
     Q_PROPERTY(double min READ getMin WRITE setMin DESIGNABLE true);
     Q_PROPERTY(double max READ getMax WRITE setMax DESIGNABLE true);
     Q_PROPERTY(int decimals READ getDecimals WRITE setDecimals DESIGNABLE true);
+    Q_PROPERTY(int editorDecimals READ getEditorDecimals WRITE setEditorDecimals DESIGNABLE true);
     Q_PROPERTY(int defaultCols READ getDefaultCols WRITE setDefaultCols DESIGNABLE true);
     Q_PROPERTY(int defaultRows READ getDefaultRows WRITE setDefaultRows DESIGNABLE true);
     Q_PROPERTY(QStringList horizontalLabels READ getHorizontalLabels WRITE setHorizontalLabels DESIGNABLE true);
     Q_PROPERTY(QStringList verticalLabels READ getVerticalLabels WRITE setVerticalLabels DESIGNABLE true);
+    Q_PROPERTY(QStringList suffixes READ getSuffixes WRITE setSuffixes DESIGNABLE true);
+    Q_PROPERTY(QHeaderView::ResizeMode horizontalResizeMode READ getHorizontalResizeMode WRITE setHorizontalResizeMode DESIGNABLE true);
+    Q_PROPERTY(QHeaderView::ResizeMode verticalResizeMode READ getVerticalResizeMode WRITE setVerticalResizeMode DESIGNABLE true);
+    Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment DESIGNABLE true);
     
 
     Q_CLASSINFO("prop://data", "the dataObject to be shown");
     Q_CLASSINFO("prop://readOnly", "enable write protection");
     Q_CLASSINFO("prop://min", "get/set minimum value");
     Q_CLASSINFO("prop://max", "get/set maximum value");
-    Q_CLASSINFO("prop://decimals", "number of decimals to be shown within each cell");
+    Q_CLASSINFO("prop://decimals", "number of visible decimals for floating point numbers");
+    Q_CLASSINFO("prop://editorDecimals", "number of possible decimals during the edit of floating point numbers");
     Q_CLASSINFO("prop://defaultCols", "number of column to be shown");
     Q_CLASSINFO("prop://defaultRows", "number of rows to be shown");
     Q_CLASSINFO("prop://horizontalLabels", "list with labels for each column row");
     Q_CLASSINFO("prop://verticalLabels", "list with labels for each shown row");
+    Q_CLASSINFO("prop://suffixes", "list with suffixes for each columns. If less suffixes than columns are indicated, the last suffix is repeated.");
+    Q_CLASSINFO("prop://horizontalResizeMode", "defines the mode how the rows can be resized or are stretched over the available space.");
+    Q_CLASSINFO("prop://verticalResizeMode", "defines the mode how the columns can be resized or are stretched over the available space.");
+    Q_CLASSINFO("prop://alignment", "alignment of the text cells.");
 
     Q_CLASSINFO("signal://activated", "signal emitted if a cell is activated. Arguments are (row,column) of the cell.")
     Q_CLASSINFO("signal://clicked", "signal emitted if a cell is clicked by the mouse. Arguments are (row,column) of the cell.")
@@ -151,17 +94,32 @@ public:
     int getDecimals() const;
     void setDecimals(int value);
 
-    inline int getDefaultCols() const { return m_pModel->m_defaultCols; }
+    Qt::Alignment getAlignment() const;
+    void setAlignment(Qt::Alignment alignment);
+
+    int getEditorDecimals() const;
+    void setEditorDecimals(int value);
+
+    QHeaderView::ResizeMode getHorizontalResizeMode() const;
+    void setHorizontalResizeMode(QHeaderView::ResizeMode mode);
+
+    QHeaderView::ResizeMode getVerticalResizeMode() const;
+    void setVerticalResizeMode(QHeaderView::ResizeMode mode);
+
+    int getDefaultCols() const;
     void setDefaultCols(int value);
 
-    inline int getDefaultRows() const { return m_pModel->m_defaultRows; }
+    int getDefaultRows() const;
     void setDefaultRows(int value);
 
-    inline QStringList getVerticalLabels() const { return m_pModel->m_verticalHeader; }
+    QStringList getVerticalLabels() const;
     void setVerticalLabels(QStringList value);
 
-    inline QStringList getHorizontalLabels() const { return m_pModel->m_horizontalHeader; }
+    QStringList getHorizontalLabels() const;
     void setHorizontalLabels(QStringList value);
+
+    QStringList getSuffixes() const;
+    void setSuffixes(QStringList value);
 
     virtual QSize sizeHint() const;
 
@@ -169,6 +127,9 @@ public:
 protected:
     DataObjectModel *m_pModel;
     DataObjectDelegate *m_pDelegate;
+
+    void keyPressEvent(QKeyEvent *e);
+    void contextMenuEvent(QContextMenuEvent *event);
 
 private:
 
@@ -178,6 +139,8 @@ private slots:
     inline void _doubleClicked (const QModelIndex &index) { emit doubleClicked(index.row(), index.column()); }
     inline void _entered (const QModelIndex &index) { emit entered(index.row(), index.column()); }
     inline void _pressed (const QModelIndex &index) { emit pressed(index.row(), index.column()); }
+    void copySelectionToClipboard();
+    void copyAllToClipboard();
 
 signals:
     void activated (int row, int column);
@@ -185,7 +148,6 @@ signals:
     void doubleClicked (int row, int column);
     void entered (int row, int column);
     void pressed (int row, int column);
-
 };
 
 #endif

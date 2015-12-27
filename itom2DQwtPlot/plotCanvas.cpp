@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO),
-   Universität Stuttgart, Germany
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
 
    This file is part of itom.
 
@@ -29,7 +29,8 @@
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
 #include "valuePicker2d.h"
-#include "../sharedFiles/multiPointPickerMachine.h"
+#include "multiPointPickerMachine.h"
+#include "itomPlotZoomer.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -54,9 +55,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent /*= NULL*/) :
-        QwtPlot(parent),
-        m_pZoomer(NULL),
-        m_pPanner(NULL),
+        ItomQwtPlot(contextMenu, parent),
         m_pLineCutPicker(NULL),
         m_pCenterMarker(NULL),
 //        m_pStackCut(NULL),
@@ -75,12 +74,9 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
         m_pMultiPointPicker(NULL),
         m_activeDrawItem(-1),
         m_ignoreNextMouseEvent(false),
-        m_contextMenu(contextMenu),
         m_isRefreshingPlot(false),
-        m_firstTimeVisible(false),
         m_unitLabelChanged(false)
 {
-    setMouseTracking(false);
 
     //canvas() is the real plotting area, where the plot is printed (without axes...)
     //canvas()->setFrameShadow(QFrame::Plain);
@@ -107,25 +103,6 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_dOverlayItem->setColorMap(new QwtLinearColorMap(Qt::black, Qt::white, QwtColorMap::Indexed));
     m_colorOverlayMapName = "gray";
     m_dOverlayItem->setVisible(false);
-    //zoom tool
-    m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
-    m_pZoomer->setEnabled(false);
-    m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
-    m_pZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton); //right click should open the context menu, not a zoom out to level 0 (Ctrl+0) if zoomer is enabled.
-
-    //pan tool
-    m_pPanner = new QwtPlotPanner(canvas());
-    m_pPanner->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis
-    m_pPanner->setCursor(Qt::SizeAllCursor);
-    m_pPanner->setEnabled(false);
-    connect(m_pPanner, SIGNAL(panned(int,int)), m_pZoomer, SLOT(canvasPanned(int,int))); //if panner is moved, the new rect is added to the zoom stack for a synchronization of both tools
-
-    m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
-    m_pMagnifier->setEnabled(true);
-    m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yLeft,true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xBottom,true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yRight,false); //do not consider the right vertical axis (color bar)
 
     //value picker
     m_pValuePicker = new ValuePicker2D(QwtPlot::xBottom, QwtPlot::yLeft, canvas(), m_rasterData, m_rasterOverlayData);
@@ -138,6 +115,7 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_pStackPicker->setTrackerMode(QwtPicker::AlwaysOn);
     m_pStackPicker->setRubberBand(QwtPicker::CrossRubberBand);
     m_pStackPicker->setEnabled(false);
+
     //disable key movements for the picker (the marker will be moved by the key-event of this widget)
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
     m_pStackPicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
@@ -153,7 +131,6 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     m_pStackCutMarker->setVisible(false);
 
     //marker for the camera center
-
     m_pCenterMarker = new QwtPlotMarker();
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(Qt::green), QPen(QBrush(Qt::green), 1),  QSize(11,11)));
     m_pCenterMarker->attach(this);
@@ -191,25 +168,6 @@ PlotCanvas::PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * pare
     connect(m_pMultiPointPicker, SIGNAL(activated(bool)), this, SLOT(multiPointActivated(bool)));
     //connect(m_pMultiPointPicker, SIGNAL(selected(QPolygon)), this, SLOT(multiPointSelected (QPolygon)));
     //connect(m_pMultiPointPicker, SIGNAL(appended(QPoint)), this, SLOT(multiPointAppended (QPoint)));
-
-    //Geometry of the plot:
-    setContentsMargins(5,5,5,5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
-
-    canvas()->setContentsMargins(0,0,0,0); //border of the canvas (border between canvas and axes or title)
-
-    //left axis
-    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
-    leftAxis->setMargin(0);                 //distance backbone <-> canvas
-    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
-    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    leftAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
-
-    //bottom axis
-    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
-    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
-    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
-    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    bottomAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
 
     //right axis (color bar)
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
@@ -272,6 +230,8 @@ ito::RetVal PlotCanvas::init()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshStyles()
 {
+    ItomQwtPlot::loadStyles();
+
     QPen rubberBandPen = QPen(QBrush(Qt::red), 1, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
     QFont trackerFont = QFont("Verdana", 10);
@@ -320,10 +280,6 @@ void PlotCanvas::refreshStyles()
         trackerPen.setColor(m_inverseColor0);
         centerMarkerPen.setColor(m_inverseColor0);
     }
-
-    m_pZoomer->setRubberBandPen(rubberBandPen);
-    m_pZoomer->setTrackerFont(trackerFont);
-    m_pZoomer->setTrackerPen(trackerPen);
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
@@ -539,11 +495,11 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
         if (updateState & changeData)
         {
-            m_pZoomer->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
         }
         else
         {
-            m_pZoomer->rescale(false);
+            zoomer()->rescale(false);
         }
     }
     else
@@ -987,6 +943,7 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
     {
         event->ignore(); //Clearing the accept parameter indicates that the event receiver does not want the event. Unwanted events might be propagated to the parent widget.
     }
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1167,19 +1124,19 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     if (doZoomBase)
     {
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
-        if (m_pZoomer->isEnabled())
+        if (zoomer()->isEnabled())
         {
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
 
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->zoom(zoom);
+                zoomer()->zoom(zoom);
             }
         }
         else
@@ -1198,14 +1155,14 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
             
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->appendZoomStack(zoom);
+                zoomer()->appendZoomStack(zoom);
             }
 
         }
@@ -1215,6 +1172,12 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     {
         replot();
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::home()
+{
+    zoomer()->zoom(0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1241,7 +1204,7 @@ void PlotCanvas::setInterval(Qt::Axis axis, const ito::AutoInterval &interval)
     {
         m_pData->m_yaxisScaleAuto = interval.isAuto();
 
-        if (m_pData->m_xaxisScaleAuto)
+        if (m_pData->m_yaxisScaleAuto)
         {
             QwtInterval ival = m_rasterData->interval(Qt::YAxis);
             m_pData->m_yaxisMin = ival.minValue();
@@ -1336,7 +1299,10 @@ ito::AutoInterval PlotCanvas::getInterval(Qt::Axis axis) const
         }
     }
 
-    return ito::AutoInterval(i.minValue(), i.maxValue(), autoScale);
+    double minimum = i.minValue();
+    double maximum = i.maxValue();
+    if (maximum < minimum) std::swap(minimum, maximum);
+    return ito::AutoInterval(minimum, maximum, autoScale);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1358,7 +1324,10 @@ void PlotCanvas::setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &inte
 ito::AutoInterval PlotCanvas::getOverlayInterval(Qt::Axis axis) const
 {
     QwtInterval i = m_rasterOverlayData->interval(axis);
-    return ito::AutoInterval(i.minValue(), i.maxValue(), m_pData->m_overlayScaleAuto);
+    double minimum = i.minValue();
+    double maximum = i.maxValue();
+    if (maximum < minimum) std::swap(minimum, maximum);
+    return ito::AutoInterval(minimum, maximum, m_pData->m_overlayScaleAuto);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1368,7 +1337,7 @@ ito::int32 PlotCanvas::getCurrentPlane() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setState(tState state)
+void PlotCanvas::setState(tState state, ito::PrimitiveContainer::tPrimitive shape /*= ito::PrimitiveContainer::tNoType*/)
 {
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
 
@@ -1385,21 +1354,19 @@ void PlotCanvas::setState(tState state)
 
     if (m_pData->m_state != state)
     {
-        if ((m_pData->m_state == tMultiPointPick || m_pData->m_state == tPoint
-            || m_pData->m_state == tLine || m_pData->m_state == tRect || m_pData->m_state == tEllipse) && state != tIdle)
+        if (m_pData->m_state == tStateDrawShape && state != tIdle)
         {
             return; //multiPointPick needs to go back to idle
         }
 
-        if (m_pZoomer) m_pZoomer->setEnabled(state == tZoom);
-        if (m_pPanner) m_pPanner->setEnabled(state == tPan);
+        if (zoomer()) zoomer()->setEnabled(state == tZoom);
+        if (panner()) panner()->setEnabled(state == tPan);
         if (m_pValuePicker) m_pValuePicker->setEnabled(state == tValuePicker);
         if (m_pLineCutPicker) m_pLineCutPicker->setEnabled(state == tLineCut);
         if (m_pStackPicker) m_pStackPicker->setEnabled(state == tStackCut);
         //if (m_pMultiPointPicker) m_pMultiPointPicker->setEnabled(state == tMultiPointPick);
 
-        if (state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
-            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == tIdle)
+        if (state == tStateDrawShape || state == tIdle)
         {
             if (p)
             {
@@ -1411,8 +1378,7 @@ void PlotCanvas::setState(tState state)
             }
         }
 
-        if (state == tZoom || state == tPan || state == tMultiPointPick || m_pData->m_state == tPoint || m_pData->m_state == tLine
-            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == tValuePicker || state == tIdle)
+        if (state == tZoom || state == tPan || state == tStateDrawShape || state == tValuePicker || state == tIdle)
         {
             if (p)
             {
@@ -1443,20 +1409,15 @@ void PlotCanvas::setState(tState state)
                 canvas()->setCursor(Qt::CrossCursor);
             break;
 
-            case tMultiPointPick:
-                canvas()->setCursor(Qt::CrossCursor);
-            break;
-
-            case tPoint:
-            case tLine:
-            case tRect:
-            case tEllipse:
+            case tStateDrawShape:
                 canvas()->setCursor(Qt::CrossCursor);
             break;
         }
 
         m_pData->m_state = state;
     }
+
+    m_pData->m_stateShapePrimitive = shape;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1729,7 +1690,7 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
+void PlotCanvas::childFigureDestroyed(QObject* /*obj*/, ito::uint32 UID)
 {
     if (UID > 0)
     {
@@ -1758,7 +1719,7 @@ void PlotCanvas::childFigureDestroyed(QObject* obj, ito::uint32 UID)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
+ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, const QString &style, const QString &id, int plane)
 {
     ito::RetVal retval;
     int limits[] = {2,8,0,99999};
@@ -1771,15 +1732,18 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
 
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
 
+    if (!retval.containsError())
+    {
+        if (dObj->getSize(0) <= 2)
+        {
     QwtSymbol::Style symStyle = QwtSymbol::XCross;
-    QSize symSize(5,5);
+            QSize symSize(5, 5);
     QBrush symBrush(Qt::NoBrush);
     QPen symPen(Qt::red);
-    
+
     QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
     if (rgexp.indexIn(style) != -1)
     {
-//        QString s = rgexp.cap(1);
         char s = rgexp.cap(1).toLatin1()[0];
 
         if (s == 'b') symPen.setColor(Qt::blue);
@@ -1811,7 +1775,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
         int size = rgexp.cap(3).toInt(&ok);
         if (ok)
         {
-            symSize = QSize(size,size);
+                    symSize = QSize(size, size);
         }
     }
     else
@@ -1819,18 +1783,11 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
         retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format").toLatin1().data());
     }
 
-    if (!retval.containsError())
-    {
-        if (dObj->getSize(0) <= 2)
-        {
-            //QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
             QwtPlotMarker *marker = NULL;
             int nrOfMarkers = dObj->getSize(1);
 
-            if (id == "") id = "unknown";
-
-            ito::float32 *xCoords = (ito::float32*)dObj->rowPtr(0,0);
-            ito::float32 *yCoords = (ito::float32*)dObj->rowPtr(0,1);
+            const ito::float32 *xCoords = dObj->rowPtr<const ito::float32>(0,0);
+            const ito::float32 *yCoords = dObj->rowPtr<const ito::float32>(0, 1);
 
             for (int i = 0; i < nrOfMarkers; ++i)
             {
@@ -1840,20 +1797,17 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 marker->attach(this);
                 if(m_pData->m_markerLabelVisible)
                 {
-                    QwtText label(QString(" %1").arg(id));
+                    QwtText label(QString(" %1").arg(id == "" ? "unknown" : id));
                     marker->setLabel(label);
                 }
                 
                 
-                m_plotMarkers.insert(id, QPair<int, QwtPlotMarker*>(plane, marker));
+                m_plotMarkers.insert(id == "" ? "unknown" : id, QPair<int, QwtPlotMarker*>(plane, marker));
             }
         }
         else if (dObj->getSize(0) >= 8)
         {
-//            QwtPlotMarker *marker = NULL;
             int nrOfMarkers = dObj->getSize(1);
-            
-            if (id == "") id = "unknown";
 
             ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 0);            
             ito::float32 *types = (ito::float32*)dObj->rowPtr(0, 1);
@@ -1873,21 +1827,21 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 unsigned char flags = (((int)types[i]) & ito::tGeoFlagMask) >> 16;
                 switch (type)
                 {
-                    case tPoint:
+                    case ito::PrimitiveContainer::tPoint:
                         path.moveTo(xCoords1[i], yCoords1[i]);
                         path.lineTo(xCoords1[i], yCoords1[i]);
                     break;
                         
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         path.moveTo(xCoords1[i], yCoords1[i]);
                         path.lineTo(xCoords2[i], yCoords2[i]);                        
                     break;
                         
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         path.addRect(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
                     break;
                         
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         path.addEllipse(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
                     break;
                     
@@ -1904,21 +1858,21 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                 {
                     switch (type)
                     {
-                        case tMultiPointPick:
-                        case tPoint:                    
-                            newItem = new DrawItem(this, tPoint, (int)ids[i]);
+                        case ito::PrimitiveContainer::tMultiPointPick:
+                        case ito::PrimitiveContainer::tPoint:
+                            newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint, (int)ids[i]);
                         break;
                         
-                        case tLine:
-                            newItem = new DrawItem(this, tLine, (int)ids[i]);
+                        case ito::PrimitiveContainer::tLine:
+                            newItem = new DrawItem(this, ito::PrimitiveContainer::tLine, (int)ids[i]);
                         break;
                         
-                        case tRect:
-                            newItem = new DrawItem(this, tRect, (int)ids[i]);
+                        case ito::PrimitiveContainer::tRectangle:
+                            newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle, (int)ids[i]);
                         break;
                         
-                        case tEllipse:
-                            newItem = new DrawItem(this, tEllipse, (int)ids[i]);
+                        case ito::PrimitiveContainer::tEllipse:
+                            newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse, (int)ids[i]);
                         break;
                         
                         default:
@@ -1927,15 +1881,6 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                     }
                     if (newItem)
                     {
-                        /*
-                        if (this->m_inverseColor0.isValid())
-                        {
-                            newItem->setPen(QPen(m_inverseColor0, 1.0));
-//                            newItem->setBrush(QBrush(m_inverseColor0));
-                        }
-                        else newItem->setPen(QPen(Qt::green, 1.0));
-                        */
-
                         newItem->setShape(path, m_inverseColor0, m_inverseColor1);
                         
                         newItem->setVisible(true);
@@ -1943,7 +1888,7 @@ ito::RetVal PlotCanvas::plotMarkers(const ito::DataObject *coords, QString style
                         newItem->attach(this);
                         newItem->m_flags = flags;
                         replot();
-                        //                m_pData->m_pDrawItems.append(newItem);
+
                         m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
                     }
                 }                
@@ -2032,10 +1977,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
     m_drawedIemsIndexes.clear();
     m_pMultiPointPicker->selection().clear();
 
-    if (type == tPoint || type == tMultiPointPick) //multiPointPick
+    if (type == ito::PrimitiveContainer::tPoint || type == ito::PrimitiveContainer::tMultiPointPick) //multiPointPick
     {
         if (start)
         {
+            setState(tStateDrawShape, (ito::PrimitiveContainer::tPrimitive)type);
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
@@ -2060,7 +2006,6 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
                 //QKeyEvent evt(QEvent::KeyPress, Qt::Key_M, Qt::NoModifier);
                 //m_pMultiPointPicker->eventFilter(m_pMultiPointPicker->parent(), &evt); //starts the process
             }
-            setState((PlotCanvas::tState)type);
         }
         else //start == false
         {
@@ -2083,10 +2028,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             setState(tIdle);
         }
     }
-    else if (type == tLine)
+    else if (type == ito::PrimitiveContainer::tLine)
     {
         if (start)
         {
+            setState(tStateDrawShape, (ito::PrimitiveContainer::tPrimitive)type);
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::PolygonRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -2105,7 +2051,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
             }
-            setState(tLine);
+            setState(tStateDrawShape, ito::PrimitiveContainer::tLine);
         }
         else //start == false
         {
@@ -2126,10 +2072,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             setState(tIdle);
         }
     }
-    else if (type == tRect)
+    else if (type == ito::PrimitiveContainer::tRectangle)
     {
         if (start)
         {
+            setState(tStateDrawShape, (ito::PrimitiveContainer::tPrimitive)type);
             //maxNrOfPoints = 2;
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
@@ -2148,7 +2095,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
             }
-            setState(tRect);
+            setState(tStateDrawShape, ito::PrimitiveContainer::tRectangle);
         }
         else //start == false
         {
@@ -2170,10 +2117,11 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
             setState(tIdle);
         }
     }
-    else if (type == tEllipse)
+    else if (type == ito::PrimitiveContainer::tEllipse)
     {
         if (start)
         {
+            setState(tStateDrawShape, (ito::PrimitiveContainer::tPrimitive)type);
             //maxNrOfPoints = 2;
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
@@ -2192,7 +2140,7 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
             }
-            setState(tEllipse);
+            setState(tStateDrawShape, ito::PrimitiveContainer::tEllipse);
         }
         else //start == false
         {
@@ -2227,19 +2175,29 @@ ito::RetVal PlotCanvas::userInteractionStart(int type, bool start, int maxNrOfPo
         retval += ito::RetVal(ito::retError, 0, tr("Unknown type for userInteractionStart").toLatin1().data());
     }
 
+    if (start)
+    {
+        //if spinbox for multiple planes has the focus, a possible ESC is not correctly caught.
+        //therefore set the focus to the canvas.
+        canvas()->setFocus();
+    }
+
     return retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::multiPointActivated (bool on)
+void PlotCanvas::multiPointActivated(bool on)
 {
     if (m_pData)
     {
-        switch(m_pData->m_state)
+        Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+
+        switch (m_pData->m_stateShapePrimitive)
         {
-            case tMultiPointPick:
+            case ito::PrimitiveContainer::tMultiPointPick:
                 if (!on)
                 {
+                    p->mnuDrawMode(false);
                     QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
                     bool aborted = false;
 
@@ -2284,9 +2242,10 @@ void PlotCanvas::multiPointActivated (bool on)
                 }
             break;
 
-            case tPoint:
+            case ito::PrimitiveContainer::tPoint:
                 if (!on)
                 {
+                    p->mnuDrawMode(false);
                     QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 
                     bool aborted = false;
@@ -2307,7 +2266,7 @@ void PlotCanvas::multiPointActivated (bool on)
                         {
                             QPainterPath path;
                             DrawItem *newItem = NULL;
-                            newItem = new DrawItem(this, tPoint);
+                            newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint);
                             path.moveTo(polygonScale[i].x(), polygonScale[i].y());
                             path.lineTo(polygonScale[i].x(), polygonScale[i].y());
 
@@ -2335,9 +2294,10 @@ void PlotCanvas::multiPointActivated (bool on)
                 }
             break;
 
-            case tLine:
+            case ito::PrimitiveContainer::tLine:
                 if (!on)
                 {
+                    p->mnuDrawMode(false);
                     QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 
                     bool aborted = false;
@@ -2354,7 +2314,7 @@ void PlotCanvas::multiPointActivated (bool on)
 
                         QPainterPath path;
                         DrawItem *newItem = NULL;
-                        newItem = new DrawItem(this, tLine);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tLine);
                         path.moveTo(polygonScale[0].x(), polygonScale[0].y());
                         path.lineTo(polygonScale[1].x(), polygonScale[1].y());
 
@@ -2414,9 +2374,10 @@ void PlotCanvas::multiPointActivated (bool on)
                 }
             break;
 
-            case tRect:
+            case ito::PrimitiveContainer::tRectangle:
                 if (!on)
                 {
+                    p->mnuDrawMode(false);
                     QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 
                     bool aborted = false;
@@ -2433,7 +2394,7 @@ void PlotCanvas::multiPointActivated (bool on)
 
                         QPainterPath path;
                         DrawItem *newItem = NULL;
-                        newItem = new DrawItem(this, tRect);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle);
                         path.addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
                                       polygonScale[1].y() - polygonScale[0].y());
 
@@ -2492,9 +2453,10 @@ void PlotCanvas::multiPointActivated (bool on)
                 }
             break;
 
-            case tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
                 if (!on)
                 {
+                    p->mnuDrawMode(false);
                     QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 
                     bool aborted = false;
@@ -2511,7 +2473,7 @@ void PlotCanvas::multiPointActivated (bool on)
 
                         QPainterPath path;
                         DrawItem *newItem = NULL;
-                        newItem = new DrawItem(this, tEllipse);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse);
                         path.addEllipse(polygonScale[0].x(), polygonScale[0].y(),
                                 (polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
@@ -2574,7 +2536,7 @@ void PlotCanvas::multiPointActivated (bool on)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
+void PlotCanvas::mouseMoveEvent(QMouseEvent * event)
 {
     if(m_ignoreNextMouseEvent)
     {
@@ -2668,7 +2630,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
 
                     switch (it.value()->m_type)
                     {
-                        case tPoint:
+                        case ito::PrimitiveContainer::tPoint:
                         {
                             if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                             {
@@ -2682,7 +2644,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                             }
                         }
                         break;
-                        case tLine:
+                        case ito::PrimitiveContainer::tLine:
                         {
                             if (QApplication::keyboardModifiers() == Qt::ControlModifier)      
                             {   
@@ -2697,7 +2659,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                         }
                         break;
 
-                        case tRect:
+                        case ito::PrimitiveContainer::tRectangle:
                         {
                             if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                             {
@@ -2710,7 +2672,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                         }
                         break;
 
-                        case tEllipse:
+                        case ito::PrimitiveContainer::tEllipse:
                         {
                             if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                             {
@@ -2746,7 +2708,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                         
                         switch (it.value()->m_type)
                         {
-                            case tPoint:
+                            case ito::PrimitiveContainer::tPoint:
 
                                 path.moveTo(canxpos, canypos);
                                 path.lineTo(canxpos, canypos);                                              
@@ -2756,7 +2718,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                                 replot();
                             break;
 
-                            case tLine:
+                            case ito::PrimitiveContainer::tLine:
 
                                 if (QApplication::keyboardModifiers() == Qt::ControlModifier)       // draw line horizontal or vertical with second point fixed
                                 {
@@ -2815,7 +2777,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                                 replot();
                             break;
 
-                            case tRect:
+                            case ito::PrimitiveContainer::tRectangle:
                                 if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                                 {
                                     dx = it.value()->x2 - canxpos;
@@ -2856,7 +2818,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                                 replot();
                             break;
 
-                            case tEllipse:
+                            case ito::PrimitiveContainer::tEllipse:
                                 if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                                 {
                                     dx = it.value()->x2 - canxpos;
@@ -2911,7 +2873,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                         QPainterPath path;
                         switch (it.value()->m_type)
                         {
-                            case tLine:
+                            case ito::PrimitiveContainer::tLine:
                                 if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                                 {
                                     dx = canxpos - it.value()->x1;
@@ -2967,7 +2929,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                                 replot();
                             break;
 
-                            case tRect:
+                            case ito::PrimitiveContainer::tRectangle:
                                 if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                                 {
                                     dx = canxpos - it.value()->x1;
@@ -3006,7 +2968,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
                                 replot();
                             break;
 
-                            case tEllipse:
+                            case ito::PrimitiveContainer::tEllipse:
                                 if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                                 {
                                     dx = canxpos - it.value()->x1;
@@ -3057,7 +3019,7 @@ void PlotCanvas::mouseMoveEvent (QMouseEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mousePressEvent (QMouseEvent * event)
+void PlotCanvas::mousePressEvent(QMouseEvent * event)
 {
     if (m_pData->m_state == tIdle)
     {
@@ -3129,15 +3091,13 @@ void PlotCanvas::mousePressEvent (QMouseEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
+void PlotCanvas::mouseReleaseEvent(QMouseEvent * event)
 {
     Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
-    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
-        || m_pData->m_state == tPoint || m_pData->m_state == tIdle)
+    if (m_pData->m_state == tStateDrawShape || m_pData->m_state == tIdle)
     {
         QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
         for (;it != m_pData->m_pDrawItems.end(); ++it)        
-//        for (int n = 0; n < m_pData->m_pDrawItems.size(); n++)
         {
             if (it.value() != NULL && it.value()->m_active > 0 != 0 && p)
             {
@@ -3146,14 +3106,15 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                 values.reserve(11);
                 switch(it.value()->m_type)
                 {
-                    case tPoint:
+                    case ito::PrimitiveContainer::tPoint:
                         type = ito::tGeoPoint;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
+                        p->m_pActDrawMode->setChecked(false);
                     break;
 
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         type = ito::tGeoLine;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
@@ -3161,11 +3122,12 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                         values.append(it.value()->x2);
                         values.append(it.value()->y2);
                         values.append(0.0);
+                        p->m_pActDrawMode->setChecked(false);
                     break;
 
                     // square is a rect
 //                    case tSquare:
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         type = ito::tGeoRectangle;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
@@ -3173,11 +3135,12 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                         values.append(it.value()->x2);
                         values.append(it.value()->y2);
                         values.append(0.0);
+                        p->m_pActDrawMode->setChecked(false);
                     break;
 
                     // circle is an ellispe
 //                    case tCircle:
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         type = ito::tGeoEllipse;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
@@ -3185,10 +3148,11 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                         values.append(abs(it.value()->x1 - it.value()->x2)*0.5);
                         values.append(abs(it.value()->y1 - it.value()->y2)*0.5);
                         values.append(0.0);
+                        p->m_pActDrawMode->setChecked(false);
                     break;
 
 /*
-                    case tCircle:
+                    case ito::PrimitiveContainer::tCircle:
                         type = ito::tGeoCircle;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
@@ -3198,7 +3162,7 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
                     break;
 */
 /*
-                    case tSquare:
+                    case ito::PrimitiveContainer::tSquare:
                         type = ito::tGeoSquare;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
@@ -3218,12 +3182,6 @@ void PlotCanvas::mouseReleaseEvent (QMouseEvent * event)
             }
         }
     }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::configRescaler(void)
-{
-    m_pZoomer->setFixedAspectRatio(m_pData->m_keepAspect);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3287,20 +3245,6 @@ void PlotCanvas::alphaChanged()
     m_dObjItem->setVisible(m_pData->m_alpha < 255);
     if(m_pValuePicker) m_pValuePicker->enableOverlay(m_pData->m_alpha > 0);
     replot();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::contextMenuEvent(QContextMenuEvent * event)
-{
-    if (m_showContextMenu && m_pPanner->isEnabled() == false)
-    {
-        event->accept();
-        m_contextMenu->exec(event->globalPos());
-    }
-    else
-    {
-        event->ignore();
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3383,24 +3327,6 @@ void PlotCanvas::updateColors(void)
     }
 
     return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setVisible(bool visible)
-{    
-    this->QwtPlot::setVisible(visible);
-    if (visible)
-    {
-        if (!m_firstTimeVisible)
-        {
-            this->updateScaleValues(true, true);
-        }
-        else
-        {
-            this->updateScaleValues(true, false);
-        }
-        m_firstTimeVisible = true;
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

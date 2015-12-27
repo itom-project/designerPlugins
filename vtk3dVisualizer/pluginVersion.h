@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -25,9 +25,9 @@
 
 #include "itom_sdk.h"
 
-#define PLUGIN_VERSION_MAJOR 0
+#define PLUGIN_VERSION_MAJOR 1
 #define PLUGIN_VERSION_MINOR 0
-#define PLUGIN_VERSION_PATCH 1
+#define PLUGIN_VERSION_PATCH 0
 #define PLUGIN_VERSION_REVISION 0
 #define PLUGIN_VERSION        CREATE_VERSION(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
 #define PLUGIN_VERSION_STRING CREATE_VERSION_STRING(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)

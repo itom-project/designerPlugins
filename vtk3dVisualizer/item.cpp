@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -28,10 +28,11 @@
 
 Q_DECLARE_METATYPE ( SharedItemPtr )
 
-Item::Item(const QString &name, QTreeWidgetItem *treeItem) :
+Item::Item(const QString &name, rttiItem rtti, QTreeWidgetItem *treeItem) :
     m_name(name),
     m_visible(true),
-    m_treeItem(treeItem)
+    m_treeItem(treeItem),
+    m_rtti(rtti)
 {
     m_type = "";
 }

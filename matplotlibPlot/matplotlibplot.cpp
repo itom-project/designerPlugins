@@ -98,9 +98,9 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     addMenu(contextMenu);
 
     m_pContent = new MatplotlibWidget(contextMenu, this);
-    ((MatplotlibWidget*)m_pContent)->setObjectName("canvasWidget");
+    m_pContent->setObjectName("canvasWidget");
 
-    setCentralWidget((MatplotlibWidget*)m_pContent);
+    setCentralWidget(m_pContent);
 
     setPropertyObservedObject(this);
 }
@@ -153,8 +153,8 @@ void MatplotlibPlot::mnuMarkerClick(bool checked)
 {
     if (m_pContent)
     {
-        ((MatplotlibWidget*)m_pContent)->m_trackerActive = checked;
-        ((MatplotlibWidget*)m_pContent)->setMouseTracking(checked);
+        m_pContent->m_trackerActive = checked;
+        m_pContent->setMouseTracking(checked);
     }
 }
 
@@ -163,7 +163,7 @@ void MatplotlibPlot::setContextMenuEnabled(bool show)
 {
     if (m_pContent) 
     {
-        ((MatplotlibWidget*)m_pContent)->m_showContextMenu = show;
+        m_pContent->m_showContextMenu = show;
     }
 }
 
@@ -172,93 +172,63 @@ bool MatplotlibPlot::getContextMenuEnabled() const
 {
     if (m_pContent)
     {
-        return ((MatplotlibWidget*)m_pContent)->m_showContextMenu;
+        return m_pContent->m_showContextMenu;
     }
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::showSubplotConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace)
+//valLeft, valTop, valRight, valBottom, valWSpace, valHSpace are
+//fractions of the image width and height multiplied by 1000 (resolution: 0.1%)
+void MatplotlibPlot::showSubplotConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace)
 {
     if (m_pMatplotlibSubfigConfig == NULL)
     {
         m_pMatplotlibSubfigConfig = new MatplotlibSubfigConfig(valLeft, valTop, valRight, valBottom, valWSpace, valHSpace, this);
-        connect(((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderLeft(), SIGNAL(valueChanged(int)), this, SLOT(subplotConfigSliderLeftChanged(int)));
-        connect(((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderTop(), SIGNAL(valueChanged(int)), this, SLOT(subplotConfigSliderTopChanged(int)));
-        connect(((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderRight(), SIGNAL(valueChanged(int)), this, SLOT(subplotConfigSliderRightChanged(int)));
-        connect(((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderBottom(), SIGNAL(valueChanged(int)), this, SLOT(subplotConfigSliderBottomChanged(int)));
-        connect(((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderWSpace(), SIGNAL(valueChanged(int)), this, SLOT(subplotConfigSliderWSpaceChanged(int)));
-        connect(((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderHSpace(), SIGNAL(valueChanged(int)), this, SLOT(subplotConfigSliderHSpaceChanged(int)));
+        connect((m_pMatplotlibSubfigConfig)->sliderLeftRight(), SIGNAL(minimumValueChanged(double)), this, SLOT(subplotConfigSliderLeftChanged(double)));
+        connect((m_pMatplotlibSubfigConfig)->sliderLeftRight(), SIGNAL(maximumValueChanged(double)), this, SLOT(subplotConfigSliderRightChanged(double)));
+        connect((m_pMatplotlibSubfigConfig)->sliderBottomTop(), SIGNAL(minimumValueChanged(double)), this, SLOT(subplotConfigSliderBottomChanged(double)));
+        connect((m_pMatplotlibSubfigConfig)->sliderBottomTop(), SIGNAL(maximumValueChanged(double)), this, SLOT(subplotConfigSliderTopChanged(double)));
+        connect((m_pMatplotlibSubfigConfig)->sliderWSpace(), SIGNAL(valueChanged(double)), this, SLOT(subplotConfigSliderWSpaceChanged(double)));
+        connect((m_pMatplotlibSubfigConfig)->sliderHSpace(), SIGNAL(valueChanged(double)), this, SLOT(subplotConfigSliderHSpaceChanged(double)));
     }
 
-    ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->setModal(true);
-    ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->show();
+    (m_pMatplotlibSubfigConfig)->setModal(true);
+    (m_pMatplotlibSubfigConfig)->show();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::subplotConfigSliderLeftChanged(int value)
+void MatplotlibPlot::subplotConfigSliderLeftChanged(double value)
 {
-    int sliderRightValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderRight()->sliderPosition() - 1;
-    if (value > sliderRightValue)
-    {
-        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderLeft()->setValue(sliderRightValue);
-    }
-    else
-    {
-        emit subplotConfigSliderChanged(0, value);
-    }
+    emit subplotConfigSliderChanged(0, qRound(value * 10.0));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::subplotConfigSliderTopChanged(int value)
+void MatplotlibPlot::subplotConfigSliderTopChanged(double value)
 {
-    int sliderBottomValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderBottom()->sliderPosition() + 1;
-    if (value < sliderBottomValue)
-    {
-        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderTop()->setValue(sliderBottomValue);
-    }
-    else
-    {
-        emit subplotConfigSliderChanged(1, value);
-    }
+    emit subplotConfigSliderChanged(1, qRound(value * 10.0));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::subplotConfigSliderRightChanged(int value)
+void MatplotlibPlot::subplotConfigSliderRightChanged(double value)
 {
-    int sliderLeftValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderLeft()->sliderPosition() + 1;
-    if (value < sliderLeftValue)
-    {
-        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderRight()->setValue(sliderLeftValue);
-    }
-    else
-    {
-        emit subplotConfigSliderChanged(2, value);
-    }
+    emit subplotConfigSliderChanged(2, qRound(value * 10.0));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::subplotConfigSliderBottomChanged(int value)
+void MatplotlibPlot::subplotConfigSliderBottomChanged(double value)
 {
-    int sliderTopValue = ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderTop()->sliderPosition() - 1;
-    if (value > sliderTopValue)
-    {
-        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->sliderBottom()->setValue(sliderTopValue);
-    }
-    else
-    {
-        emit subplotConfigSliderChanged(3, value);
-    }
+    emit subplotConfigSliderChanged(3, qRound(value * 10.0));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::subplotConfigSliderWSpaceChanged(int value)
+void MatplotlibPlot::subplotConfigSliderWSpaceChanged(double value)
 {
-    emit subplotConfigSliderChanged(4, value);
+    emit subplotConfigSliderChanged(4, qRound(value * 10.0));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::subplotConfigSliderHSpaceChanged(int value)
+void MatplotlibPlot::subplotConfigSliderHSpaceChanged(double value)
 {
-    emit subplotConfigSliderChanged(5, value);
+    emit subplotConfigSliderChanged(5, qRound(value * 10.0));
 }

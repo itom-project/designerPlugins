@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -69,7 +69,7 @@ public:
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
     enum Interpolation { Flat, Gouraud, Phong };
     enum Culling { ShowAll, BackfaceOnly, FrontfaceOnly };
-    enum ColorMode { RGB, SolidColor, NormalX, NormalY, NormalZ, NormalMagnitude, X, Y, Z, XY, YZ, XZ, XYZ};
+    enum ColorMode { RGB, SolidColor, NormalX, NormalY, NormalZ, NormalMagnitude, X, Y, Z, XY, YZ, XZ, XYZ, Curvature};
     enum ColorMap { gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green};
 
     //properties

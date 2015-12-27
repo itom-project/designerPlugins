@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO),
-   Universität Stuttgart, Germany
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
 
    This file is part of itom.
 
@@ -91,7 +91,7 @@ int plotGLWidget::initOGL2(const int width, const int height)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix wählen
+    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix waehlen
     glLoadIdentity();
     glViewport(0, 0, (GLsizei)width, (GLsizei)height);                //Window resizen
     gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
@@ -354,7 +354,7 @@ void plotGLWidget::initializeGL()
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix wählen
+    glMatrixMode(GL_PROJECTION);                    //Projektionsmatrix waehlen
     glLoadIdentity();
     glViewport(0, 0, (GLsizei)width(), (GLsizei)height());                //Window resizen
     gluOrtho2D(-1.1, 1.1, -1.1, 1.1);
@@ -1682,8 +1682,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             m_axisZ.phys[0] = zmin;
             m_axisZ.phys[1] = zmax;
 
-            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-                m_zAmpl = 0.000000001; // make sure µm can be displayed
+            if (m_zAmpl < 0.000000001) // make sure mu m can be displayed
+                m_zAmpl = 0.000000001; // make sure mu m can be displayed
 
             zs = m_axisZ.phys[1] - m_axisZ.phys[0];
             xs = m_axisX.phys[1] - m_axisX.phys[0];
@@ -1736,8 +1736,8 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
 
         if(!retval.containsError())
         {
-            if (m_zAmpl < 0.000000001) // make sure µm can be displayed
-                m_zAmpl = 0.000000001; // make sure µm can be displayed
+            if (m_zAmpl < 0.000000001) // make sure mu m can be displayed
+                m_zAmpl = 0.000000001; // make sure mu m can be displayed
 
             if(m_axisZ.isMetric) zs = m_axisZ.phys[1] - m_axisZ.phys[0];
 
@@ -2386,7 +2386,7 @@ void plotGLWidget::paintAxisOGL(double x0, double y0, double z0, double x1, doub
 //-----------------------------------------------------------------------------------------------
 /**
 *\fn static void dreidogl_lichtpfeil(class FilterObject *fo)
-*\brief Zeichnet den Lichtpfeil für die Beleuchtungsdarstellung
+*\brief Zeichnet den Lichtpfeil fuer die Beleuchtungsdarstellung
 *\param[in] *fo Zeiger auf das Goofi-Filterobjekt
 *\return error
 *\ingroup 3DOGLFuncsGroup
@@ -2448,7 +2448,7 @@ void plotGLWidget::paintLightArrow()
 /**
 *\brief Zeichnet die Achsenstriche
 *\param[in] *fo Zeiger auf das Goofi-Filterobjekt
-*\param[in] write Flag für das Schreiben von Tick-Lables
+*\param[in] write Flag fuer das Schreiben von Tick-Lables
 *\return error
 *\ingroup 3DOGLFuncsGroup
 */
@@ -2614,7 +2614,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
                 {
                     label.append(" in ");
 
-                    char sign[2] = {("afpnµm-kMGTPE"[al.unitydigit / 3 + 6]), 0};
+                    char sign[2] = {("afpn\u00B5m-kMGTPE"[al.unitydigit / 3 + 6]), 0}; // Ermittlung der Masseinheit
                     label.append(sign);
 
                     if(alreadyScaled)
@@ -2780,7 +2780,7 @@ void plotGLWidget::paintAxisLabelOGL(const struct AxisLabel &axisLabel, const do
         else
         {
             int rest=firstdigit>0?firstdigit%3:2-(2-firstdigit)%3;
-            _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpnµm-kMGTPE"[(firstdigit - rest) / 3 + 6]);
+            _snprintf(buffer, sizeof(buffer), "%.0f%c", pow(10.0, rest), "afpn\u00B5m-kMGTPE"[(firstdigit - rest) / 3 + 6]); // Ermittlung der Masseinheit
         }
     }
 

@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of itom.
 
@@ -31,8 +31,9 @@
 #include "MarkerLegend/markerLegendWidget.h"
 
 #include "common/sharedStructuresPrimitives.h"
-#include "../sharedFiles/multiPointPickerMachine.h"
-#include "../sharedFiles/itomLogLogScaleEngine.h"
+#include "multiPointPickerMachine.h"
+#include "itomLogLogScaleEngine.h"
+#include "itomPlotZoomer.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -62,8 +63,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent) :
-        QwtPlot(parent),
-        m_contextMenu(contextMenu),
+        ItomQwtPlot(contextMenu, parent),
         m_pPlotGrid(NULL),
 //        m_startScaledX(false),
 //        m_startScaledY(false),
@@ -80,7 +80,6 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_layerState(false),
         m_pData(data),
         m_activeDrawItem(1),
-        m_pRescaler(NULL),
         m_ignoreNextMouseEvent(false),
         m_gridEnabled(false),
         m_legendPosition(BottomLegend),
@@ -92,15 +91,12 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
         m_curveFilled(Itom1DQwt::NoCurveFill),
         m_pLegend(NULL),
         m_valueScale(Itom1DQwt::Linear),
-        m_axisScale(Itom1DQwt::Linear),
-        m_firstTimeVisible(false)
+        m_axisScale(Itom1DQwt::Linear)
 {
-    this->setMouseTracking(false);
     
     m_inverseColor0 = Qt::green;
     m_inverseColor1 = Qt::blue;
     
-
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
     m_pMultiPointPicker->setEnabled(false);
@@ -117,42 +113,18 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     canvas()->setCursor(Qt::ArrowCursor);
 
     m_colorList.reserve(12);
-    m_colorList.append("blue");
-    m_colorList.append("green");
-    m_colorList.append("red");
-    m_colorList.append("magenta");
-    m_colorList.append("cyan");
-    m_colorList.append("yellow");
-    m_colorList.append("darkBlue");
-    m_colorList.append("darkGreen");
-    m_colorList.append("darkRed");
-    m_colorList.append("darkMagenta");
-    m_colorList.append("darkCyan");
-    m_colorList.append("darkYellow");
-
-    m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
-    m_pZoomer->setEnabled(false);
-    m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
-    m_pZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton); //right click should open the context menu, not a zoom out to level 0 (Ctrl+0) if zoomer is enabled.
-    //m_pZoomer->setFixedAspectRatio(true);
-    //all others settings for zoomer are set in init (since they need access to the settings via api)
-
-    m_pPanner = new QwtPlotPanner(canvas());
-    m_pPanner->setAxisEnabled(QwtPlot::yRight,false);
-    m_pPanner->setCursor(Qt::SizeAllCursor);
-    m_pPanner->setEnabled(false);
-    connect(m_pPanner, SIGNAL(panned(int,int)), m_pZoomer, SLOT(canvasPanned(int,int))); //if panner is moved, the new rect is added to the zoom stack for a synchronization of both tools
-
-    m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
-    m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
-    m_pMagnifier->setZoomInKey(Qt::Key_Plus, Qt::KeypadModifier);
-    m_pMagnifier->setZoomOutKey(Qt::Key_Minus, Qt::KeypadModifier);
-    m_pMagnifier->setMouseFactor(-m_pMagnifier->mouseFactor());
-    m_pMagnifier->setEnabled(true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, false);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yRight, false);
-    m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
+    m_colorList.append(tr("blue"));
+    m_colorList.append(tr("green"));
+    m_colorList.append(tr("red"));
+    m_colorList.append(tr("magenta"));
+    m_colorList.append(tr("cyan"));
+    m_colorList.append(tr("yellow"));
+    m_colorList.append(tr("darkBlue"));
+    m_colorList.append(tr("darkGreen"));
+    m_colorList.append(tr("darkRed"));
+    m_colorList.append(tr("darkMagenta"));
+    m_colorList.append(tr("darkCyan"));
+    m_colorList.append(tr("darkYellow"));
 
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
@@ -168,29 +140,8 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     m_drawedIemsIndexes.clear();
     m_drawedIemsIndexes.reserve(10);
 
-    setState((Plot1DWidget::tState)m_pData->m_state);
+    setState(m_pData->m_state);
     updateColors();
-
-
-    //Geometry of the plot:
-    setContentsMargins(5,5,5,5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
-
-    canvas()->setContentsMargins(0,0,0,0); //border of the canvas (border between canvas and axes or title)
-
-    //left axis
-    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
-    leftAxis->setMargin(0);                 //distance backbone <-> canvas
-    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
-    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    leftAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
-    
-
-    //bottom axis
-    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
-    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
-    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
-    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    bottomAxis->setContentsMargins(0,0,0,0);  //left axis starts and ends at same level than canvas
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -217,12 +168,6 @@ Plot1DWidget::~Plot1DWidget()
         m_pPlotGrid = NULL;
     }
 
-    if (m_pRescaler != NULL)
-    {
-        m_pRescaler->deleteLater();
-        m_pRescaler = NULL;
-    }
-
     if (m_pMultiPointPicker != NULL) 
     {
         m_pMultiPointPicker->deleteLater();
@@ -239,7 +184,8 @@ Plot1DWidget::~Plot1DWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::init()
 {
-    QPen rubberBandPen = QPen(QBrush(Qt::red),2,Qt::DashLine);
+    ItomQwtPlot::loadStyles();
+
     QPen trackerPen = QPen(QBrush(Qt::red),2);
     QFont trackerFont = QFont("Verdana",10);
     QBrush trackerBg = QBrush(QColor(255,255,255,155), Qt::SolidPattern);
@@ -249,9 +195,8 @@ ito::RetVal Plot1DWidget::init()
     QFont axisFont = QFont("Helvetica",10);
     m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
 
-    if(ito::ITOM_API_FUNCS_GRAPH)
+    if (ito::ITOM_API_FUNCS_GRAPH)
     {
-        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
         trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>();
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
@@ -269,11 +214,6 @@ ito::RetVal Plot1DWidget::init()
 
         m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
     }
-
-    
-    m_pZoomer->setRubberBandPen(rubberBandPen);
-    m_pZoomer->setTrackerFont(trackerFont);
-    m_pZoomer->setTrackerPen(trackerPen);
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
@@ -324,7 +264,6 @@ void Plot1DWidget::setDefaultValueScaleEngine(const Itom1DQwt::ScaleEngine &scal
 
         updateScaleValues(recalculateBoundaries);
     }
-        
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -379,7 +318,7 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
             QwtLegendLabel *legendLabel = NULL;
             foreach (QwtPlotCurve *item, m_plotCurveItems)
             {
-                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget( itemToInfo(item) ) );
+                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
                 if (legendLabel)
                 {
                     legendLabel->setChecked(item->isVisible());
@@ -397,17 +336,34 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setLegendTitles(const QStringList &legends)
+void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataObject *object)
 {
     int index = 0;
     m_legendTitles = legends;
 
-    QwtLegendLabel *legendLabel = NULL;
-    foreach (QwtPlotCurve *item, m_plotCurveItems)
+    bool valid = false;
+    ito::DataObjectTagType tag;
+    QwtPlotCurve *item = NULL;
+
+    for (int index = 0; index < m_plotCurveItems.size(); ++index)
     {
+        item = m_plotCurveItems[index];
         if (m_legendTitles.size() == 0)
         {
+            if (object)
+            {
+                tag = object->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
+            }
+
+            if (valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
+            {
+                item->setTitle(QString::fromLatin1(tag.getVal_ToString().data()));
+            }
+            else // plots with empty tags: curce 0, curve 1, ...
+            {
             item->setTitle(tr("curve %1").arg(index));
+        }
+            
         }
         else if (m_legendTitles.size() > index)
         {
@@ -417,7 +373,6 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends)
         {
             item->setTitle("");
         }
-        index++;
     }
     replot();
 }
@@ -474,7 +429,6 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
 
     replot();
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel)
@@ -566,6 +520,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         int dims = dataObj->getDims();
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dataObj->getSize(dims - 2) : (width == 0) ? 0 : 1;
+		m_pData->m_dataType = (ito::tDataType)dataObj->getType();
 
         if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
         {
@@ -573,7 +528,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             m_cmplxState = true;
             m_colorState = false;
         }
-        else if(dataObj->getType() == ito::tRGBA32)
+        else if (dataObj->getType() == ito::tRGBA32)
         {
             if (!m_colorState) ((Itom1DQwtPlot*)m_pParent)->enableObjectGUIElements(1);
             m_colorState = true;
@@ -590,36 +545,35 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         Itom1DQwt::tMultiLineMode multiLineMode = m_pData->m_multiLine;
 
-        if(dataObj->getType() == ito::tRGBA32)
+        if (dataObj->getType() == ito::tRGBA32)
         {
             m_layerState = false;
-            if(bounds.size() == 0) m_pData->m_multiLine = width == 1 ? Itom1DQwt::FirstCol : Itom1DQwt::FirstRow;
+            if (bounds.size() == 0) m_pData->m_multiLine = width == 1 ? Itom1DQwt::FirstCol : Itom1DQwt::FirstRow;
             m_legendTitles.clear();
             switch(m_pData->m_colorLine)
             {
                 case Itom1DQwt::Gray:
                     numCurves = 1;
-                    m_legendTitles << "gray";
+                    m_legendTitles << tr("gray");
                 break;
                 case Itom1DQwt::RGB:
                     numCurves = 3;
-                    m_legendTitles << "blue" << "green" << "red";
+                    m_legendTitles << tr("blue") << tr("green") << tr("red");
                 break;
                 case Itom1DQwt::RGBA:
                     numCurves = 4;
-                    m_legendTitles << "blue" << "green" << "red" << "alpha";
+                    m_legendTitles << tr("blue") << tr("green") << tr("red") << tr("alpha");
                 break;
                 case Itom1DQwt::RGBGray:
                     numCurves = 4;
-                    m_legendTitles << "blue" << "green" << "red" << "gray";
+                    m_legendTitles << tr("blue") << tr("green") << tr("red") << tr("gray");
                 break;
                 default:
                     numCurves = 3;
                     m_pData->m_colorLine = Itom1DQwt::RGB;
-                    m_legendTitles << "blue" << "green" << "red";
+                    m_legendTitles << tr("blue") << tr("green") << tr("red");
                 break;
             }
-
         }
         else if (bounds.size() == 0)
         {
@@ -640,7 +594,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     numCurves = width;
                     break;
                 case Itom1DQwt::MultiLayerAuto:
-                    if(width == 1 && height == 1)
+                    if (width == 1 && height == 1)
                     {
                         multiLineMode = Itom1DQwt::MultiLayerRows;
                     }
@@ -660,7 +614,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 default:
                 {
                     m_layerState = false;
-                    if(width == 1 && height == 1 && dims < 3)
+                    if (width == 1 && height == 1 && dims < 3)
                     {
                         multiLineMode = Itom1DQwt::MultiRows;
                         numCurves = height;
@@ -680,9 +634,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else //if there are boundaries, only plot one curve from bounds[0] to bounds[1]
         {
-            if(bounds.size() == 3)
+            if (bounds.size() == 3)
             {
-                if(m_pData->m_multiLine == Itom1DQwt::MultiLayerCols || 
+                if (m_pData->m_multiLine == Itom1DQwt::MultiLayerCols || 
                    m_pData->m_multiLine == Itom1DQwt::MultiLayerRows || 
                    m_pData->m_multiLine == Itom1DQwt::MultiLayerAuto)
                 {
@@ -711,12 +665,23 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             delete curve;
         }
 
+        bool valid;
+        ito::DataObjectTagType tag;
+
         while (m_plotCurveItems.size() < numCurves)
         {
             index = m_plotCurveItems.size();
             if (m_legendTitles.size() == 0)
             {
+                tag = dataObj->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
+				if(valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
+				{
+					dObjCurve = new QwtPlotCurveDataObject(QString::fromLatin1(tag.getVal_ToString().data()));
+				}
+				else // plots with empty tags: curce 0, curve 1, ...
+				{
                 dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index));
+				}			  
             }
             else if (m_legendTitles.size() > index)
             {
@@ -727,13 +692,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 dObjCurve = new QwtPlotCurveDataObject("");
             }
 
-    
             dObjCurve->setData(NULL);
             dObjCurve->attach(this);
 
             if (m_pLegend)
             {
-                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget( itemToInfo(dObjCurve) ) );
+                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(dObjCurve)));
                 if (legendLabel)
                 {
                     legendLabel->setChecked(true);
@@ -748,7 +712,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             dObjCurve->setPen(plotPen);
 
             // Add Symbol here
-            if(m_pData->m_lineSymbole != QwtSymbol::NoSymbol)
+            if (m_pData->m_lineSymbole != QwtSymbol::NoSymbol)
             {
                 dObjCurve->setSymbol(new QwtSymbol(m_pData->m_lineSymbole, QBrush(Qt::white), QPen(m_colorList[colorIndex]),  QSize(m_pData->m_lineSymboleSize,m_pData->m_lineSymboleSize)));
             }
@@ -780,7 +744,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 case Itom1DQwt::Steps:
                     dObjCurve->setOrientation(Qt::Horizontal);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::UserCurve );
+                    dObjCurve->setStyle(QwtPlotCurve::UserCurve);
                 break;
                 case Itom1DQwt::SticksHorizontal:
                     dObjCurve->setOrientation(Qt::Horizontal);
@@ -799,9 +763,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
             dObjCurve->setBaseline(m_baseLine);
             dObjCurve->setCurveFilled(m_curveFilled);
-            if(m_curveFilled != Itom1DQwt::NoCurveFill)
+            if (m_curveFilled != Itom1DQwt::NoCurveFill)
             {
-                if(m_filledColor.isValid())
+                if (m_filledColor.isValid())
                 {
                     dObjCurve->setBrush(QBrush(m_filledColor));
                 }
@@ -828,7 +792,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             case Itom1DQwt::MultiLayerCols:
             case Itom1DQwt::FirstCol:
             case Itom1DQwt::MultiCols:
-                if(m_layerState)
+                if (m_layerState)
                 {
                     pts.resize(3);
                     pts[1].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
@@ -843,7 +807,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                    if(m_layerState)
+                    if (m_layerState)
                     {
                         pts[0].setX(n);
                         pts[0].setY(n);
@@ -866,11 +830,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         seriesData->updateDataObject(dataObj, pts);
                         m_plotCurveItems[n]->setData(seriesData);
                     }
-                    if(m_colorState)
+                    if (m_colorState)
                     {
-                        if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                        else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
-                        else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                        if (m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                        else if (m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                        else if (m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                     }
                 }
 
@@ -888,7 +852,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             case Itom1DQwt::FirstRow:
             case Itom1DQwt::MultiRows:
 
-                if(m_layerState)
+                if (m_layerState)
                 {
                     pts.resize(3);
                     pts[1].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
@@ -900,12 +864,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     pts[1].setX(dataObj->getPixToPhys(dims-1, width-1, _unused));
                 }
 
-
                 for (int n = 0; n < numCurves; n++)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
 
-                    if(m_layerState)
+                    if (m_layerState)
                     {
                         pts[0].setX(n);
                         pts[0].setY(n);
@@ -929,11 +892,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         m_plotCurveItems[n]->setData(seriesData);
                     }
 
-                    if(m_colorState)
+                    if (m_colorState)
                     {
-                        if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                        else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
-                        else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                        if (m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                        else if (m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                        else if (m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                     }
                 }
 
@@ -952,7 +915,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             for (int n = 0; n < numCurves; n++)
             {
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
-                if(tmpBounds.size() == 3 && m_layerState)
+                if (tmpBounds.size() == 3 && m_layerState)
                 {
                     tmpBounds[0].setX(n);
                     tmpBounds[0].setY(n);
@@ -967,11 +930,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     seriesData->updateDataObject(dataObj, tmpBounds);
                     m_plotCurveItems[n]->setData(seriesData);
                 }
-                if(m_colorState)
+                if (m_colorState)
                 {
-                    if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                    else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
-                    else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                    if (m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                    else if (m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                    else if (m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                 }
             }
 
@@ -998,11 +961,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     m_plotCurveItems[n]->setData(seriesData);
                 }
 
-                if(m_colorState)
+                if (m_colorState)
                 {
-                    if(m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                    else if(m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
-                    else if(m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                    if (m_pData->m_colorLine == Itom1DQwt::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
+                    else if (m_pData->m_colorLine == Itom1DQwt::RGB || m_pData->m_colorLine == Itom1DQwt::RGBA) seriesData->setColorState(n);
+                    else if (m_pData->m_colorLine == Itom1DQwt::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
                 }
             }
             if (numCurves > 0)
@@ -1013,11 +976,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
         }
 
-        bool valid;
-        ito::DataObjectTagType tag;
         tag = dataObj->getTag("title", valid);
         m_pData->m_titleDObj = valid? QString::fromLatin1(tag.getVal_ToString().data()) : "";
-
     } 
 
     updateLabels();
@@ -1053,12 +1013,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
             updateScaleValues(false, true); //replot is done here
 
-            m_pZoomer->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
         }
         else if (m_pData->m_forceValueParsing)
         {
             updatePickerPosition(true);
-
 
             QRectF rect = seriesData->boundingRect();
             if (m_pData->m_valueScaleAuto)
@@ -1074,13 +1033,13 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
 
             updateScaleValues(false, false); //no replot is done here
-            m_pZoomer->rescale(false);
+            zoomer()->rescale(false);
 
             m_pData->m_forceValueParsing = false;
         }
         else
         {
-            updatePickerPosition(true,false);
+            updatePickerPosition(true, false);
 
             replot();
         }
@@ -1183,11 +1142,10 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
         }
     }
 
-    if(event->isAccepted() == false && event->matches(QKeySequence::Copy))
+    if (event->isAccepted() == false && event->matches(QKeySequence::Copy))
     {
         p->copyToClipBoard();
     }
-
     
     replot();
 }
@@ -1195,8 +1153,6 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mousePressEvent (QMouseEvent * event)
 {
-    
-
     if (m_pData->m_state == stateIdle)
     {
         //int n;
@@ -1284,7 +1240,7 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
                 picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
                                                  m_pData->m_pickerType, 
                                                  m_pData->m_pickerLabelAlignment, 
-                                                 m_pData->m_pickerLabelOrientation );
+                                                 m_pData->m_pickerLabelOrientation);
                 picker.item->attach(this);
                 picker.active = true;
                 //marker.color = Qt::darkGreen;
@@ -1310,7 +1266,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 {
 //    Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 
-    if(m_ignoreNextMouseEvent)
+    if (m_ignoreNextMouseEvent)
     {
         m_ignoreNextMouseEvent = false;
         return;
@@ -1360,7 +1316,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                 QPainterPath path;
                 switch (it.value()->m_type)
                 {
-                    case tPoint:
+                    case ito::PrimitiveContainer::tPoint:
                         path.moveTo(canxpos, canypos);
                         path.lineTo(canxpos, canypos);
                         it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
@@ -1368,7 +1324,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x2;
@@ -1398,7 +1354,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = it.value()->x2 - canxpos;
@@ -1427,7 +1383,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
 
-                        if(m_ignoreNextMouseEvent)
+                        if (m_ignoreNextMouseEvent)
                         {
                             ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
                             ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
@@ -1439,7 +1395,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = it.value()->x2 - canxpos;
@@ -1467,7 +1423,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
 
-                        if(m_ignoreNextMouseEvent)
+                        if (m_ignoreNextMouseEvent)
                         {
                             ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
                             ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
@@ -1489,7 +1445,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                 QPainterPath path;
                 switch (it.value()->m_type)
                 {
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x1;
@@ -1518,7 +1474,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x1;
@@ -1545,7 +1501,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
-                        if(m_ignoreNextMouseEvent)
+                        if (m_ignoreNextMouseEvent)
                         {
                             ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
                             ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
@@ -1557,7 +1513,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         replot();
                     break;
 
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         if (QApplication::keyboardModifiers() == Qt::ControlModifier)
                         {
                             dx = canxpos - it.value()->x1;
@@ -1586,7 +1542,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
                         it.value()->setShape(path, m_inverseColor0, m_inverseColor1);
                         it.value()->setActive(it.value()->m_active);
                         //if (p) emit p->plotItemChanged(n);
-                        if(m_ignoreNextMouseEvent)
+                        if (m_ignoreNextMouseEvent)
                         {
                             ito::float32 destPosX = transform(QwtPlot::xBottom, canxpos);
                             ito::float32 destPosY = transform(QwtPlot::yLeft, canypos);
@@ -1608,8 +1564,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 {
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
-    if (m_pData->m_state == tEllipse || m_pData->m_state == tRect || m_pData->m_state == tLine
-        || m_pData->m_state == tPoint || m_pData->m_state == stateIdle)
+    if (m_pData->m_state == stateDrawShape || m_pData->m_state == stateIdle)
     {
         QHash<int, DrawItem*>::iterator it = m_pData->m_pDrawItems.begin();
         for (;it != m_pData->m_pDrawItems.end(); ++it)        
@@ -1622,14 +1577,14 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
                 values.reserve(11);
                 switch(it.value()->m_type)
                 {
-                    case tPoint:
+                    case ito::PrimitiveContainer::tPoint:
                         type = ito::tGeoPoint;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
                         values.append(0.0);
                     break;
 
-                    case tLine:
+                    case ito::PrimitiveContainer::tLine:
                         type = ito::tGeoLine;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
@@ -1641,7 +1596,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 
                     // square is a rect
 //                    case tSquare:
-                    case tRect:
+                    case ito::PrimitiveContainer::tRectangle:
                         type = ito::tGeoRectangle;
                         values.append(it.value()->x1);
                         values.append(it.value()->y1);
@@ -1653,7 +1608,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 
                     // circle is an ellispe
 //                    case tCircle:
-                    case tEllipse:
+                    case ito::PrimitiveContainer::tEllipse:
                         type = ito::tGeoEllipse;
                         values.append((it.value()->x1 + it.value()->x2)*0.5);
                         values.append((it.value()->y1 + it.value()->y2)*0.5);
@@ -1729,7 +1684,7 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
         picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
                                                  m_pData->m_pickerType, 
                                                  m_pData->m_pickerLabelAlignment, 
-                                                 m_pData->m_pickerLabelOrientation );
+                                                 m_pData->m_pickerLabelOrientation);
         picker.item->attach(this);
         picker.active = false;
                 
@@ -1767,7 +1722,10 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir) //di
 {
     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
 
-    if (!qIsFinite(xScaleStart)) xScaleStart = m->item->xValue();
+    if (!qIsFinite(xScaleStart))
+    {
+        xScaleStart = m->item->xValue();
+    }
 
     int thisIdx = data->getPosToPix(xScaleStart);
     int s = (int)data->size();
@@ -1838,7 +1796,6 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir) //di
                     m->item->setYValue(p.ry());
                     found = true;
                 }
-                
             }
             else
             {
@@ -1964,19 +1921,6 @@ void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int curveIdx, int 
     }
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::contextMenuEvent(QContextMenuEvent * event)
-{
-    if (m_showContextMenu && m_pPanner->isEnabled() == false)
-    {
-        event->accept();
-        m_contextMenu->exec(event->globalPos());
-    }
-    else
-    {
-        event->ignore();
-    }
-}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
@@ -2027,24 +1971,24 @@ void Plot1DWidget::setZoomerEnable(const bool checked)
 
         m_pData->m_state = stateZoomer;
 
-        m_pPanner->setEnabled(false);
+        panner()->setEnabled(false);
 
         DataObjectSeriesData *data = NULL;
 
         foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
             data = (DataObjectSeriesData *)curve->data();
-            m_pZoomer->setZoomBase(data->boundingRect());
+            zoomer()->setZoomBase(data->boundingRect());
         }
 
-        m_pZoomer->setEnabled(true);
+        zoomer()->setEnabled(true);
         canvas()->setCursor(Qt::CrossCursor);
     }
     else
     {
         m_pData->m_state = stateIdle;
 
-        m_pZoomer->setEnabled(false);
+        zoomer()->setEnabled(false);
         canvas()->setCursor(Qt::ArrowCursor);
 
         /*foreach(QwtPlotCurve *curve, m_plotCurveItems)
@@ -2097,7 +2041,7 @@ void Plot1DWidget::setPannerEnable(const bool checked)
         m_pData->m_state = stateIdle;
         canvas()->setCursor(Qt::ArrowCursor);
     }
-    m_pPanner->setEnabled(checked);
+    panner()->setEnabled(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2152,19 +2096,19 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
     if (doZoomBase)
     {
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
-        if (m_pZoomer->isEnabled())
+        if (zoomer()->isEnabled())
         {
             QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
             zoom = zoom.normalized();
 
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->zoom(zoom);
+                zoomer()->zoom(zoom);
             }
         }
         else
@@ -2175,14 +2119,14 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
             zoom = zoom.normalized();
 
-            if (zoom == m_pZoomer->zoomRect())
+            if (zoom == zoomer()->zoomRect())
             {
-                m_pZoomer->zoom(zoom);
-                m_pZoomer->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);
+                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
             else
             {
-                m_pZoomer->appendZoomStack(zoom);
+                zoomer()->appendZoomStack(zoom);
             }
         }
     }
@@ -2241,67 +2185,18 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     QString coords, offsets;
     if (points.size() > 1)
     {
-        coords = QString("[%1; %2]\n [%3; %4]").arg(points[0].x(),0,'g',4).arg(points[0].y(),0,'g',4 ).arg(points[1].x(),0,'g',4 ).arg(points[1].y(),0,'g',4 );
-        offsets = QString("dx = %1\n dy = %2").arg(points[1].x() - points[0].x(),0,'g',4).arg(points[1].y() - points[0].y(), 0, 'g', 4);
+        coords = QString("[%1; %2]\n [%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
+        offsets = QString("dx = %1\n dy = %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
         ((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->updatePickers(idcs, points);
     }
     else if (points.size() == 1)
     {
-        coords = QString("[%1; %2]\n      ").arg(points[0].x(),0,'g',4).arg(points[0].y(),0,'g',4 );
+        coords = QString("[%1; %2]\n      ").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4);
         ((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->updatePickers(idcs, points);
     }
 
 
     emit setPickerText(coords,offsets);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::configRescaler(void)
-{
-    //if (m_pData->m_keepAspect)
-    //{
-    //    //int height = plotLayout()->canvasRect().height();
-    //    //int width = plotLayout()->canvasRect().width();
-
-    //    int refAxis = plotLayout()->canvasRect().width() < plotLayout()->canvasRect().height() ? QwtPlot::xBottom : QwtPlot::yLeft;
-    //    
-    //    if (m_pRescaler == NULL)
-    //    {
-    //        QwtInterval curXInterVal = axisInterval(QwtPlot::xBottom);
-    //        QwtInterval curYInterVal = axisInterval(QwtPlot::yLeft);
-
-    //        m_pRescaler = new QwtPlotRescaler(canvas(), refAxis , QwtPlotRescaler::Fitting);
-    //        m_pRescaler->setIntervalHint(QwtPlot::xBottom, curXInterVal);
-    //        m_pRescaler->setIntervalHint(QwtPlot::yLeft, curYInterVal);
-    //        m_pRescaler->setAspectRatio(1.0);
-    //        m_pRescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandUp);
-    //        m_pRescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
-    //        //m_pRescaler->setExpandingDirection(QwtPlot::yRight, QwtPlotRescaler::ExpandBoth);
-    //    }
-    //    else
-    //    {
-
-    //        m_pRescaler->setReferenceAxis(refAxis);
-    //    }
-    //    m_pRescaler->setEnabled(true);
-    //}
-    //else
-    //{
-    //    if (m_pRescaler != NULL)
-    //    {
-    //        m_pRescaler->setEnabled(false);
-    //        //m_pRescaler->deleteLater();
-    //        //m_pRescaler = NULL;
-    //    }
-    //    
-    //}
-    //if (m_pRescaler != NULL && m_pData->m_keepAspect)
-    //{
-    //    m_pRescaler->rescale();
-    //}
-    ////replot();
-    m_pZoomer->setFixedAspectRatio(m_pData->m_keepAspect);
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2312,10 +2207,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
     m_drawedIemsIndexes.clear();
     m_pMultiPointPicker->selection().clear();
 
-    if (type == tPoint) //multiPointPick
+    if (type == ito::PrimitiveContainer::tPoint) //multiPointPick
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tPoint);
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
@@ -2363,10 +2259,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             setState(stateIdle);
         }
     }
-    else if (type == tLine)
+    else if (type == ito::PrimitiveContainer::tLine)
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tLine);
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::PolygonRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -2385,7 +2282,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
             }
-            setState(tLine);
+            setState(stateDrawShape, ito::PrimitiveContainer::tLine);
         }
         else //start == false
         {
@@ -2407,10 +2304,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             setState(stateIdle);
         }
     }
-    else if (type == tRect)
+    else if (type == ito::PrimitiveContainer::tRectangle)
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tRectangle);
             //maxNrOfPoints = 2;
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
@@ -2429,7 +2327,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
             }
-            setState(tRect);
+            setState(stateDrawShape, ito::PrimitiveContainer::tRectangle);
         }
         else //start == false
         {
@@ -2451,10 +2349,11 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             setState(stateIdle);
         }
     }
-    else if (type == tEllipse)
+    else if (type == ito::PrimitiveContainer::tEllipse)
     {
         if (start)
         {
+            setState(this->stateDrawShape, ito::PrimitiveContainer::tEllipse);
             //maxNrOfPoints = 2;
             m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
@@ -2473,7 +2372,7 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
                 if (m_pData->m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_pData->m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
             }
-            setState(tEllipse);
+            setState(stateDrawShape, ito::PrimitiveContainer::tEllipse);
         }
         else //start == false
         {
@@ -2503,37 +2402,42 @@ ito::RetVal Plot1DWidget::userInteractionStart(int type, bool start, int maxNrOf
             QPolygonF polygonScale;
             emit p->userInteractionDone(type, true, polygonScale);
         }
-        retval += ito::RetVal(ito::retError,0,"Unknown type for userInteractionStart");
+        retval += ito::RetVal(ito::retError, 0, tr("Unknown type for userInteractionStart").toLatin1().data());
         setState(stateIdle);
+    }
+
+    if (start)
+    {
+        //if spinbox for multiple planes has the focus, a possible ESC is not correctly caught.
+        //therefore set the focus to the canvas.
+        canvas()->setFocus();
     }
 
     return retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setState(tState state)
+void Plot1DWidget::setState(tState state, ito::PrimitiveContainer::tPrimitive shape /*= ito::PrimitiveContainer::tNoType*/)
 {
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(parent());
 
     if (m_pData->m_state != state)
     {
-        if ((m_pData->m_state == tPoint || m_pData->m_state == tLine || 
-             m_pData->m_state == tRect  || m_pData->m_state == tEllipse) 
-             && state != stateIdle)
+        if (m_pData->m_state == stateDrawShape && state != stateIdle)
         {
             return; //drawFunction needs to go back to idle
         }
 
-        if (m_pZoomer)
+        if (zoomer())
         {
-            m_pZoomer->setEnabled(state == stateZoomer);
+            zoomer()->setEnabled(state == stateZoomer);
             this->setZoomerEnable(state == stateZoomer);
         }
-        if (m_pPanner) m_pPanner->setEnabled(state == statePanner);
+
+        if (panner()) panner()->setEnabled(state == statePanner);
         if (m_pValuePicker) m_pValuePicker->setEnabled(state == statePicker);
 
-        if (m_pData->m_state == tPoint || m_pData->m_state == tLine
-            || m_pData->m_state == tRect || m_pData->m_state == tEllipse || state == stateIdle)
+        if (m_pData->m_state == stateDrawShape || state == stateIdle)
         {
             if (p)
             {
@@ -2563,16 +2467,15 @@ void Plot1DWidget::setState(tState state)
                 canvas()->setCursor(Qt::CrossCursor);
             break;
 
-            case tPoint:
-            case tLine:
-            case tRect:
-            case tEllipse:
+            case stateDrawShape:
                 canvas()->setCursor(Qt::CrossCursor);
             break;
         }
 
         m_pData->m_state = state;
     }
+
+    m_pData->m_stateShapePrimitive = shape;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2580,11 +2483,14 @@ void Plot1DWidget::multiPointActivated (bool on)
 {
 	if (m_pData)
 	{
-		switch(m_pData->m_state)
+        Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+
+        switch (m_pData->m_stateShapePrimitive)
 		{
-			case tPoint:
+            case ito::PrimitiveContainer::tPoint:
 				if (!on)
 				{
+                    p->mnuDrawMode(false);
 					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
@@ -2604,7 +2510,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 						{
 							QPainterPath path;
 							DrawItem *newItem = NULL;
-							newItem = new DrawItem(this, tPoint);
+                            newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint);
 							path.moveTo(polygonScale[i].x(), polygonScale[i].y());
 							path.lineTo(polygonScale[i].x(), polygonScale[i].y());
 
@@ -2628,7 +2534,6 @@ void Plot1DWidget::multiPointActivated (bool on)
 						replot();
 					}
 
-					Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 					if (p)
 					{
 
@@ -2641,9 +2546,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 				}
 			break;
 
-			case tLine:
+            case ito::PrimitiveContainer::tLine:
 				if (!on)
 				{
+                    p->mnuDrawMode(false);
 					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
@@ -2659,7 +2565,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 						QPainterPath path;
 						DrawItem *newItem = NULL;
-						newItem = new DrawItem(this, tLine);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tLine);
 						path.moveTo(polygonScale[0].x(), polygonScale[0].y());
 						path.lineTo(polygonScale[1].x(), polygonScale[1].y());
 
@@ -2697,7 +2603,6 @@ void Plot1DWidget::multiPointActivated (bool on)
 					else
 					{
 						m_pData->m_elementsToPick = 0;
-						Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 						if (p)
 						{
 							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
@@ -2721,9 +2626,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 				}
 			break;
 
-			case tRect:
+            case ito::PrimitiveContainer::tRectangle:
 				if (!on)
 				{
+                    p->mnuDrawMode(false);
 					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
@@ -2739,7 +2645,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 						QPainterPath path;
 						DrawItem *newItem = NULL;
-						newItem = new DrawItem(this, tRect);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle);
 						path.addRect(polygonScale[0].x(), polygonScale[0].y(), polygonScale[1].x() - polygonScale[0].x(),
 									  polygonScale[1].y() - polygonScale[0].y());
 
@@ -2777,7 +2683,6 @@ void Plot1DWidget::multiPointActivated (bool on)
 					else
 					{
 						m_pData->m_elementsToPick = 0;
-						Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 						if (p)
 						{
 							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
@@ -2800,9 +2705,10 @@ void Plot1DWidget::multiPointActivated (bool on)
 				}
 			break;
 
-			case tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
 				if (!on)
 				{
+                    p->mnuDrawMode(false);
 					QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
 					bool aborted = false;
 
@@ -2818,7 +2724,7 @@ void Plot1DWidget::multiPointActivated (bool on)
 
 						QPainterPath path;
 						DrawItem *newItem = NULL;
-						newItem = new DrawItem(this, tEllipse);
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse);
 						path.addEllipse(polygonScale[0].x(), polygonScale[0].y(),
 								(polygonScale[1].x() - polygonScale[0].x()), (polygonScale[1].y() - polygonScale[0].y()));
 
@@ -2863,7 +2769,6 @@ void Plot1DWidget::multiPointActivated (bool on)
 					else
 					{
 						m_pData->m_elementsToPick = 0;
-						Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
 						if (p)
 						{
 							QPolygonF destPolygon(0);//(m_drawedIemsIndexes.size() * 4);
@@ -2893,157 +2798,112 @@ void Plot1DWidget::multiPointActivated (bool on)
 ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
 {
     ito::RetVal retval;
-    int limits[] = {2,8,0,99999};
+    int limits[] = { 2, 8, 0, 99999 };
 
-    if(!ito::ITOM_API_FUNCS_GRAPH)
-        retval += ito::RetVal(ito::retError,0,"Could not plot markers because api is missing");
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        emit statusBarMessage(tr("Could not plot marker, api is missing"), 4000);
+        return ito::RetVal(ito::retError, 0, tr("Could not plot marker, api is missing").toLatin1().data());
+    }
 
     ito::DataObject *dObj = apiCreateFromDataObject(coords, 2, ito::tFloat32, limits, &retval);
-
-    QwtSymbol::Style symStyle = QwtSymbol::XCross;
-    QSize symSize(5,5);
-    QBrush symBrush(Qt::NoBrush);
-    QPen symPen(Qt::red);
-
-    QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)$");
-    if (rgexp.indexIn(style) != -1)
-    {
-//        QString s = rgexp.cap(1);
-        char s = rgexp.cap(1).toLatin1()[0];
-
-        if (s == 'b') symPen.setColor(Qt::blue);
-        else if (s == 'g') symPen.setColor(Qt::green);
-        else if (s == 'r') symPen.setColor(Qt::red);
-        else if (s == 'c') symPen.setColor(Qt::cyan);
-        else if (s == 'm') symPen.setColor(Qt::magenta);
-        else if (s == 'y') symPen.setColor(Qt::yellow);
-        else if (s == 'k') symPen.setColor(Qt::black);
-        else if (s == 'w') symPen.setColor(Qt::white);
-
-        s = rgexp.cap(2).toLatin1()[0];
-        bool ok;
-
-        if (s == '.') symStyle = QwtSymbol::Ellipse;
-        else if (s == 'o') symStyle = QwtSymbol::Ellipse;
-        else if (s == 's') symStyle = QwtSymbol::Rect;
-        else if (s == 'd') symStyle = QwtSymbol::Diamond;
-        else if (s == '>') symStyle = QwtSymbol::RTriangle;
-        else if (s == 'v') symStyle = QwtSymbol::DTriangle;
-        else if (s == '^') symStyle = QwtSymbol::UTriangle;
-        else if (s == '<') symStyle = QwtSymbol::LTriangle;
-        else if (s == 'x') symStyle = QwtSymbol::XCross;
-        else if (s == '*') symStyle = QwtSymbol::Star1;
-        else if (s == '+') symStyle = QwtSymbol::Cross;
-        else if (s == 'h') symStyle = QwtSymbol::Hexagon;
-
-        //s = rgexp.cap(3);
-        int size = rgexp.cap(3).toInt(&ok);
-        if (ok)
-        {
-            symSize = QSize(size,size);
-        }
-    }
-    else
-    {
-        retval += ito::RetVal(ito::retError,0,"The style tag does not correspond to the required format");
-    }
 
     if (!retval.containsError())
     {
         if (dObj->getSize(0) >= 8)
         {
-//            ItomPlotMarker *marker = NULL;
             int nrOfMarkers = dObj->getSize(1);
-            
-            if (id == "") id = "unknown";
 
-            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 0);            
+            ito::float32 *ids = (ito::float32*)dObj->rowPtr(0, 0);
             ito::float32 *types = (ito::float32*)dObj->rowPtr(0, 1);
             ito::float32 *xCoords1 = (ito::float32*)dObj->rowPtr(0, 2);
             ito::float32 *yCoords1 = (ito::float32*)dObj->rowPtr(0, 3);
+
             ito::float32 *xCoords2 = (ito::float32*)dObj->rowPtr(0, 4);
             ito::float32 *yCoords2 = (ito::float32*)dObj->rowPtr(0, 5);
-            
+
+            // The definition do not correspond to the definetion of primitiv elements
+
             for (int i = 0; i < nrOfMarkers; ++i)
             {
                 QPainterPath path;
-                DrawItem *newItem = NULL;                
-                
-                switch ((int)types[i])
+                DrawItem *newItem = NULL;
+                unsigned short type = ((int)types[i]) & ito::PrimitiveContainer::tTypeMask;
+                unsigned char flags = (((int)types[i]) & ito::PrimitiveContainer::tFlagMask) >> 16;
+                switch (type)
                 {
-                    case tPoint:
+                case ito::PrimitiveContainer::tPoint:
                         path.moveTo(xCoords1[i], yCoords1[i]);
                         path.lineTo(xCoords1[i], yCoords1[i]);
                     break;
-                        
-                    case tLine:
+
+                case ito::PrimitiveContainer::tLine:
                         path.moveTo(xCoords1[i], yCoords1[i]);
-                        path.lineTo(xCoords2[i], yCoords2[i]);                        
+                    path.lineTo(xCoords2[i], yCoords2[i]);
                     break;
-                        
-                    case tRect:
+
+                case ito::PrimitiveContainer::tRectangle:
                         path.addRect(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
                     break;
-                        
-                    case tEllipse:
+
+                case ito::PrimitiveContainer::tEllipse:
                         path.addEllipse(xCoords1[i], yCoords1[i], xCoords2[i] -  xCoords1[i], yCoords2[i] - yCoords1[i]);
                     break;
-                    
+
                     default:
                         retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
                     break;
-                }                    
+                }
                 if (m_pData->m_pDrawItems.contains((int)ids[i]))
                 {
                     m_pData->m_pDrawItems[(int)ids[i]]->setShape(path, m_inverseColor0, m_inverseColor1);
+                    m_pData->m_pDrawItems[(int)ids[i]]->m_flags = flags;
                 }
                 else
                 {
-                    switch ((int)types[i])
+                    switch (type)
                     {
-                        case tPoint:                    
-                            newItem = new DrawItem(this, tPoint, (int)ids[i]);
+                    case ito::PrimitiveContainer::tMultiPointPick:
+                    case ito::PrimitiveContainer::tPoint:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tPoint, (int)ids[i]);
                         break;
-                        
-                        case tLine:
-                            newItem = new DrawItem(this, tLine, (int)ids[i]);
+
+                    case ito::PrimitiveContainer::tLine:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tLine, (int)ids[i]);
                         break;
-                        
-                        case tRect:
-                            newItem = new DrawItem(this, tRect, (int)ids[i]);
+
+                    case ito::PrimitiveContainer::tRectangle:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tRectangle, (int)ids[i]);
                         break;
-                        
-                        case tEllipse:
-                            newItem = new DrawItem(this, tEllipse, (int)ids[i]);
+
+                    case ito::PrimitiveContainer::tEllipse:
+                        newItem = new DrawItem(this, ito::PrimitiveContainer::tEllipse, (int)ids[i]);
                         break;
-                        
+
                         default:
                             retval += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
-                        break;                        
+                        break;
                     }
                     if (newItem)
                     {
                         newItem->setShape(path, m_inverseColor0, m_inverseColor1);
-                        
+
                         newItem->setVisible(true);
                         newItem->show();
                         newItem->attach(this);
-                        newItem->setSelected(true);
+                        newItem->m_flags = flags;
                         replot();
-                        //                m_pData->m_pDrawItems.append(newItem);
+
                         m_pData->m_pDrawItems.insert(newItem->m_idx, newItem);
                     }
-                }                
             }
+        }
         }
 
         replot();
     }
 
-    if (dObj)
-    {
-        delete dObj;
-    }
+    if (dObj) delete dObj;
 
     return retval;
 }
@@ -3074,7 +2934,7 @@ ito::RetVal Plot1DWidget::deleteMarkers(const int id)
 
     if (!found)
     {
-        retval += ito::RetVal::format(ito::retError,0,"No marker with id '%d' found.", id);
+        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%d' found.").toLatin1().data(), id);
     }
     else
     {
@@ -3087,7 +2947,7 @@ ito::RetVal Plot1DWidget::deleteMarkers(const int id)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::home()
 {
-    QStack<QRectF> currentZoomStack = m_pZoomer->zoomStack();
+    QStack<QRectF> currentZoomStack = zoomer()->zoomStack();
 
     //get total bounding box
     QRectF boundingRect;
@@ -3105,30 +2965,31 @@ void Plot1DWidget::home()
         currentZoomStack.first() = boundingRect;
     }
 
-    m_pZoomer->setZoomStack(currentZoomStack, 0);
-    m_pZoomer->zoom(0);
+    zoomer()->setZoomStack(currentZoomStack, 0);
+    zoomer()->zoom(0);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Plot1DWidget::getPlotPicker() const
 {
     int ysize = m_pickers.size();
     int xsize = 3;
 
-    if(ysize == 0)
+    if (ysize == 0)
     {
         return QSharedPointer< ito::DataObject >(new ito::DataObject());
     }
 
     ito::DataObject tmp(ysize, xsize, ito::tFloat32);
 
-    for(int idx = 0; idx < ysize; idx++)
+    for (int idx = 0; idx < ysize; idx++)
     {
         ito::float64 xScaleStart = (m_pickers[idx]).item->xValue();
         ito::float64 yValue = (m_pickers[idx]).item->yValue();
         tmp.at<ito::float32>(idx, 1) = cv::saturate_cast<ito::float32>(xScaleStart);
         tmp.at<ito::float32>(idx, 2) = cv::saturate_cast<ito::float32>(yValue);
 
-        if((m_pickers[idx]).curveIdx < 0 || (m_pickers[idx]).curveIdx > m_plotCurveItems.size() - 1)
+        if ((m_pickers[idx]).curveIdx < 0 || (m_pickers[idx]).curveIdx > m_plotCurveItems.size() - 1)
             continue;
 
         DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[(m_pickers[idx]).curveIdx]->data());
@@ -3142,58 +3003,60 @@ QSharedPointer< ito::DataObject > Plot1DWidget::getPlotPicker() const
 
     return exportItem;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::setPicker(const QVector<int> &pxCords)
 {
     int cnt = pxCords.size();
-    if(cnt < m_pData->m_pickerLimit)
+    if (cnt < m_pData->m_pickerLimit)
         cnt = m_pData->m_pickerLimit;
 
-    for(int i = 0; i < cnt; i++)
+    for (int i = 0; i < cnt; i++)
     {
-        if( i > m_pickers.size() - 1)
+        if (i > m_pickers.size() - 1)
         {
                 Picker picker;
                 picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
                                                  m_pData->m_pickerType, 
                                                  m_pData->m_pickerLabelAlignment, 
-                                                 m_pData->m_pickerLabelOrientation );
+                                                 m_pData->m_pickerLabelOrientation);
                 picker.item->attach(this);
                 picker.active = true;
                 //marker.color = Qt::darkGreen;
                 //marker.item->setSymbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::white), QPen(marker.color,1),  QSize(8,8)));
                 
                 picker.curveIdx = 0;
-                stickPickerToSampleIdx( &picker, pxCords[i] < 0 ? 0 : pxCords[i], 0, 0);
+                stickPickerToSampleIdx(&picker, pxCords[i] < 0 ? 0 : pxCords[i], 0, 0);
                 picker.item->setVisible(true);
                 
                 m_pickers.append(picker);
         }
         else
         {
-            stickPickerToSampleIdx( &(m_pickers[i]), pxCords[i] < 0 ? 0 : pxCords[i], 0, 0);
+            stickPickerToSampleIdx(&(m_pickers[i]), pxCords[i] < 0 ? 0 : pxCords[i], 0, 0);
         }
         
     }
     updatePickerPosition(false, false);
     return ito::retOk;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::setPicker(const QVector<float> &physCords)
 {
     int cnt = physCords.size();
-    if(cnt < m_pData->m_pickerLimit)
+    if (cnt < m_pData->m_pickerLimit)
         cnt = m_pData->m_pickerLimit;
 
-    for(int i = 0; i < cnt; i++)
+    for (int i = 0; i < cnt; i++)
     {
-        if( i > m_pickers.size() - 1)
+        if (i > m_pickers.size() - 1)
         {
                 Picker picker;
                 picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible, 
                                                  m_pData->m_pickerType, 
                                                  m_pData->m_pickerLabelAlignment, 
-                                                 m_pData->m_pickerLabelOrientation );
+                                                 m_pData->m_pickerLabelOrientation);
                 picker.item->attach(this);
                 picker.active = true;
                 //picker.color = Qt::darkGreen;
@@ -3208,28 +3071,29 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<float> &physCords)
         }
         else
         {
-            stickPickerToXPx( &(m_pickers[i]), physCords[i], 0);
+            stickPickerToXPx(&(m_pickers[i]), physCords[i], 0);
         }
     }
     updatePickerPosition(false, false);
     return ito::retOk;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QVector<int> Plot1DWidget::getPickerPixel() const
 {
     int ysize = m_pickers.size();
 
-    if(ysize == 0)
+    if (ysize == 0)
     {
         return QVector<int>();
     }
 
     QVector<int> exportItem(ysize, 0);
 
-    for(int idx = 0; idx < ysize; idx++)
+    for (int idx = 0; idx < ysize; idx++)
     {
 
-        if((m_pickers[idx]).curveIdx < 0 || (m_pickers[idx]).curveIdx > m_plotCurveItems.size() - 1)
+        if ((m_pickers[idx]).curveIdx < 0 || (m_pickers[idx]).curveIdx > m_plotCurveItems.size() - 1)
             continue;
 
         DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[(m_pickers[idx]).curveIdx]->data());
@@ -3240,63 +3104,66 @@ QVector<int> Plot1DWidget::getPickerPixel() const
 
     return exportItem;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QVector<float> Plot1DWidget::getPickerPhys() const
 {
     int ysize = m_pickers.size();
 
-    if(ysize == 0)
+    if (ysize == 0)
     {
         return QVector<ito::float32>();
     }
 
     QVector<ito::float32> exportItem(ysize, 0);
 
-    for(int idx = 0; idx < ysize; idx++)
+    for (int idx = 0; idx < ysize; idx++)
     {
         exportItem[idx] = (m_pickers[idx]).item->xValue();
     }
 
     return exportItem;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updateColors(void)
 {
-    if(m_pData)
+    if (m_pData)
     {
         QString styleSheet = this->styleSheet();
 
-        styleSheet = QString("background-color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_backgnd.red()), QString::number(m_pData->m_backgnd.green()), QString::number(m_pData->m_backgnd.blue())) ;
-        styleSheet.append(QString("color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_axisColor.red()), QString::number(m_pData->m_axisColor.green()), QString::number(m_pData->m_axisColor.blue())));
+        styleSheet = tr("background-color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_backgnd.red()), QString::number(m_pData->m_backgnd.green()), QString::number(m_pData->m_backgnd.blue())) ;
+        styleSheet.append(tr("color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_axisColor.red()), QString::number(m_pData->m_axisColor.green()), QString::number(m_pData->m_axisColor.blue())));
         this->setStyleSheet(styleSheet);
 
         QPalette newPalette(m_pData->m_backgnd);
 
-        newPalette.setColor( QPalette::WindowText, m_pData->m_axisColor); // for ticks
-        newPalette.setColor( QPalette::Text, m_pData->m_textColor); // for ticks' labels
+        newPalette.setColor(QPalette::WindowText, m_pData->m_axisColor); // for ticks
+        newPalette.setColor(QPalette::Text, m_pData->m_textColor); // for ticks' labels
 
-        setAutoFillBackground( true );
-        setPalette( newPalette );
+        setAutoFillBackground(true);
+        setPalette(newPalette);
         setCanvasBackground(m_pData->m_backgnd);
         
         
-        axisWidget(QwtPlot::xBottom)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::xBottom)->setAutoFillBackground(true);
         axisWidget(QwtPlot::xBottom)->setPalette(newPalette);
 
-        axisWidget(QwtPlot::yLeft)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::yLeft)->setAutoFillBackground(true);
         axisWidget(QwtPlot::yLeft)->setPalette(newPalette);
 
-        axisWidget(QwtPlot::yRight)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::yRight)->setAutoFillBackground(true);
         axisWidget(QwtPlot::yRight)->setPalette(newPalette);
 
-        axisWidget(QwtPlot::xTop)->setAutoFillBackground( true );
+        axisWidget(QwtPlot::xTop)->setAutoFillBackground(true);
         axisWidget(QwtPlot::xTop)->setPalette(newPalette);
         
         replot();        
     }
 
-    return;
+//    return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
 {
@@ -3307,10 +3174,11 @@ void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
         replot();
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updatePickerStyle(void)
 {
-    if(!m_pData) return;
+    if (!m_pData) return;
 
     foreach (Picker m, m_pickers)
     {
@@ -3321,6 +3189,7 @@ void Plot1DWidget::updatePickerStyle(void)
     } 
     replot();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setQwtLineStyle(const Itom1DQwt::tCurveStyle &style)
 {
@@ -3355,7 +3224,7 @@ void Plot1DWidget::setQwtLineStyle(const Itom1DQwt::tCurveStyle &style)
             case Itom1DQwt::Steps:
                 c->setOrientation(Qt::Horizontal);
                 c->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                c->setStyle(QwtPlotCurve::UserCurve );
+                c->setStyle(QwtPlotCurve::UserCurve);
             break;
             case Itom1DQwt::SticksHorizontal:
                 c->setOrientation(Qt::Horizontal);
@@ -3374,6 +3243,7 @@ void Plot1DWidget::setQwtLineStyle(const Itom1DQwt::tCurveStyle &style)
 
     replot();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setBaseLine(const qreal &line)
 {
@@ -3386,6 +3256,7 @@ void Plot1DWidget::setBaseLine(const qreal &line)
 
     replot();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setCurveFilled()
 {
@@ -3394,9 +3265,9 @@ void Plot1DWidget::setCurveFilled()
     {
         c->setBaseline(m_baseLine);
         ((QwtPlotCurveDataObject*)c)->setCurveFilled(m_curveFilled);
-        if(m_curveFilled != Itom1DQwt::NoCurveFill)
+        if (m_curveFilled != Itom1DQwt::NoCurveFill)
         {
-            if(m_filledColor.isValid())
+            if (m_filledColor.isValid())
             {
                 ((QwtPlotCurveDataObject*)c)->setBrush(QBrush(m_filledColor));
             }
@@ -3478,14 +3349,13 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
         if (lengthPx > 0)
         {
             displayed->setAxisScale(1, lengthPhys / lengthPx);
-            displayed->setAxisOffset(1, -(seriesData->sample(firstIdx).x() / lengthPhys) * lengthPx );
+            displayed->setAxisOffset(1, -(seriesData->sample(firstIdx).x() / lengthPhys) * lengthPx);
         }
         else
         {
             displayed->setAxisScale(1, 1.0);
             displayed->setAxisOffset(1, -seriesData->sample(firstIdx).x());
         }
-        
 
         //put data in
         for (int i = 0; i < m_plotCurveItems.size(); ++i)
@@ -3573,20 +3443,3 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
     return QSharedPointer<ito::DataObject>(displayed);
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setVisible(bool visible)
-{    
-    this->QwtPlot::setVisible(visible);
-    if (visible)
-    {
-        if (!m_firstTimeVisible)
-        {
-            this->updateScaleValues(true, true);
-        }
-        else
-        {
-            this->updateScaleValues(true, false);
-        }
-        m_firstTimeVisible = true;
-    }
-}

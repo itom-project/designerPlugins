@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of itom.
 
@@ -31,34 +31,19 @@ class PlotCanvas;
     #define ITOM2DPLOT_EXPORT Q_DECL_IMPORT
 #endif
 
-#include "plot/AbstractDObjFigure.h"
+#include "itomQwtDObjFigure.h"
 #include "plot/AbstractNode.h"
 #include "itom2dqwtplotenums.h"
-//#include "plotCanvas.h"
-//#include <qwt_plot_shapeitem.h>
-
-#include "common/itomPlotHandle.h"
 
 #include <qaction.h>
 #include <qwidgetaction.h>
 #include <qspinbox.h>
 #include <qslider.h>
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/qlabel.h>
-#endif
-
-#ifndef DECLAREMETADATAOBJECT
-    Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)
-    #define DECLAREMETADATAOBJECT
-#endif
+#include <qlabel.h>
 
 
-#ifndef DECLAREMETAPLOTHANDLE
-    Q_DECLARE_METATYPE(ito::ItomPlotHandle)
-    #define DECLAREMETAPLOTHANDLE
-#endif
 
-class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
+class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 {
     Q_OBJECT
 
@@ -90,6 +75,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
 
     Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+    Q_PROPERTY(int buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
     
@@ -131,6 +117,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
     Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
+    Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
     Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
 
@@ -151,32 +138,14 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://getDisplayedLineCut", "")
     Q_CLASSINFO("slot://setLinePlot", "")
     Q_CLASSINFO("slot://removeOverlayImage", "")
-    Q_CLASSINFO("slot://copyToClipBoard", "")
 
     Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
     Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
 
-
-    Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.") 
-    Q_CLASSINFO("signal://userInteractionDone", "")
-    Q_CLASSINFO("signal://plotItemChanged", "")
-    Q_CLASSINFO("signal://plotItemDeleted", "")
-    Q_CLASSINFO("signal://plotItemsDeleted", "")
-
-    DESIGNER_PLUGIN_ITOM_API
-    public:
+public:
     Itom2dQwtPlot(QWidget *parent = 0);
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
-
-    enum GeometryModificationMode
-    {
-        tNextElementMode = 0,
-        tMoveGeometricElements = 1,
-        tRotateGeometricElements = 2,
-        tResizeGeometricElements = 3,
-        tModifyPoints   = 4
-    }; //!> This enum must be equal to the enum PlotCanvas::tModificationState, todo: find a better solution
 
     ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack = false);
 
@@ -287,6 +256,12 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     //!> get current background color
     QColor getBackgroundColor(void) const;
 
+    //!> set new button set
+    void setButtonSet(const int newVal);
+
+    //!> get button set
+    int getButtonSet(void) const;
+
     /** set color of axis
     *   @param [in] newVal  new axis color
     */
@@ -321,9 +296,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ito::AbstractDObjFigure
     Itom2DQwt::tModificationState getModState() const;
     void setModState(const Itom2DQwt::tModificationState val);
 
-    QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
-
-
 
     friend class PlotCanvas;
 
@@ -339,7 +311,6 @@ private:
     void constructor();
 
     PlotCanvas *m_pContent;    
-//  InternalData m_data;
     void *m_pVData;
 
     QAction *m_pActSave;
@@ -376,6 +347,10 @@ private:
 
     QAction* m_pActDrawModifyMode;
     QMenu *m_pMnuDrawModifyMode;
+    QAction *m_pActMove;
+    QAction *m_pActResize;
+    QAction *m_pActRotate;
+    QAction *m_pActModify;
 
     QAction* m_pActCntrMarker;
 
@@ -384,12 +359,12 @@ private:
 
     QHash<QObject*,ito::uint32> m_childFigures;
 
+    char m_buttonSet;
+
     ito::RetVal qvector2DataObject(const ito::DataObject *dstObject);
-    ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0,0.0), const int resolution = 300);
 
 private slots:
     void mnuActSave();
-    void mnuActSendCurrentToWorkspace();
 
     void mnuActHome();
     void mnuActPan(bool checked);
@@ -403,7 +378,6 @@ private slots:
     void mnuLineCutMode(QAction *action);
     void mnuActStackCut(bool checked);
     
-    
     void mnuActPlaneSelector(int plane);
     void mnuDrawModifyMode(QAction *action);
     void mnuDrawMode(QAction *action);
@@ -415,9 +389,6 @@ private slots:
     void mnuCmplxSwitch(QAction *action);
     void childFigureDestroyed(QObject *obj);
 
-private slots:
-    void resizeEvent ( QResizeEvent * event );
-
     void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
 
 public slots:
@@ -427,10 +398,6 @@ public slots:
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
     ito::RetVal clearGeometricElements(void);
-//    void userInteractionEndRect(const QRectF &rect);
-//    void userInteractionEndEllipse(const QRectF &rect);    
-//    void userInteractionEndPt(const QVector<QPointF> &points);
-//    void userInteractionEndLine(const QVector<QPointF> &points);
 
     QSharedPointer<ito::DataObject> getDisplayed(void);
 
@@ -443,15 +410,8 @@ public slots:
     ito::RetVal setGeometricElementLabelVisible(int id, bool setVisible);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
-    ito::RetVal copyToClipBoard();
 
-signals:
-    void userInteractionDone(int type, bool aborted, QPolygonF points);
-    void plotItemChanged(int idx, int flags, QVector<float> values);
-    void plotItemDeleted(int idx);
-    void plotItemsDeleted();
-    //void plotItemChanged(ito::int32 idx);
-    void plotItemsFinished(int type, bool aborted);
+
 
 };
 

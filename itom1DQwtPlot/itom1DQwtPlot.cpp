@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of itom.
 
@@ -120,9 +120,7 @@ void Itom1DQwtPlot::constructor()
     m_data->m_forceValueParsing = false;
 
     m_pContent = new Plot1DWidget(contextMenu, m_data, this);
-
-    connect(m_pContent, SIGNAL(statusBarClear()), (QObject*)statusBar(), SLOT(clearMessage()));
-    connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), (QObject*)statusBar(), SLOT(showMessage(QString,int)));
+    m_pBaseContent = m_pContent;
 
     m_pContent->setObjectName("canvasWidget");
 
@@ -165,7 +163,7 @@ void Itom1DQwtPlot::constructor()
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent) :
-    AbstractDObjFigure(itomSettingsFile, windowMode, parent),
+    ItomQwtDObjFigure(itomSettingsFile, windowMode, parent),
     m_pContent(NULL),
     m_pActScaleSetting(NULL),
     m_pRescaleParent(NULL),
@@ -183,6 +181,11 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pMnuCmplxSwitch(NULL),
     m_pActRGBSwitch(NULL),
     m_pMnuRGBSwitch(NULL),
+    m_pActRGBA(NULL),
+    m_pActGray(NULL),
+    m_pActRGBL(NULL),
+    m_pActRGBAL(NULL),
+    m_pActRGBG(NULL),
     m_pLblMarkerOffsets(NULL),
     m_pLblMarkerCoords(NULL),
     m_pActAspectRatio(NULL),
@@ -194,14 +197,21 @@ Itom1DQwtPlot::Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::Wi
     m_pActMarkerLegend(NULL),
     m_pActMultiRowSwitch(NULL),
     m_pMnuMultiRowSwitch(NULL),
-    m_pActSendCurrentToWorkspace(NULL)
+    m_pActXVAuto(NULL),
+    m_pActXVFR(NULL),
+    m_pActXVFC(NULL),
+    m_pActXVMR(NULL),
+    m_pActXVMC(NULL),
+    m_pActXVML(NULL),
+    m_pActSendCurrentToWorkspace(NULL),
+    m_buttonSet(0)
 {
     constructor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
-    AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
+    ItomQwtDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
     m_pContent(NULL),
     m_pActScaleSetting(NULL),
     m_pRescaleParent(NULL),
@@ -219,6 +229,11 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
     m_pMnuCmplxSwitch(NULL),
     m_pActRGBSwitch(NULL),
     m_pMnuRGBSwitch(NULL),
+    m_pActRGBA(NULL),
+    m_pActGray(NULL),
+    m_pActRGBL(NULL),
+    m_pActRGBAL(NULL),
+    m_pActRGBG(NULL),
     m_pLblMarkerOffsets(NULL),
     m_pLblMarkerCoords(NULL),
     m_pActAspectRatio(NULL),
@@ -230,6 +245,12 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
     m_pActMarkerLegend(NULL),
     m_pActMultiRowSwitch(NULL),
     m_pMnuMultiRowSwitch(NULL),
+    m_pActXVAuto(NULL),
+    m_pActXVFR(NULL),
+    m_pActXVFC(NULL),
+    m_pActXVMR(NULL),
+    m_pActXVMC(NULL),
+    m_pActXVML(NULL),
     m_pActSendCurrentToWorkspace(NULL)
 {
     constructor();
@@ -257,6 +278,8 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
     m_pContent->deleteLater();
 //    m_pContent = NULL;
     m_pContent = NULL;
+    m_pBaseContent = NULL;
+
     if (m_data)
         delete m_data;
     if (m_pMnuSetMarker)
@@ -304,7 +327,7 @@ void Itom1DQwtPlot::setRowPresentation(const Itom1DQwt::tMultiLineMode idx)
     if (m_pContent)
     {
         QVector<QPointF> bounds = getBounds();
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
@@ -363,7 +386,7 @@ void Itom1DQwtPlot::setRGBPresentation(const int idx)
     if (m_pContent)
     {
         QVector<QPointF> bounds = getBounds();
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
@@ -428,7 +451,11 @@ int Itom1DQwtPlot::getGeometricElementsCount() const
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getkeepAspectRatio(void) const 
 {
-    return m_data->m_keepAspect;
+    if (m_pContent)
+    {
+        return m_pContent->keepAspectRatio();
+    }
+    return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -457,7 +484,7 @@ void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
     {
         m_pContent->m_unitLabelStyle = style;
         QVector<QPointF> bounds = getBounds();
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         m_pContent->setInterval(Qt::YAxis, m_data->m_valueScaleAuto, m_data->m_valueMin, m_data->m_valueMax); //replot is done here 
@@ -471,14 +498,20 @@ void Itom1DQwtPlot::createActions()
     QAction *a = NULL;
 
     //m_actHome
+    if (m_buttonSet == 0)
     m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
+    else
+        m_pActHome = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/home_lt.png"), tr("Home"), this);
     a->setObjectName("actHome");
     a->setToolTip(tr("Reset original view"));
     a->setShortcut(Qt::CTRL + Qt::Key_0);
     connect(a, SIGNAL(triggered()), this, SLOT(mnuHome()));
  
     //m_actSave
+    if (m_buttonSet == 0)
     m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
+    else
+        m_pActSave = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/filesave_lt.png"), tr("Save..."), this);
     a->setObjectName("actSave");
     a->setShortcut(QKeySequence::Save);
     a->setToolTip(tr("Export current view..."));
@@ -487,44 +520,62 @@ void Itom1DQwtPlot::createActions()
     //m_pActSendCurrentToWorkspace
     m_pActSendCurrentToWorkspace = a = new QAction(QIcon(":/plugins/icons/sendToPython.png"), tr("Send current view to workspace..."), this);
     a->setObjectName("actSendCurrentToWorkspace");
-    connect(a, SIGNAL(triggered()), this, SLOT(mnuActSendCurrentToWorkspace()));
+    connect(a, SIGNAL(triggered()), this, SLOT(sendCurrentToWorkspace()));
 
     //m_actCopyClipboard
+    if (m_buttonSet == 0)
     m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), tr("Copy to clipboard"), this);
+    else
+        m_pActCopyClipboard = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/clipboard_lt.png"), tr("Copy to clipboard"), this);
     a->setObjectName("actCopyClipboard");
     a->setShortcut(QKeySequence::Copy);
     a->setToolTip(tr("Copies the current view to the clipboard"));
     connect(a, SIGNAL(triggered()), this, SLOT(copyToClipBoard()));
 
     //m_actScaleSetting
+    if (m_buttonSet == 0)
     m_pActScaleSetting = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"), tr("Scale Settings..."), this);
+    else
+        m_pActScaleSetting = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/autoscal_lt.png"), tr("Scale Settings..."), this);
     a->setObjectName("actScaleSetting");
     a->setToolTip(tr("Set the ranges and offsets of this view"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuScaleSetting()));
 
     //m_rescaleParent
+    if (m_buttonSet == 0)
     m_pRescaleParent = a = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"), tr("Parent Scale Settings"), this);
+    else
+        m_pRescaleParent = a = new QAction(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale_lt.png"), tr("Parent Scale Settings"), this);
     a->setObjectName("rescaleParent");
     a->setToolTip(tr("Set the value-range of the parent view according to this plot"));
     a->setVisible(false);
     connect(a, SIGNAL(triggered()), this, SLOT(mnuParentScaleSetting()));
 
     //m_actForward
+    if (m_buttonSet == 0)
     m_pActForward = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("Forward"), this);
+    else
+        m_pActForward = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/forward_lt.png"), tr("Forward"), this);
     a->setObjectName("actionForward");
     a->setEnabled(false);
     a->setToolTip(tr("Forward to next line"));
     m_pActForward->setVisible(false);
 
     //m_actBack
+    if (m_buttonSet == 0)
     m_pActBack = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("Back"), this);
+    else
+        m_pActBack = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"), tr("Back"), this);
     a->setObjectName("actionBack");
     a->setEnabled(false);
     a->setToolTip(tr("Back to previous line"));
     m_pActBack->setVisible(false);
 
     //m_actPan
+    if (m_buttonSet == 0)
     m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
+    else
+        m_pActPan = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"), tr("Move"), this);
     a->setObjectName("actionPan");
     a->setCheckable(true);
     a->setChecked(false);
@@ -532,7 +583,10 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuPanner(bool)));
 
     //m_actZoomToRect
+    if (m_buttonSet == 0)
     m_pActZoomToRect = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("Zoom To Rectangle"), this);
+    else
+        m_pActZoomToRect = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/zoom_to_rect_lt.png"), tr("Zoom To Rectangle"), this);
     a->setObjectName("actionZoomToRect");
     a->setCheckable(true);
     a->setChecked(false);
@@ -540,7 +594,10 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuZoomer(bool)));
 
     //m_pActAspectRatio
+    if (m_buttonSet == 0)
     m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"), tr("Lock Aspect Ratio"), this);
+    else
+        m_pActAspectRatio = a = new QAction(QIcon(":/itomDesignerPlugins/aspect_lt/icons/AspRatio11_lt.png"), tr("Lock Aspect Ratio"), this);
     a->setObjectName("actRatio");
     a->setCheckable(true);
     a->setChecked(false);
@@ -548,21 +605,30 @@ void Itom1DQwtPlot::createActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
     //m_actMarker
+    if (m_buttonSet == 0)
     m_pActMarker = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("Marker"), this);
+    else
+        m_pActMarker = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"), tr("Marker"), this);
     a->setObjectName("actionMarker");
     a->setCheckable(true);
     a->setChecked(false);
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));    
 
     //m_actSetMarker
+    if (m_buttonSet == 0)
     m_pActSetMarker = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"), tr("Set Markers to"), this);
+    else
+        m_pActSetMarker = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"), tr("Set Markers to"), this);
     m_pMnuSetMarker = new QMenu("Marker Switch");
     m_pMnuSetMarker->addAction(tr("To Min-Max"));
     m_pActSetMarker->setMenu(m_pMnuSetMarker);
     connect(m_pMnuSetMarker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetMarker(QAction*)));
 
     //m_actCmplxSwitch
+    if (m_buttonSet == 0)
     m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
+    else
+        m_pActCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImRe_lt.png"), tr("Switch Imag, Real, Abs, Pha"), this);
     m_pMnuCmplxSwitch = new QMenu("Complex Switch");
     m_pMnuCmplxSwitch->addAction(tr("Imag"));
     m_pMnuCmplxSwitch->addAction(tr("Real"));
@@ -571,66 +637,109 @@ void Itom1DQwtPlot::createActions()
     m_pActCmplxSwitch->setMenu(m_pMnuCmplxSwitch);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
-
+    
     //m_pActMultiRowSwitch
+    if (m_buttonSet == 0)
     m_pActMultiRowSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"), tr("Switch Auto, first row, first column, multi row, multi column"), this);
+    else
+        m_pActMultiRowSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"), tr("Switch Auto, first row, first column, multi row, multi column"), this);
     m_pMnuMultiRowSwitch = new QMenu("Data Representation");
-    a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"), tr("Auto"));
+    if (m_buttonSet == 0)
+        m_pActXVAuto = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"), tr("Auto"));
+    else
+        m_pActXVAuto = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"), tr("Auto"));
     a->setData(0);
-    a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"), tr("first row"));
+    if (m_buttonSet == 0)
+        m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"), tr("first row"));
+    else
+        m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"), tr("first row"));
     a->setData(1);
-    a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"), tr("first column"));
+    if (m_buttonSet == 0)
+        m_pActXVFC = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"), tr("first column"));
+    else
+        m_pActXVFC = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/yv_plot_lt.png"), tr("first column"));
     a->setData(2);
-    a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xvm_plot.png"), tr("multi row"));
+    if (m_buttonSet == 0)
+        m_pActXVMR = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/xvm_plot.png"), tr("multi row"));
+    else
+        m_pActXVMR = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvm_plot_lt.png"), tr("multi row"));
     a->setData(3);
-    a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"), tr("multi column"));
+    if (m_buttonSet == 0)
+        m_pActXVMC = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"), tr("multi column"));
+    else
+        m_pActXVMC = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/yvm_plot_lt.png"), tr("multi column"));
     a->setData(4);
-    a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yxvzm_plot.png"), tr("multi layer"));
+    if (m_buttonSet == 0)
+        m_pActXVML = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/yxvzm_plot.png"), tr("multi layer"));
+    else
+        m_pActXVML = a = m_pMnuMultiRowSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/yxvzm_plot_lt.png"), tr("multi layer"));
     a->setData(5);
     m_pActMultiRowSwitch->setMenu(m_pMnuMultiRowSwitch);
     m_pActMultiRowSwitch->setVisible(true);
     connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
 
     //m_pActRGBSwitch
+    if (m_buttonSet == 0)
     m_pActRGBSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("Switch Auto, gray, rgb, rgba, rgb-gray"), this);
+    else
+        m_pActRGBSwitch = new QAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"), tr("Switch Auto, gray, rgb, rgba, rgb-gray"), this);
     m_pMnuRGBSwitch = new QMenu("Color Representation");
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("auto value"));
+    if (m_buttonSet == 0)
+        m_pActRGBA = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("auto value"));
+    else
+        m_pActRGBA = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"), tr("auto value"));
     a->setData(0);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_Gray.png"), tr("gray value"));
+    if (m_buttonSet == 0)
+        m_pActGray = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_Gray.png"), tr("gray value"));
+    else
+        m_pActGray = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGB_Gray_lt.png"), tr("gray value"));
     a->setData(1);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("RGB-lines"));
+    if (m_buttonSet == 0)
+        m_pActRGBL = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"), tr("RGB-lines"));
+    else
+        m_pActRGBL = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"), tr("RGB-lines"));
     a->setData(2);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGBA.png"), tr("RGBA-lines"));
+    if (m_buttonSet == 0)
+        m_pActRGBAL = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGBA.png"), tr("RGBA-lines"));
+    else
+        m_pActRGBAL = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGBA_lt.png"), tr("RGBA-lines"));
     a->setData(3);
-    a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBGray.png"), tr("RGB + Gray"));
+    if (m_buttonSet == 0)
+        m_pActRGBG = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBGray.png"), tr("RGB + Gray"));
+    else
+        m_pActRGBG = a = m_pMnuRGBSwitch->addAction(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGB_RGBGray_lt.png"), tr("RGB + Gray"));
     a->setData(4);
     m_pActRGBSwitch->setMenu(m_pMnuRGBSwitch);
     m_pActRGBSwitch->setVisible(false);
     connect(m_pMnuRGBSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuRGBSwitch(QAction*)));
 
     //m_actDrawMode
-    m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Switch Draw Mode"), this);
+    if (m_buttonSet == 0)
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"), tr("Draw geometric shape"), this);
+    else
+        m_pActDrawMode = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"), tr("Draw geometric shape"), this);
+    m_pActDrawMode->setData(ito::PrimitiveContainer::tPoint);
     m_pMnuDrawMode = new QMenu("Draw Mode", this);
 
     m_pDrawModeActGroup = new QActionGroup(this);
     a = m_pDrawModeActGroup->addAction(tr("Point"));
-    a->setData(Plot1DWidget::tPoint);
+    a->setData(ito::PrimitiveContainer::tPoint);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
-    a->setChecked(true);
+//    a->setChecked(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Line"));
-    a->setData(Plot1DWidget::tLine);
+    a->setData(ito::PrimitiveContainer::tLine);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Rectangle"));
-    a->setData(Plot1DWidget::tRect);
+    a->setData(ito::PrimitiveContainer::tRectangle);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
     a = m_pDrawModeActGroup->addAction(tr("Ellipse"));
-    a->setData(Plot1DWidget::tEllipse);
+    a->setData(ito::PrimitiveContainer::tEllipse);
     m_pMnuDrawMode->addAction(a);
     a->setCheckable(true);
 
@@ -642,11 +751,14 @@ void Itom1DQwtPlot::createActions()
     connect(m_pActDrawMode, SIGNAL(triggered(bool)), this, SLOT(mnuDrawMode(bool)));
     
     //m_pActClearDrawings
-    m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear Marker"), this);
+    if (m_buttonSet == 0)
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"), tr("Clear geometric shapes"), this);
+    else
+        m_pActClearDrawings = a = new QAction(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"), tr("Clear geometric shapes"), this);
     a->setObjectName("actClearGeometricElements");
     a->setCheckable(false);
     a->setChecked(false);
-    a->setToolTip(tr("Clear all existing geometric elements"));
+    a->setToolTip(tr("Clear all existing geometric shapes"));
     connect(a, SIGNAL(triggered()), this, SLOT(clearGeometricElements()));
 
     //Labels for current cursor position
@@ -666,7 +778,10 @@ void Itom1DQwtPlot::createActions()
     m_pActMarkerLegend = this->getMarkerLegendDockWidget()->toggleViewAction();
     connect(m_pActMarkerLegend, SIGNAL(triggered(bool)), this, SLOT(mnuShowMarkerLegend(bool)));
 
+    if (m_buttonSet == 0)
     m_pActGrid = a = new QAction(QIcon(":/itomDesignerPlugins/plot/icons/grid.png"), tr("Grid"), this);
+    else
+        m_pActGrid = a = new QAction(QIcon(":/itomDesignerPlugins/plot_lt/icons/grid_lt.png"), tr("Grid"), this);
     a->setObjectName("actGrid");
     a->setCheckable(true);
     a->setChecked(false);
@@ -679,11 +794,11 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
-    if ((ito::DataObject*)m_pInput["source"]->getVal<void*>())
+    if (m_pInput["source"]->getVal<ito::DataObject*>())
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
         // why "source" is used here and not "displayed" .... ck 05/15/2013
-        m_pContent->refreshPlot((ito::DataObject*)m_pInput["source"]->getVal<char*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         ito::Channel* dataChannel = getInputChannel("source");
         m_pRescaleParent->setVisible(dataChannel && dataChannel->getParent());
@@ -702,14 +817,14 @@ void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getContextMenuEnabled() const
 {
-    if (m_pContent) return (m_pContent)->m_showContextMenu;
+    if (m_pContent) return (m_pContent)->showContextMenu();
     return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setContextMenuEnabled(bool show)
 {
-    if (m_pContent) (m_pContent)->m_showContextMenu = show;
+    if (m_pContent) m_pContent->setShowContextMenu(show);
     updatePropertyDock();
 }
 
@@ -1173,7 +1288,7 @@ void Itom1DQwtPlot::setLegendTitles(const QStringList &legends)
 {
     if (m_pContent)
     {
-        return m_pContent->setLegendTitles(legends);
+        return m_pContent->setLegendTitles(legends, m_pInput["source"]->getVal<ito::DataObject*>());
     }
 
     updatePropertyDock();
@@ -1235,10 +1350,29 @@ void Itom1DQwtPlot::mnuDrawMode(bool checked)
         m_pActZoomToRect->setChecked(false);
         m_pActMarker->setChecked(false);
         m_pContent->setZoomerEnable(false);
-        m_pContent->setState(m_pContent->stateIdle);
+        m_pContent->setState(Plot1DWidget::stateIdle);
+
+        foreach(QAction *act, m_pDrawModeActGroup->actions())
+        {
+            act->setChecked(act->data() == m_pActDrawMode->data().toInt());
+            if (act->isChecked())
+            {
+                mnuDrawMode(act);
     }
-    // we need to find out which draw mode we should activate here ...
-//    m_pContent->setState(checked ? PlotCanvas::tDraw : PlotCanvas::stateIdle);
+        }
+    }
+    else
+    {
+        if (m_pActDrawMode->isChecked())
+        {
+            m_pActDrawMode->setChecked(false);
+        }
+
+        foreach(QAction *act, m_pDrawModeActGroup->actions())
+        {
+            act->setChecked(false);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1254,27 +1388,31 @@ void Itom1DQwtPlot::mnuDrawMode(QAction *action)
     switch (action->data().toInt())
     {
         default:
-        case Plot1DWidget::tPoint:
+        case ito::PrimitiveContainer::tPoint:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
-            m_pContent->userInteractionStart(Plot1DWidget::tPoint, 1, 1);
+            m_pActDrawMode->setData(action->data());
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tPoint, 1, 1);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndPt(QVector<QPointF>)));
         break;
 
-        case Plot1DWidget::tLine:
+        case ito::PrimitiveContainer::tLine:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
-            m_pContent->userInteractionStart(Plot1DWidget::tLine, 1, 2);
+            m_pActDrawMode->setData(action->data());
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tLine, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QVector<QPointF>)), this, SLOT(userInteractionEndLine(QVector<QPointF>)));
         break;
 
-        case Plot1DWidget::tRect:
+        case ito::PrimitiveContainer::tRectangle:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle.png"));
-            m_pContent->userInteractionStart(Plot1DWidget::tRect, 1, 2);
+            m_pActDrawMode->setData(action->data());
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tRectangle, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndRect(QRectF)));
         break;
 
-        case Plot1DWidget::tEllipse:
+        case ito::PrimitiveContainer::tEllipse:
             m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
-            m_pContent->userInteractionStart(Plot1DWidget::tEllipse, 1, 2);
+            m_pActDrawMode->setData(action->data());
+            m_pContent->userInteractionStart(ito::PrimitiveContainer::tEllipse, 1, 2);
 //            connect(m_pContent->m_pMultiPointPicker, SIGNAL(selected(QRectF)), this, SLOT(userInteractionEndEllipse(QRectF)));
         break;
     }
@@ -1394,18 +1532,6 @@ void Itom1DQwtPlot::mnuParentScaleSetting()
     {
         const QwtScaleDiv scale = m_pContent->axisScaleDiv(QwtPlot::yLeft);
         ito::AutoInterval bounds(scale.lowerBound(), scale.upperBound());
-        /*
-        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>((m_pContent)->m_plotCurveItems[0]->data());
-        int cmlpState = seriesData->getCmplxState();
-        ito::uint32  minLoc[3], maxLoc[3];
-        ito::float64 minVal, maxVal;
-
-        ito::DataObject temp = seriesData->getResampledDataObject();
-
-        if ((temp.getType() != ito::tFloat64) || (temp.getDims() == 0))
-            return;*/
-
-        //ito::dObjHelper::minMaxValueFunc<ito::float64>(&temp, minVal, minLoc, maxVal, maxLoc, true, cmlpState);
         
         ito::Channel* dataChannel = getInputChannel("source");
         if (dataChannel && dataChannel->getParent())
@@ -1424,8 +1550,6 @@ void Itom1DQwtPlot::mnuSetMarker(QAction *action)
 
         if (action->text() == QString(tr("To Min-Max")))
         {
-//            DataObjectSeriesData::ComplexType cmlpState = seriesData->getCmplxState();
-
             ito::float64 minVal, maxVal;
             int minLoc, maxLoc;
             if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
@@ -1482,19 +1606,19 @@ void Itom1DQwtPlot::userInteractionStart(int type, bool start, int maxNrOfPoints
     switch (type)
     {
         default:
-        case Plot1DWidget::tPoint:
+        case ito::PrimitiveContainer::tPoint:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints);
         break;
 
-        case Plot1DWidget::tLine:
+        case ito::PrimitiveContainer::tLine:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
-        case Plot1DWidget::tRect:
+        case ito::PrimitiveContainer::tRectangle:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
 
-        case Plot1DWidget::tEllipse:
+        case ito::PrimitiveContainer::tEllipse:
             m_pContent->userInteractionStart(type, start, maxNrOfPoints * 2);
         break;
     }
@@ -1693,28 +1817,7 @@ void Itom1DQwtPlot::setkeepAspectRatio(const bool &keepAspectEnable)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::mnuActRatio(bool checked)
 {
-    m_data->m_keepAspect = checked;
-    if (m_pContent) m_pContent->configRescaler();
-
-    /*if (m_pActZoomToRect->isChecked()) m_pActZoomToRect->setChecked(false);
-    if (m_pActPan->isChecked()) m_pActPan->setChecked(false);
-    
-    m_pActPan->setEnabled(!checked);
-    m_pActZoomToRect->setEnabled(!checked);
-
-    if (m_pContent)
-    {
-        m_pContent->m_pZoomer->zoom(0);
-        m_pContent->setState(Plot1DWidget::stateIdle);
-        m_pContent->configRescaler();
-    }*/
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::resizeEvent ( QResizeEvent * event )
-{
-    //resizeEvent(event);
-    //if (m_pContent) m_pContent->configRescaler();
+    if (m_pContent) m_pContent->setKeepAspectRatio(checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1781,13 +1884,13 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
         rowPtr[0] = (ito::float32) (it.value()->m_idx);
         switch (it.value()->m_type)
         {
-            case Plot1DWidget::tPoint:
+            case ito::PrimitiveContainer::tPoint:
                 rowPtr[1] = (ito::float32) ito::tGeoPoint;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
             break;
 
-            case Plot1DWidget::tLine:
+            case ito::PrimitiveContainer::tLine:
                 rowPtr[1] = (ito::float32) ito::tGeoLine;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
@@ -1795,7 +1898,7 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
-            case Plot1DWidget::tRect:
+            case ito::PrimitiveContainer::tRectangle:
                 rowPtr[1] = (ito::float32) ito::tGeoRectangle;
                 rowPtr[2] = (ito::float32) (it.value()->x1);
                 rowPtr[3] = (ito::float32) (it.value()->y1);
@@ -1803,7 +1906,7 @@ ito::RetVal Itom1DQwtPlot::qvector2DataObject(const ito::DataObject *dstObject)
                 rowPtr[6] = (ito::float32) (it.value()->y2);
             break;
 
-            case Plot1DWidget::tEllipse:
+            case ito::PrimitiveContainer::tEllipse:
                 rowPtr[1] = (ito::float32) ito::tGeoEllipse;
                 rowPtr[2] = (((ito::float32)it.value()->x1 + (ito::float32)it.value()->x2) / 2.0);
                 rowPtr[3] = (((ito::float32)it.value()->y1 + (ito::float32)it.value()->y2) / 2.0);
@@ -2156,6 +2259,84 @@ void Itom1DQwtPlot::setBackgroundColor(const QColor newVal)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+char Itom1DQwtPlot::getButtonSet(void) const
+{
+    return m_buttonSet;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setButtonSet(const char newVal)
+{
+    if (newVal == 0)
+    {
+        m_buttonSet = 0;
+        m_pActHome->setIcon(QIcon(":/itomDesignerPlugins/general/icons/home.png"));
+        m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"));
+        m_pActCopyClipboard->setIcon(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"));
+        m_pActScaleSetting->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"));
+        m_pActHome->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/home_lt.png"));
+        m_pRescaleParent->setIcon(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"));
+        m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general/icons/forward.png"));
+        m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general/icons/back.png"));
+        m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general/icons/move.png"));
+        m_pActZoomToRect->setIcon(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"));
+        m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
+        m_pActMarker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/marker.png"));
+        m_pActSetMarker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
+        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"));
+        m_pActMultiRowSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
+        m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
+        m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
+        m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
+        m_pActXVMC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"));
+        m_pActXVML->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yxvzm_plot.png"));
+        m_pActRGBSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"));
+        m_pActRGBA->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"));
+        m_pActGray->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGB_Gray.png"));
+        m_pActRGBL->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"));
+        m_pActRGBAL->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGBA.png"));
+        m_pActRGBG->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBGray.png"));
+        m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/marker.png"));
+        m_pActClearDrawings->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
+        m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/grid.png"));
+    }
+    else
+    {
+        m_buttonSet = 1;
+
+        m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/filesave_lt.png"));
+        m_pActCopyClipboard->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/clipboard_lt.png"));
+        m_pActScaleSetting->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/autoscal_lt.png"));
+        m_pRescaleParent->setIcon(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale_lt.png"));
+        m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/forward_lt.png"));
+        m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"));
+        m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"));
+        m_pActZoomToRect->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/zoom_to_rect_lt.png"));
+        m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect_lt/icons/AspRatio11_lt.png"));
+        m_pActMarker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
+        m_pActSetMarker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
+        m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImRe_lt.png"));
+        m_pActMultiRowSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
+        m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
+        m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
+        m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yv_plot_lt.png"));
+        m_pActXVMR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvm_plot.png"));
+        m_pActXVMR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvm_plot_lt.png"));
+        m_pActXVMC->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yvm_plot_lt.png"));
+        m_pActXVML->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yxvzm_plot_lt.png"));
+        m_pActRGBSwitch->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"));
+        m_pActRGBA->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"));
+        m_pActGray->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGB_Gray_lt.png"));
+        m_pActRGBL->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"));
+        m_pActRGBAL->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGBA_lt.png"));
+        m_pActRGBG->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGB_RGBGray_lt.png"));
+        m_pActDrawMode->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/marker_lt.png"));
+        m_pActClearDrawings->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"));
+        m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/grid_lt.png"));
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom1DQwtPlot::getAxisColor(void) const
 {
     if (m_data) 
@@ -2210,141 +2391,6 @@ void Itom1DQwtPlot::setTextColor(const QColor newVal)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
-{
-    if (!m_data)
-    {
-        return ito::RetVal(ito::retError, 0, tr("Export image failed, internal setting handle not initilized").toLatin1().data());
-    }
-    if (!m_pContent)
-    {
-        return ito::RetVal(ito::retError, 0, tr("Export image failed, canvas handle not initilized").toLatin1().data());
-    }
-    if (curSize.height() == 0 || curSize.width() == 0)
-    {
-        curSize = m_pContent->size();
-    }
-    QBrush curBrush = m_pContent->canvasBackground();
-
-    QPalette curPalette = m_pContent->palette();
-    //qreal linewidth = m_pContent->m_lineWidth;
-    m_pContent->setAutoFillBackground( true );
-    m_pContent->setPalette( Qt::white );
-    m_pContent->setCanvasBackground(Qt::white);
-    qreal resFaktor = 1.0;
-
-    if (copyToClipboardNotFile)
-    {
-        m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
-
-        resFaktor = resFaktor = resolution / 72.0 + 0.5;;
-        resFaktor = resFaktor < 1.0 ? 1.0 : resFaktor;
-        //m_pContent->setLineWidth(linewidth * resFaktor);
-    }
-    m_pContent->replot();
-
-    QwtPlotRenderer renderer;
-
-    // flags to make the document look like the widget
-    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-    //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
-    
-    if (copyToClipboardNotFile)
-    {
-        m_pContent->statusBarMessage(tr("copy current view to clipboard..."));
-        QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
-        
-        QClipboard *clipboard = QApplication::clipboard();
-        QImage img(myRect, QImage::Format_ARGB32);
-        QPainter painter(&img);
-        painter.scale(resFaktor, resFaktor);
-        
-        renderer.render(m_pContent, &painter, m_pContent->rect());
-        clipboard->setImage(img);  
-        
-        m_pContent->statusBarMessage(tr("copy current view to clipboard. done."), 1000);
-    }
-    else 
-    {
-        renderer.renderDocument((m_pContent), fileName, curSize, resolution);
-    }
-
-    m_pContent->setPalette( curPalette);
-    m_pContent->setCanvasBackground( curBrush);
-    //m_pContent->setLineWidth(linewidth);
-    m_pContent->replot();
-    return ito::retOk;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::copyToClipBoard()
-{
-    return exportCanvas(true, "");
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QPixmap Itom1DQwtPlot::renderToPixMap(const int xsize, const int ysize, const int resolution) 
-{
-
-    QSizeF curSize(xsize, ysize);
-    if (!m_pContent || !m_data)
-    {
-        QSize myRect(curSize.width(), curSize.height());
-        QPixmap destinationImage(myRect);
-        return destinationImage;
-    }
-
-    if (curSize.height() == 0 || curSize.width() == 0)
-    {
-        curSize = ((Plot1DWidget *)m_pContent)->size();
-    }
-    //qreal linewidth = m_pContent->m_lineWidth;
-    qreal resFaktor = resolution / 72.0 + 0.5;
-    resFaktor = resFaktor < 1 ? 1 : resFaktor;
-    resFaktor = resFaktor > 6 ? 6 : resFaktor;
-
-    QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
-
-    QPixmap destinationImage(myRect);
-
-    if (!m_pContent)
-    {
-        destinationImage.fill(Qt::red);
-        return destinationImage;
-    }
-    destinationImage.fill(Qt::white);
-    QBrush curBrush = m_pContent->canvasBackground();
-
-    QPalette curPalette = m_pContent->palette();
-
-    m_pContent->setAutoFillBackground( true );
-    m_pContent->setPalette( Qt::white );
-    m_pContent->setCanvasBackground(Qt::white);    
-    //m_pContent->setLineWidth(linewidth*resFaktor);
-    m_pContent->replot();
-
-    QwtPlotRenderer renderer;
-
-    // flags to make the document look like the widget
-    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
-    //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
-
-    //QImage img(myRect, QImage::Format_ARGB32);
-    QPainter painter(&destinationImage);
-    painter.scale(resFaktor, resFaktor);
-    renderer.render(m_pContent, &painter, m_pContent->rect());
-    //destinationImage.convertFromImage(img);
-
-
-    m_pContent->setPalette( curPalette);
-    m_pContent->setCanvasBackground( curBrush);
-    //m_pContent->setLineWidth(linewidth);
-    m_pContent->replot();
-
-    return destinationImage;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::setPicker(const QVector<int> &pxCords)
 {
     if (!m_pContent)
@@ -2389,7 +2435,7 @@ ito::RetVal Itom1DQwtPlot::setGeometricElementLabel(int id, QString label)
 {
     if (!m_data) 
     {
-        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structure").toLatin1().data());
     }
 
     InternalData* pData = m_data;
@@ -2412,7 +2458,7 @@ ito::RetVal Itom1DQwtPlot::setGeometricElementLabelVisible(int id, bool setVisib
 {
     if (!m_data) 
     {
-        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structur").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not access internal data structure").toLatin1().data());
     }
 
     InternalData* pData = m_data;
@@ -2616,46 +2662,4 @@ int Itom1DQwtPlot::getCurveFillAlpha() const
         return m_pContent->m_fillCurveAlpa;
     }
     return 128;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::mnuActSendCurrentToWorkspace()
-{
-    bool ok;
-    QString varname = QInputDialog::getText(this, tr("Current to workspace"), tr("Indicate the python variable name for the currently visible object"), QLineEdit::Normal, "displayed_line", &ok);
-    if (ok && varname != "")
-    {
-        QSharedPointer<ito::DataObject> obj = getDisplayed();
-        const ito::DataObject *dobj = &(*obj);
-        QSharedPointer<ito::ParamBase> obj_(new ito::ParamBase("displayed", ito::ParamBase::DObjPtr, (const char*)dobj));
-
-        QApplication::setOverrideCursor(Qt::WaitCursor);
-
-        ito::RetVal retval = apiSendParamToPyWorkspace(varname, obj_);
-
-        QApplication::restoreOverrideCursor();
-
-        if (retval.containsError())
-        {
-            QMessageBox msgBox;
-            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
-            if (retval.errorMessage())
-            {
-                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
-            }
-            msgBox.setIcon(QMessageBox::Critical);
-            msgBox.exec();
-        }
-        else if (retval.containsWarning())
-        {
-            QMessageBox msgBox;
-            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
-            if (retval.errorMessage())
-            {
-                msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
-            }
-            msgBox.setIcon(QMessageBox::Warning);
-            msgBox.exec();
-        }
-    }
 }

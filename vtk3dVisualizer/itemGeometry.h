@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -55,7 +55,7 @@ public:
     ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
     ~ItemGeometry();
 
-    enum Type { tCylinder, tPlane, tCircle, tCone, tCube, tPyramid, tCuboid, tSphere, tText, tLines };
+    enum Type { tCylinder, tPlane, tCircle, tCone, tCube, tPyramid, tCuboid, tSphere, tText, tLines, tPolygon };
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
     enum Interpolation { Flat, Gouraud, Phong };
 
@@ -66,6 +66,7 @@ public:
     ito::RetVal addCube(const Eigen::Vector3f &size, const Eigen::Affine3f &pose, const QColor &color);
     ito::RetVal addLines(const ito::DataObject *points, const QColor &color);
     ito::RetVal addSphere(const pcl::PointXYZ &center, double radius, const QColor &color);
+    ito::RetVal addPolygon(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr polygon, const QColor &color);
     ito::RetVal updatePose(const Eigen::Affine3f &pose);
     ito::RetVal updateText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
 

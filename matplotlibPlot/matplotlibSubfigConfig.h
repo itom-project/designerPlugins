@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of itom.
 
@@ -32,27 +32,23 @@ class MatplotlibSubfigConfig : public QDialog
 {
     Q_OBJECT
 public:
-    MatplotlibSubfigConfig(int valLeft, int valTop, int valRight, int valBottom, int valWSpace, int valHSpace, QWidget *parent = 0) :
+    MatplotlibSubfigConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace, QWidget *parent = 0) :
         QDialog(parent)
     {
         ui.setupUi(this);
 
-        ui.sliderLeft->setSliderPosition(valLeft);
-        ui.sliderTop->setSliderPosition(valTop);
-        ui.sliderRight->setSliderPosition(valRight);
-        ui.sliderBottom->setSliderPosition(valBottom);
-        ui.sliderWSpace->setSliderPosition(valWSpace);
-        ui.sliderHSpace->setSliderPosition(valHSpace);
+        ui.dblRangeLeftRight->setValues(valLeft / 10.0, valRight / 10.0);
+        ui.dblRangeBottomTop->setValues(valBottom / 10.0, valTop / 10.0);
+        ui.sliderWSpace->setValue(valWSpace / 10.0);
+        ui.sliderHSpace->setValue(valHSpace / 10.0);
     }
 
     ~MatplotlibSubfigConfig() {};
 
-    QSlider *sliderLeft()   { return ui.sliderLeft;   }
-    QSlider *sliderTop()    { return ui.sliderTop;    }
-    QSlider *sliderRight()  { return ui.sliderRight;  }
-    QSlider *sliderBottom() { return ui.sliderBottom; }
-    QSlider *sliderHSpace() { return ui.sliderHSpace; }
-    QSlider *sliderWSpace() { return ui.sliderWSpace; }
+    DoubleRangeWidget *sliderLeftRight()  { return ui.dblRangeLeftRight; }
+    DoubleRangeWidget *sliderBottomTop() { return ui.dblRangeBottomTop; }
+    SliderWidget *sliderHSpace() { return ui.sliderHSpace; }
+    SliderWidget *sliderWSpace() { return ui.sliderWSpace; }
 
 private:
     Ui::frmMatplotlibSubfigConfig ui;

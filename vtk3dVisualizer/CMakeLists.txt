@@ -63,8 +63,9 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
         LINK_DIRECTORIES(
             ${CMAKE_CURRENT_SOURCE_DIR}/..
-			${Boost_LIBRARY_DIR}
-			${VTK_DIR}
+            ${Boost_LIBRARY_DIR}
+            ${BOOST_LIBRARYDIR}
+            ${VTK_DIR}
         )
 
         set(plugin_HEADERS
@@ -75,12 +76,13 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/coordSysProperty.h
             ${CMAKE_CURRENT_SOURCE_DIR}/CustomTypes.h
             ${CMAKE_CURRENT_SOURCE_DIR}/item.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/itemCanvas.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloud.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloudNormal.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPolygonMesh.h
             ${CMAKE_CURRENT_SOURCE_DIR}/Vec3fProperty.h
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/pointCloudHandlerGenericFields.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/treeWidgetKeyEater.h
         )
 
         set(plugin_HEADERS_COPY
@@ -93,6 +95,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
         set(plugin_RCC
             ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
+			${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.qrc
         )
 
         set(plugin_SOURCES 
@@ -101,12 +104,12 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/coordSysProperty.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/CustomTypes.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/item.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/itemCanvas.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloud.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPointCloudNormal.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemPolygonMesh.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/Vec3fProperty.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/treeWidgetKeyEater.cpp
         )
 
         #If you want to use automatical metadata for dlls under windows use the following if-case.

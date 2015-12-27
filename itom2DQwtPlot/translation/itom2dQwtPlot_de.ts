@@ -464,17 +464,17 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Resize Elements</source>
+        <source>Resize elements</source>
         <translation type="unfinished">Elemente in Größe anpassen</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Rotate Elements</source>
+        <source>Rotate elements</source>
         <translation type="unfinished">Elemente rotieren</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Modify Points</source>
+        <source>Modify points</source>
         <translation type="unfinished">Modifikationspunkt</translation>
     </message>
     <message>
@@ -610,7 +610,7 @@
     <message>
         <location line="+82"/>
         <location line="+23"/>
-        <source>Could not access internal data structur</source>
+        <source>Could not access internal data structure</source>
         <translation type="unfinished">Es kann nicht auf die interne Datenstruktur zugegriffen werden</translation>
     </message>
     <message>

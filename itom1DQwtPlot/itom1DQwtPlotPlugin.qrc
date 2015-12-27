@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/itom1DQwtFigurePlugin">
         <file>icons/parentScale.png</file>
+        <file>icons/parentScale_lt.png</file>
     </qresource>
 </RCC>

@@ -22,7 +22,7 @@ ENDIF(BUILD_SHARED_LIBS)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomWidgets REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 FIND_PACKAGE_QT(ON Core Widgets Xml Svg Designer LinguistTools)
 
@@ -58,6 +58,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
     ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles
 )
 
 LINK_DIRECTORIES(
@@ -66,17 +67,6 @@ LINK_DIRECTORIES(
 )
 
 set(plugin_HEADERS
-    ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsGraphInc.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/apiFunctionsInc.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresGraphics.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresQt.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructuresPrimitives.h
-    ${ITOM_SDK_INCLUDE_DIR}/common/typeDefs.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractDObjFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractItomDesignerPlugin.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjItem.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
@@ -93,7 +83,8 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotPicker.h
-
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
 )
 
 set(plugin_UI
@@ -120,11 +111,14 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotPicker.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.cpp
 )
 
 set(plugin_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotenums.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.

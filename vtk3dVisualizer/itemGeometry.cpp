@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -27,7 +27,7 @@
 
 //-------------------------------------------------------------------------------------------
 ItemGeometry::ItemGeometry(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
-    : Item(name, treeItem),
+    : Item(name, Item::rttiGeometry, treeItem),
     m_visualizer(visualizer),
     m_representation(Wireframe),
     m_interpolation(Flat),
@@ -86,6 +86,24 @@ ito::RetVal ItemGeometry::addSphere(const pcl::PointXYZ &center, double radius, 
     m_nrOfShapes = 1;
 
     if (m_visualizer->addSphere(center, radius, color.redF(), color.greenF(), color.blueF(), m_name.toStdString()))
+    {
+        vtkProp *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.clear();
+        m_actors.append(a);
+
+        m_lineColor = color;
+    }
+
+    return ito::retOk;
+}
+
+//-------------------------------------------------------------------------------------------
+ito::RetVal ItemGeometry::addPolygon(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr polygon, const QColor &color)
+{
+    m_geometryType = tPolygon;
+    m_nrOfShapes = 1;
+    if (m_visualizer->addPolygon<pcl::PointXYZ>(polygon, color.redF(), color.greenF(), color.blueF(), m_name.toStdString()))
     {
         vtkProp *a = getLastActor();
         syncActorProperties(a);

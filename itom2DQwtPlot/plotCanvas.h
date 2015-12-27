@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO),
-   Universität Stuttgart, Germany
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
 
    This file is part of itom.
 
@@ -31,10 +31,10 @@
 #include "DataObject/dataobj.h"
 
 #include "dataObjItem.h"
+
+#include "../sharedFiles/itomQwtPlot.h"
 #include "../sharedFiles/userInteractionPlotPicker.h"
 #include "../sharedFiles/drawItem.h"
-#include "../sharedFiles/itomPlotZoomer.h"
-#include "../sharedFiles/itomPlotMagnifier.h"
 #include "../sharedFiles/itomPlotPicker.h"
 
 
@@ -49,8 +49,6 @@
 #include <qspinbox.h>
 #include <qhash.h>
 
-#include <qwt_plot.h>
-#include <qwt_plot_panner.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_shapeitem.h>
@@ -66,7 +64,7 @@ class DataObjRasterData;
 //class UserInteractionPlotPicker;
 
 
-class PlotCanvas : public QwtPlot
+class PlotCanvas : public ItomQwtPlot
 {
     Q_OBJECT
     public:
@@ -78,14 +76,7 @@ class PlotCanvas : public QwtPlot
             tPan = 3, 
             tLineCut = 4, 
             tStackCut = 5, 
-            tMultiPointPick = ito::tMultiPointPick, 
-            tPoint = ito::tGeoPoint, 
-            tLine = ito::tGeoLine, 
-            tRect = ito::tGeoRectangle, 
-            tSquare = ito::tGeoSquare,
-            tEllipse = ito::tGeoEllipse, 
-            tCircle = ito::tGeoCircle, 
-            tPolygon = ito::tGeoPolygon
+            tStateDrawShape = 6,
         };
 
         enum changeFlag {
@@ -97,8 +88,6 @@ class PlotCanvas : public QwtPlot
         PlotCanvas(QMenu *contextMenu, InternalData *m_pData, QWidget * parent = NULL);
         ~PlotCanvas();
 
-        bool m_showContextMenu;
-
         ito::RetVal init();
         void refreshPlot(const ito::DataObject *dObj, int plane = -1);
 
@@ -107,7 +96,7 @@ class PlotCanvas : public QwtPlot
 
         void internalDataUpdated();
 
-        void setState( tState state);
+        void setState(tState state, ito::PrimitiveContainer::tPrimitive shape = ito::PrimitiveContainer::tNoType);
         void childFigureDestroyed(QObject* obj, ito::uint32 UID);
 
         ito::AutoInterval getInterval(Qt::Axis axis) const;
@@ -116,7 +105,7 @@ class PlotCanvas : public QwtPlot
         ito::AutoInterval getOverlayInterval(Qt::Axis axis) const;
         void setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval);
 
-        ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
+        ito::RetVal plotMarkers(const ito::DataObject *coords, const QString &style, const QString &id, int plane);
         ito::RetVal deleteMarkers(const QString &id);
         ito::RetVal deleteMarkers(const int id);
 
@@ -125,18 +114,11 @@ class PlotCanvas : public QwtPlot
         QSharedPointer<ito::DataObject> getOverlayObject(void);
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 
-        void setVisible(bool visible);
-/*        
-        ito::RetVal addDrawItems(const ito::DataObject *items, QString style);
-        ito::RetVal delDrawItems(const ito::DataObject *items, QString style);
-*/        
         friend class Itom2dQwtPlot;
-        friend class DrawItem;
 
     protected:
         void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc);
         void getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, double *maxPhysLoc);
-        void contextMenuEvent(QContextMenuEvent * event);
         void keyPressEvent ( QKeyEvent * event );
         void keyReleaseEvent ( QKeyEvent * event );
 
@@ -158,13 +140,14 @@ class PlotCanvas : public QwtPlot
         void mousePressEvent ( QMouseEvent * event );
         void mouseMoveEvent ( QMouseEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
-
-        void configRescaler(void);
         
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
         void updateColors();
         void updateLabelVisibility();
+
+        void home();
+
     private:
 
         // a1 is line1 start, a2 is line1 end, b1 is line2 start, b2 is line2 end
@@ -172,9 +155,8 @@ class PlotCanvas : public QwtPlot
 
         ito::DataObject randImg;
 
-        ItomPlotZoomer *m_pZoomer;
+        
         QwtPlotPanner *m_pPanner;
-        ItomPlotMagnifier *m_pMagnifier;
 
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
@@ -213,8 +195,6 @@ class PlotCanvas : public QwtPlot
         QColor m_inverseColor0, m_inverseColor1;
         int m_activeDrawItem;
 
-        QMenu *m_contextMenu;
-
         QVector<ito::uint16> m_drawedIemsIndexes;
         bool m_ignoreNextMouseEvent;
 
@@ -222,14 +202,10 @@ class PlotCanvas : public QwtPlot
         QPointF m_initialMarkerPosition;
 
         bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)
-        bool m_firstTimeVisible; //true if this plot becomes visible for the first time
 
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
-
-        void statusBarClear();
-        void statusBarMessage(const QString &message, int timeout = 0);
 
     private slots:
         void zStackCutTrackerMoved(const QPoint &pt);
@@ -283,7 +259,6 @@ struct InternalData
         m_elementsToPick = 0;
 
         m_pDrawItems.clear();
-        m_keepAspect = false;
         m_enablePlotting = true;
         m_showCenterMarker = false;
         m_alpha = 0;
@@ -297,6 +272,7 @@ struct InternalData
         m_backgnd = Qt::white;
 
         m_markerLabelVisible = false;
+        m_stateShapePrimitive = ito::PrimitiveContainer::tNoType;
     }
     ~InternalData()
     {
@@ -327,7 +303,6 @@ struct InternalData
     QString m_yaxisLabelDObj;
     QString m_valueLabelDObj;
 
-    bool m_keepAspect;
     bool m_autoTitle;
     bool m_autoxAxisLabel;
     bool m_autoyAxisLabel;
@@ -367,6 +342,7 @@ struct InternalData
     Itom2DQwt::tComplexType m_cmplxType;
 
     PlotCanvas::tState m_state;
+    ito::PrimitiveContainer::tPrimitive m_stateShapePrimitive; /*!< geometric shape that is active is m_state is stateShape */
     Itom2DQwt::tModificationState m_modState;
     const QHash<QString, ito::Param*> *m_pConstOutput;
 //    QVector<DrawItem *> m_pDrawItems;

@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of itom.
 
@@ -21,604 +21,18 @@
 *********************************************************************** */
 
 #include "dataObjectTable.h"
-#include <qspinbox.h>
 #include <qheaderview.h>
 #include <qscrollbar.h>
+#include <qevent.h>
+#include <qapplication.h>
+#include <qclipboard.h>
+#include <qmenu.h>
 
+#include "dataObjectDelegate.h"
+#include "dataObjectModel.h"
 
-//----------------------------------------------------------------------------------------------------------------------------------
-DataObjectModel::DataObjectModel() : 
-    m_readOnly(false), m_defaultRows(3), m_defaultCols(3)
-{
-    m_sharedDataObj = QSharedPointer<ito::DataObject>(new ito::DataObject());
-}
+#include "common/typeDefs.h"
 
-//----------------------------------------------------------------------------------------------------------------------------------
-DataObjectModel::~DataObjectModel()
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QVariant DataObjectModel::data(const QModelIndex &index, int role) const
-{
-    if (index.isValid())
-    {
-        if (role == Qt::DisplayRole || role == Qt::EditRole)
-        {
-            switch(m_sharedDataObj->getDims())
-            {
-            case 0:
-                return (double)0.0; //default case (for designer, adjustment can be done using the defaultRow and defaultCol property)
-            case 1:
-                if (index.column() == 0 && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
-                {
-                    return at(index.row(), index.column());
-                }
-                return QVariant();
-            case 2:
-                if (index.column() >= 0 && index.column() < (int)m_sharedDataObj->getSize(1) && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
-                {
-                    return at(index.row(), index.column());
-                }
-                return QVariant();
-            default:
-                return QVariant();
-            }
-        }
-        else
-        {
-            return QVariant();
-        }
-    }
-    else
-    {
-        return QVariant();
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-bool DataObjectModel::setData(const QModelIndex & index, const QVariant & value, int role/* = Qt::EditRole */)
-{
-    if (index.isValid())
-    {
-        if (role == Qt::EditRole)
-        {
-            switch(m_sharedDataObj->getDims())
-            {
-            /*case 0:
-                return QVariant();*/
-            case 1:
-                if (index.column() == 0 && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
-                {
-                    return setValue(index.row(), index.column(), value);
-                }
-                return false;
-            case 2:
-                if (index.column() >= 0 && index.column() < (int)m_sharedDataObj->getSize(1) && index.row() >= 0 && index.row() < (int)m_sharedDataObj->getSize(0))
-                {
-                    return setValue(index.row(), index.column(), value);
-                }
-                return false;
-            }
-        }
-    }
-    return false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QVariant DataObjectModel::at(const int row, const int column) const
-{
-    Q_ASSERT(row >= 0);
-    Q_ASSERT(column >= 0);
-    Q_ASSERT(m_sharedDataObj->getDims() == 1 || m_sharedDataObj->getDims() == 2);
-    Q_ASSERT(row < (int)m_sharedDataObj->getSize(0));
-    Q_ASSERT(column < (int)m_sharedDataObj->getSize(1));
-
-    switch(m_sharedDataObj->getType())
-    {
-    case ito::tInt8:
-        return (int)m_sharedDataObj->at<ito::int8>(row,column);
-    case ito::tUInt8:
-        return (uint)m_sharedDataObj->at<ito::uint8>(row,column);
-    case ito::tInt16:
-        return (int)m_sharedDataObj->at<ito::int16>(row,column);
-    case ito::tUInt16:
-        return (uint)m_sharedDataObj->at<ito::uint16>(row,column);
-    case ito::tInt32:
-        return (int)m_sharedDataObj->at<ito::int32>(row,column);
-    case ito::tUInt32:
-        return (uint)m_sharedDataObj->at<ito::uint32>(row,column);
-    case ito::tFloat32:
-        return (float)m_sharedDataObj->at<ito::float32>(row,column);
-    case ito::tFloat64:
-        return (double)m_sharedDataObj->at<ito::float64>(row,column);
-    case ito::tComplex64:
-        //return (float)m_sharedDataObj->at<ito::complex64>(row,column);
-        return QVariant();
-    case ito::tComplex128:
-        //return (double)m_sharedDataObj->at<ito::complex128>(row,column);
-        return QVariant();
-    }
-    return QVariant();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-bool DataObjectModel::setValue(const int &row, const int &column, const QVariant &value)
-{
-    Q_ASSERT(row >= 0);
-    Q_ASSERT(column >= 0);
-    Q_ASSERT(m_sharedDataObj->getDims() == 1 || m_sharedDataObj->getDims() == 2);
-    Q_ASSERT(row < (int)m_sharedDataObj->getSize(0));
-    Q_ASSERT(column < (int)m_sharedDataObj->getSize(1));
-
-    QModelIndex i = createIndex(row, column);
-    bool ok = false;
-
-    switch(m_sharedDataObj->getType())
-    {
-    case ito::tInt8:
-        {
-            int val = value.toInt(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::int8>(row,column) = cv::saturate_cast<ito::int8>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tUInt8:
-        {
-            uint val = value.toUInt(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::uint8>(row,column) = cv::saturate_cast<ito::uint8>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tInt16:
-        {
-            int val = value.toInt(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::int16>(row,column) = cv::saturate_cast<ito::int16>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tUInt16:
-        {
-            uint val = value.toUInt(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::uint16>(row,column) = cv::saturate_cast<ito::uint16>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tInt32:
-        {
-            int val = value.toInt(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::uint32>(row,column) = cv::saturate_cast<ito::int32>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tUInt32:
-        {
-            uint val = value.toUInt(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::uint32>(row,column) = cv::saturate_cast<ito::uint32>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tFloat32:
-        {
-            double val = value.toDouble(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::float32>(row,column) = cv::saturate_cast<ito::float32>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tFloat64:
-        {
-            double val = value.toDouble(&ok);
-            if (!ok) return false;
-            m_sharedDataObj->at<ito::float64>(row,column) = cv::saturate_cast<ito::float64>(val);
-            emit dataChanged(i,i);
-            return true;
-        }
-    case ito::tComplex64:
-        //return (float)m_dataObj.at<ito::complex64>(row,column);
-        return false;
-    case ito::tComplex128:
-        //return (double)m_dataObj.at<ito::complex128>(row,column);
-        return false;
-    }
-    return false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QModelIndex DataObjectModel::index(int row, int column, const QModelIndex &parent) const
-{
-    if (parent.isValid() == false)
-    {
-        return createIndex(row,column);
-    }
-    return QModelIndex();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QModelIndex DataObjectModel::parent(const QModelIndex &/*index*/) const
-{
-    return QModelIndex();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectModel::rowCount(const QModelIndex &parent) const
-{
-    if (parent.isValid() == false && m_sharedDataObj->getDims() > 0)
-    {
-        return m_sharedDataObj->getSize(0);
-    }
-    else if (parent.isValid() == false) //default case
-    {
-        return m_defaultRows;
-    }
-    return 0;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectModel::columnCount(const QModelIndex &parent) const
-{
-    if (parent.isValid() == false)
-    {
-        if (m_sharedDataObj->getDims() > 1)
-        {
-            return m_sharedDataObj->getSize(1);
-        }
-        else if (m_sharedDataObj->getDims() == 0) //default case
-        {
-            return m_defaultCols;
-        }
-        return 1;
-    }
-    return 0;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QVariant DataObjectModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (role == Qt::DisplayRole)
-    {
-        if (orientation == Qt::Horizontal)
-        {
-            switch(m_sharedDataObj->getDims())
-            {
-            case 0:
-                if (m_horizontalHeader.count() > section) //default case
-                {
-                    return m_horizontalHeader[section];
-                }
-                else
-                {
-                    return section;
-                }
-            case 1:
-                return 0;
-            default:
-                {
-                    if (section >= 0 && section < (int)m_sharedDataObj->getSize(1))
-                    {
-                        if (m_horizontalHeader.count() > section)
-                        {
-                            return m_horizontalHeader[section];
-                        }
-                        else
-                        {
-                            return section;
-                        }
-                    }
-                    return QVariant();
-                }
-            }
-        }
-        else //vertical
-        {
-            switch(m_sharedDataObj->getDims())
-            {
-            case 0:
-                if (m_verticalHeader.count() > section) //default case
-                {
-                    return m_verticalHeader[section];
-                }
-                else
-                {
-                    return section;
-                }
-            case 1:
-                return 1;
-            default:
-                {
-                    if (section >= 0 && section < (int)m_sharedDataObj->getSize(0))
-                    {
-                        if (m_verticalHeader.count() > section)
-                        {
-                            return m_verticalHeader[section];
-                        }
-                        else
-                        {
-                            return section;
-                        }
-                    }
-                    return QVariant();
-                }
-            }
-        }
-    }
-
-    return QVariant();
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectModel::setHeaderLabels(Qt::Orientation orientation, const QStringList &labels)
-{
-    beginResetModel();
-    if (orientation == Qt::Horizontal)
-    {
-        m_horizontalHeader = labels;
-    }
-    else
-    {
-        m_verticalHeader = labels;
-    }
-    endResetModel();
-    emit headerDataChanged (orientation, 0, labels.count() - 1);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-Qt::ItemFlags DataObjectModel::flags (const QModelIndex & index) const
-{
-    if (m_readOnly || m_sharedDataObj->getDims() == 0)
-    {
-        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    }
-    return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectModel::setDataObject(QSharedPointer<ito::DataObject> dataObj)
-{
-    beginResetModel();
-    m_sharedDataObj = dataObj;
-    endResetModel();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectModel::setReadOnly(bool value)
-{
-    beginResetModel();
-    m_readOnly = value;
-    endResetModel();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectModel::setDefaultGrid(int rows, int cols)
-{
-    if (m_defaultRows != rows || m_defaultCols != cols)
-    {
-        beginResetModel();
-        m_defaultRows = rows;
-        m_defaultCols = cols;
-        endResetModel();
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
-DataObjectDelegate::DataObjectDelegate(QObject *parent /*= 0*/)
-    : QItemDelegate(parent), 
-    m_min(-std::numeric_limits<double>::max()), 
-    m_max(std::numeric_limits<double>::max()),
-    m_decimals(2)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-QWidget *DataObjectDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/,  const QModelIndex &index) const
-{
-    const DataObjectModel *model = qobject_cast<const DataObjectModel*>(index.model());
-    int type = model->getType();
-
-    QWidget *result = NULL;
-
-    //this is a workaround, since the saturate_cast from double::max() to limits of int8 for instance if malignious.
-    int intMin = m_min < (double)(std::numeric_limits<int>::min()) ? std::numeric_limits<int>::min() : m_min;
-    int intMax = m_max > (double)(std::numeric_limits<int>::max()) ? std::numeric_limits<int>::max() : m_max;
-
-    switch(type)
-    {
-    case ito::tInt8:
-        {
-            QSpinBox *editor = new QSpinBox(parent);
-            editor->setMinimum(std::max(std::numeric_limits<ito::int8>::min(), cv::saturate_cast<ito::int8>(intMin)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::int8>::max(), cv::saturate_cast<ito::int8>(intMax)));
-            result = editor;
-        }
-        break;
-    case ito::tUInt8:
-        {
-            QSpinBox *editor = new QSpinBox(parent);
-            editor->setMinimum(std::max(std::numeric_limits<ito::uint8>::min(), cv::saturate_cast<ito::uint8>(intMin)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::uint8>::max(), cv::saturate_cast<ito::uint8>(intMax)));
-            result = editor;
-        }
-        break;
-    case ito::tInt16:
-        {
-            QSpinBox *editor = new QSpinBox(parent);
-            editor->setMinimum(std::max(std::numeric_limits<ito::int16>::min(), cv::saturate_cast<ito::int16>(intMin)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::int16>::max(), cv::saturate_cast<ito::int16>(intMax)));
-            result = editor;
-        }
-        break;
-    case ito::tUInt16:
-        {
-            QSpinBox *editor = new QSpinBox(parent);
-            editor->setMinimum(std::max(std::numeric_limits<ito::uint16>::min(), cv::saturate_cast<ito::uint16>(intMin)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::uint16>::max(), cv::saturate_cast<ito::uint16>(intMax)));
-            result = editor;
-        }
-        break;
-    case ito::tInt32:
-        {
-            QSpinBox *editor = new QSpinBox(parent);
-            editor->setMinimum(std::max(std::numeric_limits<ito::int32>::min(), cv::saturate_cast<ito::int32>(intMin)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::int32>::max(), cv::saturate_cast<ito::int32>(intMax)));
-            result = editor;
-        }
-        break;
-    case ito::tUInt32:
-        {
-            QSpinBox *editor = new QSpinBox(parent);
-            editor->setMinimum(std::max(std::numeric_limits<ito::uint32>::min(), cv::saturate_cast<ito::uint32>(intMin)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::uint32>::max(), cv::saturate_cast<ito::uint32>(intMax)));
-            result = editor;
-        }
-        break;
-    case ito::tFloat32:
-        {
-            QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
-            editor->setDecimals(m_decimals);
-            editor->setMinimum(std::max(-std::numeric_limits<ito::float32>::max(), cv::saturate_cast<ito::float32>(m_min)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::float32>::max(), cv::saturate_cast<ito::float32>(m_max)));
-            result = editor;
-        }
-        break;
-    case ito::tFloat64:
-        {
-            QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
-            editor->setDecimals(m_decimals);
-            editor->setMinimum(std::max(-std::numeric_limits<ito::float64>::max(), cv::saturate_cast<ito::float64>(m_min)));
-            editor->setMaximum(std::min(std::numeric_limits<ito::float64>::max(), cv::saturate_cast<ito::float64>(m_max)));
-            result = editor;
-        }
-        break;
-    case ito::tComplex64:
-        {
-            
-        }
-        break;
-    case ito::tComplex128:
-        {
-            
-        }
-        break;
-    }
-
-    return result;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
-{
-    const DataObjectModel *model = qobject_cast<const DataObjectModel*>(index.model());
-    int type = model->getType();
-
-//    QWidget *result = NULL;
-
-    switch(type)
-    {
-    case ito::tInt8:
-    case ito::tInt16:
-    case ito::tInt32:
-        {
-            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-            int value = model->data(index, Qt::EditRole).toInt();
-            spinBox->setValue(value);
-        }
-        break;
-
-    case ito::tUInt8:
-    case ito::tUInt16:
-    case ito::tUInt32:
-        {
-            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-            uint value = model->data(index, Qt::EditRole).toUInt();
-            spinBox->setValue(value);
-        }
-        break;
-
-    case ito::tFloat32:
-    case ito::tFloat64:
-        {
-            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
-            double value = model->data(index, Qt::EditRole).toDouble();
-            spinBox->setValue(value);
-        }
-        break;
-    case ito::tComplex64:
-        {
-            
-        }
-        break;
-    case ito::tComplex128:
-        {
-            
-        }
-        break;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
-{
-    const DataObjectModel *model2 = qobject_cast<DataObjectModel*>(model);
-    int type = model2->getType();
-
-//    QWidget *result = NULL;
-
-    switch(type)
-    {
-    case ito::tInt8:
-    case ito::tInt16:
-    case ito::tInt32:
-        {
-            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-            int value = model->setData(index, spinBox->value(), Qt::EditRole); 
-            spinBox->setValue(value);
-        }
-        break;
-
-    case ito::tUInt8:
-    case ito::tUInt16:
-    case ito::tUInt32:
-        {
-            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-            int value = model->setData(index, spinBox->value(), Qt::EditRole); 
-            spinBox->setValue(value);
-        }
-        break;
-
-    case ito::tFloat32:
-    case ito::tFloat64:
-        {
-            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
-            int value = model->setData(index, spinBox->value(), Qt::EditRole); 
-            spinBox->setValue(value);
-        }
-        break;
-    case ito::tComplex64:
-        {
-            
-        }
-        break;
-    case ito::tComplex128:
-        {
-            
-        }
-        break;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void DataObjectDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    editor->setGeometry(option.rect);
-}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -638,6 +52,14 @@ DataObjectTable::DataObjectTable(QWidget *parent /*= 0*/)
     connect(this, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(_doubleClicked(QModelIndex)));
     connect(this, SIGNAL(entered(QModelIndex)), this, SLOT(_entered(QModelIndex)));
     connect(this, SIGNAL(pressed(QModelIndex)), this, SLOT(_pressed(QModelIndex)));
+
+#if QT_VERSION < 0x050000
+    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+#else
+    horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#endif
+
+    setContextMenuPolicy(Qt::DefaultContextMenu);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -698,13 +120,65 @@ void DataObjectTable::setMax(double value)
 //----------------------------------------------------------------------------------------------------------------------------------
 int DataObjectTable::getDecimals() const
 {
-    return m_pDelegate->m_decimals;
+    return m_pModel->getDecimals();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectTable::setDecimals(int value)
 {
-    m_pDelegate->m_decimals = value;
+    m_pModel->setDecimals(value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int DataObjectTable::getEditorDecimals() const
+{
+    return m_pDelegate->m_editorDecimals;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::setEditorDecimals(int value)
+{
+    m_pDelegate->m_editorDecimals = value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QHeaderView::ResizeMode DataObjectTable::getHorizontalResizeMode() const
+{
+#if QT_VERSION < 0x050000
+    return horizontalHeader()->resizeMode(0);
+#else
+    return horizontalHeader()->sectionResizeMode(0);
+#endif
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::setHorizontalResizeMode(QHeaderView::ResizeMode mode)
+{
+#if QT_VERSION < 0x050000
+    horizontalHeader()->setResizeMode(mode);
+#else
+    return horizontalHeader()->setSectionResizeMode(mode);
+#endif
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QHeaderView::ResizeMode DataObjectTable::getVerticalResizeMode() const
+{
+#if QT_VERSION < 0x050000
+    return verticalHeader()->resizeMode(0);
+#else
+    return verticalHeader()->sectionResizeMode(0);
+#endif
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::setVerticalResizeMode(QHeaderView::ResizeMode mode)
+{
+#if QT_VERSION < 0x050000
+    verticalHeader()->setResizeMode(mode);
+#else
+    return verticalHeader()->setSectionResizeMode(mode);
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -715,6 +189,12 @@ void DataObjectTable::setHorizontalLabels(QStringList value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QStringList DataObjectTable::getHorizontalLabels() const 
+{ 
+    return m_pModel->getHorizontalHeaderLabels(); 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectTable::setVerticalLabels(QStringList value)
 {
     m_pModel->setHeaderLabels(Qt::Vertical, value);
@@ -722,15 +202,58 @@ void DataObjectTable::setVerticalLabels(QStringList value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QStringList DataObjectTable::getVerticalLabels() const 
+{ 
+    return m_pModel->getVerticalHeaderLabels(); 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::setSuffixes(QStringList value)
+{
+    m_pDelegate->m_suffixes = value;
+    m_pModel->setSuffixes(value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QStringList DataObjectTable::getSuffixes() const 
+{ 
+    return m_pModel->getSuffixes(); 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectTable::setDefaultCols(int value)
 {
-    m_pModel->setDefaultGrid(m_pModel->m_defaultRows, value);
+    m_pModel->setDefaultGrid(m_pModel->getDefaultRows(), value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int DataObjectTable::getDefaultCols() const 
+{ 
+    return m_pModel->getDefaultCols(); 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjectTable::setDefaultRows(int value)
 {
-    m_pModel->setDefaultGrid(value, m_pModel->m_defaultCols);
+    m_pModel->setDefaultGrid(value, m_pModel->getDefaultCols());
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int DataObjectTable::getDefaultRows() const 
+{ 
+    return m_pModel->getDefaultRows(); 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+Qt::Alignment DataObjectTable::getAlignment() const
+{
+    return m_pModel->getAlignment();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::setAlignment(Qt::Alignment alignment)
+{
+    m_pModel->setAlignment(alignment);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -744,8 +267,8 @@ QSize DataObjectTable::sizeHint() const
 
     int h = 25;
     int w = 15;
-    h += m_pModel->m_defaultRows * vHeader->defaultSectionSize();
-    w += m_pModel->m_defaultCols * hHeader->defaultSectionSize();
+    h += m_pModel->getDefaultRows() * vHeader->defaultSectionSize();
+    w += m_pModel->getDefaultCols() * hHeader->defaultSectionSize();
 
     if (vHeader->isVisible())
     {
@@ -768,3 +291,129 @@ QSize DataObjectTable::sizeHint() const
     return QSize(w,h);
 }
 
+bool sortByRowAndColumn(const QModelIndex &idx1, const QModelIndex &idx2)
+{
+    if (idx1.row() == idx2.row())
+    {
+        return idx1.column() < idx2.column();
+    }
+
+    return idx1.row() < idx2.row();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::keyPressEvent(QKeyEvent *e)
+{
+    if (e->matches(QKeySequence::Copy))
+    {
+        copySelectionToClipboard();
+        e->accept();
+    }
+    else
+    {
+        QTableView::keyPressEvent(e);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu contextMenu(this);
+    contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), "copy selection", this, SLOT(copySelectionToClipboard()));
+    contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), "copy all", this, SLOT(copyAllToClipboard()));
+    contextMenu.exec(event->globalPos());
+    
+    event->accept();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::copySelectionToClipboard()
+{
+    QStringList items;
+    int currentRow = 0;
+    QModelIndexList selected = selectedIndexes();
+    qSort(selected.begin(), selected.end(), sortByRowAndColumn);
+
+    if (selected.size() > 0)
+    {
+        int firstRow = selected[0].row();
+        int lastRow = selected[selected.size()-1].row();
+        int firstCol = INT_MAX;
+        int lastCol = 0;
+        foreach (const QModelIndex &idx, selected)
+        {
+            firstCol = std::min(firstCol, idx.column());
+            lastCol = std::max(lastCol, idx.column());
+        }
+        int cols = 1 + lastCol - firstCol;
+        int rows = 1 + lastRow - firstRow;
+
+        items.reserve(rows * cols);
+        int currentIdx = 0;
+        int lastIdx = 0;
+
+        foreach (const QModelIndex &idx, selected)
+        {
+            currentIdx = cols * (idx.row() - firstRow) + (idx.column() - firstCol);
+            while (lastIdx < currentIdx)
+            {
+                items.append("");
+                lastIdx++;
+            }
+
+            items.append(m_pModel->data(idx, DataObjectModel::displayRoleWithoutSuffix).toString());
+            lastIdx++;
+        }
+
+        while (items.size() < rows)
+        {
+            items.append("");
+        }
+
+        QStringList final;
+        for (int i = 0; i < rows; ++i)
+        {
+            final.append( QStringList(items.mid(i*cols,cols)).join(";") );
+        }
+
+        QApplication::clipboard()->setText(final.join("\n"));
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::copyAllToClipboard()
+{
+    int rows = m_pModel->rowCount();
+    int cols = m_pModel->columnCount();
+    
+    QStringList colHeaders;
+    colHeaders << ""; //for the top left corner
+    for (int i = 0; i < cols; ++i)
+    {
+        colHeaders << QString("\"%1\"").arg(m_pModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
+    }
+
+    QStringList rowHeaders;
+    for (int i = 0; i < rows; ++i)
+    {
+        rowHeaders << QString("\"%1\"").arg(m_pModel->headerData(i, Qt::Vertical, Qt::DisplayRole).toString());
+    }
+
+    QStringList final;
+    final << colHeaders.join(";");
+
+    for (int r = 0; r < rows; ++r)
+    {
+        QStringList rowData;
+        rowData << rowHeaders[r];
+
+        for (int c = 0; c < cols; ++c)
+        {
+            rowData << m_pModel->data(m_pModel->index(r,c), DataObjectModel::preciseDisplayRoleWithoutSuffix).toString();
+        }
+        final << rowData.join(";");
+    }
+
+    QApplication::clipboard()->setText(final.join("\n"));
+}

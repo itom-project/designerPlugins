@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -24,15 +24,19 @@
 
 //-------------------------------------------------------------------------------------------
 ItemPointCloudNormal::ItemPointCloudNormal(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
-    : ItemPointCloud(visualizer, name, treeItem)
+    : Item(name, Item::rttiPointCloudNormal, treeItem),
+    m_visualizer(visualizer)
 {
+    m_pointSize = 2;
+    m_lineWidth = 1;
+    m_color = QColor("white");
     m_type = "point cloud normal";
 }
 
 //-------------------------------------------------------------------------------------------
 ItemPointCloudNormal::~ItemPointCloudNormal()
 {
-    //cloud is removed from stage by base class itemPointCloud
+    m_visualizer->removePointCloud( m_name.toStdString() );
 }
 
 //-------------------------------------------------------------------------------------------
@@ -103,6 +107,41 @@ void ItemPointCloudNormal::setScale(float value)
     {
         m_scale = value;
     }
+}
+
+//-------------------------------------------------------------------------------------------
+void ItemPointCloudNormal::setVisible(bool value)
+{
+    m_visible = value;
+
+    double val = value ? 1.0 : 0.0;
+    m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_OPACITY, val, m_name.toStdString());
+    emit updateCanvasRequest();
+
+    Item::setVisible(value);
+}
+
+//-------------------------------------------------------------------------------------------
+void ItemPointCloudNormal::setPointSize(int value)
+{
+    m_pointSize = value;
+    m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, value, m_name.toStdString() );
+    emit updateCanvasRequest();
+}
+
+//-------------------------------------------------------------------------------------------
+void ItemPointCloudNormal::setLineWidth(int value)
+{
+    m_lineWidth = value;
+    m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, value, m_name.toStdString() );
+    emit updateCanvasRequest();
+}
+
+void ItemPointCloudNormal::setColor(QColor value)
+{
+    m_color = value;
+    m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_COLOR, value.red()/255.0, value.green()/255.0, value.blue()/255.0, m_name.toStdString() );
+    emit updateCanvasRequest();
 }
 
 //-------------------------------------------------------------------------------------

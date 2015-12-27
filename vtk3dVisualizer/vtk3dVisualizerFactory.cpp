@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -32,9 +32,10 @@
 Vtk3DVisualizerFactory::Vtk3DVisualizerFactory(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
-    m_plotDataFormats = 0; //ito::Format_Float32;
-    m_plotDataTypes = 0; //ito::DataObjPlane;
-    m_plotFeatures = 0; //ito::Static | ito::Cartesian;
+    m_plotDataFormats = ito::Format_Float32 | ito::Format_RGB32 | ito::Format_ARGB32;
+    m_plotDataTypes = ito::PointCloud | ito::PolygonMesh;
+    m_plotFeatures = ito::Static | ito::Plot3D | ito::PlotISO | ito::OpenGl | ito::Cartesian;
+
 
     m_description = QObject::tr("3D visualization of point clouds, polygon meshes and geometries using PCL and VTK.");
     m_detaildescription = QObject::tr("You can display any point cloud (with and without normals), polygon meshes or geometries, group them in a tree structure, change their display properties and connect to click events.");

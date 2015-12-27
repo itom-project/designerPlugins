@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of itom.
 
@@ -39,10 +39,6 @@
 #include <qqueue.h>
 #include <qmenu.h>
 
-#include <qwt_plot_rescaler.h>
-#include <qwt_plot.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_panner.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_grid.h>
@@ -53,15 +49,14 @@
 
 #include "../sharedFiles/userInteractionPlotPicker.h"
 #include "../sharedFiles/drawItem.h"
-#include "../sharedFiles/itomPlotMagnifier.h"
-#include "../sharedFiles/itomPlotZoomer.h"
+#include "../sharedFiles/itomQwtPlot.h"
 #include "itomPlotMarker.h"
 
 class Itom1DQwtPlot;
 class QwtLegend;
 struct InternalData;
 
-class Plot1DWidget : public QwtPlot
+class Plot1DWidget : public ItomQwtPlot
 {
     Q_OBJECT
     public:
@@ -72,13 +67,7 @@ class Plot1DWidget : public QwtPlot
             statePanner = 1, 
             stateZoomer = 2, 
             statePicker = 3,             
-            tPoint = ito::tGeoPoint, 
-            tLine = ito::tGeoLine, 
-            tRect = ito::tGeoRectangle, 
-//            tSquare = ito::tGeoSquare,
-            tEllipse = ito::tGeoEllipse, 
-//            tCircle = ito::tGeoCircle, 
-            tPolygon = ito::tGeoPolygon
+            stateDrawShape = 4
         };
 
         Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * parent = 0);
@@ -86,7 +75,6 @@ class Plot1DWidget : public QwtPlot
 
         ito::RetVal init();
 
-        bool m_showContextMenu;
         void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>() );
 
         ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);
@@ -106,7 +94,7 @@ class Plot1DWidget : public QwtPlot
         ito::RetVal setPicker(const QVector<float> &physCords);
 
         void setLegendPosition(LegendPosition position, bool visible);
-        void setLegendTitles(const QStringList &legends);
+        void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
@@ -114,8 +102,6 @@ class Plot1DWidget : public QwtPlot
         QSharedPointer<ito::DataObject> getDisplayed();
 
         void setSymbolStyle(const QwtSymbol::Style style, int size);
-
-        void setVisible(bool visible);
 
         friend class Itom1DQwtPlot;
         friend class DrawItem;      
@@ -125,18 +111,15 @@ class Plot1DWidget : public QwtPlot
         void mousePressEvent ( QMouseEvent * event );
         void mouseMoveEvent ( QMouseEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
-        void contextMenuEvent(QContextMenuEvent * event);
 
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
         void synchronizeCurrentScaleValues();
         void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
 
-        void configRescaler();
-
         ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
 
-        void setState( tState state);
+        void setState(tState state, ito::PrimitiveContainer::tPrimitive shape = ito::PrimitiveContainer::tNoType);
         void updateColors(void);
         void updatePickerStyle(void);
 
@@ -149,8 +132,9 @@ class Plot1DWidget : public QwtPlot
         void setDefaultValueScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine);
         void setDefaultAxisScaleEngine(const Itom1DQwt::ScaleEngine &scaleEngine);
 
+        void home();
+
     private:
-        QwtPlotRescaler* m_pRescaler;
 
         struct Picker
         {
@@ -167,10 +151,7 @@ class Plot1DWidget : public QwtPlot
         int getPickerCount() const {return m_pickers.size();}
         QSharedPointer< ito::DataObject > getPlotPicker() const;
 
-        void home();
-
-
-        QMenu *m_contextMenu;
+        
 
         QList<QwtPlotCurve*> m_plotCurveItems;
 
@@ -206,9 +187,6 @@ class Plot1DWidget : public QwtPlot
         QStringList m_colorList;
 
         QWidget *m_pParent;
-        ItomPlotZoomer *m_pZoomer;
-        QwtPlotPanner *m_pPanner;
-        ItomPlotMagnifier *m_pMagnifier;
 
         ValuePicker1D *m_pValuePicker;
 
@@ -236,12 +214,9 @@ class Plot1DWidget : public QwtPlot
         Itom1DQwt::ScaleEngine m_valueScale;
         Itom1DQwt::ScaleEngine m_axisScale;
 
-        bool m_firstTimeVisible; //true if this plot becomes visible for the first time
-
     signals:
 
-        void statusBarClear();
-        void statusBarMessage(const QString &message, int timeout = 0);
+        
 
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
@@ -264,7 +239,7 @@ struct InternalData
     InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
         m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
         m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0), m_elementsToPick(0), m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
-        m_enablePlotting(true), m_keepAspect(false), m_lineSymboleSize(1)
+        m_enablePlotting(true), m_lineSymboleSize(1), m_stateShapePrimitive(ito::PrimitiveContainer::tNoType)
     {
         m_pDrawItems.clear();
         m_state = Plot1DWidget::stateIdle;
@@ -301,8 +276,8 @@ struct InternalData
     }
     ito::tDataType m_dataType;
      
-//    Plot1DWidget::tState m_state;
-    int m_state;
+    Plot1DWidget::tState m_state; //
+    ito::PrimitiveContainer::tPrimitive m_stateShapePrimitive; /*!< geometric shape that is active is m_state is stateShape */
     int m_pickerLimit;
 
     QString m_title;
@@ -327,7 +302,6 @@ struct InternalData
 
     int m_elementsToPick;
     bool m_enablePlotting;
-    bool m_keepAspect;
 
     bool m_pickerLabelVisible;
     Itom1DQwt::tPlotPickerType m_pickerType;

@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut für Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
+   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -42,12 +42,14 @@ class Item : public QObject
     Q_PROPERTY(bool visible READ visible WRITE setVisible DESIGNABLE true USER true);
 
 public:
+    enum rttiItem { rttiRoot, rttiCanvas, rttiGeometry, rttiMesh, rttiPointCloud, rttiPointCloudNormal };
     
-    Item(const QString &name, QTreeWidgetItem *treeItem);
+    Item(const QString &name, rttiItem rtti, QTreeWidgetItem *treeItem);
     virtual ~Item();
 
     inline QString name() const { return m_name; };
     inline QString type() const { return m_type; };
+    inline rttiItem rtti() const { return m_rtti; };
     void setTreeItem(QTreeWidgetItem *treeItem)
     {
         m_treeItem = treeItem;
@@ -67,6 +69,7 @@ signals:
 protected:
     QString m_name;
     QString m_type;
+    rttiItem m_rtti;
     bool m_visible;
 
     QTreeWidgetItem* m_treeItem;
