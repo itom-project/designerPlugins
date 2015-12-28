@@ -29,9 +29,8 @@
 #include "qnumeric.h"
 #include "dialog1DScale.h"
 
-#include "plotLegends/infoWidgetMarkers.h"
+
 #include "plotLegends/infoWidgetPickers.h"
-#include "plotLegends/infoWidgetShapes.h"
 #include "plotLegends/infoWidgetDObject.h"
 
 #include "itomLogLogScaleEngine.h"
@@ -1449,7 +1448,10 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                     it->item->detach();
                     delete it->item;
                     it = m_pickers.erase(it);
-					((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+					if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+					{
+						((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+					}
                 }
                 else
                 {
@@ -2066,7 +2068,10 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             delete m.item;
         }
         m_pickers.clear();
-		((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		{
+			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+		}
     }
 
     QColor colors[3] = { Qt::red, Qt::darkGreen, Qt::darkGray };
@@ -2103,12 +2108,18 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     {
         coords = QString("[%1; %2]\n[%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
         offsets = QString(" width: %1\n height: %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
-		((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
+		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		{
+			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
+		}
 	}
     else if (points.size() == 1)
     {
         coords = QString("[%1; %2]\n      ").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4);
-		((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
+		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		{
+			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
+		}
     }
 
     setPickerText(coords,offsets);
@@ -2287,6 +2298,10 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
             delete m.item;
         }
         m_pickers.clear();
+		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		{
+			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+		}
     }
     else if (id < 0 || id >= m_pickers.size())
     {
@@ -2297,6 +2312,10 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
         m_pickers[id].item->detach();
         delete m_pickers[id].item;
         m_pickers.removeAt(id);
+		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		{
+			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePicker(id);
+		}
     }
 
     updatePickerPosition(false, false);

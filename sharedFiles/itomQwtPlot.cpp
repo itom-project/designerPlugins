@@ -46,6 +46,9 @@
 #include "multiPointPickerMachine.h"
 #include "dialogExportProperties.h"
 
+#include "plotLegends/infoWidgetShapes.h"
+#include "plotLegends/infoWidgetMarkers.h"
+
 #include "common/apiFunctionsGraphInc.h"
 #include "common/retVal.h"
 
@@ -877,6 +880,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                 emit p->userInteractionDone(ito::Shape::MultiPointPick, aborted, shapes);
                 emit p->geometricShapeFinished(ito::Shape::MultiPointPick, aborted);
+				if (((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
+				{
+					((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarkers(shapes);
+				}
             }
 
             m_pMultiPointPicker->setEnabled(false);
@@ -950,6 +957,11 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Point, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Point, aborted);
+					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					{
+						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+					}
+					
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1024,6 +1036,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Line, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Line, aborted);
+					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					{
+						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+					}
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1097,6 +1113,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Rectangle, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Rectangle, aborted);
+					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					{
+						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+					}
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1170,6 +1190,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Ellipse, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Ellipse, aborted);
+					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					{
+						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+					}
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1412,7 +1436,13 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 void ItomQwtPlot::clearAllGeometricShapes()
 {
     bool thingsToDo = m_pShapes.size() > 0;
-
+	if (thingsToDo)
+	{
+		if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+		{
+			((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->removeShapes();
+		}
+	}
     //delete all geometric shapes and marker sets
     QHashIterator<int, DrawItem *> i(m_pShapes);
     while (i.hasNext())
@@ -1565,6 +1595,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                 {
                     
                 }
+				
             }
 
             replot();
@@ -1572,11 +1603,14 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
-
-    if (retVal.hasErrorMessage())
+	
+	if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+	{
+		((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(geometricShapes);
+	}
+	if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
-        
     }
     
     if (p) emit  p->geometricShapeFinished(0, retVal.containsError());
