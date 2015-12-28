@@ -35,8 +35,6 @@
 #include <QCoreApplication>
 #include <qtransform.h>
 
-#define GEO_PI 3.14159265358979323846
-
 double PlotTreeWidget::quietNaN = std::numeric_limits<double>::quiet_NaN();
 
 //----------------------------------------------------------------------------------------------------------------------------------

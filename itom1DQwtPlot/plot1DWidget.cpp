@@ -29,6 +29,8 @@
 #include "qnumeric.h"
 #include "dialog1DScale.h"
 
+#include "MarkerLegend/markerLegendWidget.h"
+
 #include "itomLogLogScaleEngine.h"
 
 #include "../sharedFiles/itomPlotZoomer.h"
@@ -1444,6 +1446,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                     it->item->detach();
                     delete it->item;
                     it = m_pickers.erase(it);
+					((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->removePickers();
                 }
                 else
                 {
@@ -2060,12 +2063,15 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             delete m.item;
         }
         m_pickers.clear();
+		((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->removePickers();
     }
 
     QColor colors[3] = { Qt::red, Qt::darkGreen, Qt::darkGray };
     int cur = 0;
     Picker *m;
     QVector<QPointF> points;
+
+	QVector< int > idcs;
 
     for (int i = 0 ; i < m_pickers.size() ; i++)
     {
@@ -2085,7 +2091,8 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
         }
 
         if (cur < 2) cur++;
-        points << QPointF(m_pickers[i].item->xValue(), m_pickers[i].item->yValue());       
+        points << QPointF(m_pickers[i].item->xValue(), m_pickers[i].item->yValue());   
+		idcs << i;
     }
 
     QString coords, offsets;
@@ -2093,10 +2100,12 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     {
         coords = QString("[%1; %2]\n[%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
         offsets = QString(" width: %1\n height: %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
-    }
+		((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->updatePickers(idcs, points);
+	}
     else if (points.size() == 1)
     {
         coords = QString("[%1; %2]\n      ").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4);
+		((MarkerLegendWidget*)((Itom1DQwtPlot*)(this->parent()))->legendDock())->updatePickers(idcs, points);
     }
 
     setPickerText(coords,offsets);
