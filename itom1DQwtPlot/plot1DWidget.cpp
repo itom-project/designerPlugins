@@ -29,7 +29,6 @@
 #include "qnumeric.h"
 #include "dialog1DScale.h"
 
-
 #include "plotLegends/infoWidgetPickers.h"
 #include "plotLegends/infoWidgetDObject.h"
 
@@ -1371,6 +1370,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
 
         m_hash = hash;
+
+		if (((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget())
+		{
+			//if (((DObjectInfoWidget*)(((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget()))->isVisible())
+			{
+				((DObjectInfoWidget*)(((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget()))->updateInfoHeader(
+					QString("1D Object Slice"),
+					dataObj->getType(),
+					dataObj->getDims(),
+					dataObj->getSize());
+			}
+		}
     }
     else
     {

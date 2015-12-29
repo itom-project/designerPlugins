@@ -1558,11 +1558,15 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
         DrawItem *newItem = NULL;
         // The definition do not correspond to the definetion of primitiv elements
 
-        foreach(const ito::Shape &shape, geometricShapes)
+        foreach(ito::Shape shape, geometricShapes)
         {
             if (m_pShapes.contains(shape.index()))
             {
                 m_pShapes[shape.index()]->setShape(shape, m_inverseColor0, m_inverseColor1);
+				if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+				{
+					((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
+				}
             }
             else
             {
@@ -1583,6 +1587,11 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                         newItem->show();
                         newItem->attach(this);
                         m_pShapes.insert(newItem->getIndex(), newItem);
+						shape.setIndex(newItem->getIndex());
+						if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+						{
+							((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
+						}
                     }
                     break;
 
@@ -1604,10 +1613,6 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
 	
-	if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
-	{
-		((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(geometricShapes);
-	}
 	if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
@@ -1882,6 +1887,17 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
     ito::RetVal retval;
     int limits[] = { 2, 2, 0, std::numeric_limits<int>::max() };
 
+	QString tmpID = id;
+	if (tmpID == "")
+	{
+		tmpID = "undef";
+		int cnt = 0;
+		while (m_plotMarkers.contains(tmpID))
+		{
+			tmpID = QString("undef%1").arg(cnt);
+			cnt++;
+		}
+	}
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         emit statusBarMessage(tr("Could not plot marker, api is missing"), 4000);
@@ -1953,20 +1969,32 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         const ito::float32 *xRow = mat->ptr<const ito::float32>(0);
         const ito::float32 *yRow = mat->ptr<const ito::float32>(1);
 
+		QPolygonF markerPolygon;
+		markerPolygon.clear();
+
         for (int i = 0; i < nrOfMarkers; ++i)
         {
             marker = new QwtPlotMarker();
             marker->setSymbol(new QwtSymbol(symStyle, symBrush, symPen, symSize));
             marker->setValue(xRow[i], yRow[i]);
             marker->attach(this);
+			
+			markerPolygon.append(QPointF(xRow[i], yRow[i]));
+
             if (m_markerLabelVisible)
             {
-                QwtText label(QString(" %1").arg(id == "" ? "unknown" : id));
+                QwtText label(QString(" %1").arg(tmpID));
                 marker->setLabel(label);
             }
 
-            m_plotMarkers.insert(id == "" ? "unknown" : id, QPair<int, QwtPlotMarker*>(plane, marker));
+			m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
         }
+
+		if (((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
+		{
+			ito::Shape shapes = ito::Shape::fromMultipoint(markerPolygon, m_plotMarkers.size(), tmpID);
+			((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarker(shapes);
+		}
 
         replot();
     }
