@@ -827,6 +827,10 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
                 ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
                 if (p)
                 {
+					if (p->ShapesWidget())
+					{
+						((ShapesInfoWidget*)p->ShapesWidget())->updateShape(it.value()->getShape());
+					}
                     emit p->geometricShapeChanged(it.value()->getIndex(), it.value()->getShape());
                 }
             }
