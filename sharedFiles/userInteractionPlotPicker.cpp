@@ -26,7 +26,7 @@
 #include <qwt_painter.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-UserInteractionPlotPicker::UserInteractionPlotPicker(QWidget *canvas) : QwtPlotPicker(canvas) 
+UserInteractionPlotPicker::UserInteractionPlotPicker(QWidget *canvas) : QwtPlotPicker(canvas), m_keepAspectRatio(false)
 { 
     init(); 
 }
@@ -37,7 +37,7 @@ UserInteractionPlotPicker::~UserInteractionPlotPicker()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis, QWidget *widget) : QwtPlotPicker(xAxis,yAxis,widget) 
+UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis, QWidget *widget) : QwtPlotPicker(xAxis,yAxis,widget), m_keepAspectRatio(false)
 { 
     init(); 
 }
@@ -45,7 +45,8 @@ UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis, QWidg
 //----------------------------------------------------------------------------------------------------------------------------------
 UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis,
     RubberBand rubberBand, DisplayMode trackerMode, QWidget *widget) :
-    QwtPlotPicker(xAxis,yAxis,rubberBand,trackerMode,widget) 
+    QwtPlotPicker(xAxis,yAxis,rubberBand,trackerMode,widget),
+    m_keepAspectRatio(false)
 { 
     init(); 
 }
@@ -211,13 +212,38 @@ void UserInteractionPlotPicker::drawRubberBand(QPainter *painter) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::selectionAppended(const QPointF &pos)
 {
-    m_selection.append(pos);
+    if (!m_keepAspectRatio || m_selection.size() != 1)
+    {
+        m_selection.append(pos);
+    }
+    else
+    {
+        //the second point can be the end point of a square or circle since the aspect ratio is fixed. Correct this point!
+        QPointF start = m_selection[0];
+        QPointF diff = pos - start;
+        const qreal size = 0.5 * (qAbs(diff.x()) + qAbs(diff.y()));
+        QPointF dest = start;
+        dest.rx() += size * (diff.x() >= 0 ? 1.0 : -1.0);
+        dest.ry() += size * (diff.y() >= 0 ? 1.0 : -1.0);
+        m_selection.append(dest);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void UserInteractionPlotPicker::selectionMoved(const QPointF &pos)
 {
-    if (m_selection.size() > 0)
+    if (m_selection.size() == 2 && m_keepAspectRatio)
+    {
+        //the second point can be the end point of a square or circle since the aspect ratio is fixed. Correct this point!
+        QPointF start = m_selection[0];
+        QPointF diff = pos - start;
+        const qreal size = 0.5 * (qAbs(diff.x()) + qAbs(diff.y()));
+        QPointF dest = start;
+        dest.rx() += size * (diff.x() >= 0 ? 1.0 : -1.0);
+        dest.ry() += size * (diff.y() >= 0 ? 1.0 : -1.0);
+        m_selection.last() = dest;
+    }
+    else if (m_selection.size() > 0)
     {
         m_selection.last() = pos;
     }
@@ -229,5 +255,37 @@ void UserInteractionPlotPicker::selectionActivated(bool on)
     if (on)
     {
         m_selection.clear();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QPolygon UserInteractionPlotPicker::adjustedPoints(const QPolygon &points) const
+{
+    if (!m_keepAspectRatio)
+    {
+        return points;
+    }
+    else
+    {
+        if ( points.size() == 2 )
+        {
+            QPointF start = invTransform(points[0]);
+            QPointF end = invTransform(points[1]);
+            QPolygon adjusted;
+            QPointF diff = end - start;
+            const qreal size = 0.5 * (qAbs(diff.x()) + qAbs(diff.y()));
+            QPointF dest = start;
+            dest.rx() += size * (diff.x() >= 0 ? 1.0 : -1.0);
+            dest.ry() += size * (diff.y() >= 0 ? 1.0 : -1.0);
+
+            adjusted += points[0];
+            adjusted += transform(dest);
+            return adjusted;
+        }
+        else
+        {
+            return points;
+        }
+        
     }
 }

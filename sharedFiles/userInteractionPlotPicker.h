@@ -46,7 +46,12 @@ public:
 
     QPolygonF selectionInPlotCoordinates() const { return m_selection; }
 
+    bool keepAspectRatio() const { return m_keepAspectRatio; }
+    void setKeepAspectRatio(bool keep) {m_keepAspectRatio = keep; }
+
 protected:
+    virtual QPolygon adjustedPoints(const QPolygon &points) const;
+
     void reset();
     void init();
 
@@ -57,6 +62,8 @@ private:
     QBrush m_rectFillBrush;
 
     QPolygonF m_selection;
+
+    bool m_keepAspectRatio;
 
 private slots:
     void selectionActivated(bool on);

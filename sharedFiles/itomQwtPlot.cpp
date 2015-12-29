@@ -1256,6 +1256,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         {
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
+            m_pMultiPointPicker->setKeepAspectRatio(false);
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
             if (m)
             {
@@ -1296,6 +1297,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         {
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
+            m_pMultiPointPicker->setKeepAspectRatio(false);
             MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
 
             if (m)
@@ -1326,19 +1328,14 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
     {
         if (start)
         {
-            m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
+            m_pMultiPointPicker->setStateMachine(new QwtPickerDragLineMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::PolygonRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
-            MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+            m_pMultiPointPicker->setKeepAspectRatio(false);
+            m_pMultiPointPicker->setEnabled(true);
 
-            if (m)
-            {
-                m->setMaxNrItems(2);
-                m_pMultiPointPicker->setEnabled(true);
-
-                if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_elementsToPick));
-                else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
-            }
+            if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_elementsToPick));
+            else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
         }
         else //start == false
         {
@@ -1359,9 +1356,10 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
     {
         if (start)
         {
-            m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
+            m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+            m_pMultiPointPicker->setKeepAspectRatio(false);
             m_pMultiPointPicker->setEnabled(true);
 
             if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
@@ -1389,9 +1387,10 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         if (start)
         {
 
-            m_pMultiPointPicker->setStateMachine(new QwtPickerClickRectMachine());
+            m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+            m_pMultiPointPicker->setKeepAspectRatio(false);
             m_pMultiPointPicker->setEnabled(true);
 
             if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
