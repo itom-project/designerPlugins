@@ -28,6 +28,8 @@
 
 #include "../sharedFiles/dialogExportProperties.h"
 
+#include "plotLegends/infoWidgetPickers.h"
+
 #include <qfiledialog.h>
 #include <qimagewriter.h>
 #include <qinputdialog.h>
@@ -750,6 +752,8 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         return ito::RetVal(ito::retError, 0, tr("Could not spawn lineCut due to missing API-handle").toLatin1().data());
     }
 
+	int infoType = ito::Shape::Line;
+
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
     ito::uint32 newUniqueID = uniqueID;
@@ -765,7 +769,8 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     }
 
     if (zStack)
-    {
+    {	
+		infoType = ito::Shape::Point;
         m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
         if (m_zSliceType & ito::AbstractFigure::tUninitilizedExtern)
         {
@@ -775,8 +780,8 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         }
     }
     else
-    {
-        if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
+    {	
+		if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
         {
             needChannelUpdate = true;
             m_lineCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
@@ -903,14 +908,27 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 {
+
+
     QHash<QObject*,ito::uint32>::iterator it = m_childFigures.find(obj);
 
     if (it != m_childFigures.end())
     {
         m_pContent->childFigureDestroyed(obj, m_childFigures[obj]);
+
+		if (PickerWidget())
+		{
+			((PickerInfoWidget*)PickerWidget())->removeChildPlot(m_childFigures[obj]);
+		}
+	
     }
-    else
-    {
+	else
+	{
+		if (PickerWidget())
+		{
+			((PickerInfoWidget*)PickerWidget())->removeChildPlots();
+		}
+	
         m_pContent->childFigureDestroyed(obj, 0);
     }
 

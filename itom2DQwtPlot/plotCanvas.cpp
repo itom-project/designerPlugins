@@ -33,8 +33,8 @@
 #include "itomPlotZoomer.h"
 #include "dialog2DScale.h"
 
-#include "plotLegends/infoWidgetPickers.h"
 #include "plotLegends/infoWidgetDObject.h"
+#include "plotLegends/infoWidgetPickers.h"
 
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
@@ -1144,11 +1144,9 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             QVector<QPointF> pts;
             pts.append(markerPosScaleCoords);
             p->displayCut(pts, m_zstackCutUID,true);
-
-			if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
 			{
-				QVector4D vec(markerPosScaleCoords);
-				((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->updateChildPlot(0, ito::Shape::Point, vec);
+				((PickerInfoWidget*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
 			}
 
             replot();
@@ -1224,11 +1222,12 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
             p->displayCut(pts, m_lineCutUID, false);
-            
-			if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
 			{
-				QVector4D vec(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-				((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->updateChildPlot(0, ito::Shape::Line, vec);
+				QVector4D vec;
+				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+				((PickerInfoWidget*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
 			}
 
             replot();
@@ -1720,11 +1719,11 @@ void PlotCanvas::zStackCutTrackerAppended(const QPoint &pt)
             setCoordinates(pts, true);
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
 
-			if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
 			{
-				QVector4D vec(pts[0]);
-				((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->updateChildPlot(0, ito::Shape::Point, vec);
+				((PickerInfoWidget*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pt));
 			}
+
             replot();
         }   
     }
@@ -1760,13 +1759,11 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
             pts.append(ptScale);
             setCoordinates(pts, true);
 
-			if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
-			{
-				QVector4D vec(pts[0]);
-				((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->updateChildPlot(0, ito::Shape::Point, vec);
-			}
-
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
+			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			{
+				((PickerInfoWidget*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
+			}
             replot();
         }    
     }
@@ -1844,7 +1841,13 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-
+			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			{
+				QVector4D vec;
+				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+				((PickerInfoWidget*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+			}
             replot();
         }
         else //first point is still not valid, try to find a valid first point
@@ -1908,15 +1911,15 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
             }
 
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-
+			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			{
+				QVector4D vec;
+				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+				((PickerInfoWidget*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+			}
             replot();
         }
-
-		if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
-		{
-			QVector4D vec(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-			((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->updateChildPlot(0, ito::Shape::Point, vec);
-		}
     }
 }
 
@@ -1955,11 +1958,12 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
         }
         
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-
-		if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
+		if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
 		{
-			QVector4D vec(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-			((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->updateChildPlot(0, ito::Shape::Point, vec);
+			QVector4D vec;
+			if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+			else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+			((PickerInfoWidget*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
 		}
 
         replot();
@@ -2161,13 +2165,7 @@ void PlotCanvas::setCoordinates(const QVector<QPointF> &pts, bool visible)
         }
         m_pCoordinates->setText(buf);
     }
-	else
-	{
-		if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
-		{
-			((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->removeChildPlots();
-		}
-	}
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2180,12 +2178,6 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
     }
     else
     {
-
-		if ((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())
-		{
-			((PickerInfoWidget*)((Itom2dQwtPlot*)(this->parent()))->PickerWidget())->removeChildPlots();
-		}
-
         return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
     }
 
