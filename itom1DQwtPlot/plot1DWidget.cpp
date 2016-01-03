@@ -23,6 +23,7 @@
 #include "itom1DQwtPlot.h"
 #include "plot1DWidget.h"
 #include "dataObjectSeriesData.h"
+#include "DataObject/dataObjectFuncs.h"
 #include "qwtPlotCurveDataObject.h"
 #include "common/sharedStructuresGraphics.h"
 #include "common/apiFunctionsGraphInc.h"
@@ -1371,15 +1372,23 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         m_hash = hash;
 
-		if (((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget())
+		if (dataObj && ((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget())
 		{
-			//if (((DObjectInfoWidget*)(((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget()))->isVisible())
+			DObjectInfoWidget* infoWidget = (DObjectInfoWidget*)(((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget());
+			infoWidget->updateInfoHeader(
+				QString("1D Object Slice"),
+				dataObj->getType(),
+				dataObj->getDims(),
+				dataObj->getSize());
+
+			if (infoWidget->useDetailInfo())
 			{
-				((DObjectInfoWidget*)(((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget()))->updateInfoHeader(
-					QString("1D Object Slice"),
-					dataObj->getType(),
-					dataObj->getDims(),
-					dataObj->getSize());
+				double min = 0.0, max = 0.0, mean = 0.0, dev = 0.0;
+				ito::uint32 minLoc[3];
+				ito::uint32 maxLoc[3];
+				ito::dObjHelper::minMaxValue(dataObj, min, minLoc, max, maxLoc, true);
+				ito::dObjHelper::devValue(dataObj, 0, mean, dev, true);
+				infoWidget->updateInfoDetail(min, max, mean, dev);
 			}
 		}
     }

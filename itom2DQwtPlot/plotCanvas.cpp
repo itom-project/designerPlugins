@@ -713,13 +713,21 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
 	if (m_dObjPtr && ((Itom2dQwtPlot*)(this->parent()))->ObjectInfoWidget())
 	{
-		//if (((DObjectInfoWidget*)(((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget()))->isVisible())
+		DObjectInfoWidget* infoWidget = (DObjectInfoWidget*)(((Itom2dQwtPlot*)(this->parent()))->ObjectInfoWidget());
+		infoWidget->updateInfoHeader(
+			QString("2D Object Plot"),
+			m_dObjPtr->getType(),
+			m_dObjPtr->getDims(),
+			m_dObjPtr->getSize());
+
+		if (infoWidget->useDetailInfo())
 		{
-			((DObjectInfoWidget*)(((Itom2dQwtPlot*)(this->parent()))->ObjectInfoWidget()))->updateInfoHeader(
-				QString("2D Object Plot"),
-				m_dObjPtr->getType(),
-				m_dObjPtr->getDims(),
-				m_dObjPtr->getSize());
+			double min = 0.0, max = 0.0, mean = 0.0, dev = 0.0;
+			ito::uint32 minLoc[3];
+			ito::uint32 maxLoc[3];
+			ito::dObjHelper::minMaxValue(m_dObjPtr, min, minLoc, max, maxLoc, true);
+			ito::dObjHelper::devValue(m_dObjPtr, 0, mean, dev, true);
+			infoWidget->updateInfoDetail(min, max, mean, dev);
 		}
 	}
 
