@@ -82,7 +82,6 @@ IF(UNIX)
     INCLUDE_DIRECTORIES(
 	usr/include #for GL/GL.h and GL/GLU.h
     )
-    message(FATAL "TEST")
 ENDIF(UNIX)
 
 LINK_DIRECTORIES(
