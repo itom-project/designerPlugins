@@ -293,7 +293,7 @@ ItomQwtPlotEnums::ModificationModes ItomQwtDObjFigure::getModificationModes() co
     {
         return m_pBaseContent->shapeModificationModes();
     }
-
+    
     return ItomQwtPlotEnums::Move | ItomQwtPlotEnums::Resize | ItomQwtPlotEnums::Rotate;
 }
 
