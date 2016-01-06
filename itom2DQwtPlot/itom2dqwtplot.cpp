@@ -918,7 +918,7 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 
 		if (PickerWidget())
 		{
-			((PickerInfoWidget*)PickerWidget())->removeChildPlot(m_childFigures[obj]);
+			((PlotInfoPicker*)PickerWidget())->removeChildPlot(m_childFigures[obj]);
 		}
 	
     }
@@ -926,7 +926,7 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 	{
 		if (PickerWidget())
 		{
-			((PickerInfoWidget*)PickerWidget())->removeChildPlots();
+			((PlotInfoPicker*)PickerWidget())->removeChildPlots();
 		}
 	
         m_pContent->childFigureDestroyed(obj, 0);

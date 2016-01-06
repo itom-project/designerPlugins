@@ -36,6 +36,11 @@
 #include "itomQwtPlotEnums.h"
 #include "common/shape.h"
 
+#include "itomWidgets/plotInfoShapes.h"
+#include "itomWidgets/plotInfoMarker.h"
+#include "itomWidgets/plotInfoPicker.h"
+#include "itomWidgets/plotInfoDObject.h"
+
 #include <qsize.h>
 #include <qstring.h>
 #include <qpixmap.h>
@@ -170,15 +175,28 @@ public Q_SLOTS:
     ito::RetVal deleteMarkers(QString id = "");
     
 
-    
-
 protected:
+
+	inline QObject* MarkerWidget(void) const { return m_pMarkerDock; }
+	inline QObject* PickerWidget(void) const { return m_pPickerInfo; }
+	inline QObject* ShapesWidget(void) const { return m_pShapesDock; }
+	inline QObject* DObjectWidget(void) const { return m_pObjectInfoDock; }
+
     void addToolbarsAndMenus();
     
     ItomQwtPlot *m_pBaseContent;
 
 private:
     
+	QDockWidget *m_pMarkerDock;
+	QDockWidget *m_pPickerDock;
+	QDockWidget *m_pShapesDock;
+	QDockWidget *m_pObjectInfoDock;
+
+	PlotInfoShapes  *m_pShapesInfo;
+	PlotInfoMarker  *m_pMarkerInfo;
+	PlotInfoPicker  *m_pPickerInfo;
+	PlotInfoDObject *m_pObjectInfo;
 
 signals :
     void userInteractionDone(int type, bool aborted, QVector<ito::Shape> shapes);

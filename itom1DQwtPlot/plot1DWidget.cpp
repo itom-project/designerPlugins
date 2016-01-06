@@ -1372,9 +1372,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         m_hash = hash;
 
-		if (dataObj && ((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget())
+		if (dataObj && ((Itom1DQwtPlot*)(this->parent()))->DObjectWidget())
 		{
-			DObjectInfoWidget* infoWidget = (DObjectInfoWidget*)(((Itom1DQwtPlot*)(this->parent()))->ObjectInfoWidget());
+			PlotInfoDObject* infoWidget = (PlotInfoDObject*)(((Itom1DQwtPlot*)(this->parent()))->DObjectWidget());
 			infoWidget->updateInfoHeader(
 				QString("1D Object Slice"),
 				dataObj->getType(),
@@ -1468,9 +1468,9 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                     it->item->detach();
                     delete it->item;
                     it = m_pickers.erase(it);
-					if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+					if (((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
 					{
-						((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+						((PlotInfoPicker*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
 					}
                 }
                 else
@@ -2088,9 +2088,9 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             delete m.item;
         }
         m_pickers.clear();
-		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		if (((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
 		{
-			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+			((PlotInfoPicker*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
 		}
     }
 
@@ -2128,17 +2128,17 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     {
         coords = QString("[%1; %2]\n[%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
         offsets = QString(" width: %1\n height: %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
-		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		if (((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
 		{
-			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
+			((PlotInfoPicker*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
 		}
 	}
     else if (points.size() == 1)
     {
         coords = QString("[%1; %2]\n      ").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4);
-		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		if (((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
 		{
-			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
+			((PlotInfoPicker*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->updatePickers(idcs, points);
 		}
     }
 
@@ -2318,9 +2318,9 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
             delete m.item;
         }
         m_pickers.clear();
-		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		if (((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
 		{
-			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
+			((PlotInfoPicker*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePickers();
 		}
     }
     else if (id < 0 || id >= m_pickers.size())
@@ -2332,9 +2332,9 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
         m_pickers[id].item->detach();
         delete m_pickers[id].item;
         m_pickers.removeAt(id);
-		if ((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
+		if (((Itom1DQwtPlot*)(this->parent()))->PickerWidget())
 		{
-			((PickerInfoWidget*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePicker(id);
+			((PlotInfoPicker*)((Itom1DQwtPlot*)(this->parent()))->PickerWidget())->removePicker(id);
 		}
     }
 

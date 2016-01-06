@@ -829,7 +829,7 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
                 {
 					if (p->ShapesWidget())
 					{
-						((ShapesInfoWidget*)p->ShapesWidget())->updateShape(it.value()->getShape());
+						((PlotInfoShapes*)p->ShapesWidget())->updateShape(it.value()->getShape());
 					}
                     emit p->geometricShapeChanged(it.value()->getIndex(), it.value()->getShape());
                 }
@@ -884,9 +884,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                 emit p->userInteractionDone(ito::Shape::MultiPointPick, aborted, shapes);
                 emit p->geometricShapeFinished(ito::Shape::MultiPointPick, aborted);
-				if (((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
+				if (((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
 				{
-					((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarkers(shapes);
+					((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarkers(shapes);
 				}
             }
 
@@ -961,9 +961,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Point, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Point, aborted);
-					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
 					{
-						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
 					}
 					
                 }
@@ -1040,9 +1040,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Line, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Line, aborted);
-					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
 					{
-						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
 					}
                 }
 
@@ -1117,9 +1117,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Rectangle, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Rectangle, aborted);
-					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
 					{
-						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
 					}
                 }
 
@@ -1194,9 +1194,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Ellipse, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Ellipse, aborted);
-					if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
 					{
-						((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
 					}
                 }
 
@@ -1441,9 +1441,9 @@ void ItomQwtPlot::clearAllGeometricShapes()
     bool thingsToDo = m_pShapes.size() > 0;
 	if (thingsToDo)
 	{
-		if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+		if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
 		{
-			((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->removeShapes();
+			((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->removeShapes();
 		}
 	}
     //delete all geometric shapes and marker sets
@@ -1566,9 +1566,9 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
             if (m_pShapes.contains(shape.index()))
             {
                 m_pShapes[shape.index()]->setShape(shape, m_inverseColor0, m_inverseColor1);
-				if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+				if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
 				{
-					((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
+					((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
 				}
             }
             else
@@ -1591,9 +1591,9 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                         newItem->attach(this);
                         m_pShapes.insert(newItem->getIndex(), newItem);
 						shape.setIndex(newItem->getIndex());
-						if (((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+						if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
 						{
-							((ShapesInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
+							((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
 						}
                     }
                     break;
@@ -1993,10 +1993,10 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 			m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
         }
 
-		if (((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
+		if (((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
 		{
 			ito::Shape shapes = ito::Shape::fromMultipoint(markerPolygon, m_plotMarkers.size(), tmpID);
-			((MarkerInfoWidget*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarker(shapes);
+			((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarker(shapes);
 		}
 
         replot();
