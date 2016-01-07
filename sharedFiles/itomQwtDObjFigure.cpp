@@ -83,7 +83,6 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFi
 	m_pObjectInfoDock->setWidget(m_pObjectInfo);
 
 	addToolbox(m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
-	
 	addToolbox(m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
 	addToolbox(m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
 	addToolbox(m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
@@ -93,10 +92,27 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFi
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::~ItomQwtDObjFigure()
 {
+	
+	removeToolbox("shapes info");
+	m_pShapesDock->deleteLater();
+	m_pShapesDock = NULL;
 	m_pShapesInfo = NULL;
-	m_pMarkerInfo = NULL;
+	
+	removeToolbox("picker info");
+	m_pPickerDock->deleteLater();
+	m_pPickerDock = NULL;
 	m_pPickerInfo = NULL;
+
+	removeToolbox("object info");
+	m_pObjectInfoDock->deleteLater();
+	m_pObjectInfoDock = NULL;
 	m_pObjectInfo = NULL;
+
+	removeToolbox("marker info");
+	m_pMarkerDock->deleteLater();
+	m_pMarkerDock = NULL;
+	
+	m_pMarkerInfo = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
