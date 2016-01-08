@@ -262,12 +262,22 @@ void ItomQwtPlot::createBaseActions()
     m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
+    a = m_pMenuShapeType->addAction(tr("Square"));
+    a->setData(ito::Shape::Square);
+    m_pMenuShapeType->addAction(a);
+    a->setCheckable(true);
+
     a = m_pMenuShapeType->addAction(tr("Ellipse"));
     a->setData(ito::Shape::Ellipse);
     m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
-    m_pActShapeType->setData(ito::Shape::Point);
+    a = m_pMenuShapeType->addAction(tr("Circle"));
+    a->setData(ito::Shape::Circle);
+    m_pMenuShapeType->addAction(a);
+    a->setCheckable(true);
+
+    m_pActShapeType->setData(ito::Shape::Rectangle);
     m_pActShapeType->setVisible(true);
     m_pActShapeType->setCheckable(true);
     connect(m_pMenuShapeType, SIGNAL(triggered(QAction*)), this, SLOT(mnuGroupShapeTypes(QAction*)));
@@ -340,6 +350,12 @@ void ItomQwtPlot::setButtonStyle(int style)
             case ito::Shape::Ellipse:
                 m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse.png"));
                 break;
+            case ito::Shape::Circle:
+                m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/circle.png"));
+                break;
+            case ito::Shape::Square:
+                m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/square.png"));
+                break;
         }
     }
     else
@@ -367,6 +383,12 @@ void ItomQwtPlot::setButtonStyle(int style)
             break;
         case ito::Shape::Ellipse:
             m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse_lt.png"));
+            break;
+        case ito::Shape::Circle:
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/circle_lt.png"));
+            break;
+        case ito::Shape::Square:
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/square_lt.png"));
             break;
         }
     }
@@ -473,6 +495,12 @@ void ItomQwtPlot::mnuGroupShapeTypes(QAction *action)
         break;
     case ito::Shape::Ellipse:
         m_currentShapeType = ito::Shape::Ellipse;
+        break;
+    case ito::Shape::Circle:
+        m_currentShapeType = ito::Shape::Circle;
+        break;
+    case ito::Shape::Square:
+        m_currentShapeType = ito::Shape::Square;
         break;
     default:
         m_currentShapeType = ito::Shape::Invalid;
@@ -610,6 +638,18 @@ void ItomQwtPlot::setState(int state)
 
                 case ito::Shape::Ellipse:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/ellipse.png" : ":/itomDesignerPlugins/plot/icons/ellipse_lt.png"));
+                    m_elementsToPick = std::max(m_elementsToPick, 1);
+                    startOrStopDrawGeometricShape(1);
+                    break;
+
+                case ito::Shape::Circle:
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/circle.png" : ":/itomDesignerPlugins/plot/icons/circle_lt.png"));
+                    m_elementsToPick = std::max(m_elementsToPick, 1);
+                    startOrStopDrawGeometricShape(1);
+                    break;
+
+                case ito::Shape::Square:
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/square.png" : ":/itomDesignerPlugins/plot/icons/square_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
@@ -1129,6 +1169,79 @@ void ItomQwtPlot::multiPointActivated(bool on)
         }
         break;
 
+    case ito::Shape::Square:
+        if (!on)
+        {
+            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
+            bool aborted = false;
+
+            if (polygonScale.size() == 0)
+            {
+                emit statusBarMessage(tr("Selection has been aborted."), 2000);
+                aborted = true;
+                m_currentShapeIndices.clear();
+            }
+            else
+            {
+                emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
+
+                ito::Shape shape = ito::Shape::fromSquare(0.5 * (polygonScale[1] + polygonScale[0]), std::abs((polygonScale[1] - polygonScale[0]).x()));
+                DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
+                newItem->setColor(m_inverseColor0, m_inverseColor1);
+                if (this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                newItem->setSelected(true);
+                m_pShapes.insert(newItem->getIndex(), newItem);
+                m_currentShapeIndices.append(newItem->getIndex());
+                replot();
+            }
+
+            // if further elements are needed reset the plot engine and go ahead else finish editing
+            if (m_elementsToPick > 1)
+            {
+                m_elementsToPick--;
+                MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                if (m)
+                {
+                    m_pMultiPointPicker->setEnabled(true);
+
+                    if (!aborted)
+                    {
+                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
+                        else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
+                    }
+                }
+                return;
+            }
+            else
+            {
+                m_elementsToPick = 0;
+                if (p)
+                {
+                    QPolygonF destPolygon(0);
+                    for (int i = 0; i < m_currentShapeIndices.size(); i++)
+                    {
+                        if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
+                        shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
+                    }
+                    m_currentShapeIndices.clear();
+                    emit p->userInteractionDone(ito::Shape::Square, aborted, shapes);
+                    emit p->geometricShapeFinished(ito::Shape::Square, aborted);
+                }
+
+                m_pMultiPointPicker->setEnabled(false);
+                setState(stateIdle);
+            }
+        }
+        break;
+
     case ito::Shape::Ellipse:
         if (!on)
         {
@@ -1205,6 +1318,79 @@ void ItomQwtPlot::multiPointActivated(bool on)
             }
         }
         break;
+
+    case ito::Shape::Circle:
+        if (!on)
+        {
+            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
+            bool aborted = false;
+
+            if (polygonScale.size() == 0)
+            {
+                emit statusBarMessage(tr("Selection has been aborted."), 2000);
+                aborted = true;
+                m_currentShapeIndices.clear();
+            }
+            else
+            {
+                emit statusBarMessage(tr("%1 points have been selected.").arg(polygonScale.size() - 1), 2000);
+
+                ito::Shape shape = ito::Shape::fromCircle(0.5 * (polygonScale[1] + polygonScale[0]), std::abs((polygonScale[1] - polygonScale[0]).x()) * 0.5);
+                DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
+                newItem->setColor(m_inverseColor0, m_inverseColor1);
+                if (this->m_inverseColor0.isValid())
+                {
+                    newItem->setPen(QPen(m_inverseColor0));
+                }
+                else newItem->setPen(QPen(Qt::green));
+
+                newItem->setVisible(true);
+                newItem->show();
+                newItem->attach(this);
+                newItem->setSelected(true);
+                m_pShapes.insert(newItem->getIndex(), newItem);
+                m_currentShapeIndices.append(newItem->getIndex());
+                replot();
+            }
+
+            // if further elements are needed reset the plot engine and go ahead else finish editing
+            if (m_elementsToPick > 1)
+            {
+                m_elementsToPick--;
+                MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
+                if (m)
+                {
+                    m_pMultiPointPicker->setEnabled(true);
+
+                    if (!aborted)
+                    {
+                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
+                        else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
+                    }
+                }
+                return;
+            }
+            else
+            {
+                m_elementsToPick = 0;
+                if (p)
+                {
+                    QPolygonF destPolygon(0);
+                    for (int i = 0; i < m_currentShapeIndices.size(); i++)
+                    {
+                        if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
+                        shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
+                    }
+                    m_currentShapeIndices.clear();
+                    emit p->userInteractionDone(ito::Shape::Circle, aborted, shapes);
+                    emit p->geometricShapeFinished(ito::Shape::Circle, aborted);
+                }
+
+                m_pMultiPointPicker->setEnabled(false);
+                setState(stateIdle);
+            }
+        }
+        break;
     }
 }
 
@@ -1221,6 +1407,8 @@ ito::RetVal ItomQwtPlot::userInteractionStart(int type, bool start, int maxNrOfP
             type == ito::Shape::Point || \
             type == ito::Shape::Line || \
             type == ito::Shape::Rectangle || \
+            type == ito::Shape::Square || \
+            type == ito::Shape::Circle || \
             type == ito::Shape::Ellipse)
         {
             m_currentShapeType = (ito::Shape::ShapeType)type;
@@ -1382,6 +1570,36 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
             setState(stateIdle);
         }
     }
+    else if (m_currentShapeType == ito::Shape::Square)
+    {
+        if (start)
+        {
+            m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
+            m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+            m_pMultiPointPicker->setKeepAspectRatio(true);
+            m_pMultiPointPicker->setEnabled(true);
+
+            if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 squares. Esc aborts the selection.").arg(m_elementsToPick));
+            else emit statusBarMessage(tr("Please draw one square. Esc aborts the selection."));
+
+        }
+        else //start == false
+        {
+            m_pMultiPointPicker->setEnabled(false);
+
+            emit statusBarMessage(tr("Selection has been interrupted."), 2000);
+
+            m_elementsToPick = 1;
+
+            if (p)
+            {
+                QVector<ito::Shape> shapes;
+                emit p->userInteractionDone(m_currentShapeType, true, shapes);
+            }
+            setState(stateIdle);
+        }
+    }
     else if (m_currentShapeType == ito::Shape::Ellipse)
     {
         if (start)
@@ -1395,6 +1613,36 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 
             if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
             else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
+        }
+        else //start == false
+        {
+            m_pMultiPointPicker->setEnabled(false);
+
+            emit statusBarMessage(tr("Selection has been interrupted."), 2000);
+
+            m_elementsToPick = 1;
+
+            if (p)
+            {
+                QVector<ito::Shape> shapes;
+                emit p->userInteractionDone(m_currentShapeType, true, shapes);
+            }
+            setState(stateIdle);
+        }
+    }
+    else if (m_currentShapeType == ito::Shape::Circle)
+    {
+        if (start)
+        {
+
+            m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
+            m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
+            m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
+            m_pMultiPointPicker->setKeepAspectRatio(true);
+            m_pMultiPointPicker->setEnabled(true);
+
+            if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 circles. Esc aborts the selection.").arg(m_elementsToPick));
+            else emit statusBarMessage(tr("Please draw one circle. Esc aborts the selection."));
         }
         else //start == false
         {
