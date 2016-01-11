@@ -176,7 +176,6 @@ public Q_SLOTS:
     
 
 protected:
-
 	inline QObject* MarkerWidget(void) const { return m_pMarkerInfo; }
 	inline QObject* PickerWidget(void) const { return m_pPickerInfo; }
 	inline QObject* ShapesWidget(void) const { return m_pShapesInfo; }
@@ -187,6 +186,7 @@ protected:
     ItomQwtPlot *m_pBaseContent;
 
 private:
+	void construct();
     
 	QDockWidget *m_pMarkerDock;
 	QDockWidget *m_pPickerDock;

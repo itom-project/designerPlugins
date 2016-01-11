@@ -37,8 +37,19 @@
 #include <qwt_plot_renderer.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ItomQwtDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent)
+ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : 
+	ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
+    m_pBaseContent(NULL),
+	m_pMarkerDock(NULL),
+	m_pPickerDock(NULL),
+	m_pShapesDock(NULL),
+	m_pObjectInfoDock(NULL),
+	m_pShapesInfo(NULL),
+	m_pMarkerInfo(NULL),
+	m_pPickerInfo(NULL),
+	m_pObjectInfo(NULL)	
 {
+	construct();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -53,6 +64,12 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFi
 	m_pMarkerInfo(NULL),
 	m_pPickerInfo(NULL),
 	m_pObjectInfo(NULL)
+{
+	construct();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::construct()
 {
 	m_pMarkerDock = new QDockWidget(tr("Marker Info"), this);
 	m_pMarkerDock->setVisible(false);
@@ -86,7 +103,6 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFi
 	addToolbox(m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
 	addToolbox(m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
 	addToolbox(m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
