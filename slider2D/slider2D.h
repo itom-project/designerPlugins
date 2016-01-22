@@ -92,8 +92,9 @@ public:
 
 public slots:
 
-    void setX(qreal s);
-    void setY(qreal v);
+    void setX(qreal x);
+    void setY(qreal y);
+    void setValues(qreal x, qreal y);
 
 
 signals:

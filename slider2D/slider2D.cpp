@@ -264,7 +264,7 @@ int Slider2D::getDecimals() const
 //------------------------------------------------------------------------------------------
 void Slider2D::setDecimals(int decimals)
 {
-    p->decimals = decimals;
+    p->decimals = qMax(0, decimals);
     update();
 }
 
@@ -291,6 +291,38 @@ void Slider2D::setX(qreal s)
 void Slider2D::setY(qreal v)
 {
     p->yVal = v;
+
+    if (p->yStep > 0.0)
+    {
+        p->yVal -= p->yRange.rx();
+        int counts = qBound(0, qRound(p->yVal / p->yStep), qFloor((p->yRange.ry() - p->yRange.rx()) / p->yStep));
+        p->yVal = p->yStep * counts + p->yRange.rx();
+    }
+    else
+    {
+        p->yVal = qBound(p->yRange.rx(), p->yVal, p->yRange.ry());
+    }
+
+    update();
+}
+
+//------------------------------------------------------------------------------------------
+void Slider2D::setValues(qreal x, qreal y)
+{
+    p->xVal = x;
+
+    if (p->xStep > 0.0)
+    {
+        p->xVal -= p->xRange.rx();
+        int counts = qBound(0, qRound(p->xVal / p->xStep), qFloor((p->xRange.ry() - p->xRange.rx()) / p->xStep));
+        p->xVal = p->xStep * counts + p->xRange.rx();
+    }
+    else
+    {
+        p->xVal = qBound(p->xRange.rx(), p->xVal, p->xRange.ry());
+    }
+
+    p->yVal = y;
 
     if (p->yStep > 0.0)
     {
