@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -66,8 +66,10 @@ private:
 public:
 
     qreal xVal, yVal;
-    QPoint xRange;
-    QPoint yRange;
+    qreal xStep, yStep;
+    int decimals;
+    QPointF xRange;
+    QPointF yRange;
     Mouse_Status mouseStatus;
     QImage innerSelector;
     QImage leftSliderBackgr;
@@ -77,7 +79,8 @@ public:
 
     Private(Slider2D *widget)
         : w(widget), xVal(0), yVal(0),
-        xRange(0,1), yRange(0,1), mouseStatus(nothing)
+        xRange(0,1), yRange(0,1), mouseStatus(nothing),
+        decimals(2), xStep(0.0), yStep(0.0)
     { }
 
 
@@ -127,71 +130,197 @@ public:
 
 };
 
+//------------------------------------------------------------------------------------------
 Slider2D::Slider2D(QWidget *parent) :
     QWidget(parent), p(new Private(this))
 {
 
 }
 
+//------------------------------------------------------------------------------------------
 Slider2D::~Slider2D()
 {
     delete p;
 }
 
-
-//QSize Slider2D::sizeHint() const
-//{
-//    return QSize(p->wheel_width*5, p->wheel_width*5);
-//}
-
-
+//------------------------------------------------------------------------------------------
 qreal Slider2D::xVal() const
 {
     return p->xVal;
 }
 
+//------------------------------------------------------------------------------------------
 qreal Slider2D::yVal() const
 {
     return p->yVal; //color().valueF();
 }
 
-QPoint Slider2D::xRange() const
+//------------------------------------------------------------------------------------------
+QPointF Slider2D::xRange() const
 {
     return p->xRange;
 }
 
-QPoint Slider2D::yRange() const
+//------------------------------------------------------------------------------------------
+QPointF Slider2D::yRange() const
 {
     return p->yRange;
 }
 
-void Slider2D::setXRange(QPoint xr)
+//------------------------------------------------------------------------------------------
+void Slider2D::setXRange(QPointF xr)
 {
     p->xRange = xr;
+    if (p->xRange.ry() < p->xRange.rx())
+    {
+        std::swap(p->xRange.rx(), p->xRange.ry());
+    }
+
+    if (p->xStep > 0.0)
+    {
+        p->xVal -= p->xRange.rx();
+        int counts = qBound(0, qRound(p->xVal / p->xStep), qFloor((p->xRange.ry() - p->xRange.rx()) / p->xStep));
+        p->xVal = p->xStep * counts + p->xRange.rx();
+    }
+    else
+    {
+        p->xVal = qBound(xr.rx(), p->xVal, xr.ry());
+    }
+
     update();
 }
 
-void Slider2D::setYRange(QPoint yr)
+//------------------------------------------------------------------------------------------
+void Slider2D::setYRange(QPointF yr)
 {
     p->yRange = yr;
+    if (p->yRange.ry() < p->yRange.rx())
+    {
+        std::swap(p->yRange.rx(), p->yRange.ry());
+    }
+
+    if (p->yStep > 0.0)
+    {
+        p->yVal -= p->yRange.rx();
+        int counts = qBound(0, qRound(p->yVal / p->yStep), qFloor((p->yRange.ry() - p->yRange.rx()) / p->yStep));
+        p->yVal = p->yStep * counts + p->yRange.rx();
+    }
+    else
+    {
+        p->yVal = qBound(yr.rx(), p->yVal, yr.ry());
+    }
+
     update();
 }
 
-void Slider2D::paintEvent(QPaintEvent * )
+//------------------------------------------------------------------------------------------
+qreal Slider2D::getXStepSize() const
 {
-    //QSlider *slider = new QSlider(Qt::Horizontal, this);
-    qreal xValRanged = (p->xVal - p->xRange.x())/(p->xRange.y() - p->xRange.x());        // transforms coordinate of range (xmin, xmax) to range (0,1)
-    qreal yValRanged = (p->yVal - p->yRange.y())/(p->yRange.x() - p->yRange.y());
+    return p->xStep;
+}
+
+//------------------------------------------------------------------------------------------
+void Slider2D::setXStepSize(qreal xStepSize)
+{
+    p->xStep = xStepSize;
+
+    if (p->xStep > 0.0)
+    {
+        p->xVal -= p->xRange.rx();
+        int counts = qBound(0, qRound(p->xVal / p->xStep), qFloor((p->xRange.ry() - p->xRange.rx()) / p->xStep));
+        p->xVal = p->xStep * counts + p->xRange.rx();
+    }
+
+    update();
+}
+
+//------------------------------------------------------------------------------------------
+qreal Slider2D::getYStepSize() const
+{
+    return p->yStep;
+}
+
+//------------------------------------------------------------------------------------------
+void Slider2D::setYStepSize(qreal yStepSize)
+{
+    p->yStep = yStepSize;
+
+    if (p->yStep > 0.0)
+    {
+        p->yVal -= p->yRange.rx();
+        int counts = qBound(0, qRound(p->yVal / p->yStep), qFloor((p->yRange.ry() - p->yRange.rx()) / p->yStep));
+        p->yVal = p->yStep * counts + p->yRange.rx();
+    }
+
+    update();
+}
+
+//------------------------------------------------------------------------------------------
+int Slider2D::getDecimals() const
+{
+    return p->decimals;
+}
+
+//------------------------------------------------------------------------------------------
+void Slider2D::setDecimals(int decimals)
+{
+    p->decimals = decimals;
+    update();
+}
+
+//------------------------------------------------------------------------------------------
+void Slider2D::setX(qreal s)
+{
+    p->xVal = s;
+
+    if (p->xStep > 0.0)
+    {
+        p->xVal -= p->xRange.rx();
+        int counts = qBound(0, qRound(p->xVal / p->xStep), qFloor((p->xRange.ry() - p->xRange.rx()) / p->xStep));
+        p->xVal = p->xStep * counts + p->xRange.rx();
+    }
+    else
+    {
+        p->xVal = qBound(p->xRange.rx(), p->xVal, p->xRange.ry());
+    }
+
+    update();
+}
+
+//------------------------------------------------------------------------------------------
+void Slider2D::setY(qreal v)
+{
+    p->yVal = v;
+
+    if (p->yStep > 0.0)
+    {
+        p->yVal -= p->yRange.rx();
+        int counts = qBound(0, qRound(p->yVal / p->yStep), qFloor((p->yRange.ry() - p->yRange.rx()) / p->yStep));
+        p->yVal = p->yStep * counts + p->yRange.rx();
+    }
+    else
+    {
+        p->yVal = qBound(p->yRange.rx(), p->yVal, p->yRange.ry());
+    }
+
+    update();
+}
+
+//------------------------------------------------------------------------------------------
+void Slider2D::paintEvent(QPaintEvent *)
+{
+    qreal xValRanged = (p->xVal - p->xRange.x()) / (p->xRange.y() - p->xRange.x());        // transforms coordinate of range (xmin, xmax) to range (0,1)
+    qreal yValRanged = (p->yVal - p->yRange.y()) / (p->yRange.x() - p->yRange.y());
 
 
     QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.translate(geometry().width()/2,geometry().height()/2);
+    painter.translate(geometry().width() / 2, geometry().height() / 2);
 
-    
 
-    if(p->innerSelector.isNull())
+
+    if (p->innerSelector.isNull())
         p->renderBackground();
 
     painter.translate(p->selectorImageOffset());
@@ -201,29 +330,44 @@ void Slider2D::paintEvent(QPaintEvent * )
     selector2DPosition = QPointF(xValRanged*side, yValRanged*side);
 
     QRectF text_rect_1 = QRectF(side*1.03, yValRanged*side - 0.075*side, 0.15*side, 0.15*side);
-    QRectF text_rect_2 = QRectF(xValRanged*side - 0.075*side, side*1.03 , 0.15*side, 0.15*side);
+    QRectF text_rect_2 = QRectF(xValRanged*side - 0.075*side, side*1.03, 0.15*side, 0.15*side);
 
     QPainterPath path_tri_1;
-    path_tri_1.moveTo (side, yValRanged*side);
-    path_tri_1.lineTo (side*1.03, yValRanged*side - 0.075*side);
-    path_tri_1.lineTo (side*1.03,   yValRanged*side + 0.075*side);
-    path_tri_1.lineTo (side, yValRanged*side);
+    path_tri_1.moveTo(side, yValRanged*side);
+    path_tri_1.lineTo(side*1.03, yValRanged*side - 0.075*side);
+    path_tri_1.lineTo(side*1.03, yValRanged*side + 0.075*side);
+    path_tri_1.lineTo(side, yValRanged*side);
 
     QPainterPath path_tri_2;
-    path_tri_2.moveTo (xValRanged*side, side);
-    path_tri_2.lineTo (xValRanged*side - 0.075*side, side*1.03);
-    path_tri_2.lineTo (xValRanged*side + 0.075*side, side*1.03);
-    path_tri_2.lineTo (xValRanged*side, side);
+    path_tri_2.moveTo(xValRanged*side, side);
+    path_tri_2.lineTo(xValRanged*side - 0.075*side, side*1.03);
+    path_tri_2.lineTo(xValRanged*side + 0.075*side, side*1.03);
+    path_tri_2.lineTo(xValRanged*side, side);
 
 
-    painter.drawImage(0,0,p->innerSelector);
-    painter.drawImage(side*1.03,0,p->leftSliderBackgr);
+    painter.drawImage(0, 0, p->innerSelector);
+    painter.drawImage(side*1.03, 0, p->leftSliderBackgr);
 
-    painter.drawText(text_rect_1, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->yVal,'g',3));
+    if (std::abs(p->yVal) > 1e4)
+    {
+        painter.drawText(text_rect_1, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->yVal, 'e', p->decimals));
+    }
+    else
+    {
+        painter.drawText(text_rect_1, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->yVal, 'f', p->decimals));
+    }
     painter.drawRect(text_rect_1);
 
     painter.drawImage(0,side*1.03,p->rightSliderBackgr);
-    painter.drawText(text_rect_2, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->xVal,'g',3));
+    if (std::abs(p->xVal) > 1e4)
+    {
+        painter.drawText(text_rect_2, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->xVal, 'e', p->decimals));
+    }
+    else
+    {
+        painter.drawText(text_rect_2, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->xVal, 'f', p->decimals));
+    }
+    
     painter.drawRect(text_rect_2);
 
     painter.setClipping(false);
@@ -240,6 +384,7 @@ void Slider2D::paintEvent(QPaintEvent * )
 
 }
 
+//------------------------------------------------------------------------------------------
 void Slider2D::mouseMoveEvent(QMouseEvent *ev)
 {
     if(p->mouseStatus == dragSquare)
@@ -251,17 +396,33 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
      //   centerMouseLn.setAngle(centerMouseLn.angle());
         centerMouseLn.setP2(centerMouseLn.p2()-p->selectorImageOffset());
 
-        qreal xval_old = qBound(0.0, centerMouseLn.x2()/p->squareSize(), 1.0);
-        qreal yval_old = qBound(0.0, centerMouseLn.y2()/p->squareSize(), 1.0);
+        qreal xval = qBound(0.0, centerMouseLn.x2()/p->squareSize(), 1.0);
+        qreal yval = 1.0 - qBound(0.0, centerMouseLn.y2()/p->squareSize(), 1.0);
+
+        // changes coordinate from range (0, 1) to range (xmin, xmax)
+        xval = xval*(p->xRange.y() - p->xRange.x());
+        yval = yval*(p->yRange.y() - p->yRange.x());
+
+        //check step size
+        if (p->xStep > 0.0)
+        {
+            int counts = qBound(0, qRound(xval / p->xStep), qFloor((p->xRange.ry() - p->xRange.rx()) / p->xStep));
+            xval = p->xStep * counts;
+        }
+
+        if (p->yStep > 0.0)
+        {
+            int counts = qBound(0, qRound(yval / p->yStep), qFloor((p->yRange.ry() - p->xRange.rx()) / p->yStep));
+            yval = p->yStep * counts;
+        }
+
+        p->xVal = xval + p->xRange.x();  
+        p->yVal = yval + p->yRange.x();
 
 
-
-        p->xVal =   xval_old*(p->xRange.y() - p->xRange.x()) + p->xRange.x();  // changes coordinate from range (0, 1) to range (xmin, xmax)
-        p->yVal =   yval_old*(p->yRange.x() - p->yRange.y()) + p->yRange.y();
-
-
-        emit xValChanged(xVal());
-        emit yValChanged(yVal());
+        emit xValChanged(p->xVal);
+        emit yValChanged(p->yVal);
+        emit valuesChanged(p->xVal, p->yVal);
         update();
     }
 
@@ -271,14 +432,24 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
         QLineF centerMouseLn ( QPointF(0,0),
                                  globMouseLn.p2() - globMouseLn.p1() );
 
-       // centerMouseLn.setAngle(centerMouseLn.angle());
-        centerMouseLn.setP2(centerMouseLn.p2()-p->selectorImageOffset());
+        centerMouseLn.setP2(centerMouseLn.p2() - p->selectorImageOffset());
 
-        qreal yval_old = qBound(0.0, centerMouseLn.y2()/p->squareSize(), 1.0);  
-        
-        p->yVal =   yval_old*(p->yRange.x() - p->yRange.y()) + p->yRange.y();
+        qreal yval = 1.0 - qBound(0.0, centerMouseLn.y2() / p->squareSize(), 1.0);
 
-        emit yValChanged(yVal());
+        // changes coordinate from range (0, 1) to range (xmin, xmax)
+        yval = yval*(p->yRange.y() - p->yRange.x());
+
+
+        if (p->yStep > 0.0)
+        {
+            int counts = qBound(0, qRound(yval / p->yStep), qFloor((p->yRange.ry() - p->xRange.rx()) / p->yStep));
+            yval = p->yStep * counts;
+        }
+
+        p->yVal = yval + p->yRange.x();
+
+        emit yValChanged(p->yVal);
+        emit valuesChanged(p->xVal, p->yVal);
         update();
     }
 
@@ -288,18 +459,30 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
         QLineF centerMouseLn ( QPointF(0,0),
                                  globMouseLn.p2() - globMouseLn.p1() );
 
-       // centerMouseLn.setAngle(centerMouseLn.angle());
         centerMouseLn.setP2(centerMouseLn.p2()-p->selectorImageOffset());
 
 
-        qreal xval_old = qBound(0.0, centerMouseLn.x2()/p->squareSize(), 1.0);
-        p->xVal =   xval_old*(p->xRange.y() - p->xRange.x()) + p->xRange.x();
+        qreal xval = qBound(0.0, centerMouseLn.x2() / p->squareSize(), 1.0);
 
-        emit xValChanged(xVal());
+        // changes coordinate from range (0, 1) to range (xmin, xmax)
+        xval = xval*(p->xRange.y() - p->xRange.x());
+
+        //check step size
+        if (p->xStep > 0.0)
+        {
+            int counts = qBound(0, qRound(xval / p->xStep), qFloor((p->xRange.ry() - p->xRange.rx()) / p->xStep));
+            xval = p->xStep * counts;
+        }
+
+        p->xVal = xval + p->xRange.x();
+
+        emit xValChanged(p->xVal);
+        emit valuesChanged(p->xVal, p->yVal);
         update();
     }
 }
 
+//------------------------------------------------------------------------------------------
 void Slider2D::mousePressEvent(QMouseEvent *ev)
 {
     
@@ -319,32 +502,18 @@ void Slider2D::mousePressEvent(QMouseEvent *ev)
     }
 }
 
+//------------------------------------------------------------------------------------------
 void Slider2D::mouseReleaseEvent(QMouseEvent *ev)
 {
     mouseMoveEvent(ev);
     p->mouseStatus = nothing;
 }
 
+//------------------------------------------------------------------------------------------
 void Slider2D::resizeEvent(QResizeEvent *)
 {
     p->renderBackground();
 }
 
 
-
-void Slider2D::setX(qreal s)
-{
-    qreal low = p->xRange.x();
-    qreal high = p->xRange.y();
-    p->xVal = qBound(low, s, high);
-    update();
-}
-
-void Slider2D::setY(qreal v)
-{    
-    qreal low = p->yRange.x();
-    qreal high = p->yRange.y();
-    p->yVal = qBound(low, v, high);
-    update();
-}
 

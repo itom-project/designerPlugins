@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -34,11 +34,28 @@
 class Slider2D : public QWidget
 {
     Q_OBJECT
+    
+    //keep the order, the initialization from an ui file is processed in this order
+    Q_PROPERTY(QPointF xRange READ xRange WRITE setXRange DESIGNABLE true )
+    Q_PROPERTY(QPointF yRange READ yRange WRITE setYRange DESIGNABLE true )
+    Q_PROPERTY(qreal xStepSize READ getXStepSize WRITE setXStepSize DESIGNABLE true)
+    Q_PROPERTY(qreal yStepSize READ getYStepSize WRITE setYStepSize DESIGNABLE true)
+    Q_PROPERTY(qreal xVal READ xVal WRITE setX NOTIFY xValChanged DESIGNABLE true)
+    Q_PROPERTY(qreal yVal READ yVal WRITE setY NOTIFY yValChanged DESIGNABLE true)
+    Q_PROPERTY(int decimals READ getDecimals WRITE setDecimals DESIGNABLE true)
 
-    Q_PROPERTY(qreal xVal READ xVal WRITE setX NOTIFY xValChanged DESIGNABLE true )
-    Q_PROPERTY(qreal yVal READ yVal WRITE setY NOTIFY yValChanged DESIGNABLE true )
-    Q_PROPERTY(QPoint xRange READ xRange WRITE setXRange DESIGNABLE true )
-    Q_PROPERTY(QPoint yRange READ yRange WRITE setYRange DESIGNABLE true )
+    Q_CLASSINFO("prop://xRange", "get/set the range of the x-value");
+    Q_CLASSINFO("prop://yRange", "get/set the range of the y-value");
+    Q_CLASSINFO("prop://xStepSize", "get/set the step size of the x-value (default: 0.0, no step size contraints)");
+    Q_CLASSINFO("prop://yStepSize", "get/set the step size of the y-value (default: 0.0, no step size contraints)");
+    Q_CLASSINFO("prop://xVal", "get/set current horizontal value (x-value) of the slider");
+    Q_CLASSINFO("prop://yVal", "get/set current vertical value (y-value) of the slider");
+    Q_CLASSINFO("prop://decimals", "get/set the number of decimals");
+    
+    Q_CLASSINFO("signal://xValChanged", "signal is emitted if the x-value of the slider changed.")
+    Q_CLASSINFO("signal://yValChanged", "signal is emitted if the y-value of the slider changed.")
+    Q_CLASSINFO("signal://valuesChanged", "signal is emitted if the hoirzontal and/or vertical value of the slider changed.")
+
 
 public:
 
@@ -56,12 +73,21 @@ public:
     qreal yVal() const;
 
     /// Get the width in pixels of the outer wheel
-    QPoint xRange() const;
-    QPoint yRange() const;
+    QPointF xRange() const;
+    QPointF yRange() const;
 
     /// Set the width in pixels of the outer wheel
-    void setXRange(QPoint xRange);
-    void setYRange(QPoint yRange);
+    void setXRange(QPointF xRange);
+    void setYRange(QPointF yRange);
+
+    qreal getXStepSize() const;
+    void setXStepSize(qreal xStepSize);
+
+    qreal getYStepSize() const;
+    void setYStepSize(qreal yStepSize);
+
+    int getDecimals() const;
+    void setDecimals(int decimals);
 
 
 public slots:
@@ -72,8 +98,9 @@ public slots:
 
 signals:
 
-    void xValChanged(qreal);
-    void yValChanged(qreal);
+    void xValChanged(qreal x);
+    void yValChanged(qreal y);
+    void valuesChanged(qreal x, qreal y);
 
 
 protected:
