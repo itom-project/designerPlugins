@@ -1935,6 +1935,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
     {
         curSize = size();
     }
+	ItomQwtDObjFigure* hMyParent = (ItomQwtDObjFigure*)parent();
 
     QBrush curBrush = canvasBackground();
     QPalette curPalette = palette();
@@ -1947,27 +1948,71 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 
     QwtPlotRenderer renderer;
 
+	QList< QRectF > plotContentWidgetCoords;
+	plotContentWidgetCoords << QRectF(QPointF(hMyParent->x(), hMyParent->y()), hMyParent->size());
+	qDebug("x %i, y %i, sizeX %i, sizeY %i", hMyParent->x(), hMyParent->y(), hMyParent->size().width(), hMyParent->size().height());
     // flags to make the document look like the widget
     renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
     //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
     if (copyToClipboardNotFile)
     {
-        emit statusBarMessage(tr("copy current view to clipboard..."));
+		bool plotInfoVisible = false;
+		qreal resFaktor = std::max(qRound(resolution / 72.0), 1);
+		QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
 
-        qreal resFaktor = std::max(qRound(resolution / 72.0), 1);
+		QClipboard *clipboard = QApplication::clipboard();
 
-        QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
-        QClipboard *clipboard = QApplication::clipboard();
+		if ((hMyParent->MarkerWidget()  && ((QWidget*)hMyParent->MarkerWidget())->isVisible()) ||
+			(hMyParent->PickerWidget()  && ((QWidget*)hMyParent->PickerWidget())->isVisible()) ||
+			(hMyParent->DObjectWidget() && ((QWidget*)hMyParent->DObjectWidget())->isVisible()) ||
+			(hMyParent->ShapesWidget()  && ((QWidget*)hMyParent->ShapesWidget())->isVisible()))
+		{
+			plotInfoVisible = true;
+			emit statusBarMessage(tr("copy current view to clipboard including infoWidgets ..."));
+			
+			for each (ito::AbstractFigure::ToolboxItem item in hMyParent->getToolboxes())
+			{
+				if (item.toolbox && item.toolbox->isVisible() /*&& item.toolbox->widget()->isVisible()*/)
+				{
+					plotContentWidgetCoords << QRectF(QPointF(item.toolbox->x(), item.toolbox->y()), item.toolbox->size());
+					qDebug("x %i, y %i, sizeX %i, sizeY %i", item.toolbox->x(), item.toolbox->y(), item.toolbox->size().width(), item.toolbox->size().height());
+				}
+			}
+
+
+		}
+		else
+		{
+			emit statusBarMessage(tr("copy current view to clipboard ..."));
+		}
+        
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
-        renderer.render(this, &painter, rect());
+		
+
+
+		if (plotInfoVisible)
+		{
+
+		}
+		else
+		{
+			renderer.render(this, &painter, rect());
+		}
+
         img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
         img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
         clipboard->setImage(img);
-
-        emit statusBarMessage(tr("copy current view to clipboard. done."), 1000);
+		if (plotInfoVisible)
+		{
+			emit statusBarMessage(tr("copy current view to clipboard including infoWidgets. Done."), 1000);
+		}
+		else
+		{
+			emit statusBarMessage(tr("copy current view to clipboard. Done."), 1000);
+		}
     }
     else
     {

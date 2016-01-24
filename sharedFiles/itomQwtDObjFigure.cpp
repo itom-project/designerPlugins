@@ -37,19 +37,8 @@
 #include <qwt_plot_renderer.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : 
-	ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
-    m_pBaseContent(NULL),
-	m_pMarkerDock(NULL),
-	m_pPickerDock(NULL),
-	m_pShapesDock(NULL),
-	m_pObjectInfoDock(NULL),
-	m_pShapesInfo(NULL),
-	m_pMarkerInfo(NULL),
-	m_pPickerInfo(NULL),
-	m_pObjectInfo(NULL)	
+ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ItomQwtDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent)
 {
-	construct();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -64,12 +53,6 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFi
 	m_pMarkerInfo(NULL),
 	m_pPickerInfo(NULL),
 	m_pObjectInfo(NULL)
-{
-	construct();
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtDObjFigure::construct()
 {
 	m_pMarkerDock = new QDockWidget(tr("Marker Info"), this);
 	m_pMarkerDock->setVisible(false);
@@ -103,29 +86,38 @@ void ItomQwtDObjFigure::construct()
 	addToolbox(m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
 	addToolbox(m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
 	addToolbox(m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
+
+	if (getPropertyDockWidget())
+	{
+		tabifyDockWidget(m_pMarkerDock, getPropertyDockWidget());
+	}
+
+	tabifyDockWidget(m_pPickerDock, m_pMarkerDock);
+	tabifyDockWidget(m_pShapesDock, m_pPickerDock);
+	tabifyDockWidget(m_pObjectInfoDock, m_pShapesDock);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::~ItomQwtDObjFigure()
 {
 	
-	removeToolbox("shapes info");
-	m_pShapesDock->deleteLater();
+	//removeToolbox("shapes info");
+	//m_pShapesDock->deleteLater();
 	m_pShapesDock = NULL;
 	m_pShapesInfo = NULL;
 	
-	removeToolbox("picker info");
-	m_pPickerDock->deleteLater();
+	//removeToolbox("picker info");
+	//m_pPickerDock->deleteLater();
 	m_pPickerDock = NULL;
 	m_pPickerInfo = NULL;
 
-	removeToolbox("object info");
-	m_pObjectInfoDock->deleteLater();
+	//removeToolbox("object info");
+	//m_pObjectInfoDock->deleteLater();
 	m_pObjectInfoDock = NULL;
 	m_pObjectInfo = NULL;
 
-	removeToolbox("marker info");
-	m_pMarkerDock->deleteLater();
+	//removeToolbox("marker info");
+	//m_pMarkerDock->deleteLater();
 	m_pMarkerDock = NULL;
 	
 	m_pMarkerInfo = NULL;

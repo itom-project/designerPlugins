@@ -117,6 +117,7 @@ set(plugin_SOURCES
 
 set(plugin_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotenums.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
 )
