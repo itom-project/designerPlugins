@@ -30,7 +30,7 @@
 #endif
 
 #include "plot/AbstractDObjFigure.h"
-#include "common/RetVal.h"
+#include "common/retVal.h"
 #include "common/itomPlotHandle.h"
 
 #include <qsize.h>
