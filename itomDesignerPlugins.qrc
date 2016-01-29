@@ -97,6 +97,7 @@
         <file>icons/settings.png</file>
         <file>icons/editDelete.png</file>
         <file>icons/copyImg.png</file>
+        <file>icons/decimals.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general_lt">
         <file>icons/back_lt.png</file>
@@ -112,6 +113,7 @@
         <file>icons/settings_lt.png</file>
         <file>icons/editDelete_lt.png</file>
         <file>icons/copyImg_lt.png</file>
+      <file>icons/decimals_lt.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/axis">
         <file>icons/xvm_plot.png</file>

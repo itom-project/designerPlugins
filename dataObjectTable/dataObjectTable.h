@@ -141,6 +141,7 @@ private slots:
     inline void _pressed (const QModelIndex &index) { emit pressed(index.row(), index.column()); }
     void copySelectionToClipboard();
     void copyAllToClipboard();
+    void setDecimalsGUI();
 
 signals:
     void activated (int row, int column);
