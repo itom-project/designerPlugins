@@ -2703,13 +2703,13 @@ QString DataObjectSeriesData::getDObjAxisLabel(const AbstractFigure::UnitLabelSt
 //----------------------------------------------------------------------------------------------
 void DataObjectSeriesData::getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const
 {
-    description = m_dObjValueDescription.toStdString();
-    unit = m_dObjValueUnit.toStdString();
+    description = m_dObjValueDescription.toLatin1().toStdString();
+    unit = m_dObjValueUnit.toLatin1().toStdString();
 }
 
 //----------------------------------------------------------------------------------------------
 void DataObjectSeriesData::getDObjAxisDescriptionAndUnit(std::string &description, std::string &unit) const
 {
-    description = m_dObjAxisDescription.toStdString();
-    unit = m_dObjAxisUnit.toStdString();
+    description = m_dObjAxisDescription.toLatin1().toStdString();
+    unit = m_dObjAxisUnit.toLatin1().toStdString();
 }

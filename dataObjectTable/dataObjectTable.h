@@ -54,19 +54,19 @@ class DataObjectTable : public QTableView
     Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment DESIGNABLE true);
     
 
-    Q_CLASSINFO("prop://data", "the dataObject to be shown");
+    Q_CLASSINFO("prop://data", "dataObject that is displaye in the table view");
     Q_CLASSINFO("prop://readOnly", "enable write protection");
-    Q_CLASSINFO("prop://min", "get/set minimum value");
-    Q_CLASSINFO("prop://max", "get/set maximum value");
+    Q_CLASSINFO("prop://min", "minimum acceptable value (if editing is allowed)");
+    Q_CLASSINFO("prop://max", "maximum acceptable value (if editing is allowed)");
     Q_CLASSINFO("prop://decimals", "number of visible decimals for floating point numbers");
     Q_CLASSINFO("prop://editorDecimals", "number of possible decimals during the edit of floating point numbers");
     Q_CLASSINFO("prop://defaultCols", "number of column to be shown");
     Q_CLASSINFO("prop://defaultRows", "number of rows to be shown");
-    Q_CLASSINFO("prop://horizontalLabels", "list with labels for each column row");
-    Q_CLASSINFO("prop://verticalLabels", "list with labels for each shown row");
-    Q_CLASSINFO("prop://suffixes", "list with suffixes for each columns. If less suffixes than columns are indicated, the last suffix is repeated.");
-    Q_CLASSINFO("prop://horizontalResizeMode", "defines the mode how the rows can be resized or are stretched over the available space.");
-    Q_CLASSINFO("prop://verticalResizeMode", "defines the mode how the columns can be resized or are stretched over the available space.");
+    Q_CLASSINFO("prop://horizontalLabels", "list with labels for each shown column (if more columns are shown than labels, a default numbering is used for additional columns)");
+    Q_CLASSINFO("prop://verticalLabels", "list with labels for each shown row (if more rows are shown than labels, a default numbering is used for additional rows)");
+    Q_CLASSINFO("prop://suffixes", "list with suffixes for each column. If less suffixes than columns are indicated, the last suffix is repeated.");
+    Q_CLASSINFO("prop://horizontalResizeMode", "defines the mode how the rows can be resized or are stretched over the available space (ResizeToContents, Interactive, Stretch, Fixed, Custom -> see QHeaderView::ResizeMode).");
+    Q_CLASSINFO("prop://verticalResizeMode", "defines the mode how the columns can be resized or are stretched over the available space (ResizeToContents, Interactive, Stretch, Fixed, Custom -> see QHeaderView::ResizeMode).");
     Q_CLASSINFO("prop://alignment", "alignment of the text cells.");
 
     Q_CLASSINFO("signal://activated", "signal emitted if a cell is activated. Arguments are (row,column) of the cell.")
@@ -141,6 +141,7 @@ private slots:
     inline void _pressed (const QModelIndex &index) { emit pressed(index.row(), index.column()); }
     void copySelectionToClipboard();
     void copyAllToClipboard();
+    void setDecimalsGUI();
 
 signals:
     void activated (int row, int column);

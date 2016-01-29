@@ -27,6 +27,7 @@
 #include <qapplication.h>
 #include <qclipboard.h>
 #include <qmenu.h>
+#include <qinputdialog.h>
 
 #include "dataObjectDelegate.h"
 #include "dataObjectModel.h"
@@ -321,6 +322,8 @@ void DataObjectTable::contextMenuEvent(QContextMenuEvent *event)
     QMenu contextMenu(this);
     contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), "copy selection", this, SLOT(copySelectionToClipboard()));
     contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"), "copy all", this, SLOT(copyAllToClipboard()));
+    contextMenu.addSeparator();
+    contextMenu.addAction(QIcon(":/itomDesignerPlugins/general/icons/decimals.png"), "decimals...", this, SLOT(setDecimalsGUI()));
     contextMenu.exec(event->globalPos());
     
     event->accept();
@@ -416,4 +419,19 @@ void DataObjectTable::copyAllToClipboard()
     }
 
     QApplication::clipboard()->setText(final.join("\n"));
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void DataObjectTable::setDecimalsGUI()
+{
+    bool ok;
+    int decimals = getDecimals();
+    int newDecimals = QInputDialog::getInt(this, tr("number of decimals"), tr("set number of decimals"), decimals, 0, 15, 1, &ok);
+
+    if (ok)
+    {
+        int editorDecimals = getEditorDecimals();
+        setDecimals(newDecimals);
+        setEditorDecimals(std::max(0, editorDecimals + (newDecimals - decimals)));
+    }
 }

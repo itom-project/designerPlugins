@@ -1,7 +1,7 @@
 SET (target_name dataObjectTable)
 SET (figure_name dataObjectTable)
 project(${target_name})
-
+ 
 cmake_minimum_required(VERSION 2.8)
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
@@ -126,3 +126,5 @@ ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
 ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
 ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
 POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+
+COPY_DIRECTORY_IF_CHANGED("${CMAKE_CURRENT_SOURCE_DIR}/docs/source" "${ITOM_APP_DIR}/designer/docs/${target_name}" ${target_name} "*.*" GLOB_RECURSE)
