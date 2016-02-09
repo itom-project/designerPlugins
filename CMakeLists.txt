@@ -24,7 +24,7 @@ if (PLUGIN_itom1DQwtPlot OR PLUGIN_itom2DQwtPlot)
 endif ()
 
 if (PLUGIN_slider2D)
-    ADD_SUBDIRECTORY(Slider2D)
+    ADD_SUBDIRECTORY(slider2D)
 endif ()
 
 if (PLUGIN_itom1DQwtPlot)
