@@ -8,7 +8,7 @@ in the spin box will call the **setX** or **setY** slot of the Slider2D. These c
 configured in the QtDesigner.
 
 .. figure:: slider2D.png    
-    :scale: 60%
+    :scale: 100%
     :align: center
     
 To manually change the x-value or y-value from a script, use the following snippet:

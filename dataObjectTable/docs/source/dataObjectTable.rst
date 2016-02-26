@@ -8,7 +8,7 @@ to a direct modification of the values in the origin object. It is not possible 
 size or type of the displayed dataObject.
 
 .. figure:: dataObjectTable.png    
-    :scale: 60%
+    :scale: 100%
     :align: center
     
 The figure is taken from the example **dataObjectTableDemo** (demo subfolder **ui/customItomWidgets**).
@@ -96,7 +96,7 @@ select a part or the entire table and choose **copy selection** or **copy all** 
 on the table). 
 
 .. figure:: dataObjectTableClipboard.png    
-    :scale: 40%
+    :scale: 100%
     :align: center
     
 The result will look like this (copy selection):
