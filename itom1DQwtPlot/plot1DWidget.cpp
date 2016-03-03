@@ -111,18 +111,18 @@ Plot1DWidget::Plot1DWidget(QMenu *contextMenu, InternalData *data, QWidget * par
     canvas()->setCursor(Qt::ArrowCursor);
 
     m_colorList.reserve(12);
-    m_colorList.append(tr("blue"));
-    m_colorList.append(tr("green"));
-    m_colorList.append(tr("red"));
-    m_colorList.append(tr("magenta"));
-    m_colorList.append(tr("cyan"));
-    m_colorList.append(tr("yellow"));
-    m_colorList.append(tr("darkBlue"));
-    m_colorList.append(tr("darkGreen"));
-    m_colorList.append(tr("darkRed"));
-    m_colorList.append(tr("darkMagenta"));
-    m_colorList.append(tr("darkCyan"));
-    m_colorList.append(tr("darkYellow"));
+    m_colorList.append("blue");
+    m_colorList.append("green");
+    m_colorList.append("red");
+    m_colorList.append("magenta");
+    m_colorList.append("cyan");
+    m_colorList.append("yellow");
+    m_colorList.append("darkBlue");
+    m_colorList.append("darkGreen");
+    m_colorList.append("darkRed");
+    m_colorList.append("darkMagenta");
+    m_colorList.append("darkCyan");
+    m_colorList.append("darkYellow");
 
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
