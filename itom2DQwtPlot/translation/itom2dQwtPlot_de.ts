@@ -14,40 +14,40 @@
         <translation>X-Anzeige</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <location line="+109"/>
-        <location line="+109"/>
+        <location line="+12"/>
+        <location line="+118"/>
+        <location line="+118"/>
         <source>auto</source>
         <translation>Automatisch</translation>
     </message>
     <message>
-        <location line="-208"/>
-        <location line="+109"/>
-        <location line="+109"/>
+        <location line="-226"/>
+        <location line="+118"/>
+        <location line="+118"/>
         <source>manual adjustment:</source>
         <translation>Manuelle Ausrichtung:</translation>
     </message>
     <message>
-        <location line="-206"/>
-        <location line="+109"/>
-        <location line="+109"/>
+        <location line="-218"/>
+        <location line="+118"/>
+        <location line="+118"/>
         <source>from</source>
         <translation>von</translation>
     </message>
     <message>
-        <location line="-186"/>
-        <location line="+109"/>
-        <location line="+109"/>
+        <location line="-223"/>
+        <location line="+118"/>
+        <location line="+118"/>
         <source>to</source>
         <translation>bis</translation>
     </message>
     <message>
-        <location line="-184"/>
+        <location line="-171"/>
         <source>y-range</source>
         <translation>Y-Anzeige</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+118"/>
         <source>values</source>
         <translation>Werte</translation>
     </message>
@@ -201,7 +201,8 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+251"/>
+        <location filename="../itom2dqwtplot.cpp" line="+267"/>
+        <location line="+2"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -211,12 +212,24 @@
         <translation>Ursprüngliche Ansicht wiederherstellen</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+12"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation>Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+5"/>
+        <location line="+2"/>
+        <source>Clear geometric shapes</source>
+        <translation type="unfinished">Geometrische Formen löschen</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Clear all existing geometric shapes</source>
+        <translation type="unfinished">Alle existierende geometrische Formen löschen</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <location line="+2"/>
         <location line="+4"/>
         <source>Zoom to rectangle</source>
         <translation>Zoom in Rechteck</translation>
@@ -227,7 +240,8 @@
         <translation type="unfinished">Aktuelle Grafik an Workspace senden...</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
+        <location line="+2"/>
         <source>Scale settings...</source>
         <translation type="unfinished">Skalen setzten...</translation>
     </message>
@@ -237,7 +251,8 @@
         <translation>Einstellungen der Skalen</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
+        <location line="+2"/>
         <source>Palette</source>
         <translation>Farbpalette wechseln</translation>
     </message>
@@ -247,7 +262,8 @@
         <translation>Wechsel der Farbpaletten</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
+        <location line="+2"/>
         <source>Show Colorbar</source>
         <translation>Farbleiste anzeigen</translation>
     </message>
@@ -257,7 +273,7 @@
         <translation>Farbleiste ein- und ausblenden</translation>
     </message>
     <message>
-        <location line="-164"/>
+        <location line="-198"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
@@ -272,7 +288,8 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+75"/>
+        <location line="+80"/>
+        <location line="+2"/>
         <source>Save...</source>
         <translation>Speichern...</translation>
     </message>
@@ -282,7 +299,8 @@
         <translation>Aktuelle Abbildung exportieren...</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
+        <location line="+2"/>
         <source>Copy to clipboard</source>
         <translation type="unfinished">In die Zwischenablage kopieren</translation>
     </message>
@@ -292,22 +310,22 @@
         <translation type="unfinished">Aktuelle Grafik in die Zwischenablage kopieren</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+15"/>
+        <location line="+2"/>
         <source>Move</source>
         <translation>Verschieben</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>Clear markers</source>
-        <translation>Alle Marker löschen</translation>
+        <translation type="vanished">Alle Marker löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Clear all existing geometric elements</source>
-        <translation>Löscht alle gesetzen Marker</translation>
+        <translation type="vanished">Löscht alle gesetzen Marker</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+20"/>
+        <location line="+2"/>
         <source>Lock aspect ratio</source>
         <translation>Seitenverhältnis beibehalten</translation>
     </message>
@@ -321,19 +339,21 @@
         <translation type="vanished">Skaleneinstellungen...</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+49"/>
+        <location line="+2"/>
         <source>Marker</source>
         <translation>Positionsanzeiger</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <location line="+1310"/>
+        <location line="+8"/>
+        <location line="+2"/>
+        <location line="+1492"/>
         <location line="+8"/>
         <source>Linecut</source>
         <translation>Linienschnitt</translation>
     </message>
     <message>
-        <location line="-1315"/>
+        <location line="-1497"/>
         <source>Show a in plane line cut</source>
         <translation>Linienschnitt der Ebene anzeigen</translation>
     </message>
@@ -403,7 +423,8 @@
         <translation type="unfinished">Alpha für das Overlay setzen</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
+        <location line="+2"/>
         <source>Slice in z-direction</source>
         <translation>Schnitt in Z-Richtung</translation>
     </message>
@@ -418,17 +439,15 @@
         <translation>Bildebene auswählen</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Switch Draw Mode</source>
-        <translation>Markermodus</translation>
+        <translation type="vanished">Markermodus</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Draw Mode</source>
-        <translation>Markermodus</translation>
+        <translation type="vanished">Markermodus</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+17"/>
         <source>Point</source>
         <translation>Punkt</translation>
     </message>
@@ -448,14 +467,26 @@
         <translation>Ellipse</translation>
     </message>
     <message>
-        <location line="+11"/>
         <source>Switch Element Modification Mode</source>
-        <translation type="unfinished">Elementausrichtung</translation>
+        <translation type="obsolete">Elementausrichtung</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Elemet Modify Mode</source>
-        <translation type="unfinished">Elementausrichtung</translation>
+        <translation type="obsolete">Elementausrichtung</translation>
+    </message>
+    <message>
+        <location line="-23"/>
+        <location line="+2"/>
+        <location line="+2"/>
+        <source>Draw geometric shape</source>
+        <translation type="unfinished">Geometrische Formen zeichnen</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <location line="+2"/>
+        <location line="+1"/>
+        <source>Geometric shape modification mode</source>
+        <translation type="unfinished">Modifikationsmodus für geometisches Element</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -463,22 +494,23 @@
         <translation type="unfinished">Elemente verschieben</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+9"/>
         <source>Resize elements</source>
         <translation type="unfinished">Elemente in Größe anpassen</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>Rotate elements</source>
         <translation type="unfinished">Elemente rotieren</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>Modify points</source>
         <translation type="unfinished">Modifikationspunkt</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+16"/>
+        <location line="+2"/>
         <source>Center marker</source>
         <translation>Mittelpunktsanzeige</translation>
     </message>
@@ -488,7 +520,8 @@
         <translation>Zeigt den Objektmittelpunkt</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
+        <location line="+2"/>
         <source>Switch Imag, Real, Abs, Pha</source>
         <translation>Bildmodus</translation>
     </message>
@@ -518,7 +551,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+508"/>
+        <location line="+588"/>
         <source>PDF Documents (*.pdf)</source>
         <translation>FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -543,12 +576,12 @@
         <translation>Speichern unter</translation>
     </message>
     <message>
-        <location line="+512"/>
+        <location line="+585"/>
         <source>Could not spawn lineCut due to missing API-handle</source>
         <translation type="unfinished">Linienschnitt konnte nicht erzeugt werden, API-Handle wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+61"/>
         <source>the opened figure is not inherited from ito::AbstractDObjFigure</source>
         <translation>Die geöffnete Abbildung wurde nicht von ito::AbstractDObjFigure vererbt</translation>
     </message>
@@ -558,7 +591,7 @@
         <translation type="unfinished">Z-Stapel</translation>
     </message>
     <message>
-        <location line="+338"/>
+        <location line="+323"/>
         <source>Element container did not match criteria, 2 dims, elements x 11, floating point value</source>
         <translation>Objekt entspricht nicht den Kriterien: Zweidimensional, Objekte x 11, Fließkommewerte</translation>
     </message>
@@ -568,22 +601,22 @@
         <translation>Gelöschtes Objekt. Neue Objektliste ist leer</translation>
     </message>
     <message>
-        <location line="+208"/>
+        <location line="+202"/>
         <source>Could not convert elements, type undefined</source>
         <translation>Objekt kann nicht konvertiert werden: Unbekannter Typ</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+11"/>
         <source>Could not set elements</source>
         <translation>Element konnte nicht gesetzt werden</translation>
     </message>
     <message>
-        <location line="+186"/>
+        <location line="+209"/>
         <source>Could not set active element, index out of range.</source>
         <translation>Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+22"/>
         <source>Set lineCut coordinates failed. Could not activate lineCut.</source>
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Der Linienschnitt konnte nicht aktiviert werden.</translation>
     </message>
@@ -593,34 +626,61 @@
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Widget nicht bereit.</translation>
     </message>
     <message>
-        <location line="+313"/>
         <source>Export image failed, canvas handle not initilized</source>
-        <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
+        <translation type="obsolete">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
     </message>
     <message>
-        <location line="+25"/>
         <source>copy current view to clipboard...</source>
-        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren...</translation>
+        <translation type="obsolete">Aktuelle Grafik in Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>copy current view to clipboard. done.</source>
-        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren. - Beendet.</translation>
+        <translation type="obsolete">Aktuelle Grafik in Zwischenablage kopieren. - Beendet.</translation>
     </message>
     <message>
-        <location line="+82"/>
-        <location line="+23"/>
+        <location line="+450"/>
+        <location line="+24"/>
         <source>Could not access internal data structure</source>
         <translation type="unfinished">Es kann nicht auf die interne Datenstruktur zugegriffen werden</translation>
     </message>
     <message>
-        <location line="-16"/>
-        <location line="+23"/>
+        <location line="-17"/>
+        <location line="+24"/>
         <source>Geometric element not found</source>
         <translation type="unfinished">Geometisches Element wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <source>Current to workspace</source>
+        <translation type="obsolete">Aktueller Plot in den Workspace</translation>
+    </message>
+    <message>
+        <source>Indicate the python variable name for the currently visible object</source>
+        <translation type="obsolete">Variablenname für die Übernahme in den Workspace</translation>
+    </message>
+    <message>
+        <source>Error sending data object to workspace</source>
+        <translation type="obsolete">Fehler beim Senden des Datenobjekts an Workspace</translation>
+    </message>
+</context>
+<context>
+    <name>ItomQwtDObjFigure</name>
+    <message>
+        <location filename="../../sharedFiles/itomQwtDObjFigure.cpp" line="+67"/>
+        <source>Export image failed, canvas handle not initilized</source>
+        <translation type="unfinished">Der Bildexport ist fehlgeschlagen, Canvas-Handle wurde nicht inizialisiert</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>copy current view to clipboard...</source>
+        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren...</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>copy current view to clipboard. done.</source>
+        <translation type="unfinished">Aktuelle Grafik in Zwischenablage kopieren. - Beendet.</translation>
+    </message>
+    <message>
+        <location line="+75"/>
         <source>Current to workspace</source>
         <translation type="unfinished">Aktueller Plot in den Workspace</translation>
     </message>
@@ -639,7 +699,7 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+590"/>
+        <location filename="../plotCanvas.cpp" line="+546"/>
         <location line="+163"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
@@ -657,24 +717,24 @@
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="+972"/>
+        <location line="+977"/>
         <location line="+1"/>
         <source>Could not plot marker, api is missing</source>
         <translation>Die Position kann nicht angezeigt werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+53"/>
         <source>The style tag does not correspond to the required format</source>
         <translation>Das Tag-Format stimmt nicht mit dem benötigten Format überein</translation>
     </message>
     <message>
-        <location line="+76"/>
+        <location line="+66"/>
         <location line="+30"/>
         <source>invalid marker type</source>
         <translation>Ungültiger Marker-Typ</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+47"/>
         <source>No marker with id &apos;%1&apos; found.</source>
         <translation>Der Marker mit der ID &apos;%1&apos; wurde nicht gefunden.</translation>
     </message>
@@ -684,7 +744,7 @@
         <translation>Der Marker mit der ID &apos;%d&apos; wurde nicht gefunden.</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+37"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation>%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
@@ -694,69 +754,69 @@
         <translation>Punkte auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <location line="+43"/>
+        <location line="+12"/>
         <location line="+44"/>
-        <location line="+44"/>
+        <location line="+45"/>
+        <location line="+45"/>
         <source>Selection has been interrupted.</source>
         <translation>Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
-        <location line="-96"/>
-        <location line="+280"/>
+        <location line="-98"/>
+        <location line="+294"/>
         <source>Please draw %1 lines. Esc aborts the selection.</source>
         <translation>%1 Linien einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-279"/>
-        <location line="+280"/>
+        <location line="-293"/>
+        <location line="+294"/>
         <source>Please draw one line. Esc aborts the selection.</source>
         <translation>Eine Linie einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-238"/>
-        <location line="+315"/>
+        <location line="-251"/>
+        <location line="+329"/>
         <source>Please draw %1 rectangles. Esc aborts the selection.</source>
         <translation>%1 Rechtecke einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-314"/>
-        <location line="+315"/>
+        <location line="-328"/>
+        <location line="+329"/>
         <source>Please draw one rectangle. Esc aborts the selection.</source>
         <translation>Ein Rechteck einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-272"/>
-        <location line="+349"/>
+        <location line="-285"/>
+        <location line="+363"/>
         <source>Please draw %1 ellipses. Esc aborts the selection.</source>
         <translation>%1 Ellipsen einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-348"/>
-        <location line="+349"/>
+        <location line="-362"/>
+        <location line="+363"/>
         <source>Please draw one ellipse. Esc aborts the selection.</source>
         <translation>Eine Ellipse einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-315"/>
+        <location line="-329"/>
         <source>Unknown type for userInteractionStart</source>
         <translation>Ungültiger Typ für &apos;userInteractionStart&apos;</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <location line="+48"/>
-        <location line="+51"/>
+        <location line="+31"/>
+        <location line="+49"/>
+        <location line="+52"/>
+        <location line="+80"/>
         <location line="+79"/>
-        <location line="+78"/>
         <source>Selection has been aborted.</source>
         <translation>Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
-        <location line="-251"/>
-        <location line="+48"/>
-        <location line="+52"/>
+        <location line="-255"/>
+        <location line="+49"/>
+        <location line="+53"/>
+        <location line="+80"/>
         <location line="+79"/>
-        <location line="+78"/>
         <source>%1 points have been selected.</source>
         <translation>%1 Punkt(e) wurden ausgewählt.</translation>
     </message>
@@ -784,14 +844,12 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+73"/>
         <source>Source data for plot</source>
-        <translation>Quelldaten der Abbildung</translation>
+        <translation type="vanished">Quelldaten der Abbildung</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Actual output data of plot</source>
-        <translation>Quelldaten der Abbildung</translation>
+        <translation type="vanished">Quelldaten der Abbildung</translation>
     </message>
     <message>
         <source>duplicate Channel, in addChannel</source>
@@ -838,12 +896,11 @@
         <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
-        <translation>Live-Datenquelle für Abbildung</translation>
+        <translation type="vanished">Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-2826"/>
+        <location filename="../itom2dqwtplot.cpp" line="-3027"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
     </message>

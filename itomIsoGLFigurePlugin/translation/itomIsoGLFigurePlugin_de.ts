@@ -169,11 +169,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../build/itom/SDK/include/plot/AbstractDObjPCLFigure.h" line="+80"/>
-        <location line="+2"/>
-        <location line="+2"/>
         <source>Source data for plot</source>
-        <translation>Quelldaten der Abbildung</translation>
+        <translation type="vanished">Quelldaten der Abbildung</translation>
     </message>
     <message>
         <source>Actual output data of plot</source>
@@ -224,9 +221,8 @@
         <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
-        <translation>Live-Datenquelle für Abbildung</translation>
+        <translation type="vanished">Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
         <location filename="../itomIsoGLFigurePlugin.cpp" line="+39"/>

@@ -374,14 +374,12 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../../build/itom/SDK/include/plot/AbstractDObjFigure.h" line="+73"/>
         <source>Source data for plot</source>
-        <translation>Quelldaten der Abbildung</translation>
+        <translation type="vanished">Quelldaten der Abbildung</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Actual output data of plot</source>
-        <translation>Quelldaten der Abbildung</translation>
+        <translation type="vanished">Quelldaten der Abbildung</translation>
     </message>
     <message>
         <source>duplicate Channel, in addChannel</source>
@@ -428,9 +426,8 @@
         <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
     </message>
     <message>
-        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
-        <translation>Live-Datenquelle für Abbildung</translation>
+        <translation type="vanished">Live-Datenquelle für Abbildung</translation>
     </message>
     <message>
         <location filename="../graphicViewPlugin.cpp" line="+38"/>

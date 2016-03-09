@@ -110,9 +110,8 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../../build/itom/SDK/include/plot/AbstractNode.h" line="+210"/>
         <source>Live data source for plot</source>
-        <translation type="unfinished">Live-Datenquelle für die Anzeige</translation>
+        <translation type="obsolete">Live-Datenquelle für die Anzeige</translation>
     </message>
 </context>
 <context>
@@ -133,34 +132,50 @@
         <translation>Links</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+16"/>
+        <location line="+33"/>
+        <location line="+49"/>
+        <location line="+19"/>
+        <source> %</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="-58"/>
         <source>top</source>
         <translation>Oben</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+16"/>
+        <source>vertical space</source>
+        <translation type="unfinished">Vertikaler Abstand</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>horizontal space</source>
+        <translation type="unfinished">Horizontaler Abstand</translation>
+    </message>
+    <message>
+        <location line="-49"/>
         <source>bottom</source>
         <translation>Unten</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="-7"/>
         <source>right</source>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+43"/>
         <source>Spacing</source>
         <translation>Abstand</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>hspace</source>
-        <translation>Horizontal</translation>
+        <translation type="vanished">Horizontal</translation>
     </message>
     <message>
-        <location line="+23"/>
         <source>wspace</source>
-        <translation>Vertikal</translation>
+        <translation type="vanished">Vertikal</translation>
     </message>
 </context>
 </TS>
