@@ -631,6 +631,21 @@ bool PlotTreeWidget::calculateDistance(const ito::Shape &first, const ito::Shape
         distance = std::abs((line_vector.x() * dist_points.y() - line_vector.y() * dist_points.x()) / std::sqrt(line_vector.x()*line_vector.x() + line_vector.y()*line_vector.y()));
         return true;
     }
+    else if (!p2.isNull() && first.type() == ito::Shape::Line)
+    {
+        QLineF line(first.rtransform().map(first.rbasePoints()[0]), first.rtransform().map(first.rbasePoints()[1]));
+        QPointF line_vector = first.rtransform().map(first.rbasePoints()[1]) - first.rtransform().map(first.rbasePoints()[0]);
+
+        if (line_vector.manhattanLength() == 0.0)
+        {
+            distance = quietNaN;
+            return false;
+        }
+
+        QPointF dist_points = p2 - line.p1();
+        distance = std::abs((line_vector.x() * dist_points.y() - line_vector.y() * dist_points.x()) / std::sqrt(line_vector.x()*line_vector.x() + line_vector.y()*line_vector.y()));
+        return true;
+    }
 
     distance = quietNaN;
     return false;
