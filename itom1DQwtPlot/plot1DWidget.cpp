@@ -269,6 +269,7 @@ Plot1DWidget::~Plot1DWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::init()
 {
+    ito::RetVal retVal;
     ItomQwtPlot::loadStyles();
 
     QPen trackerPen = QPen(QBrush(Qt::red),2);
@@ -279,25 +280,28 @@ ito::RetVal Plot1DWidget::init()
     QFont labelFont =  QFont("Helvetica",12);
     QFont axisFont = QFont("Helvetica",10);
     m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
+    int buttonSet = 0;
 
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
-        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>();
-        trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
-        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, &retVal).value<QPen>();
+        trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, &retVal).value<QFont>();
+        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, &retVal).value<QBrush>();
 
-        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>();
-        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>();
-        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>();   
+        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, &retVal).value<QFont>();
+        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, &retVal).value<QFont>();
+        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, &retVal).value<QFont>();
 
-        m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, NULL).value<int>());
-        m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, NULL).value<qreal>();
+        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, &retVal).value<int>();
 
-        m_curveFilled = (ItomQwtPlotEnums::FillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, NULL).value<int>();
-        m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, NULL).value<QColor>();
-        m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, NULL).value<int>());
+        m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, &retVal).value<int>());
+        m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, &retVal).value<qreal>();
 
-        m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
+        m_curveFilled = (ItomQwtPlotEnums::FillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, &retVal).value<int>();
+        m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, &retVal).value<QColor>();
+        m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, &retVal).value<int>());
+
+        m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, &retVal).value<int>());
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -308,6 +312,8 @@ ito::RetVal Plot1DWidget::init()
 
     axisTitle(QwtPlot::xBottom).setFont(axisFont);
     axisTitle(QwtPlot::yLeft).setFont(axisFont);
+    setAxisFont(QwtPlot::xBottom, axisFont);
+    setAxisFont(QwtPlot::yLeft, axisFont);
 
     QwtText t = axisWidget(QwtPlot::xBottom)->title();
     t.setFont(labelFont);
@@ -317,7 +323,9 @@ ito::RetVal Plot1DWidget::init()
     t.setFont(labelFont);
     axisWidget(QwtPlot::yLeft)->setTitle(t);
 
-    return ito::retOk;
+    setButtonStyle(buttonSet);
+
+    return retVal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

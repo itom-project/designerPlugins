@@ -327,6 +327,7 @@ void PlotCanvas::refreshStyles()
 
     QSize centerMarkerSize = QSize(10, 10);
     QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);
+    int buttonSet = 0;
 
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -335,6 +336,8 @@ void PlotCanvas::refreshStyles()
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana", 10), NULL).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern), NULL).value<QBrush>();
         selectionPen = apiGetFigureSetting(parent(), "selectionPen", QPen(QBrush(Qt::gray), 2, Qt::SolidLine), NULL).value<QPen>();
+
+        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>();
 
         titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica", 12), NULL).value<QFont>();
         labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica", 12), NULL).value<QFont>();
@@ -396,6 +399,8 @@ void PlotCanvas::refreshStyles()
 
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
+
+    setButtonStyle(buttonSet);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
