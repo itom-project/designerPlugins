@@ -88,33 +88,7 @@ void Itom2dQwtPlot::constructor()
 
     addToolbarsAndMenus();
 
-    //TODO: this part steals the shortcuts from actions, defined as childs of this main window and creates
-    //them as childs of the content such that they can be properly registered if the plot is docked, undocked,
-    //part of a GUI... This code snippet should be placed as protected function in AbstractFigure.h and
-    //called from here, since it is working for all types of plots. (will be done after merging the reworkQwtBranch)
-    QShortcut *shortcut;
-    QAction *a;
-    QWidget *p = centralWidget();
-    foreach(QObject *o, children())
-    {
-        a = qobject_cast<QAction*>(o);
-        if (a && a->shortcut().isEmpty() == false)
-        {
-            shortcut = new QShortcut(a->shortcut(), p);
-            shortcut->setContext(Qt::WidgetWithChildrenShortcut);
-            connect(shortcut, SIGNAL(activated()), a, SLOT(trigger()));
-
-            QString text2 = a->text();
-            QString text3 = a->text();
-            text3.replace("&", "");
-            text2 += "\t" + a->shortcut().toString(QKeySequence::NativeText);
-            text3 += " (" + a->shortcut().toString(QKeySequence::NativeText) + ")";
-            a->setText(text2);
-            a->setToolTip(text3);
-            a->setShortcut(QKeySequence());
-        }
-    }
-    //end
+    registerShortcutActions();
 
     setPropertyObservedObject(this);
 }
