@@ -57,6 +57,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_plot_renderer.h>
 #include <qwt_symbol.h>
+#include <qwt_plot_layout.h>
 
 //---------------------------------------------------------------------------
 ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
@@ -125,7 +126,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pMagnifier->setZoomOutKey(Qt::Key_Minus, Qt::KeypadModifier);
     //m_pMagnifier->setMouseFactor(-m_pMagnifier->mouseFactor()); //todo: not done in 2d plot, only in 1d plot. what is right?
     m_pMagnifier->setEnabled(true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, false);
+    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, true);
     m_pMagnifier->setAxisEnabled(QwtPlot::yRight, false);
     m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
     m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
@@ -143,6 +144,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     setContentsMargins(5, 5, 5, 5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
     canvas()->setContentsMargins(0, 0, 0, 0); //border of the canvas (border between canvas and axes or title)
 
+    plotLayout()->setAlignCanvasToScales(true); //directly connects the bottom-left-corners of the y-left and x-bottom axis.
+
     //left axis
     QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
     leftAxis->setMargin(0);                 //distance backbone <-> canvas
@@ -156,6 +159,14 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
     bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
     bottomAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
+
+    ////top axis
+    //QwtScaleWidget *topAxis = axisWidget(QwtPlot::xTop);
+    //enableAxis(QwtPlot::xTop, true);
+    //topAxis->setMargin(0);                 //distance backbone <-> canvas
+    //topAxis->setSpacing(6);                //distance tick labels <-> axis label
+    //topAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
+    //topAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
 
     setState(stateIdle);
 
