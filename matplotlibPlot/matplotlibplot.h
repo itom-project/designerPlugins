@@ -25,8 +25,10 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
     Q_OBJECT
 
     Q_PROPERTY(bool forceWindowResize READ getForceWindowResize WRITE setForceWindowResize USER true)
+    Q_PROPERTY(bool keepSizeFixed READ getKeepSizeFixed WRITE setKeepSizeFixed USER true)
 
     Q_CLASSINFO("prop://forceWindowResize", "If set, the plot widget / area is resized to the desired sizes given by matplotlib. Uncheck this option, if you want to keep the canvas unchanged e.g. in an user-defined GUI")
+    Q_CLASSINFO("prop://keepSizeFixed", "If you want to control the size of the canvas by python / matplotlib (e.g. set_size_inches), set this to true. The canvas will then have a fixed size, that is not affected by the window size.")
     
     Q_CLASSINFO("slot://showSubplotConfig", "")
     Q_CLASSINFO("slot://setLabelText", "")
@@ -44,6 +46,9 @@ public:
 
     void setForceWindowResize(bool force) { m_forceWindowResize = force; } 
     bool getForceWindowResize() const { return m_forceWindowResize; }
+
+    void setKeepSizeFixed(bool fixed);
+    bool getKeepSizeFixed() const { return m_keepSizeFixed; }
 
     void resizeCanvas(int width, int height);
 
@@ -66,6 +71,7 @@ private:
     MatplotlibWidget *m_pContent;
     MatplotlibSubfigConfig *m_pMatplotlibSubfigConfig;
     bool m_forceWindowResize;
+    bool m_keepSizeFixed;
 
 signals:
     void subplotConfigSliderChanged(int type, int value);
