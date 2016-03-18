@@ -127,20 +127,20 @@ public slots:
 
     void setCursors(int cursorId)
     {
-        QApplication::restoreOverrideCursor();
+        unsetCursor();
         switch(cursorId)
         {
         case Qt::ArrowCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::ArrowCursor) );
+            setCursor( QCursor(Qt::ArrowCursor) );
             break;
         case Qt::CrossCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::CrossCursor) );
+            setCursor( QCursor(Qt::CrossCursor) );
             break;
         case Qt::SizeAllCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::SizeAllCursor) );
+            setCursor( QCursor(Qt::SizeAllCursor) );
             break;
         case Qt::PointingHandCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::PointingHandCursor) );
+            setCursor( QCursor(Qt::PointingHandCursor) );
             break;
         }
     };

@@ -335,7 +335,6 @@ void MatplotlibWidget::leaveEvent ( QEvent * /*event*/ )
 {
     if (!hasFocus())
         return;
-    QApplication::restoreOverrideCursor();
     emit eventLeaveEnter(0);
 }
 
@@ -414,7 +413,6 @@ void MatplotlibWidget::mouseReleaseEvent ( QMouseEvent * event )
     {
         setMouseTracking(false);
     }
-    QApplication::restoreOverrideCursor();
     m_pendingEvent.clear(); //clear possible move events which are still in queue
     handleMouseEvent(3, event);
     event->accept();
