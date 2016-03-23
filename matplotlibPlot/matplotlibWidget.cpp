@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -102,7 +102,71 @@ void MatplotlibWidget::externalResize(int width, int height)
 }
 
 //-------------------------------------------------------------------------------------
-void MatplotlibWidget::paintResult(QByteArray imageString, int x, int y, int w, int h, bool blit )
+void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int y, int w, int h, bool blit )
+{
+    int imgHeight = 0;
+    int imgWidth = 0;
+
+    m_timer.stop();
+    
+    if(blit == false)
+    {
+        //qDebug() << "size: " << w << ", " << h << ", imageString-size:" << imageString.length() << " win: " << width() << ", " << height();
+        QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
+        m_pixmap = QPixmap::fromImage(image);
+        m_pixmapItem->setPixmap(m_pixmap);
+        m_pixmapItem->setOffset(x,y);
+        m_pixmapItem->update();
+    }
+    else
+    {
+        //check sizes
+        
+        imgHeight = m_pixmap.height();
+        imgWidth = m_pixmap.width();
+
+        if(x>=0 && y>=0 && imgHeight >= (y+h) && imgWidth >= (x+w))
+        {
+            QPainter painter(&m_pixmap);
+            QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
+            //painter.fillRect(x,y,w,h,QBrush(Qt::red));
+            painter.drawImage(QPoint(x,y),image);
+            painter.end();
+            m_pixmapItem->setPixmap(m_pixmap);
+            //m_pixmapItem->setOffset(x,y);
+            m_pixmapItem->update();
+        }
+
+    }
+
+    paintRect(false);
+
+    //QTransform unityTransform;
+    //this->setTransform(unityTransform);
+    ////this->scale(1.0,1.0);
+    ////fitInView(m_pixmapItem, Qt::KeepAspectRatio);
+    
+    QSize s = size();
+    //qDebug() << "size: " << s << ", pixmap:" << m_pixmap.size();
+
+    if(abs(m_pixmap.width()-s.width())<6 && abs(m_pixmap.height()-s.height())<6)
+    {
+        setTransform( QTransform(1,0,0,1,0,0), false );
+        centerOn( m_pixmapItem->boundingRect().center() );
+    }
+    else
+    {
+        fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
+    }
+    
+    //handle possible further update requests
+    paintTimeout();
+
+    emit eventIdle();
+}
+
+//-------------------------------------------------------------------------------------
+void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int y, int w, int h, bool blit )
 {
     int imgHeight = 0;
     int imgWidth = 0;
@@ -205,26 +269,20 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
         //qDebug() << "resizeEvent: " << event->size();
 
         m_pendingEvent = PendingEvent(event->size().height(), event->size().width());
-        if(m_timer.isActive())
-        {
-            m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
-        }
-        else
-        {
-            paintTimeout();
-        }
+        m_timer.start(60);
+        //if(m_timer.isActive())
+        //{
+        //    m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
+        //}
+        //else
+        //{
+        //    paintTimeout();
+        //}
     }
     m_internalResize = false;
     
-    //event->ignore();
     QGraphicsView::resizeEvent(event);
 }
-
-//-------------------------------------------------------------------------------------
-//void MatplotlibWidget::paintEvent ( QPaintEvent * event )
-//{
-//    QGraphicsView::paintEvent(event);
-//}
 
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintTimeout()
@@ -354,12 +412,10 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
     QPointF scenePos = mapToScene( event->pos().x(), event->pos().y() );
     if(event->orientation() == Qt::Vertical)
     {
-        //emit eventWheel(event->pos().x(), event->pos().y(), event->delta(), 1);
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 1);
     }
     else
     {
-        //emit eventWheel(event->pos().x(), event->pos().y(), event->delta(), 0);
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 0);
     }
 }

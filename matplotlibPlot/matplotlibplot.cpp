@@ -1,3 +1,25 @@
+/* ********************************************************************
+   itom measurement system
+   URL: http://www.uni-stuttgart.de/ito
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
+ 
+   This file is part of itom.
+
+   itom is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   itom is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with itom. If not, see <http://www.gnu.org/licenses/>.
+*********************************************************************** */
+
 #include "matplotlibplot.h"
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
@@ -111,7 +133,7 @@ MatplotlibPlot::~MatplotlibPlot()
 {
     if (m_pMatplotlibSubfigConfig)
     {
-        ((MatplotlibSubfigConfig*)m_pMatplotlibSubfigConfig)->deleteLater();
+        m_pMatplotlibSubfigConfig->deleteLater();
         m_pMatplotlibSubfigConfig = NULL;
     }
 }
@@ -119,22 +141,6 @@ MatplotlibPlot::~MatplotlibPlot()
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::resizeCanvas(int width, int height)
 {
-    /*if (m_toolbar->isVisible() && m_toolbar->isFloating() == false)
-    {
-        if (m_toolbar->orientation() == Qt::Horizontal)
-        {
-            resize(width,height+m_toolbar->height());
-        }
-        else
-        {
-            resize(width + m_toolbar->width(),height);
-        }
-    }
-    else
-    {
-        resize(width,height);
-    }*/
-
     resize(width,height);
 
     if (m_forceWindowResize)
@@ -215,8 +221,8 @@ void MatplotlibPlot::showSubplotConfig(float valLeft, float valTop, float valRig
         connect((m_pMatplotlibSubfigConfig)->sliderHSpace(), SIGNAL(valueChanged(double)), this, SLOT(subplotConfigSliderHSpaceChanged(double)));
     }
 
-    (m_pMatplotlibSubfigConfig)->setModal(true);
-    (m_pMatplotlibSubfigConfig)->show();
+    m_pMatplotlibSubfigConfig->setModal(true);
+    m_pMatplotlibSubfigConfig->show();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
