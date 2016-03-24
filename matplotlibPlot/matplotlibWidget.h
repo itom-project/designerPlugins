@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -34,6 +34,7 @@
 #include <qgraphicsview.h>
 #include <qgraphicsscene.h>
 #include <qgraphicsitem.h>
+#include <qsharedpointer.h>
 #include <qqueue.h>
 #include <qmenu.h>
 
@@ -117,7 +118,8 @@ signals:
 
 public slots:
     void externalResize(int width, int height);
-    void paintResult(QByteArray imageString, int x, int y, int w, int h, bool blit );
+    void paintResultDeprecated(QByteArray imageString, int x, int y, int w, int h, bool blit );
+    void paintResult(QSharedPointer<char> imageString, int x, int y, int w, int h, bool blit ); //this version is faster than the version above.
     void paintRect(bool drawRect, int x = 0, int y = 0, int w = 0, int h = 0);
     void paintTimeout();
     void stopTimer()
@@ -127,20 +129,20 @@ public slots:
 
     void setCursors(int cursorId)
     {
-        QApplication::restoreOverrideCursor();
+        unsetCursor();
         switch(cursorId)
         {
         case Qt::ArrowCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::ArrowCursor) );
+            setCursor( QCursor(Qt::ArrowCursor) );
             break;
         case Qt::CrossCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::CrossCursor) );
+            setCursor( QCursor(Qt::CrossCursor) );
             break;
         case Qt::SizeAllCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::SizeAllCursor) );
+            setCursor( QCursor(Qt::SizeAllCursor) );
             break;
         case Qt::PointingHandCursor:
-            QApplication::setOverrideCursor( QCursor(Qt::PointingHandCursor) );
+            setCursor( QCursor(Qt::PointingHandCursor) );
             break;
         }
     };

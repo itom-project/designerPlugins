@@ -60,10 +60,6 @@ LINK_DIRECTORIES(
 )
 
 set(plugin_HEADERS
-    ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
-	${ITOM_SDK_INCLUDE_DIR}/plot/AbstractNode.h
-	${ITOM_SDK_INCLUDE_DIR}/plot/AbstractFigure.h
-    ${ITOM_SDK_INCLUDE_DIR}/plot/AbstractItomDesignerPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplotfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibSubfigConfig.h
