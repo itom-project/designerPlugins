@@ -90,7 +90,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pMenuShapeType(NULL),
     m_pActClearShapes(NULL),
     m_pActProperties(NULL),
-    m_pActShapeType(NULL)
+    m_pActShapeType(NULL),
+    m_currentPlane(0)
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -144,7 +145,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     setContentsMargins(5, 5, 5, 5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
     canvas()->setContentsMargins(0, 0, 0, 0); //border of the canvas (border between canvas and axes or title)
 
-    plotLayout()->setAlignCanvasToScales(true); //directly connects the bottom-left-corners of the y-left and x-bottom axis.
+    //plotLayout()->setAlignCanvasToScales(true); //directly connects the bottom-left-corners of the y-left and x-bottom axis.
 
     //left axis
     QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
@@ -878,9 +879,9 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
                 ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
                 if (p)
                 {
-					if (p->ShapesWidget())
+					if (p->shapesWidget())
 					{
-						((PlotInfoShapes*)p->ShapesWidget())->updateShape(it.value()->getShape());
+						p->shapesWidget()->updateShape(it.value()->getShape());
 					}
                     emit p->geometricShapeChanged(it.value()->getIndex(), it.value()->getShape());
                 }
@@ -935,9 +936,11 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                 emit p->userInteractionDone(ito::Shape::MultiPointPick, aborted, shapes);
                 emit p->geometricShapeFinished(ito::Shape::MultiPointPick, aborted);
-				if (((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
+
+                PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
+				if (pim)
 				{
-					((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarkers(shapes);
+					pim->updateMarkers(shapes);
 				}
             }
 
@@ -1012,9 +1015,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Point, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Point, aborted);
-					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 					{
-						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
 					}
 					
                 }
@@ -1091,9 +1094,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Line, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Line, aborted);
-					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 					{
-						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
 					}
                 }
 
@@ -1168,9 +1171,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Rectangle, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Rectangle, aborted);
-					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 					{
-						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
 					}
                 }
 
@@ -1318,9 +1321,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Ellipse, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Ellipse, aborted);
-					if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 					{
-						((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShapes(shapes);
+						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
 					}
                 }
 
@@ -1700,9 +1703,9 @@ void ItomQwtPlot::clearAllGeometricShapes()
     bool thingsToDo = m_pShapes.size() > 0;
 	if (thingsToDo)
 	{
-		if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+		if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 		{
-			((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->removeShapes();
+			(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->removeShapes();
 		}
 	}
     //delete all geometric shapes and marker sets
@@ -1825,9 +1828,9 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
             if (m_pShapes.contains(shape.index()))
             {
                 m_pShapes[shape.index()]->setShape(shape, m_inverseColor0, m_inverseColor1);
-				if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+				if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 				{
-					((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
+					(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(shape);
 				}
             }
             else
@@ -1850,9 +1853,9 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                         newItem->attach(this);
                         m_pShapes.insert(newItem->getIndex(), newItem);
 						shape.setIndex(newItem->getIndex());
-						if (((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget()))
+						if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 						{
-							((PlotInfoShapes*)((ItomQwtDObjFigure*)(this->parent()))->ShapesWidget())->updateShape(shape);
+							(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(shape);
 						}
                     }
                     break;
@@ -1974,10 +1977,10 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 
 		QClipboard *clipboard = QApplication::clipboard();
 
-		if ((hMyParent->MarkerWidget()  && ((QWidget*)hMyParent->MarkerWidget())->isVisible()) ||
-			(hMyParent->PickerWidget()  && ((QWidget*)hMyParent->PickerWidget())->isVisible()) ||
-			(hMyParent->DObjectWidget() && ((QWidget*)hMyParent->DObjectWidget())->isVisible()) ||
-			(hMyParent->ShapesWidget()  && ((QWidget*)hMyParent->ShapesWidget())->isVisible()))
+		if ((hMyParent->markerWidget()  && hMyParent->markerWidget()->isVisible()) ||
+			(hMyParent->pickerWidget()  && hMyParent->pickerWidget()->isVisible()) ||
+			(hMyParent->dObjectWidget() && hMyParent->dObjectWidget()->isVisible()) ||
+			(hMyParent->shapesWidget()  && hMyParent->shapesWidget()->isVisible()))
 		{
 			plotInfoVisible = true;
 			emit statusBarMessage(tr("copy current view to clipboard including infoWidgets ..."));
@@ -2225,30 +2228,74 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         {
             char s = rgexp.cap(1).toLatin1()[0];
 
-            if (s == 'b') symPen.setColor(Qt::blue);
-            else if (s == 'g') symPen.setColor(Qt::green);
-            else if (s == 'r') symPen.setColor(Qt::red);
-            else if (s == 'c') symPen.setColor(Qt::cyan);
-            else if (s == 'm') symPen.setColor(Qt::magenta);
-            else if (s == 'y') symPen.setColor(Qt::yellow);
-            else if (s == 'k') symPen.setColor(Qt::black);
-            else if (s == 'w') symPen.setColor(Qt::white);
+            switch (s)
+            {
+            case 'b':
+                symPen.setColor(Qt::blue);
+                break;
+            case 'g':
+                symPen.setColor(Qt::green);
+                break;
+            case 'r':
+                symPen.setColor(Qt::red);
+                break;
+            case 'c':
+                symPen.setColor(Qt::cyan);
+                break;
+            case 'm':
+                symPen.setColor(Qt::magenta);
+                break;
+            case 'y':
+                symPen.setColor(Qt::yellow);
+                break;
+            case 'k':
+                symPen.setColor(Qt::black);
+                break;
+            case 'w':
+                symPen.setColor(Qt::white);
+                break;
+            }
 
             s = rgexp.cap(2).toLatin1()[0];
             bool ok;
 
-            if (s == '.') symStyle = QwtSymbol::Ellipse;
-            else if (s == 'o') symStyle = QwtSymbol::Ellipse;
-            else if (s == 's') symStyle = QwtSymbol::Rect;
-            else if (s == 'd') symStyle = QwtSymbol::Diamond;
-            else if (s == '>') symStyle = QwtSymbol::RTriangle;
-            else if (s == 'v') symStyle = QwtSymbol::DTriangle;
-            else if (s == '^') symStyle = QwtSymbol::UTriangle;
-            else if (s == '<') symStyle = QwtSymbol::LTriangle;
-            else if (s == 'x') symStyle = QwtSymbol::XCross;
-            else if (s == '*') symStyle = QwtSymbol::Star1;
-            else if (s == '+') symStyle = QwtSymbol::Cross;
-            else if (s == 'h') symStyle = QwtSymbol::Hexagon;
+            switch (s)
+            {
+            case '.':
+            case 'o':
+                symStyle = QwtSymbol::Ellipse;
+                break;
+            case 's':
+                symStyle = QwtSymbol::Rect;
+                break;
+            case 'd':
+                symStyle = QwtSymbol::Diamond;
+                break;
+            case '>':
+                symStyle = QwtSymbol::RTriangle;
+                break;
+            case 'v':
+                symStyle = QwtSymbol::DTriangle;
+                break;
+            case '^':
+                symStyle = QwtSymbol::UTriangle;
+                break;
+            case '<':
+                symStyle = QwtSymbol::LTriangle;
+                break;
+            case 'x':
+                symStyle = QwtSymbol::XCross;
+                break;
+            case '*':
+                symStyle = QwtSymbol::Star1;
+                break;
+            case '+':
+                symStyle = QwtSymbol::Cross;
+                break;
+            case 'h':
+                symStyle = QwtSymbol::Hexagon;
+                break;
+            }
 
             //s = rgexp.cap(3);
             int size = rgexp.cap(3).toInt(&ok);
@@ -2265,7 +2312,7 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         }
         else
         {
-            retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format").toLatin1().data());
+            retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,>,v,^,<,x,*,+,h)").toLatin1().data());
         }
 
         QwtPlotMarker *marker = NULL;
@@ -2294,13 +2341,23 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
                 marker->setLabel(label);
             }
 
+            if (plane == -1 || plane == m_currentPlane)
+            {
+                marker->setVisible(true);
+            }
+            else
+            {
+                marker->setVisible(false);
+            }
+
 			m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
         }
 
-		if (((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget()))
+        PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
+		if (pim)
 		{
 			ito::Shape shapes = ito::Shape::fromMultipoint(markerPolygon, m_plotMarkers.size(), tmpID);
-			((PlotInfoMarker*)((ItomQwtDObjFigure*)(this->parent()))->MarkerWidget())->updateMarker(shapes);
+			pim->updateMarker(shapes);
 		}
 
         replot();
@@ -2317,6 +2374,7 @@ ito::RetVal ItomQwtPlot::deleteMarkers(const QString &id)
     ito::RetVal retval;
     bool found = false;
     QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
+    
     while (i.hasNext())
     {
         i.next();
@@ -2327,6 +2385,12 @@ ito::RetVal ItomQwtPlot::deleteMarkers(const QString &id)
             found = true;
             i.remove();
         }
+    }
+
+    PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
+    if (pim)
+    {
+        pim->removeMarker(id);
     }
 
     if (!found && id != "")
@@ -2389,4 +2453,20 @@ void ItomQwtPlot::setShapesLabelVisible(bool visible)
     }
 
     m_shapesLabelVisible = visible;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtPlot::changeVisibleMarkers(int currentPlane)
+{
+    m_currentPlane = currentPlane;
+
+    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
+
+    while (i.hasNext())
+    {
+        i.next();
+        i.value().second->setVisible(i.value().first == -1 || i.value().first == currentPlane);
+    }
+
+    return ito::retOk;
 }

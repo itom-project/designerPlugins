@@ -126,6 +126,8 @@ protected:
     QwtPlotPanner *panner() const;
     void configRescaler();
 
+    ito::RetVal changeVisibleMarkers(int currentPlane);
+
     /*
     @param doReplot forces a replot of the content
     @param doZoomBase if true, the x/y-zoom is reverted to the full x-y-area of the manually set ranges (the same holds for the value range)
@@ -216,6 +218,7 @@ private:
     
     int m_state; /*!< current state (value of enum State or stateUser + X) */
     bool m_stateIsChanging;
+    int m_currentPlane;
 
     ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
 

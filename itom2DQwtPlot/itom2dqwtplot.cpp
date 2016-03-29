@@ -919,17 +919,17 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
     {
         m_pContent->childFigureDestroyed(obj, m_childFigures[obj]);
 
-		if (PickerWidget())
+		if (pickerWidget())
 		{
-			((PlotInfoPicker*)PickerWidget())->removeChildPlot(m_childFigures[obj]);
+			(pickerWidget())->removeChildPlot(m_childFigures[obj]);
 		}
 	
     }
 	else
 	{
-		if (PickerWidget())
+		if (pickerWidget())
 		{
-			((PlotInfoPicker*)PickerWidget())->removeChildPlots();
+			(pickerWidget())->removeChildPlots();
 		}
 	
         m_pContent->childFigureDestroyed(obj, 0);

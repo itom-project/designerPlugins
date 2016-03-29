@@ -176,10 +176,10 @@ public Q_SLOTS:
     
 
 protected:
-	inline QObject* MarkerWidget(void) const { return m_pMarkerInfo; }
-	inline QObject* PickerWidget(void) const { return m_pPickerInfo; }
-	inline QObject* ShapesWidget(void) const { return m_pShapesInfo; }
-	inline QObject* DObjectWidget(void) const { return m_pObjectInfo; }
+    inline PlotInfoMarker* markerWidget(void) const { return m_pMarkerInfo; }
+    inline PlotInfoPicker* pickerWidget(void) const { return m_pPickerInfo; }
+    inline PlotInfoShapes* shapesWidget(void) const { return m_pShapesInfo; }
+    inline PlotInfoDObject* dObjectWidget(void) const { return m_pObjectInfo; }
 
     void addToolbarsAndMenus();
     

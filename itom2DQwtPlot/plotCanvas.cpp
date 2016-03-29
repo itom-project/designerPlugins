@@ -716,9 +716,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         }
     }
 
-	if (m_dObjPtr && ((Itom2dQwtPlot*)(this->parent()))->DObjectWidget())
+	if (m_dObjPtr && ((Itom2dQwtPlot*)(this->parent()))->dObjectWidget())
 	{
-		PlotInfoDObject* infoWidget = (PlotInfoDObject*)(((Itom2dQwtPlot*)(this->parent()))->DObjectWidget());
+		PlotInfoDObject* infoWidget = (((Itom2dQwtPlot*)(this->parent()))->dObjectWidget());
 		infoWidget->updateInfoHeader(
 			QString("2D Object Plot"),
 			m_dObjPtr->getType(),
@@ -814,6 +814,7 @@ void PlotCanvas::setColorDataTypeRepresentation(bool colorOn)
 void PlotCanvas::changePlane(int plane)
 {
     refreshPlot(m_dObjPtr, plane);
+    changeVisibleMarkers(plane);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1157,9 +1158,9 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             QVector<QPointF> pts;
             pts.append(markerPosScaleCoords);
             p->displayCut(pts, m_zstackCutUID,true);
-			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
 			{
-				((PlotInfoPicker*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
+				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
 			}
 
             replot();
@@ -1235,12 +1236,12 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
             p->displayCut(pts, m_lineCutUID, false);
-			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
 			{
 				QVector4D vec;
 				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
 				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-				((PlotInfoPicker*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
 			}
 
             replot();
@@ -1732,9 +1733,9 @@ void PlotCanvas::zStackCutTrackerAppended(const QPoint &pt)
             setCoordinates(pts, true);
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
 
-			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
 			{
-				((PlotInfoPicker*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pt));
+				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pt));
 			}
 
             replot();
@@ -1773,9 +1774,9 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
             setCoordinates(pts, true);
 
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
-			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
 			{
-				((PlotInfoPicker*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
+				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
 			}
             replot();
         }    
@@ -1854,12 +1855,12 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
 			{
 				QVector4D vec;
 				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
 				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-				((PlotInfoPicker*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
 			}
             replot();
         }
@@ -1924,12 +1925,12 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
             }
 
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-			if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
 			{
 				QVector4D vec;
 				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
 				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-				((PlotInfoPicker*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
 			}
             replot();
         }
@@ -1971,12 +1972,12 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
         }
         
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-		if (((Itom2dQwtPlot*)this->parent())->PickerWidget())
+		if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
 		{
 			QVector4D vec;
 			if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
 			else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-			((PlotInfoPicker*)((Itom2dQwtPlot*)this->parent())->PickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+			(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
 		}
 
         replot();
