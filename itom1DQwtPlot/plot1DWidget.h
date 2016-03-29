@@ -97,6 +97,7 @@ class Plot1DWidget : public ItomQwtPlot
         void enableObjectGUIElements(const int mode);
 
         int getPickerCount() const { return m_pickers.size(); }
+        void setPickerLimit(int limit);
         QSharedPointer< ito::DataObject > getPlotPicker() const;
 
         void setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx);

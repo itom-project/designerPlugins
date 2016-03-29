@@ -71,14 +71,15 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     // Properties related with geometric elements
     Q_PROPERTY(QVector<ito::Shape> geometricShapes READ getGeometricShapes WRITE setGeometricShapes DESIGNABLE false USER false)
     Q_PROPERTY(int geometricShapesCount READ getGeometricShapesCount DESIGNABLE false USER false)
-    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(int selectedGeometricShape READ getSelectedGeometricShape WRITE setSelectedGeometricShape DESIGNABLE false USER true)
+    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
+    Q_PROPERTY(ItomQwtPlotEnums::ModificationModes geometryModificationModes READ getModificationModes WRITE setModificationModes DESIGNABLE true USER true);
     
-    Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
     Q_PROPERTY(bool geometricShapesLabelsVisible READ getShapesLabelsVisible WRITE setShapesLabelsVisible DESIGNABLE true USER true)
 
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
-    Q_PROPERTY(ItomQwtPlotEnums::ModificationModes geometryModificationModes READ getModificationModes WRITE setModificationModes DESIGNABLE true USER true);
+    
+    Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
 
     Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")

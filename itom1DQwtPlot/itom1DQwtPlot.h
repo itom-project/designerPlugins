@@ -47,13 +47,18 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 {
     Q_OBJECT
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
+
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel USER true)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel USER true)
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
-    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
-    Q_PROPERTY(bool grid READ getGrid WRITE setGrid USER true)
+    Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
+    Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
+    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
+
+    Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
+    Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
 
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
@@ -61,35 +66,27 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ItomQwtPlotEnums::FillCurveStyle fillCurve READ getCurveFilled WRITE setCurveFilled USER true)
     Q_PROPERTY(QColor curveFillColor READ getCurveFillColor WRITE setCurveFillColor RESET resetCurveFillColor USER true)
     Q_PROPERTY(int curveFillAlpha READ getCurveFillAlpha WRITE setCurveFillAlpha USER true)
-
     Q_PROPERTY(qreal baseLine READ getBaseLine WRITE setBaseLine USER true)
 
     Q_PROPERTY(Symbol lineSymbol READ getLineSymbol WRITE setLineSymbol USER true);
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true);
 
+    Q_PROPERTY(bool grid READ getGrid WRITE setGrid USER true)
+    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+
     Q_PROPERTY(ItomQwtPlotEnums::MultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
     
+    Q_PROPERTY(ItomQwtPlotEnums::PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
     Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true USER true)
     Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false USER true)
     Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
     
-    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
-    
-    Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
-    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
-
-    Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
-    Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
-
     Q_PROPERTY(bool pickerLabelVisible READ getPickerLabelVisible WRITE setPickerLabelVisible USER true);
     Q_PROPERTY(Qt::Orientation pickerLabelOrientation READ getPickerLabelOrientation WRITE setPickerLabelOrientation USER true);
     Q_PROPERTY(Qt::Alignment pickerLabelAlignment READ getPickerLabelAlignment WRITE setPickerLabelAlignment USER true);
-    Q_PROPERTY(ItomQwtPlotEnums::PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
 
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
-
-    
 
     Q_ENUMS(LegendPos);
     Q_ENUMS(Symbol);

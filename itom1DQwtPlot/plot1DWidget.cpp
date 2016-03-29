@@ -2002,6 +2002,27 @@ void Plot1DWidget::setPannerEnable(const bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setPickerLimit(int limit)
+{
+    if (m_pData) m_pData->m_pickerLimit = std::max(0, limit);
+
+    m_pActPicker->setEnabled(state() != stateDrawShape && (m_pData->m_pickerLimit > 0));
+
+    if (m_pickers.size() > m_pData->m_pickerLimit)
+    {
+        //remove pickers exceeding the new limit
+        while (m_pickers.size() > m_pData->m_pickerLimit)
+        {
+            m_pickers.last().item->detach();
+            delete m_pickers.last().item;
+            m_pickers.pop_back();
+        }
+
+        replot();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::synchronizeCurrentScaleValues()
 {
     QwtScaleDiv div = axisScaleDiv(QwtPlot::yLeft);
@@ -2169,7 +2190,7 @@ void Plot1DWidget::stateChanged(int state)
 {
     if (m_pValuePicker) m_pValuePicker->setEnabled(state == stateValuePicker);
 
-    m_pActPicker->setEnabled(state != stateDrawShape);
+    m_pActPicker->setEnabled(state != stateDrawShape && (m_pData->m_pickerLimit > 0));
     m_pActPicker->setChecked(state == stateValuePicker);
 
     switch (state)
@@ -2260,24 +2281,31 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<double> &coords, int curveInde
     {
         retVal += ito::RetVal::format(ito::retError, 0, "curveIndex out of bounds [0,%i]", m_plotCurveItems.size() - 1);
     }
-    else if (!append)
-    {
-        retVal += clearPicker(-1, false);
-    }
 
-    if (coords.size() > (m_pData->m_pickerLimit - m_pickers.size()))
+    if (append && coords.size() > (m_pData->m_pickerLimit - m_pickers.size()))
     {
         retVal += ito::RetVal::format(ito::retError, 0, "number of new pickers exceed the given picker limit of %i", m_pData->m_pickerLimit);
+    }
+    else if (!append && coords.size() > m_pData->m_pickerLimit)
+    {
+        retVal += ito::RetVal::format(ito::retError, 0, "number of pickers exceed the given picker limit of %i", m_pData->m_pickerLimit);
     }
 
     if (!retVal.containsError())
     {
         int cnt = std::min(coords.size(), m_pData->m_pickerLimit);
         int coord_px;
+        int picker_offset = (append ? m_pickers.size() : 0);
+
+        //remove items, if m_pickers contains more items than desired
+        while (m_pickers.size() > cnt + picker_offset)
+        {
+            clearPicker(m_pickers.size() - 1, false);
+        }
 
         for (int i = 0; i < cnt; i++)
         {
-            if (i > m_pickers.size() - 1)
+            if ((i + picker_offset) > m_pickers.size() - 1)
             {
                 Picker picker;
                 picker.item = new ItomPlotMarker(m_pData->m_pickerLabelVisible,
@@ -2285,7 +2313,7 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<double> &coords, int curveInde
                     m_pData->m_pickerLabelAlignment,
                     m_pData->m_pickerLabelOrientation);
                 picker.item->attach(this);
-                picker.active = true;
+                picker.active = false;
                 picker.curveIdx = curveIndex;
 
                 if (physNotPix)
@@ -2306,16 +2334,15 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<double> &coords, int curveInde
             {
                 if (physNotPix)
                 {
-                    stickPickerToXPx(&(m_pickers[i]), coords[i], 0);
+                    stickPickerToXPx(&(m_pickers[i + picker_offset]), coords[i], 0);
                 }
                 else
                 {
                     coord_px = qRound(coords[i]);
-                    stickPickerToSampleIdx(&(m_pickers[i]), coord_px < 0 ? 0 : coord_px, 0);
+                    stickPickerToSampleIdx(&(m_pickers[i + picker_offset]), coord_px < 0 ? 0 : coord_px, 0);
                 }
             }
         }
-        
     }
 
     updatePickerPosition(false, false);
@@ -2335,9 +2362,9 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
             delete m.item;
         }
         m_pickers.clear();
-		if (((Itom1DQwtPlot*)(this->parent()))->pickerWidget())
+		if (((Itom1DQwtPlot*)(parent()))->pickerWidget())
 		{
-			(((Itom1DQwtPlot*)(this->parent()))->pickerWidget())->removePickers();
+			(((Itom1DQwtPlot*)(parent()))->pickerWidget())->removePickers();
 		}
     }
     else if (id < 0 || id >= m_pickers.size())
@@ -2349,9 +2376,9 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
         m_pickers[id].item->detach();
         delete m_pickers[id].item;
         m_pickers.removeAt(id);
-		if (((Itom1DQwtPlot*)(this->parent()))->pickerWidget())
+		if (((Itom1DQwtPlot*)(parent()))->pickerWidget())
 		{
-			(((Itom1DQwtPlot*)(this->parent()))->pickerWidget())->removePicker(id);
+			(((Itom1DQwtPlot*)(parent()))->pickerWidget())->removePicker(id);
 		}
     }
 

@@ -155,7 +155,10 @@ int Itom1DQwtPlot::getPickerLimit(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerLimit(const int idx)
 {
-    if (m_pData) m_pData->m_pickerLimit = std::max(0,idx);
+    if (m_pContent)
+    {
+        m_pContent->setPickerLimit(idx);
+    }
     updatePropertyDock();
 }
 
