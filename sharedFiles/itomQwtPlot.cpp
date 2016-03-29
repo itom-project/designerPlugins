@@ -489,6 +489,8 @@ void ItomQwtPlot::setShapeModificationModes(const ItomQwtPlotEnums::Modification
     {
         d->setModificationModes(modes);
     }
+
+    replot();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -972,7 +974,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     newItem->setPen(QPen(m_inverseColor0));
                 }
-                else newItem->setPen(QPen(Qt::green));
+                else
+                {
+                    newItem->setPen(QPen(Qt::green));
+                }
+
+                /*unselect all existing shapes before adding the new one*/
+                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                {
+                    if (it.value() == NULL)
+                    {
+                        continue;
+                    }
+                    it.value()->setSelected(false);
+                }
 
                 newItem->setVisible(true);
                 newItem->show();
@@ -1051,7 +1066,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     newItem->setPen(QPen(m_inverseColor0));
                 }
-                else newItem->setPen(QPen(Qt::green));
+                else
+                {
+                    newItem->setPen(QPen(Qt::green));
+                }
+
+                /*unselect all existing shapes before adding the new one*/
+                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                {
+                    if (it.value() == NULL)
+                    {
+                        continue;
+                    }
+                    it.value()->setSelected(false);
+                }
 
                 newItem->setVisible(true);
                 newItem->show();
@@ -1129,7 +1157,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     newItem->setPen(QPen(m_inverseColor0));
                 }
-                else newItem->setPen(QPen(Qt::green));
+                else
+                {
+                    newItem->setPen(QPen(Qt::green));
+                }
+
+                /*unselect all existing shapes before adding the new one*/
+                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                {
+                    if (it.value() == NULL)
+                    {
+                        continue;
+                    }
+                    it.value()->setSelected(false);
+                }
 
                 newItem->setVisible(true);
                 newItem->show();
@@ -1206,7 +1247,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     newItem->setPen(QPen(m_inverseColor0));
                 }
-                else newItem->setPen(QPen(Qt::green));
+                else
+                {
+                    newItem->setPen(QPen(Qt::green));
+                }
+
+                /*unselect all existing shapes before adding the new one*/
+                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                {
+                    if (it.value() == NULL)
+                    {
+                        continue;
+                    }
+                    it.value()->setSelected(false);
+                }
 
                 newItem->setVisible(true);
                 newItem->show();
@@ -1279,7 +1333,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     newItem->setPen(QPen(m_inverseColor0));
                 }
-                else newItem->setPen(QPen(Qt::green));
+                else
+                {
+                    newItem->setPen(QPen(Qt::green));
+                }
+
+                /*unselect all existing shapes before adding the new one*/
+                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                {
+                    if (it.value() == NULL)
+                    {
+                        continue;
+                    }
+                    it.value()->setSelected(false);
+                }
 
                 newItem->setVisible(true);
                 newItem->show();
@@ -1356,7 +1423,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     newItem->setPen(QPen(m_inverseColor0));
                 }
-                else newItem->setPen(QPen(Qt::green));
+                else
+                {
+                    newItem->setPen(QPen(Qt::green));
+                }
+
+                /*unselect all existing shapes before adding the new one*/
+                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                {
+                    if (it.value() == NULL)
+                    {
+                        continue;
+                    }
+                    it.value()->setSelected(false);
+                }
 
                 newItem->setVisible(true);
                 newItem->show();

@@ -48,6 +48,7 @@
 #include <qwt_picker_machine.h>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_engine.h>
+#include <qwt_text_label.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -309,6 +310,7 @@ ito::RetVal Plot1DWidget::init()
     m_pValuePicker->setBackgroundFillBrush(trackerBg);
 
     title().setFont(titleFont);
+    titleLabel()->setFont(titleFont);
 
     axisTitle(QwtPlot::xBottom).setFont(axisFont);
     axisTitle(QwtPlot::yLeft).setFont(axisFont);

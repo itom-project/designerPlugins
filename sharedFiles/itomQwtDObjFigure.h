@@ -72,7 +72,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(QVector<ito::Shape> geometricShapes READ getGeometricShapes WRITE setGeometricShapes DESIGNABLE false USER false)
     Q_PROPERTY(int geometricShapesCount READ getGeometricShapesCount DESIGNABLE false USER false)
     Q_PROPERTY(int selectedGeometricShape READ getSelectedGeometricShape WRITE setSelectedGeometricShape DESIGNABLE false USER true)
-    Q_PROPERTY(bool enablePlotting READ getEnabledPlotting WRITE setEnabledPlotting USER true)
+    Q_PROPERTY(bool geometricShapesDrawingEnabled READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(ItomQwtPlotEnums::ModificationModes geometryModificationModes READ getModificationModes WRITE setModificationModes DESIGNABLE true USER true);
     
     Q_PROPERTY(bool geometricShapesLabelsVisible READ getShapesLabelsVisible WRITE setShapesLabelsVisible DESIGNABLE true USER true)
@@ -87,7 +87,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("prop://geometricShapesCount", "Number of currently existing geometric shapes.")
     Q_CLASSINFO("prop://geometricShapesLabelsVisible", "Toggle visibility of shape labels, the label is the name of the shape.")
 
-    Q_CLASSINFO("prop://enablePlotting", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
+    Q_CLASSINFO("prop://geometricShapesDrawingEnabled", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
 
     Q_CLASSINFO("prop://selectedGeometricShape", "Get or set the currently highlighted geometric shape. After manipulation the last element stays selected.")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
@@ -102,6 +102,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
     Q_CLASSINFO("slot://plotMarkers", "")
     Q_CLASSINFO("slot://deleteMarkers", "Delete all sets of markers with given name or all markers if no or an empty name is passed.")
+    Q_CLASSINFO("slot://replot", "Force a replot which is for instance necessary if values of the displayed data object changed and you want to update the plot, too.")
 
     Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.")
     Q_CLASSINFO("signal://userInteractionDone", "")
@@ -174,6 +175,8 @@ public Q_SLOTS:
 
     ito::RetVal plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
+
+    void replot();
     
 
 protected:

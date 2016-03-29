@@ -50,6 +50,7 @@
 #include <qwt_picker_machine.h>
 #include <qwt_plot_shapeitem.h>
 #include <qwt_symbol.h>
+#include <qwt_text_label.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -331,21 +332,21 @@ void PlotCanvas::refreshStyles()
 
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
-        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", QPen(QBrush(Qt::red), 1, Qt::DashLine),NULL).value<QPen>();
-        trackerPen = apiGetFigureSetting(parent(), "trackerPen", QPen(QBrush(Qt::red), 2), NULL).value<QPen>();
-        trackerFont = apiGetFigureSetting(parent(), "trackerFont", QFont("Verdana", 10), NULL).value<QFont>();
-        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern), NULL).value<QBrush>();
-        selectionPen = apiGetFigureSetting(parent(), "selectionPen", QPen(QBrush(Qt::gray), 2, Qt::SolidLine), NULL).value<QPen>();
+        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>();
+        trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
+        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
+        selectionPen = apiGetFigureSetting(parent(), "selectionPen", selectionPen, NULL).value<QPen>();
 
         buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>();
 
-        titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica", 12), NULL).value<QFont>();
-        labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica", 12), NULL).value<QFont>();
+        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>();
+        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>();
         labelFont.setItalic(false);
-        axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica", 10), NULL).value<QFont>();
+        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>();
 
-        centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", QSize(10, 10), NULL).value<QSize>();
-        centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", QPen(QBrush(Qt::red), 1), NULL).value<QPen>();
+        centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", centerMarkerSize, NULL).value<QSize>();
+        centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", centerMarkerPen, NULL).value<QPen>();
     }
 
     if (inverseColor1().isValid())
@@ -377,6 +378,7 @@ void PlotCanvas::refreshStyles()
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
     
     title().setFont(titleFont);
+    titleLabel()->setFont(titleFont);
 
     axisTitle(QwtPlot::xBottom).setFont(axisFont);
     axisTitle(QwtPlot::yLeft).setFont(axisFont);

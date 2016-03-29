@@ -490,4 +490,13 @@ ito::AbstractFigure::UnitLabelStyle ItomQwtDObjFigure::getUnitLabelStyle() const
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::replot()
+{
+    if (m_pBaseContent)
+    {
+        m_pBaseContent->replot();
+    }
+}
+
 
