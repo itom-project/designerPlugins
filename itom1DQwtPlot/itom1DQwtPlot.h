@@ -160,7 +160,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
             NoSymbol = -1, Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon
         };
         enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray };
-        enum PlotPickerType { DefaultMarker, RangeMarker };
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         

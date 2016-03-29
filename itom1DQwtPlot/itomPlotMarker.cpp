@@ -39,11 +39,13 @@ void ItomPlotMarker::setPlotType(const ItomQwtPlotEnums::PlotPickerType value)
         case ItomQwtPlotEnums::DefaultMarker:
             setLineStyle(QwtPlotMarker::NoLine);
             break;
-        //case ItomQwtPlotEnums::MultilineMarker:
-        //    setLineStyle(QwtPlotMarker::NoLine);
-        //    break;
         case ItomQwtPlotEnums::RangeMarker:
+        case ItomQwtPlotEnums::AxisRangeMarker:
             setLineStyle(QwtPlotMarker::VLine);
+            setLinePen( Qt::gray, 1.0, Qt::DashLine );
+            break;
+        case ItomQwtPlotEnums::ValueRangeMarker:
+            setLineStyle(QwtPlotMarker::HLine);
             setLinePen( Qt::gray, 1.0, Qt::DashLine );
             break;
     }
