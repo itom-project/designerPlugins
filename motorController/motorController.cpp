@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -64,9 +64,24 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_enableJoyStick(true),
     m_allowJoyStick(true),
     m_joyModeFast(true),
-    m_autoUpdate(false)
+    m_autoUpdate(false),
+    m_pStepFastNegSignalMapper(NULL),
+    m_pStepSlowNegSignalMapper(NULL),
+    m_pStepFastPosSignalMapper(NULL),
+    m_pStepSlowPosSignalMapper(NULL)
 {
+    m_pStepFastNegSignalMapper = new QSignalMapper(this);
+    m_pStepSlowNegSignalMapper = new QSignalMapper(this);
+    m_pStepFastPosSignalMapper = new QSignalMapper(this);
+    m_pStepSlowPosSignalMapper = new QSignalMapper(this);
+    connect(m_pStepFastNegSignalMapper, SIGNAL(mapped(int)), this, SLOT(moveStepFastNeg(int)));
+    connect(m_pStepSlowNegSignalMapper, SIGNAL(mapped(int)), this, SLOT(moveStepSlowNeg(int)));
+    connect(m_pStepFastPosSignalMapper, SIGNAL(mapped(int)), this, SLOT(moveStepFastPos(int)));
+    connect(m_pStepSlowPosSignalMapper, SIGNAL(mapped(int)), this, SLOT(moveStepSlowPos(int)));
+
     unsigned int numAxisToUse = 6;
+    QPushButton *btn;
+
     setTitle("MotorMonitor");
     m_axisName.clear();
     m_axisName.reserve(6);
@@ -84,109 +99,61 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_curAbsPos.resize(numAxisToUse);
     m_curAbsPos.fill(0.0, numAxisToUse);
 
-    m_posLabels.clear();
     m_posLabels.reserve(numAxisToUse);
-    m_posLabels.append(new QLineEdit(this));
-    m_posLabels.append(new QLineEdit(this));
-    m_posLabels.append(new QLineEdit(this));
-    m_posLabels.append(new QLineEdit(this));
-    m_posLabels.append(new QLineEdit(this));
-    m_posLabels.append(new QLineEdit(this));
-
-
-    m_posWidgets.clear();
     m_posWidgets.reserve(numAxisToUse);
-    m_posWidgets.append(new QDoubleSpinBox(this));
-    m_posWidgets.append(new QDoubleSpinBox(this));
-    m_posWidgets.append(new QDoubleSpinBox(this));
-    m_posWidgets.append(new QDoubleSpinBox(this));
-    m_posWidgets.append(new QDoubleSpinBox(this));
-    m_posWidgets.append(new QDoubleSpinBox(this));
-    
-    
-    m_smallStepWidgets.clear();
     m_smallStepWidgets.reserve(numAxisToUse);
-    m_smallStepWidgets.append(new QDoubleSpinBox(this));
-    m_smallStepWidgets.append(new QDoubleSpinBox(this));
-    m_smallStepWidgets.append(new QDoubleSpinBox(this));
-    m_smallStepWidgets.append(new QDoubleSpinBox(this));
-    m_smallStepWidgets.append(new QDoubleSpinBox(this));
-    m_smallStepWidgets.append(new QDoubleSpinBox(this));
-    
-    m_largeStepWidgets.clear();
     m_largeStepWidgets.reserve(numAxisToUse);
-    m_largeStepWidgets.append(new QDoubleSpinBox(this));
-    m_largeStepWidgets.append(new QDoubleSpinBox(this));
-    m_largeStepWidgets.append(new QDoubleSpinBox(this));
-    m_largeStepWidgets.append(new QDoubleSpinBox(this));
-    m_largeStepWidgets.append(new QDoubleSpinBox(this));
-    m_largeStepWidgets.append(new QDoubleSpinBox(this));
-
-    m_changePosButtons.clear();
     m_changePosButtons.reserve(numAxisToUse);
 
-    for (unsigned int i = 0; i < numAxisToUse; i++)
+    for (unsigned int i = 0; i < numAxisToUse; ++i)
     {
+        m_posLabels.append(new QLineEdit(this));
+        m_posWidgets.append(new QDoubleSpinBox(this));
+        m_smallStepWidgets.append(new QDoubleSpinBox(this));
+        m_largeStepWidgets.append(new QDoubleSpinBox(this));
+
         QList<QPushButton* > buttons;
         buttons.reserve(4);
         QString bname(10);
         
-        buttons.append(new QPushButton("--", this));
+        btn = new QPushButton("--", this);
         bname.sprintf("%c--", m_axisName[i][0].toLatin1());
-        buttons[0]->setToolTip(bname);
-        buttons[0]->setMinimumSize(24, 24);
-        buttons[0]->setMaximumSize(24, 24);
+        btn->setToolTip(bname);
+        btn->setMinimumSize(24, 24);
+        btn->setMaximumSize(24, 24);
+        buttons.append(btn);
+        connect(btn, SIGNAL(pressed()), m_pStepFastNegSignalMapper, SLOT(map()));
+        m_pStepFastNegSignalMapper->setMapping(btn, i);
 
-        buttons.append(new QPushButton("-", this));
+        btn = new QPushButton("-", this);
         bname.sprintf("%c-", m_axisName[i][0].toLatin1());
-        buttons[1]->setToolTip(bname);
-        buttons[1]->setMinimumSize(24, 24);
-        buttons[1]->setMaximumSize(24, 24);
+        btn->setToolTip(bname);
+        btn->setMinimumSize(24, 24);
+        btn->setMaximumSize(24, 24);
+        buttons.append(btn);
+        connect(btn, SIGNAL(pressed()), m_pStepSlowNegSignalMapper, SLOT(map()));
+        m_pStepSlowNegSignalMapper->setMapping(btn, i);
 
-        buttons.append(new QPushButton("+", this));
+        btn = new QPushButton("+", this);
         bname.sprintf("%c+", m_axisName[i][0].toLatin1());
-        buttons[2]->setToolTip(bname);
-        buttons[2]->setMinimumSize(24, 24);
-        buttons[2]->setMaximumSize(24, 24);
+        btn->setToolTip(bname);
+        btn->setMinimumSize(24, 24);
+        btn->setMaximumSize(24, 24);
+        buttons.append(btn);
+        connect(btn, SIGNAL(pressed()), m_pStepSlowPosSignalMapper, SLOT(map()));
+        m_pStepSlowPosSignalMapper->setMapping(btn, i);
 
-        buttons.append(new QPushButton("++", this));
+        btn = new QPushButton("++", this);
         bname.sprintf("%c++", m_axisName[i][0].toLatin1());
-        buttons[3]->setToolTip(bname);
-        buttons[3]->setMinimumSize(24, 24);
-        buttons[3]->setMaximumSize(24, 24);
+        btn->setToolTip(bname);
+        btn->setMinimumSize(24, 24);
+        btn->setMaximumSize(24, 24);
+        buttons.append(btn);
+        connect(btn, SIGNAL(pressed()), m_pStepFastPosSignalMapper, SLOT(map()));
+        m_pStepFastPosSignalMapper->setMapping(btn, i);
 
-        m_changePosButtons.append(buttons); 
+        m_changePosButtons.append(buttons);
     }
-
-    connect(m_changePosButtons[0][0], SIGNAL(pressed()), this, SLOT(axis0BigStepMinus()));
-    connect(m_changePosButtons[0][1], SIGNAL(pressed()), this, SLOT(axis0SmallStepMinus()));
-    connect(m_changePosButtons[0][2], SIGNAL(pressed()), this, SLOT(axis0SmallStepPlus()));
-    connect(m_changePosButtons[0][3], SIGNAL(pressed()), this, SLOT(axis0BigStepPlus()));
-
-    connect(m_changePosButtons[1][0], SIGNAL(pressed()), this, SLOT(axis1BigStepMinus()));
-    connect(m_changePosButtons[1][1], SIGNAL(pressed()), this, SLOT(axis1SmallStepMinus()));
-    connect(m_changePosButtons[1][2], SIGNAL(pressed()), this, SLOT(axis1SmallStepPlus()));
-    connect(m_changePosButtons[1][3], SIGNAL(pressed()), this, SLOT(axis1BigStepPlus()));
-
-    connect(m_changePosButtons[2][0], SIGNAL(pressed()), this, SLOT(axis2BigStepMinus()));
-    connect(m_changePosButtons[2][1], SIGNAL(pressed()), this, SLOT(axis2SmallStepMinus()));
-    connect(m_changePosButtons[2][2], SIGNAL(pressed()), this, SLOT(axis2SmallStepPlus()));
-    connect(m_changePosButtons[2][3], SIGNAL(pressed()), this, SLOT(axis2BigStepPlus()));
-
-    connect(m_changePosButtons[3][0], SIGNAL(pressed()), this, SLOT(axis3BigStepMinus()));
-    connect(m_changePosButtons[3][1], SIGNAL(pressed()), this, SLOT(axis3SmallStepMinus()));
-    connect(m_changePosButtons[3][2], SIGNAL(pressed()), this, SLOT(axis3SmallStepPlus()));
-    connect(m_changePosButtons[3][3], SIGNAL(pressed()), this, SLOT(axis3BigStepPlus()));
-
-    connect(m_changePosButtons[4][0], SIGNAL(pressed()), this, SLOT(axis4BigStepMinus()));
-    connect(m_changePosButtons[4][1], SIGNAL(pressed()), this, SLOT(axis4SmallStepMinus()));
-    connect(m_changePosButtons[4][2], SIGNAL(pressed()), this, SLOT(axis4SmallStepPlus()));
-    connect(m_changePosButtons[4][3], SIGNAL(pressed()), this, SLOT(axis4BigStepPlus()));
-
-    connect(m_changePosButtons[5][0], SIGNAL(pressed()), this, SLOT(axis5BigStepMinus()));
-    connect(m_changePosButtons[5][1], SIGNAL(pressed()), this, SLOT(axis5SmallStepMinus()));
-    connect(m_changePosButtons[5][2], SIGNAL(pressed()), this, SLOT(axis5SmallStepPlus()));
-    connect(m_changePosButtons[5][3], SIGNAL(pressed()), this, SLOT(axis5BigStepPlus()));
 
     QString micronString(2, 181);
     micronString[1] = 'm';
@@ -387,7 +354,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     resizeEvent(NULL);
     m_isUpdating = false;
 
-    return;
+    setEnabled(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -449,7 +416,7 @@ void MotorController::resizeEvent(QResizeEvent * event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MotorController::initializeJouStick()
+void MotorController::initializeJoystick()
 {
 #if (CONNEXION_ENABLE)
     SiInitialize ();
@@ -520,7 +487,7 @@ MotorController::~MotorController()
         m_mnuSetAutoUpdate = NULL;
     }
 
-    m_pActuator = NULL;
+    removeActuator();
 
 #if (CONNEXION_ENABLE)
     if (m_conNeedsTermination)
@@ -539,21 +506,23 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
 {
     if (actuator.isNull())
     {
-        m_pActuator = NULL;
+        removeActuator();
         setEnabled(false);
     }
     else
     {
+        //at first increment the reference to the new actuator, then delete the old one (and decrement its reference). Finally assign the new one to this widget
+        removeActuator();
         m_pActuator = actuator;
 
         connect(m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>)), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>)));
+        connect(m_pActuator, SIGNAL(destroyed()), this, SLOT(actuatorDestroyed()));
+        m_updateBySignal = connect(this, SIGNAL(requestStatusAndPosition(bool, bool)), m_pActuator, SLOT(requestStatusAndPosition(bool, bool)));
         
         if (m_allowJoyStick)
         {
-            initializeJouStick();
+            initializeJoystick();
         }
-
-        m_updateBySignal = connect(this, SIGNAL(requestStatusAndPosition(bool, bool)), m_pActuator, SLOT(requestStatusAndPosition(bool, bool)));
 
         triggerUpdatePosition();
 
@@ -562,10 +531,30 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
         QMap<QString, ito::Param> *paramList = NULL;
         m_pActuator->getParamList(&paramList);
         m_needStepAdaption = paramList->contains("stepwidth");
-
+        setEnabled(true);
     }
 
     return;  
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MotorController::removeActuator()
+{
+    if (m_pActuator.isNull() == false)
+    {
+        disconnect(m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>)), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>)));
+        disconnect(m_pActuator, SIGNAL(destroyed()), this, SLOT(actuatorDestroyed()));
+        disconnect(this, SIGNAL(requestStatusAndPosition(bool, bool)), m_pActuator, SLOT(requestStatusAndPosition(bool, bool)));
+        m_updateBySignal = false;
+        m_pActuator.clear();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MotorController::actuatorDestroyed()
+{
+    removeActuator();
+    setEnabled(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -929,6 +918,30 @@ void MotorController::setAbsRel(const bool absRel)
         m_posLabels[i]->setText(m_axisName[i]);
     }
     triggerUpdatePosition();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MotorController::moveStepFastNeg(int index)
+{
+    triggerActuatorStep(index, true, false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MotorController::moveStepSlowNeg(int index)
+{
+    triggerActuatorStep(index, false, false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MotorController::moveStepFastPos(int index)
+{
+    triggerActuatorStep(index, true, true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MotorController::moveStepSlowPos(int index)
+{
+    triggerActuatorStep(index, false, true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

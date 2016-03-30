@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -37,16 +37,16 @@
 
 #include "common/addInInterface.h"
 
-//#include <QWidget>
-#include <QGroupBox>
-#include <QPointer>
-#include <QDoubleSpinBox>
-#include <QPushButton>
-#include <QAction>
-#include <QMenu>
-#include <QLineEdit>
-#include <QTimer>
+#include <qgroupbox.h>
+#include <qpointer.h>
+#include <qspinbox.h>
+#include <qpushbutton.h>
+#include <qaction.h>
+#include <qmenu.h>
+#include <qlineedit.h>
+#include <qtimer.h>
 #include <qactiongroup.h>
+#include <qsignalmapper.h>
 
 #if defined(CONNEXION_FOUND) //&& !_DEBUG
     #ifdef _DEBUG
@@ -70,6 +70,7 @@
 #else
     #define CONNEXION_ENABLE 0
 #endif
+
 
 class MotorController : public QGroupBox
 {
@@ -178,6 +179,7 @@ protected:
     QPointer<ito::AddInActuator> m_pActuator;
 
     void resizeEvent(QResizeEvent * event );
+    void removeActuator();
 
 #if CONNEXION_ENABLE
         bool winEvent(MSG * message, long * result);
@@ -195,7 +197,7 @@ private:
    
 #endif
 
-    void initializeJouStick();
+    void initializeJoystick();
 
     //! QList with all vertical layout, one for each axis
     QList<QGroupBox* > m_axisGroups;
@@ -285,6 +287,11 @@ private:
 
     QMenu    *m_mnuSetUnit;
     QMenu    *m_mnuSetAbsRel;
+
+    QSignalMapper *m_pStepFastNegSignalMapper;
+    QSignalMapper *m_pStepSlowNegSignalMapper;
+    QSignalMapper *m_pStepFastPosSignalMapper;
+    QSignalMapper *m_pStepSlowPosSignalMapper;
     
 
 public slots:
@@ -298,38 +305,15 @@ private slots:
     void mnuSetUnit(QAction* inputAction);
     void mnuSetAbsRel(QAction* inputAction);
 
-    void axis0BigStepMinus(void){triggerActuatorStep(0, true, false);};
-    void axis0BigStepPlus(void){triggerActuatorStep(0, true, true);};
-    void axis0SmallStepMinus(void){triggerActuatorStep(0, false, false);};
-    void axis0SmallStepPlus(void){triggerActuatorStep(0, false, true);};
-
-    void axis1BigStepMinus(void){triggerActuatorStep(1, true, false);};
-    void axis1BigStepPlus(void){triggerActuatorStep(1, true, true);};
-    void axis1SmallStepMinus(void){triggerActuatorStep(1, false, false);};
-    void axis1SmallStepPlus(void){triggerActuatorStep(1, false, true);};
-
-    void axis2BigStepMinus(void){triggerActuatorStep(2, true, false);};
-    void axis2BigStepPlus(void){triggerActuatorStep(2, true, true);};
-    void axis2SmallStepMinus(void){triggerActuatorStep(2, false, false);};
-    void axis2SmallStepPlus(void){triggerActuatorStep(2, false, true);};
-
-    void axis3BigStepMinus(void){triggerActuatorStep(3, true, false);};
-    void axis3BigStepPlus(void){triggerActuatorStep(3, true, true);};
-    void axis3SmallStepMinus(void){triggerActuatorStep(3, false, false);};
-    void axis3SmallStepPlus(void){triggerActuatorStep(3, false, true);};
-
-    void axis4BigStepMinus(void){triggerActuatorStep(4, true, false);};
-    void axis4BigStepPlus(void){triggerActuatorStep(4, true, true);};
-    void axis4SmallStepMinus(void){triggerActuatorStep(4, false, false);};
-    void axis4SmallStepPlus(void){triggerActuatorStep(4, false, true);};
-
-    void axis5BigStepMinus(void){triggerActuatorStep(5, true, false);};
-    void axis5BigStepPlus(void){triggerActuatorStep(5, true, true);};
-    void axis5SmallStepMinus(void){triggerActuatorStep(5, false, false);};
-    void axis5SmallStepPlus(void){triggerActuatorStep(5, false, true);};
-
     void guiChangedSmallStep(double value);
     void guiChangedLargeStep(double value);
+
+    void actuatorDestroyed();
+
+    void moveStepFastNeg(int index);
+    void moveStepSlowNeg(int index);
+    void moveStepFastPos(int index);
+    void moveStepSlowPos(int index);
 
 signals:
     void requestStatusAndPosition(bool sendActPosition, bool sendTargetPos);
