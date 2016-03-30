@@ -78,7 +78,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_colorState(false),
         m_layerState(false),
         m_pData(data),
-        m_gridEnabled(false),
+        m_gridStyle(Itom1DQwtPlot::GridNo),
         m_legendPosition(BottomLegend),
         m_legendVisible(false),
         m_qwtCurveStyle(ItomQwtPlotEnums::Lines),
@@ -144,8 +144,9 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
 
     m_pPlotGrid = new QwtPlotGrid();
     m_pPlotGrid->attach(this);
-    setGridEnabled(m_gridEnabled);
+    setGridStyle(m_gridStyle);
     m_pPlotGrid->setMajorPen(Qt::gray, 1);
+    m_pPlotGrid->setMinorPen(Qt::gray, 1, Qt::DashLine);
 
     QWidget *guiParent = parent;
     if (!guiParent) guiParent = this;
@@ -297,6 +298,9 @@ ito::RetVal Plot1DWidget::init()
         m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, &retVal).value<int>());
 
         m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, &retVal).value<int>());
+
+        m_pPlotGrid->setMajorPen(apiGetFigureSetting(parent(), "gridMajorPen", QPen(QBrush(Qt::gray), 1, Qt::SolidLine), &retVal).value<QPen>());
+        m_pPlotGrid->setMinorPen(apiGetFigureSetting(parent(), "gridMinorPen", QPen(QBrush(Qt::gray), 1, Qt::DashLine), &retVal).value<QPen>());
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -691,12 +695,14 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setGridEnabled(const bool enabled)
+void Plot1DWidget::setGridStyle(const Itom1DQwtPlot::GridStyle gridStyle)
 {
-    m_gridEnabled = enabled;
-    m_pPlotGrid->enableX(enabled);
-    m_pPlotGrid->enableY(enabled);
-    m_pActGrid->setChecked(enabled);
+    m_gridStyle = gridStyle;
+    m_pPlotGrid->enableX(gridStyle == Itom1DQwtPlot::GridMajorX || gridStyle == Itom1DQwtPlot::GridMajorXY || gridStyle == Itom1DQwtPlot::GridMinorX || gridStyle == Itom1DQwtPlot::GridMinorXY);
+    m_pPlotGrid->enableY(gridStyle == Itom1DQwtPlot::GridMajorY || gridStyle == Itom1DQwtPlot::GridMajorXY || gridStyle == Itom1DQwtPlot::GridMinorY || gridStyle == Itom1DQwtPlot::GridMinorXY);
+    m_pPlotGrid->enableXMin(gridStyle == Itom1DQwtPlot::GridMinorX || gridStyle == Itom1DQwtPlot::GridMinorXY);
+    m_pPlotGrid->enableYMin(gridStyle == Itom1DQwtPlot::GridMinorY || gridStyle == Itom1DQwtPlot::GridMinorXY);
+    m_pActGrid->setChecked(gridStyle != Itom1DQwtPlot::GridNo);
     replot();
 }
 
@@ -2925,7 +2931,7 @@ void Plot1DWidget::mnuScaleSettings()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mnuGridEnabled(bool checked)
 {
-    setGridEnabled(checked);
+    setGridStyle(checked ? Itom1DQwtPlot::GridMajorXY : Itom1DQwtPlot::GridNo);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -70,7 +70,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(Symbol lineSymbol READ getLineSymbol WRITE setLineSymbol USER true);
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true);
 
-    Q_PROPERTY(bool grid READ getGrid WRITE setGrid USER true)
+    Q_PROPERTY(GridStyle grid READ getGrid WRITE setGrid USER true)
     
 
     Q_PROPERTY(ItomQwtPlotEnums::MultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
@@ -89,6 +89,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     Q_ENUMS(LegendPos);
     Q_ENUMS(Symbol);
+    Q_ENUMS(GridStyle);
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -156,6 +157,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
             NoSymbol = -1, Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon
         };
         enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray };
+        enum GridStyle { GridNo = 0, GridMajorXY = 1, GridMajorX = 2, GridMajorY = 3, GridMinorXY = 4, GridMinorX = 5, GridMinorY = 6 };
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         
@@ -198,8 +200,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         QFont getAxisFont(void) const;
         void setAxisFont(const QFont &font);
 
-        bool getGrid(void) const;
-        void setGrid(const bool &enabled);
+        GridStyle getGrid(void) const;
+        void setGrid(const GridStyle &gridStyle);
 
         qreal getLineWidth(void) const;
         void setLineWidth(const qreal &width);

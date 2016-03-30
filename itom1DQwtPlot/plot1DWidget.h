@@ -45,6 +45,7 @@
 #include "valuepicker1d.h"
 
 #include "../sharedFiles/itomQwtPlot.h"
+#include "itom1DQwtPlot.h"
 #include "itomPlotMarker.h"
 
 class Itom1DQwtPlot;
@@ -70,7 +71,7 @@ class Plot1DWidget : public ItomQwtPlot
         void setPickerEnable(const bool checked);
         void setPannerEnable(const bool checked);
 
-        void setGridEnabled(const bool enabled);
+        void setGridStyle(const Itom1DQwtPlot::GridStyle gridStyle);
 
         void setMainPickersToIndex(int idx1, int idx2, int curveIdx);
 
@@ -158,7 +159,7 @@ class Plot1DWidget : public ItomQwtPlot
         bool m_cmplxState;
         bool m_colorState;
         bool m_layerState;
-        bool m_gridEnabled;
+        Itom1DQwtPlot::GridStyle m_gridStyle;
 
         //unsigned char m_autoLineColIndex;
         long m_lineCol;

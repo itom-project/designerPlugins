@@ -476,21 +476,21 @@ void Itom1DQwtPlot::setAxisFont(const QFont &font)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool Itom1DQwtPlot::getGrid(void) const
+Itom1DQwtPlot::GridStyle Itom1DQwtPlot::getGrid(void) const
 {
     if (m_pContent)
     {
-        return m_pContent->m_gridEnabled;
+        return m_pContent->m_gridStyle;
     }
-    return false;
+    return GridStyle::GridNo;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::setGrid(const bool &enabled)
+void Itom1DQwtPlot::setGrid(const Itom1DQwtPlot::GridStyle &gridStyle)
 {
     if (m_pContent)
     {
-        m_pContent->setGridEnabled(enabled);
+        m_pContent->setGridStyle(gridStyle);
     }
     
     updatePropertyDock();
