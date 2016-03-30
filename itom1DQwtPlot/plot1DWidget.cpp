@@ -120,10 +120,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     createActions();
     setButtonStyle(buttonStyle());
 
-    //canvas() is the real plotting area, where the plot is printed (without axes...)
-    //canvas()->setFrameShadow(QFrame::Plain); //deprecated in qwt 6.1.0
-    //canvas()->setFrameShape(QFrame::NoFrame); //deprecated in qwt 6.1.0
-    canvas()->setStyleSheet("border: 0px;");
     canvas()->setCursor(Qt::ArrowCursor);
 
     m_colorList.reserve(12);
@@ -150,8 +146,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pPlotGrid->attach(this);
     setGridEnabled(m_gridEnabled);
     m_pPlotGrid->setMajorPen(Qt::gray, 1);
-
-    updateColors();
 
     QWidget *guiParent = parent;
     if (!guiParent) guiParent = this;
@@ -532,19 +526,19 @@ void Plot1DWidget::setButtonStyle(int style)
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
         {
-            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag_lt.png"));
+            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReImag_lt.png"));
         }
         else if (cmplxIdx == ItomQwtPlotEnums::CmplxReal)
         {
-            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReReal_lt.png"));
+            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReReal_lt.png"));
         }
         else if (cmplxIdx == ItomQwtPlotEnums::CmplxArg)
         {
-            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImRePhase_lt.png"));
+            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImRePhase_lt.png"));
         }
         else
         {
-            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs_lt.png"));
+            m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReAbs_lt.png"));
         }
     }
 }
@@ -2438,44 +2432,7 @@ QVector<float> Plot1DWidget::getPickerPhys() const
     return exportItem;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::updateColors(void)
-{
-    if (m_pData)
-    {
-        QString styleSheet = this->styleSheet();
 
-        styleSheet = QString("background-color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_backgnd.red()), QString::number(m_pData->m_backgnd.green()), QString::number(m_pData->m_backgnd.blue())) ;
-        styleSheet.append(QString("color: rgb(%1, %2, %3);").arg(QString::number(m_pData->m_axisColor.red()), QString::number(m_pData->m_axisColor.green()), QString::number(m_pData->m_axisColor.blue())));
-        this->setStyleSheet(styleSheet);
-
-        QPalette newPalette(m_pData->m_backgnd);
-
-        newPalette.setColor(QPalette::WindowText, m_pData->m_axisColor); // for ticks
-        newPalette.setColor(QPalette::Text, m_pData->m_textColor); // for ticks' labels
-
-        setAutoFillBackground(true);
-        setPalette(newPalette);
-        setCanvasBackground(m_pData->m_backgnd);
-        
-        
-        axisWidget(QwtPlot::xBottom)->setAutoFillBackground(true);
-        axisWidget(QwtPlot::xBottom)->setPalette(newPalette);
-
-        axisWidget(QwtPlot::yLeft)->setAutoFillBackground(true);
-        axisWidget(QwtPlot::yLeft)->setPalette(newPalette);
-
-        axisWidget(QwtPlot::yRight)->setAutoFillBackground(true);
-        axisWidget(QwtPlot::yRight)->setPalette(newPalette);
-
-        axisWidget(QwtPlot::xTop)->setAutoFillBackground(true);
-        axisWidget(QwtPlot::xTop)->setPalette(newPalette);
-        
-        replot();        
-    }
-
-//    return;
-}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)

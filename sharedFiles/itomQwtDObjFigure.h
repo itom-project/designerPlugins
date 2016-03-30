@@ -66,6 +66,11 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_ENUMS(ButtonStyle)
 
     Q_PROPERTY(ButtonStyle buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
+    Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
+    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
+    Q_PROPERTY(QColor canvasColor READ getCanvasColor WRITE setCanvasColor USER true)
+    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+
     Q_PROPERTY(bool keepAspectRatio READ getKeepAspectRatio WRITE setKeepAspectRatio USER true)
 
     // Properties related with geometric elements
@@ -82,6 +87,11 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
 
     Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
+    Q_CLASSINFO("prop://backgroundColor", "Set the background color.")
+    Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
+    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
+    Q_CLASSINFO("prop://canvasColor", "Set the color of the canvas.")
+
     Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
     Q_CLASSINFO("prop://geometricShapes", "Geometric shapes defined by a vector of itom.shape for each element.")
     Q_CLASSINFO("prop://geometricShapesCount", "Number of currently existing geometric shapes.")
@@ -151,6 +161,36 @@ public:
 
     void setContextMenuEnabled(bool show); /*!< overloaded from AbstractFigure */
     bool getContextMenuEnabled() const;    /*!< overloaded from AbstractFigure */
+
+    //!> set new background color
+    void setBackgroundColor(const QColor newVal);
+
+    //!> get current background color
+    QColor getBackgroundColor(void) const;
+
+    /** set color of axis
+    *   @param [in] newVal  new axis color
+    */
+    void setAxisColor(const QColor newVal);
+
+    //!> return axis color
+    QColor getAxisColor(void) const;
+
+    /** set text color
+    *   @param [in] newVal  new text color
+    */
+    void setTextColor(const QColor newVal);
+
+    //!> return text color
+    QColor getTextColor(void) const;
+
+    /** set canvas color
+    *   @param [in] newVal  new text color
+    */
+    void setCanvasColor(const QColor newVal);
+
+    //!> return canvas color
+    QColor getCanvasColor(void) const;
 
     ito::AbstractFigure::UnitLabelStyle getUnitLabelStyle() const;
     virtual void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style) = 0;

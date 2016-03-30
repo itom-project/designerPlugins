@@ -54,8 +54,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
-    Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
-    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
+    
 
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
     Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
@@ -72,7 +71,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true);
 
     Q_PROPERTY(bool grid READ getGrid WRITE setGrid USER true)
-    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
+    
 
     Q_PROPERTY(ItomQwtPlotEnums::MultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
     
@@ -121,10 +120,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
     Q_CLASSINFO("prop://picker", "Get picker defined by a Mx4 float32 data object. Each row represents one picker and contains the following information: [pixelIndex, physIndex, value, curveIndex]. PixelIndex and physIndex are equal if axisScale = 1 and axisOffset = 0 for the corresponding dataObject.")
 
-    Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
     
-    Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
-    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers")
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
     Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the data object is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
@@ -241,28 +237,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
-
-        //!> set new background color
-        void setBackgroundColor(const QColor newVal);
-
-        //!> get current background color
-        QColor getBackgroundColor(void) const;
-
-        /** set color of axis
-        *   @param [in] newVal  new axis color
-        */
-        void setAxisColor(const QColor newVal);
-
-        //!> return axis color
-        QColor getAxisColor(void) const;
-
-        /** set text color
-        *   @param [in] newVal  new text color
-        */
-        void setTextColor(const QColor newVal);
-
-        //!> return text color
-        QColor getTextColor(void) const;
 
         void setPickerLabelVisible(const bool state);
         bool getPickerLabelVisible() const;

@@ -500,3 +500,92 @@ void ItomQwtDObjFigure::replot()
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor ItomQwtDObjFigure::getBackgroundColor(void) const
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->backgroundColor();
+    }
+    else
+        return Qt::white;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setBackgroundColor(const QColor newVal)
+{
+    if (m_pBaseContent)
+    {
+        m_pBaseContent->setBackgroundColor(newVal.rgb() & 0x00FFFFFF);
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor ItomQwtDObjFigure::getCanvasColor(void) const
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->canvasColor();
+    }
+    else
+        return Qt::white;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setCanvasColor(const QColor newVal)
+{
+    if (m_pBaseContent)
+    {
+        m_pBaseContent->setCanvasColor(newVal.rgb() & 0x00FFFFFF);
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor ItomQwtDObjFigure::getAxisColor(void) const
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->axisColor();
+    }
+    else
+        return Qt::black;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setAxisColor(const QColor newVal)
+{
+    if (m_pBaseContent)
+    {
+        m_pBaseContent->setAxisColor(newVal.rgb() & 0x00FFFFFF);
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QColor ItomQwtDObjFigure::getTextColor(void) const
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->textColor();
+    }
+    else
+        return Qt::black;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setTextColor(const QColor newVal)
+{
+    if (m_pBaseContent)
+    {
+        m_pBaseContent->setTextColor(newVal.rgb() & 0x00FFFFFF);
+    }
+
+    updatePropertyDock();
+}
+
+

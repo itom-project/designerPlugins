@@ -99,6 +99,18 @@ public:
     ItomQwtPlotEnums::ModificationModes shapeModificationModes() const { return m_shapeModificationModes; }
     void setShapeModificationModes(const ItomQwtPlotEnums::ModificationModes &modes);
 
+    QColor backgroundColor() const { return m_backgroundColor; }
+    void setBackgroundColor(const QColor &color);
+
+    QColor canvasColor() const { return m_canvasColor; }
+    void setCanvasColor(const QColor &color);
+
+    QColor axisColor() const { return m_axisColor; }
+    void setAxisColor(const QColor &color);
+
+    QColor textColor() const { return m_textColor; }
+    void setTextColor(const QColor &color);
+
     void setVisible(bool visible);
 
     int countGeometricShapes() const { return m_pShapes.count(); }
@@ -153,6 +165,7 @@ protected:
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent * event);
+    bool event(QEvent * event);
 
 
     QAction *m_pActSave;        /*!< action to save the plot */
@@ -173,12 +186,11 @@ protected:
     QList<QToolBar*> m_toolbars;
     QList<QMenu*> m_menus;
     QMenu *m_pContextMenu;
-
+    bool m_styledBackground;
     
 
 private:
     void createBaseActions();
-
     
     bool m_showContextMenu;
 
@@ -220,6 +232,11 @@ private:
     bool m_stateIsChanging;
     int m_currentPlane;
 
+    QColor m_backgroundColor;       //!> plot background color
+    QColor m_axisColor;         //!> color of axis
+    QColor m_textColor;         //!> text color
+    QColor m_canvasColor;       //!> canvas color
+
     ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
 
     
@@ -238,6 +255,8 @@ private slots:
     void mnuShapeType(bool checked);
     void mnuCopyToClipboard();
     void mnuSendCurrentToWorkspace();
+
+    void updateColors(void);
 
 signals:
     void statusBarClear();

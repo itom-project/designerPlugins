@@ -58,6 +58,7 @@
 #include <qwt_plot_renderer.h>
 #include <qwt_symbol.h>
 #include <qwt_plot_layout.h>
+#include <qwt_plot_canvas.h>
 
 //---------------------------------------------------------------------------
 ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
@@ -91,7 +92,12 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pActClearShapes(NULL),
     m_pActProperties(NULL),
     m_pActShapeType(NULL),
-    m_currentPlane(0)
+    m_currentPlane(0),
+    m_axisColor(Qt::black),
+    m_textColor(Qt::black),
+    m_backgroundColor(Qt::white),
+    m_canvasColor(Qt::white),
+    m_styledBackground(false)
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -105,6 +111,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
 
     //load actions and icons
     createBaseActions();
+
+    updateColors();
 
     //zoom tool
     m_pZoomer = new ItomPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
@@ -144,8 +152,13 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     //Geometry of the plot:
     setContentsMargins(5, 5, 5, 5); //this is the border between the canvas (including its axes and labels) and the overall mainwindow
     canvas()->setContentsMargins(0, 0, 0, 0); //border of the canvas (border between canvas and axes or title)
-
+    QwtPlotCanvas* c = dynamic_cast<QwtPlotCanvas*>(canvas());
+    c->setFrameStyle(QFrame::Box);
+    c->setLineWidth(1);
+    c->setMidLineWidth(0);
+    //canvas()->setStyleSheet("border: 0px;");
     //plotLayout()->setAlignCanvasToScales(true); //directly connects the bottom-left-corners of the y-left and x-bottom axis.
+    plotLayout()->setCanvasMargin(2,-1);
 
     //left axis
     QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
@@ -153,6 +166,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     leftAxis->setSpacing(6);                //distance tick labels <-> axis label
     leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
     leftAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
+    axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtScaleDraw::Backbone, false);
 
     //bottom axis
     QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
@@ -160,6 +174,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
     bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
     bottomAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
+    axisScaleDraw(QwtPlot::xBottom)->enableComponent(QwtScaleDraw::Backbone, false);
 
     ////top axis
     //QwtScaleWidget *topAxis = axisWidget(QwtPlot::xTop);
@@ -334,6 +349,86 @@ void ItomQwtPlot::loadStyles()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::updateColors(void)
+{
+    QwtPlotCanvas* c = dynamic_cast<QwtPlotCanvas*>(canvas());
+
+    if (testAttribute(Qt::WA_StyledBackground))
+    {
+        m_styledBackground = true;
+
+        //we have to apply all styles using style sheets
+        QString styleSheet = QString("background-color: %1;").arg(m_backgroundColor.name());
+        styleSheet.append(QString("color: %1;").arg(m_axisColor.name()));
+        setStyleSheet(styleSheet);
+
+        c->setStyleSheet(QString("border: 1px solid %1; background-color: %2;").arg(m_axisColor.name()).arg(m_canvasColor.name()));
+    }
+    else
+    {
+        m_styledBackground = false;
+
+        //no style sheets are applied, therefore the default OS dependet style methods can be used
+        c->setFrameStyle(QFrame::Box);
+        c->setLineWidth(1);
+        c->setMidLineWidth(0);
+    }
+
+    QPalette newPalette(m_backgroundColor);
+
+    newPalette.setColor(QPalette::WindowText, m_axisColor); // for ticks
+    newPalette.setColor(QPalette::Text, m_textColor); // for ticks' labels
+
+    setAutoFillBackground(true);
+    setPalette(newPalette);
+    setCanvasBackground(m_canvasColor);
+
+
+    axisWidget(QwtPlot::xBottom)->setAutoFillBackground(true);
+    axisWidget(QwtPlot::xBottom)->setPalette(newPalette);
+
+    axisWidget(QwtPlot::yLeft)->setAutoFillBackground(true);
+    axisWidget(QwtPlot::yLeft)->setPalette(newPalette);
+
+    axisWidget(QwtPlot::yRight)->setAutoFillBackground(true);
+    axisWidget(QwtPlot::yRight)->setPalette(newPalette);
+
+    axisWidget(QwtPlot::xTop)->setAutoFillBackground(true);
+    axisWidget(QwtPlot::xTop)->setPalette(newPalette);
+
+    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setBackgroundColor(const QColor &color)
+{
+    m_backgroundColor = color;
+    updateColors();
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setAxisColor(const QColor &color)
+{
+    m_axisColor = color;
+    updateColors();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setTextColor(const QColor &color)
+{
+    m_textColor = color;
+    updateColors();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setCanvasColor(const QColor &color)
+{
+    m_canvasColor = color;
+    updateColors();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::setButtonStyle(int style)
 {
     if (style == 0)
@@ -385,22 +480,22 @@ void ItomQwtPlot::setButtonStyle(int style)
         {
         default:
         case ito::Shape::Point:
-            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/point_lt.png"));
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/point_lt.png"));
             break;
         case ito::Shape::Line:
-            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline_lt.png"));
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
             break;
         case ito::Shape::Rectangle:
-            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rectangle_lt.png"));
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rectangle_lt.png"));
             break;
         case ito::Shape::Ellipse:
-            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/ellipse_lt.png"));
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/ellipse_lt.png"));
             break;
         case ito::Shape::Circle:
-            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/circle_lt.png"));
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/circle_lt.png"));
             break;
         case ito::Shape::Square:
-            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/square_lt.png"));
+            m_pActShapeType->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/square_lt.png"));
             break;
         }
     }
@@ -633,37 +728,37 @@ void ItomQwtPlot::setState(int state)
                 {
                 default:
                 case ito::Shape::Point:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/point.png" : ":/itomDesignerPlugins/plot/icons/point_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/point.png" : ":/itomDesignerPlugins/plot_lt/icons/point_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
                 case ito::Shape::Line:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/pntline.png" : ":/itomDesignerPlugins/plot/icons/pntline_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/pntline.png" : ":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
                 case ito::Shape::Rectangle:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/rectangle.png" : ":/itomDesignerPlugins/plot/icons/rectangle_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/rectangle.png" : ":/itomDesignerPlugins/plot_lt/icons/rectangle_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
                 case ito::Shape::Ellipse:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/ellipse.png" : ":/itomDesignerPlugins/plot/icons/ellipse_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/ellipse.png" : ":/itomDesignerPlugins/plot_lt/icons/ellipse_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
                 case ito::Shape::Circle:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/circle.png" : ":/itomDesignerPlugins/plot/icons/circle_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/circle.png" : ":/itomDesignerPlugins/plot_lt/icons/circle_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
 
                 case ito::Shape::Square:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/square.png" : ":/itomDesignerPlugins/plot/icons/square_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/square.png" : ":/itomDesignerPlugins/plot_lt/icons/square_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
                     startOrStopDrawGeometricShape(1);
                     break;
@@ -685,6 +780,20 @@ void ItomQwtPlot::setState(int state)
 
         m_stateIsChanging = false;
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool ItomQwtPlot::event(QEvent * event)
+{
+    if (event->type() == QEvent::StyleChange)
+    {
+        if (testAttribute(Qt::WA_StyledBackground) != m_styledBackground)
+        {
+            QTimer::singleShot(0, this, SLOT(updateColors()));
+        }
+    }
+
+    return QwtPlot::event(event);
 }
 
 

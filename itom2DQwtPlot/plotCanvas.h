@@ -130,7 +130,6 @@ class PlotCanvas : public ItomQwtPlot
         
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
-        void updateColors();
 
         void home();
         void setColorDataTypeRepresentation(bool colorOn);
@@ -259,10 +258,6 @@ struct InternalData
         m_overlayScaleAuto = true;
         m_overlayMin = 0;
         m_overlayMax = 0;
-
-        m_axisColor = Qt::black;
-        m_textColor = Qt::black;
-        m_backgnd = Qt::white;
     }
     ~InternalData()
     {
@@ -306,10 +301,6 @@ struct InternalData
 
     bool m_colorBarVisible;
     unsigned char m_alpha;
-
-    QColor m_backgnd;           //!> plot background color
-    QColor m_axisColor;         //!> color of axis
-    QColor m_textColor;         //!> text color
 
     ItomQwtPlotEnums::ComplexType m_cmplxType;
 

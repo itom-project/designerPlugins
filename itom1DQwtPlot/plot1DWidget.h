@@ -115,7 +115,6 @@ class Plot1DWidget : public ItomQwtPlot
         void updateLabels();
         void setPickerText(const QString &coords, const QString &offsets);
 
-        void updateColors(void);
         void updatePickerStyle(void);
 
         void setLineWidth(const qreal &width);
@@ -266,9 +265,7 @@ struct InternalData
         Qt::Orientation m_pickerLabelOrientation = Qt::Horizontal;
         m_pickerLabelAlignment = Qt::AlignRight;
 
-        m_axisColor = Qt::black;
-        m_textColor = Qt::black;
-        m_backgnd = Qt::white;
+        
         m_lineSymbole = QwtSymbol::NoSymbol;
     }
 
@@ -305,9 +302,7 @@ struct InternalData
     Qt::Orientation m_pickerLabelOrientation;
     Qt::Alignment m_pickerLabelAlignment;
 
-    QColor m_backgnd;           //!> plot background color
-    QColor m_axisColor;         //!> color of axis
-    QColor m_textColor;         //!> text color
+    
 
     //true for one replot if setSource-Property has been set 
     //(even if the same data object is given one more time, 

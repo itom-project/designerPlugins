@@ -66,10 +66,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QString overlayColorMap READ getOverlayColorMap WRITE setOverlayColorMap DESIGNABLE true USER true)
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
-
-    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor USER true)
-    Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
-    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
     
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
@@ -98,10 +94,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://overlayColorMap", "Defines which color map should be used for the overlay channel [e.g. grayMarked, hotIron].")
 
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
-
-    Q_CLASSINFO("prop://backgroundColor", "Set the background / canvas color.")
-    Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
-    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
 
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
 
@@ -203,27 +195,7 @@ public:
 
     void enableOverlaySlider(bool enabled);
 
-    //!> set new background color
-    void setBackgroundColor(const QColor newVal);
-
-    //!> get current background color
-    QColor getBackgroundColor(void) const;
-
-    /** set color of axis
-    *   @param [in] newVal  new axis color
-    */
-    void setAxisColor(const QColor newVal);
-
-    //!> return axis color
-    QColor getAxisColor(void) const;
-
-    /** set text color
-    *   @param [in] newVal  new text color
-    */
-    void setTextColor(const QColor newVal);
-
-    //!> return text color
-    QColor getTextColor(void) const;
+    
 
     //!> set a line cut id for lateral slices
     ito::ItomPlotHandle getLineCutPlotItem() const;
