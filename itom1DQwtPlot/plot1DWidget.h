@@ -212,6 +212,8 @@ class Plot1DWidget : public ItomQwtPlot
         QAction *m_pActGridSettings;
         QAction *m_pActMultiRowSwitch;
         QMenu *m_pMnuMultiRowSwitch;
+        QAction *m_pActLegendSwitch;
+        QMenu *m_pMnuLegendSwitch;
 
         QAction* m_pActXVAuto;
         QAction* m_pActXVFR;
@@ -239,6 +241,7 @@ class Plot1DWidget : public ItomQwtPlot
     private slots:
         void legendItemChecked(const QVariant &itemInfo, bool on);
         void mnuCmplxSwitch(QAction*);
+        void mnuLegendSwitch(QAction*);
         void mnuMultiRowSwitch(QAction*);
         void mnuRGBSwitch(QAction*);
         void mnuSetPicker(QAction *action);

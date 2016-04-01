@@ -115,7 +115,9 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_pActRGBG(NULL),
         m_pActMultiRowSwitch(NULL),
         m_pActRGBSwitch(NULL),
-        m_pActCmplxSwitch(NULL)
+        m_pActCmplxSwitch(NULL),
+        m_pActLegendSwitch(NULL),
+        m_pMnuLegendSwitch(NULL)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -202,6 +204,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuView->addAction(m_pActZoom);
     menuView->addAction(m_pActAspectRatio);
     menuView->addAction(m_pActGrid);
+    menuView->addAction(m_pActLegendSwitch);
     menuView->addSeparator();
     menuView->addAction(m_pActScaleSettings);
     menuView->addAction(m_pRescaleParent);
@@ -404,6 +407,24 @@ void Plot1DWidget::createActions()
     a->setData(ItomQwtPlotEnums::CmplxArg);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
+    
+    //m_actCmplxSwitch
+    m_pActLegendSwitch = new QAction(tr("Legend"), p);
+    m_pActLegendSwitch->setCheckable(true);
+    m_pMnuLegendSwitch = new QMenu(tr("Legend"), p);
+    m_pActLegendSwitch->setMenu(m_pMnuLegendSwitch);
+    a = m_pMnuLegendSwitch->addAction(tr("Off"));
+    a->setData(-1);
+    m_pMnuLegendSwitch->setDefaultAction(a);
+    a = m_pMnuLegendSwitch->addAction(tr("Right"));
+    a->setData(LegendPosition::RightLegend);
+    a = m_pMnuLegendSwitch->addAction(tr("Bottom"));
+    a->setData(LegendPosition::BottomLegend);
+    a = m_pMnuLegendSwitch->addAction(tr("Left"));
+    a->setData(LegendPosition::LeftLegend);
+    a = m_pMnuLegendSwitch->addAction(tr("Top"));
+    a->setData(LegendPosition::TopLegend);
+    connect(m_pMnuLegendSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuLegendSwitch(QAction*)));
 
     //m_pActMultiRowSwitch
     m_pActMultiRowSwitch = new QAction(tr("Data Representation"), p);
@@ -644,9 +665,34 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
                 }
             }
         }
+
+        foreach(QAction *a, m_pMnuLegendSwitch->actions())
+        {
+            if (a->data().toInt() == position)
+            {
+                m_pMnuLegendSwitch->setDefaultAction(a);
+                a->setChecked(true);
+            }
+            else
+            {
+                a->setChecked(false);
+            }
+        }
     }
     else
     {
+        foreach(QAction *a, m_pMnuLegendSwitch->actions())
+        {
+            if (a->data().toInt() == -1)
+            {
+                m_pMnuLegendSwitch->setDefaultAction(a);
+                a->setChecked(true);
+            }
+            else
+            {
+                a->setChecked(false);
+            }
+        }
         insertLegend(NULL);
     }
 
@@ -2876,6 +2922,19 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
 
     //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
     setInterval(Qt::YAxis, m_pData->m_valueScaleAuto, m_pData->m_valueMin, m_pData->m_valueMax); //replot is done here 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::mnuLegendSwitch(QAction *action)
+{
+    if (action->data().toInt() == -1)
+    {
+        setLegendPosition(QwtPlot::RightLegend, false);
+    }
+    else
+    {
+        setLegendPosition((QwtPlot::LegendPosition)action->data().toInt(), true);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
