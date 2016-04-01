@@ -187,6 +187,13 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addAction(m_pActForward);
     mainTb->addAction(m_pActCmplxSwitch);
 
+    QMenu *menuFile = new QMenu(tr("File"), guiParent);
+    menuFile->addAction(m_pActSave);
+    menuFile->addSeparator();
+    menuFile->addAction(m_pActCopyClipboard);
+    menuFile->addAction(m_pActSendCurrentToWorkspace);
+    m_menus.append(menuFile);
+
     QMenu *menuView = new QMenu(tr("View"), guiParent);
     menuView->addAction(m_pActHome);
     menuView->addAction(m_pActPan);
@@ -203,10 +210,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
-    menuTools->addAction(m_pActSave);
-    menuTools->addAction(m_pActCopyClipboard);
-    menuTools->addAction(m_pActSendCurrentToWorkspace);
-    menuTools->addSeparator();
     menuTools->addAction(m_pActPicker);
     menuTools->addAction(m_pActSetPicker);
     menuTools->addSeparator();

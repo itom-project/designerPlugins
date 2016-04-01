@@ -225,6 +225,13 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActCmplxSwitch);
     mainTb->addAction(m_pActCoordinates);
 
+    QMenu *menuFile = new QMenu(tr("File"), guiParent);
+    menuFile->addAction(m_pActSave);
+    menuFile->addSeparator();
+    menuFile->addAction(m_pActCopyClipboard);
+    menuFile->addAction(m_pActSendCurrentToWorkspace);
+    m_menus.append(menuFile);
+
     QMenu *menuView = new QMenu(tr("View"), guiParent);
     menuView->addAction(m_pActHome);
     menuView->addAction(m_pActPan);
@@ -242,10 +249,6 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
-    menuTools->addAction(m_pActSave);
-    menuTools->addAction(m_pActCopyClipboard);
-    menuTools->addAction(m_pActSendCurrentToWorkspace);
-    menuTools->addSeparator();
     menuTools->addAction(m_pActValuePicker);
     menuTools->addAction(m_pActCntrMarker);
     menuTools->addAction(m_pActLineCut);
