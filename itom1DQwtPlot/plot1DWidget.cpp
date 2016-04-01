@@ -157,6 +157,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
 
     // first block is zoom, scale settings, home
     mainTb->addAction(m_pActSave);
+    mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActScaleSettings);
@@ -189,6 +190,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
 
     QMenu *menuFile = new QMenu(tr("File"), guiParent);
     menuFile->addAction(m_pActSave);
+    menuFile->addAction(m_pActPrint);
     menuFile->addSeparator();
     menuFile->addAction(m_pActCopyClipboard);
     menuFile->addAction(m_pActSendCurrentToWorkspace);
@@ -219,6 +221,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
 
     m_pContextMenu = new QMenu(QObject::tr("plot1D"), guiParent);
     m_pContextMenu->addAction(m_pActSave);
+    m_pContextMenu->addAction(m_pActPrint);
     m_pContextMenu->addAction(m_pActCopyClipboard);
     m_pContextMenu->addAction(m_pActSendCurrentToWorkspace);
     m_pContextMenu->addSeparator();

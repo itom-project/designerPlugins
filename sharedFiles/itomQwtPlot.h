@@ -34,6 +34,7 @@
 #include <qsharedpointer.h>
 #include <qsize.h>
 #include <qstring.h>
+#include <qprinter.h>
 
 #include "DataObject/dataobj.h"
 #include "common/shape.h"
@@ -128,6 +129,7 @@ public:
     virtual QList<QMenu*> getMenus() { return m_menus; }
 
     ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize = QSizeF(0.0, 0.0), const int resolution = 300);
+    ito::RetVal printCanvas();
 
     ito::RetVal plotMarkers(const QSharedPointer<ito::DataObject> coordinates, const QString &style, const QString &id, int plane);
     ito::RetVal deleteMarkers(const QString &id);
@@ -169,6 +171,7 @@ protected:
 
 
     QAction *m_pActSave;        /*!< action to save the plot */
+    QAction *m_pActPrint;        /*!< action to print the dialog with a print-preview dialog */
     QAction *m_pActHome;          /*!< action for homing */
     QAction *m_pActPan;         /*!< action for panner */
     QAction *m_pActZoom;        /*!< action for zoomer */
@@ -239,6 +242,8 @@ private:
 
     ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
 
+    QPrinter *m_pPrinter;
+
     
 public slots:
     void clearAllGeometricShapes();
@@ -247,6 +252,7 @@ private slots:
     void multiPointActivated(bool on);
 
     void mnuActSave();
+    void mnuActPrint();
     void mnuActHome();
     void mnuActPan(bool checked);
     void mnuActZoom(bool checked);
@@ -257,6 +263,8 @@ private slots:
     void mnuSendCurrentToWorkspace();
 
     void updateColors(void);
+
+    void printPreviewRequested(QPrinter* printer);
 
 signals:
     void statusBarClear();

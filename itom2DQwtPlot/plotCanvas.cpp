@@ -202,6 +202,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_toolbars.append(mainTb);
 
     mainTb->addAction(m_pActSave);
+    mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActPan);
@@ -227,6 +228,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 
     QMenu *menuFile = new QMenu(tr("File"), guiParent);
     menuFile->addAction(m_pActSave);
+    menuFile->addAction(m_pActPrint);
     menuFile->addSeparator();
     menuFile->addAction(m_pActCopyClipboard);
     menuFile->addAction(m_pActSendCurrentToWorkspace);
@@ -260,6 +262,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 
     m_pContextMenu = new QMenu(QObject::tr("plot2D"), guiParent);
     m_pContextMenu->addAction(m_pActSave);
+    m_pContextMenu->addAction(m_pActPrint);
     m_pContextMenu->addAction(m_pActCopyClipboard);
     m_pContextMenu->addAction(m_pActSendCurrentToWorkspace);
     m_pContextMenu->addSeparator();

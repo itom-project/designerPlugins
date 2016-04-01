@@ -37,6 +37,7 @@
 #include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
+#include <qprintpreviewdialog.h>
 
 #include "itomPlotZoomer.h"
 #include "itomPlotMagnifier.h"
@@ -82,6 +83,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_shapesLabelVisible(false),
     m_unitLabelStyle(ito::AbstractFigure::UnitLabelSlash),
     m_pActSave(NULL),
+    m_pActPrint(NULL),
     m_pActHome(NULL),
     m_pActPan(NULL),
     m_pActZoom(NULL),
@@ -97,7 +99,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_textColor(Qt::black),
     m_backgroundColor(Qt::white),
     m_canvasColor(Qt::white),
-    m_styledBackground(false)
+    m_styledBackground(false),
+    m_pPrinter(NULL)
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -203,6 +206,12 @@ ItomQwtPlot::~ItomQwtPlot()
         m_pMultiPointPicker->deleteLater();
         m_pMultiPointPicker = NULL;
     }
+
+    if (m_pPrinter)
+    {
+        delete m_pPrinter;
+        m_pPrinter = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -224,6 +233,13 @@ void ItomQwtPlot::createBaseActions()
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
+    
+    //m_pActPrint
+    m_pActPrint = a = new QAction(tr("Print..."), p);
+    a->setShortcut(QKeySequence::Print);
+    a->setObjectName("actPrint");
+    a->setToolTip(tr("Print preview..."));
+    connect(a, SIGNAL(triggered()), this, SLOT(mnuActPrint()));
 
     //m_actCopyClipboard
     m_pActCopyClipboard = a = new QAction(tr("Copy to clipboard"), p);
@@ -434,6 +450,7 @@ void ItomQwtPlot::setButtonStyle(int style)
     if (style == 0)
     {
         m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"));
+        m_pActPrint->setIcon(QIcon(":/itomDesignerPlugins/general/icons/print.png"));
         m_pActCopyClipboard->setIcon(QIcon(":/itomDesignerPlugins/general/icons/clipboard.png"));
         m_pActHome->setIcon(QIcon(":/itomDesignerPlugins/general/icons/home.png"));
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general/icons/move.png"));
@@ -468,6 +485,7 @@ void ItomQwtPlot::setButtonStyle(int style)
     else
     {
         m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/filesave_lt.png"));
+        m_pActPrint->setIcon(QIcon(":/itomDesignerPlugins/general/icons/print_lt.png"));
         m_pActCopyClipboard->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/clipboard_lt.png"));
         m_pActHome->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/home_lt.png"));
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"));
@@ -2230,6 +2248,28 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtPlot::printCanvas()
+{
+    if (!m_pPrinter)
+    {
+        m_pPrinter = new QPrinter();
+        m_pPrinter->setPageMargins(15, 15, 15, 15, QPrinter::Millimeter);
+    }
+    QPrintPreviewDialog printPreviewDialog(m_pPrinter, this, Qt::Window);
+    connect(&printPreviewDialog, SIGNAL(paintRequested(QPrinter*)), this, SLOT(printPreviewRequested(QPrinter*)));
+    printPreviewDialog.exec();
+    return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::printPreviewRequested(QPrinter* printer)
+{
+    QwtPlotRenderer renderer;
+    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+    renderer.renderTo(this, *printer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mnuActSave()
 {
     //first get the output format information, then the filename (in order to let the user see what can be adjusted before defining a filename)
@@ -2298,7 +2338,7 @@ void ItomQwtPlot::mnuActSave()
     QDir file(saveDefaultPath);
     fileName = QFileDialog::getSaveFileName(
         this, tr("Export File Name"), file.absoluteFilePath(fileName),
-        filter.join(";;"), NULL, QFileDialog::DontConfirmOverwrite);
+        filter.join(";;"), NULL);
 #endif
 
     if (!fileName.isEmpty())
@@ -2308,6 +2348,12 @@ void ItomQwtPlot::mnuActSave()
 
         exportCanvas(false, fileName, curSize, resolution);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::mnuActPrint()
+{
+    printCanvas();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -394,6 +394,8 @@ void QwtPlotCurveDataObject::drawSticks( QPainter *painter,  const QwtScaleMap &
                 QwtPainter::drawLine( painter, xi, y0, xi, yi );
         }
     }
+
+    painter->restore();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const

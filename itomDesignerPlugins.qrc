@@ -90,6 +90,7 @@
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>
         <file>icons/filesave.png</file>
+        <file>icons/print.png</file>
         <file>icons/clipboard.png</file>
         <file>icons/forward.png</file>
         <file>icons/home.png</file>
@@ -107,6 +108,7 @@
     <qresource prefix="/itomDesignerPlugins/general_lt">
         <file>icons/back_lt.png</file>
         <file>icons/filesave_lt.png</file>
+        <file>icons/print_lt.png</file>
         <file>icons/clipboard_lt.png</file>
         <file>icons/forward_lt.png</file>
         <file>icons/home_lt.png</file>
