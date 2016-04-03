@@ -118,10 +118,12 @@ public:
     int getSelectedGeometricShapeIdx() const;
     void setSelectedGeometricShapeIdx(int idx);
     ito::RetVal setGeometricShapes(const QVector<ito::Shape> &geometricShapes);
-    ito::RetVal deleteGeometricShape(const int id);
+    ito::RetVal addGeometricShape(const ito::Shape &geometricShape); //add the new shape (only if its index does not already exist)
+    ito::RetVal modifyGeometricShape(const ito::Shape &geometricShape); //modifies the shape with the same index or add the given shape if its index does not already exist.
+    ito::RetVal deleteGeometricShape(const int idx);
     QVector<ito::Shape> getGeometricShapes();
-    ito::RetVal setGeometricShapeLabelVisible(int id, bool setVisible);
-    ito::RetVal setGeometricShapeLabel(int id, const QString &label);
+    ito::RetVal setGeometricShapeLabelVisible(int idx, bool setVisible);
+    ito::RetVal setGeometricShapeLabel(int idx, const QString &label);
 
     ito::RetVal userInteractionStart(int type, bool start, int maxNrOfPoints);
 

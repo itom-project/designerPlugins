@@ -207,11 +207,13 @@ public Q_SLOTS:
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
     ito::RetVal clearGeometricShapes(void);
-    ito::RetVal deleteGeometricShape(int id);
+    ito::RetVal deleteGeometricShape(int idx);
     ito::RetVal setGeometricShapes(QVector< ito::Shape > geometricShapes);
+    ito::RetVal addGeometricShape(const ito::Shape &geometricShape); //add the new shape (only if its index does not already exist)
+    ito::RetVal modifyGeometricShape(const ito::Shape &geometricShape); //modifies the shape with the same index or add the given shape if its index does not already exist.
 
-    ito::RetVal setGeometricShapeLabel(int id, QString label);
-    ito::RetVal setGeometricShapeLabelVisible(int id, bool setVisible);
+    ito::RetVal setGeometricShapeLabel(int idx, QString label);
+    ito::RetVal setGeometricShapeLabelVisible(int idx, bool setVisible);
 
     ito::RetVal plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");

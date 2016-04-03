@@ -279,29 +279,29 @@ ito::RetVal ItomQwtDObjFigure::clearGeometricShapes(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::deleteGeometricShape(int id)
+ito::RetVal ItomQwtDObjFigure::deleteGeometricShape(int idx)
 {
     if (m_pBaseContent)
     {
-        return m_pBaseContent->deleteGeometricShape(id);
+        return m_pBaseContent->deleteGeometricShape(idx);
     }
     return ito::RetVal(ito::retError, 0, tr("content widget not available").toLatin1().data());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabel(int id, QString label)
+ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabel(int idx, QString label)
 {
     if (m_pBaseContent)
-        return m_pBaseContent->setGeometricShapeLabel(id, label);
+        return m_pBaseContent->setGeometricShapeLabel(idx, label);
 
     return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabelVisible(int id, bool setVisible)
+ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabelVisible(int idx, bool setVisible)
 {
     if (m_pBaseContent)
-        return m_pBaseContent->setGeometricShapeLabelVisible(id, setVisible);
+        return m_pBaseContent->setGeometricShapeLabelVisible(idx, setVisible);
 
     updatePropertyDock();
 
@@ -404,6 +404,30 @@ ito::RetVal ItomQwtDObjFigure::setGeometricShapes(QVector<ito::Shape> geometricS
     if (m_pBaseContent)
     {
         ito::RetVal retval = m_pBaseContent->setGeometricShapes(geometricShapes);
+        updatePropertyDock();
+        return retval;
+    }
+    return ito::RetVal(ito::retError, 0, "content not available");
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtDObjFigure::addGeometricShape(const ito::Shape &geometricShape)
+{
+    if (m_pBaseContent)
+    {
+        ito::RetVal retval = m_pBaseContent->addGeometricShape(geometricShape);
+        updatePropertyDock();
+        return retval;
+    }
+    return ito::RetVal(ito::retError, 0, "content not available");
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtDObjFigure::modifyGeometricShape(const ito::Shape &geometricShape)
+{
+    if (m_pBaseContent)
+    {
+        ito::RetVal retval = m_pBaseContent->modifyGeometricShape(geometricShape);
         updatePropertyDock();
         return retval;
     }

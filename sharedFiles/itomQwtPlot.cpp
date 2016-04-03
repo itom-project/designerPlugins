@@ -1940,31 +1940,31 @@ void ItomQwtPlot::clearAllGeometricShapes()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::deleteGeometricShape(const int id)
+ito::RetVal ItomQwtPlot::deleteGeometricShape(const int idx)
 {
     ito::RetVal retVal;
     bool found = false;
 
-    if (m_pShapes.contains(id))
+    if (m_pShapes.contains(idx))
     {
         //
-        DrawItem *delItem = m_pShapes[id];
+        DrawItem *delItem = m_pShapes[idx];
         delItem->detach();
-        m_pShapes.remove(id);
+        m_pShapes.remove(idx);
         delete delItem; // ToDo check for memory leak
         found = true;
     }
 
     if (!found)
     {
-        retVal += ito::RetVal::format(ito::retError, 0, tr("No geometric shape with id '%d' found.").toLatin1().data(), id);
+        retVal += ito::RetVal::format(ito::retError, 0, tr("No geometric shape with index '%d' found.").toLatin1().data(), idx);
     }
     else
     {
         replot();
 
         ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
-        if (p) emit  p->geometricShapeDeleted(id);
+        if (p) emit  p->geometricShapeDeleted(idx);
     }
 
     return retVal;
@@ -2021,7 +2021,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
-        retVal += ito::RetVal(ito::retError, 0, tr("Could not plot marker, api is missing").toLatin1().data());
+        retVal += ito::RetVal(ito::retError, 0, tr("Could not set geometric shapes, api is missing").toLatin1().data());
     }
     else
     {
@@ -2068,13 +2068,8 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                     break;
 
                 default:
-                    retVal += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
+                    retVal += ito::RetVal(ito::retError, 0, tr("invalid or unsupported shape type").toLatin1().data());
                     break;
-                }
-
-                if (newItem)
-                {
-                    
                 }
 				
             }
@@ -2095,6 +2090,144 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
     return retVal;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape)
+{
+    ito::RetVal retVal;
+    clearAllGeometricShapes();
+    ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
+
+
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        retVal += ito::RetVal(ito::retError, 0, tr("Could not add a geometric shape, api is missing").toLatin1().data());
+    }
+    else
+    {
+        if (m_pShapes.contains(geometricShape.index()))
+        {
+            retVal += ito::RetVal(ito::retError, 0, tr("Could not add the geometric shape since a shape with the same index already exists").toLatin1().data());
+        }
+        else
+        {
+            
+            DrawItem *newItem = NULL;
+            switch (geometricShape.type())
+            {
+            case ito::Shape::MultiPointPick:
+            case ito::Shape::Point:
+            case ito::Shape::Line:
+            case ito::Shape::Rectangle:
+            case ito::Shape::Square:
+            case ito::Shape::Ellipse:
+            case ito::Shape::Circle:
+                newItem = new DrawItem(geometricShape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
+                if (!retVal.containsError())
+                {
+                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setVisible(true);
+                    newItem->show();
+                    newItem->attach(this);
+                    m_pShapes.insert(newItem->getIndex(), newItem);
+					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+					{
+						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());
+					}
+                }
+                break;
+
+            default:
+                retVal += ito::RetVal(ito::retError, 0, tr("invalid or unsupported shape type").toLatin1().data());
+                break;				
+            }
+
+            replot();
+        }
+    }
+
+    m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
+	
+	if (retVal.hasErrorMessage())
+    {
+        emit statusBarMessage(retVal.errorMessage(), 12000);
+    }
+    
+    if (p) emit  p->geometricShapeFinished(0, retVal.containsError());
+
+    return retVal;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtPlot::modifyGeometricShape(const ito::Shape &geometricShape)
+{
+    ito::RetVal retVal;
+    clearAllGeometricShapes();
+    ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
+
+
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        retVal += ito::RetVal(ito::retError, 0, tr("Could not modify a geometric shape, api is missing").toLatin1().data());
+    }
+    else
+    {            
+        DrawItem *newItem = NULL;
+        // The definition do not correspond to the definetion of primitiv elements
+
+        if (m_pShapes.contains(geometricShape.index()))
+        {
+            m_pShapes[geometricShape.index()]->setShape(geometricShape, m_inverseColor0, m_inverseColor1);
+			if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+			{
+				(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(geometricShape);
+			}
+        }
+        else
+        {
+            switch (geometricShape.type())
+            {
+            case ito::Shape::MultiPointPick:
+            case ito::Shape::Point:
+            case ito::Shape::Line:
+            case ito::Shape::Rectangle:
+            case ito::Shape::Square:
+            case ito::Shape::Ellipse:
+            case ito::Shape::Circle:
+                newItem = new DrawItem(geometricShape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
+                if (!retVal.containsError())
+                {
+                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setVisible(true);
+                    newItem->show();
+                    newItem->attach(this);
+                    m_pShapes.insert(newItem->getIndex(), newItem);
+					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+					{
+						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());
+					}
+                }
+                break;
+
+            default:
+                retVal += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
+                break;
+            }
+
+            replot();
+        }
+    }
+
+    m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
+	
+	if (retVal.hasErrorMessage())
+    {
+        emit statusBarMessage(retVal.errorMessage(), 12000);
+    }
+    
+    if (p) emit  p->geometricShapeFinished(0, retVal.containsError());
+
+    return retVal;
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QVector<ito::Shape> ItomQwtPlot::getGeometricShapes()
@@ -2121,28 +2254,28 @@ QVector<ito::Shape> ItomQwtPlot::getGeometricShapes()
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::setGeometricShapeLabel(int id, const QString &label)
+ito::RetVal ItomQwtPlot::setGeometricShapeLabel(int idx, const QString &label)
 {
-    if (!m_pShapes.contains(id))
+    if (!m_pShapes.contains(idx))
     {
         return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
     }
 
-    m_pShapes[id]->setLabel(label);
+    m_pShapes[idx]->setLabel(label);
     replot();
 
     return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::setGeometricShapeLabelVisible(int id, bool setVisible)
+ito::RetVal ItomQwtPlot::setGeometricShapeLabelVisible(int idx, bool setVisible)
 {
-    if (!m_pShapes.contains(id))
+    if (!m_pShapes.contains(idx))
     {
         return ito::RetVal(ito::retError, 0, tr("Geometric element not found").toLatin1().data());
     }
 
-    m_pShapes[id]->setLabelVisible(setVisible);
+    m_pShapes[idx]->setLabelVisible(setVisible);
     replot();
 
     return ito::retOk;

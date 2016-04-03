@@ -81,9 +81,10 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     if (shape.index() < 0)
     {
         int idxCtr = 0;
-        do 
+        while (idxVec.contains(idxCtr))
+        {
             idxCtr++;
-        while (idxVec.contains(idxCtr));
+        }
         d->m_shape.setIndex(idxCtr);
         idxVec.append(idxCtr);
     }

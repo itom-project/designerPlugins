@@ -24,7 +24,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomWidgets itomShapeLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-FIND_PACKAGE_QT(ON Core Widgets Xml Designer PrintSupport Svg LinguistTools)
+FIND_PACKAGE_QT(ON Core Widgets Xml Designer PrintSupport Svg LinguistTools PrintSupport)
 
 find_package(VisualLeakDetector QUIET)
 
