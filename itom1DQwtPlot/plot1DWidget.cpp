@@ -126,7 +126,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     canvas()->setCursor(Qt::ArrowCursor);
 
     m_colorList.reserve(12);
-    m_colorList.append("blue");
+    /*m_colorList.append("blue");
     m_colorList.append("green");
     m_colorList.append("red");
     m_colorList.append("magenta");
@@ -137,7 +137,21 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_colorList.append("darkRed");
     m_colorList.append("darkMagenta");
     m_colorList.append("darkCyan");
-    m_colorList.append("darkYellow");
+    m_colorList.append("darkYellow");*/
+
+    //12-class Paired list from colorbrewer2.org (Cynthia Brewer, Geography, Pennsylvania State University). (reordered)
+    m_colorList.append("#1f78b4"); //also used for blue in RGBA values
+    m_colorList.append("#33a02c"); //also used for green in RGBA values
+    m_colorList.append("#e31a1c"); //also used for red in RGBA values
+    m_colorList.append("#ff7f00");
+    m_colorList.append("#6a3d9a");
+    m_colorList.append("#b15928");
+    m_colorList.append("#a6cee3");
+    m_colorList.append("#b2df8a");
+    m_colorList.append("#fb9a99");
+    m_colorList.append("#fdbf6f");
+    m_colorList.append("#cab2d6");
+    m_colorList.append("#ffff99");
 
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
@@ -773,6 +787,8 @@ void Plot1DWidget::setLineWidth(const qreal &width)
 {
     if (m_lineWidth != width)
     {
+        m_lineWidth = width;
+
         foreach(QwtPlotCurve *c, m_plotCurveItems)
         {
             QPen pen = c->pen();

@@ -176,7 +176,7 @@ class Plot1DWidget : public ItomQwtPlot
         int m_Curser[2];
         int m_actPickerIdx;
 
-        QStringList m_colorList;
+        QList<QColor> m_colorList;
 
         ValuePicker1D *m_pValuePicker;
 
