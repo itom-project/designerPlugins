@@ -154,8 +154,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         enum LegendPos { Off = 0, Left = 1, Top = 2, Right = 3, Bottom = 4 };
         enum Symbol
         {
-            NoSymbol = -1, Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon
-        };
+            NoSymbol = 0, Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon
+        }; //this enum corresponds to the first entries of QwtSymbol::Style, however all values are shifted by 1, such that NoSymbol (0) corresponds to QwtSymbol::NoSymbol (-1) -> enum value -1 is invalid for Qt meta enumeration system.
         enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray };
         enum GridStyle { GridNo = 0, GridMajorXY = 1, GridMajorX = 2, GridMajorY = 3, GridMinorXY = 4, GridMinorX = 5, GridMinorY = 6 };
 
@@ -293,6 +293,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
         ito::RetVal deleteMarkers(int id);
+
+        ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
+        QVariant getCurveProperty(int index, const QByteArray &property);
         
 
         QSharedPointer<ito::DataObject> getDisplayed(void);

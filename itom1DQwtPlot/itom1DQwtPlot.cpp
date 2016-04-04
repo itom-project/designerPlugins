@@ -567,7 +567,7 @@ void Itom1DQwtPlot::setCurveStyle(const ItomQwtPlotEnums::CurveStyle state)
 //----------------------------------------------------------------------------------------------------------------------------------
 Itom1DQwtPlot::Symbol Itom1DQwtPlot::getLineSymbol() const
 {
-    return (Symbol)(m_pData->m_lineSymbole);
+    return (Symbol)(m_pData->m_lineSymbole + 1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -576,9 +576,9 @@ void Itom1DQwtPlot::setLineSymbol(const Symbol symbol)
     if (m_pContent)
     {
         
-        if (symbol < QwtSymbol::Path && symbol > -2 )
+        if (symbol <= QwtSymbol::Path && symbol >= 0 )
         {
-            m_pContent->setSymbolStyle((QwtSymbol::Style)symbol, m_pData->m_lineSymboleSize);
+            m_pContent->setSymbolStyle((QwtSymbol::Style)(symbol - 1), m_pData->m_lineSymboleSize);
         }
     }
 
@@ -600,7 +600,7 @@ int Itom1DQwtPlot::getLineSymbolSize() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLineSymbolSize(const int size)
 {
-    if (size < 1 || size > 21)
+    if (size < 1)
         return;
 
     if (m_pContent)
@@ -1004,4 +1004,26 @@ int Itom1DQwtPlot::getCurveFillAlpha() const
         return m_pContent->m_fillCurveAlpa;
     }
     return 128;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom1DQwtPlot::setCurveProperty(int index, const QByteArray &property, const QVariant &value)
+{
+    if (m_pContent)
+    {
+        return m_pContent->setCurveProperty(index, property, value);
+    }
+
+    return ito::RetVal(ito::retError, 0, "canvas not available");
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QVariant Itom1DQwtPlot::getCurveProperty(int index, const QByteArray &property)
+{
+    if (m_pContent)
+    {
+        return m_pContent->getCurveProperty(index, property);
+    }
+
+    return QVariant();
 }

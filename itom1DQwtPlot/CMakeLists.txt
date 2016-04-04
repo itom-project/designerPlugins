@@ -57,7 +57,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
     ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles
 )
 
 LINK_DIRECTORIES(
@@ -71,6 +71,7 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlotPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveProperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.h
@@ -81,16 +82,16 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomLogLogScaleEngine.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
 )
 
 set(plugin_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlotEnums.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
 )
 
 set(plugin_UI
@@ -111,6 +112,7 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveProperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.cpp
@@ -119,8 +121,8 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomLogLogScaleEngine.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.

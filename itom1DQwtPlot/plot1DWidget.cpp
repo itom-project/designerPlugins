@@ -25,6 +25,7 @@
 #include "dataObjectSeriesData.h"
 #include "DataObject/dataObjectFuncs.h"
 #include "qwtPlotCurveDataObject.h"
+#include "QwtPlotCurveProperty.h"
 #include "common/sharedStructuresGraphics.h"
 #include "common/apiFunctionsGraphInc.h"
 #include "qnumeric.h"
@@ -247,6 +248,15 @@ Plot1DWidget::~Plot1DWidget()
         delete c;
     }
     m_plotCurveItems.clear();
+
+    foreach(QwtPlotCurveProperty* c, m_plotCurvePropertyItems)
+    {
+        if (c)
+        {
+            delete c;
+        }
+    }
+    m_plotCurvePropertyItems.clear();
 
     foreach (Picker m, m_pickers)
     {
@@ -761,45 +771,99 @@ void Plot1DWidget::setGridStyle(const Itom1DQwtPlot::GridStyle gridStyle)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLineWidth(const qreal &width)
 {
-    m_lineWidth = width;
-
-    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    if (m_lineWidth != width)
     {
-        QPen pen = c->pen();
-        pen.setWidthF(m_lineWidth);
-        c->setPen(pen);
-    }
+        foreach(QwtPlotCurve *c, m_plotCurveItems)
+        {
+            QPen pen = c->pen();
+            pen.setWidthF(width);
+            c->setPen(pen);
+        }
 
-    replot();
+        replot();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLineStyle(const Qt::PenStyle &style)
 {
-    m_lineStyle = style;
-
-    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    if (m_lineStyle != style)
     {
-        QPen pen = c->pen();
-        pen.setStyle(m_lineStyle);
-        c->setPen(pen);
-    }
+        m_lineStyle = style;
 
-    replot();
+        foreach(QwtPlotCurve *c, m_plotCurveItems)
+        {
+            QPen pen = c->pen();
+            pen.setStyle(style);
+            c->setPen(pen);
+        }
+
+        replot();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
 {
-    m_pData->m_lineSymbole = style;
-    m_pData->m_lineSymboleSize = size;
-    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    if (m_pData->m_lineSymbole != style && m_pData->m_lineSymboleSize != size)
     {
-        QPen pen = c->pen();
-        c->setSymbol(new QwtSymbol(m_pData->m_lineSymbole, QBrush(Qt::white), QPen(pen.color()),  QSize(m_pData->m_lineSymboleSize,m_pData->m_lineSymboleSize)));
+        foreach(QwtPlotCurve *c, m_plotCurveItems)
+        {
+            QPen pen = c->pen();
+            const QwtSymbol *s = c->symbol();
+            QSize newSize(size, size);
+            if (style == QwtSymbol::NoSymbol || size == 0)
+            {
+                c->setSymbol(NULL);
+            }
+            else
+            {
+                c->setSymbol(new QwtSymbol(style, QBrush(Qt::white), QPen(pen.color()), newSize));
+            }
+        }
+
+        replot();
+    }
+    else if (m_pData->m_lineSymbole != style)
+    {
+        foreach(QwtPlotCurve *c, m_plotCurveItems)
+        {
+            QPen pen = c->pen();
+            const QwtSymbol *s = c->symbol();
+            if (style == QwtSymbol::NoSymbol)
+            {
+                c->setSymbol(NULL);
+            }
+            else
+            {
+                QSize size = s ? s->size() : QSize(m_pData->m_lineSymboleSize, m_pData->m_lineSymboleSize);
+                c->setSymbol(new QwtSymbol(style, QBrush(Qt::white), QPen(pen.color()), size));
+            }
+        }
+
+        replot();
+    }
+    else if (m_pData->m_lineSymboleSize != size)
+    {
+        foreach(QwtPlotCurve *c, m_plotCurveItems)
+        {
+            QPen pen = c->pen();
+            const QwtSymbol *s = c->symbol();
+            if (size == 0)
+            {
+                c->setSymbol(NULL);
+            }
+            else
+            {
+                c->setSymbol(new QwtSymbol(s ? s->style() : m_pData->m_lineSymbole, QBrush(Qt::white), QPen(pen.color()), QSize(size,size)));
+            }
+        }
+
+        replot();
     }
 
-    replot();
+    m_pData->m_lineSymbole = style;
+    m_pData->m_lineSymboleSize = size;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1053,6 +1117,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         while (m_plotCurveItems.size() > numCurves)
         {
             curve = m_plotCurveItems.takeLast();
+            m_plotCurvePropertyItems.takeLast();
             curve->detach();
             delete curve;
         }
@@ -1178,6 +1243,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 dObjCurve->setBrush(Qt::NoBrush);
             }
             m_plotCurveItems.append(dObjCurve);
+            m_plotCurvePropertyItems.append(new QwtPlotCurveProperty(dObjCurve));
         }
 
         if (bounds.size() == 0)
@@ -2579,7 +2645,10 @@ void Plot1DWidget::setBaseLine(const qreal &line)
 
     foreach(QwtPlotCurve *c, m_plotCurveItems)
     {
-        c->setBaseline(m_baseLine);
+        if (c->baseline() != m_baseLine)
+        {
+            c->setBaseline(m_baseLine);
+        }
     }
 
     replot();
@@ -2591,7 +2660,11 @@ void Plot1DWidget::setCurveFilled()
     int colorIndex = 0;
     foreach(QwtPlotCurve *c, m_plotCurveItems)
     {
-        c->setBaseline(m_baseLine);
+        if (c->baseline() != m_baseLine)
+        {
+            c->setBaseline(m_baseLine);
+        }
+
         ((QwtPlotCurveDataObject*)c)->setCurveFilled(m_curveFilled);
         if (m_curveFilled != ItomQwtPlotEnums::NoCurveFill)
         {
@@ -3046,5 +3119,66 @@ void Plot1DWidget::mnuSetPicker(QAction *action)
     {
         clearPicker(-1, true);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Plot1DWidget::setCurveProperty(int index, const QByteArray &property, const QVariant &value)
+{
+    ito::RetVal retval;
+    if (index < 0 || index >= m_plotCurvePropertyItems.size())
+    {
+        retval += ito::RetVal::format(ito::retError, 0, "index out of bounds [0,%i]", m_plotCurvePropertyItems.size() - 1);
+    }
+    else if (!m_plotCurvePropertyItems[index])
+    {
+        retval += ito::RetVal::format(ito::retError, 0, "properties of curve %i are not available.", index);
+    }
+    else
+    {
+        QwtPlotCurveProperty *prop = m_plotCurvePropertyItems[index];
+
+        if (ito::ITOM_API_FUNCS)
+        {
+            retval += apiQObjectPropertyWrite(prop, property.data(), value);
+        }
+        else
+        {
+            retval += ito::RetVal(ito::retError, 0, "itom API not available.");
+        }
+
+        if (!retval.containsError())
+        {
+            replot();
+        }
+
+    }
+
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QVariant Plot1DWidget::getCurveProperty(int index, const QByteArray &property)
+{
+    if (index < 0 || index >= m_plotCurvePropertyItems.size())
+    {
+        return QVariant();
+    }
+    else if (!m_plotCurvePropertyItems[index])
+    {
+        return QVariant();
+    }
+    else
+    {
+        QwtPlotCurveProperty *prop = m_plotCurvePropertyItems[index];
+
+        if (ito::ITOM_API_FUNCS)
+        {
+            QVariant v;
+            apiQObjectPropertyRead(prop, property.data(), v);
+            return v;
+        }
+    }
+
+    return QVariant();
 }
 

@@ -45,6 +45,7 @@ class QPainter;
 
 class QwtPlotCurveDataObject : public QwtPlotCurve
 {
+
 public:
 
     explicit QwtPlotCurveDataObject( const QString &title = QString::null ) : QwtPlotCurve(title), m_privCurveFitter(NULL), m_curveFillState(ItomQwtPlotEnums::NoCurveFill) {}

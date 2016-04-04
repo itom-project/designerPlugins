@@ -52,6 +52,7 @@ class Itom1DQwtPlot;
 class ItomQwtDObjFigure;
 class QwtLegend;
 struct InternalData;
+class QwtPlotCurveProperty;
 
 class Plot1DWidget : public ItomQwtPlot
 {
@@ -104,6 +105,9 @@ class Plot1DWidget : public ItomQwtPlot
         void setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx);
         void setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx);
 
+        ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
+        QVariant getCurveProperty(int index, const QByteArray &property);
+
         friend Itom1DQwtPlot;
 
     protected:
@@ -147,6 +151,7 @@ class Plot1DWidget : public ItomQwtPlot
         void createActions();
 
         QList<QwtPlotCurve*> m_plotCurveItems;
+        QList<QwtPlotCurveProperty*> m_plotCurvePropertyItems; //sychrone with m_plotCurveItems. Every item is derived from QObject and therefore propagate a Q_PROPERTY based set of properties for each curve!
         QwtPlotGrid *m_pPlotGrid;
         QwtLegend *m_pLegend;
         QStringList m_legendTitles;
@@ -258,7 +263,7 @@ struct InternalData
     InternalData() : m_title(""), m_axisLabel(""), m_valueLabel(""), m_titleDObj(""),
         m_axisLabelDObj(""), m_valueLabelDObj(""), m_autoTitle(1), m_autoAxisLabel(1), m_autoValueLabel(1),
         m_valueScaleAuto(1), m_valueMin(0), m_valueMax(0),  m_axisScaleAuto(1), m_axisMin(0), m_axisMax(0), m_forceValueParsing(1),
-        m_lineSymboleSize(1)
+        m_lineSymboleSize(8)
     {
         m_multiLine = ItomQwtPlotEnums::AutoRowCol;
         m_colorLine = ItomQwtPlotEnums::AutoColor;
