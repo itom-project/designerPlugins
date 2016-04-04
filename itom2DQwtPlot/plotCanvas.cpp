@@ -841,11 +841,11 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     QwtLinearColorMap *colorBarMap = NULL;
     ito::ItomPalette newPalette;
     ito::RetVal retval(ito::retOk);
-    int numPalettes = 1;
+    int numPalettes = 1;    
 
     if(!ito::ITOM_API_FUNCS_GRAPH)
     {
-        emit statusBarMessage(tr("Could not change color bar, api is missing"), 4000);
+        //emit statusBarMessage(tr("Could not change color bar, api is missing"), 4000);
         return false;
     }
 
@@ -893,50 +893,6 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     }
 
     m_colorMapName = newPalette.name;
-
-/*
-    if (newPalette.getPos(newPalette.getSize() - 1) == newPalette.getPos(newPalette.getSize() - 2))  // BuxFix - For Gray-Marked
-    {
-        colorMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColor(newPalette.getSize() - 2), QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColor(newPalette.getSize() - 2), QwtColorMap::Indexed);
-        if (newPalette.getSize() > 2)
-        {
-            for (int i = 1; i < newPalette.getSize() - 2; i++)
-            {
-                colorMap->addColorStop(newPalette.getPos(i), newPalette.getColor(i));
-                colorBarMap->addColorStop(newPalette.getPos(i), newPalette.getColor(i));
-            }
-            colorMap->addColorStop(newPalette.getPos(newPalette.getSize() - 1), newPalette.getColor(newPalette.getSize() - 1));
-            colorBarMap->addColorStop(newPalette.getPos(newPalette.getSize() - 1), newPalette.getColor(newPalette.getSize() - 1));
-        }
-    }
-    else
-    {
-        colorMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColorLast(), QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.getColorFirst(), newPalette.getColorLast(), QwtColorMap::Indexed);
-        if (newPalette.getSize() > 2)
-        {
-            for (int i = 1; i < newPalette.getSize() - 1; i++)
-            {
-                colorMap->addColorStop(newPalette.getPos(i), newPalette.getColor(i));
-                colorBarMap->addColorStop(newPalette.getPos(i), newPalette.getColor(i));
-            }
-        }
-    }
-*/
-
-    //if (newPalette.inverseColorOne.isValid() /* && newPalette.inverseColorTwo.isValid() */)
-    //{
-    //    m_pLineCutPicker->setRubberBandPen(QPen(newPalette.inverseColorOne));
-    //    m_pLineCutPicker->setTrackerPen(QPen(newPalette.inverseColorOne));
-    //    m_pLineCutLine->setPen(newPalette.inverseColorOne);
-    //}
-    //else
-    //{
-    //    m_pLineCutPicker->setRubberBandPen(QPen(Qt::gray));
-    //    m_pLineCutPicker->setTrackerPen(QPen(Qt::gray));
-    //    m_pLineCutLine->setPen(Qt::gray);
-    //}
 
     setInverseColors(newPalette.inverseColorOne, newPalette.inverseColorTwo);
     refreshStyles();

@@ -66,6 +66,8 @@ void Itom1DQwtPlot::constructor()
     registerShortcutActions();
 
     setPropertyObservedObject(this);
+
+    init(); //here, the API is not ready, yet. Usually init() is called again once the event is raised signalling that the api is ready. However, in QtDesigner, the api is not available. Therefore, we want to init the canvas here.
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
