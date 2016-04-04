@@ -411,11 +411,11 @@ ito::RetVal ItomQwtDObjFigure::setGeometricShapes(QVector<ito::Shape> geometricS
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::addGeometricShape(const ito::Shape &geometricShape)
+ito::RetVal ItomQwtDObjFigure::addGeometricShape(const ito::Shape &geometricShape, int *newIndex /*= NULL*/)
 {
     if (m_pBaseContent)
     {
-        ito::RetVal retval = m_pBaseContent->addGeometricShape(geometricShape);
+        ito::RetVal retval = m_pBaseContent->addGeometricShape(geometricShape, newIndex);
         updatePropertyDock();
         return retval;
     }
@@ -423,11 +423,11 @@ ito::RetVal ItomQwtDObjFigure::addGeometricShape(const ito::Shape &geometricShap
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::modifyGeometricShape(const ito::Shape &geometricShape)
+ito::RetVal ItomQwtDObjFigure::updateGeometricShape(const ito::Shape &geometricShape, int *newIndex /*= NULL*/)
 {
     if (m_pBaseContent)
     {
-        ito::RetVal retval = m_pBaseContent->modifyGeometricShape(geometricShape);
+        ito::RetVal retval = m_pBaseContent->updateGeometricShape(geometricShape, newIndex);
         updatePropertyDock();
         return retval;
     }

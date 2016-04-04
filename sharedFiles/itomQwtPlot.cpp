@@ -2091,10 +2091,9 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape)
+ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int *newIndex /*= NULL*/)
 {
     ito::RetVal retVal;
-    clearAllGeometricShapes();
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
 
 
@@ -2129,6 +2128,10 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape)
                     newItem->show();
                     newItem->attach(this);
                     m_pShapes.insert(newItem->getIndex(), newItem);
+                    if (newIndex)
+                    {
+                        *newIndex = newItem->getIndex();
+                    }
 					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 					{
 						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());
@@ -2158,10 +2161,9 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::modifyGeometricShape(const ito::Shape &geometricShape)
+ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, int *newIndex /*= NULL*/)
 {
     ito::RetVal retVal;
-    clearAllGeometricShapes();
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
 
 
@@ -2181,6 +2183,11 @@ ito::RetVal ItomQwtPlot::modifyGeometricShape(const ito::Shape &geometricShape)
 			{
 				(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(geometricShape);
 			}
+
+            if (newIndex)
+            {
+                *newIndex = geometricShape.index();
+            }
         }
         else
         {
@@ -2201,6 +2208,10 @@ ito::RetVal ItomQwtPlot::modifyGeometricShape(const ito::Shape &geometricShape)
                     newItem->show();
                     newItem->attach(this);
                     m_pShapes.insert(newItem->getIndex(), newItem);
+                    if (newIndex)
+                    {
+                        *newIndex = newItem->getIndex();
+                    }
 					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
 					{
 						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());

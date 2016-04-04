@@ -107,10 +107,14 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
 
     Q_CLASSINFO("slot://copyToClipBoard", "")
     Q_CLASSINFO("slot://userInteractionStart", "")
-    Q_CLASSINFO("slot://clearGeometricElements", "")
-    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index id")
-    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index id")
-    Q_CLASSINFO("slot://plotMarkers", "")
+    Q_CLASSINFO("slot://clearGeometricShapes", "removes all geometric shapes from the canvas.")
+    Q_CLASSINFO("slot://deleteGeometricShape", "deletes the geometric shape with the given index. The index is thereby part of the shape object and must not always corresponds to the position in the vector of the geometricShapes property.")
+    Q_CLASSINFO("slot://setGeometricShapes", "This slot is also called by the setter function of the property 'geometricShapes'. Pass a vector of geometric shapes that replace any existing shape and will be displayed on the canvas.")
+    Q_CLASSINFO("slot://addGeometricShape", "Add another geometric shape if its index is not already available. If the index is -1 (default), the next free value >= 0 will be assigned as index to the new shape object.")
+    Q_CLASSINFO("slot://updateGeometricShape", "Updates an existing geometric shape, if the index already exists or add the given shape as new shape to the list of existing shapes.")
+    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index idx.")
+    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index idx.")
+    Q_CLASSINFO("slot://plotMarkers", "Put markers all all coordinates given by the first dataObject argument (2xN, first row: x-coordinates, second row: y-coordinates). The style of the markers is given as second argument, while an optional set name can be given as third argument. If the markers should only be displayed in one plane, give the plane index as last argument.")
     Q_CLASSINFO("slot://deleteMarkers", "Delete all sets of markers with given name or all markers if no or an empty name is passed.")
     Q_CLASSINFO("slot://replot", "Force a replot which is for instance necessary if values of the displayed data object changed and you want to update the plot, too.")
 
@@ -209,8 +213,8 @@ public Q_SLOTS:
     ito::RetVal clearGeometricShapes(void);
     ito::RetVal deleteGeometricShape(int idx);
     ito::RetVal setGeometricShapes(QVector< ito::Shape > geometricShapes);
-    ito::RetVal addGeometricShape(const ito::Shape &geometricShape); //add the new shape (only if its index does not already exist)
-    ito::RetVal modifyGeometricShape(const ito::Shape &geometricShape); //modifies the shape with the same index or add the given shape if its index does not already exist.
+    ito::RetVal addGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //add the new shape (only if its index does not already exist)
+    ito::RetVal updateGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //updates the shape with the same index or add the given shape if its index does not already exist.
 
     ito::RetVal setGeometricShapeLabel(int idx, QString label);
     ito::RetVal setGeometricShapeLabelVisible(int idx, bool setVisible);
