@@ -192,7 +192,7 @@ QPixmap ItomQwtDObjFigure::renderToPixMap(const int xsize, const int ysize, cons
     QBrush curBrush = plot->canvasBackground();
 
     QPalette curPalette = plot->palette();
-
+    
     plot->setAutoFillBackground(true);
     plot->setPalette(Qt::white);
     plot->setCanvasBackground(Qt::white);

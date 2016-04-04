@@ -369,8 +369,11 @@ void ItomQwtPlot::updateColors(void)
 {
     QwtPlotCanvas* c = dynamic_cast<QwtPlotCanvas*>(canvas());
 
-    if (testAttribute(Qt::WA_StyledBackground))
-    {
+    //at first, it was possible to let the windows be styled by os-dependent tools. However, the QFrame::Box 
+    //created undesired corner forms when printing the canvas. Therefore, stylesheets are always used.
+
+    /*if (testAttribute(Qt::WA_StyledBackground))
+    {*/
         m_styledBackground = true;
 
         //we have to apply all styles using style sheets
@@ -379,16 +382,16 @@ void ItomQwtPlot::updateColors(void)
         setStyleSheet(styleSheet);
 
         c->setStyleSheet(QString("border: 1px solid %1; background-color: %2;").arg(m_axisColor.name()).arg(m_canvasColor.name()));
-    }
-    else
-    {
-        m_styledBackground = false;
+    //}
+    //else
+    //{
+    //    m_styledBackground = false;
 
-        //no style sheets are applied, therefore the default OS dependet style methods can be used
-        c->setFrameStyle(QFrame::Box);
-        c->setLineWidth(1);
-        c->setMidLineWidth(0);
-    }
+    //    //no style sheets are applied, therefore the default OS dependet style methods can be used
+    //    c->setFrameStyle(QFrame::Box);
+    //    c->setLineWidth(1);
+    //    c->setMidLineWidth(0);
+    //}
 
     QPalette newPalette(m_backgroundColor);
 
@@ -485,7 +488,7 @@ void ItomQwtPlot::setButtonStyle(int style)
     else
     {
         m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/filesave_lt.png"));
-        m_pActPrint->setIcon(QIcon(":/itomDesignerPlugins/general/icons/print_lt.png"));
+        m_pActPrint->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/print_lt.png"));
         m_pActCopyClipboard->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/clipboard_lt.png"));
         m_pActHome->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/home_lt.png"));
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"));
@@ -2399,6 +2402,7 @@ ito::RetVal ItomQwtPlot::printCanvas()
         m_pPrinter = new QPrinter();
         m_pPrinter->setPageMargins(15, 15, 15, 15, QPrinter::Millimeter);
     }
+
     QPrintPreviewDialog printPreviewDialog(m_pPrinter, this, Qt::Window);
     connect(&printPreviewDialog, SIGNAL(paintRequested(QPrinter*)), this, SLOT(printPreviewRequested(QPrinter*)));
     printPreviewDialog.exec();
