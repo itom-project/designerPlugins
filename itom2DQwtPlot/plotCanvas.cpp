@@ -186,8 +186,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     //rightAxis->scaleDraw()->setLength(20);
     rightAxis->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone,false); //disable backbone
     rightAxis->setMargin(10);                       //distance colorbar <-> canvas
-    rightAxis->setSpacing(8);                       //distance tick labels <-> axis label && color bar -> ticks
-    rightAxis->scaleDraw()->setSpacing(6);          //distance tick labels <-> ticks
+    rightAxis->setSpacing(4);                       //distance tick labels <-> axis label && color bar -> ticks
+    rightAxis->scaleDraw()->setSpacing(5);          //distance tick labels <-> ticks
     rightAxis->setContentsMargins(0,0,0,0);         //top and bottom offset
 
     configRescaler();

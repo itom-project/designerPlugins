@@ -640,7 +640,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
         {
             marker = new QwtPlotMarker();
             marker->setLinePen(QPen(d->m_markerColor));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_lineColor), QPen(QBrush(d->m_lineColor), 1), QSize(7, 7)));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
             marker->attach(d->m_pparent);
             d->m_marker.append(marker);
         }

@@ -24,11 +24,15 @@
 #include <qwt_symbol.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomPlotMarker::ItomPlotMarker(bool labelState, ItomQwtPlotEnums::PlotPickerType type, Qt::Alignment align, Qt::Orientation orient) : QwtPlotMarker(), m_plotType(type), m_labelState(labelState)
+ItomPlotMarker::ItomPlotMarker(bool labelState, ItomQwtPlotEnums::PlotPickerType type, Qt::Alignment align, Qt::Orientation orient) : 
+    QwtPlotMarker(), 
+    m_plotType(type), 
+    m_labelState(labelState)
 { 
     setLabelAlignment(align);
     setLabelOrientation(orient);
     setLabelEnabled(m_labelState);
+    setPlotType(type);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomPlotMarker::setPlotType(const ItomQwtPlotEnums::PlotPickerType value)

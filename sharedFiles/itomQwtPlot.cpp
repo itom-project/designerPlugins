@@ -347,6 +347,9 @@ void ItomQwtPlot::loadStyles()
         m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
     }
 
+    rubberBandPen.setColor(m_inverseColor0);
+    trackerPen.setColor(m_inverseColor0);
+
     m_pZoomer->setRubberBandPen(rubberBandPen);
     m_pZoomer->setTrackerFont(trackerFont);
     m_pZoomer->setTrackerPen(trackerPen);
