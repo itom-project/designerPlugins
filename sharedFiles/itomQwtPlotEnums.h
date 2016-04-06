@@ -31,6 +31,7 @@ class ItomQwtPlotEnums : public QObject
        
     Q_ENUMS(ComplexType);
     Q_ENUMS(ModificationState);
+    Q_ENUMS(ShapeType);
     Q_ENUMS(PlotPickerType);
     Q_ENUMS(MultiLineMode);    
     Q_ENUMS(ColorHandling); 
@@ -39,6 +40,7 @@ class ItomQwtPlotEnums : public QObject
     Q_ENUMS(ScaleEngine);
 
     Q_FLAGS(ModificationMode ModificationModes)
+    Q_FLAGS(ShapeType ShapeTypes)
 
 public:
     
@@ -64,8 +66,23 @@ public:
     enum CurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, SticksHorizontal, SticksVertical, Steps, StepsRight, StepsLeft,  Dots };
     enum FillCurveStyle {   NoCurveFill = -1,  FillBaseLine, FillFromTop, FillFromBottom};
     enum ScaleEngine { Linear = 1, Log2 = 2, Log10 = 10, Log16 = 16, LogLog2 = 1002, LogLog10 = 1010, LogLog16 = 1016};
+
+    enum ShapeType //this enum is identical to ito::Shape::ShapeType but can be used for the Qt Meta System, such that the properties can be set in QtDesigner and via Python
+    {
+        /*Invalid = 0, */ /*ignore invalid*/
+        MultiPointPick = 0x00000001,
+        Point = 0x00000002,
+        Line = 0x00000004,
+        Rectangle = 0x00000008,
+        Square = 0x00000010,
+        Ellipse = 0x00000020,
+        Circle = 0x00000040,
+        Polygon = 0x00000080,
+    };
+    Q_DECLARE_FLAGS(ShapeTypes, ShapeType)
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ItomQwtPlotEnums::ModificationModes)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ItomQwtPlotEnums::ShapeTypes)
 
 #endif //ITOMQWTPLOTENUMS_H

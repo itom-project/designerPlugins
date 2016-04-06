@@ -77,6 +77,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_inverseColor1(Qt::blue),
     m_elementsToPick(1),
     m_currentShapeType(ito::Shape::Point),
+    m_allowedShapeTypes(~ItomQwtPlotEnums::ShapeTypes()),
     m_buttonStyle(0),
     m_plottingEnabled(true),
     m_markerLabelVisible(false),
@@ -613,6 +614,43 @@ void ItomQwtPlot::setShapeModificationModes(const ItomQwtPlotEnums::Modification
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes)
+{
+    m_allowedShapeTypes = allowedTypes;
+    ito::Shape::ShapeType potentialCurrentShape = ito::Shape::Invalid;
+
+    foreach(QAction *a, m_pMenuShapeType->actions())
+    {
+        if (m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)(a->data().toInt())))
+        {
+            a->setEnabled(true);
+            potentialCurrentShape = (ito::Shape::ShapeType)(a->data().toInt());
+        }
+        else
+        {
+            a->setEnabled(false);
+        }
+    }
+
+    if (m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)m_currentShapeType) == false)
+    {
+        if (potentialCurrentShape != ito::Shape::Invalid)
+        {
+            if (m_state == stateDrawShape) //if an interaction is already running and the user desires another one, goto idle first.
+            {
+                setState(stateIdle);
+            }
+
+            m_currentShapeType = potentialCurrentShape;
+            m_pActShapeType->setData(potentialCurrentShape);
+            setButtonStyle(m_buttonStyle); //to set the current icon
+        }
+    }
+
+    m_pMenuShapeType->setEnabled(m_plottingEnabled && (m_allowedShapeTypes ^ ItomQwtPlotEnums::MultiPointPick) != 0);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mnuGroupShapeTypes(QAction *action)
 {
     switch (action->data().toInt())
@@ -640,17 +678,20 @@ void ItomQwtPlot::mnuGroupShapeTypes(QAction *action)
         break;
     }
 
-    if (m_state == stateDrawShape) //if an interaction is already running and the user desires another one, goto idle first.
+    if (m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)m_currentShapeType))
     {
-        setState(stateIdle);
+        if (m_state == stateDrawShape) //if an interaction is already running and the user desires another one, goto idle first.
+        {
+            setState(stateIdle);
+        }
+        setState(stateDrawShape);
     }
-    setState(stateDrawShape);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mnuShapeType(bool checked)
 {
-    if (checked)
+    if (checked && m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)m_currentShapeType))
     {
         setState(stateDrawShape); 
     }
@@ -717,8 +758,8 @@ void ItomQwtPlot::setState(int state)
         m_pActPan->setChecked(state == statePan);
         m_pPanner->setEnabled(state == statePan);
         m_pActShapeType->setChecked(state == stateDrawShape);
-        m_pMenuShapeType->setEnabled(m_plottingEnabled);
-        m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
+        m_pMenuShapeType->setEnabled(m_plottingEnabled && (m_allowedShapeTypes ^ ItomQwtPlotEnums::MultiPointPick) != 0);
+        m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes());
 
         if (m_pActShapeType->isChecked() && !m_plottingEnabled)
         {
@@ -2038,46 +2079,53 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
 
         foreach(ito::Shape shape, geometricShapes)
         {
-            if (m_pShapes.contains(shape.index()))
+            if (!m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)shape.type()))
             {
-                m_pShapes[shape.index()]->setShape(shape, m_inverseColor0, m_inverseColor1);
-				if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-				{
-					(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(shape);
-				}
+                retVal += ito::RetVal(ito::retWarning, 0, tr("The shapes contain at least one shape type, that is not allowed for this plot, and is therefore ignored.").toLatin1().data());
             }
             else
             {
-                switch (shape.type())
+                if (m_pShapes.contains(shape.index()))
                 {
-                case ito::Shape::MultiPointPick:
-                case ito::Shape::Point:
-                case ito::Shape::Line:
-                case ito::Shape::Rectangle:
-                case ito::Shape::Square:
-                case ito::Shape::Ellipse:
-                case ito::Shape::Circle:
-                    newItem = new DrawItem(shape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
-                    if (!retVal.containsError())
+                    m_pShapes[shape.index()]->setShape(shape, m_inverseColor0, m_inverseColor1);
+                    if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
                     {
-                        newItem->setColor(m_inverseColor0, m_inverseColor1);
-                        newItem->setVisible(true);
-                        newItem->show();
-                        newItem->attach(this);
-                        m_pShapes.insert(newItem->getIndex(), newItem);
-						shape.setIndex(newItem->getIndex());
-						if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-						{
-							(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(shape);
-						}
+                        (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(shape);
                     }
-                    break;
-
-                default:
-                    retVal += ito::RetVal(ito::retError, 0, tr("invalid or unsupported shape type").toLatin1().data());
-                    break;
                 }
-				
+                else
+                {
+                    switch (shape.type())
+                    {
+                    case ito::Shape::MultiPointPick:
+                    case ito::Shape::Point:
+                    case ito::Shape::Line:
+                    case ito::Shape::Rectangle:
+                    case ito::Shape::Square:
+                    case ito::Shape::Ellipse:
+                    case ito::Shape::Circle:
+                        newItem = new DrawItem(shape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
+                        if (!retVal.containsError())
+                        {
+                            newItem->setColor(m_inverseColor0, m_inverseColor1);
+                            newItem->setVisible(true);
+                            newItem->show();
+                            newItem->attach(this);
+                            m_pShapes.insert(newItem->getIndex(), newItem);
+                            shape.setIndex(newItem->getIndex());
+                            if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+                            {
+                                (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(shape);
+                            }
+                        }
+                        break;
+
+                    default:
+                        retVal += ito::RetVal(ito::retError, 0, tr("invalid or unsupported shape type").toLatin1().data());
+                        break;
+                    }
+
+                }
             }
 
             replot();
@@ -2112,6 +2160,10 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
         if (m_pShapes.contains(geometricShape.index()))
         {
             retVal += ito::RetVal(ito::retError, 0, tr("Could not add the geometric shape since a shape with the same index already exists").toLatin1().data());
+        }
+        else if (!m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)geometricShape.type()))
+        {
+            retVal += ito::RetVal(ito::retError, 0, tr("The type of the shape is not allowed for this plot.").toLatin1().data());
         }
         else
         {
@@ -2176,6 +2228,10 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         retVal += ito::RetVal(ito::retError, 0, tr("Could not modify a geometric shape, api is missing").toLatin1().data());
+    }
+    else if (!m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)geometricShape.type()))
+    {
+        retVal += ito::RetVal(ito::retError, 0, tr("The type of the shape is not allowed for this plot.").toLatin1().data());
     }
     else
     {            

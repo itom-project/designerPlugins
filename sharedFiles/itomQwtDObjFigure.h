@@ -79,6 +79,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(int selectedGeometricShape READ getSelectedGeometricShape WRITE setSelectedGeometricShape DESIGNABLE false USER true)
     Q_PROPERTY(bool geometricShapesDrawingEnabled READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(ItomQwtPlotEnums::ModificationModes geometryModificationModes READ getModificationModes WRITE setModificationModes DESIGNABLE true USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::ShapeTypes allowedGeometricShapes READ getAllowedGeometricShapes WRITE setAllowedGeometricShapes DESIGNABLE true USER true);
     
     Q_PROPERTY(bool geometricShapesLabelsVisible READ getShapesLabelsVisible WRITE setShapesLabelsVisible DESIGNABLE true USER true)
 
@@ -99,12 +100,15 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
 
     Q_CLASSINFO("prop://geometricShapesDrawingEnabled", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
 
+    Q_CLASSINFO("prop://geometryModificationModes", "Bitmask to globally change how geometric shapes can be modified. The possible modes of a shape are both restricted by the shape's flags and the allowed modes of the plot (move: 0x01, rotate: 0x02, resize: 0x04)")
+    Q_CLASSINFO("prop://allowedGeometricShapes", "Combination of values of enumeration ShapeType to decide which types of geometric shapes are allowed (default: all shape types are allowed)")
+
+
     Q_CLASSINFO("prop://selectedGeometricShape", "Get or set the currently highlighted geometric shape. After manipulation the last element stays selected.")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
-    Q_CLASSINFO("prop://geometryModificationModes", "Bitmask to globally change how geometric shapes can be modified. The possible modes of a shape are both restricted by the shape's flags and the allowed modes of the plot (move: 0x01, rotate: 0x02, resize: 0x04)")
-
+    
     Q_CLASSINFO("slot://copyToClipBoard", "")
     Q_CLASSINFO("slot://userInteractionStart", "")
     Q_CLASSINFO("slot://clearGeometricShapes", "removes all geometric shapes from the canvas.")
@@ -201,6 +205,9 @@ public:
 
     ItomQwtPlotEnums::ModificationModes getModificationModes() const;
     void setModificationModes(const ItomQwtPlotEnums::ModificationModes modes);
+    
+    ItomQwtPlotEnums::ShapeTypes getAllowedGeometricShapes() const;
+    void setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes);
 
     friend ItomQwtPlot;
 

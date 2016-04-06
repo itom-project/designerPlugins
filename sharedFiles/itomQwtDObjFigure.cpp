@@ -391,6 +391,28 @@ void ItomQwtDObjFigure::setModificationModes(const ItomQwtPlotEnums::Modificatio
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::ShapeTypes ItomQwtDObjFigure::getAllowedGeometricShapes() const
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->allowedGeometricShapes();
+    }
+
+    return ~ItomQwtPlotEnums::ShapeTypes();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes)
+{
+    if (m_pBaseContent)
+    {
+        m_pBaseContent->setAllowedGeometricShapes(allowedTypes);
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QVector<ito::Shape> ItomQwtDObjFigure::getGeometricShapes()
 {
     if (m_pBaseContent)

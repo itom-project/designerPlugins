@@ -100,6 +100,9 @@ public:
     ItomQwtPlotEnums::ModificationModes shapeModificationModes() const { return m_shapeModificationModes; }
     void setShapeModificationModes(const ItomQwtPlotEnums::ModificationModes &modes);
 
+    ItomQwtPlotEnums::ShapeTypes allowedGeometricShapes() const { return m_allowedShapeTypes; }
+    void setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes);
+
     QColor backgroundColor() const { return m_backgroundColor; }
     void setBackgroundColor(const QColor &color);
 
@@ -216,6 +219,7 @@ private:
     QVector<int> m_currentShapeIndices; /*!< indices of all shapes that have already been drawn in the current collection, e.g. if 4 rectangles are requested, the four indices are stored until the last rectangle has been given.*/
     int m_elementsToPick; /*!< number of shapes that should be picked in the current session. */
     ito::Shape::ShapeType m_currentShapeType;
+    ItomQwtPlotEnums::ShapeTypes m_allowedShapeTypes;
     ItomQwtPlotEnums::ModificationModes m_shapeModificationModes;
     bool m_shapesLabelVisible;
 
