@@ -79,6 +79,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_currentShapeType(ito::Shape::Point),
     m_allowedShapeTypes(~ItomQwtPlotEnums::ShapeTypes()),
     m_buttonStyle(0),
+    m_boxFrame(true),
     m_plottingEnabled(true),
     m_markerLabelVisible(false),
     m_shapesLabelVisible(false),
@@ -170,7 +171,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     leftAxis->setSpacing(6);                //distance tick labels <-> axis label
     leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
     leftAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
-    axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtScaleDraw::Backbone, false);
+    axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtScaleDraw::Backbone, !m_boxFrame);
 
     //bottom axis
     QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
@@ -178,7 +179,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
     bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
     bottomAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
-    axisScaleDraw(QwtPlot::xBottom)->enableComponent(QwtScaleDraw::Backbone, false);
+    axisScaleDraw(QwtPlot::xBottom)->enableComponent(QwtScaleDraw::Backbone, !m_boxFrame);
 
     ////top axis
     //QwtScaleWidget *topAxis = axisWidget(QwtPlot::xTop);
@@ -336,8 +337,6 @@ void ItomQwtPlot::loadStyles()
     QFont trackerFont = QFont("Verdana", 10);
     QBrush trackerBg = QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern);
 
-    m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
-
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
         rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
@@ -346,6 +345,8 @@ void ItomQwtPlot::loadStyles()
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
 
         m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
+        bool enableBoxFrame = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "enableBoxFrame", m_boxFrame, NULL).value<bool>());
+        setBoxFrame(enableBoxFrame);
     }
 
     rubberBandPen.setColor(m_inverseColor0);
@@ -385,7 +386,14 @@ void ItomQwtPlot::updateColors(void)
         styleSheet.append(QString("color: %1;").arg(m_axisColor.name()));
         setStyleSheet(styleSheet);
 
-        c->setStyleSheet(QString("border: 1px solid %1; background-color: %2;").arg(m_axisColor.name()).arg(m_canvasColor.name()));
+        if (m_boxFrame)
+        {
+            c->setStyleSheet(QString("border: 1px solid %1; background-color: %2;").arg(m_axisColor.name()).arg(m_canvasColor.name()));
+        }
+        else
+        {
+            c->setStyleSheet(QString("background-color: %2;").arg(m_canvasColor.name()));
+        }
     //}
     //else
     //{
@@ -420,6 +428,18 @@ void ItomQwtPlot::updateColors(void)
     axisWidget(QwtPlot::xTop)->setPalette(newPalette);
 
     replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setBoxFrame(bool boxFrame)
+{
+    if (boxFrame != m_boxFrame)
+    {
+        axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtScaleDraw::Backbone, !boxFrame);
+        axisScaleDraw(QwtPlot::xBottom)->enableComponent(QwtScaleDraw::Backbone, !boxFrame);
+        m_boxFrame = boxFrame;
+        updateColors();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

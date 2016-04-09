@@ -218,11 +218,11 @@ QPixmap ItomQwtDObjFigure::renderToPixMap(const int xsize, const int ysize, cons
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtDObjFigure::setButtonSet(const ButtonStyle newVal)
+void ItomQwtDObjFigure::setButtonSet(const ButtonStyle buttonSet)
 {
     if (m_pBaseContent)
     {
-        m_pBaseContent->setButtonStyle(newVal);
+        m_pBaseContent->setButtonStyle(buttonSet);
     }
 }
 
@@ -236,6 +236,24 @@ ItomQwtDObjFigure::ButtonStyle ItomQwtDObjFigure::getButtonSet(void) const
     return StyleBright;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setBoxFrame(const bool boxFrame)
+{
+    if (m_pBaseContent)
+    {
+        m_pBaseContent->setBoxFrame(boxFrame);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool ItomQwtDObjFigure::getBoxFrame(void) const
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->boxFrame();
+    }
+    return true;
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtDObjFigure::userInteractionStart(int type, bool start, int maxNrOfPoints /*= -1*/)

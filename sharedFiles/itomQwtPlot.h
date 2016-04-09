@@ -91,6 +91,9 @@ public:
     virtual void setButtonStyle(int style); /*!< can be overwritten, however call this base implementation in the overloaded method, too.*/
     int buttonStyle() const { return m_buttonStyle; }
 
+    void setBoxFrame(bool boxFrame);
+    int boxFrame() const { return m_boxFrame; }
+
     virtual void setPlottingEnabled(bool enabled); /*!< can be overwritten, however call this base implementation in the overloaded method, too.*/
     bool plottingEnabled() const { return m_plottingEnabled; }
 
@@ -236,6 +239,7 @@ private:
     bool m_plottingEnabled;
 
     int m_buttonStyle; /*!< 0: dark buttons for bright theme, 1: bright buttons for dark theme */
+    bool m_boxFrame;
     
     int m_state; /*!< current state (value of enum State or stateUser + X) */
     bool m_stateIsChanging;

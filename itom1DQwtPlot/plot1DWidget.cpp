@@ -444,13 +444,13 @@ void Plot1DWidget::createActions()
     a->setData(-1);
     m_pMnuLegendSwitch->setDefaultAction(a);
     a = m_pMnuLegendSwitch->addAction(tr("Right"));
-    a->setData(LegendPosition::RightLegend);
+    a->setData(RightLegend);
     a = m_pMnuLegendSwitch->addAction(tr("Bottom"));
-    a->setData(LegendPosition::BottomLegend);
+    a->setData(BottomLegend);
     a = m_pMnuLegendSwitch->addAction(tr("Left"));
-    a->setData(LegendPosition::LeftLegend);
+    a->setData(LeftLegend);
     a = m_pMnuLegendSwitch->addAction(tr("Top"));
-    a->setData(LegendPosition::TopLegend);
+    a->setData(TopLegend);
     connect(m_pMnuLegendSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuLegendSwitch(QAction*)));
 
     //m_pActMultiRowSwitch

@@ -65,6 +65,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_OBJECT
     Q_ENUMS(ButtonStyle)
 
+    Q_PROPERTY(bool enableBoxFrame READ getBoxFrame WRITE setBoxFrame DESIGNABLE true USER true)
     Q_PROPERTY(ButtonStyle buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor USER true)
@@ -86,7 +87,8 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
     
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
-
+    
+    Q_CLASSINFO("prop://enableBoxFrame", "If true, a 1px solid border is drawn as a boxed rectangle around the canvas, else no margin is visible on the upper and right side.")
     Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://backgroundColor", "Set the background color.")
     Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
@@ -142,10 +144,13 @@ public:
     virtual ~ItomQwtDObjFigure();
 
     //!> set new button set
-    void setButtonSet(const ButtonStyle newVal);
+    void setButtonSet(const ButtonStyle buttonSet);
 
     //!> get current button set
     ButtonStyle getButtonSet(void) const;
+
+    void setBoxFrame(const bool boxFrame);
+    bool getBoxFrame(void) const;
 
     int getGeometricShapesCount() const;
 
