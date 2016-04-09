@@ -309,7 +309,7 @@ ito::RetVal Plot1DWidget::init()
     QFont labelFont =  QFont("Helvetica",12);
     QFont axisFont = QFont("Helvetica",10);
     m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
-    int buttonSet = 0;
+    int buttonSet = buttonStyle();
 
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -321,7 +321,7 @@ ito::RetVal Plot1DWidget::init()
         labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, &retVal).value<QFont>();
         axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, &retVal).value<QFont>();
 
-        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, &retVal).value<int>();
+        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot.
 
         m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, &retVal).value<int>());
         m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, &retVal).value<qreal>();
@@ -356,7 +356,10 @@ ito::RetVal Plot1DWidget::init()
     t.setFont(labelFont);
     axisWidget(QwtPlot::yLeft)->setTitle(t);
 
-    setButtonStyle(buttonSet);
+    if (buttonSet != buttonStyle())
+    {
+        setButtonStyle(buttonSet);
+    }
 
     return retVal;
 }
