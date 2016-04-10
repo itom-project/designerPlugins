@@ -36,17 +36,35 @@
 #include <qwt_plot.h>
 #include <qwt_plot_renderer.h>
 
+#include "itomWidgets/plotInfoShapes.h"
+#include "itomWidgets/plotInfoMarker.h"
+#include "itomWidgets/plotInfoPicker.h"
+#include "itomWidgets/plotInfoDObject.h"
+
+//------------------------------------------------------------------------------------------------------------------------
+class ItomQwtDObjFigurePrivate 
+{
+public:
+    ItomQwtDObjFigurePrivate() : 
+        m_pMarkerDock(NULL),
+        m_pPickerDock(NULL),
+        m_pShapesDock(NULL),
+        m_pObjectInfoDock(NULL)
+    {}
+    
+    QDockWidget *m_pMarkerDock;
+	QDockWidget *m_pPickerDock;
+	QDockWidget *m_pShapesDock;
+	QDockWidget *m_pObjectInfoDock;
+};
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
     m_pBaseContent(NULL),
-	m_pMarkerDock(NULL),
-	m_pPickerDock(NULL),
-	m_pShapesDock(NULL),
-	m_pObjectInfoDock(NULL),
-	m_pShapesInfo(NULL),
-	m_pMarkerInfo(NULL),
-	m_pPickerInfo(NULL),
-	m_pObjectInfo(NULL)	
+    m_pMarkerInfo(NULL),
+    m_pPickerInfo(NULL),
+    m_pShapesInfo(NULL),
+    m_pObjectInfo(NULL)
 {
 	construct();
 }
@@ -54,14 +72,10 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ito::Abstract
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) : ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
 	m_pBaseContent(NULL),
-	m_pMarkerDock(NULL),
-	m_pPickerDock(NULL),
-	m_pShapesDock(NULL),
-	m_pObjectInfoDock(NULL),
-	m_pShapesInfo(NULL),
-	m_pMarkerInfo(NULL),
-	m_pPickerInfo(NULL),
-	m_pObjectInfo(NULL)
+    m_pMarkerInfo(NULL),
+    m_pPickerInfo(NULL),
+    m_pShapesInfo(NULL),
+    m_pObjectInfo(NULL)
 {
 	construct();
 }
@@ -70,47 +84,49 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFi
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtDObjFigure::construct()
 {
-	m_pMarkerDock = new QDockWidget(tr("Marker Info"), this);
-	m_pMarkerDock->setVisible(false);
-	m_pMarkerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    d = new ItomQwtDObjFigurePrivate();
 
-	m_pMarkerInfo = new PlotInfoMarker(m_pMarkerDock);
-	m_pMarkerDock->setWidget(m_pMarkerInfo);
+	d->m_pMarkerDock = new QDockWidget(tr("Marker Info"), this);
+	d->m_pMarkerDock->setVisible(false);
+	d->m_pMarkerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
-	m_pPickerDock = new QDockWidget(tr("Picker Info"), this);
-	m_pPickerDock->setVisible(false);
-	m_pPickerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+	m_pMarkerInfo = new PlotInfoMarker(d->m_pMarkerDock);
+	d->m_pMarkerDock->setWidget(m_pMarkerInfo);
 
-	m_pPickerInfo = new PlotInfoPicker(m_pPickerDock);
-	m_pPickerDock->setWidget(m_pPickerInfo);
+	d->m_pPickerDock = new QDockWidget(tr("Picker Info"), this);
+	d->m_pPickerDock->setVisible(false);
+	d->m_pPickerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
-	m_pShapesDock = new QDockWidget(tr("Shapes Info"), this);
-	m_pShapesDock->setVisible(false);
-	m_pShapesDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+	m_pPickerInfo = new PlotInfoPicker(d->m_pPickerDock);
+	d->m_pPickerDock->setWidget(m_pPickerInfo);
 
-	m_pShapesInfo = new PlotInfoShapes(m_pShapesDock);
-	m_pShapesDock->setWidget(m_pShapesInfo);
+	d->m_pShapesDock = new QDockWidget(tr("Shapes Info"), this);
+	d->m_pShapesDock->setVisible(false);
+	d->m_pShapesDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
-	m_pObjectInfoDock = new QDockWidget(tr("Data Object Info"), this);
-	m_pObjectInfoDock->setVisible(false);
-	m_pObjectInfoDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+	m_pShapesInfo = new PlotInfoShapes(d->m_pShapesDock);
+	d->m_pShapesDock->setWidget(m_pShapesInfo);
 
-	m_pObjectInfo = new PlotInfoDObject(m_pObjectInfoDock);
-	m_pObjectInfoDock->setWidget(m_pObjectInfo);
+	d->m_pObjectInfoDock = new QDockWidget(tr("Data Object Info"), this);
+	d->m_pObjectInfoDock->setVisible(false);
+	d->m_pObjectInfoDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
-	addToolbox(m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
-	addToolbox(m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
-	addToolbox(m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
-	addToolbox(m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
+	m_pObjectInfo = new PlotInfoDObject(d->m_pObjectInfoDock);
+	d->m_pObjectInfoDock->setWidget(m_pObjectInfo);
+
+	addToolbox(d->m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
+	addToolbox(d->m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
+	addToolbox(d->m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
+	addToolbox(d->m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
 	
 	if (getPropertyDockWidget())
 	{
-		tabifyDockWidget(m_pMarkerDock, getPropertyDockWidget());
+		tabifyDockWidget(d->m_pMarkerDock, getPropertyDockWidget());
 	}
 
-	tabifyDockWidget(m_pPickerDock, m_pMarkerDock);
-	tabifyDockWidget(m_pShapesDock, m_pPickerDock);
-	tabifyDockWidget(m_pObjectInfoDock, m_pShapesDock);
+	tabifyDockWidget(d->m_pPickerDock, d->m_pMarkerDock);
+	tabifyDockWidget(d->m_pShapesDock, d->m_pPickerDock);
+	tabifyDockWidget(d->m_pObjectInfoDock, d->m_pShapesDock);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -119,24 +135,27 @@ ItomQwtDObjFigure::~ItomQwtDObjFigure()
 	
 	//removeToolbox("shapes info");
 	//m_pShapesDock->deleteLater();
-	m_pShapesDock = NULL;
+	d->m_pShapesDock = NULL;
 	m_pShapesInfo = NULL;
 	
 	//removeToolbox("picker info");
 	//m_pPickerDock->deleteLater();
-	m_pPickerDock = NULL;
+	d->m_pPickerDock = NULL;
 	m_pPickerInfo = NULL;
 
 	//removeToolbox("object info");
 	//m_pObjectInfoDock->deleteLater();
-	m_pObjectInfoDock = NULL;
+	d->m_pObjectInfoDock = NULL;
 	m_pObjectInfo = NULL;
 
 	//removeToolbox("marker info");
 	//m_pMarkerDock->deleteLater();
-	m_pMarkerDock = NULL;
+	d->m_pMarkerDock = NULL;
 	
 	m_pMarkerInfo = NULL;
+
+    delete d;
+    d = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

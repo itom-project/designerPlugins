@@ -40,7 +40,7 @@ class PlotCanvas;
 #include <qslider.h>
 #include <qlabel.h>
 
-struct InternalData;
+class Itom2dQwtPlotPrivate;
 
 class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 {
@@ -195,8 +195,6 @@ public:
 
     void enableOverlaySlider(bool enabled);
 
-    
-
     //!> set a line cut id for lateral slices
     ito::ItomPlotHandle getLineCutPlotItem() const;
 
@@ -209,7 +207,6 @@ public:
     //!> return the current line cut id for zSlices
     void setZSlicePlotItem(const ito::ItomPlotHandle idx);
 
-
     friend class PlotCanvas;
 
 protected:
@@ -218,22 +215,18 @@ protected:
 private:
     void constructor();
 
-    PlotCanvas *m_pContent;    
-    InternalData *m_pData;
+    PlotCanvas *m_pContent;   
 
-    QHash<QObject*,ito::uint32> m_childFigures;
+    //avoid to add private members but put them in the Itom2dQwtPlotPrivate container
+    //since this file is part of the itom SDK and can be included in other plugin's source code.
+    //The container is defined in the cpp file only, therefore members can be changed there, without
+    //breaking the binary compatibility.
+    Itom2dQwtPlotPrivate *d;
 
 private slots:
-    
-    
-    
     void childFigureDestroyed(QObject *obj);
 
-    
-
 public slots:
-    
-
     QSharedPointer<ito::DataObject> getDisplayed(void);
 
     QSharedPointer<ito::DataObject> getDisplayedLineCut(void);
@@ -242,9 +235,6 @@ public slots:
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
-
-
-
 };
 
 #endif // ITOM2DQWTPLOT_H

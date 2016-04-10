@@ -58,6 +58,7 @@
 #endif
 
 class ItomQwtPlot;
+class ItomQwtDObjFigurePrivate;
 
 
 class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
@@ -249,16 +250,17 @@ protected:
 
 private:
 	void construct();
-    
-	QDockWidget *m_pMarkerDock;
-	QDockWidget *m_pPickerDock;
-	QDockWidget *m_pShapesDock;
-	QDockWidget *m_pObjectInfoDock;
 
-	PlotInfoMarker  *m_pMarkerInfo;
+    PlotInfoMarker  *m_pMarkerInfo;
 	PlotInfoPicker  *m_pPickerInfo;
 	PlotInfoShapes  *m_pShapesInfo;
 	PlotInfoDObject *m_pObjectInfo;
+    
+    //avoid to add private members but put them in the ItomQwtDObjFigurePrivate container
+    //since this file is part of the itom SDK and can be included in other plugin's source code.
+    //The container is defined in the cpp file only, therefore members can be changed there, without
+    //breaking the binary compatibility.
+    ItomQwtDObjFigurePrivate *d;
 
 signals :
     void userInteractionDone(int type, bool aborted, QVector<ito::Shape> shapes);

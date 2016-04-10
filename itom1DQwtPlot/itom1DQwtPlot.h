@@ -38,10 +38,8 @@
 #include <qstring.h>
 #include <qfont.h>
 
+class Itom1DQwtPlotPrivate;
 class Plot1DWidget;
-class ItomPlotMarker;
-struct InternalData;
-
 
 class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 {
@@ -55,7 +53,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
     
-
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
     Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
 
@@ -72,7 +69,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     Q_PROPERTY(GridStyle grid READ getGrid WRITE setGrid USER true)
     
-
     Q_PROPERTY(ItomQwtPlotEnums::MultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
     
     Q_PROPERTY(ItomQwtPlotEnums::PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
@@ -113,15 +109,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://baseLine", "the baseline/reference for the curveStyle::sticks mode.")
     //Q_CLASSINFO("prop://stickOrientation", "the orientation for the curveStyle::sticks mode.")
 
-    
-
     Q_CLASSINFO("prop://columnInterpretation", "Define the interpretation of M x N objects as Auto, FirstRow, FirstCol, MultiRows, MultiCols.")
     
     Q_CLASSINFO("prop://pickerLimit", "Define the maximal number of picker for this plot.")
     Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
     Q_CLASSINFO("prop://picker", "Get picker defined by a Mx4 float32 data object. Each row represents one picker and contains the following information: [pixelIndex, physIndex, value, curveIndex]. PixelIndex and physIndex are equal if axisScale = 1 and axisOffset = 0 for the corresponding dataObject.")
-
-    
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
     Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the data object is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
@@ -134,8 +126,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://valueScale", "linear or logarithmic scale (various bases) can be chosen for the vertical axis (y-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
 
-    
-
     Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical or in pixel coordinates. The coordinates are the axis positions only, the values are chosen from the curve values. Existing pickers are deleted at first.")
     Q_CLASSINFO("slot://appendPicker", "Append plot pickers to a specific curve either in physical or in pixel coordinates. The coordinates are the axis positions only, the values are chosen from the curve values.")
     Q_CLASSINFO("slot://plotMarkers", "Plot markers.")
@@ -143,8 +133,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("slot://deletePicker", "Delete a specific (id >= 0) or all pickers (id = -1)")
     
     Q_CLASSINFO("slot://getDisplayed", "")
-
-    
 
     public:
         Itom1DQwtPlot(QWidget *parent = 0);
@@ -278,13 +266,17 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     protected:
         ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
-        Plot1DWidget *m_pContent;
-        InternalData *m_pData;
-
     private:
         
-
         void constructor();
+
+        Plot1DWidget *m_pContent;
+
+        //avoid to add private members but put them in the Itom1DQwtPlotPrivate container
+        //since this file is part of the itom SDK and can be included in other plugin's source code.
+        //The container is defined in the cpp file only, therefore members can be changed there, without
+        //breaking the binary compatibility.
+        Itom1DQwtPlotPrivate *d;
 
     public slots:
         ito::RetVal setPicker(const QVector<double> &coords, int curveIndex = 0, bool physicalCoordinates = true);
@@ -297,7 +289,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
         QVariant getCurveProperty(int index, const QByteArray &property);
         
-
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
     private slots:

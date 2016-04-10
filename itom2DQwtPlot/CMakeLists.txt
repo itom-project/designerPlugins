@@ -1,7 +1,7 @@
 SET (target_name itom2dQwtPlot)
 SET (figure_name itom2dQwtPlot)
 project(${target_name})
-
+ 
 cmake_minimum_required(VERSION 2.8)
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
