@@ -23,6 +23,9 @@
 #include "QwtPlotCurveProperty.h"
 
 #include "qwt_symbol.h"
+#include "qwt_plot.h"
+#include "qwt_legend.h"
+#include "qwt_legend_label.h"
 
 //-----------------------------------------------------------------------------------------------------
 QwtPlotCurveProperty::QwtPlotCurveProperty(QwtPlotCurve *curve) : m_pCurve(curve)
@@ -206,4 +209,81 @@ void QwtPlotCurveProperty::setLineSymbolStyle(const Itom1DQwtPlot::Symbol &symbo
             m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(c), size));
         }
     }
+}
+
+//-----------------------------------------------------------------------------------------------------
+bool QwtPlotCurveProperty::getLegendVisible() const
+{
+    if (m_pCurve)
+    {
+        return m_pCurve->testItemAttribute(QwtPlotItem::Legend);
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------------------------------
+void QwtPlotCurveProperty::setLegendVisible(bool visible)
+{
+    //if the legend item becomes visible again and the legend is currently displayed, it will be appended to all legend items.
+    // Once, the overall legend is moved to another location or becomes visible later, the original order is reset.
+    // \Todo: change this!
+    if (m_pCurve)
+    {
+        if (m_pCurve->testItemAttribute(QwtPlotItem::Legend) != visible)
+        {
+            m_pCurve->setItemAttribute(QwtPlotItem::Legend, visible);
+
+            QwtPlot *plot = m_pCurve->plot();
+            if (plot)
+            {
+                plot->updateLegend();
+
+                QwtLegend *legend = qobject_cast<QwtLegend*>(plot->legend());
+                if (legend)
+                {
+                    QwtLegendLabel *legendLabel = qobject_cast<QwtLegendLabel*>(legend->legendWidget(plot->itemToInfo(m_pCurve)));
+                    if (legendLabel)
+                    {
+                        legendLabel->setChecked(m_pCurve->isVisible());
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
+
+//-----------------------------------------------------------------------------------------------------
+bool QwtPlotCurveProperty::getVisible() const
+{
+    if (m_pCurve)
+    {
+        return m_pCurve->isVisible();
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------------------------------
+void QwtPlotCurveProperty::setVisible(bool visible)
+{
+    if (m_pCurve)
+    {
+        m_pCurve->setVisible(visible);
+
+        QwtPlot *plot = m_pCurve->plot();
+        if (plot)
+        {
+            QwtLegend *legend = qobject_cast<QwtLegend*>(plot->legend());
+            if (legend)
+            {
+                QwtLegendLabel *legendLabel = qobject_cast<QwtLegendLabel*>(legend->legendWidget(plot->itemToInfo(m_pCurve)));
+                if (legendLabel)
+                {
+                    legendLabel->setChecked(m_pCurve->isVisible());
+                }
+            }
+        }
+    }
+    
 }

@@ -683,13 +683,30 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
         if (m_pLegend)
         {
             QwtLegendLabel *legendLabel = NULL;
+            QSize maxLegendIconSize(0,0);
             foreach (QwtPlotCurve *item, m_plotCurveItems)
             {
+                item->setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
+                item->setLegendAttribute(QwtPlotCurve::LegendShowSymbol, true);
+                maxLegendIconSize.rheight() = std::max(maxLegendIconSize.height(), item->legendIconSize().height());
+                maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
+                //item->setLegendIconSize(QSize(8,24));
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
                 if (legendLabel)
                 {
+                    //the check status is again set in QwtPlotCurveProperty::setLegendVisible
                     legendLabel->setChecked(item->isVisible());
                 }
+            }
+
+            //max icon size: 30w, 18h
+            maxLegendIconSize.rwidth() = std::min(maxLegendIconSize.width(), 30);
+            maxLegendIconSize.rheight() = std::min(maxLegendIconSize.height(), 18);
+
+            //adjust legend icon size
+            foreach (QwtPlotCurve *item, m_plotCurveItems)
+            {
+                item->setLegendIconSize(maxLegendIconSize);
             }
         }
 

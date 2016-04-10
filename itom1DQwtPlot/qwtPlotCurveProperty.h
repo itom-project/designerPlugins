@@ -33,7 +33,8 @@
 class QwtPlotCurveProperty : public QObject 
 {
     Q_OBJECT
-
+    
+    Q_PROPERTY(bool visible READ getVisible WRITE setVisible USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
     Q_PROPERTY(QColor lineColor READ getLineColor WRITE setLineColor USER true)
@@ -41,6 +42,7 @@ class QwtPlotCurveProperty : public QObject
     Q_PROPERTY(Qt::PenCapStyle lineCapStyle READ getLineCapStyle WRITE setLineCapStyle USER true)
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true)
     Q_PROPERTY(Itom1DQwtPlot::Symbol lineSymbolStyle READ getLineSymbolStyle WRITE setLineSymbolStyle USER true)
+    Q_PROPERTY(bool legendVisible READ getLegendVisible WRITE setLegendVisible USER true)
     
 public:
     QwtPlotCurveProperty(QwtPlotCurve *curve);
@@ -67,7 +69,11 @@ public:
     Itom1DQwtPlot::Symbol getLineSymbolStyle() const;
     void setLineSymbolStyle(const Itom1DQwtPlot::Symbol &symbol);
 
-    
+    bool getLegendVisible() const;
+    void setLegendVisible(bool visible);
+
+    bool getVisible() const;
+    void setVisible(bool visible);
 
 private:
 
