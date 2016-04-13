@@ -146,13 +146,13 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_colorList.append("#ff7f00");
     m_colorList.append("#6a3d9a");
     m_colorList.append("#b15928");
-    m_colorList.append("#a6cee3");
+    m_colorList.append("#97c9e3");
     m_colorList.append("#b2df8a");
     m_colorList.append("#fb9a99");
     m_colorList.append("#fdbf6f");
     m_colorList.append("#cab2d6");
     m_colorList.append("#ffff99");
-
+    
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pValuePicker->setEnabled(false);
@@ -1633,6 +1633,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
         case Qt::Key_Delete:
         {
             QList<Picker>::iterator it = m_pickers.begin();
+            bool deletedAtLeastOne = false;
 
             while (it != m_pickers.end())
             {
@@ -1640,6 +1641,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                 {
                     it->item->detach();
                     delete it->item;
+                    deletedAtLeastOne = true;
                     it = m_pickers.erase(it);
 					if (((Itom1DQwtPlot*)(this->parent()))->pickerWidget())
 					{
@@ -1651,6 +1653,13 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                     ++it;
                 }
             }
+
+            //active the first picker
+            if (deletedAtLeastOne && m_pickers.size() > 0)
+            {
+                m_pickers[0].active = true;
+            }
+
             break;
         }
         default:
