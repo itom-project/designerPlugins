@@ -305,6 +305,15 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             m_pData->m_relationsList[rel].myWidget = NULL;
         }
 
+        // first check if we have left over relations and remove them
+        for (int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
+        {
+            if (!keys.contains(m_pData->m_relationsList[rel].firstElementIdx) || !keys.contains(m_pData->m_relationsList[rel].secondElementIdx))
+            {
+                m_pData->m_relationsList.remove(rel);
+            }
+        }
+
         for (int geo = 0; geo < keys.size(); geo++)
         {
             QTreeWidgetItem* currentGeometry = topLevelItem(geo);
@@ -342,6 +351,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
                 idx = idx < m_pData->m_relationNames.length() ? idx : 0;
                 currentGeometry->child(childIdx)->setText(0, m_pData->m_relationNames[idx]);
+                currentGeometry->child(childIdx)->setData(0, Qt::UserRole, childIdx);
 
                 int idx2 = m_pData->m_relationsList[curRel].secondElementIdx;
 
@@ -814,7 +824,7 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
             found = false;
             for (int scnt = 0; scnt < shapes.size(); scnt++)
             {
-                if (hashKeys[dcnt] == shapes[dcnt].index())
+                if (hashKeys[dcnt] == shapes[scnt].index())
                 {
                     found = true;
                     break;
@@ -1272,3 +1282,5 @@ ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx, const ito::Shap
     updateRelationShips(true);
     return ito::retOk;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------

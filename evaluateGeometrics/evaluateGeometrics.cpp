@@ -74,14 +74,14 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actAddRel = new QAction(QIcon(":/evaluateGeometrics/icons/addRel.png"), tr("add relation"), this);
     m_actAddRel->setObjectName("actAddRelation");
     m_actAddRel->setToolTip(tr("Add a further relation to this table or fix a defect one."));
-    m_actAddRel->setVisible(false);
+    m_actAddRel->setVisible(true);
     connect(m_actAddRel, SIGNAL(triggered()), this, SLOT(mnuAddRelation()));
 
     //m_actRemoveRel
     m_actRemoveRel = new QAction(QIcon(":/evaluateGeometrics/icons/remRel.png"), tr("remove relation"), this);
     m_actRemoveRel->setObjectName("actRemoveRelation");
     m_actRemoveRel->setToolTip(tr("Remove a relation from the table."));
-    m_actRemoveRel->setVisible(false);
+    m_actRemoveRel->setVisible(true);
     connect(m_actRemoveRel, SIGNAL(triggered()), this, SLOT(mnuDeleteRelation()));
 
     //m_actUpdate
@@ -411,7 +411,7 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
                 newRelation.extValue = 0.0;
                 m_pInfo->m_relationsList.append(newRelation);
             }
-            break;
+        break;
 
         case 2:
             for (int i = 0; i < myMat->rows; i ++)
@@ -423,8 +423,7 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
                 newRelation.extValue = 0.0;
                 m_pInfo->m_relationsList.append(newRelation);
             }
-
-            break;
+        break;
 
         case 3:
             for (int i = 0; i < myMat->rows; i ++)
@@ -436,7 +435,7 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
                 newRelation.extValue = 0.0;
                 m_pInfo->m_relationsList.append(newRelation);
             }
-            break;
+        break;
 
         default:
         case 4:
@@ -449,7 +448,7 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
                 newRelation.extValue = (ito::float32)ptr[3];
                 m_pInfo->m_relationsList.append(newRelation);
             }
-            break;
+        break;
     }
 
     m_lastAddedRelation = m_pInfo->m_relationsList.size() -1;
@@ -461,8 +460,8 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
 
     return;
 }
-//----------------------------------------------------------------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPointer<ito::DataObject> relation)
 {
     int dims = 0;
@@ -516,22 +515,26 @@ ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPoint
                 newRelation.extValue = relation->at<ito::float32>(0,3);
             else 
                 newRelation.extValue = (ito::float32)(relation->at<ito::float64>(0,3));
+
         case 3:
             if (relation->getType() == ito::tFloat32) 
                 newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float32>(0,2));
             else 
                 newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float64>(0,2));
+
         case 2:
             if (relation->getType() == ito::tFloat32) 
                 newRelation.type = (ito::int32)(relation->at<ito::float32>(0,1));
             else 
                 newRelation.type = (ito::int32)(relation->at<ito::float64>(0,1));
+        
         case 1:
             if (relation->getType() == ito::tFloat32) 
                 newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float32>(0,0));
             else 
                 newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float64>(0,0));
         break;
+        
         case 0:
             return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toLatin1().data());
     }
@@ -546,7 +549,6 @@ ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPoint
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-
 QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) const
 {
     if (m_pInfo->m_relationsList.size() == 0)
@@ -566,6 +568,32 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) con
         ptr[2] = (ito::float32)m_pInfo->m_relationsList[i].secondElementIdx;
         ptr[3] = (ito::float32)m_pInfo->m_relationsList[i].extValue;
     }
+
+    return exportedData;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getCurrentRelation(void) const
+{
+    QModelIndex idx = m_pContent->currentIndex();
+    QTreeWidgetItem *curItm = m_pContent->currentItem();
+
+    if (m_pInfo->m_relationsList.size() == 0 || !idx.isValid() || !curItm->parent())
+    {
+        return QSharedPointer<ito::DataObject>(new ito::DataObject());
+    }
+
+    QSharedPointer<ito::DataObject> exportedData(new ito::DataObject(5, 1, ito::tFloat32));
+    ito::float32* ptr = (ito::float32*)(*exportedData).rowPtr(0, 0);
+    QVariant relId = curItm->data(0, Qt::UserRole);
+    relationsShip curRel = m_pContent->m_pData->m_relationsList[relId.toInt()];
+    ptr[0] = curRel.firstElementIdx;
+    ptr[1] = curRel.type;
+    ptr[2] = curRel.secondElementIdx;
+    ptr[3] = curRel.extValue;
+    ptr[4] = relId.toInt();
+
+  //  ptr[0] = curItm
 
     return exportedData;
 }
@@ -760,6 +788,7 @@ void EvaluateGeometricsFigure::setRelationNames(const QStringList input)
     }
     return;
 }
+
 //---------------------------------------------------------------------------------------------------------
 QStringList EvaluateGeometricsFigure::getRelationNames(void) const 
 {
@@ -771,11 +800,13 @@ ito::RetVal EvaluateGeometricsFigure::init() //called when api-pointers are tran
 {
     return m_pContent->init(); 
 }
+
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::clearRelation(const bool apply)
 {
     m_pInfo->m_relationsList.clear();
 }
+
 //---------------------------------------------------------------------------------------------------------
 QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysize, const int resolution)
 {
@@ -861,11 +892,13 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
     
     return destinationImage;
 }
+
 //---------------------------------------------------------------------------------------------------------
 int EvaluateGeometricsFigure::getNumberOfDigits() const
 {
     return m_pInfo->m_numberOfDigits;
 }
+
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::setNumberOfDigits(const int val)
 {
@@ -875,11 +908,13 @@ void EvaluateGeometricsFigure::setNumberOfDigits(const int val)
     }
     m_pInfo->m_numberOfDigits = val;
 }
+
 //---------------------------------------------------------------------------------------------------------
 int EvaluateGeometricsFigure::getPrintRowSpacing(void) const
 {
     return m_pInfo->m_rowPrintSpacing;
 }
+
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::setPrintRowSpacing(const int val)
 {
@@ -889,11 +924,13 @@ void EvaluateGeometricsFigure::setPrintRowSpacing(const int val)
     }
     m_pInfo->m_rowPrintSpacing = val;
 }
+
 //---------------------------------------------------------------------------------------------------------
 int EvaluateGeometricsFigure::getPrintTopLevelRowSpacing(void) const
 {
     return m_pInfo->m_tpPrintSpacing;
 }
+
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::setPrintTopLevelRowSpacing(const int val)
 {
@@ -903,11 +940,13 @@ void EvaluateGeometricsFigure::setPrintTopLevelRowSpacing(const int val)
     }
     m_pInfo->m_tpPrintSpacing = val;
 }
+
 //---------------------------------------------------------------------------------------------------------
 int EvaluateGeometricsFigure::getPrintColumnSpacing(void) const
 {
     return m_pInfo->m_columnPrintSpacing;
 }
+
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::setPrintColumnSpacing(const int val)
 {
@@ -917,3 +956,37 @@ void EvaluateGeometricsFigure::setPrintColumnSpacing(const int val)
     }
     m_pInfo->m_columnPrintSpacing = val;
 }
+
+//---------------------------------------------------------------------------------------------------------
+int EvaluateGeometricsFigure::getCurrentItem(void)
+{
+    QModelIndex idx = m_pContent->currentIndex();
+    if (idx.isValid())
+    {
+        QString txt = m_pContent->topLevelItem(idx.row())->text(0);
+        QRegExp re("([0-9]+)");
+        if (re.indexIn(txt, 0) != -1)
+        {
+            return re.cap().toInt();
+        }
+    }
+    return -1;
+}
+
+//---------------------------------------------------------------------------------------------------------
+ito::Shape EvaluateGeometricsFigure::getShape(const int idx)
+{
+    if (m_pContent->m_rowHash.contains(idx))
+        return m_pContent->m_rowHash[idx];
+    else
+        return ito::Shape();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal EvaluateGeometricsFigure::delRelation(const int idx)
+{
+    m_pContent->m_pData->m_relationsList.remove(idx);
+    return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------

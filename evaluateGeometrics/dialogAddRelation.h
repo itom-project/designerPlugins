@@ -32,7 +32,6 @@
 #include <qdialog.h>
 
 #include "plotTreeWidget.h"
-
 #include "ui_dialogRelation.h"
 
 /*!
@@ -41,20 +40,22 @@
  * \todo  Implement this dialog
  */
 
-class DialogAddRelation : public QDialog 
+class DialogAddRelation : public QDialog
 {
-public:
-    DialogAddRelation(const InternalInfo &data, QWidget *parent = NULL);    /*!< Class constructor, which takes all necessary informations to create the correspondig dialog and fill in the information of each relations.*/
-    ~DialogAddRelation() {};                                                /*!< Class destructor, currently not used */
+    Q_OBJECT
 
-    void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
+    public:
+        DialogAddRelation(const InternalInfo &data, EvaluateGeometricsFigure *egFig, QWidget *parent = NULL);    /*!< Class constructor, which takes all necessary informations to create the correspondig dialog and fill in the information of each relations.*/
+        ~DialogAddRelation() {};                                                /*!< Class destructor, currently not used */
 
-private:
+        void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
 
-    Ui::UIDialogRelation ui;                                                /*!< Handle to the UI dialog, defined in "ui_dialogRelation.h"*/
+    private:
+        EvaluateGeometricsFigure *m_evalGeoFig;
+        Ui::DialogRelation ui;                                                /*!< Handle to the UI dialog, defined in "ui_dialogRelation.h"*/
 
-private slots:
-
+    private slots:
+        void on_buttonBox_clicked(QAbstractButton* btn);
 };
 
 #endif //DIALOGADDRELATION

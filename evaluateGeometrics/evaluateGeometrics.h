@@ -123,6 +123,7 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         void setRelations(QSharedPointer<ito::DataObject> relations);
 
         QSharedPointer<ito::DataObject> getRelations(void) const;
+        QSharedPointer<ito::DataObject> getCurrentRelation(void) const;
 
         int getNumberOfDigits() const;
         void setNumberOfDigits(const int val);
@@ -144,7 +145,8 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         QString getDestinationFolder() const {return m_lastFolder;}
 
         int getLastRelation(void) const {return m_lastAddedRelation;}
-    
+        int getCurrentItem(void);
+        ito::RetVal delRelation(const int idx);                 //> remove a relation
         QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution); 
 
         int getPrintRowSpacing(void) const;
@@ -153,10 +155,10 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         void setPrintTopLevelRowSpacing(const int val);
         int getPrintColumnSpacing(void) const;
         void setPrintColumnSpacing(const int val);
+        ito::Shape getShape(const int idx);                     //> return shape with specific index
 
     protected:
         ito::RetVal init();
-
         PlotTreeWidget *m_pContent;
 
     private:
@@ -175,8 +177,6 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         int m_lastAddedRelation;
 
     public slots:
-
-
         ito::RetVal addRelation(QSharedPointer<ito::DataObject> relation);
         ito::RetVal modifyRelation(const int idx, QSharedPointer<ito::DataObject> relation);
 

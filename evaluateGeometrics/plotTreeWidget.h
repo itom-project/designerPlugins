@@ -150,21 +150,18 @@ class PlotTreeWidget : public QTreeWidget
 
     protected:
         static double quietNaN;
-
         void setShapes(const QVector<ito::Shape> &shapes);
-
-        void updateGeometricShapes();                                                      /*! force a replot of all primitives and its relations */
-
+        void updateGeometricShapes();                                                 /*! force a replot of all primitives and its relations */
         void autoFitCols();                                                           /*! calculate the idle width of the widget columns */
+
     private:
+        void updateRelationShips(const bool fastUpdate);                                /*! force an update of all relation ships. */
+        void displayShape(const int row, const bool update, const ito::Shape &shape);   /*! Set a primitiv element in row number row */
 
-        void updateRelationShips(const bool fastUpdate);                              /*! force an update of all relation ships. */
-        void displayShape(const int row, const bool update, const ito::Shape &shape); /*! Set a primitiv element in row number row */
-
-        bool calculateAngle(const ito::Shape &first, const ito::Shape &second, ito::float32 &angle);         /*! calculate the angle between to elements */
-        bool calculateDistance(const ito::Shape &first, const ito::Shape &second, ito::float32 &distance);   /*! calculate the distance between to elements */
-        bool calculateRadius(const ito::Shape &first, ito::float32 &radius);                                                /*! calculate the radius of a sigle circle or ellipse */
-        bool calculateLength(const ito::Shape &first, ito::float32 &length);                             /*! calculate the length of a line */
+        bool calculateAngle(const ito::Shape &first, const ito::Shape &second, ito::float32 &angle);        /*! calculate the angle between to elements */
+        bool calculateDistance(const ito::Shape &first, const ito::Shape &second, ito::float32 &distance);  /*! calculate the distance between to elements */
+        bool calculateRadius(const ito::Shape &first, ito::float32 &radius);                                /*! calculate the radius of a sigle circle or ellipse */
+        bool calculateLength(const ito::Shape &first, ito::float32 &length);                                /*! calculate the length of a line */
         //bool calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point);  /*! calculate the intersection point of two lines */
         bool calculateArea(const ito::Shape &first, ito::float32 &area);                                 /*! calculate the area of a geometric element */
 
@@ -173,17 +170,11 @@ class PlotTreeWidget : public QTreeWidget
         ito::RetVal writeToRAW(const QFileInfo &fileName);                                                              /*! export raw content as two tables */
 
         ito::RetVal m_lastRetVal;                                                                                       /*! last retval for error checking, currently not used */
-
         QMenu *m_contextMenu;                                                                                           /*! handle to the internal context menu */
-
         QWidget *m_pParent;                                                                                             /*! handle to the parent widget of this (see EvaluateGeometricsFigure) */
-
         State m_state;                                                                                                  /*! current state for the state maschine */
-
         InternalInfo *m_pData;                                                                                          /*! handle to the shared configuration struct */
-
         QHash<ito::int32, ito::Shape> m_rowHash;                                                                        /*! the hash table with data for all geometric shapes */
-
         ito::RetVal updateElement(const ito::int32 &idx, const ito::Shape &shape);                                      /*! update a certain element of the hash table */
 
     signals:

@@ -26,17 +26,120 @@
  */
 
 #include "dialogAddRelation.h"
+#include "evaluateGeometrics.h"
+#include "plotTreeWidget.h"
 
 //-----------------------------------------------------------------------------------------------
-DialogAddRelation::DialogAddRelation(const InternalInfo &data, QWidget *parent) :
-    QDialog(parent)
+DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometricsFigure *egFig, QWidget *parent) :
+    QDialog(parent),
+    m_evalGeoFig(egFig)
 {
     ui.setupUi(this);
+    if (egFig == NULL)
+        return;
 
+    QVector<ito::Shape> shapes = egFig->getGeometricShapes();
+    int setItem = -1;
+    int curItem = egFig->getCurrentItem();
+    for (int ni = 0; ni < shapes.length(); ni++)
+    {
+        QString str;
+        switch (shapes[ni].type())
+        {
+            case ito::Shape::Point:
+                ui.comboBoxFirst->addItem(str.sprintf("#%d: Point", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.sprintf("#%d: Point", ni), shapes[ni].index());
+            break;
 
+            case ito::Shape::Line:
+                ui.comboBoxFirst->addItem(str.sprintf("#%d: Line", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.sprintf("#%d: Line", ni), shapes[ni].index());
+            break;
+
+            case ito::Shape::Rectangle:
+                ui.comboBoxFirst->addItem(str.sprintf("#%d: Rectangle", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.sprintf("#%d: Rectangle", ni), shapes[ni].index());
+            break;
+
+            case ito::Shape::Square:
+                ui.comboBoxFirst->addItem(str.sprintf("#%d: Square", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.sprintf("#%d: Square", ni), shapes[ni].index());
+            break;
+
+            case ito::Shape::Circle:
+                ui.comboBoxFirst->addItem(str.sprintf("#%d: Circle", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.sprintf("#%d: Circle", ni), shapes[ni].index());
+            break;
+
+            case ito::Shape::Ellipse:
+                ui.comboBoxFirst->addItem(str.sprintf("#%d: Ellipse", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.sprintf("#%d: Ellipse", ni), shapes[ni].index());
+            break;
+
+            case ito::Shape::Polygon:
+                ui.comboBoxFirst->addItem(str.sprintf("#%d: Polygon", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.sprintf("#%d: Polygon", ni), shapes[ni].index());
+            break;
+        }
+        if (shapes[ni].index() == curItem)
+            setItem = ni;
+    }
+    
+    ui.comboBoxFirst->setCurrentIndex(setItem);
+    ui.comboBoxSecond->setCurrentIndex(setItem);
+
+    ui.comboBoxType->addItem("Radius", 1);
+    ui.comboBoxType->addItem("Angle", 2);
+    ui.comboBoxType->addItem("Distance", 3);
+    ui.comboBoxType->addItem("Intersection", 4);
+    ui.comboBoxType->addItem("Length", 5);
+    ui.comboBoxType->addItem("Area", 6);
+
+//    QObject::connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+//    QObject::connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+//    QObject::connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
 }
 
 //-----------------------------------------------------------------------------------------------
 void DialogAddRelation::getData(InternalInfo &data)
 {
 }
+
+//-----------------------------------------------------------------------------------------------
+void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
+{
+    QDialogButtonBox::ButtonRole role = ui.buttonBox->buttonRole(btn);
+    if (role == QDialogButtonBox::AcceptRole)
+    {
+        QVariant idx1 = ui.comboBoxFirst->currentData();
+        QVariant idx2 = ui.comboBoxSecond->currentData();
+        ito::DataObject rObj;
+        ito::float64 *dPtr = NULL;
+        if (idx1 == idx2)
+        {
+            rObj.zeros(2, ito::tFloat64);
+            dPtr = (ito::float64*)rObj.rowPtr(0, 0);
+        }
+        else
+        {
+            rObj.zeros(4, ito::tFloat64);
+            dPtr = (ito::float64*)rObj.rowPtr(0, 0);
+            dPtr[2] = idx2.toFloat();
+        }
+        dPtr[0] = idx1.toFloat();
+        dPtr[1] = ui.comboBoxType->currentData().toFloat();
+        if (m_evalGeoFig)
+        {
+            QSharedPointer<ito::DataObject> dObjPtr(new ito::DataObject(rObj));
+            m_evalGeoFig->addRelation(dObjPtr);
+        }
+
+        accept(); //AcceptRole
+    }
+    else
+    {
+        reject(); //close dialog with reject
+    }
+}
+
+//-----------------------------------------------------------------------------------------------

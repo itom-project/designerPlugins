@@ -33,7 +33,6 @@ DialogSettings::DialogSettings(const InternalInfo &data, const int &geometicElem
 {
     ui.setupUi(this);
 
-
     ui.spinBoxGeometrics->setValue(geometicElements);
     ui.spinBoxRelations->setValue(data.m_relationsList.size());
     ui.lineEditValueUnit->setText(data.m_valueUnit);
@@ -48,8 +47,6 @@ DialogSettings::DialogSettings(const InternalInfo &data, const int &geometicElem
     }
     
     ui.plainTextEditRelationNames->setPlainText(relationString);
-
-    
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -58,3 +55,5 @@ void DialogSettings::getData(InternalInfo &data)
     data.m_valueUnit = ui.lineEditValueUnit->text();
     data.m_numberOfDigits = ui.spinBoxNumberDigits->value();
 }
+
+//-----------------------------------------------------------------------------------------------
