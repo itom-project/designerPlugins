@@ -2418,7 +2418,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 			plotInfoVisible = true;
 			emit statusBarMessage(tr("copy current view to clipboard including infoWidgets ..."));
 			
-			for each (ito::AbstractFigure::ToolboxItem item in hMyParent->getToolboxes())
+			foreach (const ito::AbstractFigure::ToolboxItem &item, hMyParent->getToolboxes())
 			{
 				if (item.toolbox && item.toolbox->isVisible() /*&& item.toolbox->widget()->isVisible()*/)
 				{

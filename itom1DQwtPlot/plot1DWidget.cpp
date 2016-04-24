@@ -25,7 +25,7 @@
 #include "dataObjectSeriesData.h"
 #include "DataObject/dataObjectFuncs.h"
 #include "qwtPlotCurveDataObject.h"
-#include "QwtPlotCurveProperty.h"
+#include "qwtPlotCurveProperty.h"
 #include "common/sharedStructuresGraphics.h"
 #include "common/apiFunctionsGraphInc.h"
 #include "qnumeric.h"

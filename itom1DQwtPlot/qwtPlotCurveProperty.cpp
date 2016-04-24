@@ -20,7 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#include "QwtPlotCurveProperty.h"
+#include "qwtPlotCurveProperty.h"
 
 #include "qwt_symbol.h"
 #include "qwt_plot.h"
