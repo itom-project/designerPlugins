@@ -546,7 +546,7 @@ void MotorController::removeActuator()
         disconnect(m_pActuator, SIGNAL(destroyed()), this, SLOT(actuatorDestroyed()));
         disconnect(this, SIGNAL(requestStatusAndPosition(bool, bool)), m_pActuator, SLOT(requestStatusAndPosition(bool, bool)));
         m_updateBySignal = false;
-        m_pActuator.clear();
+        m_pActuator = NULL; //same as ito::actuator.clear(); which does not exist in Qt4
     }
 }
 
