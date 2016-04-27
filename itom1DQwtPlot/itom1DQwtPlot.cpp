@@ -79,12 +79,12 @@ void Itom1DQwtPlot::constructor()
     addToolbarsAndMenus();
 
     //create dock widget for the line properties
-    /*d->m_pLinePropertiesDock = new QDockWidget(this);
+    d->m_pLinePropertiesDock = new QDockWidget(this);
     d->m_pLinePropertiesDock->setObjectName(QStringLiteral("curveProperties"));
     d->m_pLinePropertiesDock->setWindowTitle("Curve Properties");
     d->m_pLinePropertiesDock->setVisible(false);
     d->m_pLinePropertiesDock->setWidget(new QLabel("this feature is coming soon"));
-    addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);*/
+    addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();
 

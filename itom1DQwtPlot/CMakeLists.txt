@@ -96,7 +96,8 @@ set(plugin_HEADERS_COPY
 
 set(plugin_UI
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
-     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/widgetCurveProperties.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
 )
 
 set(plugin_RCC
