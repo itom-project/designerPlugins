@@ -23,6 +23,7 @@
 #include "itom1DQwtPlot.h"
 #include "dataObjectSeriesData.h"
 #include "plot1DWidget.h"
+#include "widgetCurveProperties.h"
 #include "DataObject/dataobj.h"
 
 #include <qsharedpointer.h>
@@ -83,7 +84,7 @@ void Itom1DQwtPlot::constructor()
     d->m_pLinePropertiesDock->setObjectName(QStringLiteral("curveProperties"));
     d->m_pLinePropertiesDock->setWindowTitle("Curve Properties");
     d->m_pLinePropertiesDock->setVisible(false);
-    d->m_pLinePropertiesDock->setWidget(new QLabel("this feature is coming soon"));
+    d->m_pLinePropertiesDock->setWidget(new WidgetCurveProperties());
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();
