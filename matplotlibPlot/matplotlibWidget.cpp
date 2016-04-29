@@ -113,6 +113,7 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     {
         //qDebug() << "size: " << w << ", " << h << ", imageString-size:" << imageString.length() << " win: " << width() << ", " << height();
         QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
+
         m_pixmap = QPixmap::fromImage(image);
         m_pixmapItem->setPixmap(m_pixmap);
         m_pixmapItem->setOffset(x,y);
@@ -232,9 +233,12 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintRect(bool drawRect, int x, int y, int w, int h)
 {
-    if(drawRect == false && m_rectItem->isVisible())
+    if(drawRect == false)
     {
-        m_rectItem->setVisible(false);
+        if (m_rectItem->isVisible())
+        {
+            m_rectItem->setVisible(false);
+        }
     }
     else
     {
