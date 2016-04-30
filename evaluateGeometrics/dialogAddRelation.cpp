@@ -41,7 +41,7 @@ DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometric
     QVector<ito::Shape> shapes = egFig->getGeometricShapes();
     int setItem = -1;
     int curItem = egFig->getCurrentItem();
-    for (int ni = 0; ni < shapes.length(); ni++)
+    for (int ni = 0; ni < shapes.size(); ni++)
     {
         QString str;
         switch (shapes[ni].type())
@@ -111,8 +111,13 @@ void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
     QDialogButtonBox::ButtonRole role = ui.buttonBox->buttonRole(btn);
     if (role == QDialogButtonBox::AcceptRole)
     {
+#if QTVERSION >= 0x050200
         QVariant idx1 = ui.comboBoxFirst->currentData();
         QVariant idx2 = ui.comboBoxSecond->currentData();
+#else
+        QVariant idx1 = ui.comboBoxFirst->itemData(ui.comboBoxFirst->currentIndex());
+        QVariant idx2 = ui.comboBoxSecond->itemData(ui.comboBoxFirst->currentIndex());
+#endif
         ito::DataObject rObj;
         ito::float64 *dPtr = NULL;
         if (idx1 == idx2)
@@ -127,7 +132,11 @@ void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
             dPtr[2] = idx2.toFloat();
         }
         dPtr[0] = idx1.toFloat();
+#if QTVERSION >= 0x050200        
         dPtr[1] = ui.comboBoxType->currentData().toFloat();
+#else        
+        dPtr[1] = ui.comboBoxType->itemData(ui.comboBoxFirst->currentIndex()).toFloat();
+#endif
         if (m_evalGeoFig)
         {
             QSharedPointer<ito::DataObject> dObjPtr(new ito::DataObject(rObj));
