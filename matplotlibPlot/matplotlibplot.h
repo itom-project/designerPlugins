@@ -111,7 +111,7 @@ private slots:
     void subplotConfigSliderWSpaceChanged(double value);
     void subplotConfigSliderHSpaceChanged(double value);
 
-    void resetFixedSize() { setFixedSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX); }
+    void resetFixedSize();
 
 public slots:
 void showSubplotConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace);

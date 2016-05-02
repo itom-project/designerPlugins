@@ -151,6 +151,7 @@ void MatplotlibPlot::resizeCanvas(int width, int height)
 
     if (m_forceWindowResize)
     {
+        //qDebug() << "fixed size (resizeCanvas)" << width << height;
         setFixedSize(width,height); //forces the window to a fixed size...
         updateGeometry();
 
@@ -172,15 +173,27 @@ void MatplotlibPlot::setKeepSizeFixed(bool fixed)
     {
         if (fixed)
         {
+            //qDebug() << "fixed size" << geometry().size();
             setFixedSize(geometry().size());
             m_pResetFixedSizeTimer->stop();
         }
         else
         {
+            //qDebug() << "resetFixedSize";
             resetFixedSize();
         }
         m_keepSizeFixed = fixed;
+        
+        if (m_pContent)
+            m_pContent->setKeepSizeFixed(fixed);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MatplotlibPlot::resetFixedSize() 
+{ 
+    setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX); 
+    //qDebug() << "resetFixedSize"; 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -32,6 +32,7 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
         QGraphicsView(parent),
         m_trackerActive(false),
         m_internalResize(false),
+        m_keepSizeFixed(false),
         m_scene(NULL),
         m_rectItem(NULL),
         m_pixmapItem(NULL),
@@ -141,23 +142,24 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     }
 
     paintRect(false);
-
-    //QTransform unityTransform;
-    //this->setTransform(unityTransform);
-    ////this->scale(1.0,1.0);
-    ////fitInView(m_pixmapItem, Qt::KeepAspectRatio);
     
     QSize s = size();
-    //qDebug() << "size: " << s << ", pixmap:" << m_pixmap.size();
 
-    if(abs(m_pixmap.width()-s.width())<6 && abs(m_pixmap.height()-s.height())<6)
+    if ((abs(m_pixmap.width() - s.width()) < 6 && abs(m_pixmap.height() - s.height()) < 6))
     {
         setTransform( QTransform(1,0,0,1,0,0), false );
         centerOn( m_pixmapItem->boundingRect().center() );
+        //qDebug() << "centerOn" << m_pixmapItem->boundingRect() << s << w << h;
     }
     else
     {
         fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
+        //qDebug() << "fitInView" << m_pixmapItem->boundingRect() << s << w << h;
+
+        if (m_keepSizeFixed && (abs(m_pixmap.width() - s.width()) != 0 || abs(m_pixmap.height() - s.height()) >> 0))
+        {
+            m_pendingEvent = PendingEvent(s.height(), s.width());
+        }
     }
     
     //handle possible further update requests
@@ -205,16 +207,10 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
     }
 
     paintRect(false);
-
-    //QTransform unityTransform;
-    //this->setTransform(unityTransform);
-    ////this->scale(1.0,1.0);
-    ////fitInView(m_pixmapItem, Qt::KeepAspectRatio);
     
     QSize s = size();
-    //qDebug() << "size: " << s << ", pixmap:" << m_pixmap.size();
 
-    if(abs(m_pixmap.width()-s.width())<6 && abs(m_pixmap.height()-s.height())<6)
+    if (m_keepSizeFixed || (abs(m_pixmap.width() - s.width()) < 6 && abs(m_pixmap.height() - s.height()) < 6))
     {
         setTransform( QTransform(1,0,0,1,0,0), false );
         centerOn( m_pixmapItem->boundingRect().center() );
@@ -261,27 +257,15 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
 {
     if(m_internalResize == false)
     {
-        //qDebug() << "resize: " << event->size().width() << ", h:" << event->size().height();
         if(m_pixmapItem)
-        {
-            //scale(1.0,1.0);
-            //fitInView(m_pixmapItem, Qt::KeepAspectRatio);
-            
+        {            
             fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
-        }
 
-        //qDebug() << "resizeEvent: " << event->size();
+            //qDebug() << "fitInView (resizeEvent)" << m_pixmapItem->boundingRect() << event->size();
+        }
 
         m_pendingEvent = PendingEvent(event->size().height(), event->size().width());
         m_timer.start(60);
-        //if(m_timer.isActive())
-        //{
-        //    m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
-        //}
-        //else
-        //{
-        //    paintTimeout();
-        //}
     }
     m_internalResize = false;
     
@@ -483,6 +467,7 @@ void MatplotlibWidget::showEvent ( QShowEvent * event ) //widget is shown, now t
 {
     QGraphicsView::showEvent( event );
     fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
+    //qDebug() << "fitInView (showEvent)" << m_pixmapItem->boundingRect();
 }
 
 //-------------------------------------------------------------------------------------
