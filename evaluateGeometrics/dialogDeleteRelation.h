@@ -35,6 +35,8 @@
 
 #include "ui_dialogRelation.h"
 
+class EvaluateGeometricsFigure; //forward declaration
+
 /*!
  * \class DialogDeleteRelation
  * \brief This class manages the dialog for deleting relations it inherites and corresponding ui-dialog "dialogRelation.ui"

@@ -34,6 +34,8 @@
 #include "plotTreeWidget.h"
 #include "ui_dialogRelation.h"
 
+class EvaluateGeometricsFigure; //forward declaration
+
 /*!
  * \class DialogAddRelation
  * \brief This class manages the dialog for adding relations it inherites and corresponding ui-dialog "dialogRelation.ui"
