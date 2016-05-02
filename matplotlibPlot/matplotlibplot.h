@@ -41,6 +41,7 @@
 
 class MatplotlibSubfigConfig; //forward declaration
 class MatplotlibWidget; //forward declaration
+class QTimer;
 
 class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 {
@@ -94,6 +95,7 @@ private:
     MatplotlibSubfigConfig *m_pMatplotlibSubfigConfig;
     bool m_forceWindowResize;
     bool m_keepSizeFixed;
+    QTimer *m_pResetFixedSizeTimer;
 
 signals:
     void subplotConfigSliderChanged(int type, int value);
