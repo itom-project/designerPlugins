@@ -46,7 +46,10 @@ public:
     MatplotlibWidget(QMenu *contextMenu, QWidget * parent = 0);
     ~MatplotlibWidget();
 
-    //QSize sizeHint() const;
+    void setKeepSizeFixed(bool fixed) 
+    {
+        m_keepSizeFixed = fixed;
+    }
 
     bool m_showContextMenu;
 
@@ -94,6 +97,7 @@ private:
 
     QPixmap m_pixmap;
     QRect m_pixmapRect;
+    bool m_keepSizeFixed;
 
     QTimer m_timer;
     bool m_internalResize; //resize has been done, but resizeEvent should not request a python-side refresh of the image (if true)
