@@ -39,9 +39,15 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_pContent(NULL),
     m_pMatplotlibSubfigConfig(NULL),
     m_forceWindowResize(true),
-    m_keepSizeFixed(false)
+    m_keepSizeFixed(false),
+    m_pResetFixedSizeTimer(NULL)
 {
     setWindowFlags(Qt::Widget); //this is important such that this main window reacts as widget
+
+    m_pResetFixedSizeTimer = new QTimer(this);
+    connect(m_pResetFixedSizeTimer, SIGNAL(timeout()), this, SLOT(resetFixedSize()));
+    m_pResetFixedSizeTimer->setSingleShot(true);
+    m_pResetFixedSizeTimer->stop();
 
     m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("home"), this);
     m_actHome->setObjectName("actionHome");
@@ -150,7 +156,7 @@ void MatplotlibPlot::resizeCanvas(int width, int height)
 
         if (!m_keepSizeFixed)
         {
-            QTimer::singleShot(50, this, SLOT(resetFixedSize())); //and fire a trigger in order to cancel the fixed size (this is a hack in order to really force the window to its new size)
+            m_pResetFixedSizeTimer->start(50); //and fire a trigger in order to cancel the fixed size (this is a hack in order to really force the window to its new size)
         }
     }
     else
@@ -167,6 +173,7 @@ void MatplotlibPlot::setKeepSizeFixed(bool fixed)
         if (fixed)
         {
             setFixedSize(geometry().size());
+            m_pResetFixedSizeTimer->stop();
         }
         else
         {
