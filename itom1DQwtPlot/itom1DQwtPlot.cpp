@@ -84,7 +84,7 @@ void Itom1DQwtPlot::constructor()
     d->m_pLinePropertiesDock->setObjectName(QStringLiteral("curveProperties"));
     d->m_pLinePropertiesDock->setWindowTitle("Curve Properties");
     d->m_pLinePropertiesDock->setVisible(false);
-    d->m_pLinePropertiesDock->setWidget(new WidgetCurveProperties());
+    d->m_pLinePropertiesDock->setWidget(new WidgetCurveProperties(m_pContent));
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();

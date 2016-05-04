@@ -3184,7 +3184,7 @@ ito::RetVal Plot1DWidget::setCurveProperty(int index, const QByteArray &property
 
         if (ito::ITOM_API_FUNCS)
         {
-            retval += apiQObjectPropertyWrite(prop, property.data(), value);
+            retval += apiQObjectPropertyWrite(prop, property.constData(), value);
         }
         else
         {

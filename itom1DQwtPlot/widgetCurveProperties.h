@@ -27,15 +27,19 @@
 
 #include "ui_widgetCurveProperties.h"
 
+class Plot1DWidget; //forward declaration
+
 class WidgetCurveProperties : public QWidget 
 {
     Q_OBJECT
 public:
-    WidgetCurveProperties(QWidget *parent = NULL);
+    WidgetCurveProperties(Plot1DWidget* content, QWidget *parent = NULL);
     ~WidgetCurveProperties() {};
 
 private:
     Ui::WidgetCurveProperties ui;
+
+    Plot1DWidget *m_pContent;
 
 private slots:
 void on_listWidget_itemClicked(QListWidgetItem *item);

@@ -24,8 +24,11 @@
 
 #include <qdebug.h>
 
+#include "Plot1DWidget.h"
+
 //-----------------------------------------------------------------------------------------------
-WidgetCurveProperties::WidgetCurveProperties(QWidget *parent /*= NULL*/) :
+WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *parent /*= NULL*/) :
+    m_pContent(content),
     QWidget(parent)
 {
     ui.setupUi(this);
