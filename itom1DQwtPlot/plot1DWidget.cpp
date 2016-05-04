@@ -1019,8 +1019,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         //if this 1d plot is based on bounds (hence, a line cut or similar of a 2d cut, all pickers should be deleted if the boundaries changed)
         if (bounds.size() != m_currentBounds.size())
         {
-            clearPicker(-1, false);
-            m_currentBounds = bounds;
+            clearPicker(-1, false); 
         }
         else
         {
@@ -1028,12 +1027,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             {
                 if (bounds[i] != m_currentBounds[i])
                 {
-                    clearPicker(-1, false);
-                    m_currentBounds = bounds;
+                    this->updatePickerPosition(true, false);
                     break;
                 }
             }
         }
+        m_currentBounds = bounds;
 
         ItomQwtPlotEnums::MultiLineMode multiLineMode = m_pData->m_multiLine;
 
@@ -1691,7 +1690,7 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
         {
             for (int i = 0 ; i < m_pickers.size() ; i++)
             {
-                if (abs(transform(xBottom, m_pickers[i].item->xValue()) - xPx) < 20 && abs(transform(yLeft, m_pickers[i].item->yValue()) - yPx) < 20)
+                if (!closeToPicker && abs(transform(xBottom, m_pickers[i].item->xValue()) - xPx) < 20 && abs(transform(yLeft, m_pickers[i].item->yValue()) - yPx) < 20)
                 {
                     closeToPicker = true;
                     m_pickers[i].active = true;
