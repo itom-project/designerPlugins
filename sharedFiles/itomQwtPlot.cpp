@@ -136,14 +136,18 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     //magnifier tool
     m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
     m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
+    m_pMagnifier->setAxesDisabledOnAdditionalModifier(QList<int>() << QwtPlot::yLeft, Qt::AltModifier);
+    m_pMagnifier->setAxesDisabledOnAdditionalModifier(QList<int>() << QwtPlot::xBottom, Qt::ShiftModifier);
     m_pMagnifier->setZoomInKey(Qt::Key_Plus, Qt::KeypadModifier);
     m_pMagnifier->setZoomOutKey(Qt::Key_Minus, Qt::KeypadModifier);
     //m_pMagnifier->setMouseFactor(-m_pMagnifier->mouseFactor()); //todo: not done in 2d plot, only in 1d plot. what is right?
     m_pMagnifier->setEnabled(true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, true);
+    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, false);
     m_pMagnifier->setAxisEnabled(QwtPlot::yRight, false);
     m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
     m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
+
+    
 
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
