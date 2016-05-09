@@ -51,6 +51,8 @@ public:
         m_keepSizeFixed = fixed;
     }
 
+    void replot();
+
     bool m_showContextMenu;
 
     bool m_trackerActive;
@@ -101,8 +103,6 @@ private:
 
     QTimer m_timer;
     bool m_internalResize; //resize has been done, but resizeEvent should not request a python-side refresh of the image (if true)
-
-    //QSize m_externalSizeHint;
 
     PendingEvent m_pendingEvent;
 
