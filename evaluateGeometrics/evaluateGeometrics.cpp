@@ -394,7 +394,7 @@ void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> impo
     cv::Mat * myMat = importedData->getCvPlaneMat(0);
     ito::float32* ptr = NULL;
 
-    relationsShip newRelation;
+    relationShip newRelation;
 //    newRelation.secondElementRow = -1;
 //    newRelation.firstElementRow = -1;
     newRelation.myWidget = NULL;
@@ -503,7 +503,7 @@ ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPoint
         return ito::RetVal(ito::retError, 0, tr("addressed relation outside current relation list range (idx = %1, range = 0..%2)").arg(idx).arg(m_pInfo->m_relationsList.size() - 1).toLatin1().data());
     }
 
-    relationsShip newRelation;
+    relationShip newRelation;
             
     newRelation.myWidget = NULL;
 
@@ -586,7 +586,7 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getCurrentRelation(voi
     QSharedPointer<ito::DataObject> exportedData(new ito::DataObject(5, 1, ito::tFloat32));
     ito::float32* ptr = (ito::float32*)(*exportedData).rowPtr(0, 0);
     QVariant relId = curItm->data(0, Qt::UserRole);
-    relationsShip curRel = m_pContent->m_pData->m_relationsList[relId.toInt()];
+    relationShip curRel = m_pContent->m_pData->m_relationsList[relId.toInt()];
     ptr[0] = curRel.firstElementIdx;
     ptr[1] = curRel.type;
     ptr[2] = curRel.secondElementIdx;
@@ -601,7 +601,7 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getCurrentRelation(voi
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relation)
 {
-    relationsShip newRelation;
+    relationShip newRelation;
             
     if (relation.isNull() || relation->getDims() != 2 || relation->getSize(0) != 1)
     {
@@ -696,7 +696,7 @@ void EvaluateGeometricsFigure::mnuAddRelation()
     DialogAddRelation *dlg = new DialogAddRelation(*m_pInfo, this);
     if (dlg->exec() == QDialog::Accepted)
     {
-        dlg->getData(*m_pInfo);
+//        dlg->getData(*m_pInfo);
 
         m_pContent->updateRelationShips(false);
     }
@@ -708,10 +708,20 @@ void EvaluateGeometricsFigure::mnuAddRelation()
 //---------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::mnuDeleteRelation()
 {
+    QVector<ito::Shape> shapes = getGeometricShapes();
+    int setItem1 = -1, setItem2 = -1;
+    int curItem = getCurrentItem();
+    QSharedPointer<ito::DataObject> curRel = getCurrentRelation();
+    if (curItem < 0 || !curRel || curRel->getDims() == 0)
+    {
+        QMessageBox::critical(NULL, "Error", "No relationship selected - select relationship first, aborting!");
+        return;
+    }
+
     DialogDeleteRelation *dlg = new DialogDeleteRelation(*m_pInfo, this);
     if (dlg->exec() == QDialog::Accepted)
     {
-        dlg->getData(*m_pInfo);
+//        dlg->getData(*m_pInfo);
 
         m_pContent->updateRelationShips(false);
     }

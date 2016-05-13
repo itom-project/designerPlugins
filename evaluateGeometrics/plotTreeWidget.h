@@ -44,16 +44,18 @@
 class EvaluateGeomatricsFigure;
 
 /*!
-* \struct relationsShip
+* \struct relationShip
 * \brief  This struct defines the geometric elements.
 *
 * \sa PlotTreeWidget, EvaluateGeometricsFigure, PlotTreeWidget::tMeasurementType
 */
 
-struct relationsShip
+struct relationShip
 {
-    relationsShip() : firstElementIdx(0), type(0), secondElementIdx(0), myWidget(NULL), extValue(0) {}
-    ~relationsShip() {}
+    relationShip() : firstElementIdx(0), type(0), secondElementIdx(0), myWidget(NULL), extValue(0) {}
+    relationShip(ito::int32 firstIdx, ito::int32 secondIdx, ito::uint32 type) 
+        : firstElementIdx(firstIdx), type(type), secondElementIdx(secondIdx), myWidget(NULL), extValue(0) {}
+    ~relationShip() {}
 
     ito::int32 firstElementIdx;     /*!< The index of the first geometric element. The relations will be a child of this element.  */
     ito::uint32 type;               /*!< The type of the relations as defiend by PlotTreeWidget::tMeasurementType.  */
@@ -66,7 +68,7 @@ struct relationsShip
 * \struct InternalInfo
 * \brief  This struct contains most of the shared data for PlotTreeWidget and EvaluateGeometricsFigure.
 *
-* \sa PlotTreeWidget, EvaluateGeometricsFigure, relationsShip
+* \sa PlotTreeWidget, EvaluateGeometricsFigure, relationShip
 */
 
 struct InternalInfo
@@ -104,7 +106,7 @@ struct InternalInfo
     QString m_valueUnit;                            /*!< The value unit for all caluclations */
     QHash<ito::uint16, QString> m_shapeTypeNames;     /*!< A hashTable containing all possible primites type in it */
     QStringList m_relationNames;                    /*!< A list with the relation names to be plotted. First 6 are protected other can be added but should be used with external defined values */
-    QVector<relationsShip> m_relationsList;         /*!< A list with all relations to be evaluated for the figure*/
+    QVector<relationShip> m_relationsList;         /*!< A list with all relations to be evaluated for the figure*/
     //QHash<int, geometricPrimitives> m_rowHash;    /*!< A hashList with all geometric elements to be evaluated for the figure*/
     ito::uint8 m_numberOfDigits;                    /*!< Number of digits to be plotted */
     ito::int32 m_rowPrintSpacing;                    /*!< Number of pixels for each row pixmap export*/

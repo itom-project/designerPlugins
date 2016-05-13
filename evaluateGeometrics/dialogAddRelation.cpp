@@ -25,6 +25,8 @@
  * \brief This file contains the definitions for the dialog "addRelation" for the evaluateGeometrics-Widget.
  */
 
+#include <qglobal.h> // needed for qt version check
+
 #include "dialogAddRelation.h"
 #include "evaluateGeometrics.h"
 #include "plotTreeWidget.h"
@@ -101,17 +103,21 @@ DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometric
 }
 
 //-----------------------------------------------------------------------------------------------
+/*
 void DialogAddRelation::getData(InternalInfo &data)
 {
+    data.m_relationsList.append(relationShip(ui.comboBoxFirst->currentData().toInt(),
+        ui.comboBoxSecond->currentData().toInt(),
+        ui.comboBoxType->currentData().toInt()));
 }
-
+*/
 //-----------------------------------------------------------------------------------------------
 void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
 {
     QDialogButtonBox::ButtonRole role = ui.buttonBox->buttonRole(btn);
     if (role == QDialogButtonBox::AcceptRole)
     {
-#if QTVERSION >= 0x050200
+#if QT_VERSION >= 0x050200
         QVariant idx1 = ui.comboBoxFirst->currentData();
         QVariant idx2 = ui.comboBoxSecond->currentData();
 #else
@@ -132,7 +138,7 @@ void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
             dPtr[2] = idx2.toFloat();
         }
         dPtr[0] = idx1.toFloat();
-#if QTVERSION >= 0x050200        
+#if QT_VERSION >= 0x050200        
         dPtr[1] = ui.comboBoxType->currentData().toFloat();
 #else        
         dPtr[1] = ui.comboBoxType->itemData(ui.comboBoxFirst->currentIndex()).toFloat();
