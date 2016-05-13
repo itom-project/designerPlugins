@@ -393,60 +393,65 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
             switch(m_pData->m_relationsList[rel].type & 0x0FFF)
             {
-            case tRadius:
-                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
-                m_pData->m_relationsList[rel].myWidget->setText(1, "");
-                m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
-                break;
-            case tAngle:
-                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
-                if (m_pData->m_relationsList[rel].secondElementIdx < 0)
-                {
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
-                }
-                else
-                {
+                case tRadius:
+                    m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
+                    m_pData->m_relationsList[rel].myWidget->setText(1, "");
                     m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
-                }
                 break;
-            case tDistance:
-                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
-                if (m_pData->m_relationsList[rel].secondElementIdx < 0)
+                
+                case tAngle:
+                    m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
+                    if (m_pData->m_relationsList[rel].secondElementIdx < 0)
+                    {
+                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
+                    }
+                    else
+                    {
+                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                    }
+                break;
+                
+                case tDistance:
+                    m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
+                    if (m_pData->m_relationsList[rel].secondElementIdx < 0)
+                    {
+                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
+                    }
+                    else
+                    {
+                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                    }
+                break;
+                
+                case tIntersection:
                 {
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
-                }
-                else
-                {
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
-                }
-                break;
-            case tIntersection:
-            {
-                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
-                if (m_pData->m_relationsList[rel].secondElementIdx < 0)
-                {
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
-                }
-                else
-                {
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                    m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
+                    if (m_pData->m_relationsList[rel].secondElementIdx < 0)
+                    {
+                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
+                    }
+                    else
+                    {
+                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                    }
                 }
                 break;
-            }
-            case tLength:
-            {
-                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
-                m_pData->m_relationsList[rel].myWidget->setText(1, "");
-                m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
-                break;
-            }
-            case tArea:
-                m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/area.png"));
-                m_pData->m_relationsList[rel].myWidget->setText(1, "");
-                m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
-                break;
-            default:
 
+                case tLength:
+                {
+                    m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
+                    m_pData->m_relationsList[rel].myWidget->setText(1, "");
+                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                }
+                break;
+                
+                case tArea:
+                    m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/area.png"));
+                    m_pData->m_relationsList[rel].myWidget->setText(1, "");
+                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                break;
+                
+                default:
                 break;
             }
         }
@@ -514,40 +519,42 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
                 switch(m_pData->m_relationsList[rel].type & 0x0FFF)
                 {
-                case tAngle:
-                    check = calculateAngle(first, second, m_pData->m_relationsList[rel].extValue);
-                    resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
-                                                  .arg(QChar(0x00B0));
+                    case tAngle:
+                        check = calculateAngle(first, second, m_pData->m_relationsList[rel].extValue);
+                        resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
+                                                      .arg(QChar(0x00B0));
                     break;
-                case tDistance:
-                    check = calculateDistance(first, second, m_pData->m_relationsList[rel].extValue);
-                    resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
-                                                  .arg(m_pData->m_valueUnit);
+                    
+                    case tDistance:
+                        check = calculateDistance(first, second, m_pData->m_relationsList[rel].extValue);
+                        resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
+                                                      .arg(m_pData->m_valueUnit);
                     break;
-                /*
-                case tIntersection:
-                {
-                    cv::Vec3f val;
-                    check = calculateIntersections(first, second, val);
-                    if (m_pData->m_consider2DOnly)
+                    /*
+                    case tIntersection:
                     {
-                        resultString = QString("%1, %2 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
-                                                                 .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
-                                                                 .arg(m_pData->m_valueUnit);                       
+                        cv::Vec3f val;
+                        check = calculateIntersections(first, second, val);
+                        if (m_pData->m_consider2DOnly)
+                        {
+                            resultString = QString("%1, %2 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
+                                                                     .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
+                                                                     .arg(m_pData->m_valueUnit);                       
+                        }
+                        else
+                        {
+                            resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
+                                                                     .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
+                                                                     .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
+                                                                     .arg(m_pData->m_valueUnit);                    
+                        }
+                        break;
                     }
-                    else
-                    {
-                        resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
-                                                                 .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
-                                                                 .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                                                 .arg(m_pData->m_valueUnit);                    
-                    }
-                    break;
-                }
-                */
-                default:
-                    m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
-                    continue;
+                    */
+
+                    default:
+                        m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
+                        continue;
                 }
             }
             else
@@ -601,23 +608,25 @@ bool PlotTreeWidget::calculateDistance(const ito::Shape &first, const ito::Shape
 
     switch (first.type())
     {
-    case ito::Shape::Point:
-        p1 = first.rtransform().map(first.rbasePoints()[0]);
+        case ito::Shape::Point:
+            p1 = first.rtransform().map(first.rbasePoints()[0]);
         break;
-    case ito::Shape::Circle:
-    case ito::Shape::Ellipse:
-        p1 = first.rtransform().map(0.5 * (first.rbasePoints()[0] + first.rbasePoints()[1]));
+        
+        case ito::Shape::Circle:
+        case ito::Shape::Ellipse:
+            p1 = first.rtransform().map(0.5 * (first.rbasePoints()[0] + first.rbasePoints()[1]));
         break;
     }
 
     switch (second.type())
     {
-    case ito::Shape::Point:
-        p2 = second.rtransform().map(second.rbasePoints()[0]);
+        case ito::Shape::Point:
+            p2 = second.rtransform().map(second.rbasePoints()[0]);
         break;
-    case ito::Shape::Circle:
-    case ito::Shape::Ellipse:
-        p2 = second.rtransform().map(0.5 * (second.rbasePoints()[0] + second.rbasePoints()[1]));
+        
+        case ito::Shape::Circle:
+        case ito::Shape::Ellipse:
+            p2 = second.rtransform().map(0.5 * (second.rbasePoints()[0] + second.rbasePoints()[1]));
         break;
     }
 

@@ -288,16 +288,19 @@ void EvaluateGeometricsFigure::mnuExport(QAction* action)
             default:
             case exportCSVTree:
                 m_pContent->writeToCSV(exportFile, false);
-                break;
+            break;
+            
             case exportCSVTable:
                 m_pContent->writeToCSV(exportFile, true);
-                break;
+            break;
+            
             case exportXMLTree:
                 m_pContent->writeToXML(exportFile);
-                break;
+            break;
+            
             case exportCSVList:
                 m_pContent->writeToRAW(exportFile);
-                break;
+            break;
         }
     }
 }
@@ -334,16 +337,19 @@ ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, int exportFla
             default:
             case exportCSVTree:
                 retVal = m_pContent->writeToCSV(exportFile, false);
-                break;
+            break;
+            
             case exportCSVTable:
                 retVal = m_pContent->writeToCSV(exportFile, true);
-                break;
+            break;
+            
             case exportXMLTree:
                 retVal = m_pContent->writeToXML(exportFile);
-                break;
+            break;
+            
             case exportCSVList:
                 retVal = m_pContent->writeToRAW(exportFile);
-                break;
+            break;
         }
     }
 

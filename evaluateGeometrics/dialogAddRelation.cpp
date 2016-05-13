@@ -97,6 +97,38 @@ DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometric
     ui.comboBoxType->addItem("Length", 5);
     ui.comboBoxType->addItem("Area", 6);
 
+    // make some more or less meaningful preselection of the relation type
+    switch (shapes[setItem].type())
+    {
+        case ito::Shape::Point:
+            ui.comboBoxType->setCurrentIndex(2);
+        break;
+
+        case ito::Shape::Line:
+            ui.comboBoxType->setCurrentIndex(4);
+        break;
+
+        case ito::Shape::Rectangle:
+            ui.comboBoxType->setCurrentIndex(5);
+        break;
+
+        case ito::Shape::Square:
+            ui.comboBoxType->setCurrentIndex(5);
+        break;
+
+        case ito::Shape::Circle:
+            ui.comboBoxType->setCurrentIndex(0);
+        break;
+
+        case ito::Shape::Ellipse:
+            ui.comboBoxType->setCurrentIndex(0);
+        break;
+
+        case ito::Shape::Polygon:
+            ui.comboBoxType->setCurrentIndex(5);
+        break;
+    }
+
 //    QObject::connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 //    QObject::connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 //    QObject::connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
