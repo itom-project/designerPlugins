@@ -1152,7 +1152,7 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
 
             setCoordinates(pts, true);
         }
-        else
+        else if (m_pLineCutLine->dataSize() >= 2)
         {
             pts.append(m_pLineCutLine->sample(0));
             pts.append(m_pLineCutLine->sample(1));
@@ -1184,6 +1184,10 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             {
                 setCoordinates(pts, true);
             }
+        }
+        else
+        {
+            event->ignore();
         }
 
         if (event->isAccepted() && m_rasterData->pointValid(pts[0]) && m_rasterData->pointValid(pts[1]))
