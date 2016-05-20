@@ -2892,8 +2892,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
 //----------------------------------------------------------------------------------------------------------------------------------   
 void Plot1DWidget::setPickerText(const QString &coords, const QString &offsets)
 {
-    m_pLblMarkerCoords->setText(coords);
-    m_pLblMarkerOffsets->setText(offsets);
+    m_pLblMarkerCoords->setText(coords != "" ? coords : "    \n    ");
+    m_pLblMarkerOffsets->setText(offsets != "" ? offsets : "    \n    ");
 }
 
 
