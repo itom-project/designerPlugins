@@ -136,14 +136,18 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     //magnifier tool
     m_pMagnifier = new ItomPlotMagnifier(canvas(), m_pZoomer);
     m_pMagnifier->setWheelModifiers(Qt::ControlModifier);
+    m_pMagnifier->setAxesDisabledOnAdditionalModifier(QList<int>() << QwtPlot::yLeft, Qt::AltModifier);
+    m_pMagnifier->setAxesDisabledOnAdditionalModifier(QList<int>() << QwtPlot::xBottom, Qt::ShiftModifier);
     m_pMagnifier->setZoomInKey(Qt::Key_Plus, Qt::KeypadModifier);
     m_pMagnifier->setZoomOutKey(Qt::Key_Minus, Qt::KeypadModifier);
     //m_pMagnifier->setMouseFactor(-m_pMagnifier->mouseFactor()); //todo: not done in 2d plot, only in 1d plot. what is right?
     m_pMagnifier->setEnabled(true);
-    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, true);
+    m_pMagnifier->setAxisEnabled(QwtPlot::xTop, false);
     m_pMagnifier->setAxisEnabled(QwtPlot::yRight, false);
     m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
     m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
+
+    
 
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
@@ -1075,10 +1079,10 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
                 ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
                 if (p)
                 {
-					if (p->shapesWidget())
-					{
-						p->shapesWidget()->updateShape(it.value()->getShape());
-					}
+                    if (p->shapesWidget())
+                    {
+                        p->shapesWidget()->updateShape(it.value()->getShape());
+                    }
                     emit p->geometricShapeChanged(it.value()->getIndex(), it.value()->getShape());
                 }
             }
@@ -1134,10 +1138,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 emit p->geometricShapeFinished(ito::Shape::MultiPointPick, aborted);
 
                 PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
-				if (pim)
-				{
-					pim->updateMarkers(shapes);
-				}
+                if (pim)
+                {
+                    pim->updateMarkers(shapes);
+                }
             }
 
             m_pMultiPointPicker->setEnabled(false);
@@ -1224,11 +1228,11 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Point, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Point, aborted);
-					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-					{
-						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
-					}
-					
+                    if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+                    {
+                        (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
+                    }
+                    
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1316,10 +1320,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Line, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Line, aborted);
-					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-					{
-						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
-					}
+                    if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+                    {
+                        (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
+                    }
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1406,10 +1410,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Rectangle, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Rectangle, aborted);
-					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-					{
-						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
-					}
+                    if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+                    {
+                        (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
+                    }
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1582,10 +1586,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     m_currentShapeIndices.clear();
                     emit p->userInteractionDone(ito::Shape::Ellipse, aborted, shapes);
                     emit p->geometricShapeFinished(ito::Shape::Ellipse, aborted);
-					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-					{
-						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
-					}
+                    if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+                    {
+                        (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
+                    }
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1975,13 +1979,13 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 void ItomQwtPlot::clearAllGeometricShapes()
 {
     bool thingsToDo = m_pShapes.size() > 0;
-	if (thingsToDo)
-	{
-		if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-		{
-			(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->removeShapes();
-		}
-	}
+    if (thingsToDo)
+    {
+        if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+        {
+            (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->removeShapes();
+        }
+    }
     //delete all geometric shapes and marker sets
     QHashIterator<int, DrawItem *> i(m_pShapes);
     while (i.hasNext())
@@ -2153,8 +2157,8 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
-	
-	if (retVal.hasErrorMessage())
+    
+    if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
@@ -2210,16 +2214,16 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
                     {
                         *newIndex = newItem->getIndex();
                     }
-					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-					{
-						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());
-					}
+                    if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+                    {
+                        (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());
+                    }
                 }
                 break;
 
             default:
                 retVal += ito::RetVal(ito::retError, 0, tr("invalid or unsupported shape type").toLatin1().data());
-                break;				
+                break;                
             }
 
             replot();
@@ -2227,8 +2231,8 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
-	
-	if (retVal.hasErrorMessage())
+    
+    if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
@@ -2261,10 +2265,10 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
         if (m_pShapes.contains(geometricShape.index()))
         {
             m_pShapes[geometricShape.index()]->setShape(geometricShape, m_inverseColor0, m_inverseColor1);
-			if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-			{
-				(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(geometricShape);
-			}
+            if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+            {
+                (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(geometricShape);
+            }
 
             if (newIndex)
             {
@@ -2294,10 +2298,10 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
                     {
                         *newIndex = newItem->getIndex();
                     }
-					if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
-					{
-						(((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());
-					}
+                    if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
+                    {
+                        (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShape(newItem->getShape());
+                    }
                 }
                 break;
 
@@ -2311,8 +2315,8 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
-	
-	if (retVal.hasErrorMessage())
+    
+    if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
@@ -2382,7 +2386,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
     {
         curSize = size();
     }
-	ItomQwtDObjFigure* hMyParent = (ItomQwtDObjFigure*)parent();
+    ItomQwtDObjFigure* hMyParent = (ItomQwtDObjFigure*)parent();
 
     QBrush curBrush = canvasBackground();
     QPalette curPalette = palette();
@@ -2395,71 +2399,71 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 
     QwtPlotRenderer renderer;
 
-	QList< QRectF > plotContentWidgetCoords;
-	plotContentWidgetCoords << QRectF(QPointF(hMyParent->x(), hMyParent->y()), hMyParent->size());
-	qDebug("x %i, y %i, sizeX %i, sizeY %i", hMyParent->x(), hMyParent->y(), hMyParent->size().width(), hMyParent->size().height());
+    QList< QRectF > plotContentWidgetCoords;
+    plotContentWidgetCoords << QRectF(QPointF(hMyParent->x(), hMyParent->y()), hMyParent->size());
+    qDebug("x %i, y %i, sizeX %i, sizeY %i", hMyParent->x(), hMyParent->y(), hMyParent->size().width(), hMyParent->size().height());
     // flags to make the document look like the widget
     renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
     //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
 
     if (copyToClipboardNotFile)
     {
-		bool plotInfoVisible = false;
-		qreal resFaktor = std::max(qRound(resolution / 72.0), 1);
-		QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
+        bool plotInfoVisible = false;
+        qreal resFaktor = std::max(qRound(resolution / 72.0), 1);
+        QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
 
-		QClipboard *clipboard = QApplication::clipboard();
+        QClipboard *clipboard = QApplication::clipboard();
 
-		if ((hMyParent->markerWidget()  && hMyParent->markerWidget()->isVisible()) ||
-			(hMyParent->pickerWidget()  && hMyParent->pickerWidget()->isVisible()) ||
-			(hMyParent->dObjectWidget() && hMyParent->dObjectWidget()->isVisible()) ||
-			(hMyParent->shapesWidget()  && hMyParent->shapesWidget()->isVisible()))
-		{
-			plotInfoVisible = true;
-			emit statusBarMessage(tr("copy current view to clipboard including infoWidgets ..."));
-			
-			foreach (const ito::AbstractFigure::ToolboxItem &item, hMyParent->getToolboxes())
-			{
-				if (item.toolbox && item.toolbox->isVisible() /*&& item.toolbox->widget()->isVisible()*/)
-				{
-					plotContentWidgetCoords << QRectF(QPointF(item.toolbox->x(), item.toolbox->y()), item.toolbox->size());
-					qDebug("x %i, y %i, sizeX %i, sizeY %i", item.toolbox->x(), item.toolbox->y(), item.toolbox->size().width(), item.toolbox->size().height());
-				}
-			}
+        if ((hMyParent->markerWidget()  && hMyParent->markerWidget()->isVisible()) ||
+            (hMyParent->pickerWidget()  && hMyParent->pickerWidget()->isVisible()) ||
+            (hMyParent->dObjectWidget() && hMyParent->dObjectWidget()->isVisible()) ||
+            (hMyParent->shapesWidget()  && hMyParent->shapesWidget()->isVisible()))
+        {
+            plotInfoVisible = true;
+            emit statusBarMessage(tr("copy current view to clipboard including infoWidgets ..."));
+            
+            foreach (const ito::AbstractFigure::ToolboxItem &item, hMyParent->getToolboxes())
+            {
+                if (item.toolbox && item.toolbox->isVisible() /*&& item.toolbox->widget()->isVisible()*/)
+                {
+                    plotContentWidgetCoords << QRectF(QPointF(item.toolbox->x(), item.toolbox->y()), item.toolbox->size());
+                    qDebug("x %i, y %i, sizeX %i, sizeY %i", item.toolbox->x(), item.toolbox->y(), item.toolbox->size().width(), item.toolbox->size().height());
+                }
+            }
 
 
-		}
-		else
-		{
-			emit statusBarMessage(tr("copy current view to clipboard ..."));
-		}
+        }
+        else
+        {
+            emit statusBarMessage(tr("copy current view to clipboard ..."));
+        }
         
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
-		
+        
 
 
-		if (plotInfoVisible)
-		{
+        if (plotInfoVisible)
+        {
 
-		}
-		else
-		{
-			renderer.render(this, &painter, rect());
-		}
+        }
+        else
+        {
+            renderer.render(this, &painter, rect());
+        }
 
         img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
         img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
         clipboard->setImage(img);
-		if (plotInfoVisible)
-		{
-			emit statusBarMessage(tr("copy current view to clipboard including infoWidgets. Done."), 1000);
-		}
-		else
-		{
-			emit statusBarMessage(tr("copy current view to clipboard. Done."), 1000);
-		}
+        if (plotInfoVisible)
+        {
+            emit statusBarMessage(tr("copy current view to clipboard including infoWidgets. Done."), 1000);
+        }
+        else
+        {
+            emit statusBarMessage(tr("copy current view to clipboard. Done."), 1000);
+        }
     }
     else
     {
@@ -2659,17 +2663,17 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
     ito::RetVal retval;
     int limits[] = { 2, 2, 0, std::numeric_limits<int>::max() };
 
-	QString tmpID = id;
-	if (tmpID == "")
-	{
-		tmpID = "undef";
-		int cnt = 0;
-		while (m_plotMarkers.contains(tmpID))
-		{
-			tmpID = QString("undef%1").arg(cnt);
-			cnt++;
-		}
-	}
+    QString tmpID = id;
+    if (tmpID == "")
+    {
+        tmpID = "undef";
+        int cnt = 0;
+        while (m_plotMarkers.contains(tmpID))
+        {
+            tmpID = QString("undef%1").arg(cnt);
+            cnt++;
+        }
+    }
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         emit statusBarMessage(tr("Could not plot marker, api is missing"), 4000);
@@ -2785,8 +2789,8 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         const ito::float32 *xRow = mat->ptr<const ito::float32>(0);
         const ito::float32 *yRow = mat->ptr<const ito::float32>(1);
 
-		QPolygonF markerPolygon;
-		markerPolygon.clear();
+        QPolygonF markerPolygon;
+        markerPolygon.clear();
 
         for (int i = 0; i < nrOfMarkers; ++i)
         {
@@ -2794,8 +2798,8 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
             marker->setSymbol(new QwtSymbol(symStyle, symBrush, symPen, symSize));
             marker->setValue(xRow[i], yRow[i]);
             marker->attach(this);
-			
-			markerPolygon.append(QPointF(xRow[i], yRow[i]));
+            
+            markerPolygon.append(QPointF(xRow[i], yRow[i]));
 
             if (m_markerLabelVisible)
             {
@@ -2812,15 +2816,15 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
                 marker->setVisible(false);
             }
 
-			m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
+            m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
         }
 
         PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
-		if (pim)
-		{
-			ito::Shape shapes = ito::Shape::fromMultipoint(markerPolygon, m_plotMarkers.size(), tmpID);
-			pim->updateMarker(shapes);
-		}
+        if (pim)
+        {
+            ito::Shape shapes = ito::Shape::fromMultipoint(markerPolygon, m_plotMarkers.size(), tmpID);
+            pim->updateMarker(shapes);
+        }
 
         replot();
     }

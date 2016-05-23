@@ -50,7 +50,7 @@ class DialogAddRelation : public QDialog
         DialogAddRelation(const InternalInfo &data, EvaluateGeometricsFigure *egFig, QWidget *parent = NULL);    /*!< Class constructor, which takes all necessary informations to create the correspondig dialog and fill in the information of each relations.*/
         ~DialogAddRelation() {};                                                /*!< Class destructor, currently not used */
 
-        void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
+//        void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
 
     private:
         EvaluateGeometricsFigure *m_evalGeoFig;

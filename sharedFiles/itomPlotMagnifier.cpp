@@ -33,7 +33,8 @@
    \param parent Widget to be magnified
 */
 ItomPlotMagnifier::ItomPlotMagnifier( QWidget *parent, ItomPlotZoomer *zoomer /*= NULL*/):
-    QwtPlotMagnifier( parent )
+    QwtPlotMagnifier( parent ),
+    m_pActiveDisabledAxesSet( NULL )
 {
     m_zoomer = QPointer<ItomPlotZoomer>(zoomer);
 }
@@ -51,6 +52,31 @@ void ItomPlotMagnifier::widgetMouseMoveEvent( QMouseEvent *mouseEvent )
     QwtPlotMagnifier::widgetMouseMoveEvent(mouseEvent);
 }
 
+//-------------------------------------------------------------------------------------------------
+void ItomPlotMagnifier::setAxesDisabledOnAdditionalModifier(const QList<int> &axes, Qt::KeyboardModifiers modifiers /*= Qt::NoModifier*/)
+{
+    if (m_disabledAxesOnSpecialModifiers.contains(wheelModifiers() | modifiers) && axes.size() == 0)
+    {
+        m_disabledAxesOnSpecialModifiers.remove(wheelModifiers() | modifiers);
+    }
+    else
+    {
+        m_disabledAxesOnSpecialModifiers[wheelModifiers() | modifiers] = axes;
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+bool ItomPlotMagnifier::isAxisEnabledSpecial(int axis)
+{
+    if (!m_pActiveDisabledAxesSet)
+    {
+        return isAxisEnabled(axis);
+    }
+    else
+    {
+        return isAxisEnabled(axis) && (!m_pActiveDisabledAxesSet->contains(axis) || (m_zoomer.data() && m_zoomer->fixedAspectRatio())); //if fixed aspect ratio: no single axis magnification is possible
+    }
+}
 
 //-------------------------------------------------------------------------------------------------
 void ItomPlotMagnifier::rescale(double factor)
@@ -68,8 +94,8 @@ void ItomPlotMagnifier::rescale(double factor)
     const bool autoReplot = plt->autoReplot();
     plt->setAutoReplot( false );
     
-    int xAxis = -1;
-    int yAxis = -1;
+    int xAxisZoomer = -1;
+    int yAxisZoomer = -1;
     QRectF zoomRect;
 
     //if a zoomer is given, and both axes covered by the zoomer are part of this magnifier
@@ -80,13 +106,14 @@ void ItomPlotMagnifier::rescale(double factor)
     //fights against this magnifier.
     if (m_zoomer.data())
     {
-        xAxis = m_zoomer->xAxis();
-        yAxis = m_zoomer->yAxis();
+        xAxisZoomer = m_zoomer->xAxis();
+        yAxisZoomer = m_zoomer->yAxis();
 
-        if ((xAxis >= 0 && !isAxisEnabled(xAxis)) || (yAxis >= 0 && !isAxisEnabled(yAxis)))
+        //zoomer and magnifier control different axes...
+        if ((xAxisZoomer >= 0 && !isAxisEnabled(xAxisZoomer)) && (yAxisZoomer >= 0 && !isAxisEnabled(yAxisZoomer)))
         {
-            xAxis = -1;
-            yAxis = -1;
+            xAxisZoomer = -1;
+            yAxisZoomer = -1;
         }
     }
 
@@ -94,30 +121,45 @@ void ItomPlotMagnifier::rescale(double factor)
     for ( int axisId = 0; axisId < QwtPlot::axisCnt; axisId++ )
     {
         const QwtScaleDiv &scaleDiv = plt->axisScaleDiv( axisId );
-        if ( isAxisEnabled( axisId ) )
-        {
-            const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
-            const double width_2 = scaleDiv.range() / 2 * factor;
+        const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
+        const double width_2 = scaleDiv.range() / 2 * factor;
 
-            if (xAxis == axisId)
+        if (xAxisZoomer == axisId)
+        {
+            if (isAxisEnabledSpecial(axisId))
             {
                 zoomRect.setLeft(center - width_2);
                 zoomRect.setRight(center + width_2);
             }
-            else if (yAxis == axisId)
+            else
+            {
+                //let this axis unchanged
+                zoomRect.setLeft(scaleDiv.lowerBound());
+                zoomRect.setRight(scaleDiv.upperBound());
+            }
+        }
+        else if (yAxisZoomer == axisId)
+        {
+            if (isAxisEnabledSpecial(axisId))
             {
                 zoomRect.setTop(center - width_2);
                 zoomRect.setBottom(center + width_2);
             }
             else
             {
-                plt->setAxisScale( axisId, center - width_2, center + width_2 );
-                doReplot = true;
+                //let this axis unchanged
+                zoomRect.setTop(scaleDiv.lowerBound());
+                zoomRect.setBottom(scaleDiv.upperBound());
             }
+        }
+        else if (isAxisEnabledSpecial(axisId))
+        {
+            plt->setAxisScale( axisId, center - width_2, center + width_2 );
+            doReplot = true;
         }
     }
 
-    if (m_zoomer.data())
+    if (m_zoomer.data() && zoomRect.isValid())
     {
         m_zoomer->zoom(zoomRect);
     }
@@ -150,98 +192,150 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
     //size of the canvas might change while magnifying due to varying sizes of the axes
     //descriptions and ticks. Then the resizeEvent of the zoomer is called, that finally
     //fights against this magnifier.
-    int xAxis = -1;
-    int yAxis = -1;
+    int xAxisZoomer = -1;
+    int yAxisZoomer = -1;
     QRectF zoomRect;
 
     if (m_zoomer.data())
     {
-        xAxis = m_zoomer->xAxis();
-        yAxis = m_zoomer->yAxis();
+        xAxisZoomer = m_zoomer->xAxis();
+        yAxisZoomer = m_zoomer->yAxis();
 
-        if ((xAxis >= 0 && !isAxisEnabled(xAxis)) || (yAxis >= 0 && !isAxisEnabled(yAxis)))
+        //zoomer and magnifier control different axes...
+        if ((xAxisZoomer >= 0 && !isAxisEnabled(xAxisZoomer)) && (yAxisZoomer >= 0 && !isAxisEnabled(yAxisZoomer)))
         {
-            xAxis = -1;
-            yAxis = -1;
+            xAxisZoomer = -1;
+            yAxisZoomer = -1;
         }
     }
 
     for ( int axisId = 0; axisId < QwtPlot::axisCnt; axisId++ )
     {
         const QwtScaleDiv &scaleDiv = plt->axisScaleDiv( axisId );
-        if ( isAxisEnabled( axisId ) )
+        if (axisId == QwtPlot::xBottom || axisId == QwtPlot::yLeft)
         {
-            if (axisId == QwtPlot::xBottom || axisId == QwtPlot::yLeft)
+            const double size = scaleDiv.range() * factor;
+            const double scaleXorY = plt->invTransform(axisId, (axisId == QwtPlot::xBottom) ? mouseCoords.x() : mouseCoords.y());
+
+            if (scaleDiv.contains(scaleXorY))
             {
-                const double width = scaleDiv.range() * factor;
-                const double scaleXorY = plt->invTransform(axisId, (axisId == QwtPlot::xBottom) ? mouseCoords.x() : mouseCoords.y());
+                const double factor = (scaleXorY - scaleDiv.lowerBound()) / scaleDiv.range();
 
-                if (scaleDiv.contains(scaleXorY))
+                if (xAxisZoomer == axisId)
                 {
-                    const double factor = (scaleXorY - scaleDiv.lowerBound()) / scaleDiv.range();
-
-                    if (xAxis == axisId)
+                    if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setLeft(scaleXorY - width * factor);
-                        zoomRect.setRight(scaleXorY + width * (1-factor));
-                    }
-                    else if (yAxis == axisId)
-                    {
-                        zoomRect.setTop(scaleXorY - width * factor);
-                        zoomRect.setBottom(scaleXorY + width * (1-factor));
+                        zoomRect.setLeft(scaleXorY - size * factor);
+                        zoomRect.setRight(scaleXorY + size * (1-factor));
                     }
                     else
                     {
-                        plt->setAxisScale( axisId, scaleXorY - width * factor, scaleXorY + width * (1-factor) );
-                        doReplot = true;
+                        //let this axis unchanged
+                        zoomRect.setLeft(scaleDiv.lowerBound());
+                        zoomRect.setRight(scaleDiv.upperBound());
                     }
                 }
-                else
+                else if (yAxisZoomer == axisId)
                 {
-                    const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
-                    
-                    if (xAxis == axisId)
+                    if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setLeft(center - width / 2);
-                        zoomRect.setRight(center + width / 2);
-                    }
-                    else if (yAxis == axisId)
-                    {
-                        zoomRect.setTop(center - width / 2);
-                        zoomRect.setBottom(center + width / 2);
+                        zoomRect.setTop(scaleXorY - size * factor);
+                        zoomRect.setBottom(scaleXorY + size * (1-factor));
                     }
                     else
                     {
-                        plt->setAxisScale( axisId, center - width / 2, center + width / 2 );
-                        doReplot = true;
+                        //let this axis unchanged
+                        zoomRect.setTop(scaleDiv.lowerBound());
+                        zoomRect.setBottom(scaleDiv.upperBound());
                     }
+                }
+                else if (isAxisEnabledSpecial(axisId))
+                {
+                    plt->setAxisScale( axisId, scaleXorY - size * factor, scaleXorY + size * (1-factor) );
+                    doReplot = true;
                 }
             }
             else
             {
-                const double width_2 = scaleDiv.range() * factor / 2;
                 const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
 
-                if (xAxis == axisId)
+                if (xAxisZoomer == axisId)
+                {
+                    if (isAxisEnabledSpecial(axisId))
+                    {
+                        zoomRect.setLeft(center - size / 2);
+                        zoomRect.setRight(center + size / 2);
+                    }
+                    else
+                    {
+                        //let this axis unchanged
+                        zoomRect.setLeft(scaleDiv.lowerBound());
+                        zoomRect.setRight(scaleDiv.upperBound());
+                    }
+                }
+                else if (yAxisZoomer == axisId)
+                {
+                    if (isAxisEnabledSpecial(axisId))
+                    {
+                        zoomRect.setTop(center - size / 2);
+                        zoomRect.setBottom(center + size / 2);
+                    }
+                    else
+                    {
+                        //let this axis unchanged
+                        zoomRect.setTop(scaleDiv.lowerBound());
+                        zoomRect.setBottom(scaleDiv.upperBound());
+                    }
+                }
+                else if (isAxisEnabledSpecial(axisId))
+                {
+                    plt->setAxisScale( axisId, center - size / 2, center + size / 2 );
+                    doReplot = true;
+                }
+            }
+        }
+        else
+        {
+            const double width_2 = scaleDiv.range() * factor / 2;
+            const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
+
+            if (xAxisZoomer == axisId)
+            {
+                if (isAxisEnabledSpecial(axisId))
                 {
                     zoomRect.setLeft(center - width_2);
                     zoomRect.setRight(center + width_2);
                 }
-                else if (yAxis == axisId)
+                else
+                {
+                    //let this axis unchanged
+                    zoomRect.setLeft(scaleDiv.lowerBound());
+                    zoomRect.setRight(scaleDiv.upperBound());
+                }
+            }
+            else if (yAxisZoomer == axisId)
+            {
+                if (isAxisEnabledSpecial(axisId))
                 {
                     zoomRect.setTop(center - width_2);
                     zoomRect.setBottom(center + width_2);
                 }
                 else
                 {
-                    plt->setAxisScale( axisId, center - width_2, center + width_2 );
-                    doReplot = true;
+                    //let this axis unchanged
+                    zoomRect.setTop(scaleDiv.lowerBound());
+                    zoomRect.setBottom(scaleDiv.upperBound());
                 }
+            }
+            else if (isAxisEnabledSpecial(axisId))
+            {
+                plt->setAxisScale( axisId, center - width_2, center + width_2 );
+                doReplot = true;
             }
         }
     }
 
-    if (m_zoomer.data())
+    if (m_zoomer.data() && zoomRect.isValid())
     {
         m_zoomer->zoom(zoomRect);
     }
@@ -255,13 +349,19 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
 //-------------------------------------------------------------------------------------------------
 void ItomPlotMagnifier::widgetWheelEvent( QWheelEvent *wheelEvent )
 {
-    if ( wheelEvent->modifiers() != wheelModifiers() )
+    const Qt::KeyboardModifiers &modifiers = wheelEvent->modifiers();
+    if ( modifiers != wheelModifiers() && !m_disabledAxesOnSpecialModifiers.contains(modifiers) )
     {
         return;
     }
 
     if ( wheelFactor() != 0.0 )
     {
+        if (modifiers != wheelModifiers())
+        {
+            m_pActiveDisabledAxesSet = &(m_disabledAxesOnSpecialModifiers[modifiers]);
+        }
+
         /*
             A positive delta indicates that the wheel was
             rotated forwards away from the user; a negative
@@ -285,5 +385,8 @@ void ItomPlotMagnifier::widgetWheelEvent( QWheelEvent *wheelEvent )
         {
             rescale(f, m_mousePos);
         }
+
+        //reset temporarily disabled axes
+        m_pActiveDisabledAxesSet = NULL;
     }
 }

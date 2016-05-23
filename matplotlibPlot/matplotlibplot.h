@@ -36,8 +36,6 @@
 #include <qlabel.h>
 
 #include "plot/AbstractItomDesignerPlugin.h"
-#include "matplotlibWidget.h"
-#include "matplotlibSubfigConfig.h"
 
 class MatplotlibSubfigConfig; //forward declaration
 class MatplotlibWidget; //forward declaration
@@ -55,6 +53,7 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
     
     Q_CLASSINFO("slot://showSubplotConfig", "")
     Q_CLASSINFO("slot://setLabelText", "")
+    Q_CLASSINFO("slot://replot", "forces a replot of the plot")
 
     Q_CLASSINFO("signal://subplotConfigSliderChanged", "")
 
@@ -114,8 +113,9 @@ private slots:
     void resetFixedSize();
 
 public slots:
-void showSubplotConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace);
+    void showSubplotConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace);
     void setLabelText(QString text) { m_lblCoordinates->setText(text); }
+    void replot();
 
 };
 

@@ -282,3 +282,13 @@ void MatplotlibPlot::subplotConfigSliderHSpaceChanged(double value)
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void MatplotlibPlot::replot()
+{
+    if (m_pContent) 
+    {
+        m_pContent->replot();
+    }
+}
+
+

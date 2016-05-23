@@ -273,6 +273,13 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
 }
 
 //-------------------------------------------------------------------------------------
+void MatplotlibWidget::replot()
+{
+    m_pendingEvent = PendingEvent(height(), width());
+    m_timer.start(1);
+}
+
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintTimeout()
 {
     if(m_pendingEvent.isValid())

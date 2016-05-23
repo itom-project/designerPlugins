@@ -25,6 +25,8 @@
  * \brief This file contains the definitions for the dialog "deleteRelation" for the evaluateGeometrics-Widget.
  */
 
+#include <qglobal.h> // needed for qt version check
+
 #include "dialogDeleteRelation.h"
 #include "evaluateGeometrics.h"
 #include "plotTreeWidget.h"
@@ -45,11 +47,13 @@ DialogDeleteRelation::DialogDeleteRelation(const InternalInfo &data, EvaluateGeo
     int setItem1 = -1, setItem2 = -1;
     int curItem = egFig->getCurrentItem();
     QSharedPointer<ito::DataObject> curRel = egFig->getCurrentRelation();
+    /*
     if (curItem < 0)
     {
         QMessageBox::critical(parent, "Error", "No relationship selected - select relationship first, aborting!");
         return;
     }
+    */
 
     QString str;
 
@@ -144,10 +148,14 @@ DialogDeleteRelation::DialogDeleteRelation(const InternalInfo &data, EvaluateGeo
 }
 
 //-----------------------------------------------------------------------------------------------
+/*
 void DialogDeleteRelation::getData(InternalInfo &data)
 {
-   
+    data.m_relationsList.append(relationShip(ui.comboBoxFirst->currentData().toInt(), 
+        ui.comboBoxSecond->currentData().toInt(), 
+        ui.comboBoxType->currentData().toInt()));
 }
+*/
 
 //-----------------------------------------------------------------------------------------------
 void DialogDeleteRelation::on_buttonBox_clicked(QAbstractButton* btn)

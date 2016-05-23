@@ -25,6 +25,8 @@
  * \brief This file contains the definitions for the dialog "addRelation" for the evaluateGeometrics-Widget.
  */
 
+#include <qglobal.h> // needed for qt version check
+
 #include "dialogAddRelation.h"
 #include "evaluateGeometrics.h"
 #include "plotTreeWidget.h"
@@ -95,23 +97,59 @@ DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometric
     ui.comboBoxType->addItem("Length", 5);
     ui.comboBoxType->addItem("Area", 6);
 
+    // make some more or less meaningful preselection of the relation type
+    switch (shapes[setItem].type())
+    {
+        case ito::Shape::Point:
+            ui.comboBoxType->setCurrentIndex(2);
+        break;
+
+        case ito::Shape::Line:
+            ui.comboBoxType->setCurrentIndex(4);
+        break;
+
+        case ito::Shape::Rectangle:
+            ui.comboBoxType->setCurrentIndex(5);
+        break;
+
+        case ito::Shape::Square:
+            ui.comboBoxType->setCurrentIndex(5);
+        break;
+
+        case ito::Shape::Circle:
+            ui.comboBoxType->setCurrentIndex(0);
+        break;
+
+        case ito::Shape::Ellipse:
+            ui.comboBoxType->setCurrentIndex(0);
+        break;
+
+        case ito::Shape::Polygon:
+            ui.comboBoxType->setCurrentIndex(5);
+        break;
+    }
+
 //    QObject::connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 //    QObject::connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 //    QObject::connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
 }
 
 //-----------------------------------------------------------------------------------------------
+/*
 void DialogAddRelation::getData(InternalInfo &data)
 {
+    data.m_relationsList.append(relationShip(ui.comboBoxFirst->currentData().toInt(),
+        ui.comboBoxSecond->currentData().toInt(),
+        ui.comboBoxType->currentData().toInt()));
 }
-
+*/
 //-----------------------------------------------------------------------------------------------
 void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
 {
     QDialogButtonBox::ButtonRole role = ui.buttonBox->buttonRole(btn);
     if (role == QDialogButtonBox::AcceptRole)
     {
-#if QTVERSION >= 0x050200
+#if QT_VERSION >= 0x050200
         QVariant idx1 = ui.comboBoxFirst->currentData();
         QVariant idx2 = ui.comboBoxSecond->currentData();
 #else
@@ -132,7 +170,7 @@ void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
             dPtr[2] = idx2.toFloat();
         }
         dPtr[0] = idx1.toFloat();
-#if QTVERSION >= 0x050200        
+#if QT_VERSION >= 0x050200        
         dPtr[1] = ui.comboBoxType->currentData().toFloat();
 #else        
         dPtr[1] = ui.comboBoxType->itemData(ui.comboBoxFirst->currentIndex()).toFloat();

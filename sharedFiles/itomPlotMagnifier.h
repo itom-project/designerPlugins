@@ -26,6 +26,7 @@
 #include <qwt_plot_magnifier.h>
 #include <qpoint.h>
 #include <qpointer.h>
+#include <qmap.h>
 
 class QMouseEvent;
 class ItomPlotZoomer;
@@ -36,6 +37,8 @@ public:
     explicit ItomPlotMagnifier(QWidget* parent, ItomPlotZoomer *zoomer = NULL);
     virtual ~ItomPlotMagnifier();
 
+    void setAxesDisabledOnAdditionalModifier(const QList<int> &axes, Qt::KeyboardModifiers modifiers = Qt::NoModifier); //if Qt::NoModifier is selected and axes is empty, the axes will be removed from special handling
+
 protected:
     void widgetMouseMoveEvent(QMouseEvent *mouseEvent);
     void widgetWheelEvent( QWheelEvent *wheelEvent );
@@ -43,10 +46,14 @@ protected:
     void rescale(double factor);
     void rescale(double factor, const QPointF &mouseCoords);
 
+    bool isAxisEnabledSpecial(int axis);
+
     QPointer<ItomPlotZoomer> m_zoomer;
+    const QList<int> *m_pActiveDisabledAxesSet;
 
 private:
     QPoint m_mousePos;
+    QMap<Qt::KeyboardModifiers, QList<int> > m_disabledAxesOnSpecialModifiers; //once a modifier listed in this map is pressed during a wheel action, only the indicated axes will be magnified
 };
 
 #endif //ITOMPLOTMAGNIFIER_H
