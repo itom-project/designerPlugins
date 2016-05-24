@@ -545,7 +545,8 @@ ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPoint
             return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toLatin1().data());
     }
 
-    m_pInfo->m_relationsList[idx] = newRelation;
+    m_pInfo->m_relationsList.insert(idx, newRelation);
+//    m_pInfo->m_relationsList[idx] = newRelation;
     if (m_pContent)
     {
         m_pContent->updateRelationShips(false);

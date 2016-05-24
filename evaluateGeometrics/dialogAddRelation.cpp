@@ -98,35 +98,38 @@ DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometric
     ui.comboBoxType->addItem("Area", 6);
 
     // make some more or less meaningful preselection of the relation type
-    switch (shapes[setItem].type())
+    if (setItem >= 0)
     {
+        switch (shapes[setItem].type())
+        {
         case ito::Shape::Point:
             ui.comboBoxType->setCurrentIndex(2);
-        break;
+            break;
 
         case ito::Shape::Line:
             ui.comboBoxType->setCurrentIndex(4);
-        break;
+            break;
 
         case ito::Shape::Rectangle:
             ui.comboBoxType->setCurrentIndex(5);
-        break;
+            break;
 
         case ito::Shape::Square:
             ui.comboBoxType->setCurrentIndex(5);
-        break;
+            break;
 
         case ito::Shape::Circle:
             ui.comboBoxType->setCurrentIndex(0);
-        break;
+            break;
 
         case ito::Shape::Ellipse:
             ui.comboBoxType->setCurrentIndex(0);
-        break;
+            break;
 
         case ito::Shape::Polygon:
             ui.comboBoxType->setCurrentIndex(5);
-        break;
+            break;
+        }
     }
 
 //    QObject::connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
