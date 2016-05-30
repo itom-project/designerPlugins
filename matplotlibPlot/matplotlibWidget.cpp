@@ -145,7 +145,7 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     
     QSize s = size();
 
-    if ((abs(m_pixmap.width() - s.width()) < 6 && abs(m_pixmap.height() - s.height()) < 6))
+    if ((m_pixmap.width() == s.width()) && (m_pixmap.height() == s.height()))
     {
         setTransform( QTransform(1,0,0,1,0,0), false );
         centerOn( m_pixmapItem->boundingRect().center() );
@@ -155,11 +155,7 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     {
         fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
         //qDebug() << "fitInView" << m_pixmapItem->boundingRect() << s << w << h;
-
-        if (m_keepSizeFixed && (abs(m_pixmap.width() - s.width()) != 0 || abs(m_pixmap.height() - s.height()) >> 0))
-        {
-            m_pendingEvent = PendingEvent(s.height(), s.width());
-        }
+        m_pendingEvent = PendingEvent(s.height(), s.width());
     }
     
     //handle possible further update requests
