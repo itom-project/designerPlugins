@@ -45,11 +45,13 @@ class Itom1DQwtPlotPrivate
 public:
     Itom1DQwtPlotPrivate() : 
         m_pData(NULL),
-        m_pLinePropertiesDock(NULL)
+        m_pLinePropertiesDock(NULL),
+		m_pLinePropertyWidget(NULL)
     {}
     
     InternalData *m_pData;
     QDockWidget *m_pLinePropertiesDock;
+	WidgetCurveProperties *m_pLinePropertyWidget;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +86,8 @@ void Itom1DQwtPlot::constructor()
     d->m_pLinePropertiesDock->setObjectName(QStringLiteral("curveProperties"));
     d->m_pLinePropertiesDock->setWindowTitle("Curve Properties");
     d->m_pLinePropertiesDock->setVisible(false);
-    d->m_pLinePropertiesDock->setWidget(new WidgetCurveProperties(m_pContent));
+	d->m_pLinePropertyWidget = new WidgetCurveProperties(m_pContent);
+	d->m_pLinePropertiesDock->setWidget(d->m_pLinePropertyWidget);
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();
@@ -132,6 +135,10 @@ ito::RetVal Itom1DQwtPlot::init()
 } //called when api-pointers are transmitted, directly after construction
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QWidget* Itom1DQwtPlot::getWidgetCurveProperties()
+{
+	return (QWidget*)(d->m_pLinePropertyWidget);
+}
 ItomQwtPlotEnums::MultiLineMode Itom1DQwtPlot::getRowPresentation(void) const
 {
     return d->m_pData->m_multiLine;
@@ -290,7 +297,6 @@ QVector<QPointF> Itom1DQwtPlot::getBounds(void) const
     }
     return boundsVec;
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom1DQwtPlot::getTitle() const
 {
@@ -982,6 +988,7 @@ void Itom1DQwtPlot::setCurveFillColor(const QColor val)
         return m_pContent->setCurveFilled();
     }
     updatePropertyDock();
+	d->m_pLinePropertyWidget->updateProperties();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

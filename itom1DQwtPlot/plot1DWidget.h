@@ -54,6 +54,7 @@ class QwtLegend;
 struct InternalData;
 class QwtPlotCurveProperty;
 
+
 class Plot1DWidget : public ItomQwtPlot
 {
     Q_OBJECT
@@ -107,6 +108,8 @@ class Plot1DWidget : public ItomQwtPlot
 
         ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
         QVariant getCurveProperty(int index, const QByteArray &property);
+
+		QList<QwtPlotCurve*> getplotCurveItems();
 
         friend Itom1DQwtPlot;
 

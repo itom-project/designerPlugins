@@ -36,6 +36,17 @@ WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *par
     ui.listWidget->addItem("sdf");
     ui.listWidget->addItem("dfg");
 }
+void WidgetCurveProperties::updateProperties()
+{
+	QList<QwtPlotCurve*> curves = m_pContent->getplotCurveItems();
+	QwtPlotCurve*  curve;
+	QList<QwtLegendData> legendData;
+	foreach(curve, curves)
+	{
+		legendData = curve->legendData();
+		
+	}
+}
 
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_listWidget_itemClicked(QListWidgetItem *item)

@@ -36,6 +36,8 @@ public:
     WidgetCurveProperties(Plot1DWidget* content, QWidget *parent = NULL);
     ~WidgetCurveProperties() {};
 
+	void updateProperties();
+
 private:
     Ui::WidgetCurveProperties ui;
 

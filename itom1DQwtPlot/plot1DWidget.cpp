@@ -30,6 +30,7 @@
 #include "common/apiFunctionsGraphInc.h"
 #include "qnumeric.h"
 #include "dialog1DScale.h"
+#include "widgetCurveProperties.h"
 
 #include "plotLegends/infoWidgetPickers.h"
 #include "plotLegends/infoWidgetDObject.h"
@@ -1149,12 +1150,15 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
 
         //check if current number of curves does not correspond to height. If so, adjust the number of curves to the required number
+		bool refreshWidgetCurveProperties = 0;
         while (m_plotCurveItems.size() > numCurves)
         {
             curve = m_plotCurveItems.takeLast();
             m_plotCurvePropertyItems.takeLast();
             curve->detach();
             delete curve;
+			refreshWidgetCurveProperties = 1;
+		
         }
 
         bool valid;
@@ -1279,8 +1283,14 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
             m_plotCurveItems.append(dObjCurve);
             m_plotCurvePropertyItems.append(new QwtPlotCurveProperty(dObjCurve));
+			refreshWidgetCurveProperties = 1;
         }
 
+		if (refreshWidgetCurveProperties == 1) // if true a curve was added or deleted and the widget has to be updated
+		{	
+			((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties())->updateProperties();
+
+		}
         if (bounds.size() == 0)
         {
             QVector<QPointF> pts(2);
@@ -2599,7 +2609,11 @@ QVector<float> Plot1DWidget::getPickerPhys() const
 
     return exportItem;
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+QList<QwtPlotCurve*> Plot1DWidget::getplotCurveItems()
+{
+	return this->m_plotCurveItems;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
