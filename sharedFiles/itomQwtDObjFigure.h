@@ -267,7 +267,7 @@ signals :
     void geometricShapeChanged(int idx, ito::Shape shape);
     void geometricShapeDeleted(int idx);
     void geometricShapesDeleted();
-    void geometricShapeFinished(int type, bool aborted);
+    void geometricShapeFinished(QVector<ito::Shape> shapes, int type, bool aborted);
     
 };
 

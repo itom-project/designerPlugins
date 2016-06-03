@@ -202,7 +202,6 @@ protected:
 
 private:
     void createBaseActions();
-    
     bool m_showContextMenu;
 
     ItomPlotZoomer *m_pZoomer;
@@ -221,6 +220,7 @@ private:
 
     QVector<int> m_currentShapeIndices; /*!< indices of all shapes that have already been drawn in the current collection, e.g. if 4 rectangles are requested, the four indices are stored until the last rectangle has been given.*/
     int m_elementsToPick; /*!< number of shapes that should be picked in the current session. */
+    bool m_isUserInteraction;
     ito::Shape::ShapeType m_currentShapeType;
     ItomQwtPlotEnums::ShapeTypes m_allowedShapeTypes;
     ItomQwtPlotEnums::ModificationModes m_shapeModificationModes;

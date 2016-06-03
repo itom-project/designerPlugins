@@ -69,6 +69,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_keepAspectRatio(false),
     m_firstTimeVisible(false),
     m_state(-1),
+    m_isUserInteraction(false),
     m_stateIsChanging(false),
     m_selectedShape(NULL),
     m_ignoreNextMouseEvent(false),
@@ -1133,9 +1134,12 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
             if (p)
             {
-
-                emit p->userInteractionDone(ito::Shape::MultiPointPick, aborted, shapes);
-                emit p->geometricShapeFinished(ito::Shape::MultiPointPick, aborted);
+                if (m_isUserInteraction)
+                {
+                    emit p->userInteractionDone(ito::Shape::MultiPointPick, aborted, shapes);
+                    m_isUserInteraction = false;
+                }
+                emit p->geometricShapeFinished(shapes, ito::Shape::MultiPointPick, aborted);
 
                 PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
                 if (pim)
@@ -1226,8 +1230,12 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::Shape::Point, aborted, shapes);
-                    emit p->geometricShapeFinished(ito::Shape::Point, aborted);
+                    if (m_isUserInteraction)
+                    {
+                        emit p->userInteractionDone(ito::Shape::Point, aborted, shapes);
+                        m_isUserInteraction = false;
+                    }
+                    emit p->geometricShapeFinished(shapes, ito::Shape::Point, aborted);
                     if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
                     {
                         (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
@@ -1318,8 +1326,12 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::Shape::Line, aborted, shapes);
-                    emit p->geometricShapeFinished(ito::Shape::Line, aborted);
+                    if (m_isUserInteraction)
+                    {
+                        emit p->userInteractionDone(ito::Shape::Line, aborted, shapes);
+                        m_isUserInteraction = false;
+                    }
+                    emit p->geometricShapeFinished(shapes, ito::Shape::Line, aborted);
                     if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
                     {
                         (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
@@ -1408,8 +1420,12 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::Shape::Rectangle, aborted, shapes);
-                    emit p->geometricShapeFinished(ito::Shape::Rectangle, aborted);
+                    if (m_isUserInteraction)
+                    {
+                        emit p->userInteractionDone(ito::Shape::Rectangle, aborted, shapes);
+                        m_isUserInteraction = false;
+                    }
+                    emit p->geometricShapeFinished(shapes, ito::Shape::Rectangle, aborted);
                     if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
                     {
                         (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
@@ -1498,8 +1514,12 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::Shape::Square, aborted, shapes);
-                    emit p->geometricShapeFinished(ito::Shape::Square, aborted);
+                    if (m_isUserInteraction)
+                    {
+                        emit p->userInteractionDone(ito::Shape::Square, aborted, shapes);
+                        m_isUserInteraction = false;
+                    }
+                    emit p->geometricShapeFinished(shapes, ito::Shape::Square, aborted);
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1584,8 +1604,12 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::Shape::Ellipse, aborted, shapes);
-                    emit p->geometricShapeFinished(ito::Shape::Ellipse, aborted);
+                    if (m_isUserInteraction)
+                    {
+                        emit p->userInteractionDone(ito::Shape::Ellipse, aborted, shapes);
+                        m_isUserInteraction = false;
+                    }
+                    emit p->geometricShapeFinished(shapes, ito::Shape::Ellipse, aborted);
                     if ((((ItomQwtDObjFigure*)(this->parent()))->shapesWidget()))
                     {
                         (((ItomQwtDObjFigure*)(this->parent()))->shapesWidget())->updateShapes(shapes);
@@ -1674,8 +1698,12 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
                     }
                     m_currentShapeIndices.clear();
-                    emit p->userInteractionDone(ito::Shape::Circle, aborted, shapes);
-                    emit p->geometricShapeFinished(ito::Shape::Circle, aborted);
+                    if (m_isUserInteraction)
+                    {
+                        emit p->userInteractionDone(ito::Shape::Circle, aborted, shapes);
+                        m_isUserInteraction = false;
+                    }
+                    emit p->geometricShapeFinished(shapes, ito::Shape::Circle, aborted);
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1706,6 +1734,7 @@ ito::RetVal ItomQwtPlot::userInteractionStart(int type, bool start, int maxNrOfP
             m_currentShapeType = (ito::Shape::ShapeType)type;
             m_elementsToPick = maxNrOfPoints;
             setState(stateDrawShape); //this calls startOrStopDrawGeometricShape if everything is ok
+            m_isUserInteraction = true; // setting userinteraction to true, so we emit the counter part signal only if started with userinteractionstart
         }
         else
         {
@@ -1960,6 +1989,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         {
             QVector<ito::Shape> shapes;
             emit p->userInteractionDone(m_currentShapeType, true, shapes);
+            m_isUserInteraction = false;
         }
         setState(stateIdle);
         retval += ito::RetVal(ito::retError, 0, tr("Unknown type for userInteractionStart").toLatin1().data());
@@ -2163,7 +2193,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
     
-    if (p) emit  p->geometricShapeFinished(0, retVal.containsError());
+    if (p) emit  p->geometricShapeFinished(QVector<ito::Shape>(), 0, retVal.containsError());
 
     return retVal;
 }
@@ -2237,7 +2267,7 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
     
-    if (p) emit  p->geometricShapeFinished(0, retVal.containsError());
+    if (p) emit  p->geometricShapeFinished(QVector<ito::Shape>(), 0, retVal.containsError());
 
     return retVal;
 }
@@ -2321,7 +2351,7 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
     
-    if (p) emit  p->geometricShapeFinished(0, retVal.containsError());
+    if (p) emit  p->geometricShapeFinished(QVector<ito::Shape>(), 0, retVal.containsError());
 
     return retVal;
 }
