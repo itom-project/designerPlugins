@@ -2781,7 +2781,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
         double lengthPhys = seriesData->sample(lastIdx).x() - seriesData->sample(firstIdx).x();
         size_t lengthPx = lastIdx - firstIdx;
 
-        displayed = new ito::DataObject((int)m_plotCurveItems.size(), lastIdx - firstIdx + 1, type);
+        displayed = new ito::DataObject((int)m_plotCurveItems.size(), lengthPx + 1, type);
 
         std::string descr, unit;
         seriesData->getDObjValueDescriptionAndUnit(descr, unit);
