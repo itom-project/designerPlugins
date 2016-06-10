@@ -42,9 +42,17 @@ private:
     Ui::WidgetCurveProperties ui;
 
     Plot1DWidget *m_pContent;
+	bool m_visible;
+
 
 private slots:
-void on_listWidget_itemClicked(QListWidgetItem *item);
+	void on_listWidget_itemSelectionChanged();
+	void on_doubleSpinBoxLineWidth_valueChanged(double i);
+	void on_comboBoxLineStyle_currentIndexChanged(int val);
+	void on_checkBoxVisible_stateChanged(int state);
+
+public slots:
+	void visibilityChanged(bool visible);
 };
 
 #endif
