@@ -286,18 +286,11 @@ void ItomQwtDObjFigure::userInteractionStart(int type, bool start, int maxNrOfPo
             break;
         case ito::Shape::MultiPointPick:
         case ito::Shape::Point:
-            m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
-            break;
-
         case ito::Shape::Line:
-            m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
-            break;
-
         case ito::Shape::Rectangle:
-            m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
-            break;
-
+        case ito::Shape::Square:
         case ito::Shape::Ellipse:
+        case ito::Shape::Circle:
             m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
             break;
         }
