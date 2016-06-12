@@ -1092,20 +1092,24 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
         event->accept();
         QHash<int, DrawItem*>::iterator it = m_pShapes.begin();
         bool found = false;
+        QVector<ito::Shape> shapes;
 
         for (; it != m_pShapes.end(); ++it)
         {
             if (it.value() != NULL && it.value()->getSelected())
             {
                 found = true;
+                shapes << it.value()->getShape();
+
                 ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
                 if (p)
                 {
                     if (p->shapesWidget())
                     {
-                        p->shapesWidget()->updateShape(it.value()->getShape());
+                        p->shapesWidget()->updateShape(shapes.last());
                     }
-                    emit p->geometricShapeChanged(it.value()->getIndex(), it.value()->getShape());
+                    emit p->geometricShapeChanged(it.value()->getIndex(), shapes.last());
+                    emit p->geometricShapeFinished(shapes, false);
                 }
             }
         }
@@ -1128,14 +1132,14 @@ void ItomQwtPlot::multiPointActivated(bool on)
     ItomQwtDObjFigure *p = (ItomQwtDObjFigure*)(this->parent());
     QVector<ito::Shape> shapes;
 
-    switch (m_currentShapeType)
+    if (!on)
     {
-    case ito::Shape::MultiPointPick:
-        if (!on)
-        {
-            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
-            bool aborted = false;
+        QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
+        bool aborted = false;
 
+        switch (m_currentShapeType)
+        {
+        case ito::Shape::MultiPointPick:
             if (polygonScale.size() == 0)
             {
                 emit statusBarMessage(tr("Selection has been aborted."), 2000);
@@ -1171,20 +1175,13 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
             m_pMultiPointPicker->setEnabled(false);
             setState(stateIdle);
-        }
         break;
 
-    case ito::Shape::Point:
-        if (!on)
-        {
-            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
-            bool aborted = false;
-
+        case ito::Shape::Point:
             if (polygonScale.size() == 0)
             {
                 emit statusBarMessage(tr("Selection has been aborted."), 2000);
                 aborted = true;
-                m_currentShapeIndices.clear();
             }
             else
             {
@@ -1226,7 +1223,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
             }
 
             // if further elements are needed reset the plot engine and go ahead else finish editing
-            if (m_elementsToPick > 1)
+            if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
                 MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
@@ -1234,13 +1231,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     m->setMaxNrItems(1);
                     m_pMultiPointPicker->setEnabled(true);
-
-                    if (!aborted)
-                    {
-                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 points. Esc aborts the selection.").arg(m_elementsToPick));
-                        else emit statusBarMessage(tr("Please draw one point. Esc aborts the selection."));
-                    }
                 }
+
+                if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 points. Esc aborts the selection.").arg(m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one point. Esc aborts the selection."));
                 return;
             }
             else
@@ -1270,20 +1264,13 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
-        }
         break;
 
-    case ito::Shape::Line:
-        if (!on)
-        {
-            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
-            bool aborted = false;
-
+        case ito::Shape::Line:
             if (polygonScale.size() == 0)
             {
                 emit statusBarMessage(tr("Selection has been aborted."), 2000);
                 aborted = true;
-                m_currentShapeIndices.clear();
             }
             else
             {
@@ -1325,7 +1312,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
             }
 
             // if further elements are needed reset the plot engine and go ahead else finish editing
-            if (m_elementsToPick > 1)
+            if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
                 MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
@@ -1333,13 +1320,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 {
                     m->setMaxNrItems(2);
                     m_pMultiPointPicker->setEnabled(true);
-
-                    if (!aborted)
-                    {
-                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_elementsToPick));
-                        else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
-                    }
                 }
+
+                if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
                 return;
             }
             else
@@ -1368,20 +1352,13 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
-        }
         break;
 
-    case ito::Shape::Rectangle:
-        if (!on)
-        {
-            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
-            bool aborted = false;
-
+        case ito::Shape::Rectangle:
             if (polygonScale.size() == 0)
             {
                 emit statusBarMessage(tr("Selection has been aborted."), 2000);
                 aborted = true;
-                m_currentShapeIndices.clear();
             }
             else
             {
@@ -1423,20 +1400,17 @@ void ItomQwtPlot::multiPointActivated(bool on)
             }
 
             // if further elements are needed reset the plot engine and go ahead else finish editing
-            if (m_elementsToPick > 1)
+            if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
                 MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                 if (m)
                 {
                     m_pMultiPointPicker->setEnabled(true);
-
-                    if (!aborted)
-                    {
-                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
-                        else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
-                    }
                 }
+                    
+                if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
                 return;
             }
             else
@@ -1465,20 +1439,13 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
-        }
         break;
 
-    case ito::Shape::Square:
-        if (!on)
-        {
-            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
-            bool aborted = false;
-
+        case ito::Shape::Square:
             if (polygonScale.size() == 0)
             {
                 emit statusBarMessage(tr("Selection has been aborted."), 2000);
                 aborted = true;
-                m_currentShapeIndices.clear();
             }
             else
             {
@@ -1520,20 +1487,17 @@ void ItomQwtPlot::multiPointActivated(bool on)
             }
 
             // if further elements are needed reset the plot engine and go ahead else finish editing
-            if (m_elementsToPick > 1)
+            if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
                 MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                 if (m)
                 {
                     m_pMultiPointPicker->setEnabled(true);
-
-                    if (!aborted)
-                    {
-                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
-                        else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
-                    }
                 }
+
+                if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
                 return;
             }
             else
@@ -1558,20 +1522,13 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
-        }
         break;
 
-    case ito::Shape::Ellipse:
-        if (!on)
-        {
-            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
-            bool aborted = false;
-
+        case ito::Shape::Ellipse:
             if (polygonScale.size() == 0)
             {
                 emit statusBarMessage(tr("Selection has been aborted."), 2000);
                 aborted = true;
-                m_currentShapeIndices.clear();
             }
             else
             {
@@ -1613,20 +1570,17 @@ void ItomQwtPlot::multiPointActivated(bool on)
             }
 
             // if further elements are needed reset the plot engine and go ahead else finish editing
-            if (m_elementsToPick > 1)
+            if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
                 MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                 if (m)
                 {
                     m_pMultiPointPicker->setEnabled(true);
-
-                    if (!aborted)
-                    {
-                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
-                        else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
-                    }
                 }
+
+                if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
                 return;
             }
             else
@@ -1655,20 +1609,13 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
-        }
         break;
 
-    case ito::Shape::Circle:
-        if (!on)
-        {
-            QPolygonF polygonScale = m_pMultiPointPicker->selectionInPlotCoordinates();
-            bool aborted = false;
-
+        case ito::Shape::Circle:
             if (polygonScale.size() == 0)
             {
                 emit statusBarMessage(tr("Selection has been aborted."), 2000);
                 aborted = true;
-                m_currentShapeIndices.clear();
             }
             else
             {
@@ -1710,20 +1657,17 @@ void ItomQwtPlot::multiPointActivated(bool on)
             }
 
             // if further elements are needed reset the plot engine and go ahead else finish editing
-            if (m_elementsToPick > 1)
+            if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
                 MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
                 if (m)
                 {
                     m_pMultiPointPicker->setEnabled(true);
-
-                    if (!aborted)
-                    {
-                        if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
-                        else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
-                    }
                 }
+
+                if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
+                else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
                 return;
             }
             else
@@ -1748,8 +1692,8 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 m_pMultiPointPicker->setEnabled(false);
                 setState(stateIdle);
             }
-        }
         break;
+        }
     }
 }
 
