@@ -20,7 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#include "vtk3DVisualizer.h"
+#include "vtk3dVisualizer.h"
 
 #include "CustomTypes.h"
 

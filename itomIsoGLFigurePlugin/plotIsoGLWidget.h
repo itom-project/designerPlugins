@@ -37,6 +37,7 @@
 
 #include "DataObject/dataobj.h"
 #include "DataObject/dataObjectFuncs.h"
+#include "common/numeric.h"
 #include "common/sharedStructures.h"
 #ifdef USEPCL
     #include "PointCloud/pclStructures.h"
