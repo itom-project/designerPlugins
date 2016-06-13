@@ -26,7 +26,7 @@
 //#include "../../Qitom/global.h"
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
-#include "DataObject/dataObjectFuncs.h"
+#include "common/numeric.h"
 
 #include <qimage.h>
 #include <qlist.h>
@@ -127,7 +127,7 @@ namespace graphicViewHelper
         double scaling = 1.0;
 
 
-        if(ito::dObjHelper::isNotZero(zMax-zMin))
+        if(ito::isNotZero(zMax-zMin))
         {
             scaling = 255.0 / (zMax - zMin);
         }

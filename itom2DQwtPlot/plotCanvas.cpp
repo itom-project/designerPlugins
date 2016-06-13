@@ -22,9 +22,10 @@
 
 #include "plotCanvas.h"
 #include "common/sharedStructuresGraphics.h"
-#include "DataObject/dataObjectFuncs.h"
+#include "common/numeric.h"
 #include "common/apiFunctionsGraphInc.h"
 #include "common/apiFunctionsInc.h"
+#include "DataObject/dataObjectFuncs.h"
 
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"
@@ -2218,13 +2219,13 @@ void PlotCanvas::mnuLineCutMode(QAction *action)
     {
     default:
     case 0:
-        if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+        if (ito::isFinite(min) && ito::isFinite(max))
         {
 
             double dy = maxLoc[1] - minLoc[1];
             double dx = maxLoc[2] - minLoc[2];
 
-            if (!ito::dObjHelper::isNotZero(dy) && !ito::dObjHelper::isNotZero(dx))
+            if (!ito::isNotZero(dy) && !ito::isNotZero(dx))
             {
                 y.setMinimum((y.rmin() + y.rmax()) / 2.0);
                 y.setMaximum(y.rmin());
@@ -2312,14 +2313,14 @@ void PlotCanvas::mnuLineCutMode(QAction *action)
         }
         break;
     case 1:
-        if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+        if (ito::isFinite(min) && ito::isFinite(max))
         {
             y.setMinimum(minLoc[1]);
             y.setMaximum(minLoc[1]);
         }
         break;
     case 2:
-        if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+        if (ito::isFinite(min) && ito::isFinite(max))
         {
             y.setMinimum(maxLoc[1]);
             y.setMaximum(maxLoc[1]);
@@ -2327,7 +2328,7 @@ void PlotCanvas::mnuLineCutMode(QAction *action)
         break;
 
     case 3:
-        if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+        if (ito::isFinite(min) && ito::isFinite(max))
         {
             x.setMinimum(minLoc[2]);
             x.setMaximum(minLoc[2]);
@@ -2335,7 +2336,7 @@ void PlotCanvas::mnuLineCutMode(QAction *action)
         break;
 
     case 4:
-        if (ito::dObjHelper::isFinite(min) && ito::dObjHelper::isFinite(max))
+        if (ito::isFinite(min) && ito::isFinite(max))
         {
             x.setMinimum(maxLoc[2]);
             x.setMaximum(maxLoc[2]);
