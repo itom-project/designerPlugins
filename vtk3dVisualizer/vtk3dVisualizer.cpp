@@ -20,7 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#include "vtk3DVisualizer.h"
+#include "vtk3dVisualizer.h"
 
 #include "CustomTypes.h"
 
@@ -73,7 +73,6 @@ public:
     Vtk3dVisualizerPrivate() : 
         propertyWidget(NULL),
         treeWidget(NULL),
-        canvasItem(NULL),
         meshItem(NULL),
         cloudItem(NULL),
         geometryItem(NULL),
@@ -104,7 +103,6 @@ public:
     vtkSmartPointer<vtkCubeAxesActor> cubeAxesActor;
 
     QTreeWidget *treeWidget;
-    QTreeWidgetItem *canvasItem;
     QTreeWidgetItem *meshItem;
     QTreeWidgetItem *cloudItem;
     QTreeWidgetItem *geometryItem;
@@ -1280,25 +1278,18 @@ ito::RetVal Vtk3dVisualizer::setItemProperty(const QString &name, const QByteArr
     QString n = name;
     bool found = false;
 
-    if (name == "canvas")
+    //test all categories
+    retval += searchRecursiveTree(name, d->cloudItem, &item);
+
+    if (retval.containsError())
     {
-        item = d->canvasItem;
-    }
-    else
-    {
-        //test all categories
-        retval += searchRecursiveTree(name, d->cloudItem, &item);
+        retval = ito::retOk;
+        retval += searchRecursiveTree(name, d->meshItem, &item);
 
         if (retval.containsError())
         {
             retval = ito::retOk;
-            retval += searchRecursiveTree(name, d->meshItem, &item);
-
-            if (retval.containsError())
-            {
-                retval = ito::retOk;
-                retval += searchRecursiveTree(name, d->geometryItem, &item);
-            }
+            retval += searchRecursiveTree(name, d->geometryItem, &item);
         }
     }
 

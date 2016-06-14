@@ -29,7 +29,7 @@
 #define VTK3DVISUALIZER_EXPORT Q_DECL_IMPORT
 #endif
 
-#include "plot/AbstractDObjPclFigure.h"
+#include "plot/AbstractDObjPCLFigure.h"
 
 #include "common/sharedStructures.h"
 #include "PointCloud/pclStructures.h"
@@ -44,7 +44,7 @@
 #include <qtreewidget.h>
 
 #include <string>
-#include <qvector3d>
+#include <QVector3D>
 
 
 
