@@ -232,6 +232,7 @@ private:
     bool m_markerLabelVisible;
 
     bool m_ignoreNextMouseEvent; //todo: what is this?
+    bool m_shapeModifiedByMouseMove;
     QColor m_inverseColor0;
     QColor m_inverseColor1;
 

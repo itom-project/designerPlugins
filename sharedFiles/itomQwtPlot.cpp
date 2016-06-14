@@ -103,7 +103,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_backgroundColor(Qt::white),
     m_canvasColor(Qt::white),
     m_styledBackground(false),
-    m_pPrinter(NULL)
+    m_pPrinter(NULL),
+    m_shapeModifiedByMouseMove(false)
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -822,37 +823,37 @@ void ItomQwtPlot::setState(int state)
                 case ito::Shape::Point:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/point.png" : ":/itomDesignerPlugins/plot_lt/icons/point_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
-                    startOrStopDrawGeometricShape(1);
+                    startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Line:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/pntline.png" : ":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
-                    startOrStopDrawGeometricShape(1);
+                    startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Rectangle:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/rectangle.png" : ":/itomDesignerPlugins/plot_lt/icons/rectangle_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
-                    startOrStopDrawGeometricShape(1);
+                    startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Ellipse:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/ellipse.png" : ":/itomDesignerPlugins/plot_lt/icons/ellipse_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
-                    startOrStopDrawGeometricShape(1);
+                    startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Circle:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/circle.png" : ":/itomDesignerPlugins/plot_lt/icons/circle_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
-                    startOrStopDrawGeometricShape(1);
+                    startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Square:
                     m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/square.png" : ":/itomDesignerPlugins/plot_lt/icons/square_lt.png"));
                     m_elementsToPick = std::max(m_elementsToPick, 1);
-                    startOrStopDrawGeometricShape(1);
+                    startOrStopDrawGeometricShape(true);
                     break;
                 }
             }
@@ -1075,6 +1076,8 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                 m_mouseDragReplotCounter = 0;
             }
         }
+
+        m_shapeModifiedByMouseMove = true;
     }
 
     if (!event->isAccepted())
@@ -1086,7 +1089,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
 {
-    if (m_state == stateIdle)
+    if (m_state == stateIdle && m_shapeModifiedByMouseMove)
     {
         //modification of shape finished
         event->accept();
@@ -1118,6 +1121,8 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
         {
             replot();
         }
+
+        m_shapeModifiedByMouseMove = false;
     }
 
     if (!event->isAccepted())
@@ -1315,12 +1320,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
             if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
-                MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                if (m)
-                {
-                    m->setMaxNrItems(2);
-                    m_pMultiPointPicker->setEnabled(true);
-                }
+                m_pMultiPointPicker->setEnabled(true);
 
                 if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 lines. Esc aborts the selection.").arg(m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one line. Esc aborts the selection."));
@@ -1403,11 +1403,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
             if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
-                MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                if (m)
-                {
-                    m_pMultiPointPicker->setEnabled(true);
-                }
+                m_pMultiPointPicker->setEnabled(true);
                     
                 if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
@@ -1490,11 +1486,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
             if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
-                MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                if (m)
-                {
-                    m_pMultiPointPicker->setEnabled(true);
-                }
+                m_pMultiPointPicker->setEnabled(true);
 
                 if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one rectangle. Esc aborts the selection."));
@@ -1573,11 +1565,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
             if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
-                MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                if (m)
-                {
-                    m_pMultiPointPicker->setEnabled(true);
-                }
+                m_pMultiPointPicker->setEnabled(true);
 
                 if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
@@ -1660,11 +1648,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
             if (!aborted && m_elementsToPick > 1)
             {
                 m_elementsToPick--;
-                MultiPointPickerMachine *m = static_cast<MultiPointPickerMachine*>(m_pMultiPointPicker->stateMachine());
-                if (m)
-                {
-                    m_pMultiPointPicker->setEnabled(true);
-                }
+                m_pMultiPointPicker->setEnabled(true);
 
                 if (m_elementsToPick > 1) emit statusBarMessage(tr("Please draw %1 ellipses. Esc aborts the selection.").arg(m_elementsToPick));
                 else emit statusBarMessage(tr("Please draw one ellipse. Esc aborts the selection."));
@@ -1716,8 +1700,8 @@ ito::RetVal ItomQwtPlot::userInteractionStart(int type, bool start, int maxNrOfP
         {
             m_currentShapeType = (ito::Shape::ShapeType)type;
             m_elementsToPick = maxNrOfPoints;
-            setState(stateDrawShape); //this calls startOrStopDrawGeometricShape if everything is ok
             m_isUserInteraction = true; // setting userinteraction to true, so we emit the counter part signal only if started with userinteractionstart
+            setState(stateDrawShape); //this calls startOrStopDrawGeometricShape if everything is ok
         }
         else
         {
@@ -1746,6 +1730,11 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
 
         if (m_currentShapeType == ito::Shape::MultiPointPick) //multiPointPick
         {
+            if (p)
+            {
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
+            }
+
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
             m_pMultiPointPicker->setKeepAspectRatio(false);
@@ -1768,6 +1757,11 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         }
         else if (m_currentShapeType == ito::Shape::Point)
         {
+            if (p)
+            {
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
+            }
+
             m_pMultiPointPicker->setStateMachine(new MultiPointPickerMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::CrossRubberBand);
             m_pMultiPointPicker->setKeepAspectRatio(false);
@@ -1786,6 +1780,11 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         }
         else if (m_currentShapeType == ito::Shape::Line)
         {
+            if (p)
+            {
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
+            }
+
             m_pMultiPointPicker->setStateMachine(new QwtPickerDragLineMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::PolygonRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -1799,6 +1798,11 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         }
         else if (m_currentShapeType == ito::Shape::Rectangle)
         {
+            if (p)
+            {
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
+            }
+
             m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -1812,6 +1816,11 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         }
         else if (m_currentShapeType == ito::Shape::Square)
         {
+            if (p)
+            {
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
+            }
+
             m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::RectRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -1825,6 +1834,11 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         }
         else if (m_currentShapeType == ito::Shape::Ellipse)
         {
+            if (p)
+            {
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
+            }
+
             m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -1838,6 +1852,11 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         }
         else if (m_currentShapeType == ito::Shape::Circle)
         {
+            if (p)
+            {
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
+            }
+
             m_pMultiPointPicker->setStateMachine(new QwtPickerDragRectMachine());
             m_pMultiPointPicker->setRubberBand(QwtPicker::EllipseRubberBand);
             m_pMultiPointPicker->setTrackerMode(QwtPicker::AlwaysOn);
@@ -1856,7 +1875,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
             if (p && m_isUserInteraction)
             {
                 QVector<ito::Shape> shapes;
-                emit p->userInteractionDone(m_currentShapeType, true, shapes);
+                emit p->geometricShapeStartUserInput(m_currentShapeType, m_isUserInteraction);
                 m_isUserInteraction = false;
             }
             setState(stateIdle);

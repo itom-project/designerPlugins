@@ -263,6 +263,7 @@ private:
     ItomQwtDObjFigurePrivate *d;
 
 signals :
+    void geometricShapeStartUserInput(int type, bool userInteractionReason); //userInteractionReason is true, if creating new shapes has been started by slot 'userInteractionStart', else false (e.g. by button in toolbar)
     void userInteractionDone(int type, bool aborted, QVector<ito::Shape> shapes);
     void geometricShapeAdded(int idx, ito::Shape shape);
     void geometricShapeChanged(int idx, ito::Shape shape);
