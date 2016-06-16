@@ -29,15 +29,28 @@
        <string>GroupBox</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="3" column="2">
-        <widget class="QLabel" name="label_5">
+       <item row="1" column="3">
+        <widget class="QComboBox" name="comboBoxLineStyle"/>
+       </item>
+       <item row="0" column="3">
+        <widget class="QCheckBox" name="checkBoxVisible">
          <property name="text">
-          <string>Line Color</string>
+          <string/>
          </property>
         </widget>
        </item>
-       <item row="1" column="3">
-        <widget class="QComboBox" name="comboBoxLineStyle"/>
+       <item row="3" column="2">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Brush Style</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="QComboBox" name="comboBoxBrushStyle"/>
+       </item>
+       <item row="4" column="3">
+        <widget class="ColorPickerButton" name="ColorPickerButtonLineStyle"/>
        </item>
        <item row="2" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBoxLineWidth"/>
@@ -63,7 +76,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
+       <item row="5" column="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -76,28 +89,12 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="3">
-        <widget class="QCheckBox" name="checkBoxVisible">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="2">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Brush Style</string>
+          <string>Line Color</string>
          </property>
         </widget>
-       </item>
-       <item row="4" column="3">
-        <widget class="QComboBox" name="comboBoxBrushStyle"/>
-       </item>
-       <item row="3" column="3">
-        <widget class="QComboBox" name="comboBoxLineColor"/>
-       </item>
-       <item row="5" column="3">
-        <widget class="ColorPickerButton" name="ColorPickerButton"/>
        </item>
       </layout>
      </widget>

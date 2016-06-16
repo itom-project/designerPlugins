@@ -53,7 +53,7 @@ void WidgetCurveProperties::updateProperties()
 
 		foreach(curve, curves)
 		{
-ui.listWidget->addItem(curve->title().text());
+			ui.listWidget->addItem(curve->title().text());
 
 		}
 		const QMetaObject *mo = qt_getEnumMetaObject(Qt::PenStyle::DashLine);//penStyle
@@ -64,14 +64,6 @@ ui.listWidget->addItem(curve->title().text());
 		{
 			ui.comboBoxLineStyle->addItem(me.key(i), QVariant()); //add penStyles
 		}
-		const QMetaObject *moLineColor = qt_getEnumMetaObject(Qt::GlobalColor::black);//color
-		QMetaEnum meLineColor = moLineColor->enumerator(moLineColor->indexOfEnumerator("GlobalColor"));
-		for (i = 0; i < meLineColor.keyCount(); ++i)
-		{
-			ui.comboBoxLineColor->addItem(meLineColor.key(i), QVariant());
-		}
-		
-
 
 		const QMetaObject *moBrushStyle = qt_getEnumMetaObject(Qt::BrushStyle::NoBrush);
 		QMetaEnum meBrushStyle = moBrushStyle->enumerator(moBrushStyle->indexOfEnumerator("BrushStyle"));
@@ -87,7 +79,7 @@ ui.listWidget->addItem(curve->title().text());
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 {
-
+	isUpdating = true; //avoid any changes of the line settings while updating
 	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 	QListWidgetItem* item;
 	int row = -1;
@@ -131,7 +123,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			{
 				constBrushStyle = false;
 			}
-			if (lineColor.operator==(pen.color()))
+			if (!lineColor.operator==(pen.color()))
 			{
 				constLineColor = false;
 			}
@@ -143,6 +135,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		lineStyle = pen.style();
 		visible = m_pContent->getplotCurveItems().at(row)->isVisible();
 		brushStyle = m_pContent->getplotCurveItems().at(row)->brush().style();
+		lineColor = pen.color();
 		first = false; //set to false after first for iteration
 	}
 	if (row != -1)//true if a curve is selected
@@ -179,122 +172,121 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		{
 			ui.comboBoxBrushStyle->setCurrentIndex(-1);
 		}
-		if (constLineColor)//is the Color the same for all lines_________________________________________________________________________________________
+		if (constLineColor)
 		{
-			const QMetaObject *moLineColor = qt_getEnumMetaObject(Qt::GlobalColor::black);//color
-			QMetaEnum meLineColor = moLineColor->enumerator(moLineColor->indexOfEnumerator("GlobalColor"));
-			bool colorFound = false;
-			for (int i = 0; i < meLineColor.keyCount(); ++i)
-			{
-				if (pen.color().operator==(QColor((Qt::GlobalColor)i)))//check if the LineColor is defined in Qt::GlobalColor enum
-				{
-					ui.comboBoxLineColor->setCurrentIndex(i);
-					colorFound = true;
-					break;
-				}
-			}
-			if (!colorFound)
-			{
-				ui.comboBoxLineColor->setCurrentIndex(-1);//if the color is not defined in Qt::GlobalColor the index of the comboBox will be set to -1
-			}
+			ui.ColorPickerButtonLineStyle->setColor(pen.color());
 		}
 		else
 		{
-			ui.comboBoxLineColor->setCurrentIndex(-1);
+			ui.ColorPickerButtonLineStyle->setColor(QColor(Qt::black));
 		}
 
 	}
-
+	isUpdating = false;
 }
 //-----------------------------------------------------------------------------------------------
-void WidgetCurveProperties::on_comboBoxLineColor_currentIndexChanged(int val)
+void WidgetCurveProperties::on_ColorPickerButtonLineStyle_colorChanged(QColor color)
 {
-	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
-	QListWidgetItem* item;
-	int row;
-	QPen pen;
-	foreach(item, selection)
+	if (!isUpdating)
 	{
-		row = ui.listWidget->row(item);
-		pen = m_pContent->getplotCurveItems().at(row)->pen();
-		pen.setColor((Qt::GlobalColor)val);
-		m_pContent->getplotCurveItems().at(row)->setPen(pen);
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
+		QPen pen;
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);
+			pen = m_pContent->getplotCurveItems().at(row)->pen();
+			pen.setColor(color);
+			m_pContent->getplotCurveItems().at(row)->setPen(pen);
 
+		}
+		m_pContent->replot();
 	}
-	m_pContent->replot();
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_comboBoxBrushStyle_currentIndexChanged(int val)
 {
-	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
-	QListWidgetItem* item;
-	int row;
-	QBrush brush;
-	foreach(item, selection)
+	if (!isUpdating)
 	{
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
+		QBrush brush;
+		foreach(item, selection)
+		{
 
-		row = ui.listWidget->row(item);
-		brush = m_pContent->getplotCurveItems().at(row)->brush();
-		brush.setStyle((Qt::BrushStyle)val);
-		brush.setColor(QColor(Qt::black));
-		m_pContent->getplotCurveItems().at(row)->setBrush(brush);
-
-		
+			row = ui.listWidget->row(item);
+			brush = m_pContent->getplotCurveItems().at(row)->brush();
+			brush.setStyle((Qt::BrushStyle)val);
+			brush.setColor(QColor(Qt::black));
+			m_pContent->getplotCurveItems().at(row)->setBrush(brush);
 
 
+
+
+		}
+		m_pContent->replot();
 	}
-	m_pContent->replot();
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_checkBoxVisible_stateChanged(int state)
 {
-	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
-	QListWidgetItem* item;
-	int row;
-
-	foreach(item, selection)
+	if (!isUpdating)
 	{
-		row = ui.listWidget->row(item);
-		m_pContent->getplotCurveItems().at(row)->setVisible((bool)state);
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
 
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);
+			m_pContent->getplotCurveItems().at(row)->setVisible((bool)state);
+
+		}
+		m_pContent->replot();
 	}
-	m_pContent->replot();
-
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_comboBoxLineStyle_currentIndexChanged(int val)
 {
-	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
-	QListWidgetItem* item;
-	QPen pen;
-	int row;
-
-	foreach(item, selection)
+	if (!isUpdating)
 	{
-		row = ui.listWidget->row(item);
-		pen = m_pContent->getplotCurveItems().at(row)->pen();
-		pen.setStyle((Qt::PenStyle)val);
-		m_pContent->getplotCurveItems().at(row)->setPen(pen);
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		QPen pen;
+		int row;
+
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);
+			pen = m_pContent->getplotCurveItems().at(row)->pen();
+			pen.setStyle((Qt::PenStyle)val);
+			m_pContent->getplotCurveItems().at(row)->setPen(pen);
+		}
+		m_pContent->replot();
 	}
-	m_pContent->replot();
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_doubleSpinBoxLineWidth_valueChanged(double i)
 {
-	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
-	QListWidgetItem* item;
-	QPen pen;
-	int row;
-	foreach(item, selection)
+	if (!isUpdating)
 	{
-		row = ui.listWidget->row(item);
-		pen=m_pContent->getplotCurveItems().at(row)->pen();
-		pen.setWidthF((qreal)i);
-		m_pContent->getplotCurveItems().at(row)->setPen(pen);
-		
-		
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		QPen pen;
+		int row;
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);
+			pen = m_pContent->getplotCurveItems().at(row)->pen();
+			pen.setWidthF((qreal)i);
+			m_pContent->getplotCurveItems().at(row)->setPen(pen);
+
+
+		}
+		m_pContent->replot();
 	}
-	m_pContent->replot();
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::visibilityChanged(bool visible)

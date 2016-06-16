@@ -43,6 +43,7 @@ private:
 
     Plot1DWidget *m_pContent;
 	bool m_visible;
+	bool isUpdating;
 
 
 private slots:
@@ -51,7 +52,7 @@ private slots:
 	void on_comboBoxLineStyle_currentIndexChanged(int val);
 	void on_checkBoxVisible_stateChanged(int state);
 	void on_comboBoxBrushStyle_currentIndexChanged(int val);
-	void on_comboBoxLineColor_currentIndexChanged(int val);
+	void on_ColorPickerButtonLineStyle_colorChanged(QColor color);
 
 public slots:
 	void visibilityChanged(bool visible);
