@@ -743,7 +743,7 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
     ito::float32 absFst = sqrt(pow(firstLineDirVector[0],2) + pow(firstLineDirVector[1],2) + pow(firstLineDirVector[2],2));
     ito::float32 absSec = sqrt(pow(secondLineDirVector[0],2) + pow(secondLineDirVector[1],2) + pow(secondLineDirVector[2],2));
 
-    if (!ito::dObjHelper::isNotZero(absFst) ||  !ito::dObjHelper::isNotZero(absSec))
+    if (!ito::isNotZero(absFst) ||  !ito::isNotZero(absSec))
     {
         point[0] = quietNaN;
         point[1] = quietNaN;
@@ -758,14 +758,14 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
     ito::float32 kappa  = 0.0;
 
     // Vectors are the same we have to check if the positions vectors are on the same line
-    if (ito::dObjHelper::isNotZero(firstLineDirVector[0] - secondLineDirVector[0]) &&
-        ito::dObjHelper::isNotZero(firstLineDirVector[1] - secondLineDirVector[1]) &&
-        ito::dObjHelper::isNotZero(firstLineDirVector[2] - secondLineDirVector[2])) 
+    if (ito::isNotZero(firstLineDirVector[0] - secondLineDirVector[0]) &&
+        ito::isNotZero(firstLineDirVector[1] - secondLineDirVector[1]) &&
+        ito::isNotZero(firstLineDirVector[2] - secondLineDirVector[2])) 
     {
         secondLinePosVector -= firstLinePosVector;
         lambda = secondLinePosVector[0] / firstLinePosVector[0];
-        if ( ito::dObjHelper::isNotZero(secondLinePosVector[1] / firstLinePosVector[1] - lambda)
-          && ito::dObjHelper::isNotZero(secondLinePosVector[2] / firstLinePosVector[2] - lambda))
+        if ( ito::isNotZero(secondLinePosVector[1] / firstLinePosVector[1] - lambda)
+          && ito::isNotZero(secondLinePosVector[2] / firstLinePosVector[2] - lambda))
         {
             point = firstLinePosVector;
 
@@ -780,10 +780,10 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
         }
     }
     else if (eval2D ||  
-            (!ito::dObjHelper::isNotZero(firstLinePosVector[2]) && 
-            !ito::dObjHelper::isNotZero(secondLinePosVector[2]) &&
-            !ito::dObjHelper::isNotZero(firstLineDirVector[2]) && 
-            !ito::dObjHelper::isNotZero(secondLineDirVector[2]))) // is a two dimensional problem
+            (!ito::isNotZero(firstLinePosVector[2]) && 
+            !ito::isNotZero(secondLinePosVector[2]) &&
+            !ito::isNotZero(firstLineDirVector[2]) && 
+            !ito::isNotZero(secondLineDirVector[2]))) // is a two dimensional problem
     {
 
     }

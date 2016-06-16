@@ -37,6 +37,7 @@
 
 #include "DataObject/dataobj.h"
 #include "DataObject/dataObjectFuncs.h"
+#include "common/numeric.h"
 #include "common/sharedStructures.h"
 #ifdef USEPCL
     #include "PointCloud/pclStructures.h"
@@ -264,8 +265,8 @@ class plotGLWidget : public QGLWidget
             for (int npx = 0; npx < m_pContentPC->width() * m_pContentPC->height(); npx++)
             {
                 pt = pcl->at(npx);
-//                if ((fabs(color - pt.z) < threshold) && ito::dObjHelper::isFinite<ito::float64>(pt.z))
-                if (ito::dObjHelper::isFinite<ito::float64>(pt.z))
+//                if ((fabs(color - pt.z) < threshold) && ito::isFinite<ito::float64>(pt.z))
+                if (ito::isFinite<ito::float64>(pt.z))
                 {
                     #if (USEOMP)
                     #pragma omp critical

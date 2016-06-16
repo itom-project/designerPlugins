@@ -27,7 +27,7 @@
 #include "itomIsoGLFigure.h"
 #include "plotIsoGLWidget.h"
 #include "common/sharedStructuresGraphics.h"
-#include "DataObject/dataObjectFuncs.h"
+#include "common/numeric.h"
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -621,7 +621,7 @@ template<typename _Type> inline ito::RetVal plotGLWidget::NormalizeObj(cv::Mat &
     ito::float64* ptrScaledTopo = (ito::float64*)scaledTopo.ptr(0);
     ito::float64 norm = m_axisZ.phys[1] - m_axisZ.phys[0];
 
-    if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
+    if (!ito::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
     #if (USEOMP)
     #pragma omp parallel num_threads(m_nthreads)
@@ -664,7 +664,7 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex64>(cv::Mat
     ito::float64* ptrScaledTopo = (ito::float64*)scaledTopo.ptr(0);
     ito::float64 norm = m_axisZ.phys[1] - m_axisZ.phys[0];
 
-    if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
+    if (!ito::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
     #if (USEOMP)
     #pragma omp parallel num_threads(m_nthreads)
@@ -769,7 +769,7 @@ template<> inline ito::RetVal plotGLWidget::NormalizeObj<ito::complex128>(cv::Ma
     ito::float64* ptrScaledTopo = (ito::float64*)scaledTopo.ptr(0);;
     ito::float64 norm = m_axisZ.phys[1] - m_axisZ.phys[0];
 
-    if (!ito::dObjHelper::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
+    if (!ito::isNotZero<ito::float64>(norm)) norm = 1.0;    // if is zero set to 1.0
 
     #if (USEOMP)
     #pragma omp parallel num_threads(m_nthreads)
@@ -1227,7 +1227,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                 for (cntX = 0; cntX < xsizeObj - 1; cntX++)
                 {
                     dpixel1 = ptrScaledTopoNext[cntX];
-                    if ((fabs(color - dpixel1) < threshold) && ito::dObjHelper::isFinite<ito::float64>(dpixel1) && (dpixel1 != invalidValue))
+                    if ((fabs(color - dpixel1) < threshold) && ito::isFinite<ito::float64>(dpixel1) && (dpixel1 != invalidValue))
                     {
                         #if (USEOMP)
                         #pragma omp critical
@@ -1265,7 +1265,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                     dpixel2 = ptrScaledTopo[cntX + 1];
                     dpixel3 = ptrScaledTopo[cntX];
 
-                    if(ito::dObjHelper::isFinite<ito::float64>(dpixel1) && ito::dObjHelper::isFinite<ito::float64>(dpixel2) && ito::dObjHelper::isFinite<ito::float64>(dpixel2))
+                    if(ito::isFinite<ito::float64>(dpixel1) && ito::isFinite<ito::float64>(dpixel2) && ito::isFinite<ito::float64>(dpixel2))
                     {
                         zsum = dpixel1 + dpixel2 + dpixel3;
                         color = zsum / 3.0;
@@ -1321,7 +1321,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
                     dpixel2 = ptrScaledTopoNext[cntX + 1];
                     dpixel3 = ptrScaledTopo[cntX + 1];
 
-                    if(ito::dObjHelper::isFinite<ito::float64>(dpixel1) && ito::dObjHelper::isFinite<ito::float64>(dpixel2) && ito::dObjHelper::isFinite<ito::float64>(dpixel3))
+                    if(ito::isFinite<ito::float64>(dpixel1) && ito::isFinite<ito::float64>(dpixel2) && ito::isFinite<ito::float64>(dpixel3))
                     {
                         zsum = dpixel1 + dpixel2 + dpixel3;
                         color = zsum / 3.0;
@@ -1783,7 +1783,7 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
             m_windowXScale /= 1.2; // * fabs((double)(this->height()) / (double)this->height());
             m_windowYScale /= 1.2; // * fabs((double)(this->height()) / (double)this->height());
 
-            if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
+            if(ito::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
             {
                 m_windowZScale /= (double)(m_axisZ.phys[1] -  m_axisZ.phys[0]) * m_zAmpl;
                 //m_windowZScale /= (double)(m_maxZValue - m_minZValue);
@@ -1838,7 +1838,7 @@ void plotGLWidget::refreshPlot(ito::ParamBase *param)
         m_windowXScale /= 1.2; // * fabs((double)(this->width()) / (double)this->width());
         m_windowYScale /= 1.2; // * fabs((double)(this->height()) / (double)this->height());
 
-        if(ito::dObjHelper::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
+        if(ito::isNotZero<double>(m_axisZ.phys[1] - m_axisZ.phys[0]))
         {
             m_windowZScale /= (double)(m_axisZ.phys[1] -  m_axisZ.phys[0]) * m_zAmpl;
             //m_windowZScale /= (double)(m_maxZValue - m_minZValue);
@@ -2497,7 +2497,7 @@ void plotGLWidget::paintAxisTicksOGL(const double x0, const double y0, const dou
     if(sl1 >= l || !sl1)
         return;
 
-    if(!ito::dObjHelper::isFinite<double>(s0) || !ito::dObjHelper::isFinite<double>(s1) ||s0 >= s1)
+    if(!ito::isFinite<double>(s0) || !ito::isFinite<double>(s1) ||s0 >= s1)
         return;
 
     ldv = log10((s1 - s0) * sl1 / l);

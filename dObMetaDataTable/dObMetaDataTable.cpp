@@ -28,7 +28,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include "common/sharedStructuresGraphics.h"
-#include "DataObject/dataObjectFuncs.h"
+#include "common/numeric.h"
 //#include "common/apiFunctionsGraphInc.h"
 //#include "common/apiFunctionsInc.h"
 
@@ -75,10 +75,10 @@ template<typename _Tp> void convertComplexMat(const cv::Mat &complexIn, cv::Mat 
         }
     }
 
-    if(ito::dObjHelper::isNotZero(absValMax-absValMin)) deltaAbs = 255.0 / (absValMax-absValMin);
+    if(ito::isNotZero(absValMax-absValMin)) deltaAbs = 255.0 / (absValMax-absValMin);
     else deltaAbs = 255.0;
                 
-    if(ito::dObjHelper::isNotZero(phaValMax - phaValMin)) deltaPha = 255.0 / (phaValMax - phaValMin);
+    if(ito::isNotZero(phaValMax - phaValMin)) deltaPha = 255.0 / (phaValMax - phaValMin);
     else deltaPha = 255.0;
                 
 
@@ -205,12 +205,12 @@ void dObMetaDataTable::setData(QSharedPointer<ito::DataObject> dataObj)
                 double maxVal = 1.0;
                 cv::minMaxIdx(tempMat, &minVal, &maxVal);
 
-                if(!ito::dObjHelper::isFinite(minVal))
+                if(!ito::isFinite(minVal))
                 {
                     minVal = 0.0;
                 }
 
-                if(!ito::dObjHelper::isFinite(maxVal))
+                if(!ito::isFinite(maxVal))
                 {
                     minVal = 1.0;
                 }

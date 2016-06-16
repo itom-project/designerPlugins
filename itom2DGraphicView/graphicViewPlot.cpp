@@ -1181,15 +1181,15 @@ void GraphicViewPlot::setZAxisInterval(ito::AutoInterval interval)
         return;
     }
 
-    if (interval.isAuto() || !ito::dObjHelper::isFinite(interval.rmin() || !ito::dObjHelper::isFinite(interval.rmax())) ||
-      (!ito::dObjHelper::isNotZero(interval.rmin()) && !ito::dObjHelper::isNotZero(interval.rmax())))
+    if (interval.isAuto() || !ito::isFinite(interval.rmin() || !ito::isFinite(interval.rmax())) ||
+      (!ito::isNotZero(interval.rmin()) && !ito::isNotZero(interval.rmax())))
     {
         m_data.m_valueScaleAuto = true;
         if (m_pContent) ((PlotWidget*)m_pContent)->internalDataUpdated();
         return;
     }
 
-    if (!ito::dObjHelper::isNotZero(interval.rmin()) && ito::dObjHelper::isNotZero(interval.rmax()))
+    if (!ito::isNotZero(interval.rmin()) && ito::isNotZero(interval.rmax()))
     {
         switch((int)interval.rmax())
         {
