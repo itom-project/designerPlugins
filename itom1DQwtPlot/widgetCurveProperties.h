@@ -50,6 +50,8 @@ private slots:
 	void on_doubleSpinBoxLineWidth_valueChanged(double i);
 	void on_comboBoxLineStyle_currentIndexChanged(int val);
 	void on_checkBoxVisible_stateChanged(int state);
+	void on_comboBoxBrushStyle_currentIndexChanged(int val);
+	void on_comboBoxLineColor_currentIndexChanged(int val);
 
 public slots:
 	void visibilityChanged(bool visible);

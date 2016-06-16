@@ -29,6 +29,13 @@
        <string>GroupBox</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="3" column="2">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Line Color</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="3">
         <widget class="QComboBox" name="comboBoxLineStyle"/>
        </item>
@@ -56,7 +63,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
+       <item row="6" column="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -76,12 +83,35 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="2">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Brush Style</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
+        <widget class="QComboBox" name="comboBoxBrushStyle"/>
+       </item>
+       <item row="3" column="3">
+        <widget class="QComboBox" name="comboBoxLineColor"/>
+       </item>
+       <item row="5" column="3">
+        <widget class="ColorPickerButton" name="ColorPickerButton"/>
+       </item>
       </layout>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ColorPickerButton</class>
+   <extends>QPushButton</extends>
+   <header>colorPickerButton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
