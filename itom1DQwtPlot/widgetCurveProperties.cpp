@@ -71,6 +71,13 @@ void WidgetCurveProperties::updateProperties()
 		{
 			ui.comboBoxBrushStyle->addItem(meBrushStyle.key(i), QVariant());//addBrushStyles
 		}
+		const QMetaObject moLineSymbol = Itom1DQwtPlot::staticMetaObject;
+		QMetaEnum meLineSymbol = moLineSymbol.enumerator(moLineSymbol.indexOfEnumerator("Symbol"));
+		for (i = 0; i < meLineSymbol.keyCount(); ++i)
+		{
+			ui.comboBoxLineSymbol->addItem(meLineSymbol.key(i), QVariant());//addBrushStyles
+		}
+
 
 	}
 
@@ -86,11 +93,12 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	QPen pen;
 
 
-	bool constWidth = true;// if the current selection does not have the same linewidth at all, than constWidth will be set to false 
-	bool constLineStyle = true;// if the current selection does not have the same linestyle at all, than constWidth will be set to false 
-	bool constVisible = true;// if the current selection does not have the same visibility at all, than constWidth will be set to false
-	bool constBrushStyle = true;// if the current selection does not have the same baseline at all, than constWidth will be set to false
-	bool constLineColor = true;// if the current selection does not have the same lineColor at all, than constWidth will be set to false
+	bool constWidth = true;// if the current selection does not have the same linewidth at all, than constWidth will be set to false in the following
+	bool constLineStyle = true;// if the current selection does not have the same linestyle at all, than constWidth will be set to false in the following
+	bool constVisible = true;// if the current selection does not have the same visibility at all, than constWidth will be set to false in the following
+	bool constBrushStyle = true;// if the current selection does not have the same baseline at all, than constWidth will be set to false in the following
+	bool constLineColor = true;// if the current selection does not have the same lineColor at all, than constWidth will be set to false in the following
+	bool constLineSymbol = true;// if the current selection does not have the same lineSymbol at all, than constWidth will be set to false in the following
 
 	bool first = true; //marks the first line witch is checked 
 	float width;
@@ -98,6 +106,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	Qt::BrushStyle brushStyle;
 	QColor lineColor;
 	bool visible;
+	Itom1DQwtPlot::Symbol lineSymbol;
 	foreach(item, selection)
 	{
 		row = ui.listWidget->row(item);
@@ -126,6 +135,10 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			if (!lineColor.operator==(pen.color()))
 			{
 				constLineColor = false;
+			}
+			if (m_pContent->getplotCurveItems().at(row)->symbol()->style() == lineSymbol)
+			{
+				constLineSymbol = false;
 			}
 			
 
@@ -180,6 +193,14 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		{
 			ui.ColorPickerButtonLineStyle->setColor(QColor(Qt::black));
 		}
+		if (constLineSymbol)
+		{
+			ui.comboBoxLineSymbol->setCurrentIndex((int)m_pContent->getplotCurveItems().at(row)->symbol());
+		}
+		else
+		{
+			ui.comboBoxLineSymbol->setCurrentIndex(-1);
+		}
 
 	}
 	isUpdating = false;
@@ -200,6 +221,25 @@ void WidgetCurveProperties::on_ColorPickerButtonLineStyle_colorChanged(QColor co
 			pen.setColor(color);
 			m_pContent->getplotCurveItems().at(row)->setPen(pen);
 
+		}
+		m_pContent->replot();
+	}
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val) 
+{
+	if (!isUpdating)
+	{
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
+		QwtSymbol symbol((QwtSymbol::Style)val);
+		QwtSymbol *mySymbol = &symbol;
+
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);
+			m_pContent->getplotCurveItems().at(row)->setSymbol(mySymbol);
 		}
 		m_pContent->replot();
 	}

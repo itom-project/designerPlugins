@@ -53,6 +53,7 @@ private slots:
 	void on_checkBoxVisible_stateChanged(int state);
 	void on_comboBoxBrushStyle_currentIndexChanged(int val);
 	void on_ColorPickerButtonLineStyle_colorChanged(QColor color);
+	void on_comboBoxLineSymbol_currentIndexChanged(int val);
 
 public slots:
 	void visibilityChanged(bool visible);
