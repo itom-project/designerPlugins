@@ -170,14 +170,14 @@ void QwtPlotCurveProperty::setLineSymbolSize(int size)
     {
         const QwtSymbol *s = m_pCurve->symbol();
         QSize newSize(size, size);
-        if (s && size == 0)
-        {
-            m_pCurve->setSymbol(NULL);
-        }
-        else if (!s || s->size() != newSize)
-        {
-            m_pCurve->setSymbol(new QwtSymbol(s->style(), QBrush(Qt::white), QPen(s->pen().color()), newSize));
-        }
+		if (!s)
+		{
+			m_pCurve->setSymbol(new QwtSymbol(QwtSymbol::NoSymbol, QBrush(Qt::white), QPen(m_pCurve->pen().color()), newSize));
+		}
+		else
+		{
+			m_pCurve->setSymbol(new QwtSymbol(s->style(), s->brush(), QPen(s->pen().color()), newSize));
+		}
     }
 }
 
