@@ -4,6 +4,8 @@ project(${target_name})
  
 cmake_minimum_required(VERSION 2.8)
 
+message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")
+
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
