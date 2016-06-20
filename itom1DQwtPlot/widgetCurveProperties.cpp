@@ -43,6 +43,8 @@ WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *par
 	
 
 }
+
+//-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::updateProperties()
 {
 	if (m_visible)
@@ -56,7 +58,7 @@ void WidgetCurveProperties::updateProperties()
 			ui.listWidget->addItem(curve->title().text());
 
 		}
-		const QMetaObject *mo = qt_getEnumMetaObject(Qt::PenStyle::DashLine);//penStyle
+		const QMetaObject *mo = qt_getEnumMetaObject(Qt::DashLine);//penStyle
 		QMetaEnum me = mo->enumerator(mo->indexOfEnumerator("PenStyle"));
 
 		int i;
@@ -71,11 +73,11 @@ void WidgetCurveProperties::updateProperties()
 		{
 			ui.comboBoxBrushStyle->addItem(meBrushStyle.key(i), QVariant());//addBrushStyles
 		}
-		const QMetaObject moLineSymbol = Itom1DQwtPlot::staticMetaObject;
+		const QMetaObject moLineSymbol(Itom1DQwtPlot::staticMetaObject);
 		QMetaEnum meLineSymbol = moLineSymbol.enumerator(moLineSymbol.indexOfEnumerator("Symbol"));
 		for (i = 0; i < meLineSymbol.keyCount(); ++i)
 		{
-			ui.comboBoxLineSymbol->addItem(meLineSymbol.key(i), QVariant());//addBrushStyles
+			ui.comboBoxLineSymbol->addItem(meLineSymbol.key(i), meLineSymbol.value(i));//addBrushStyles
 		}
 
 
@@ -191,7 +193,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		}
 		else
 		{
-			ui.ColorPickerButtonLineStyle->setColor(QColor(Qt::black));
+			ui.ColorPickerButtonLineStyle->setColor(Qt::black);
 		}
 		if (constLineSymbol)
 		{
@@ -228,18 +230,17 @@ void WidgetCurveProperties::on_ColorPickerButtonLineStyle_colorChanged(QColor co
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val) 
 {
-	if (!isUpdating)
+	if (!isUpdating && val >= 0)
 	{
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;
 		int row;
-		QwtSymbol symbol((QwtSymbol::Style)val);
-		QwtSymbol *mySymbol = &symbol;
+        int enumValue = ui.comboBoxLineStyle->currentData().toInt();
 
 		foreach(item, selection)
 		{
 			row = ui.listWidget->row(item);
-			m_pContent->getplotCurveItems().at(row)->setSymbol(mySymbol);
+            m_pContent->getplotCurveItems().at(row)->setSymbol(new QwtSymbol((QwtSymbol::Style)enumValue));
 		}
 		m_pContent->replot();
 	}
@@ -281,7 +282,7 @@ void WidgetCurveProperties::on_checkBoxVisible_stateChanged(int state)
 		foreach(item, selection)
 		{
 			row = ui.listWidget->row(item);
-			m_pContent->getplotCurveItems().at(row)->setVisible((bool)state);
+			m_pContent->getplotCurveItems().at(row)->setVisible(state > 0);
 
 		}
 		m_pContent->replot();
