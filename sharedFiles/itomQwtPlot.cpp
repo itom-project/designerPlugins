@@ -2155,11 +2155,14 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                             newItem->attach(this);
                             m_pShapes.insert(newItem->getIndex(), newItem);
                             shape.setIndex(newItem->getIndex());
-                            if (p->shapesWidget())
+                            if (p)
                             {
-                                p->shapesWidget()->updateShape(shape);
+                                if (p->shapesWidget())
+                                {
+                                    p->shapesWidget()->updateShape(shape);
+                                }
+                                emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
                             }
-                            emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
                             updatedShapes << shape;
                         }
                         break;
