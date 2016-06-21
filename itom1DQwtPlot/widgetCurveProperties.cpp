@@ -27,6 +27,7 @@
 
 
 #include "Plot1DWidget.h"
+#include "qwtPlotCurveProperty.h"
 
 #include "cmath"
 
@@ -77,10 +78,20 @@ void WidgetCurveProperties::updateProperties()
 		QMetaEnum meLineSymbol = moLineSymbol.enumerator(moLineSymbol.indexOfEnumerator("Symbol"));
 		for (i = 0; i < meLineSymbol.keyCount(); ++i)
 		{
-			ui.comboBoxLineSymbol->addItem(meLineSymbol.key(i), meLineSymbol.value(i));//addBrushStyles
+			ui.comboBoxLineSymbol->addItem(meLineSymbol.key(i), meLineSymbol.value(i));//addLineSymbols
 		}
-
-
+		const QMetaObject *moCapStyle(qt_getEnumMetaObject(Qt::FlatCap));//add CapStyles
+		QMetaEnum meCapStyle(moCapStyle->enumerator(moCapStyle->indexOfEnumerator("PenCapStyle")));
+		for (i = 0; i < meCapStyle.keyCount(); ++i)
+		{
+			ui.comboBoxCapStyle->addItem(meCapStyle.key(i), meCapStyle.value(i));
+		}
+		const QMetaObject *moJoinStyle(qt_getEnumMetaObject(Qt::MiterJoin));//add JoinStyle
+		QMetaEnum meJoinStyle(moJoinStyle->enumerator(moJoinStyle->indexOfEnumerator("PenJoinStyle")));
+		for (i = 0; i < meJoinStyle.keyCount(); ++i)
+		{
+			ui.comboBoxJoinStyle->addItem(meJoinStyle.key(i), meJoinStyle.value(i));
+		}
 	}
 
 }
@@ -88,7 +99,7 @@ void WidgetCurveProperties::updateProperties()
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 {
-	isUpdating = true; //avoid any changes of the line settings while updating
+	m_isUpdating = true; //avoid any changes of the line settings while updating
 	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 	QListWidgetItem* item;
 	int row = -1;
@@ -101,6 +112,9 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	bool constBrushStyle = true;// if the current selection does not have the same baseline at all, than constWidth will be set to false in the following
 	bool constLineColor = true;// if the current selection does not have the same lineColor at all, than constWidth will be set to false in the following
 	bool constLineSymbol = true;// if the current selection does not have the same lineSymbol at all, than constWidth will be set to false in the following
+	bool constSymbolSize = true;// if the current selection does not have the same symbolSize at all, than constWidth will be set to false in the following
+	bool constCapStyle = true;// if the current selection does not have the same capStyle at all, than constWidth will be set to false in the following
+	bool consJoinStyle = true;// if the current selection does not have the same joinStyle at all, than constWidth will be set to false in the following
 
 	bool first = true; //marks the first line witch is checked 
 	float width;
@@ -108,7 +122,11 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	Qt::BrushStyle brushStyle;
 	QColor lineColor;
 	bool visible;
-	Itom1DQwtPlot::Symbol lineSymbol;
+	QwtSymbol::Style lineSymbol;
+	int symbolSize;
+	Qt::PenCapStyle capStyle;
+	Qt::PenJoinStyle joinStyle;
+
 	foreach(item, selection)
 	{
 		row = ui.listWidget->row(item);
@@ -138,14 +156,51 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			{
 				constLineColor = false;
 			}
-			if (m_pContent->getplotCurveItems().at(row)->symbol()->style() == lineSymbol)
+			if (m_pContent->getplotCurveItems().at(row)->symbol())// check if symbol exists
 			{
-				constLineSymbol = false;
-			}
-			
+				if (!(m_pContent->getplotCurveItems().at(row)->symbol()->style() == lineSymbol))
+				{
+					constLineSymbol = false;
+				}
+				if (symbolSize != m_pContent->getplotCurveItems().at(row)->symbol()->size().width())
+				{
+					constSymbolSize = false;
+				}
 
+			}
+			else
+			{
+				if (lineSymbol != QwtSymbol::NoSymbol)// check if the line before does't have any symbols set else the lines are of different style
+				{
+					constLineSymbol = false;
+				}
+				if (symbolSize != 0)
+				{
+					constSymbolSize = false;
+				}
+			}
+			if (capStyle != m_pContent->getplotCurveItems().at(row)->pen().capStyle())
+			{
+				constCapStyle = false;
+			}
+			if (joinStyle != m_pContent->getplotCurveItems().at(row)->pen().joinStyle())
+			{
+				consJoinStyle = false;
+			}
 		}
 
+		joinStyle = m_pContent->getplotCurveItems().at(row)->pen().joinStyle();
+		capStyle = m_pContent->getplotCurveItems().at(row)->pen().capStyle();
+		if (m_pContent->getplotCurveItems().at(row)->symbol())//check if NULL
+		{
+			lineSymbol = m_pContent->getplotCurveItems().at(row)->symbol()->style();
+			symbolSize = m_pContent->getplotCurveItems().at(row)->symbol()->size().width();
+		}
+		else
+		{
+			lineSymbol = QwtSymbol::NoSymbol;
+			symbolSize = 0;
+		}
 		width = pen.widthF();
 		lineStyle = pen.style();
 		visible = m_pContent->getplotCurveItems().at(row)->isVisible();
@@ -155,6 +210,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	}
 	if (row != -1)//true if a curve is selected
 	{
+
 		if (constWidth)//all lines have the same width
 		{
 			ui.doubleSpinBoxLineWidth->setValue((float)pen.widthF());
@@ -189,28 +245,122 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		}
 		if (constLineColor)
 		{
-			ui.ColorPickerButtonLineStyle->setColor(pen.color());
+			ui.colorPickerButtonLineStyle->setColor(pen.color());
 		}
 		else
 		{
-			ui.ColorPickerButtonLineStyle->setColor(Qt::black);
+			ui.colorPickerButtonLineStyle->setColor(Qt::black);
 		}
 		if (constLineSymbol)
 		{
-			ui.comboBoxLineSymbol->setCurrentIndex((int)m_pContent->getplotCurveItems().at(row)->symbol());
+			if (m_pContent->getplotCurveItems().at(row)->symbol())
+			{
+				ui.comboBoxLineSymbol->setCurrentIndex((int)(m_pContent->getplotCurveItems().at(row)->symbol()->style()+1));
+
+
+			}
+			else
+			{
+				ui.comboBoxLineSymbol->setCurrentIndex(0);
+			}
+
 		}
 		else
 		{
 			ui.comboBoxLineSymbol->setCurrentIndex(-1);
 		}
+		if (constSymbolSize)
+		{
+			if (m_pContent->getplotCurveItems().at(row)->symbol() && symbolSize == m_pContent->getplotCurveItems().at(row)->symbol()->size().height())//check if symbol is not NUll and height equal to width
+			{
+				ui.spinBoxSymbolSize->setValue(symbolSize);
+				
+			}
+			else
+			{
+				ui.spinBoxSymbolSize->setValue(0);
+			}
+			
+
+		}
+		else
+		{
+			ui.spinBoxSymbolSize->setValue(0);
+		}
+		if (constCapStyle)
+		{
+
+			ui.comboBoxCapStyle->setCurrentIndex(ui.comboBoxCapStyle->findData(QVariant((int)capStyle)));
+
+		}
+		else
+		{
+			ui.comboBoxCapStyle->setCurrentIndex(-1);
+		}
+		if (consJoinStyle)
+		{
+			ui.comboBoxJoinStyle->setCurrentIndex(ui.comboBoxJoinStyle->findData(QVariant((int)joinStyle)));
+		}
+		else
+		{
+			ui.comboBoxJoinStyle->setCurrentIndex(-1);
+		}
 
 	}
-	isUpdating = false;
+	m_isUpdating = false;
 }
 //-----------------------------------------------------------------------------------------------
-void WidgetCurveProperties::on_ColorPickerButtonLineStyle_colorChanged(QColor color)
+void WidgetCurveProperties::on_comboBoxJoinStyle_currentIndexChanged(int val)
 {
-	if (!isUpdating)
+	if (!m_isUpdating)
+	{
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);;
+			m_pContent->getPlotCurveProperty().at(row)->setLineJoinStyle((Qt::PenJoinStyle)ui.comboBoxJoinStyle->currentData().toInt());
+		}
+		m_pContent->replot();
+	}
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::on_comboBoxCapStyle_currentIndexChanged(int val)
+{
+	if (!m_isUpdating)
+	{
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);;
+			m_pContent->getPlotCurveProperty().at(row)->setLineCapStyle((Qt::PenCapStyle)ui.comboBoxCapStyle->currentData().toInt());
+		}
+		m_pContent->replot();
+	}
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::on_spinBoxSymbolSize_valueChanged(int val)
+{
+	if (!m_isUpdating)
+	{
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);
+			m_pContent->getPlotCurveProperty().at(row)->setLineSymbolSize(val);
+		}
+		m_pContent->replot();
+	}
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::on_colorPickerButtonLineStyle_colorChanged(QColor color)
+{
+	if (!m_isUpdating)
 	{
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;
@@ -230,17 +380,17 @@ void WidgetCurveProperties::on_ColorPickerButtonLineStyle_colorChanged(QColor co
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val) 
 {
-	if (!isUpdating && val >= 0)
+	if (!m_isUpdating)
 	{
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;
 		int row;
-        int enumValue = ui.comboBoxLineStyle->currentData().toInt();
+        int enumValue = ui.comboBoxLineSymbol->currentData().toInt();
 
 		foreach(item, selection)
 		{
 			row = ui.listWidget->row(item);
-            m_pContent->getplotCurveItems().at(row)->setSymbol(new QwtSymbol((QwtSymbol::Style)enumValue));
+			m_pContent->getPlotCurveProperty().at(row)->setLineSymbolStyle((Itom1DQwtPlot::Symbol)(enumValue));
 		}
 		m_pContent->replot();
 	}
@@ -248,7 +398,7 @@ void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val)
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_comboBoxBrushStyle_currentIndexChanged(int val)
 {
-	if (!isUpdating)
+	if (!m_isUpdating)
 	{
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;
@@ -273,7 +423,7 @@ void WidgetCurveProperties::on_comboBoxBrushStyle_currentIndexChanged(int val)
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_checkBoxVisible_stateChanged(int state)
 {
-	if (!isUpdating)
+	if (!m_isUpdating)
 	{
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;
@@ -291,7 +441,7 @@ void WidgetCurveProperties::on_checkBoxVisible_stateChanged(int state)
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_comboBoxLineStyle_currentIndexChanged(int val)
 {
-	if (!isUpdating)
+	if (!m_isUpdating)
 	{
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;
@@ -311,7 +461,7 @@ void WidgetCurveProperties::on_comboBoxLineStyle_currentIndexChanged(int val)
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_doubleSpinBoxLineWidth_valueChanged(double i)
 {
-	if (!isUpdating)
+	if (!m_isUpdating)
 	{
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;

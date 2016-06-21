@@ -43,17 +43,20 @@ private:
 
     Plot1DWidget *m_pContent;
 	bool m_visible;
-	bool isUpdating;
+	bool m_isUpdating;
 
 
 private slots:
+	void on_spinBoxSymbolSize_valueChanged(int val);
 	void on_listWidget_itemSelectionChanged();
 	void on_doubleSpinBoxLineWidth_valueChanged(double i);
 	void on_comboBoxLineStyle_currentIndexChanged(int val);
 	void on_checkBoxVisible_stateChanged(int state);
 	void on_comboBoxBrushStyle_currentIndexChanged(int val);
-	void on_ColorPickerButtonLineStyle_colorChanged(QColor color);
+	void on_colorPickerButtonLineStyle_colorChanged(QColor color);
 	void on_comboBoxLineSymbol_currentIndexChanged(int val);
+	void on_comboBoxCapStyle_currentIndexChanged(int val);
+	void on_comboBoxJoinStyle_currentIndexChanged(int val);
 
 public slots:
 	void visibilityChanged(bool visible);

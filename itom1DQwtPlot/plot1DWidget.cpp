@@ -2610,6 +2610,11 @@ QVector<float> Plot1DWidget::getPickerPhys() const
     return exportItem;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+QList<QwtPlotCurveProperty*> Plot1DWidget::getPlotCurveProperty()
+{
+	return this->m_plotCurvePropertyItems;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 QList<QwtPlotCurve*> Plot1DWidget::getplotCurveItems()
 {
 	return this->m_plotCurveItems;

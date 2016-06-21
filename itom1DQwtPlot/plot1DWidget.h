@@ -110,6 +110,7 @@ class Plot1DWidget : public ItomQwtPlot
         QVariant getCurveProperty(int index, const QByteArray &property);
 
 		QList<QwtPlotCurve*> getplotCurveItems();
+		QList<QwtPlotCurveProperty*> getPlotCurveProperty();
 
         friend Itom1DQwtPlot;
 

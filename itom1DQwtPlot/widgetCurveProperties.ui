@@ -29,16 +29,6 @@
        <string>GroupBox</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="3">
-        <widget class="QComboBox" name="comboBoxLineStyle"/>
-       </item>
-       <item row="0" column="3">
-        <widget class="QCheckBox" name="checkBoxVisible">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="2">
         <widget class="QLabel" name="label_4">
          <property name="text">
@@ -56,7 +46,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
+       <item row="9" column="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -75,6 +65,19 @@
           <string>Lline Width</string>
          </property>
         </widget>
+       </item>
+       <item row="6" column="3">
+        <widget class="QSpinBox" name="spinBoxSymbolSize"/>
+       </item>
+       <item row="7" column="2">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Pen Cap Style</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="3">
+        <widget class="QComboBox" name="comboBoxCapStyle"/>
        </item>
        <item row="1" column="2">
         <widget class="QLabel" name="label">
@@ -100,11 +103,41 @@
          </property>
         </widget>
        </item>
+       <item row="6" column="2">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Symbol Size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QComboBox" name="comboBoxLineStyle"/>
+       </item>
        <item row="5" column="3">
         <widget class="QComboBox" name="comboBoxLineSymbol"/>
        </item>
        <item row="4" column="3">
-        <widget class="ColorPickerButton" name="ColorPickerButtonLineStyle"/>
+        <widget class="ColorPickerButton" name="colorPickerButtonLineStyle"/>
+       </item>
+       <item row="0" column="3">
+        <widget class="QCheckBox" name="checkBoxVisible">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="tristate">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="2">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Pen Join Style</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="3">
+        <widget class="QComboBox" name="comboBoxJoinStyle"/>
        </item>
       </layout>
      </widget>
