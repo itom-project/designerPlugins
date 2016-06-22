@@ -48,7 +48,7 @@ private:
 
 private slots:
 	void on_spinBoxSymbolSize_valueChanged(int val);
-	void on_listWidget_itemSelectionChanged();
+	
 	void on_doubleSpinBoxLineWidth_valueChanged(double i);
 	void on_comboBoxLineStyle_currentIndexChanged(int val);
 	void on_checkBoxVisible_stateChanged(int state);
@@ -59,7 +59,9 @@ private slots:
 	void on_comboBoxJoinStyle_currentIndexChanged(int val);
 
 public slots:
+	void on_listWidget_itemSelectionChanged();
 	void visibilityChanged(bool visible);
+	void curveChanged();
 };
 
 #endif

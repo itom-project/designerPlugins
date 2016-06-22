@@ -89,6 +89,7 @@ void Itom1DQwtPlot::constructor()
 	d->m_pLinePropertyWidget = new WidgetCurveProperties(m_pContent);
 	d->m_pLinePropertiesDock->setWidget(d->m_pLinePropertyWidget);
 	connect(d->m_pLinePropertiesDock, SIGNAL(visibilityChanged(bool)), d->m_pLinePropertyWidget, SLOT(visibilityChanged(bool)));
+	connect(m_pContent, SIGNAL(curveChanged()), d->m_pLinePropertyWidget, SLOT(on_listWidget_itemSelectionChanged()));
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();
@@ -989,7 +990,6 @@ void Itom1DQwtPlot::setCurveFillColor(const QColor val)
         return m_pContent->setCurveFilled();
     }
     updatePropertyDock();
-	d->m_pLinePropertyWidget->updateProperties();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

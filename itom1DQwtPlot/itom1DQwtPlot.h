@@ -295,7 +295,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
     private slots:
-
 };
 //----------------------------------------------------------------------------------------------------------------------------------
 

@@ -54,6 +54,7 @@ void QwtPlotCurveProperty::setLineStyle(const Qt::PenStyle &style)
             pen.setStyle(style);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -78,6 +79,7 @@ void QwtPlotCurveProperty::setLineWidth(const qreal &width)
             pen.setWidthF(width);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -102,6 +104,7 @@ void QwtPlotCurveProperty::setLineColor(const QColor &color)
             pen.setColor(color);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -126,6 +129,7 @@ void QwtPlotCurveProperty::setLineJoinStyle(const Qt::PenJoinStyle &style)
             pen.setJoinStyle(style);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -150,6 +154,7 @@ void QwtPlotCurveProperty::setLineCapStyle(const Qt::PenCapStyle &style)
             pen.setCapStyle(style);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -178,6 +183,7 @@ void QwtPlotCurveProperty::setLineSymbolSize(int size)
 		{
 			m_pCurve->setSymbol(new QwtSymbol(s->style(), s->brush(), QPen(s->pen().color()), newSize));
 		}
+		emit curveChanged();
     }
 }
 
@@ -208,6 +214,7 @@ void QwtPlotCurveProperty::setLineSymbolStyle(const Itom1DQwtPlot::Symbol &symbo
             QColor c = s ? s->pen().color() : m_pCurve->pen().color();
             m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(c), size));
         }
+		emit curveChanged();
     }
 }
 
@@ -284,6 +291,7 @@ void QwtPlotCurveProperty::setVisible(bool visible)
                 }
             }
         }
+		emit curveChanged();
     }
     
 }

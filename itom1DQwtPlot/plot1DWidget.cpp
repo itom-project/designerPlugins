@@ -818,6 +818,7 @@ void Plot1DWidget::setLineWidth(const qreal &width)
         }
 
         replot();
+		emit curveChanged();
     }
 }
 
@@ -836,6 +837,7 @@ void Plot1DWidget::setLineStyle(const Qt::PenStyle &style)
         }
 
         replot();
+		emit curveChanged();
     }
 }
 
@@ -860,6 +862,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
         }
 
         replot();
+		emit curveChanged();
     }
     else if (m_pData->m_lineSymbole != style)
     {
@@ -879,6 +882,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
         }
 
         replot();
+		emit curveChanged();
     }
     else if (m_pData->m_lineSymboleSize != size)
     {
@@ -897,6 +901,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
         }
 
         replot();
+		emit curveChanged();
     }
 
     m_pData->m_lineSymbole = style;
@@ -1283,6 +1288,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
             m_plotCurveItems.append(dObjCurve);
             m_plotCurvePropertyItems.append(new QwtPlotCurveProperty(dObjCurve));
+			connect(m_plotCurvePropertyItems.last(), SIGNAL(curveChanged()), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
 			refreshWidgetCurveProperties = 1;
         }
 

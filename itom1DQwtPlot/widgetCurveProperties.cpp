@@ -41,8 +41,11 @@ WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *par
 {
     ui.setupUi(this);
 	Qt::PenStyle;
-	
-
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::curveChanged()
+{
+	qDebug() << "bla";
 }
 
 //-----------------------------------------------------------------------------------------------
