@@ -243,6 +243,7 @@ class Plot1DWidget : public ItomQwtPlot
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 		void curveChanged();
+		void legendModified();
 
     public slots:
         //void replot();

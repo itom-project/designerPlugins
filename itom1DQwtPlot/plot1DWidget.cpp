@@ -789,6 +789,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
         }
     }
     replot();
+	emit legendModified();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

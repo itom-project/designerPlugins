@@ -61,7 +61,7 @@ private slots:
 public slots:
 	void on_listWidget_itemSelectionChanged();
 	void visibilityChanged(bool visible);
-	void curveChanged();
+	void updateCurveList();
 };
 
 #endif

@@ -43,13 +43,7 @@ WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *par
 	Qt::PenStyle;
 }
 //-----------------------------------------------------------------------------------------------
-void WidgetCurveProperties::curveChanged()
-{
-	qDebug() << "bla";
-}
-
-//-----------------------------------------------------------------------------------------------
-void WidgetCurveProperties::updateProperties()
+void WidgetCurveProperties::updateCurveList()
 {
 	if (m_visible)
 	{
@@ -62,6 +56,15 @@ void WidgetCurveProperties::updateProperties()
 			ui.listWidget->addItem(curve->title().text());
 
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::updateProperties()
+{
+	if (m_visible)
+	{
+		updateCurveList();
 		const QMetaObject *mo = qt_getEnumMetaObject(Qt::DashLine);//penStyle
 		QMetaEnum me = mo->enumerator(mo->indexOfEnumerator("PenStyle"));
 
