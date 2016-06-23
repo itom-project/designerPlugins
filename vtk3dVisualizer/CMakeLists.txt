@@ -171,5 +171,5 @@ IF(ITOM_SDK_PCL_SUPPORT)
     ENDIF(EXISTS ${VTK_DIR})
 
 ELSE(ITOM_SDK_PCL_SUPPORT)
-    message(FATAL "${target_name} will not be build since itom has been compiled without PCL support")
+    message(WARNING "${target_name} will not be build since itom has been compiled without PCL support")
 ENDIF(ITOM_SDK_PCL_SUPPORT)
