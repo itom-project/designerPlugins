@@ -40,7 +40,6 @@ WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *par
 	m_visible(false)
 {
     ui.setupUi(this);
-	Qt::PenStyle;
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::updateCurveList()
@@ -53,7 +52,9 @@ void WidgetCurveProperties::updateCurveList()
 
 		foreach(curve, curves)
 		{
-			ui.listWidget->addItem(curve->title().text());
+			QListWidgetItem *a = new QListWidgetItem(curve->title().text());
+			a->setFlags(a->flags() | Qt::ItemIsEditable);
+			ui.listWidget->addItem(a);
 
 		}
 	}
@@ -120,7 +121,8 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	bool constLineSymbol = true;// if the current selection does not have the same lineSymbol at all, than constWidth will be set to false in the following
 	bool constSymbolSize = true;// if the current selection does not have the same symbolSize at all, than constWidth will be set to false in the following
 	bool constCapStyle = true;// if the current selection does not have the same capStyle at all, than constWidth will be set to false in the following
-	bool consJoinStyle = true;// if the current selection does not have the same joinStyle at all, than constWidth will be set to false in the following
+	bool constJoinStyle = true;// if the current selection does not have the same joinStyle at all, than constWidth will be set to false in the following
+	bool constLegendVisible = true;// if the current selection does not have the same legend visibility at all, than constLegendVisible will be set to false in the following
 
 	bool first = true; //marks the first line witch is checked 
 	float width;
@@ -132,6 +134,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	int symbolSize;
 	Qt::PenCapStyle capStyle;
 	Qt::PenJoinStyle joinStyle;
+	bool legendVisible;
 
 	foreach(item, selection)
 	{
@@ -191,10 +194,14 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			}
 			if (joinStyle != m_pContent->getplotCurveItems().at(row)->pen().joinStyle())
 			{
-				consJoinStyle = false;
+				constJoinStyle = false;
+			}
+			if (legendVisible != m_pContent->getPlotCurveProperty().at(row)->getLegendVisible())
+			{
+				constLegendVisible = false;
 			}
 		}
-
+		legendVisible = m_pContent->getPlotCurveProperty().at(row)->getLegendVisible();
 		joinStyle = m_pContent->getplotCurveItems().at(row)->pen().joinStyle();
 		capStyle = m_pContent->getplotCurveItems().at(row)->pen().capStyle();
 		if (m_pContent->getplotCurveItems().at(row)->symbol())//check if NULL
@@ -207,6 +214,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			lineSymbol = QwtSymbol::NoSymbol;
 			symbolSize = 0;
 		}
+
 		width = pen.widthF();
 		lineStyle = pen.style();
 		visible = m_pContent->getplotCurveItems().at(row)->isVisible();
@@ -235,7 +243,14 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		}
 		if (constVisible)
 		{
-			ui.checkBoxVisible->setCheckState(Qt::Checked);
+			if (visible)
+			{
+				ui.checkBoxVisible->setCheckState(Qt::Checked);
+			}
+			else
+			{
+				ui.checkBoxVisible->setCheckState(Qt::Unchecked);
+			}
 		}
 		else
 		{
@@ -303,7 +318,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		{
 			ui.comboBoxCapStyle->setCurrentIndex(-1);
 		}
-		if (consJoinStyle)
+		if (constJoinStyle)
 		{
 			ui.comboBoxJoinStyle->setCurrentIndex(ui.comboBoxJoinStyle->findData(QVariant((int)joinStyle)));
 		}
@@ -311,9 +326,46 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		{
 			ui.comboBoxJoinStyle->setCurrentIndex(-1);
 		}
+		if (constLegendVisible)
+		{
+			if (m_pContent->getPlotCurveProperty().at(row)->getLegendVisible())
+			{
+				ui.checkBoxLegendVisible->setCheckState(Qt::Checked);
+			}
+			else
+			{
+				ui.checkBoxLegendVisible->setCheckState(Qt::Unchecked);
+			}
+			
+		}
+		else
+		{
+			ui.checkBoxLegendVisible->setCheckState(Qt::Unchecked);
+		}
 
 	}
 	m_isUpdating = false;
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::on_listWidget_itemChanged(QListWidgetItem *item)
+{
+
+	m_pContent->getplotCurveItems().at(ui.listWidget->currentRow())->setTitle(item->text());
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::on_checkBoxLegendVisible_stateChanged(int val)
+{
+	if (!m_isUpdating)
+	{
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		QListWidgetItem* item;
+		int row;
+		foreach(item, selection)
+		{
+			row = ui.listWidget->row(item);
+			m_pContent->getPlotCurveProperty().at(row)->setLegendVisible(val);
+		}
+	}
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_comboBoxJoinStyle_currentIndexChanged(int val)
@@ -325,7 +377,7 @@ void WidgetCurveProperties::on_comboBoxJoinStyle_currentIndexChanged(int val)
 		int row;
 		foreach(item, selection)
 		{
-			row = ui.listWidget->row(item);;
+			row = ui.listWidget->row(item);
 			m_pContent->getPlotCurveProperty().at(row)->setLineJoinStyle((Qt::PenJoinStyle)ui.comboBoxJoinStyle->currentData().toInt());
 		}
 		m_pContent->replot();
@@ -438,7 +490,7 @@ void WidgetCurveProperties::on_checkBoxVisible_stateChanged(int state)
 		foreach(item, selection)
 		{
 			row = ui.listWidget->row(item);
-			m_pContent->getplotCurveItems().at(row)->setVisible(state > 0);
+			m_pContent->getPlotCurveProperty().at(row)->setVisible(state);
 
 		}
 		m_pContent->replot();

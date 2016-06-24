@@ -57,6 +57,8 @@ private slots:
 	void on_comboBoxLineSymbol_currentIndexChanged(int val);
 	void on_comboBoxCapStyle_currentIndexChanged(int val);
 	void on_comboBoxJoinStyle_currentIndexChanged(int val);
+	void on_checkBoxLegendVisible_stateChanged(int val);
+	void on_listWidget_itemChanged(QListWidgetItem *item);
 
 public slots:
 	void on_listWidget_itemSelectionChanged();

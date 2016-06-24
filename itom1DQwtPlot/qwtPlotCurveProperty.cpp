@@ -201,21 +201,19 @@ Itom1DQwtPlot::Symbol QwtPlotCurveProperty::getLineSymbolStyle() const
 //-----------------------------------------------------------------------------------------------------
 void QwtPlotCurveProperty::setLineSymbolStyle(const Itom1DQwtPlot::Symbol &symbol)
 {
-    if (m_pCurve)
-    {
-        const QwtSymbol *s = m_pCurve->symbol();
-        if (s && symbol == Itom1DQwtPlot::NoSymbol)
-        {
-            m_pCurve->setSymbol(NULL);
-        }
-        else if (!s || (s->style() != (QwtSymbol::Style)(symbol - 1)))
-        {
-            QSize size = s ? s->size() : QSize(1, 1);
-            QColor c = s ? s->pen().color() : m_pCurve->pen().color();
-            m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(c), size));
-        }
+	if (m_pCurve)
+	{
+		const QwtSymbol *s = m_pCurve->symbol();
+		if (!s)
+		{
+			m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(m_pCurve->pen().color()), QSize(1, 1)));
+		}
+		else
+		{
+			m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(s->pen().color()), s->size()));
+		}
 		emit curveChanged();
-    }
+	}
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -256,6 +254,7 @@ void QwtPlotCurveProperty::setLegendVisible(bool visible)
                 }
             }
         }
+		emit curveChanged();
     }
     
 }
