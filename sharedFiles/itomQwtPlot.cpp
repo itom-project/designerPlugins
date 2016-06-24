@@ -2660,6 +2660,11 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     bool ok;
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
 
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        emit statusBarMessage(tr("Could not send object to workspace, api is missing."), 4000);
+    }
+
     QString varname = QInputDialog::getText(p, tr("Current to workspace"), tr("Indicate the python variable name for the currently visible object"), QLineEdit::Normal, "zoom_object", &ok);
     if (ok && varname != "")
     {
