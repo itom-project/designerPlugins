@@ -84,6 +84,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         void setLegendPosition(LegendPosition position, bool visible);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
+		void toggleLegendLabel(QwtPlotCurve* curve, const bool state);
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
@@ -123,6 +124,7 @@ class Plot1DWidget : public ItomQwtPlot
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
         void setPickerText(const QString &coords, const QString &offsets);
+		
 
         void updatePickerStyle(void);
 
@@ -134,6 +136,7 @@ class Plot1DWidget : public ItomQwtPlot
         //void setStickOrientation(const qreal &line);
         void setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
         void setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
+
 
         void home();
 

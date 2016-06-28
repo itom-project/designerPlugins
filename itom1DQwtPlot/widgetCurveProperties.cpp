@@ -29,6 +29,7 @@
 #include "Plot1DWidget.h"
 #include "qwtPlotCurveProperty.h"
 
+
 #include "cmath"
 
 #include "limits"
@@ -40,6 +41,7 @@ WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *par
 	m_visible(false)
 {
     ui.setupUi(this);
+
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::updateCurveList()
@@ -377,6 +379,7 @@ void WidgetCurveProperties::on_comboBoxJoinStyle_currentIndexChanged(int val)
 		int row;
 		foreach(item, selection)
 		{
+
 			row = ui.listWidget->row(item);
 			m_pContent->getPlotCurveProperty().at(row)->setLineJoinStyle((Qt::PenJoinStyle)ui.comboBoxJoinStyle->currentData().toInt());
 		}
@@ -490,9 +493,12 @@ void WidgetCurveProperties::on_checkBoxVisible_stateChanged(int state)
 		foreach(item, selection)
 		{
 			row = ui.listWidget->row(item);
-			m_pContent->getPlotCurveProperty().at(row)->setVisible(state);
+			m_pContent->getplotCurveItems().at(row)->setVisible(state > 0);
+			m_pContent->toggleLegendLabel(m_pContent->getplotCurveItems().at(row), state);
 
 		}
+
+
 		m_pContent->replot();
 	}
 }

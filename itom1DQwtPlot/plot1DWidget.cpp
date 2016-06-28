@@ -664,14 +664,23 @@ void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine
         updateScaleValues(recalculateBoundaries);
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::toggleLegendLabel(QwtPlotCurve* curve, const bool state)
+{
+	if (m_pLegend)
+	{
+		QwtLegendLabel *legendLabel(qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(curve))));
+		legendLabel->setChecked(state);
+	}
 
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
 {
     if (m_pLegend)
     {
         m_pLegend->deleteLater();
-        m_pLegend = NULL;
+        m_pLegend = NULL;		
     }
 
     if (visible)
