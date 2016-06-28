@@ -51,7 +51,7 @@ private slots:
 	
 	void on_doubleSpinBoxLineWidth_valueChanged(double i);
 	void on_comboBoxLineStyle_currentIndexChanged(int val);
-	void on_checkBoxVisible_stateChanged(int state);
+	
 	void on_comboBoxBrushStyle_currentIndexChanged(int val);
 	void on_colorPickerButtonLineStyle_colorChanged(QColor color);
 	void on_comboBoxLineSymbol_currentIndexChanged(int val);
@@ -59,8 +59,10 @@ private slots:
 	void on_comboBoxJoinStyle_currentIndexChanged(int val);
 	void on_checkBoxLegendVisible_stateChanged(int val);
 	void on_listWidget_itemChanged(QListWidgetItem *item);
+	void on_checkBoxVisible_stateChanged(int state);
 
 public slots:
+	
 	void on_listWidget_itemSelectionChanged();
 	void visibilityChanged(bool visible);
 	void updateCurveList();

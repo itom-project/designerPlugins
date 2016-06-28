@@ -702,6 +702,7 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
                 maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
                 //item->setLegendIconSize(QSize(8,24));
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+				connect(legendLabel, SIGNAL(checked(bool)), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
                 if (legendLabel)
                 {
                     //the check status is again set in QwtPlotCurveProperty::setLegendVisible
