@@ -1,7 +1,7 @@
 SET (target_name itom1DQwtPlot)
 SET (figure_name itom1DQwtPlot)
 project(${target_name})
-  
+   
 cmake_minimum_required(VERSION 2.8)
 
 message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")

@@ -2367,15 +2367,6 @@ void Plot1DWidget::stateChanged(int state)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
-{
-    ito::RetVal retval;
-    
-    return retval;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::home()
 {
     QStack<QRectF> currentZoomStack = zoomer()->zoomStack();

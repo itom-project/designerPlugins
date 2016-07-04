@@ -725,19 +725,6 @@ void Itom1DQwtPlot::setLegendTitles(const QStringList &legends)
 }
 
 
-
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::plotMarkers(const ito::DataObject &coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
-{
-    return m_pContent->plotMarkers(&coords, style, id, plane);
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::deleteMarkers(int id)
-{
-    return m_pContent->deleteGeometricShape(id);
-}
-
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::AutoInterval Itom1DQwtPlot::getYAxisInterval(void) const
 { 
@@ -794,23 +781,23 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::setPicker(const QVector<double> &coords, int curveIndex /*= 0*/, bool physicalCoordinates /*= true*/)
+ito::RetVal Itom1DQwtPlot::setPicker(const QVector<double> &coordinates, int curveIndex /*= 0*/, bool physicalCoordinates /*= true*/)
 {
     if (!m_pContent)
     {
         return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initilized").toLatin1().data());
     }
-    return m_pContent->setPicker(coords, curveIndex, physicalCoordinates, false);
+    return m_pContent->setPicker(coordinates, curveIndex, physicalCoordinates, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom1DQwtPlot::appendPicker(const QVector<double> &coords, int curveIndex /*= 0*/, bool physicalCoordinates /*= true*/)
+ito::RetVal Itom1DQwtPlot::appendPicker(const QVector<double> &coordinates, int curveIndex /*= 0*/, bool physicalCoordinates /*= true*/)
 {
     if (!m_pContent)
     {
         return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initilized").toLatin1().data());
     }
-    return m_pContent->setPicker(coords, curveIndex, physicalCoordinates, true);
+    return m_pContent->setPicker(coordinates, curveIndex, physicalCoordinates, true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

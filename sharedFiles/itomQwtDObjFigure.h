@@ -90,46 +90,182 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
     
     Q_CLASSINFO("prop://enableBoxFrame", "If true, a 1px solid border is drawn as a boxed rectangle around the canvas, else no margin is visible on the upper and right side.")
-    Q_CLASSINFO("prop://buttonSet", "Set the button set used (normal or light color for dark themes).")
-    Q_CLASSINFO("prop://backgroundColor", "Set the background color.")
-    Q_CLASSINFO("prop://axisColor", "Set the color of the axis.")
-    Q_CLASSINFO("prop://textColor", "Set the color of text and tick-numbers.")
-    Q_CLASSINFO("prop://canvasColor", "Set the color of the canvas.")
+    Q_CLASSINFO("prop://buttonSet", "Get/set the button set used (normal or light color for dark themes).")
+    Q_CLASSINFO("prop://axisColor", "Get/set the color of the axis.")
+    Q_CLASSINFO("prop://textColor", "Get/set the color of text and tick-numbers.")
+    Q_CLASSINFO("prop://canvasColor", "Get/set the color of the canvas.")
+    Q_CLASSINFO("prop://backgroundColor", "Get/set the background color.")
 
-    Q_CLASSINFO("prop://keepAspectRatio", "Enable and disable a fixed 1:1 aspect ratio between x and y axis.")
-    Q_CLASSINFO("prop://geometricShapes", "Geometric shapes defined by a vector of itom.shape for each element.")
+    Q_CLASSINFO("prop://keepAspectRatio", "Enable or disable a fixed 1:1 aspect ratio between x and y axis.")
+    Q_CLASSINFO("prop://geometricShapes", "Get or set the geometric shapes on the canvas, they are set as a sequence of itom.shape for each shape.")
     Q_CLASSINFO("prop://geometricShapesCount", "Number of currently existing geometric shapes.")
-    Q_CLASSINFO("prop://geometricShapesLabelsVisible", "Toggle visibility of shape labels, the label is the name of the shape.")
-
+    Q_CLASSINFO("prop://selectedGeometricShape", "Get or set the currently highlighted geometric shape. After manipulation the last element stays selected.")
     Q_CLASSINFO("prop://geometricShapesDrawingEnabled", "Enable and disable internal plotting functions and GUI-elements for geometric elements.")
-
     Q_CLASSINFO("prop://geometryModificationModes", "Bitmask to globally change how geometric shapes can be modified. The possible modes of a shape are both restricted by the shape's flags and the allowed modes of the plot (move: 0x01, rotate: 0x02, resize: 0x04)")
     Q_CLASSINFO("prop://allowedGeometricShapes", "Combination of values of enumeration ShapeType to decide which types of geometric shapes are allowed (default: all shape types are allowed)")
-
-
-    Q_CLASSINFO("prop://selectedGeometricShape", "Get or set the currently highlighted geometric shape. After manipulation the last element stays selected.")
-    Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
+    Q_CLASSINFO("prop://geometricShapesLabelsVisible", "Toggle visibility of shape labels, the label is the name of the shape.")
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
+    Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
+
+    Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data.")
     
-    Q_CLASSINFO("slot://copyToClipBoard", "")
-    Q_CLASSINFO("slot://userInteractionStart", "")
+    Q_CLASSINFO("slot://renderToPixMap", "returns a QPixmap with the content of the plot\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "xsize : {int}\n"
+    "    width of the pixmap\n"
+    "ysize : {int}\n"
+    "    height of the pixmap\n"
+    "resolution : {int}\n"
+    "    resolution of the pixmap in dpi")
+
+    Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let the user add a certain number of geometric shapes to the canvas.\n"
+    "\n"
+    "Parameters\n"
+    "-----------\n"
+    "type : {int}\n"
+    "    type of the geometric shape the user should add (e.g. shape.Line, shape.Point, shape.Rectangle, shape.Square...\n"
+    "start : {bool}\n"
+    "    True if the interaction should be started, False if a running interaction process should be aborted\n"
+    "maxNrOfPoints : {int}\n"
+    "    number of shapes that should be added, the user can quit earlier by pressing Esc (optional, default: -1 -> infinite number of shapes)")
+
     Q_CLASSINFO("slot://clearGeometricShapes", "removes all geometric shapes from the canvas.")
-    Q_CLASSINFO("slot://deleteGeometricShape", "deletes the geometric shape with the given index. The index is thereby part of the shape object and must not always corresponds to the position in the vector of the geometricShapes property.")
-    Q_CLASSINFO("slot://setGeometricShapes", "This slot is also called by the setter function of the property 'geometricShapes'. Pass a vector of geometric shapes that replace any existing shape and will be displayed on the canvas.")
-    Q_CLASSINFO("slot://addGeometricShape", "Add another geometric shape if its index is not already available. If the index is -1 (default), the next free value >= 0 will be assigned as index to the new shape object.")
-    Q_CLASSINFO("slot://updateGeometricShape", "Updates an existing geometric shape, if the index already exists or add the given shape as new shape to the list of existing shapes.")
-    Q_CLASSINFO("slot://setGeometricElementLabel", "Set the label of geometric element with the index idx.")
-    Q_CLASSINFO("slot://setGeometricElementLabelVisible", "Set the visibility of the label of geometric element with the index idx.")
-    Q_CLASSINFO("slot://plotMarkers", "Put markers all all coordinates given by the first dataObject argument (2xN, first row: x-coordinates, second row: y-coordinates). The style of the markers is given as second argument, while an optional set name can be given as third argument. If the markers should only be displayed in one plane, give the plane index as last argument.")
-    Q_CLASSINFO("slot://deleteMarkers", "Delete all sets of markers with given name or all markers if no or an empty name is passed.")
+
+    Q_CLASSINFO("slot://deleteGeometricShape", "deletes the geometric shape with the given index.\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "idx : {int}\n"
+    "    idx is the index of the shape to be removed. This is the index of the shape instance itself and must not always correspond to the index-position of the shape within the tuple of all shapes")
+
+    Q_CLASSINFO("slot://setGeometricShapes", "This slot is the same than assigning a sequence of shape to the property 'geometricShapes'. It replaces all existing shapes by the new set of shapes.\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "geometricShapes : {seq. of shapes}\n"
+    "    Sequence (e.g tuple or list) of shapes that replace all existing shapes by this new set.")
+
+    Q_CLASSINFO("slot://addGeometricShape", "Add a new geometric shape to the canvas if no shape with the same index already exists. \n"
+    "\n"
+    "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+    "stored in the optional 'newIndex' parameter).\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "geometricShape : {shape}\n"
+    "    new geometric shape\n"
+    "\n"
+    "Raises\n"
+    "------------\n"
+    "Runtime error : \n"
+    "    if the index of the shape is != -1 and does already exist")
+
+    Q_CLASSINFO("slot://updateGeometricShape", "Updates an existing geometric shape by the new shape if the index of the shape already exists, else add the new shape to the canvas (similar to 'addGeometricShape'. \n"
+    "\n"
+    "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+    "stored in the optional 'newIndex' parameter).\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "geometricShape : {shape}\n"
+    "    new geometric shape")
+    
+    Q_CLASSINFO("slot://setGeometricShapeLabel", "Set the label of geometric shape with the index idx.\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "idx : {int}\n"
+    "    index of the shape\n"
+    "label : {str}\n"
+    "    new label of the shape")
+
+    Q_CLASSINFO("slot://setGeometricShapeLabelVisible", "Set the visibility of the label of a geometric shape with the given index.\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "idx : {int}\n"
+    "    index of the shape\n"
+    "visible : {bool}\n"
+    "    True if the label should be displayed close to the shape, else False")
+    
+    Q_CLASSINFO("slot://plotMarkers", "Draws sub-pixel wise markers to the canvas of the plot"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "coordinates : {dataObject}\n"
+    "    2xN data object with the 2D coordinates of the markers (first row: X, second row: Y coordinates in axis coordinates of the plot)\n"
+    "style : {str}\n"
+    "    Style string for the set of markers (e.g. 'r+20' for red crosses with a size of 20px)\n"
+    "id : {str}\n"
+    "    Name of the set of added markers (optional, default='')\n"
+    "plane : {int}\n"
+    "    If the dataObject has more than 2 dimensions, it is possible to add the markers to a specific plane only (optional, default=-1 -> all planes)")
+    
+    Q_CLASSINFO("slot://deleteMarkers", "Delete all sets of markers with the given id or all markers if no or an empty id is passed.\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "id : {str} \n"
+    "    name of the marker set that should be removed (optional)")
+    
     Q_CLASSINFO("slot://replot", "Force a replot which is for instance necessary if values of the displayed data object changed and you want to update the plot, too.")
 
-    Q_CLASSINFO("signal://plotItemsFinished", "Signal emitted when geometrical plotting was finished.")
-    Q_CLASSINFO("signal://userInteractionDone", "")
-    Q_CLASSINFO("signal://plotItemChanged", "")
-    Q_CLASSINFO("signal://plotItemDeleted", "")
-    Q_CLASSINFO("signal://plotItemsDeleted", "")
+    Q_CLASSINFO("signal://geometricShapeStartUserInput", "This signal is emitted whenever the plot enters a mode where the user can add a new geometric shape using the mouse\n"
+    "\n"
+    "Parameters\n"
+    "-----------\n"
+    "type : {int}\n"
+    "    Type of the shape that could be added by the user, this is one of the constants shape.Circle, shape.Ellipse, shape.Line...\n"
+    "userInteractionReason : {bool}\n"
+    "    True if the process to add a new shape has been initialized by a script-base call, False if it has been started by a button in the toolbar or menu of the plot")
+
+    Q_CLASSINFO("signal://userInteractionDone", "(int type, bool aborted, QVector<ito::Shape> shapes);")
+
+    Q_CLASSINFO("signal://geometricShapeAdded", "This signal is emitted whenever a geometric shape has been added\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "idx : {int}\n"
+    "    index of the new shape (this is the index of the second parameter 'shape')\n"
+    "shape : {shape}\n"
+    "    new shape")
+
+    Q_CLASSINFO("signal://geometricShapeChanged", "This signal is emitted whenever a geometric shape has been changed (e.g. its position or form has been changed)\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "idx : {int}\n"
+    "    index of the changed shape (this is the index of the second parameter 'shape')\n"
+    "shape : {shape}\n"
+    "    shape that has been changed")
+    
+    Q_CLASSINFO("signal://geometricShapeDeleted", "This signal is emitted whenever a geometric shape has been deleted\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "idx : {int}\n"
+    "    index of the deleted shape")
+    
+    Q_CLASSINFO("signal://geometricShapesDeleted", "This signal is emitted when the last geometric shape has been deleted or removed.")
+    
+    Q_CLASSINFO("signal://geometricShapeFinished", "This signal is emitted whenever one or multiple geometric shapes have been added, removed or modified\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "shapes : {tuple of shape}\n"
+    "    A tuple containing all shapes that have been modified\n"
+    "aborted : {bool}\n"
+    "    True if the modification process has been aborted, else False")
+    
+    Q_CLASSINFO("signal://geometricShapeCurrentChanged", "This signal is emitted whenever the currently selected geometric has been changed\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "currentShape : {shape}\n"
+    "    new current shape or an invalid shape if the current shape has been deleted and no other shape is selected now")
 
     DESIGNER_PLUGIN_ITOM_API
 
@@ -225,14 +361,14 @@ public Q_SLOTS:
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
     ito::RetVal clearGeometricShapes(void);
     ito::RetVal deleteGeometricShape(int idx);
-    ito::RetVal setGeometricShapes(QVector< ito::Shape > geometricShapes);
+    ito::RetVal setGeometricShapes(QVector<ito::Shape> geometricShapes);
     ito::RetVal addGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //add the new shape (only if its index does not already exist)
     ito::RetVal updateGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //updates the shape with the same index or add the given shape if its index does not already exist.
 
     ito::RetVal setGeometricShapeLabel(int idx, QString label);
-    ito::RetVal setGeometricShapeLabelVisible(int idx, bool setVisible);
+    ito::RetVal setGeometricShapeLabelVisible(int idx, bool visible);
 
-    ito::RetVal plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id = QString::Null(), int plane = -1);
+    ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
 
     void replot();

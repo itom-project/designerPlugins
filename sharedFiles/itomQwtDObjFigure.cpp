@@ -328,10 +328,10 @@ ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabel(int idx, QString label)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabelVisible(int idx, bool setVisible)
+ito::RetVal ItomQwtDObjFigure::setGeometricShapeLabelVisible(int idx, bool visible)
 {
     if (m_pBaseContent)
-        return m_pBaseContent->setGeometricShapeLabelVisible(idx, setVisible);
+        return m_pBaseContent->setGeometricShapeLabelVisible(idx, visible);
 
     updatePropertyDock();
 
@@ -533,11 +533,11 @@ void ItomQwtDObjFigure::setShapesLabelsVisible(const bool &visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtDObjFigure::plotMarkers(QSharedPointer< ito::DataObject > coords, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
+ito::RetVal ItomQwtDObjFigure::plotMarkers(QSharedPointer< ito::DataObject > coordinates, QString style, QString id /*= QString::Null()*/, int plane /*= -1*/)
 {
     if (m_pBaseContent)
     {
-        return m_pBaseContent->plotMarkers(coords, style, id, plane);
+        return m_pBaseContent->plotMarkers(coordinates, style, id, plane);
     }
 
     return ito::RetVal(ito::retError, 0, "content not available");
