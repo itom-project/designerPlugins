@@ -39,12 +39,14 @@
 #include <qevent.h>
 #include <qaction.h>
 #include <qmap.h>
+#include <qstring.h>
 
 #include "QVTKWidget.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkCubeAxesActor.h"
 #include "vtkCamera.h"
+#include "vtkVersion.h"
 
 #include "QPropertyEditor/QPropertyEditorWidget.h"
 
@@ -65,6 +67,10 @@
 #endif
 
 Q_DECLARE_METATYPE ( SharedItemPtr )
+
+#if QT_VERSION < 0x050000
+#define QStringLiteral QString::fromUtf8
+#endif
 
 //------------------------------------------------------------------------------------------------------------------------
 class Vtk3dVisualizerPrivate 
@@ -1795,13 +1801,18 @@ void Vtk3dVisualizer::setCubeAxesVisible(const bool &visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Vtk3dVisualizer::getCubeAxesColor() const
 {
+#if VTK_MAJOR_VERSION >= 6
     double *colors = d->cubeAxesActor->GetXAxesLinesProperty()->GetColor();
     return QColor(colors[0] * 255, colors[1] * 255, colors[2] * 255);
+#else
+    return QColor(Qt::white);
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Vtk3dVisualizer::setCubeAxesColor(const QColor &color)
 {
+#if VTK_MAJOR_VERSION >= 6
     vtkProperty *prop = d->cubeAxesActor->GetXAxesLinesProperty();
     prop->SetColor(color.redF(), color.greenF(), color.blueF());
     d->cubeAxesActor->SetXAxesLinesProperty(prop);
@@ -1823,18 +1834,24 @@ void Vtk3dVisualizer::setCubeAxesColor(const QColor &color)
 
     d->pclCanvas->update();
     updatePropertyDock();
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Vtk3dVisualizer::getCubeGridlinesColor() const
 {
+#if VTK_MAJOR_VERSION >= 6
     double *colors = d->cubeAxesActor->GetXAxesGridlinesProperty()->GetColor();
     return QColor(colors[0] * 255, colors[1] * 255, colors[2] * 255);
+#else
+    return QColor(Qt::white);
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Vtk3dVisualizer::setCubeGridlinesColor(const QColor &color)
 {
+#if VTK_MAJOR_VERSION >= 6
     vtkProperty *prop = d->cubeAxesActor->GetXAxesGridpolysProperty();
     prop->SetColor(color.redF(), color.greenF(), color.blueF());
     d->cubeAxesActor->SetXAxesGridpolysProperty(prop);
@@ -1860,6 +1877,7 @@ void Vtk3dVisualizer::setCubeGridlinesColor(const QColor &color)
     d->cubeAxesActor->SetZAxesGridlinesProperty(prop);
     d->pclCanvas->update();
     updatePropertyDock();
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1893,29 +1911,41 @@ void Vtk3dVisualizer::setCubeAxesTickLocation(const TickLocation &location)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Vtk3dVisualizer::getEnableDistanceLOD() const
 {
+#if VTK_MAJOR_VERSION >= 6
     return d->cubeAxesActor->GetEnableDistanceLOD();
+#else
+    return false;
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Vtk3dVisualizer::setEnableDistanceLOD(const bool &enable)
 {
+#if VTK_MAJOR_VERSION >= 6
     d->cubeAxesActor->SetEnableDistanceLOD(enable);
     d->pclCanvas->update();
     updatePropertyDock();
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Vtk3dVisualizer::getEnableViewAngleLOD() const
 {
+#if VTK_MAJOR_VERSION >= 6
     return d->cubeAxesActor->GetEnableViewAngleLOD();
+#else
+    return false;
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Vtk3dVisualizer::setEnableViewAngleLOD(const bool &enable)
 {
+#if VTK_MAJOR_VERSION >= 6
     d->cubeAxesActor->SetEnableViewAngleLOD(enable);
     d->pclCanvas->update();
     updatePropertyDock();
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
