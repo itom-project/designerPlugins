@@ -51,11 +51,37 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
     Q_CLASSINFO("prop://forceWindowResize", "If set, the plot widget / area is resized to the desired sizes given by matplotlib. Uncheck this option, if you want to keep the canvas unchanged e.g. in an user-defined GUI")
     Q_CLASSINFO("prop://keepSizeFixed", "If you want to control the size of the canvas by python / matplotlib (e.g. set_size_inches), set this to true. The canvas will then have a fixed size, that is not affected by the window size.")
     
-    Q_CLASSINFO("slot://showSubplotConfig", "")
-    Q_CLASSINFO("slot://setLabelText", "")
+    Q_CLASSINFO("slot://showSubplotConfig", "displays the subplot configuration dialog.\n"
+    "\n"
+    "This slot must usually not be used, since the dialog can be opened by the toolbar.\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "left : {float}\n"
+    "    left border of the current subplot configuration.\n"
+    "top : {float}\n"
+    "    top border of the current subplot configuration.\n"
+    "right : {float}\n"
+    "    right border of the current subplot configuration.\n"
+    "bottom : {float}\n"
+    "    bottom border of the current subplot configuration.\n"
+    "wSpace : {float}\n"
+    "    horizontal space between every subplot of the current configuration.\n"
+    "hSpace : {float}\n"
+    "    vertical space between every subplot of the current configuration.")
+
+    Q_CLASSINFO("slot://setLabelText", "displays a text in the toolbar\n"
+    "\n"
+    "The text is displayed in the label that is usually used for coordinates of the mouse cursor....\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "text : {str}\n"
+    "    text to display")
+
     Q_CLASSINFO("slot://replot", "forces a replot of the plot")
 
-    Q_CLASSINFO("signal://subplotConfigSliderChanged", "")
+    Q_CLASSINFO("signal://subplotConfigSliderChanged", "interal use between MatplotlibPlot and the subplot configuration dialog.")
 
     DESIGNER_PLUGIN_ITOM_API
 public:
@@ -113,7 +139,7 @@ private slots:
     void resetFixedSize();
 
 public slots:
-    void showSubplotConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace);
+    void showSubplotConfig(float left, float top, float right, float bottom, float wSpace, float hSpace);
     void setLabelText(QString text) { m_lblCoordinates->setText(text); }
     void replot();
 

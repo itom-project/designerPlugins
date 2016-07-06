@@ -160,7 +160,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     "\n"
     "Raises\n"
     "------------\n"
-    "Runtime error : \n"
+    "RuntimeError\n"
     "    if the index of the shape is != -1 and does already exist")
 
     Q_CLASSINFO("slot://updateGeometricShape", "Updates an existing geometric shape by the new shape if the index of the shape already exists, else add the new shape to the canvas (similar to 'addGeometricShape'. \n"
@@ -191,7 +191,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     "visible : {bool}\n"
     "    True if the label should be displayed close to the shape, else False")
     
-    Q_CLASSINFO("slot://plotMarkers", "Draws sub-pixel wise markers to the canvas of the plot"
+    Q_CLASSINFO("slot://plotMarkers", "Draws sub-pixel wise markers to the canvas of the plot\n"
     "\n"
     "Parameters\n"
     "------------\n"
