@@ -222,7 +222,18 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     "userInteractionReason : {bool}\n"
     "    True if the process to add a new shape has been initialized by a script-base call, False if it has been started by a button in the toolbar or menu of the plot")
 
-    Q_CLASSINFO("signal://userInteractionDone", "(int type, bool aborted, QVector<ito::Shape> shapes);")
+    Q_CLASSINFO("signal://userInteractionDone", "This signal is emitted if the user finished adding the requested number of shapes or aborted the process by pressing the Esc key\n"
+    "\n"
+    "This signal is only emitted if the user interaction has been started by the slot *userInteractionStart* or by plotItem.drawAndPickElements.\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "type : {int}\n"
+    "    type of the shapes that have been recently added (e.g. shape.Line, shape.Point, shape.Rectangle, ...)\n"
+    "aborted : {bool}\n"
+    "    True if the user aborted the process by pressing the Esc key before having added the total number of requested shapes"
+    "shapes : {list of shape}\n"
+    "    list of shapes that have been added.")
 
     Q_CLASSINFO("signal://geometricShapeAdded", "This signal is emitted whenever a geometric shape has been added\n"
     "\n"
