@@ -24,11 +24,11 @@ ELSE(BUILD_SHARED_LIBS)
     SET(LIBRARY_TYPE STATIC)
 ENDIF(BUILD_SHARED_LIBS)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 
 if (ITOM_SDK_PCL_SUPPORT) #this comes from itom_sdk.cmake, describing the build configuration of itom
-    find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud REQUIRED)
+    find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud itomCommonPlotLib REQUIRED)
 endif (ITOM_SDK_PCL_SUPPORT)
 
 FIND_PACKAGE_QT(ON Core Widgets Designer Xml Svg UiTools OpenGL LinguistTools)

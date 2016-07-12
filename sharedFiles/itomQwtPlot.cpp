@@ -926,7 +926,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
         char hitType;
         bool currentShapeFound = false;
 
-        QHash<int, DrawItem*>::iterator it;
+        QMap<int, DrawItem*>::iterator it;
         for (it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
         {
             if (it.value() == NULL)
@@ -1093,7 +1093,7 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
     {
         //modification of shape finished
         event->accept();
-        QHash<int, DrawItem*>::iterator it = m_pShapes.begin();
+        QMap<int, DrawItem*>::iterator it = m_pShapes.begin();
         bool found = false;
         QVector<ito::Shape> shapes;
 
@@ -1205,7 +1205,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 }
 
                 /*unselect all existing shapes before adding the new one*/
-                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                for (QMap<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
                 {
                     if (it.value() == NULL)
                     {
@@ -1294,7 +1294,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 }
 
                 /*unselect all existing shapes before adding the new one*/
-                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                for (QMap<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
                 {
                     if (it.value() == NULL)
                     {
@@ -1377,7 +1377,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 }
 
                 /*unselect all existing shapes before adding the new one*/
-                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                for (QMap<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
                 {
                     if (it.value() == NULL)
                     {
@@ -1460,7 +1460,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 }
 
                 /*unselect all existing shapes before adding the new one*/
-                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                for (QMap<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
                 {
                     if (it.value() == NULL)
                     {
@@ -1539,7 +1539,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 }
 
                 /*unselect all existing shapes before adding the new one*/
-                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                for (QMap<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
                 {
                     if (it.value() == NULL)
                     {
@@ -1622,7 +1622,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                 }
 
                 /*unselect all existing shapes before adding the new one*/
-                for (QHash<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+                for (QMap<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
                 {
                     if (it.value() == NULL)
                     {
@@ -1941,7 +1941,7 @@ void ItomQwtPlot::clearAllGeometricShapes()
     }
 
     //delete all geometric shapes and marker sets
-    QHashIterator<int, DrawItem *> i(m_pShapes);
+    QMapIterator<int, DrawItem *> i(m_pShapes);
     while (i.hasNext())
     {
         i.next();
@@ -2036,7 +2036,7 @@ ito::RetVal ItomQwtPlot::deleteGeometricShape(const int idx)
 //----------------------------------------------------------------------------------------------------------------------------------
 int ItomQwtPlot::getSelectedGeometricShapeIdx() const
 {
-    QHash<int, DrawItem*>::const_iterator it;
+    QMap<int, DrawItem*>::const_iterator it;
     for (it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
     {
         if (it.value() != NULL && it.value()->getSelected() != 0)
@@ -2053,7 +2053,7 @@ void ItomQwtPlot::setSelectedGeometricShapeIdx(int idx)
 {
     bool do_replot = false;
     bool failed = idx == -1 ? false : true;
-    QHash<int, DrawItem*>::const_iterator it = m_pShapes.begin();
+    QMap<int, DrawItem*>::const_iterator it = m_pShapes.begin();
     for (; it != m_pShapes.end(); ++it)
     {
         if (it.value() != NULL && it.value()->getIndex() == idx)
@@ -2348,9 +2348,9 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
                 retVal += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
                 break;
             }
-
-            replot();
         }
+
+        replot();
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
@@ -2373,7 +2373,7 @@ QVector<ito::Shape> ItomQwtPlot::getGeometricShapes()
 {
     QVector<ito::Shape> shapes;
     shapes.reserve(m_pShapes.size());
-    QHash<int, DrawItem*>::Iterator it = m_pShapes.begin();
+    QMap<int, DrawItem*>::Iterator it = m_pShapes.begin();
 
     for (; it != m_pShapes.end(); it++)
     {
