@@ -24,6 +24,7 @@
 #define WIDGETCURVEPROPERTIES
 
 #include <qwidget.h>
+#include <qlistwidget.h>
 
 #include "ui_widgetCurveProperties.h"
 

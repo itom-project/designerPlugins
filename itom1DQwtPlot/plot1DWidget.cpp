@@ -798,7 +798,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
         }
         else
         {
-            item->setTitle("");
+			item->setTitle(tr("curve %1").arg(index));
         }
     }
     replot();
