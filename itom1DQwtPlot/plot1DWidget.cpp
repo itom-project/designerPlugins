@@ -228,7 +228,10 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuView->addMenu(m_pMnuCmplxSwitch);
     menuView->addSeparator();
     menuView->addAction(m_pActProperties);
-    m_menus.append(menuView);
+	QAction *actCurveProperties = new QAction("Curve Properties", menuView);// this instance is created here because it is only needed for the 1DQWT Plot
+	menuView->addAction(actCurveProperties);
+	connect(actCurveProperties, SIGNAL(triggered()), (Itom1DQwtPlot*)(this->parent()), SLOT(showCurveProperties()));
+	m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
     menuTools->addAction(m_pActPicker);

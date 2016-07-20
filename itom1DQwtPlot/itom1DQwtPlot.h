@@ -291,7 +291,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
         QVariant getCurveProperty(int index, const QByteArray &property);
-        
+
+		void showCurveProperties();
+
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
     private slots:

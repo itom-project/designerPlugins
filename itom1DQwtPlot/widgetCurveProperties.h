@@ -52,7 +52,6 @@ private slots:
 	void on_doubleSpinBoxLineWidth_valueChanged(double i);
 	void on_comboBoxLineStyle_currentIndexChanged(int val);
 	
-	void on_comboBoxBrushStyle_currentIndexChanged(int val);
 	void on_colorPickerButtonLineStyle_colorChanged(QColor color);
 	void on_comboBoxLineSymbol_currentIndexChanged(int val);
 	void on_comboBoxCapStyle_currentIndexChanged(int val);

@@ -77,12 +77,6 @@ void WidgetCurveProperties::updateProperties()
 			ui.comboBoxLineStyle->addItem(me.key(i), QVariant()); //add penStyles
 		}
 
-		const QMetaObject *moBrushStyle = qt_getEnumMetaObject(Qt::BrushStyle::NoBrush);
-		QMetaEnum meBrushStyle = moBrushStyle->enumerator(moBrushStyle->indexOfEnumerator("BrushStyle"));
-		for (i = 0; i < meBrushStyle.keyCount(); ++i)
-		{
-			ui.comboBoxBrushStyle->addItem(meBrushStyle.key(i), QVariant());//addBrushStyles
-		}
 		const QMetaObject moLineSymbol(Itom1DQwtPlot::staticMetaObject);
 		QMetaEnum meLineSymbol = moLineSymbol.enumerator(moLineSymbol.indexOfEnumerator("Symbol"));
 		for (i = 0; i < meLineSymbol.keyCount(); ++i)
@@ -118,7 +112,6 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	bool constWidth = true;// if the current selection does not have the same linewidth at all, than constWidth will be set to false in the following
 	bool constLineStyle = true;// if the current selection does not have the same linestyle at all, than constWidth will be set to false in the following
 	bool constVisible = true;// if the current selection does not have the same visibility at all, than constWidth will be set to false in the following
-	bool constBrushStyle = true;// if the current selection does not have the same baseline at all, than constWidth will be set to false in the following
 	bool constLineColor = true;// if the current selection does not have the same lineColor at all, than constWidth will be set to false in the following
 	bool constLineSymbol = true;// if the current selection does not have the same lineSymbol at all, than constWidth will be set to false in the following
 	bool constSymbolSize = true;// if the current selection does not have the same symbolSize at all, than constWidth will be set to false in the following
@@ -129,7 +122,6 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	bool first = true; //marks the first line witch is checked 
 	float width;
 	Qt::PenStyle lineStyle;
-	Qt::BrushStyle brushStyle;
 	QColor lineColor;
 	bool visible;
 	QwtSymbol::Style lineSymbol;
@@ -158,10 +150,6 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			if (m_pContent->getplotCurveItems().at(row)->isVisible() != visible)
 			{
 				constVisible = false;
-			}
-			if ( brushStyle != m_pContent->getplotCurveItems().at(row)->brush().style())
-			{
-				constBrushStyle = false;
 			}
 			if (!lineColor.operator==(pen.color()))
 			{
@@ -220,7 +208,6 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		width = pen.widthF();
 		lineStyle = pen.style();
 		visible = m_pContent->getplotCurveItems().at(row)->isVisible();
-		brushStyle = m_pContent->getplotCurveItems().at(row)->brush().style();
 		lineColor = pen.color();
 		first = false; //set to false after first for iteration
 	}
@@ -257,14 +244,6 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		else
 		{
 			ui.checkBoxVisible->setCheckState(Qt::Unchecked);
-		}
-		if (constBrushStyle)
-		{
-			ui.comboBoxBrushStyle->setCurrentIndex((int)m_pContent->getplotCurveItems().at(row)->brush().style());
-		}
-		else
-		{
-			ui.comboBoxBrushStyle->setCurrentIndex(-1);
 		}
 		if (constLineColor)
 		{
@@ -452,31 +431,6 @@ void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val)
 		{
 			row = ui.listWidget->row(item);
 			m_pContent->getPlotCurveProperty().at(row)->setLineSymbolStyle((Itom1DQwtPlot::Symbol)(enumValue));
-		}
-		m_pContent->replot();
-	}
-}
-//-----------------------------------------------------------------------------------------------
-void WidgetCurveProperties::on_comboBoxBrushStyle_currentIndexChanged(int val)
-{
-	if (!m_isUpdating)
-	{
-		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
-		QListWidgetItem* item;
-		int row;
-		QBrush brush;
-		foreach(item, selection)
-		{
-
-			row = ui.listWidget->row(item);
-			brush = m_pContent->getplotCurveItems().at(row)->brush();
-			brush.setStyle((Qt::BrushStyle)val);
-			brush.setColor(QColor(Qt::black));
-			m_pContent->getplotCurveItems().at(row)->setBrush(brush);
-
-
-
-
 		}
 		m_pContent->replot();
 	}

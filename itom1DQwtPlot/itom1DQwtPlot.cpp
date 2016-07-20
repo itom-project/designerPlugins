@@ -142,6 +142,7 @@ QWidget* Itom1DQwtPlot::getWidgetCurveProperties()
 {
 	return (QWidget*)(d->m_pLinePropertyWidget);
 }
+//----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::MultiLineMode Itom1DQwtPlot::getRowPresentation(void) const
 {
     return d->m_pData->m_multiLine;
@@ -1063,4 +1064,9 @@ QVariant Itom1DQwtPlot::getCurveProperty(int index, const QByteArray &property)
     }
 
     return QVariant();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::showCurveProperties()
+{
+	d->m_pLinePropertiesDock->show();
 }
