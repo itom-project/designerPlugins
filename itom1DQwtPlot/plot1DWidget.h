@@ -77,8 +77,6 @@ class Plot1DWidget : public ItomQwtPlot
 
         void setMainPickersToIndex(int idx1, int idx2, int curveIdx);
 
-        ito::RetVal plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane);
-
         ito::RetVal setPicker(const QVector<double> &coords, int curveIndex = 0, bool physNotPix = true, bool append = false);
         ito::RetVal clearPicker(int id = -1, bool doReplot = true);
 

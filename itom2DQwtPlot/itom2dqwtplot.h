@@ -85,9 +85,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://titleFont", "Font for title.")
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
-    Q_CLASSINFO("prop://showCenterMarker", "Enable a marker for the center of a data object.")
+    Q_CLASSINFO("prop://showCenterMarker", "Shows or hides a marker for the center of a data object.")
 
-    Q_CLASSINFO("prop://overlayImage", "Set an overlay which is shown as a black&white image.")
+    Q_CLASSINFO("prop://overlayImage", "Set an overlay dataObject which is shown above the main dataObject and whose opacity (see 'overlayAlpha') can be controlled by a slider in the toolbar. Assign None to remove the overlay object.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
 
@@ -97,14 +97,28 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
 
-    Q_CLASSINFO("prop://lineCutPlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for lateral slicing.")
-    Q_CLASSINFO("prop://zSlicePlotItem", "Set/Get the ui-Handle of the current line plot respective the destination line plot for z slicing.")
+    Q_CLASSINFO("prop://lineCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for lateral slicing. The 'uiItem' can be savely cast to 'plotItem'.")
+    Q_CLASSINFO("prop://zSlicePlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for z slicing. The 'uiItem' can be savely cast to 'plotItem'.")
       
-    //Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")
-    Q_CLASSINFO("slot://getDisplayed", "")  
-    Q_CLASSINFO("slot://getDisplayedLineCut", "")
-    Q_CLASSINFO("slot://setLinePlot", "")
-    Q_CLASSINFO("slot://removeOverlayImage", "")
+    Q_CLASSINFO("slot://getDisplayed", "returns the currently displayed dataObject.")
+    Q_CLASSINFO("slot://getDisplayedLineCut", "returns the currently displayed line cut dataObject")
+
+    Q_CLASSINFO("slot://setLinePlot", "displays a line cut plot with the given bounds.\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "x0 : {int}\n"
+    "    x-coordinate (physical units) of the first end point of the line cut.\n"
+    "y0 : {int}\n"
+    "    y-coordinate (physical units) of the first end point of the line cut.\n"
+    "x1 : {int}\n"
+    "    x-coordinate (physical units) of the first end point of the line cut.\n"
+    "y1 : {int}\n"
+    "    y-coordinate (physical units) of the second end point of the line cut.\n"
+    "destID : {int}\n"
+    "    optional and unused")
+
+    Q_CLASSINFO("slot://removeOverlayImage", "removes an overlay image. This is the same than assigning 'None' to the property 'overlayImage'")
 
 public:
     Itom2dQwtPlot(QWidget *parent = 0);

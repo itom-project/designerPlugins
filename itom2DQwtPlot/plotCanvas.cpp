@@ -22,10 +22,10 @@
 
 #include "plotCanvas.h"
 #include "common/sharedStructuresGraphics.h"
-#include "DataObject/dataObjectFuncs.h"
 #include "common/numeric.h"
 #include "common/apiFunctionsGraphInc.h"
 #include "common/apiFunctionsInc.h"
+#include "DataObject/dataObjectFuncs.h"
 
 #include "dataObjRasterData.h"
 #include "itom2dqwtplot.h"

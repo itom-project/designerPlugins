@@ -31,12 +31,12 @@
 Itom2dQwtPlotPlugin::Itom2dQwtPlotPlugin(QObject *parent)
     : ito::AbstractItomDesignerPlugin(parent)
 {
-    m_plotDataFormats = ito::Format_Gray8 | ito::Format_Gray16 | ito::Format_Gray32 | ito::Format_Float32 | ito::Format_Float64 | ito::Format_Complex;
+    m_plotDataFormats = ito::Format_Gray8 | ito::Format_Gray16 | ito::Format_Gray32 | ito::Format_Float32 | ito::Format_Float64 | ito::Format_Complex | ito::Format_ARGB32 | ito::Format_RGB32;
     m_plotDataTypes = ito::DataObjPlane | ito::DataObjLine;
     m_plotFeatures = ito::Static | ito::Live | ito::PlotImage | ito::PlotLine | ito::Cartesian;
 
     m_description = QObject::tr("itom widget for 2D-visualisation of 2D/3D dataObjects based on Qwt.");
-    m_detaildescription = QObject::tr("This designer plugin is an itom widget for image-like visualisation of dataObjects and live images. This widget is based in part on the work of the Qwt project (http://qwt.sf.net).");
+    m_detaildescription = QObject::tr("This designer plugin is an itom widget for image-like visualisation of dataObjects and live images. This widget is based on the Qwt framework (http://qwt.sf.net).");
     m_author = "Marc Gronle, Wolfram Lyda, Christian Kohler, ITO, University Stuttgart";
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL, for Qwt see Qwt License");   

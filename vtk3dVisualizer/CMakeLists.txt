@@ -4,6 +4,8 @@ project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
 
+message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")
+
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
@@ -22,11 +24,12 @@ ENDIF(BUILD_SHARED_LIBS)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud qpropertyeditor REQUIRED)
+
+include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 
 IF(ITOM_SDK_PCL_SUPPORT)
+    find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib pointcloud qpropertyeditor REQUIRED)
     
-    include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
     FIND_PACKAGE_QT(ON Core Widgets LinguistTools Designer OpenGL)
 
     #SET(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
@@ -95,7 +98,7 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
         set(plugin_RCC
             ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
-			${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.qrc
+            ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.qrc
         )
 
         set(plugin_SOURCES 
@@ -169,5 +172,5 @@ IF(ITOM_SDK_PCL_SUPPORT)
     ENDIF(EXISTS ${VTK_DIR})
 
 ELSE(ITOM_SDK_PCL_SUPPORT)
-    message(FATAL "${target_name} will not be build since itom has been compiled without PCL support")
+    message(WARNING "${target_name} will not be build since itom has been compiled without PCL support")
 ENDIF(ITOM_SDK_PCL_SUPPORT)

@@ -4,6 +4,8 @@ project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
 
+message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")
+
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
@@ -22,7 +24,7 @@ ENDIF(BUILD_SHARED_LIBS)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 FIND_PACKAGE_QT(ON Core Widgets Xml Designer LinguistTools)
 

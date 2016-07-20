@@ -308,7 +308,8 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         // first check if we have left over relations and remove them
         for (int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
         {
-            if (!keys.contains(m_pData->m_relationsList[rel].firstElementIdx) || !keys.contains(m_pData->m_relationsList[rel].secondElementIdx))
+            if (!keys.contains(m_pData->m_relationsList[rel].firstElementIdx) 
+                || (m_pData->m_relationsList[rel].secondElementIdx != -1) && !keys.contains(m_pData->m_relationsList[rel].secondElementIdx))
             {
                 m_pData->m_relationsList.remove(rel);
             }

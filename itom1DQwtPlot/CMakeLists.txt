@@ -1,8 +1,10 @@
 SET (target_name itom1DQwtPlot)
 SET (figure_name itom1DQwtPlot)
 project(${target_name})
- 
+   
 cmake_minimum_required(VERSION 2.8)
+
+message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
@@ -22,7 +24,7 @@ ENDIF(BUILD_SHARED_LIBS)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomWidgets itomShapeLib REQUIRED)
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib itomWidgets itomShapeLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 FIND_PACKAGE_QT(ON Core Widgets Xml Designer PrintSupport Svg LinguistTools PrintSupport)
 

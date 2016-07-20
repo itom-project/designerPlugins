@@ -444,7 +444,7 @@ QPointF DrawItem::getMarkerPosScale(int index) const
 //----------------------------------------------------------------------------------------------------------------------------------
 bool DrawItem::shapeMoveTo(const QPointF &marker1ScaleCoordinate)
 {
-    bool moveable = !(d->m_shape.flags() & ito::Shape::MoveLock);
+    bool moveable = !(d->m_shape.flags() & ito::Shape::MoveLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Move);
     if (moveable)
     {
         d->m_shape.point1MoveTo(marker1ScaleCoordinate);
@@ -457,8 +457,8 @@ bool DrawItem::shapeMoveTo(const QPointF &marker1ScaleCoordinate)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers /*= Qt::NoModifier*/)
 {
-    bool resizable = !(d->m_shape.flags() & ito::Shape::ResizeLock);
-    if (resizable)
+    bool resizeable = !(d->m_shape.flags() & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
+    if (resizeable)
     {
         const QTransform &trafo = d->m_shape.rtransform();
         QTransform invTrafo = trafo.inverted();

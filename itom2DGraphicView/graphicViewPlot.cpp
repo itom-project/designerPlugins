@@ -29,7 +29,7 @@
 
 //#include <GV_plot_renderer.h>
 
-#include "DataObject/dataObjectFuncs.h"
+#include "common/numeric.h"
 
 #include "dialog2DScale.h"
 

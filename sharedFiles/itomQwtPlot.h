@@ -210,7 +210,7 @@ private:
     UserInteractionPlotPicker *m_pMultiPointPicker;
 
     //geometric shapes
-    QHash<int, DrawItem *> m_pShapes; /*!< hash table with all geometric shapes (besides marker sets) currently displayed */
+    QMap<int, DrawItem *> m_pShapes; /*!< map table with all geometric shapes (besides marker sets) currently displayed (lookup is sorted by the integer index) */
     DrawItem *m_selectedShape;
     char m_selectedShapeHitType; /*!< 0: edge only, 1..8 marker number */
     QPointF m_startMouseScale; /*!< position of mouse click on mousePressEvent based on scale coordinate system */
@@ -231,6 +231,7 @@ private:
     bool m_markerLabelVisible;
 
     bool m_ignoreNextMouseEvent; //todo: what is this?
+    bool m_shapeModifiedByMouseMove;
     QColor m_inverseColor0;
     QColor m_inverseColor1;
 

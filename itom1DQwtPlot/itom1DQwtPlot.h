@@ -94,10 +94,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://titleFont", "Font for title.")
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
-    Q_CLASSINFO("prop://grid", "enables/disables a grid.")
+    Q_CLASSINFO("prop://grid", "Style of the grid ('GridNo', 'GridMajorXY', 'GridMajorX', 'GridMajorY', 'GridMinorXY', 'GridMinorX', 'GridMinorY').")
 
-    Q_CLASSINFO("prop://lineWidth", "width of lines in pixel.")
-    Q_CLASSINFO("prop://lineStyle", "style of lines.")
+    Q_CLASSINFO("prop://lineWidth", "width of all curves in pixel.")
+    Q_CLASSINFO("prop://lineStyle", "style of all lines.")
     Q_CLASSINFO("prop://curveStyle", "set the style of the qwt-plot according to curve styles.")
 
     Q_CLASSINFO("prop://fillCurve", "fill curve below / above or according to baseline.")
@@ -107,33 +107,91 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://lineSymbol", "Get / Set the current line symbol type")
     Q_CLASSINFO("prop://lineSymbolSize", "Get / Set the current line symbol size")
 
-    Q_CLASSINFO("prop://baseLine", "the baseline/reference for the curveStyle::sticks mode.")
-    //Q_CLASSINFO("prop://stickOrientation", "the orientation for the curveStyle::sticks mode.")
+    Q_CLASSINFO("prop://baseLine", "the position of the baseline if curveStyle is set to 'Sticks', 'SticksVertical' or 'SticksHorizontal'.")
 
     Q_CLASSINFO("prop://columnInterpretation", "Define the interpretation of M x N objects as Auto, FirstRow, FirstCol, MultiRows, MultiCols.")
-    
+
     Q_CLASSINFO("prop://pickerLimit", "Define the maximal number of picker for this plot.")
     Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
     Q_CLASSINFO("prop://picker", "Get picker defined by a Mx4 float32 data object. Each row represents one picker and contains the following information: [pixelIndex, physIndex, value, curveIndex]. PixelIndex and physIndex are equal if axisScale = 1 and axisOffset = 0 for the corresponding dataObject.")
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
-    Q_CLASSINFO("prop://legendTitles", "Stringlist with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the data object is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
+    Q_CLASSINFO("prop://legendTitles", "Seq. of strings with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the data object is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
 
-    Q_CLASSINFO("prop://pickerLabelVisible", "Enable and disable the picker label.")
-    Q_CLASSINFO("prop://pickerLabelOrientation", "Get / Set label orintation for the picker-label.")
-    Q_CLASSINFO("prop://pickerLabelAlignment", "Get / Set label alignment for the picker-label.")
-    Q_CLASSINFO("prop://pickerType", "Get / Set the current picker type")
+    Q_CLASSINFO("prop://pickerLabelVisible", "Enable and disable the labels next to each picker.")
+    Q_CLASSINFO("prop://pickerLabelOrientation", "Get / set the label orientation for the picker labels.")
+    Q_CLASSINFO("prop://pickerLabelAlignment", "Get / set label alignment for the picker labels.")
+    Q_CLASSINFO("prop://pickerType", "Get / set the current picker type ('DefaultMarker', 'RangeMarker', 'ValueRangeMarker', 'AxisRangeMarker')")
 
     Q_CLASSINFO("prop://valueScale", "linear or logarithmic scale (various bases) can be chosen for the vertical axis (y-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
 
-    Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical or in pixel coordinates. The coordinates are the axis positions only, the values are chosen from the curve values. Existing pickers are deleted at first.")
-    Q_CLASSINFO("slot://appendPicker", "Append plot pickers to a specific curve either in physical or in pixel coordinates. The coordinates are the axis positions only, the values are chosen from the curve values.")
-    Q_CLASSINFO("slot://plotMarkers", "Plot markers.")
-    Q_CLASSINFO("slot://deleteMarkers", "Delete a specific marker")  
-    Q_CLASSINFO("slot://deletePicker", "Delete a specific (id >= 0) or all pickers (id = -1)")
+    Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical (axis) or in pixel coordinates.\n"
+    "\n"
+    "The pixel coordinates are the pixels of the currently displayed dataObject. The coordinates are the axis positions only, \n"
+    "the values are chosen from the curve values. Existing pickers are deleted at first.\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "coordinates : {seq. of float}\n"
+    "    x-coordinates of each picker, the y-coordinate is automatically chosen from the shape of the curve. If the size of the sequence exceeds the 'pickerLimit', a RuntimeError is thrown."
+    "curveIndex : {int}\n"
+    "    index of the curve where the pickers should be attached to (optional, default: 0 - first curve)\n"
+    "physicalCoordinates : {bool}\n"
+    "    optional, if True (default), 'coordinates' are given in axis coordinates of the plot (hence, physical coordinates of the dataObject; False: 'coordinates' are given in pixel coordinates of the dataObject")
+
+    Q_CLASSINFO("slot://appendPicker", "Append plot pickers to a specific curve either in physical (axis) or in pixel coordinates.\n"
+    "\n"
+    "The pixel coordinates are the pixels of the currently displayed dataObject. The coordinates are the axis positions only, \n"
+    "the values are chosen from the curve values. Existing pickers are not removed before this operation.\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "coordinates : {seq. of float}\n"
+    "    x-coordinates of each picker, the y-coordinate is automatically chosen from the shape of the curve. If the size of the sequence plus the number of existing pickers exceed the 'pickerLimit', a RuntimeError is thrown."
+    "curveIndex : {int}\n"
+    "    index of the curve where the pickers should be attached to (optional, default: 0 - first curve)\n"
+    "physicalCoordinates : {bool}\n"
+    "    optional, if True (default), 'coordinates' are given in axis coordinates of the plot (hence, physical coordinates of the dataObject; False: 'coordinates' are given in pixel coordinates of the dataObject")
+
+    Q_CLASSINFO("slot://deletePicker", "Delete the i-th picker (id >= 0) or all pickers (id = -1)\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "id : {int}\n"
+    "    zero-based index of the picker to be deleted, or -1 if all pickers should be deleted (default). This parameter is optional.")
+
+    Q_CLASSINFO("slot://setCurveProperty", "Set a property of a specific curve\n"
+    "\n"
+    "Some curve properties can be changed globally for all curves using the global properties. However, it is also possible to\n"
+    "set a property to different values for each curve.\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "index : {int}\n"
+    "    zero-based index of the curve whose property should be changed.\n"
+    "property : {str}\n"
+    "    name of the property to be changed\n"
+    "value : {various}\n"
+    "    value of the property")
+
+    Q_CLASSINFO("slot://getCurveProperty", "Get a property of a specific curve\n"
+    "\n"
+    "Get the value of a property of a specific curve (see slot 'setCurveProperty').\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "index : {int}\n"
+    "    zero-based index of the curve whose property should be changed.\n"
+    "property : {str}\n"
+    "    name of the property to be changed\n"
+    "\n"
+    "Returns\n"
+    "-------------\n"
+    "value : {variant}\n"
+    "    value of the requested property")
     
-    Q_CLASSINFO("slot://getDisplayed", "")
+    Q_CLASSINFO("slot://getDisplayed", "returns the currently displayed dataObject.")
 
     public:
         Itom1DQwtPlot(QWidget *parent = 0);
@@ -282,12 +340,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         Itom1DQwtPlotPrivate *d;
 
     public slots:
-        ito::RetVal setPicker(const QVector<double> &coords, int curveIndex = 0, bool physicalCoordinates = true);
-        ito::RetVal appendPicker(const QVector<double> &coords, int curveIndex = 0, bool physicalCoordinates = true);
+        ito::RetVal setPicker(const QVector<double> &coordinates, int curveIndex = 0, bool physicalCoordinates = true);
+        ito::RetVal appendPicker(const QVector<double> &coordinates, int curveIndex = 0, bool physicalCoordinates = true);
         ito::RetVal deletePicker(int id = -1);
-
-        ito::RetVal plotMarkers(const ito::DataObject &coords, QString style, QString id = QString::Null(), int plane = -1);
-        ito::RetVal deleteMarkers(int id);
 
         ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
         QVariant getCurveProperty(int index, const QByteArray &property);

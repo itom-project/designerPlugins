@@ -2397,15 +2397,6 @@ void Plot1DWidget::stateChanged(int state)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::plotMarkers(const ito::DataObject *coords, QString style, QString id, int plane)
-{
-    ito::RetVal retval;
-    
-    return retval;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::home()
 {
     QStack<QRectF> currentZoomStack = zoomer()->zoomStack();
@@ -2820,7 +2811,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
         double lengthPhys = seriesData->sample(lastIdx).x() - seriesData->sample(firstIdx).x();
         size_t lengthPx = lastIdx - firstIdx;
 
-        displayed = new ito::DataObject((int)m_plotCurveItems.size(), lastIdx - firstIdx + 1, type);
+        displayed = new ito::DataObject((int)m_plotCurveItems.size(), lengthPx + 1, type);
 
         std::string descr, unit;
         seriesData->getDObjValueDescriptionAndUnit(descr, unit);
