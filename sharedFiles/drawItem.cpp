@@ -482,7 +482,7 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
                 }
                 else if (markerIdx == 2)
                 {
-                    QLineF line(newPoint, basePoints[0]);
+                    QLineF line(basePoints[0], newPoint);
                     double angle = 45.0 * qRound(line.angle() / 45.0);
                     line.setAngle(angle);
                     basePoints[1] = line.p2();

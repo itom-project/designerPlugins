@@ -923,11 +923,29 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
         double tol_x = std::abs(invTransform(QwtPlot::xBottom, 15) - invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
         double tol_y = std::abs(invTransform(QwtPlot::yLeft, 15) - invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
         ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
-        char hitType;
+        char hitType = -1; //not hit
         bool currentShapeFound = false;
 
-        QMap<int, DrawItem*>::iterator it;
-        for (it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+        //at first check if the currently selected item is hit: If so, take this; else take any other item
+        QMap<int, DrawItem*>::iterator it = m_pShapes.begin();
+        if (m_selectedShape)
+        {
+            for (it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+            {
+                if (it.value() == m_selectedShape)
+                {
+                    hitType = it.value()->hitEdge(scalePos, tol_x, tol_y);
+                    break;
+                }
+            }
+        }
+
+        if (hitType == -1) //current shape is not hit, reset it to begin()
+        {
+            it = m_pShapes.begin();
+        }
+        
+        for (; it != m_pShapes.end(); ++it)
         {
             if (it.value() == NULL)
             {
@@ -961,7 +979,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                 {
                     m_startMouseScaleDiff = m_startMouseScale - m_selectedShape->getMarkerPosScale(hitType - 1);
                 }
-                ++it;
+                ++it; //such that the following for loop does not affect the newly selected item.
                 break;
             }
             else
