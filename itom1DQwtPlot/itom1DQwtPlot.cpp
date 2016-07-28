@@ -1041,3 +1041,23 @@ QVariant Itom1DQwtPlot::getCurveProperty(int index, const QByteArray &property)
 
     return QVariant();
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool Itom1DQwtPlot::getAntiAliased() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->getAntiAliased();
+    }
+    return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setAntiAliased(bool &antiAliased)
+{
+    if (m_pContent)
+    {
+        m_pContent->setAntiAliased(antiAliased);
+    }
+    updatePropertyDock();
+}

@@ -100,6 +100,9 @@ class Plot1DWidget : public ItomQwtPlot
         void setPickerLimit(int limit);
         QSharedPointer< ito::DataObject > getPlotPicker() const;
 
+        bool getAntiAliased() const { return m_antiAliased; }
+        void setAntiAliased(bool antiAliased);
+
         void setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx);
         void setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx);
 
@@ -170,6 +173,7 @@ class Plot1DWidget : public ItomQwtPlot
         Qt::PenStyle m_lineStyle;
         int m_linePlotID;
         ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
+        bool m_antiAliased;
 
         int m_Curser[2];
         int m_actPickerIdx;

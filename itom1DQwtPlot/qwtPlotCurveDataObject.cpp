@@ -61,6 +61,22 @@ static int verifyRange( int size, int &i1, int &i2 )
 
     return ( i2 - i1 + 1 );
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QwtPlotCurveDataObject::QwtPlotCurveDataObject(const QString &title /*= QString::null*/) : 
+    QwtPlotCurve(title), 
+    m_privCurveFitter(NULL), 
+    m_curveFillState(ItomQwtPlotEnums::NoCurveFill)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QwtPlotCurveDataObject::QwtPlotCurveDataObject(const QwtText &title) :
+    QwtPlotCurve(title), 
+    m_privCurveFitter(NULL)
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::draw( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect ) const
 {
