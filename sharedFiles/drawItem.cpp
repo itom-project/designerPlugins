@@ -200,7 +200,7 @@ void DrawItem::setSelected(const bool selected)
                 {
                     marker = new QwtPlotMarker();
                     marker->setLinePen(QPen(d->m_markerColor));
-                    marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(QBrush(d->m_lineColor), 1), QSize(9, 9)));
+                    marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
                     marker->setVisible(true);
                     marker->attach(d->m_pparent);
                     d->m_marker.append(marker);
@@ -244,7 +244,7 @@ void DrawItem::setSelected(const bool selected)
             {
                 marker = new QwtPlotMarker();
                 marker->setLinePen(QPen(d->m_markerColor));
-                marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_lineColor), 1), QSize(9, 9)));
+                marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
                 marker->setVisible(true);
                 marker->attach(d->m_pparent);
                 d->m_marker.append(marker);
@@ -713,7 +713,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
         {
             marker = new QwtPlotMarker();
             marker->setLinePen(QPen(d->m_markerColor));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor), QPen(QBrush(d->m_lineColor), 1), QSize(9, 9)));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
             marker->attach(d->m_pparent);
             d->m_marker.append(marker);
         }
