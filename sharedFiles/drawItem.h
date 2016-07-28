@@ -71,6 +71,8 @@ class DrawItem : public QwtPlotShapeItem
         void setLabelVisible(const bool labelVisible);
         bool getLabelVisible() const;
 
+        void setFillOpacity(int opacity, int opacitySelected);
+
         static QVector<int> idxVec;
 
         virtual void draw(QPainter *painter,

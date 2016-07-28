@@ -507,6 +507,32 @@ int ItomQwtDObjFigure::getGeometricShapesCount() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+int ItomQwtDObjFigure::getGeometricShapesFillOpacity() const
+{
+    return m_pBaseContent ? m_pBaseContent->getGeometricShapesFillOpacity() : 0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setGeometricShapesFillOpacity(const int &opacity)
+{
+    if (m_pBaseContent) return m_pBaseContent->setGeometricShapesFillOpacity(opacity);
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int ItomQwtDObjFigure::getGeometricShapesFillOpacitySelected() const
+{
+    return m_pBaseContent ? m_pBaseContent->getGeometricShapesFillOpacitySelected() : 0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setGeometricShapesFillOpacitySelected(const int &opacity)
+{
+    if (m_pBaseContent) return m_pBaseContent->setGeometricShapesFillOpacitySelected(opacity);
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 bool ItomQwtDObjFigure::getMarkerLabelsVisible(void) const
 {
     return m_pBaseContent ? m_pBaseContent->markerLabelVisible() : false;
