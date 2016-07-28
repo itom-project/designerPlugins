@@ -174,16 +174,16 @@ void DrawItem::setSelected(const bool selected)
             {
                 foreach(QwtPlotMarker* marker, d->m_marker)
                 {
-                    marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Rect : QwtSymbol::Triangle, QBrush(d->m_markerColor),
-                        QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
+                    marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Star1 : QwtSymbol::XCross, QBrush(d->m_markerColor),
+                        QPen(QBrush(d->m_markerColor), selected ? 2 : 1), selected ? QSize(15, 15) : QSize(11, 11)));
                 }
             }
             else
             {
                 foreach(QwtPlotMarker* marker, d->m_marker)
                 {
-                    marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor),
-                        QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
+                    marker->setSymbol(new QwtSymbol(QwtSymbol::XCross, QBrush(d->m_markerColor),
+                        QPen(QBrush(d->m_markerColor), 1), QSize(11, 11)));
                 }
             }
         }
@@ -663,13 +663,17 @@ void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
             d->m_fillBrushSelected.setColor(fillColor);
         }   
 
-        //delete markers, since their color might be changed
-        for (int n = 0; n < d->m_marker.size(); n++)
+        if (d->m_shape.type() != ito::Shape::Point && \
+            d->m_shape.type() != ito::Shape::MultiPointPick)
         {
-            d->m_marker[n]->detach();
-            delete d->m_marker[n];
+            //delete markers, since their color might be changed
+            for (int n = 0; n < d->m_marker.size(); n++)
+            {
+                d->m_marker[n]->detach();
+                delete d->m_marker[n];
+            }
+            d->m_marker.clear();
         }
-        d->m_marker.clear();
     }
 
     setSelected(d->m_selected);
