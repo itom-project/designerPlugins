@@ -903,6 +903,25 @@ void ItomQwtPlot::keyPressEvent(QKeyEvent * event)
         replot();
         event->accept();
     }
+    else if (m_plottingEnabled && event->matches(QKeySequence::Delete))
+    {
+        //delete the currently selected geometric shape (but only, if the property 'geometricShapesDrawingEnabled' is true)
+        QVector<int> indices_to_delete;
+
+        for (QMap<int, DrawItem*>::iterator it = m_pShapes.begin(); it != m_pShapes.end(); ++it)
+        {
+            if (it.value() != NULL && it.value()->getSelected())
+            {
+                indices_to_delete << it.value()->getIndex();
+            }
+        }
+
+        foreach(int index, indices_to_delete)
+        {
+            deleteGeometricShape(index);
+        }
+        event->accept();
+    }
 
     if (!event->isAccepted())
     {
