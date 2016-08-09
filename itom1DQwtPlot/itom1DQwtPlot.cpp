@@ -1071,3 +1071,8 @@ void Itom1DQwtPlot::setAntiAliased(bool &antiAliased)
         m_pContent->setAntiAliased(antiAliased);
     }
     updatePropertyDock();}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::showCurveProperties()
+{
+	d->m_pLinePropertiesDock->show();
+}
