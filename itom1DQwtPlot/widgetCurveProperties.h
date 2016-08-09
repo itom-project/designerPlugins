@@ -29,6 +29,7 @@
 #include "ui_widgetCurveProperties.h"
 
 class Plot1DWidget; //forward declaration
+class QwtPlotCurve;
 
 class WidgetCurveProperties : public QWidget 
 {
@@ -45,7 +46,7 @@ private:
     Plot1DWidget *m_pContent;
 	bool m_visible;
 	bool m_isUpdating;
-
+	QColor getSymbolColor(const QwtPlotCurve* item);
 
 private slots:
 	void on_spinBoxSymbolSize_valueChanged(int val);
@@ -55,11 +56,10 @@ private slots:
 	
 	void on_colorPickerButtonLineStyle_colorChanged(QColor color);
 	void on_comboBoxLineSymbol_currentIndexChanged(int val);
-	void on_comboBoxCapStyle_currentIndexChanged(int val);
-	void on_comboBoxJoinStyle_currentIndexChanged(int val);
 	void on_checkBoxLegendVisible_stateChanged(int val);
 	void on_listWidget_itemChanged(QListWidgetItem *item);
 	void on_checkBoxVisible_stateChanged(int state);
+	void on_colorPickerButtonSymbol_colorChanged(QColor color);
 
 public slots:
 	

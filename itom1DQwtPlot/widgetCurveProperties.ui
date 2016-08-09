@@ -48,9 +48,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="5">
-       <widget class="QComboBox" name="comboBoxJoinStyle"/>
-      </item>
       <item row="1" column="5">
        <widget class="QSpinBox" name="spinBoxSymbolSize">
         <property name="keyboardTracking">
@@ -58,14 +55,8 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
-       <widget class="ColorPickerButton" name="colorPickerButtonLineStyle"/>
-      </item>
       <item row="0" column="5">
        <widget class="QComboBox" name="comboBoxLineSymbol"/>
-      </item>
-      <item row="2" column="5">
-       <widget class="QComboBox" name="comboBoxCapStyle"/>
       </item>
       <item row="2" column="3">
        <widget class="QComboBox" name="comboBoxLineStyle"/>
@@ -121,13 +112,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="2">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Line Color</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="4">
        <widget class="QLabel" name="label_6">
         <property name="text">
@@ -135,24 +119,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="4">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Pen Join Style</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="3">
        <widget class="QDoubleSpinBox" name="doubleSpinBoxLineWidth">
         <property name="keyboardTracking">
          <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Pen Cap Style</string>
         </property>
        </widget>
       </item>
@@ -171,6 +141,26 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="2" column="4">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Line Color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="ColorPickerButton" name="colorPickerButtonLineStyle"/>
+      </item>
+      <item row="3" column="4">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Symbol Color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="ColorPickerButton" name="colorPickerButtonSymbol"/>
       </item>
      </layout>
     </widget>
