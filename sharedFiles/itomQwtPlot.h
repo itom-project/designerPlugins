@@ -118,6 +118,12 @@ public:
     QColor textColor() const { return m_textColor; }
     void setTextColor(const QColor &color);
 
+    int getGeometricShapesFillOpacity() const { return m_geometricShapeOpacity; }
+    void setGeometricShapesFillOpacity(const int &opacity);
+
+    int getGeometricShapesFillOpacitySelected() const { return m_geometricShapeOpacitySelected; }
+    void setGeometricShapesFillOpacitySelected(const int &opacity);
+
     void setVisible(bool visible);
 
     int countGeometricShapes() const { return m_pShapes.count(); }
@@ -225,6 +231,8 @@ private:
     ItomQwtPlotEnums::ShapeTypes m_allowedShapeTypes;
     ItomQwtPlotEnums::ModificationModes m_shapeModificationModes;
     bool m_shapesLabelVisible;
+    int m_geometricShapeOpacity;
+    int m_geometricShapeOpacitySelected;
 
     //markers
     QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;

@@ -48,8 +48,8 @@ class QwtPlotCurveDataObject : public QwtPlotCurve
 
 public:
 
-    explicit QwtPlotCurveDataObject( const QString &title = QString::null ) : QwtPlotCurve(title), m_privCurveFitter(NULL), m_curveFillState(ItomQwtPlotEnums::NoCurveFill) {}
-    explicit QwtPlotCurveDataObject( const QwtText &title ) : QwtPlotCurve(title), m_privCurveFitter(NULL) {}
+    explicit QwtPlotCurveDataObject(const QString &title = QString::null);
+    explicit QwtPlotCurveDataObject(const QwtText &title);
 
     virtual void draw( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect ) const;
 

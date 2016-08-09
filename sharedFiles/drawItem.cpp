@@ -50,6 +50,8 @@ public:
 
     QColor m_markerColor;
     QColor m_lineColor;
+    QBrush m_fillBrush;
+    QBrush m_fillBrushSelected;
 
     QPointF m_point1;
     QPointF m_point2;
@@ -68,6 +70,8 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     d->m_selected = false;
     d->m_labelVisible = labelVisible;
     d->m_modificationModes = modificationModes;
+    d->m_fillBrush = QBrush();
+    d->m_fillBrushSelected = QBrush();
 
     if (retVal)
     {
@@ -92,8 +96,6 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     {
         idxVec.append(shape.index());
     }
-
-    setRenderHint( QwtPlotItem::RenderAntialiased, true); //set AntiAliasing of geometric objects to true in order to plot them smoother
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -115,6 +117,34 @@ DrawItem::~DrawItem()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void DrawItem::setFillOpacity(int opacity, int opacitySelected)
+{
+    if (opacity <= 0)
+    {
+        d->m_fillBrush = QBrush();
+    }
+    else
+    {
+        QColor fillColor = d->m_lineColor;
+        fillColor.setAlpha(opacity);
+        d->m_fillBrush = QBrush(fillColor, Qt::SolidPattern);
+    }
+
+    if (opacitySelected <= 0)
+    {
+        d->m_fillBrushSelected = QBrush();
+    }
+    else
+    {
+        QColor fillColor = d->m_lineColor;
+        fillColor.setAlpha(opacitySelected);
+        d->m_fillBrushSelected = QBrush(fillColor, Qt::SolidPattern);
+    }
+
+    setSelected(d->m_selected);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setModificationModes(const ItomQwtPlotEnums::ModificationModes &modes)
 {
     d->m_modificationModes = modes;
@@ -130,6 +160,8 @@ void DrawItem::setSelected(const bool selected)
     bool resizeable = !(flags & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
     QwtPlotMarker *marker = NULL;
 
+    setRenderHint(QwtPlotItem::RenderAntialiased, false);
+
     switch (d->m_shape.type())
     {
     case ito::Shape::Invalid:
@@ -142,16 +174,16 @@ void DrawItem::setSelected(const bool selected)
             {
                 foreach(QwtPlotMarker* marker, d->m_marker)
                 {
-                    marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Rect : QwtSymbol::Triangle, QBrush(d->m_markerColor),
-                        QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
+                    marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Star1 : QwtSymbol::XCross, QBrush(d->m_markerColor),
+                        QPen(QBrush(d->m_markerColor), selected ? 2 : 1), selected ? QSize(15, 15) : QSize(11, 11)));
                 }
             }
             else
             {
                 foreach(QwtPlotMarker* marker, d->m_marker)
                 {
-                    marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor),
-                        QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
+                    marker->setSymbol(new QwtSymbol(QwtSymbol::XCross, QBrush(d->m_markerColor),
+                        QPen(QBrush(d->m_markerColor), 1), QSize(11, 11)));
                 }
             }
         }
@@ -168,7 +200,7 @@ void DrawItem::setSelected(const bool selected)
                 {
                     marker = new QwtPlotMarker();
                     marker->setLinePen(QPen(d->m_markerColor));
-                    marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
+                    marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
                     marker->setVisible(true);
                     marker->attach(d->m_pparent);
                     d->m_marker.append(marker);
@@ -192,11 +224,13 @@ void DrawItem::setSelected(const bool selected)
                 d->m_marker.clear();
             }
         }
+        setRenderHint(QwtPlotItem::RenderAntialiased, true); //set AntiAliasing of geometric objects to true in order to plot them smoother
         break;
-    case ito::Shape::Rectangle:
-    case ito::Shape::Square:
     case ito::Shape::Ellipse:
     case ito::Shape::Circle:
+        setRenderHint(QwtPlotItem::RenderAntialiased, true); //set AntiAliasing of geometric objects to true in order to plot them smoother
+    case ito::Shape::Rectangle:
+    case ito::Shape::Square:
     {
         QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
         bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
@@ -210,7 +244,7 @@ void DrawItem::setSelected(const bool selected)
             {
                 marker = new QwtPlotMarker();
                 marker->setLinePen(QPen(d->m_markerColor));
-                marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
+                marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
                 marker->setVisible(true);
                 marker->attach(d->m_pparent);
                 d->m_marker.append(marker);
@@ -295,11 +329,21 @@ void DrawItem::setSelected(const bool selected)
     }
     break;
     default:
+        
         break;
     }
     
     //line width of painter path also depends on selected state
     setPen(d->m_lineColor, d->m_selected ? 3 : 1);
+
+    if (selected)
+    {
+        setBrush(d->m_fillBrushSelected);
+    }
+    else
+    {
+        setBrush(d->m_fillBrush);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -482,7 +526,7 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
                 }
                 else if (markerIdx == 2)
                 {
-                    QLineF line(newPoint, basePoints[0]);
+                    QLineF line(basePoints[0], newPoint);
                     double angle = 45.0 * qRound(line.angle() / 45.0);
                     line.setAngle(angle);
                     basePoints[1] = line.p2();
@@ -598,10 +642,39 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
 {
-    setPen(lineColor, d->m_selected ? 3 : 1);
+    if (d->m_markerColor != markerColor || d->m_lineColor != lineColor)
+    {
+        d->m_markerColor = markerColor;
+        d->m_lineColor = lineColor;
 
-    d->m_markerColor = markerColor;
-    d->m_lineColor = lineColor;
+        if (d->m_fillBrush.style() != Qt::NoBrush)
+        {
+            int alpha = d->m_fillBrush.color().alpha();
+            QColor fillColor = lineColor;
+            fillColor.setAlpha(alpha);
+            d->m_fillBrush.setColor(fillColor);
+        }
+
+        if (d->m_fillBrushSelected.style() != Qt::NoBrush)
+        {
+            int alpha = d->m_fillBrushSelected.color().alpha();
+            QColor fillColor = lineColor;
+            fillColor.setAlpha(alpha);
+            d->m_fillBrushSelected.setColor(fillColor);
+        }   
+
+        if (d->m_shape.type() != ito::Shape::Point && \
+            d->m_shape.type() != ito::Shape::MultiPointPick)
+        {
+            //delete markers, since their color might be changed
+            for (int n = 0; n < d->m_marker.size(); n++)
+            {
+                d->m_marker[n]->detach();
+                delete d->m_marker[n];
+            }
+            d->m_marker.clear();
+        }
+    }
 
     setSelected(d->m_selected);
 }
@@ -640,7 +713,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
         {
             marker = new QwtPlotMarker();
             marker->setLinePen(QPen(d->m_markerColor));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(7, 7)));
+            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
             marker->attach(d->m_pparent);
             d->m_marker.append(marker);
         }

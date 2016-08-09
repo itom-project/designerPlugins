@@ -91,7 +91,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
 
-    Q_CLASSINFO("prop://overlayColorMap", "Defines which color map should be used for the overlay channel [e.g. grayMarked, hotIron].")
+    Q_CLASSINFO("prop://overlayColorMap", "Defines which color map should be used for the overlay channel [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
 
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 

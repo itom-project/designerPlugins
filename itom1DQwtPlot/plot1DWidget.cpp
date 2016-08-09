@@ -119,7 +119,8 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_pActRGBSwitch(NULL),
         m_pActCmplxSwitch(NULL),
         m_pActLegendSwitch(NULL),
-        m_pMnuLegendSwitch(NULL)
+        m_pMnuLegendSwitch(NULL),
+        m_antiAliased(false)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -338,6 +339,8 @@ ito::RetVal Plot1DWidget::init()
 
         m_pPlotGrid->setMajorPen(apiGetFigureSetting(parent(), "gridMajorPen", QPen(QBrush(Qt::gray), 1, Qt::SolidLine), &retVal).value<QPen>());
         m_pPlotGrid->setMinorPen(apiGetFigureSetting(parent(), "gridMinorPen", QPen(QBrush(Qt::gray), 1, Qt::DashLine), &retVal).value<QPen>());
+
+        m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>();
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -1213,6 +1216,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
 
             dObjCurve->setData(NULL);
+            dObjCurve->setRenderHint(QwtPlotItem::RenderAntialiased, m_antiAliased);
             dObjCurve->attach(this);
 
             if (m_pLegend)
@@ -3254,5 +3258,21 @@ QVariant Plot1DWidget::getCurveProperty(int index, const QByteArray &property)
     }
 
     return QVariant();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setAntiAliased(bool antiAliased)
+{
+    if (antiAliased != m_antiAliased)
+    {
+        foreach(QwtPlotCurve* curve, m_plotCurveItems)
+        {
+            curve->setRenderHint(QwtPlotItem::RenderAntialiased, antiAliased);
+        }
+
+        m_antiAliased = antiAliased;
+
+        replot();
+    }
 }
 

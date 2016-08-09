@@ -82,6 +82,8 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(bool geometricShapesDrawingEnabled READ getEnabledPlotting WRITE setEnabledPlotting USER true)
     Q_PROPERTY(ItomQwtPlotEnums::ModificationModes geometryModificationModes READ getModificationModes WRITE setModificationModes DESIGNABLE true USER true);
     Q_PROPERTY(ItomQwtPlotEnums::ShapeTypes allowedGeometricShapes READ getAllowedGeometricShapes WRITE setAllowedGeometricShapes DESIGNABLE true USER true);
+    Q_PROPERTY(int geometricShapesFillOpacity READ getGeometricShapesFillOpacity WRITE setGeometricShapesFillOpacity DESIGNABLE true USER true);
+    Q_PROPERTY(int geometricShapesFillOpacitySelected READ getGeometricShapesFillOpacitySelected WRITE setGeometricShapesFillOpacitySelected DESIGNABLE true USER true);
     
     Q_PROPERTY(bool geometricShapesLabelsVisible READ getShapesLabelsVisible WRITE setShapesLabelsVisible DESIGNABLE true USER true)
 
@@ -104,6 +106,8 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("prop://geometryModificationModes", "Bitmask to globally change how geometric shapes can be modified. The possible modes of a shape are both restricted by the shape's flags and the allowed modes of the plot (move: 0x01, rotate: 0x02, resize: 0x04)")
     Q_CLASSINFO("prop://allowedGeometricShapes", "Combination of values of enumeration ShapeType to decide which types of geometric shapes are allowed (default: all shape types are allowed)")
     Q_CLASSINFO("prop://geometricShapesLabelsVisible", "Toggle visibility of shape labels, the label is the name of the shape.")
+    Q_CLASSINFO("prop://geometricShapesFillOpacity", "Opacity for geometric shapes with an area > 0. This value ranges from 0 (not filled) to 255 (opaque).")
+    Q_CLASSINFO("prop://geometricShapesFillOpacitySelected", "Opacity for the selected geometric shapes with an area > 0. This value ranges from 0 (not filled) to 255 (opaque).")
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
@@ -319,6 +323,12 @@ public:
 
     bool getShapesLabelsVisible(void) const;
     void setShapesLabelsVisible(const bool &visible);
+
+    int getGeometricShapesFillOpacity() const;
+    void setGeometricShapesFillOpacity(const int &opacity);
+
+    int getGeometricShapesFillOpacitySelected() const;
+    void setGeometricShapesFillOpacitySelected(const int &opacity);
 
     void setContextMenuEnabled(bool show); /*!< overloaded from AbstractFigure */
     bool getContextMenuEnabled() const;    /*!< overloaded from AbstractFigure */
