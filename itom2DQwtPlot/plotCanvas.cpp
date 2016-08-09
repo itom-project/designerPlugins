@@ -318,7 +318,7 @@ void PlotCanvas::refreshStyles()
     QPen rubberBandPen = QPen(QBrush(Qt::red), 1, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
     QFont trackerFont = QFont("Verdana", 10);
-    QBrush trackerBg = QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern);
+    QBrush trackerBg = QBrush(QColor(255, 255, 255, 210), Qt::SolidPattern);
     QPen selectionPen = QPen(QBrush(Qt::gray), 2, Qt::SolidLine);
 
     QFont titleFont = QFont("Helvetica", 12);
@@ -326,7 +326,7 @@ void PlotCanvas::refreshStyles()
     labelFont.setItalic(false);
     QFont axisFont = QFont("Helvetica", 10);
 
-    QSize centerMarkerSize = QSize(10, 10);
+    QSize centerMarkerSize = QSize(25, 25);
     QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);
     int buttonSet = buttonStyle();
 

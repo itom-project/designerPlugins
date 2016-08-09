@@ -221,7 +221,7 @@ void DataObjItem::renderTile(
     }
     else //single-value data types, color map of qwt plot is considered (either index8 or rgb)
     { 
-        if ( colorMap()->format() == QwtColorMap::RGB || dataTypeFlag == DataObjRasterData::tFloating)
+        if (colorMap()->format() == QwtColorMap::RGB || dataTypeFlag == DataObjRasterData::tFloatOrComplex)
         {
             if (yMap.isInverting())
             {
