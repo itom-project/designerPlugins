@@ -69,6 +69,7 @@ LINK_DIRECTORIES(
 set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/widgetCurveProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlotPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.h
@@ -98,7 +99,8 @@ set(plugin_HEADERS_COPY
 
 set(plugin_UI
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
-     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/widgetCurveProperties.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
 )
 
 set(plugin_RCC
@@ -109,6 +111,7 @@ set(plugin_RCC
 set(plugin_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/widgetCurveProperties.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlotPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plot1DWidget.cpp

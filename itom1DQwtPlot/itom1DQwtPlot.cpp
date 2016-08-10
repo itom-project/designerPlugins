@@ -23,6 +23,7 @@
 #include "itom1DQwtPlot.h"
 #include "dataObjectSeriesData.h"
 #include "plot1DWidget.h"
+#include "widgetCurveProperties.h"
 #include "DataObject/dataobj.h"
 
 #include <qsharedpointer.h>
@@ -44,11 +45,13 @@ class Itom1DQwtPlotPrivate
 public:
     Itom1DQwtPlotPrivate() : 
         m_pData(NULL),
-        m_pLinePropertiesDock(NULL)
+        m_pLinePropertiesDock(NULL),
+		m_pLinePropertyWidget(NULL)
     {}
     
     InternalData *m_pData;
     QDockWidget *m_pLinePropertiesDock;
+	WidgetCurveProperties *m_pLinePropertyWidget;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -79,12 +82,16 @@ void Itom1DQwtPlot::constructor()
     addToolbarsAndMenus();
 
     //create dock widget for the line properties
-    /*d->m_pLinePropertiesDock = new QDockWidget(this);
+    d->m_pLinePropertiesDock = new QDockWidget(this);
     d->m_pLinePropertiesDock->setObjectName(QStringLiteral("curveProperties"));
     d->m_pLinePropertiesDock->setWindowTitle("Curve Properties");
     d->m_pLinePropertiesDock->setVisible(false);
-    d->m_pLinePropertiesDock->setWidget(new QLabel("this feature is coming soon"));
-    addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);*/
+	d->m_pLinePropertyWidget = new WidgetCurveProperties(m_pContent);
+	d->m_pLinePropertiesDock->setWidget(d->m_pLinePropertyWidget);
+	connect(d->m_pLinePropertiesDock, SIGNAL(visibilityChanged(bool)), d->m_pLinePropertyWidget, SLOT(visibilityChanged(bool)));
+	connect(m_pContent, SIGNAL(curveChanged()), d->m_pLinePropertyWidget, SLOT(on_listWidget_itemSelectionChanged()));
+	connect(m_pContent, SIGNAL(legendModified()), d->m_pLinePropertyWidget, SLOT(updateCurveList()));
+    addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();
 
@@ -130,6 +137,11 @@ ito::RetVal Itom1DQwtPlot::init()
     return m_pContent->init(); 
 } //called when api-pointers are transmitted, directly after construction
 
+//----------------------------------------------------------------------------------------------------------------------------------
+QWidget* Itom1DQwtPlot::getWidgetCurveProperties()
+{
+	return (QWidget*)(d->m_pLinePropertyWidget);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::MultiLineMode Itom1DQwtPlot::getRowPresentation(void) const
 {
@@ -289,7 +301,6 @@ QVector<QPointF> Itom1DQwtPlot::getBounds(void) const
     }
     return boundsVec;
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom1DQwtPlot::getTitle() const
 {
@@ -1059,5 +1070,9 @@ void Itom1DQwtPlot::setAntiAliased(bool &antiAliased)
     {
         m_pContent->setAntiAliased(antiAliased);
     }
-    updatePropertyDock();
+    updatePropertyDock();}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::showCurveProperties()
+{
+	d->m_pLinePropertiesDock->show();
 }

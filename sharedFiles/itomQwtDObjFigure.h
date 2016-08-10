@@ -427,8 +427,7 @@ signals :
     void geometricShapeDeleted(int idx);
     void geometricShapesDeleted();
     void geometricShapeFinished(QVector<ito::Shape> shapes, bool aborted);
-    void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/
-    
+    void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/    
 };
 
 #endif //ITOMQWTDOBJFIGURE_H

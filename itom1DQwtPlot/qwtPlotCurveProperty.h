@@ -81,6 +81,9 @@ private:
 
 private slots:
 
+signals :
+	void curveChanged();
+
 };
 
 #endif

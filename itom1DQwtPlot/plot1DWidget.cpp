@@ -30,6 +30,7 @@
 #include "common/apiFunctionsGraphInc.h"
 #include "qnumeric.h"
 #include "dialog1DScale.h"
+#include "widgetCurveProperties.h"
 
 #include "plotLegends/infoWidgetPickers.h"
 #include "plotLegends/infoWidgetDObject.h"
@@ -228,7 +229,10 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuView->addMenu(m_pMnuCmplxSwitch);
     menuView->addSeparator();
     menuView->addAction(m_pActProperties);
-    m_menus.append(menuView);
+	QAction *actCurveProperties = new QAction("Curve Properties", menuView);// this instance is created here because it is only needed for the 1DQWT Plot
+	menuView->addAction(actCurveProperties);
+	connect(actCurveProperties, SIGNAL(triggered()), (Itom1DQwtPlot*)(this->parent()), SLOT(showCurveProperties()));
+	m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
     menuTools->addAction(m_pActPicker);
@@ -666,14 +670,23 @@ void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine
         updateScaleValues(recalculateBoundaries);
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::toggleLegendLabel(QwtPlotCurve* curve, const bool state)
+{
+	if (m_pLegend)
+	{
+		QwtLegendLabel *legendLabel(qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(curve))));
+		legendLabel->setChecked(state);
+	}
 
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
 {
     if (m_pLegend)
     {
         m_pLegend->deleteLater();
-        m_pLegend = NULL;
+        m_pLegend = NULL;		
     }
 
     if (visible)
@@ -695,6 +708,7 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
                 maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
                 //item->setLegendIconSize(QSize(8,24));
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+				connect(legendLabel, SIGNAL(checked(bool)), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
                 if (legendLabel)
                 {
                     //the check status is again set in QwtPlotCurveProperty::setLegendVisible
@@ -787,10 +801,11 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
         }
         else
         {
-            item->setTitle("");
+			item->setTitle(tr("curve %1").arg(index));
         }
     }
     replot();
+	emit legendModified();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -820,6 +835,7 @@ void Plot1DWidget::setLineWidth(const qreal &width)
         }
 
         replot();
+		emit curveChanged();
     }
 }
 
@@ -838,6 +854,7 @@ void Plot1DWidget::setLineStyle(const Qt::PenStyle &style)
         }
 
         replot();
+		emit curveChanged();
     }
 }
 
@@ -862,6 +879,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
         }
 
         replot();
+		emit curveChanged();
     }
     else if (m_pData->m_lineSymbole != style)
     {
@@ -881,6 +899,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
         }
 
         replot();
+		emit curveChanged();
     }
     else if (m_pData->m_lineSymboleSize != size)
     {
@@ -899,6 +918,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
         }
 
         replot();
+		emit curveChanged();
     }
 
     m_pData->m_lineSymbole = style;
@@ -1152,12 +1172,15 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
 
         //check if current number of curves does not correspond to height. If so, adjust the number of curves to the required number
+		bool refreshWidgetCurveProperties = 0;
         while (m_plotCurveItems.size() > numCurves)
         {
             curve = m_plotCurveItems.takeLast();
             m_plotCurvePropertyItems.takeLast();
             curve->detach();
             delete curve;
+			refreshWidgetCurveProperties = 1;
+		
         }
 
         bool valid;
@@ -1283,8 +1306,15 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
             m_plotCurveItems.append(dObjCurve);
             m_plotCurvePropertyItems.append(new QwtPlotCurveProperty(dObjCurve));
+			connect(m_plotCurvePropertyItems.last(), SIGNAL(curveChanged()), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
+			refreshWidgetCurveProperties = 1;
         }
 
+		if (refreshWidgetCurveProperties == 1) // if true a curve was added or deleted and the widget has to be updated
+		{	
+			((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties())->updateProperties();
+
+		}
         if (bounds.size() == 0)
         {
             QVector<QPointF> pts(2);
@@ -2594,7 +2624,16 @@ QVector<float> Plot1DWidget::getPickerPhys() const
 
     return exportItem;
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+QList<QwtPlotCurveProperty*> Plot1DWidget::getPlotCurveProperty()
+{
+	return this->m_plotCurvePropertyItems;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QList<QwtPlotCurve*> Plot1DWidget::getplotCurveItems()
+{
+	return this->m_plotCurveItems;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3178,7 +3217,7 @@ ito::RetVal Plot1DWidget::setCurveProperty(int index, const QByteArray &property
 
         if (ito::ITOM_API_FUNCS)
         {
-            retval += apiQObjectPropertyWrite(prop, property.data(), value);
+            retval += apiQObjectPropertyWrite(prop, property.constData(), value);
         }
         else
         {

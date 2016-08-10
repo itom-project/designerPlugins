@@ -1747,6 +1747,7 @@ ito::RetVal ItomQwtPlot::userInteractionStart(int type, bool start, int maxNrOfP
             m_elementsToPick = maxNrOfPoints;
             m_isUserInteraction = true; // setting userinteraction to true, so we emit the counter part signal only if started with userinteractionstart
             setState(stateDrawShape); //this calls startOrStopDrawGeometricShape if everything is ok
+            m_isUserInteraction = true; // setting userinteraction to true, so we emit the counter part signal only if started with userinteractionstart
         }
         else
         {
@@ -1963,6 +1964,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
             {
                 p->shapesWidget()->updateShapes(shapes);
             }
+            m_isUserInteraction = false;
         }
 
         setState(stateIdle);

@@ -208,7 +208,6 @@ protected:
 
 private:
     void createBaseActions();
-    
     bool m_showContextMenu;
 
     ItomPlotZoomer *m_pZoomer;

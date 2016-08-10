@@ -38,6 +38,7 @@
 #include <qstring.h>
 #include <qfont.h>
 
+
 class Itom1DQwtPlotPrivate;
 class Plot1DWidget;
 
@@ -326,6 +327,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         void setCurveFillAlpha(const int val);
         int getCurveFillAlpha() const;
 
+		QWidget* getWidgetCurveProperties();
+
         friend Plot1DWidget;
 
     protected:
@@ -350,11 +353,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
         QVariant getCurveProperty(int index, const QByteArray &property);
-        
+
+		void showCurveProperties();
+
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
     private slots:
-
 };
 //----------------------------------------------------------------------------------------------------------------------------------
 

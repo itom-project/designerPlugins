@@ -54,6 +54,7 @@ class QwtLegend;
 struct InternalData;
 class QwtPlotCurveProperty;
 
+
 class Plot1DWidget : public ItomQwtPlot
 {
     Q_OBJECT
@@ -81,6 +82,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         void setLegendPosition(LegendPosition position, bool visible);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
+		void toggleLegendLabel(QwtPlotCurve* curve, const bool state);
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
@@ -109,6 +111,9 @@ class Plot1DWidget : public ItomQwtPlot
         ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
         QVariant getCurveProperty(int index, const QByteArray &property);
 
+		QList<QwtPlotCurve*> getplotCurveItems();
+		QList<QwtPlotCurveProperty*> getPlotCurveProperty();
+
         friend Itom1DQwtPlot;
 
     protected:
@@ -120,6 +125,7 @@ class Plot1DWidget : public ItomQwtPlot
         void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
         void setPickerText(const QString &coords, const QString &offsets);
+		
 
         void updatePickerStyle(void);
 
@@ -131,6 +137,7 @@ class Plot1DWidget : public ItomQwtPlot
         //void setStickOrientation(const qreal &line);
         void setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
         void setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
+
 
         void home();
 
@@ -240,6 +247,8 @@ class Plot1DWidget : public ItomQwtPlot
 
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
+		void curveChanged();
+		void legendModified();
 
     public slots:
         //void replot();

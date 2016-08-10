@@ -54,6 +54,7 @@ void QwtPlotCurveProperty::setLineStyle(const Qt::PenStyle &style)
             pen.setStyle(style);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -78,6 +79,7 @@ void QwtPlotCurveProperty::setLineWidth(const qreal &width)
             pen.setWidthF(width);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -102,6 +104,7 @@ void QwtPlotCurveProperty::setLineColor(const QColor &color)
             pen.setColor(color);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -126,6 +129,7 @@ void QwtPlotCurveProperty::setLineJoinStyle(const Qt::PenJoinStyle &style)
             pen.setJoinStyle(style);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -150,6 +154,7 @@ void QwtPlotCurveProperty::setLineCapStyle(const Qt::PenCapStyle &style)
             pen.setCapStyle(style);
             m_pCurve->setPen(pen);
         }
+		emit curveChanged();
     }
 }
 
@@ -170,14 +175,15 @@ void QwtPlotCurveProperty::setLineSymbolSize(int size)
     {
         const QwtSymbol *s = m_pCurve->symbol();
         QSize newSize(size, size);
-        if (s && size == 0)
-        {
-            m_pCurve->setSymbol(NULL);
-        }
-        else if (!s || s->size() != newSize)
-        {
-            m_pCurve->setSymbol(new QwtSymbol(s->style(), QBrush(Qt::white), QPen(s->pen().color()), newSize));
-        }
+		if (!s)
+		{
+			m_pCurve->setSymbol(new QwtSymbol(QwtSymbol::NoSymbol, QBrush(Qt::white), QPen(m_pCurve->pen().color()), newSize));
+		}
+		else
+		{
+			m_pCurve->setSymbol(new QwtSymbol(s->style(), s->brush(), QPen(s->pen().color()), newSize));
+		}
+		emit curveChanged();
     }
 }
 
@@ -195,20 +201,19 @@ Itom1DQwtPlot::Symbol QwtPlotCurveProperty::getLineSymbolStyle() const
 //-----------------------------------------------------------------------------------------------------
 void QwtPlotCurveProperty::setLineSymbolStyle(const Itom1DQwtPlot::Symbol &symbol)
 {
-    if (m_pCurve)
-    {
-        const QwtSymbol *s = m_pCurve->symbol();
-        if (s && symbol == Itom1DQwtPlot::NoSymbol)
-        {
-            m_pCurve->setSymbol(NULL);
-        }
-        else if (!s || (s->style() != (QwtSymbol::Style)(symbol - 1)))
-        {
-            QSize size = s ? s->size() : QSize(1, 1);
-            QColor c = s ? s->pen().color() : m_pCurve->pen().color();
-            m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(c), size));
-        }
-    }
+	if (m_pCurve)
+	{
+		const QwtSymbol *s = m_pCurve->symbol();
+		if (!s)
+		{
+			m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(m_pCurve->pen().color()), QSize(1, 1)));
+		}
+		else
+		{
+			m_pCurve->setSymbol(new QwtSymbol((QwtSymbol::Style)(symbol - 1), QBrush(Qt::white), QPen(s->pen().color()), s->size()));
+		}
+		emit curveChanged();
+	}
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -249,6 +254,7 @@ void QwtPlotCurveProperty::setLegendVisible(bool visible)
                 }
             }
         }
+		emit curveChanged();
     }
     
 }
@@ -284,6 +290,7 @@ void QwtPlotCurveProperty::setVisible(bool visible)
                 }
             }
         }
+		emit curveChanged();
     }
     
 }
