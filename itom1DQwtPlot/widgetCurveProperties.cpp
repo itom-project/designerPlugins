@@ -116,6 +116,18 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	bool legendVisible;
 	QColor symbolColor;
 
+	
+		if (selection.size() == 1)
+		{
+			ui.lineEditName->setText(m_pContent->getplotCurveItems().at(ui.listWidget->row(selection.at(0)))->title().text());//sets the name of the curve into the line edit.
+			ui.lineEditName->setEnabled(true);
+		}
+		else
+		{
+			ui.lineEditName->setText("");
+			ui.lineEditName->setEnabled(false);
+		}
+
 	foreach(item, selection)
 	{
 		row = ui.listWidget->row(item);
@@ -305,8 +317,22 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_listWidget_itemChanged(QListWidgetItem *item)
 {
+	if (!m_isUpdating)
+	{
+		m_pContent->getplotCurveItems().at(ui.listWidget->currentRow())->setTitle(item->text());
+		QStringList legendList;
+		int curveIdx = ui.listWidget->currentRow();
 
-	m_pContent->getplotCurveItems().at(ui.listWidget->currentRow())->setTitle(item->text());
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		const QwtPlotCurve* curve;
+		foreach(curve, m_pContent->getplotCurveItems())
+		{
+			legendList.append(curve->title().text());
+		}
+		m_pContent->setLegendTitles(legendList, NULL);
+		
+		//ui.lineEditName->setText(item->text());
+	}
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_checkBoxLegendVisible_stateChanged(int val)
@@ -484,5 +510,20 @@ void WidgetCurveProperties::on_colorPickerButtonSymbol_colorChanged(QColor color
 			}		
 		}
 		m_pContent->replot();
+	}
+}
+//-----------------------------------------------------------------------------------------------
+void WidgetCurveProperties::on_lineEditName_editingFinished()
+{
+	if (!m_isUpdating)
+	{
+		const QString text(ui.lineEditName->text());
+		m_isUpdating = true;
+		//const QString text(ui.lineEditName->text());
+		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		int row(ui.listWidget->row(selection.at(0)));//only one can be selected otherwise the editLine is enabled
+		m_pContent->getplotCurveItems().at(row)->setTitle(text);
+		selection[0]->setText(text);
+		m_isUpdating = false;
 	}
 }

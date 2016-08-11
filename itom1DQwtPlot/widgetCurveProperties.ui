@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>493</width>
-    <height>186</height>
+    <height>138</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,11 +25,11 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
     <widget class="QListWidget" name="listWidget"/>
    </item>
-   <item>
+   <item row="0" column="1">
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -41,34 +41,31 @@
       <string>Properties</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="2">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Visible</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="5">
-       <widget class="QSpinBox" name="spinBoxSymbolSize">
-        <property name="keyboardTracking">
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="checkBoxVisible">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="tristate">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="QComboBox" name="comboBoxLineSymbol"/>
-      </item>
-      <item row="2" column="3">
-       <widget class="QComboBox" name="comboBoxLineStyle"/>
-      </item>
-      <item row="1" column="2">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_10">
         <property name="text">
          <string>Legend Visible</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
+      <item row="2" column="1">
        <widget class="QCheckBox" name="checkBoxLegendVisible">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
@@ -81,31 +78,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Symbol Size</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="3">
-       <widget class="QCheckBox" name="checkBoxVisible">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="tristate">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Line Style</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Lline Width</string>
@@ -113,20 +86,67 @@
        </widget>
       </item>
       <item row="0" column="4">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Line Symbol</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
        <widget class="QDoubleSpinBox" name="doubleSpinBoxLineWidth">
         <property name="keyboardTracking">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="5" column="3">
+      <item row="1" column="3">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Line Style</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QComboBox" name="comboBoxLineStyle"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Line Symbol</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QComboBox" name="comboBoxLineSymbol"/>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Symbol Size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <widget class="QSpinBox" name="spinBoxSymbolSize">
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Line Color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6">
+       <widget class="ColorPickerButton" name="colorPickerButtonLineStyle"/>
+      </item>
+      <item row="2" column="5">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Symbol Color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6">
+       <widget class="ColorPickerButton" name="colorPickerButtonSymbol"/>
+      </item>
+      <item row="4" column="4">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -142,25 +162,15 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="4">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Line Color</string>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLineEdit" name="lineEditName">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
         </property>
        </widget>
-      </item>
-      <item row="2" column="5">
-       <widget class="ColorPickerButton" name="colorPickerButtonLineStyle"/>
-      </item>
-      <item row="3" column="4">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Symbol Color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="5">
-       <widget class="ColorPickerButton" name="colorPickerButtonSymbol"/>
       </item>
      </layout>
     </widget>

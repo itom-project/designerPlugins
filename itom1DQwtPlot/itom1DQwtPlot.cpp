@@ -1076,3 +1076,8 @@ void Itom1DQwtPlot::showCurveProperties()
 {
 	d->m_pLinePropertiesDock->show();
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::updatePropertiesDock()
+{
+	updatePropertyDock();
+}
