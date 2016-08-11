@@ -307,6 +307,18 @@ void WidgetCurveProperties::on_listWidget_itemChanged(QListWidgetItem *item)
 {
 
 	m_pContent->getplotCurveItems().at(ui.listWidget->currentRow())->setTitle(item->text());
+	QList<QString> legendList;
+	int curveIdx = ui.listWidget->currentRow();
+	
+	QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+	QwtPlotCurve* curve;
+	foreach(curve, m_pContent->getplotCurveItems())
+	{
+		legendList.append(curve->title().text());
+	}
+	m_pContent->setLegendList(QStringList(legendList));
+	emit legendModified();
+
 }
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::on_checkBoxLegendVisible_stateChanged(int val)
@@ -486,3 +498,4 @@ void WidgetCurveProperties::on_colorPickerButtonSymbol_colorChanged(QColor color
 		m_pContent->replot();
 	}
 }
+

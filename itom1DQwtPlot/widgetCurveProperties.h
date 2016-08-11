@@ -66,6 +66,9 @@ public slots:
 	void on_listWidget_itemSelectionChanged();
 	void visibilityChanged(bool visible);
 	void updateCurveList();
+
+signals:
+	void legendModified();
 };
 
 #endif

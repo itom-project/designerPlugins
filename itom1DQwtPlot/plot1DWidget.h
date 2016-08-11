@@ -114,6 +114,8 @@ class Plot1DWidget : public ItomQwtPlot
 		QList<QwtPlotCurve*> getplotCurveItems();
 		QList<QwtPlotCurveProperty*> getPlotCurveProperty();
 
+		void setLegendList(QStringList list);
+
         friend Itom1DQwtPlot;
 
     protected:

@@ -91,6 +91,7 @@ void Itom1DQwtPlot::constructor()
 	connect(d->m_pLinePropertiesDock, SIGNAL(visibilityChanged(bool)), d->m_pLinePropertyWidget, SLOT(visibilityChanged(bool)));
 	connect(m_pContent, SIGNAL(curveChanged()), d->m_pLinePropertyWidget, SLOT(on_listWidget_itemSelectionChanged()));
 	connect(m_pContent, SIGNAL(legendModified()), d->m_pLinePropertyWidget, SLOT(updateCurveList()));
+	connect(d->m_pLinePropertyWidget, SIGNAL(legendModified()), this, SLOT(updatePropertiesDock()));
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();
@@ -1075,4 +1076,9 @@ void Itom1DQwtPlot::setAntiAliased(bool &antiAliased)
 void Itom1DQwtPlot::showCurveProperties()
 {
 	d->m_pLinePropertiesDock->show();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::updatePropertiesDock()
+{
+	updatePropertyDock();
 }

@@ -328,6 +328,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         int getCurveFillAlpha() const;
 
 		QWidget* getWidgetCurveProperties();
+		
+
 
         friend Plot1DWidget;
 
@@ -359,6 +361,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         QSharedPointer<ito::DataObject> getDisplayed(void);
 
     private slots:
+		void updatePropertiesDock();
 };
 //----------------------------------------------------------------------------------------------------------------------------------
 
