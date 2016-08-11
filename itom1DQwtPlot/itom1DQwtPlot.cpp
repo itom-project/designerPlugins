@@ -91,7 +91,6 @@ void Itom1DQwtPlot::constructor()
 	connect(d->m_pLinePropertiesDock, SIGNAL(visibilityChanged(bool)), d->m_pLinePropertyWidget, SLOT(visibilityChanged(bool)));
 	connect(m_pContent, SIGNAL(curveChanged()), d->m_pLinePropertyWidget, SLOT(on_listWidget_itemSelectionChanged()));
 	connect(m_pContent, SIGNAL(legendModified()), d->m_pLinePropertyWidget, SLOT(updateCurveList()));
-	connect(d->m_pLinePropertyWidget, SIGNAL(legendModified()), this, SLOT(updatePropertiesDock()));
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();

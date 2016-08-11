@@ -760,12 +760,7 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
     m_legendVisible = visible;
     m_legendPosition = position;
 }
-//----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setLegendList(QStringList list)
-{
-	m_legendTitles = list;
 
-}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataObject *object)
 {
@@ -811,6 +806,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
     }
     replot();
 	emit legendModified();
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

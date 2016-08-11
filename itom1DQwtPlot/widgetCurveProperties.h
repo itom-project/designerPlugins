@@ -60,6 +60,7 @@ private slots:
 	void on_listWidget_itemChanged(QListWidgetItem *item);
 	void on_checkBoxVisible_stateChanged(int state);
 	void on_colorPickerButtonSymbol_colorChanged(QColor color);
+	void on_lineEditName_editingFinished();
 
 public slots:
 	
@@ -68,7 +69,7 @@ public slots:
 	void updateCurveList();
 
 signals:
-	void legendModified();
+
 };
 
 #endif
