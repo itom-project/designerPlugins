@@ -27,6 +27,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 
+#this is required to get the state of ITOM_SDK_PCL_SUPPORT
+find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib REQUIRED)
+
 IF(ITOM_SDK_PCL_SUPPORT)
     find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib pointcloud qpropertyeditor REQUIRED)
     
