@@ -1124,6 +1124,8 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
 				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
 			}
 
+            setCoordinates(pts, true);
+
             replot();
         }
     }
