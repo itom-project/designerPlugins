@@ -180,7 +180,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 				{
 					constSymbolSize = false;
 				}
-
+				constSymbolColor = false;//okay because the current curve does not have any color set. This leads in the following that the color is set to black
 			}
 			if (legendVisible != m_pContent->getPlotCurveProperty().at(row)->getLegendVisible())
 			{
@@ -254,6 +254,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		{
 			if (m_pContent->getplotCurveItems().at(row)->symbol())
 			{
+				ui.colorPickerButtonSymbol->setEnabled(true);
 				ui.comboBoxLineSymbol->setCurrentIndex((int)(m_pContent->getplotCurveItems().at(row)->symbol()->style()+1));
 
 
@@ -261,6 +262,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			else
 			{
 				ui.comboBoxLineSymbol->setCurrentIndex(0);
+				ui.colorPickerButtonSymbol->setEnabled(false);
 			}
 
 		}
