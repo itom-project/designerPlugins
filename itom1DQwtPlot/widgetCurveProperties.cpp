@@ -268,6 +268,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 		}
 		else
 		{
+			ui.colorPickerButtonSymbol->setEnabled(true);
 			ui.comboBoxLineSymbol->setCurrentIndex(-1);
 		}
 		if (constSymbolSize)

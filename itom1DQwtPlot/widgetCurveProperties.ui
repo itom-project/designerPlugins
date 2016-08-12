@@ -148,7 +148,11 @@
        </widget>
       </item>
       <item row="2" column="6">
-       <widget class="ColorPickerButton" name="colorPickerButtonSymbol"/>
+       <widget class="ColorPickerButton" name="colorPickerButtonSymbol">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
       </item>
       <item row="4" column="4">
        <spacer name="verticalSpacer">
