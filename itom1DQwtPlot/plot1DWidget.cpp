@@ -676,7 +676,10 @@ void Plot1DWidget::toggleLegendLabel(QwtPlotCurve* curve, const bool state)
 	if (m_pLegend)
 	{
 		QwtLegendLabel *legendLabel(qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(curve))));
-		legendLabel->setChecked(state);
+        if (legendLabel)
+        {
+		    legendLabel->setChecked(state);
+        }
 	}
 
 }
@@ -708,6 +711,9 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
                 maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
                 //item->setLegendIconSize(QSize(8,24));
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+
+                //TODO: the following connection is lost once the single legend entry becomes invisible. If it is displayed again, the signal is not re-established. Changing the legend-position
+                //re-connects it again!
 				connect(legendLabel, SIGNAL(checked(bool)), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
                 if (legendLabel)
                 {
