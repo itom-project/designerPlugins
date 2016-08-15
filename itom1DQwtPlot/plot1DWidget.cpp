@@ -2299,6 +2299,8 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             setAxisScale(QwtPlot::xBottom, m_pData->m_axisMin, m_pData->m_axisMax);
             setAxisScale(QwtPlot::yLeft, m_pData->m_valueMin, m_pData->m_valueMax);
 
+            updateGeometry(); //if the interval changes, the tick positions... change as well. Therefore, the sizeHint() might change, too, possibly allowing a smaller plot window
+
             QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
             zoom = zoom.normalized();
 
