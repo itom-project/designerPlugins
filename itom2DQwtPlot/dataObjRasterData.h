@@ -39,6 +39,13 @@ struct InternalData;
 class DataObjRasterData : public QwtRasterData
 {
     public:
+        enum RasterDataType
+        {
+            tInteger        = 0,  // Object is an integer
+            tFloatOrComplex = 1,  // Object is floating point or complex value
+            tRGB            = 2   // Object is true color type
+        };
+
         explicit DataObjRasterData(const InternalData *m_internalData, const bool isOverlayData = false);
         explicit DataObjRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending, const bool overlay = true);
         ~DataObjRasterData();
@@ -66,7 +73,7 @@ class DataObjRasterData : public QwtRasterData
 
         bool isInit() const {return m_dataObj.getDims() > 0 && m_dataObjPlane != NULL;}
 
-        char getTypeFlag() const 
+        RasterDataType getTypeFlag() const 
         { 
             int type = m_dataObj.getType();
             if(type == ito::tRGBA32) return tRGB;
@@ -74,14 +81,11 @@ class DataObjRasterData : public QwtRasterData
             return tInteger; 
         }
 
-        void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc);
+        void getPlaneScaleAndOffset(double &scaleY, double &scaleX, double &offsetY, double &offsetX) const;
 
-        enum tTypeFlag
-        {
-            tInteger        = 0,  // Object is an integer
-            tFloatOrComplex = 1,  // Object is floating point or complex value
-            tRGB            = 2   // Object is true color type
-        };
+        void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc) const;
+
+        
 
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale

@@ -745,6 +745,25 @@ QRgb DataObjRasterData::value2_yinv_rgb(int m, int n) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void DataObjRasterData::getPlaneScaleAndOffset(double &scaleY, double &scaleX, double &offsetY, double &offsetX) const
+{
+    int dims = m_dataObj.getDims();
+
+    if (dims >= 2)
+    {
+        scaleX = m_dataObj.getAxisScale(dims - 1);
+        scaleY = m_dataObj.getAxisScale(dims - 2);
+        offsetX = m_dataObj.getAxisOffset(dims - 1);
+        offsetY = m_dataObj.getAxisOffset(dims - 2);
+    }
+    else
+    {
+        scaleY = scaleX = 1.0;
+        offsetY = offsetX = 1.0;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
 {
     //timer1.restart();    
@@ -898,18 +917,18 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject()
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::discardRaster()
 {
-    //qDebug() << "rendering time" << timer1.elapsed();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
-void DataObjRasterData::getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc)
+void DataObjRasterData::getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc) const
 {
     if(!m_dataObjPlane || m_dataObjPlane->getDims() < 2)
     {
         min = std::numeric_limits<double>::quiet_NaN();
-        max = std::numeric_limits<double>::quiet_NaN();
-        return;
+        max = min;
     }
-
-    ito::dObjHelper::minMaxValue(m_dataObjPlane, min, minLoc, max, maxLoc, true, m_pInternalData->m_cmplxType);
-    return;
+    else
+    {
+        ito::dObjHelper::minMaxValue(m_dataObjPlane, min, minLoc, max, maxLoc, true, m_pInternalData->m_cmplxType);
+    }
 }
