@@ -35,6 +35,7 @@
 #include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qshortcut.h>
+#include <qdesktopwidget.h>
 
 #include <qwt_plot_renderer.h>
 #include <qmenu.h>
@@ -856,7 +857,22 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 }
 
                 //move the new figure close to the right, bottom position of this figure
-                figure->move(geom.x() + 2*geom.width()/3, geom.y() + 2*geom.height()/3);
+                geom.setX(geom.x() + 2 * geom.width() / 3);
+                geom.setY(geom.y() + 2 * geom.height() / 3);
+                geom.setWidth(width());
+                geom.setHeight(height());
+
+                //check if the desired geometry is within the available desktop
+                QDesktopWidget *dw = QApplication::desktop();
+                QRect screenGeom = dw->screenGeometry(this);
+                if (!screenGeom.contains(geom.bottomRight()))
+                {
+                    QPoint t(screenGeom.bottomRight() - geom.bottomRight());
+                    t.rx() = qMin(0, t.x());
+                    t.ry() = qMin(0, t.y());
+                    geom.translate(t);
+                }
+                figure->move(geom.x(), geom.y());
             }
             else
             {
