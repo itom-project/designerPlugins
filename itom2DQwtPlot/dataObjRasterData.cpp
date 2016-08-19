@@ -861,10 +861,11 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
     int width = m_dataObjPlane->getSize(dims - 1);
     int height = m_dataObjPlane->getSize(dims - 2);
 
-    bool validY, validX;
+    bool validY0, validX0, validY1, validX1;
 
-    m_dataObjPlane->getPhysToPix2D(yInterval.minValue(), yd0, validY, xInterval.minValue(), xd0, validX);
-    m_dataObjPlane->getPhysToPix2D(yInterval.maxValue(), yd1, validY, xInterval.maxValue(), xd1, validX);
+    m_dataObjPlane->getPhysToPix2D(yInterval.minValue(), yd0, validY0, xInterval.minValue(), xd0, validX0);
+
+    m_dataObjPlane->getPhysToPix2D(yInterval.maxValue(), yd1, validY1, xInterval.maxValue(), xd1, validX1);
 
     temp = std::max(yd0, yd1);
     yd0 = std::min(yd0, yd1);
@@ -873,6 +874,39 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
     temp = std::max(xd0, xd1);
     xd0 = std::min(xd0, xd1);
     xd1 = temp;
+
+    if (!validX0 && !validX1)
+    {
+        if (!xInterval.contains(m_dataObjPlane->getPixToPhys(dims - 1, 0)))
+        {
+            return QSharedPointer<ito::DataObject>(new ito::DataObject());
+        }
+    }
+    else if (!validY0 && !validY1)
+    {
+        if (!yInterval.contains(m_dataObjPlane->getPixToPhys(dims - 2, 0)))
+        {
+            return QSharedPointer<ito::DataObject>(new ito::DataObject());
+        }
+    }
+
+    if (!validY1)
+    {
+        yd1 = height - 1;
+    }
+    if (!validX1)
+    {
+        xd1 = width - 1;
+    }
+
+    if (!validY0)
+    {
+        yd0 = 0;
+    }
+    if (!validX0)
+    {
+        xd0 = 0;
+    }
 
     yi0 = yd0 < 0 ? 0.0 : (int)(yd0);
     yi1 = yd1 < 0 ? 0.0 : (int)(yd1 + 0.9);
