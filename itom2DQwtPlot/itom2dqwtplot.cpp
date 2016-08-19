@@ -820,6 +820,13 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
     retval += apiGetFigure("DObjStaticLine","", newUniqueID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
 
+    QWidget *w = this;
+    while (w)
+    {
+        qDebug() << w->geometry() << w->frameGeometry();
+        w = qobject_cast<QWidget*>(w->parent());
+    }
+
     if (!retval.containsError())
     {
         if (uniqueID != newUniqueID || needChannelUpdate)
@@ -828,12 +835,28 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             ito::AbstractDObjFigure* figure = NULL;
             if (lineCutObj->inherits("ito::AbstractDObjFigure"))
             {
+                //get global position of this window
+                QWidget *w = this;
+                QRect geom(0,0,0,0);
+                QRect temp = geometry();
+                geom.setHeight(temp.height());
+                geom.setWidth(temp.width());
+                while (w)
+                {
+                    temp = w->geometry();
+                    geom = QRect(temp.x() + geom.x(), temp.y() + geom.y(), geom.width(), geom.height());
+                    w = qobject_cast<QWidget*>(w->parent());
+                }
+
                 figure = (ito::AbstractDObjFigure*)lineCutObj;
                 if (!needChannelUpdate)
                 {
                     d->m_childFigures[lineCutObj] = newUniqueID;
                     connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
                 }
+
+                //move the new figure close to the right, bottom position of this figure
+                figure->move(geom.x() + 2*geom.width()/3, geom.y() + 2*geom.height()/3);
             }
             else
             {
