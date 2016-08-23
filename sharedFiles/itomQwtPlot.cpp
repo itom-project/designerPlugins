@@ -2510,6 +2510,27 @@ ito::RetVal ItomQwtPlot::setGeometricShapeLabelVisible(int idx, bool setVisible)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
 {
+    if (!copyToClipboardNotFile)
+    {
+        QFileInfo fileInfo(fileName);
+        if (fileInfo.exists())
+        {
+            if (!fileInfo.isWritable())
+            {
+                return ito::RetVal::format(ito::retError, 0, "The file '%s' already exists but cannot be overwritten.", fileName.toLatin1().data());
+            }
+            else
+            {
+                QFile file(fileName);
+                if (!file.open(QIODevice::WriteOnly))
+                {
+                    return ito::RetVal::format(ito::retError, 0, "The file '%s' already exists but cannot be overwritten (Maybe it is opened in another application).", fileName.toLatin1().data());
+                }
+                file.close();
+            }
+        }
+    }
+
     if (curSize.height() == 0 || curSize.width() == 0)
     {
         curSize = size();
@@ -2527,9 +2548,6 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 
     QwtPlotRenderer renderer;
 
-    QList< QRectF > plotContentWidgetCoords;
-    plotContentWidgetCoords << QRectF(QPointF(hMyParent->x(), hMyParent->y()), hMyParent->size());
-    qDebug("x %i, y %i, sizeX %i, sizeY %i", hMyParent->x(), hMyParent->y(), hMyParent->size().width(), hMyParent->size().height());
     // flags to make the document look like the widget
     renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
     //renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true); //deprecated in qwt 6.1.0
@@ -2549,17 +2567,6 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         {
             plotInfoVisible = true;
             emit statusBarMessage(tr("copy current view to clipboard including infoWidgets ..."));
-            
-            foreach (const ito::AbstractFigure::ToolboxItem &item, hMyParent->getToolboxes())
-            {
-                if (item.toolbox && item.toolbox->isVisible() /*&& item.toolbox->widget()->isVisible()*/)
-                {
-                    plotContentWidgetCoords << QRectF(QPointF(item.toolbox->x(), item.toolbox->y()), item.toolbox->size());
-                    qDebug("x %i, y %i, sizeX %i, sizeY %i", item.toolbox->x(), item.toolbox->y(), item.toolbox->size().width(), item.toolbox->size().height());
-                }
-            }
-
-
         }
         else
         {
@@ -2700,12 +2707,37 @@ void ItomQwtPlot::mnuActSave()
         filter.join(";;"), NULL);
 #endif
 
+    ito::RetVal retval;
+
     if (!fileName.isEmpty())
     {
         QFileInfo fi(fileName);
         saveDefaultPath = fi.path();
 
-        exportCanvas(false, fileName, curSize, resolution);
+        retval += exportCanvas(false, fileName, curSize, resolution);
+    }
+
+    if (retval.containsError())
+    {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Error while saving the plot").toLatin1().data());
+        if (retval.errorMessage())
+        {
+            msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
+        }
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+    }
+    else if (retval.containsWarning())
+    {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Warning while saving the plot").toLatin1().data());
+        if (retval.errorMessage())
+        {
+            msgBox.setInformativeText(QLatin1String(retval.errorMessage()));
+        }
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
     }
 }
 
@@ -2778,7 +2810,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
         else if (retval.containsWarning())
         {
             QMessageBox msgBox;
-            msgBox.setText(tr("Error sending data object to workspace").toLatin1().data());
+            msgBox.setText(tr("Warning sending data object to workspace").toLatin1().data());
             if (retval.errorMessage())
             {
                 msgBox.setInformativeText(QLatin1String(retval.errorMessage()));

@@ -25,6 +25,7 @@
 #include <qbrush.h>
 #include <qpalette.h>
 #include <qstatusbar.h>
+#include <qimagewriter.h>
 
 #include <qsharedpointer.h>
 #include <qapplication.h>
@@ -174,11 +175,51 @@ void ItomQwtDObjFigure::addToolbarsAndMenus()
         }
     }	
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtDObjFigure::copyToClipBoard()
 {
     if (m_pBaseContent)
         return m_pBaseContent->exportCanvas(true, "");
+    return ito::RetVal(ito::retError, 0, tr("no content widget available.").toLatin1().data());
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtDObjFigure::savePlot(const QString &filename, float xsize /*= 0*/, float ysize /*= 0*/, const int resolution /*= 300*/)
+{
+    QFileInfo fileInfo(filename);
+    QList<QByteArray> suffixes = QImageWriter::supportedImageFormats();
+#ifndef QT_NO_PRINTER
+    suffixes << "pdf";
+#endif
+
+#if QT_VERSION < 0x050000
+#ifndef QT_NO_PRINTER
+    suffixes << "ps";
+#endif
+#endif
+
+#ifndef QWT_NO_SVG
+#ifdef QT_SVG_LIB
+#if QT_VERSION >= 0x040500
+        suffixes << "svg";
+#endif
+#endif
+#endif
+
+    if (!suffixes.contains(fileInfo.suffix().toLatin1().data()))
+    {
+        QStringList s;
+        foreach(const QByteArray &b, suffixes)
+        {
+            s << b;
+        }
+        return ito::RetVal::format(ito::retError, 0, "%s is an unsupported file suffix. Supported values are: %s", fileInfo.suffix().toLatin1().data(), s.join("; ").toLatin1().data());
+    }
+
+    if (m_pBaseContent)
+        return m_pBaseContent->exportCanvas(false, filename, QSizeF(xsize, ysize), resolution);
+
     return ito::RetVal(ito::retError, 0, tr("no content widget available.").toLatin1().data());
 }
 

@@ -113,6 +113,19 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
 
     Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data.")
+
+    Q_CLASSINFO("slot://savePlot", "saves the plot as image, pdf or svg file (the supported file formats are listed in the save dialog of the plot)\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "filename : {str}\n"
+    "    absolute or relative filename whose suffix defines the file format\n"
+    "xsize : {float}\n"
+    "    x-size of the canvas in mm. If 0.0 [default], the size of the canvas is determined by the current size of the figure\n"
+    "ysize : {float}\n"
+    "    y-size of the canvas in mm. If 0.0 [default], the size of the canvas is determined by the current size of the figure\n"
+    "resolution : {int}\n"
+    "    resolution of image components in the plot in dpi (default: 300dpi)")
     
     Q_CLASSINFO("slot://renderToPixMap", "returns a QPixmap with the content of the plot\n"
     "\n"
@@ -377,6 +390,7 @@ public:
     
 public Q_SLOTS:
     ito::RetVal copyToClipBoard();
+    ito::RetVal savePlot(const QString &filename, float xsize = 0, float ysize = 0, int resolution = 300);
     QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
     void userInteractionStart(int type, bool start, int maxNrOfPoints = -1);
