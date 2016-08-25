@@ -30,6 +30,7 @@
 #include <qsharedpointer.h>
 #include <qapplication.h>
 #include <qtoolbar.h>
+#include <qfileinfo.h>
 
 #include "DataObject/dataobj.h"
 #include "itomQwtPlot.h"
