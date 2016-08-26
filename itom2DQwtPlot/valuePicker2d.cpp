@@ -61,8 +61,8 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
         {
             int x = qRound((pos.x() / sx) + ox);
             int y = qRound((pos.y() / sy) + oy);
-            double temp = std::min(pos.x(), pos.y());
-            int prec = (temp >= 0.1) ? 2 : 3;
+            double temp = std::min(std::abs(sy), std::abs(sx));
+            int prec = (temp >= 0.1) ? 1 : (temp >= 0.01 ? 2 : ((temp >= 0.001) ? 3 : 4));
             coordinates = QString("Phys.: [x: %3, y: %4]\nPx: [x: %1, y: %2]").arg(x).arg(y).arg(pos.x(), 0, 'g', prec).arg(pos.y(), 0, 'g', prec);
         }
 
