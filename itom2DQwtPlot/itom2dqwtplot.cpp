@@ -856,6 +856,10 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                     connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
                 }
 
+                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+                //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
+                QTimer::singleShot(0, this, SLOT(activatePlot()));
+
                 //move the new figure close to the right, bottom position of this figure
                 geom.setX(geom.x() + 2 * geom.width() / 3);
                 geom.setY(geom.y() + 2 * geom.height() / 3);
@@ -996,6 +1000,19 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
     }
 
     d->m_childFigures.erase(it);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::activatePlot()
+{
+    //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+    //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
+    //this method is invoked by displayCut
+    activateWindow();
+    if (m_pContent)
+    {
+        QTimer::singleShot(0, m_pContent, SLOT(setFocus()));
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

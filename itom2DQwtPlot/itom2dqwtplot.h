@@ -239,6 +239,7 @@ private:
 
 private slots:
     void childFigureDestroyed(QObject *obj);
+    void activatePlot();
 
 public slots:
     QSharedPointer<ito::DataObject> getDisplayed(void);
