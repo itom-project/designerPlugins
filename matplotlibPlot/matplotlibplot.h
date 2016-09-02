@@ -81,7 +81,7 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 
     Q_CLASSINFO("slot://replot", "forces a replot of the plot")
 
-    Q_CLASSINFO("signal://subplotConfigSliderChanged", "interal use between MatplotlibPlot and the subplot configuration dialog.")
+    Q_CLASSINFO("signal://subplotConfigSliderChanged", "internal use between MatplotlibPlot and the subplot configuration dialog.")
 
     DESIGNER_PLUGIN_ITOM_API
 public:

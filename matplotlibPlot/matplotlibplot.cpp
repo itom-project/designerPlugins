@@ -73,10 +73,11 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_actZoomToRect->setChecked(false);
     m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
 
-    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("marker"), this);
+    m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("Marker"), this);
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
+    m_actZoomToRect->setToolTip(tr("Show coordinates under mouse cursor"));
     m_actMarker->connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
 
     m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("subplot configuration..."), this);
@@ -98,30 +99,34 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_toolbar = new QToolBar(tr("matplotlib toolbar"), this);
     addToolBar(m_toolbar, "mainToolBar");
     m_toolbar->setObjectName("toolbar");
+    m_toolbar->addAction(m_actSave);
+    m_toolbar->addSeparator();
     m_toolbar->addAction(m_actHome);
     m_toolbar->addAction(m_actBack);
     m_toolbar->addAction(m_actForward);
-    m_toolbar->addSeparator();
     m_toolbar->addAction(m_actPan);
     m_toolbar->addAction(m_actZoomToRect);
-    m_toolbar->addAction(m_actMarker);
     m_toolbar->addSeparator();
     m_toolbar->addAction(m_actSubplotConfig);
-    m_toolbar->addAction(m_actSave);
+    m_toolbar->addSeparator();
+    m_toolbar->addAction(m_actMarker);
+    
     QAction *lblAction = m_toolbar->addWidget(m_lblCoordinates);
     lblAction->setVisible(true);
 
     QMenu *contextMenu = new QMenu(tr("Matplotlib"),this);
+    contextMenu->addAction(m_actSave);
+    contextMenu->addSeparator();
     contextMenu->addAction(m_actHome);
     contextMenu->addAction(m_actBack);
     contextMenu->addAction(m_actForward);
-    contextMenu->addSeparator();
     contextMenu->addAction(m_actPan);
     contextMenu->addAction(m_actZoomToRect);
+    contextMenu->addSeparator();
     contextMenu->addAction(m_actMarker);
     contextMenu->addSeparator();
     contextMenu->addAction(m_actSubplotConfig);
-    contextMenu->addAction(m_actSave);
+    contextMenu->addSeparator();
     contextMenu->addAction(m_toolbar->toggleViewAction());
     contextMenu->addAction(m_actProperties);
     addMenu(contextMenu);
@@ -203,6 +208,11 @@ void MatplotlibPlot::mnuMarkerClick(bool checked)
     {
         m_pContent->m_trackerActive = checked;
         m_pContent->setMouseTracking(checked);
+
+        if (!checked)
+        {
+            m_lblCoordinates->setText("");
+        }
     }
 }
 
