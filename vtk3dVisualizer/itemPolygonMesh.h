@@ -70,7 +70,7 @@ public:
     enum Interpolation { Flat, Gouraud, Phong };
     enum Culling { ShowAll, BackfaceOnly, FrontfaceOnly };
     enum ColorMode { RGB, SolidColor, NormalX, NormalY, NormalZ, NormalMagnitude, X, Y, Z, XY, YZ, XZ, XYZ, Curvature};
-    enum ColorMap { gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green};
+    enum ColorMap { gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis};
 
     //properties
     virtual void setVisible(bool value);
