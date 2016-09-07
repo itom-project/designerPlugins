@@ -26,7 +26,7 @@
 #include "qmetaobject.h"
 
 
-#include "Plot1DWidget.h"
+#include "plot1DWidget.h"
 #include "qwtPlotCurveProperty.h"
 
 
