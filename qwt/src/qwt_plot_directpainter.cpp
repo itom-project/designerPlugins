@@ -301,7 +301,7 @@ bool QwtPlotDirectPainter::eventFilter( QObject *, QEvent *event )
                     doCopyCache = qwtHasBackingStore( plotCanvas );
                     if ( doCopyCache )
                     {
-                        painter.drawPixmap( plotCanvas->contentsRect().topLeft(), 
+                        painter.drawPixmap( plotCanvas->rect().topLeft(), 
                             *plotCanvas->backingStore() );
                     }
                 }
