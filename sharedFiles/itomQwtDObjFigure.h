@@ -295,6 +295,13 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     "currentShape : {shape}\n"
     "    new current shape or an invalid shape if the current shape has been deleted and no other shape is selected now")
 
+	Q_CLASSINFO("signal://planeIndexChanged", "This signal is emitted whenever the displayed plane in a 3D dataObject is changed\n"
+	"\n"
+	"Parameters\n"
+	"-------------\n"
+	"plane : {int}\n"
+	"    index of the displayed plane in the dataObject")
+
     DESIGNER_PLUGIN_ITOM_API
 
 public:
@@ -441,7 +448,8 @@ signals :
     void geometricShapeDeleted(int idx);
     void geometricShapesDeleted();
     void geometricShapeFinished(QVector<ito::Shape> shapes, bool aborted);
-    void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/    
+    void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/
+	void planeIndexChanged(int planeIndex);
 };
 
 #endif //ITOMQWTDOBJFIGURE_H

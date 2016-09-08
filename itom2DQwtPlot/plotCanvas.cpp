@@ -2367,6 +2367,7 @@ void PlotCanvas::mnuPlaneSelector(int plane)
 {
     Itom2dQwtPlot *p = qobject_cast<Itom2dQwtPlot*>(this->parent());
     p->setPlaneIndex(plane);
+	emit p->planeIndexChanged(plane);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
