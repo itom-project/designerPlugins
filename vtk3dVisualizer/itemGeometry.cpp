@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
@@ -168,7 +168,7 @@ ito::RetVal ItemGeometry::addPyramid(const ito::DataObject *points, const QColor
     pcl::Vertices indices;
     pcl::PointCloud<pcl::PointXYZ> cloud;
     cloud.reserve(5);
-    indices.vertices.resize(3);
+    indices.vertices.resize(4);
 
     for(int i = 0; i < 5; ++i)
     {

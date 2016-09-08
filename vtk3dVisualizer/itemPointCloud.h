@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
@@ -38,17 +38,21 @@ class ItemPointCloud : public Item
     Q_OBJECT
 
     Q_ENUMS(ColorMode);
+    Q_ENUMS(ColorMap);
 
     Q_PROPERTY(int PointSize READ pointSize WRITE setPointSize DESIGNABLE true USER true);
     Q_PROPERTY(int LineWidth READ lineWidth WRITE setLineWidth DESIGNABLE true USER true);
     Q_PROPERTY(ColorMode ColorMode READ colorMode WRITE setColorMode DESIGNABLE true USER true);
     Q_PROPERTY(QColor Color READ color WRITE setColor DESIGNABLE true USER true);
+    Q_PROPERTY(ColorMap ColorMap READ colorMap WRITE setColorMap DESIGNABLE true USER true);
+    Q_PROPERTY(ito::AutoInterval ColorValueRange READ colorValueRange WRITE colorValueRange DESIGNABLE true USER true);
 
 public:
     ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
     virtual ~ItemPointCloud();
 
     enum ColorMode { SolidColor, X, Y, Z, XYZ, XY, YZ, XZ, Intensity, NormalX, NormalY, NormalZ, NormalXYZ, RGB, Curvature };
+    enum ColorMap { gray, falseColor, falseColorIR, hsv, hsvIR, blue2red };
 
     ito::RetVal addPointCloud(const ito::PCLPointCloud &cloud);
 
@@ -69,7 +73,11 @@ public:
     QColor color() const { return m_color; }
     void setColor(QColor value);
 
+    ColorMap colorMap() const { return m_colorMap; }
+    void setColorMap(ColorMap colorMap);
 
+    ito::AutoInterval colorValueRange() const { return m_colorValueRange; }
+    void colorValueRange(const ito::AutoInterval& range);
 
 protected:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
@@ -79,7 +87,8 @@ protected:
     int m_lineWidth;
     QColor m_color;
     ColorMode m_colorMode;
-
+    ColorMap m_colorMap;
+    ito::AutoInterval m_colorValueRange;
 
 
     template <typename PointT> ito::RetVal addPointCloudTmpl(typename pcl::PointCloud<PointT>::Ptr cloud, bool update = false);

@@ -76,7 +76,6 @@ IF(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizerFactory.h
             ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.h
-            ${ITOM_SDK_INCLUDE_DIR}/DataObject/dataObjectFuncs.h
             ${CMAKE_CURRENT_SOURCE_DIR}/coordSysProperty.h
             ${CMAKE_CURRENT_SOURCE_DIR}/CustomTypes.h
             ${CMAKE_CURRENT_SOURCE_DIR}/item.h

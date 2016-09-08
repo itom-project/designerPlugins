@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2015, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2016, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
@@ -27,7 +27,9 @@
 //-------------------------------------------------------------------------------------------
 ItemPointCloud::ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem)
     : Item(name, Item::rttiPointCloud, treeItem),
-    m_visualizer(visualizer)
+    m_visualizer(visualizer),
+    m_colorMap(falseColor),
+    m_colorValueRange(ito::AutoInterval())
 {
     m_pointSize = 2;
     m_lineWidth = 1;
@@ -238,6 +240,8 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
     if (!retval.containsError())
     {
         m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
+        setColorMap(m_colorMap);
+        colorValueRange(m_colorValueRange);
     }
 
     return retval;
@@ -438,6 +442,8 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
     if (!retval.containsError())
     {
         m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
+        setColorMap(m_colorMap);
+        colorValueRange(m_colorValueRange);
     }
 
     return retval;
@@ -580,6 +586,49 @@ void ItemPointCloud::setColorMode(ColorMode mode)
     }
     
     emit updateCanvasRequest();
+}
+
+//-------------------------------------------------------------------------------------------
+void ItemPointCloud::setColorMap(ColorMap colorMap)
+{
+    m_colorMap = colorMap;
+    switch (colorMap)
+    {
+    case gray:
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT, pcl::visualization::PCL_VISUALIZER_LUT_GREY, m_name.toStdString());
+        break;
+    case falseColor:
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT, pcl::visualization::PCL_VISUALIZER_LUT_JET, m_name.toStdString());
+        break;
+    case falseColorIR:
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT, pcl::visualization::PCL_VISUALIZER_LUT_JET_INVERSE, m_name.toStdString());
+        break;
+    case hsv:
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT, pcl::visualization::PCL_VISUALIZER_LUT_HSV, m_name.toStdString());
+        break;
+    case hsvIR:
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT, pcl::visualization::PCL_VISUALIZER_LUT_HSV_INVERSE, m_name.toStdString());
+        break;
+    case blue2red:
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT, pcl::visualization::PCL_VISUALIZER_LUT_BLUE2RED, m_name.toStdString());
+        break;
+    }
+    emit updateCanvasRequest();
+}
+
+
+//-------------------------------------------------------------------------------------------
+void ItemPointCloud::colorValueRange(const ito::AutoInterval& range)
+{
+    m_colorValueRange = range;
+    if (range.isAuto())
+    {
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT_RANGE, pcl::visualization::PCL_VISUALIZER_LUT_RANGE_AUTO, m_name.toStdString());
+    }
+    else
+    {
+        m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT_RANGE, range.minimum(), range.maximum(), m_name.toStdString());
+    }
 }
 
 

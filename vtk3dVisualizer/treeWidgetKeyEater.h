@@ -1,7 +1,7 @@
 /* ********************************************************************
 itom measurement system
 URL: http://www.uni-stuttgart.de/ito
-Copyright (C) 2015, Institut für Technische Optik (ITO),
+Copyright (C) 2016, Institut für Technische Optik (ITO),
 Universität Stuttgart, Germany
 
 This file is part of the designer widget 'vtk3dVisualizer' for itom.
