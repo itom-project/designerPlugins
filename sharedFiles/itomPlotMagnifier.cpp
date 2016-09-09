@@ -219,14 +219,14 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
 
             if (scaleDiv.contains(scaleXorY))
             {
-                const double factor = (scaleXorY - scaleDiv.lowerBound()) / scaleDiv.range();
+                const double factor2 = (scaleXorY - scaleDiv.lowerBound()) / scaleDiv.range();
 
                 if (xAxisZoomer == axisId)
                 {
                     if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setLeft(scaleXorY - size * factor);
-                        zoomRect.setRight(scaleXorY + size * (1-factor));
+                        zoomRect.setLeft(scaleXorY - size * factor2);
+                        zoomRect.setRight(scaleXorY + size * (1-factor2));
                     }
                     else
                     {
@@ -239,8 +239,8 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
                 {
                     if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setTop(scaleXorY - size * factor);
-                        zoomRect.setBottom(scaleXorY + size * (1-factor));
+                        zoomRect.setTop(scaleXorY - size * factor2);
+                        zoomRect.setBottom(scaleXorY + size * (1-factor2));
                     }
                     else
                     {
@@ -251,7 +251,7 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
                 }
                 else if (isAxisEnabledSpecial(axisId))
                 {
-                    plt->setAxisScale( axisId, scaleXorY - size * factor, scaleXorY + size * (1-factor) );
+                    plt->setAxisScale( axisId, scaleXorY - size * factor2, scaleXorY + size * (1-factor2) );
                     doReplot = true;
                 }
             }
@@ -335,6 +335,7 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
         }
     }
 
+    zoomRect = zoomRect.normalized();
     if (m_zoomer.data() && zoomRect.isValid())
     {
         m_zoomer->zoom(zoomRect);
