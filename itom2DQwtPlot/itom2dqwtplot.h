@@ -46,6 +46,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 {
     Q_OBJECT
 
+    //DESIGNABLE (default: true): property is visible in QtDesigner property editor
+    //USER (default: false): property is visible in property editor of plot
+
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)
     Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel RESET resetxAxisLabel USER true)
     Q_PROPERTY(bool xAxisVisible READ getxAxisVisible WRITE setxAxisVisible USER true)
@@ -70,8 +73,8 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
 
     
-    Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false USER true)
-    Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false USER true)
+    Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false)
+    Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false)
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -119,6 +122,13 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     "    optional and unused")
 
     Q_CLASSINFO("slot://removeOverlayImage", "removes an overlay image. This is the same than assigning 'None' to the property 'overlayImage'")
+
+    Q_CLASSINFO("signal://planeIndexChanged", "This signal is emitted whenever the displayed plane in a 3D dataObject is changed\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "plane : {int}\n"
+    "    index of the displayed plane in the dataObject")
 
 public:
     Itom2dQwtPlot(QWidget *parent = 0);
@@ -250,6 +260,9 @@ public slots:
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
+
+signals:
+    void planeIndexChanged(int planeIndex);
 };
 
 #endif // ITOM2DQWTPLOT_H

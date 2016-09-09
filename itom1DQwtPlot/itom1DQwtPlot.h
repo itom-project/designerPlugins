@@ -45,6 +45,10 @@ class Plot1DWidget;
 class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 {
     Q_OBJECT
+
+    //DESIGNABLE (default: true): property is visible in QtDesigner property editor
+    //USER (default: false): property is visible in property editor of plot
+
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
 
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)

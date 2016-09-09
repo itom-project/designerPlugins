@@ -66,6 +66,9 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_OBJECT
     Q_ENUMS(ButtonStyle)
 
+    //DESIGNABLE (default: true): property is visible in QtDesigner property editor
+    //USER (default: false): property is visible in property editor of plot
+
     Q_PROPERTY(bool enableBoxFrame READ getBoxFrame WRITE setBoxFrame DESIGNABLE true USER true)
     Q_PROPERTY(ButtonStyle buttonSet READ getButtonSet WRITE setButtonSet DESIGNABLE true USER true)
     Q_PROPERTY(QColor axisColor READ getAxisColor WRITE setAxisColor USER true)
@@ -295,13 +298,6 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     "currentShape : {shape}\n"
     "    new current shape or an invalid shape if the current shape has been deleted and no other shape is selected now")
 
-	Q_CLASSINFO("signal://planeIndexChanged", "This signal is emitted whenever the displayed plane in a 3D dataObject is changed\n"
-	"\n"
-	"Parameters\n"
-	"-------------\n"
-	"plane : {int}\n"
-	"    index of the displayed plane in the dataObject")
-
     DESIGNER_PLUGIN_ITOM_API
 
 public:
@@ -449,7 +445,6 @@ signals :
     void geometricShapesDeleted();
     void geometricShapeFinished(QVector<ito::Shape> shapes, bool aborted);
     void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/
-	void planeIndexChanged(int planeIndex);
 };
 
 #endif //ITOMQWTDOBJFIGURE_H

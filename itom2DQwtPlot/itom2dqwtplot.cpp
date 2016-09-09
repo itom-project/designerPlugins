@@ -702,22 +702,15 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
         QSpinBox *spinBox = qobject_cast<QSpinBox*>(m_pContent->m_pActPlaneSelector->defaultWidget());
         if (spinBox)
         {
-            if (index < spinBox->minimum())
-            {
-                idx = spinBox->minimum();
-            }
-            else if (index > spinBox->maximum())
-            {
-                idx = spinBox->maximum();
-            }
-
+            idx = qBound(spinBox->minimum(), idx, spinBox->maximum());
+            spinBox->blockSignals(true); //block valueChanged signal from spinBox, which also calls this method.
             spinBox->setValue(idx);
+            spinBox->blockSignals(false);
         }
-    }
 
-    if (m_pContent)
-    {
         m_pContent->changePlane(idx);
+
+        emit planeIndexChanged(idx);
     }
     
     QStringList paramNames;
