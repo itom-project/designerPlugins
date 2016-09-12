@@ -1556,6 +1556,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else if (m_pData->m_forceValueParsing)
         {
+
+            for (int i = 0; m_pickers.size() > i; ++i)
+            {
+                if (m_pickers[i].curveIdx >= m_plotCurveItems.size())//check if curve of picker still exists. If not set curveIDx of picker to zero
+                    m_pickers[i].curveIdx = 0;
+            }
             updatePickerPosition(true);
 
             QRectF rect = seriesData->boundingRect();
@@ -1914,6 +1920,10 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir) //dir: 0: this point, -1: next valid to the left or this if not possible, 1: next valid to the right or this if not possible
 {
+    if (m_plotCurveItems.size() <= m->curveIdx) 
+    {
+        return;
+    }
     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
 
     if (!qIsFinite(xScaleStart))
