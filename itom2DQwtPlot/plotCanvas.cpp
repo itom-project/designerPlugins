@@ -899,7 +899,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     m_colorMapName = newPalette.name;
 
     setInverseColors(newPalette.inverseColorOne, newPalette.inverseColorTwo);
-    refreshStyles();
+
 
     if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
     {
