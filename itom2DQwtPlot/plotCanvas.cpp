@@ -304,7 +304,7 @@ ito::RetVal PlotCanvas::init()
     }
     else
     {
-        //refreshStyles is implicitely called by setColorMap
+        refreshStyles();
     }
 
     return ito::retOk;
