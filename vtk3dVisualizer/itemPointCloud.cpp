@@ -240,8 +240,10 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
     if (!retval.containsError())
     {
         m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
+#ifdef PCL_HASLUT
         setColorMap(m_colorMap);
         colorValueRange(m_colorValueRange);
+#endif
     }
 
     return retval;
@@ -442,8 +444,10 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
     if (!retval.containsError())
     {
         m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
+#ifdef PCL_HASLUT
         setColorMap(m_colorMap);
         colorValueRange(m_colorValueRange);
+#endif
     }
 
     return retval;
@@ -589,6 +593,7 @@ void ItemPointCloud::setColorMode(ColorMode mode)
 }
 
 //-------------------------------------------------------------------------------------------
+#ifdef PCL_HASLUT
 void ItemPointCloud::setColorMap(ColorMap colorMap)
 {
     m_colorMap = colorMap;
@@ -630,7 +635,7 @@ void ItemPointCloud::colorValueRange(const ito::AutoInterval& range)
         m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT_RANGE, range.minimum(), range.maximum(), m_name.toStdString());
     }
 }
-
+#endif
 
 //-------------------------------------------------------------------------------------------
 //void ItemPointCloud::setSelected(bool value)

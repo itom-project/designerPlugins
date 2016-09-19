@@ -55,6 +55,19 @@ IF(ITOM_SDK_PCL_SUPPORT)
         ELSE(CMAKE_BUILD_TYPE)
             SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
         ENDIF (DEFINED CMAKE_BUILD_TYPE)
+        
+        #PCL does not have a proper version number. Sometimes, new enumerations or methods are introduced without incrementing
+        #the version. Therefore, a search has to be done to check for the availability of some features.
+        FIND_FILE(PCL_VISUALIZER_COMMON_H common.h PATHS ${PCL_INCLUDE_DIRS} PATH_SUFFIXES pcl/visualization/common)
+        IF (PCL_VISUALIZER_COMMON_H)
+            FILE(READ ${PCL_VISUALIZER_COMMON_H} TMPTXT)
+            STRING(FIND "${TMPTXT}" "LookUpTableRepresentationProperties" matchres)
+            IF(${matchres} EQUAL -1)
+                MESSAGE(WARNING "PCL is no final version of 1.8.0 and does not have the enumeration pcl::visualization::LookUpTableRepresentationProperties. Not all features are available.")
+            ELSE()
+                ADD_DEFINITIONS(-DPCL_HASLUT)
+            ENDIF()  
+        ENDIF()
 
         INCLUDE_DIRECTORIES(
             ${CMAKE_CURRENT_BINARY_DIR}

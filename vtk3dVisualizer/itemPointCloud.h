@@ -44,8 +44,10 @@ class ItemPointCloud : public Item
     Q_PROPERTY(int LineWidth READ lineWidth WRITE setLineWidth DESIGNABLE true USER true);
     Q_PROPERTY(ColorMode ColorMode READ colorMode WRITE setColorMode DESIGNABLE true USER true);
     Q_PROPERTY(QColor Color READ color WRITE setColor DESIGNABLE true USER true);
+#ifdef PCL_HASLUT
     Q_PROPERTY(ColorMap ColorMap READ colorMap WRITE setColorMap DESIGNABLE true USER true);
     Q_PROPERTY(ito::AutoInterval ColorValueRange READ colorValueRange WRITE colorValueRange DESIGNABLE true USER true);
+#endif
 
 public:
     ItemPointCloud(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
@@ -72,13 +74,13 @@ public:
 
     QColor color() const { return m_color; }
     void setColor(QColor value);
-
+#ifdef PCL_HASLUT
     ColorMap colorMap() const { return m_colorMap; }
     void setColorMap(ColorMap colorMap);
 
     ito::AutoInterval colorValueRange() const { return m_colorValueRange; }
     void colorValueRange(const ito::AutoInterval& range);
-
+#endif
 protected:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
     ito::PCLPointCloud m_cloud;
