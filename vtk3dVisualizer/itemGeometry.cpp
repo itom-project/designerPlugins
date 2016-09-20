@@ -158,17 +158,71 @@ ito::RetVal ItemGeometry::updateText(const QString &text, const int x, const int
 ito::RetVal ItemGeometry::addPyramid(const ito::DataObject *points, const QColor &color)
 {
     m_geometryType = tPyramid;
-    m_nrOfShapes = 1;
+    m_nrOfShapes = 5;
 
     const ito::float32 *xPtr = (ito::float32*)points->rowPtr(0,0);
     const ito::float32 *yPtr = (ito::float32*)points->rowPtr(0,1);
     const ito::float32 *zPtr = (ito::float32*)points->rowPtr(0,2);
 
-    pcl::PolygonMesh mesh;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
+    cloud->resize(3);
+
+    (*cloud)[1] = pcl::PointXYZ(xPtr[0], yPtr[0], zPtr[0]);
+    (*cloud)[0] = pcl::PointXYZ(xPtr[1], yPtr[1], zPtr[1]);
+    (*cloud)[2] = pcl::PointXYZ(xPtr[4], yPtr[4], zPtr[4]);
+    if (m_visualizer->addPolygon<pcl::PointXYZ>(cloud, color.redF(), color.greenF(), color.blueF(), QString("%1_0").arg(m_name).toStdString()))
+    {
+        vtkProp *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.clear();
+        m_actors.append(a);
+    }
+
+    (*cloud)[1] = pcl::PointXYZ(xPtr[1], yPtr[1], zPtr[1]);
+    (*cloud)[0] = pcl::PointXYZ(xPtr[2], yPtr[2], zPtr[2]);
+    if (m_visualizer->addPolygon<pcl::PointXYZ>(cloud, color.redF(), color.greenF(), color.blueF(), QString("%1_1").arg(m_name).toStdString()))
+    {
+        vtkProp *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.append(a);
+    }
+
+    (*cloud)[0] = pcl::PointXYZ(xPtr[2], yPtr[2], zPtr[2]);
+    (*cloud)[1] = pcl::PointXYZ(xPtr[3], yPtr[3], zPtr[3]);
+    if (m_visualizer->addPolygon<pcl::PointXYZ>(cloud, color.redF(), color.greenF(), color.blueF(), QString("%1_2").arg(m_name).toStdString()))
+    {
+        vtkProp *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.append(a);
+    }
+
+    (*cloud)[1] = pcl::PointXYZ(xPtr[3], yPtr[3], zPtr[3]);
+    (*cloud)[0] = pcl::PointXYZ(xPtr[0], yPtr[0], zPtr[0]);
+    if (m_visualizer->addPolygon<pcl::PointXYZ>(cloud, color.redF(), color.greenF(), color.blueF(), QString("%1_3").arg(m_name).toStdString()))
+    {
+        vtkProp *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.append(a);
+    }
+
+    (*cloud)[0] = pcl::PointXYZ(xPtr[0], yPtr[0], zPtr[0]);
+    (*cloud)[1] = pcl::PointXYZ(xPtr[1], yPtr[1], zPtr[1]);
+    (*cloud)[2] = pcl::PointXYZ(xPtr[2], yPtr[2], zPtr[2]);
+    cloud->push_back(pcl::PointXYZ(xPtr[3], yPtr[3], zPtr[3]));
+    if (m_visualizer->addPolygon<pcl::PointXYZ>(cloud, color.redF(), color.greenF(), color.blueF(), QString("%1_4").arg(m_name).toStdString()))
+    {
+        vtkProp *a = getLastActor();
+        syncActorProperties(a);
+        m_actors.append(a);
+    }
+
+    m_lineColor = color;
+
+    /*pcl::PolygonMesh mesh;
     pcl::Vertices indices;
     pcl::PointCloud<pcl::PointXYZ> cloud;
     cloud.reserve(5);
-    indices.vertices.resize(4);
+    indices.vertices.resize(3);
 
     for(int i = 0; i < 5; ++i)
     {
@@ -203,9 +257,8 @@ ito::RetVal ItemGeometry::addPyramid(const ito::DataObject *points, const QColor
         m_actors.clear();
         m_actors.append(a);
 
-        m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, color.redF(), color.greenF(), color.blueF(), m_name.toStdString());
-        m_lineColor = color;
-    }
+        setLineColor(color);
+    }*/
 
     return ito::retOk;
 }
@@ -232,7 +285,7 @@ ito::RetVal ItemGeometry::addCuboid(const ito::DataObject *points, const QColor 
     const ito::float32 *yPtr = (ito::float32*)points->rowPtr(0,1);
     const ito::float32 *zPtr = (ito::float32*)points->rowPtr(0,2);
 
-    m_geometryType = tCube; 
+    m_geometryType = tCuboid; 
     m_nrOfShapes = 1;
     pcl::PolygonMesh mesh;
     pcl::Vertices indices;
@@ -406,7 +459,7 @@ void ItemGeometry::setVisible(bool value)
 void ItemGeometry::setRepresentation(Representation value)
 {
     int val = 0;
-    if (m_geometryType != tText)
+    if (m_geometryType != tText && m_geometryType != tCuboid && m_geometryType != tLines)
     {
         switch (int (value))
         {
@@ -452,7 +505,7 @@ void ItemGeometry::setRepresentation(Representation value)
 //-------------------------------------------------------------------------------------------
 void ItemGeometry::setInterpolation(Interpolation value)
 {
-    if (m_geometryType != tText)
+    if (m_geometryType != tText && m_geometryType != tPyramid && m_geometryType != tCuboid && m_geometryType != tLines && m_geometryType != tPolygon)
     {
         int val = 0;
         switch (int (value))
@@ -610,10 +663,7 @@ void ItemGeometry::setOpacity(double value)
 void ItemGeometry::setSpecular(double value)
 {
     value = qBound(0.0, value, 1.0);
-    if (m_geometryType == tText)
-    {
-    }
-    else
+    if (m_geometryType != tText && m_geometryType != tCuboid && m_geometryType != tLines)
     {
         vtkActor *a;
         foreach (vtkProp *p, getSafeActors())
@@ -624,21 +674,18 @@ void ItemGeometry::setSpecular(double value)
                 a->GetProperty()->SetSpecular(value);
             }
         }
+
+        m_specular = value;
+
+        emit updateCanvasRequest();
     }
-
-    m_specular = value;
-
-    emit updateCanvasRequest();
 }
 
 //-------------------------------------------------------------------------------------------
 void ItemGeometry::setSpecularPower(double value)
 {
     value = qBound(0.0, value, 1.0);
-    if (m_geometryType == tText)
-    {
-    }
-    else
+    if (m_geometryType != tText && m_geometryType != tCuboid && m_geometryType != tLines)
     {
         vtkActor *a;
         foreach (vtkProp *p, getSafeActors())
@@ -649,20 +696,17 @@ void ItemGeometry::setSpecularPower(double value)
                 a->GetProperty()->SetSpecularPower(value);
             }
         }
+
+        m_specularPower = value;
+
+        emit updateCanvasRequest();
     }
-
-    m_specularPower = value;
-
-    emit updateCanvasRequest();
 }
 
 //-------------------------------------------------------------------------------------------
 void ItemGeometry::setSpecularColor(QColor color)
 {
-    if (m_geometryType == tText)
-    {
-    }
-    else
+    if (m_geometryType != tText && m_geometryType != tCuboid && m_geometryType != tLines)
     {
         vtkActor *a;
         foreach (vtkProp *p, getSafeActors())
@@ -673,11 +717,11 @@ void ItemGeometry::setSpecularColor(QColor color)
                 a->GetProperty()->SetSpecularColor(color.redF(), color.greenF(), color.blueF());
             }
         }
+
+        m_specularColor = color;
+
+        emit updateCanvasRequest();
     }
-
-    m_specularColor = color;
-
-    emit updateCanvasRequest();
 }
 
 //-------------------------------------------------------------------------------------------
