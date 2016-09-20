@@ -132,6 +132,7 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     addMenu(contextMenu);
 
     m_pContent = new MatplotlibWidget(contextMenu, this);
+    setContentsMargins(0, 0, 0, 0);
     m_pContent->setObjectName("canvasWidget");
 
     setCentralWidget(m_pContent);
@@ -152,12 +153,20 @@ MatplotlibPlot::~MatplotlibPlot()
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::resizeCanvas(int width, int height)
 {
-    resize(width,height);
+    QSize newSize(width, height);
+    if (m_pContent)
+    {
+        //sometimes the size of the canvas is smaller than the size of this widget.
+        //Since resizeCanvas should control the size of the canvas, the offset is added here.
+        newSize += (size() - m_pContent->size());
+    }
+
+    resize(newSize);
 
     if (m_forceWindowResize)
     {
         //qDebug() << "fixed size (resizeCanvas)" << width << height;
-        setFixedSize(width,height); //forces the window to a fixed size...
+        setFixedSize(newSize); //forces the window to a fixed size...
         updateGeometry();
 
         if (!m_keepSizeFixed)

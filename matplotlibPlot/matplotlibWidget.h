@@ -111,13 +111,17 @@ private:
     QGraphicsPixmapItem *m_pixmapItem;
     QMenu *m_contextMenu;
 
+#ifdef _DEBUG
+    bool m_debugOutput;
+#endif
+
 signals:
     void eventLeaveEnter(bool enter);
     void eventMouse(int type, int x, int y, int button);
     void eventWheel(int x, int y, int delta, int orientation);
     void eventKey(int type, int keyId, QString keyString, bool autoRepeat);
     void eventResize(int w, int h);
-    void eventPaintRequest();
+    //void eventPaintRequest();
     void eventIdle();
 
 public slots:

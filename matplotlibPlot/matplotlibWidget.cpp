@@ -29,17 +29,18 @@
 
 //-------------------------------------------------------------------------------------
 MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
-        QGraphicsView(parent),
-        m_trackerActive(false),
-        m_internalResize(false),
-        m_keepSizeFixed(false),
-        m_scene(NULL),
-        m_rectItem(NULL),
-        m_pixmapItem(NULL),
-        m_contextMenu(contextMenu)/*,
-        m_externalSizeHint(0,0)*/
+    QGraphicsView(parent),
+    m_trackerActive(false),
+    m_internalResize(false),
+    m_keepSizeFixed(false),
+    m_scene(NULL),
+    m_rectItem(NULL),
+    m_pixmapItem(NULL),
+#ifdef _DEBUG
+    m_debugOutput(false),
+#endif
+    m_contextMenu(contextMenu)
 {
-    //setBackgroundBrush(QBrush(Qt::red));
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
 
@@ -68,6 +69,12 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
 //-------------------------------------------------------------------------------------
 MatplotlibWidget::~MatplotlibWidget()
 {
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::destructor";
+    }
+#endif
 }
 
 //QSize MatplotlibWidget::sizeHint() const
@@ -82,14 +89,12 @@ MatplotlibWidget::~MatplotlibWidget()
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::externalResize(int width, int height)
 {
-    //QSize oldSize = this->size();
-    //m_externalSizeHint = QSize(width,height);
-
-    //QSizePolicy::Policy hPol = QSizePolicy::Fixed; //oldSize.width() < sizeHint().width() ? QSizePolicy::Minimum : QSizePolicy::Maximum;
-    //QSizePolicy::Policy vPol = QSizePolicy::Fixed; //oldSize.height() < sizeHint().height() ? QSizePolicy::Minimum : QSizePolicy::Maximum;
-
-    //setSizePolicy(hPol, vPol);    
-    //updateGeometry();
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::externalResize:" << width << height;
+    }
+#endif
 
     MatplotlibPlot *parent = qobject_cast<MatplotlibPlot*>(this->parent());
     if(parent)
@@ -98,13 +103,18 @@ void MatplotlibWidget::externalResize(int width, int height)
         parent->resizeCanvas(width,height);
         m_internalResize = false;
     }
-
-    //resize(width,height);
 }
 
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int y, int w, int h, bool blit )
 {
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::paintResult:" << x << y << w << h << blit;
+    }
+#endif
+
     int imgHeight = 0;
     int imgWidth = 0;
 
@@ -112,7 +122,6 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     
     if(blit == false)
     {
-        //qDebug() << "size: " << w << ", " << h << ", imageString-size:" << imageString.length() << " win: " << width() << ", " << height();
         QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
 
         m_pixmap = QPixmap::fromImage(image);
@@ -123,7 +132,6 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     else
     {
         //check sizes
-        
         imgHeight = m_pixmap.height();
         imgWidth = m_pixmap.width();
 
@@ -131,11 +139,9 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
         {
             QPainter painter(&m_pixmap);
             QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
-            //painter.fillRect(x,y,w,h,QBrush(Qt::red));
             painter.drawImage(QPoint(x,y),image);
             painter.end();
             m_pixmapItem->setPixmap(m_pixmap);
-            //m_pixmapItem->setOffset(x,y);
             m_pixmapItem->update();
         }
 
@@ -149,12 +155,16 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     {
         setTransform( QTransform(1,0,0,1,0,0), false );
         centerOn( m_pixmapItem->boundingRect().center() );
-        //qDebug() << "centerOn" << m_pixmapItem->boundingRect() << s << w << h;
     }
     else
     {
+#ifdef _DEBUG
+        if (m_debugOutput)
+        {
+            qDebug() << "MatplotlibWidet::paintResult: create PendingEvent" << s.height() << s.width();
+        }
+#endif
         fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
-        //qDebug() << "fitInView" << m_pixmapItem->boundingRect() << s << w << h;
         m_pendingEvent = PendingEvent(s.height(), s.width());
     }
     
@@ -167,6 +177,13 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int y, int w, int h, bool blit )
 {
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::paintResultDeprecated:" << x << y << w << h << blit;
+    }
+#endif
+
     int imgHeight = 0;
     int imgWidth = 0;
 
@@ -174,7 +191,6 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
     
     if(blit == false)
     {
-        //qDebug() << "size: " << w << ", " << h << ", imageString-size:" << imageString.length() << " win: " << width() << ", " << height();
         QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
         m_pixmap = QPixmap::fromImage(image);
         m_pixmapItem->setPixmap(m_pixmap);
@@ -184,7 +200,6 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
     else
     {
         //check sizes
-        
         imgHeight = m_pixmap.height();
         imgWidth = m_pixmap.width();
 
@@ -192,11 +207,9 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
         {
             QPainter painter(&m_pixmap);
             QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
-            //painter.fillRect(x,y,w,h,QBrush(Qt::red));
             painter.drawImage(QPoint(x,y),image);
             painter.end();
             m_pixmapItem->setPixmap(m_pixmap);
-            //m_pixmapItem->setOffset(x,y);
             m_pixmapItem->update();
         }
 
@@ -223,8 +236,15 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
 }
 
 //-------------------------------------------------------------------------------------
-void MatplotlibWidget::paintRect(bool drawRect, int x, int y, int w, int h)
+void MatplotlibWidget::paintRect(bool drawRect, int x /*= 0*/, int y /*= 0*/, int w /*= 0*/, int h /*= 0*/)
 {
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::paintRect:" << x << y << w << h << drawRect;
+    }
+#endif
+
     if(drawRect == false)
     {
         if (m_rectItem->isVisible())
@@ -236,7 +256,6 @@ void MatplotlibWidget::paintRect(bool drawRect, int x, int y, int w, int h)
     {
         
         m_rectItem->setRect(x, y, w, h);
-        //qDebug() << "Rect: " << x << y << w << h;
         m_rectItem->setVisible(true);
         m_rectItem->update();
 
@@ -244,23 +263,36 @@ void MatplotlibWidget::paintRect(bool drawRect, int x, int y, int w, int h)
 
         //handle possible further update requests
         paintTimeout();
-        //qDebug() << "End Rect";
     }
 }
 
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
 {
+    //It seems that event->size() is not exactly the same than QWidget::size(), although the documentation
+    //pretends this. Therefore, we only refer to QWidget::size() to be consistent.
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::resizeEvent:" << event->size() << size() << m_internalResize;
+    }
+#endif
+
     if(m_internalResize == false)
     {
         if(m_pixmapItem)
         {            
             fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
-
-            //qDebug() << "fitInView (resizeEvent)" << m_pixmapItem->boundingRect() << event->size();
         }
 
-        m_pendingEvent = PendingEvent(event->size().height(), event->size().width());
+#ifdef _DEBUG
+        if (m_debugOutput)
+        {
+            qDebug() << "MatplotlibWidet::resizeEvent:2:" << size();
+        }
+#endif
+
+        m_pendingEvent = PendingEvent(size().height(), size().width());
         m_timer.start(60);
     }
     m_internalResize = false;
@@ -271,6 +303,12 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::replot()
 {
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::replot: create PendingEvent" << height() << width();
+    }
+#endif
     m_pendingEvent = PendingEvent(height(), width());
     m_timer.start(1);
 }
@@ -278,21 +316,25 @@ void MatplotlibWidget::replot()
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintTimeout()
 {
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::paintTimeout";
+    }
+#endif
+
     if(m_pendingEvent.isValid())
     {
         
         switch(m_pendingEvent.m_type)
         {
         case PendingEvent::typeResize:
-            //qDebug() << "request resize event " << m_pendingEvent.m_w << " - " << m_pendingEvent.m_h;
             m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
             emit eventResize(m_pendingEvent.m_w, m_pendingEvent.m_h);
             m_pendingEvent.clear();
             break;
         case PendingEvent::typeMouseMove:
-            //qDebug() << "timer active?" << m_timer.isActive();
             m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
-            //qDebug() << "mouseMoveEvent" << m_pendingEvent.m_x << m_pendingEvent.m_y << m_pendingEvent.m_button;
             emit eventMouse(2, m_pendingEvent.m_x,m_pendingEvent.m_y, m_pendingEvent.m_button);
             m_pendingEvent.clear();
             break;
@@ -328,14 +370,12 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
         {
             if(!m_timer.isActive())
             {
-                //m_pendingEvent = PendingEvent(event->pos().x(), event->pos().y(), button);
                 m_pendingEvent = PendingEvent(qRound(scenePos.x()), qRound(scenePos.y()), button);
                 paintTimeout();
             }
         }
         else
         {
-            //m_pendingEvent = PendingEvent(qRound(event->pos().x()), qRound(event->pos().y()), button);
             m_pendingEvent = PendingEvent(qRound(scenePos.x()), qRound(scenePos.y()), button);
             if(!m_timer.isActive())
             {
@@ -355,7 +395,6 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
             case Qt::RightButton: button = 3; break;
             case Qt::MiddleButton: button = 2; break;
         }
-        //emit eventMouse(type, event->pos().x(), event->pos().y(), button);
         emit eventMouse(type, qRound(scenePos.x()), qRound(scenePos.y()), button);
     }
 }
@@ -425,7 +464,6 @@ void MatplotlibWidget::mouseDoubleClickEvent ( QMouseEvent * event )
     case Qt::MiddleButton: button = 2; break;
     }
     QPointF scenePos = mapToScene( event->pos().x(), event->pos().y() );
-    //emit eventMouse(1, event->pos().x(), event->pos().y(), button);
     emit eventMouse(1, qRound(scenePos.x()), qRound(scenePos.y()), button);
     event->accept();
 }
@@ -470,7 +508,6 @@ void MatplotlibWidget::showEvent ( QShowEvent * event ) //widget is shown, now t
 {
     QGraphicsView::showEvent( event );
     fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
-    //qDebug() << "fitInView (showEvent)" << m_pixmapItem->boundingRect();
 }
 
 //-------------------------------------------------------------------------------------
