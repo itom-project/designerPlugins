@@ -337,6 +337,7 @@ void WidgetCurveProperties::on_listWidget_itemChanged(QListWidgetItem *item)
 	if (!m_isUpdating)
 	{
 		m_pContent->getplotCurveItems().at(ui.listWidget->currentRow())->setTitle(item->text());
+        m_pContent->applyLegendFont();
 		QStringList legendList;
 		int curveIdx = ui.listWidget->currentRow();
 
@@ -540,6 +541,7 @@ void WidgetCurveProperties::on_lineEditName_editingFinished()
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		int row(ui.listWidget->row(selection.at(0)));//only one can be selected otherwise the editLine is enabled
 		m_pContent->getplotCurveItems().at(row)->setTitle(text);
+        m_pContent->applyLegendFont();
 		selection[0]->setText(text);
 		m_isUpdating = false;
 	}

@@ -797,6 +797,21 @@ const QFont Plot1DWidget::getLegendFont() const
     return m_legendFont;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::applyLegendFont()
+{
+    if (m_pLegend)
+    {
+        QwtLegendLabel* legendLabel;
+        foreach(QwtPlotCurve *item, m_plotCurveItems)
+        {
+            legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+            QwtText text(legendLabel->data().title());
+            text.setFont(m_legendFont);
+            legendLabel->setText(text);
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataObject *object)
 {
     int index = 0;
@@ -840,6 +855,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
         }
     }
     replot();
+    applyLegendFont();
 	emit legendModified();
 
 }

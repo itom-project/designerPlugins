@@ -84,6 +84,7 @@ class Plot1DWidget : public ItomQwtPlot
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
 		void toggleLegendLabel(QwtPlotCurve* curve, const bool state);
         void setLegendFont(const QFont &font);
+        void applyLegendFont();
         const QFont getLegendFont() const;
 
         QVector<int> getPickerPixel() const;
