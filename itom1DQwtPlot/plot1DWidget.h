@@ -83,6 +83,8 @@ class Plot1DWidget : public ItomQwtPlot
         void setLegendPosition(LegendPosition position, bool visible);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
 		void toggleLegendLabel(QwtPlotCurve* curve, const bool state);
+        void setLegendFont(const QFont &font);
+        const QFont getLegendFont() const;
 
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
@@ -209,6 +211,7 @@ class Plot1DWidget : public ItomQwtPlot
         ItomQwtPlotEnums::ScaleEngine m_axisScale;
 
         QVector<QPointF> m_currentBounds;
+        QFont m_legendFont;
 
         QAction* m_pActScaleSettings;
         QAction* m_pRescaleParent;

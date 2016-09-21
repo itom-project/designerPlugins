@@ -472,7 +472,20 @@ QFont Itom1DQwtPlot::getLabelFont(void) const
     }
     return QFont();
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+QFont Itom1DQwtPlot::getLegendFont() const
+{
+    if (m_pContent)
+    {
+       return m_pContent->getLegendFont();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLegendFont(const QFont &font)
+{
+    m_pContent->setLegendFont(font);
+    updatePropertyDock();
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLabelFont(const QFont &font)
 {

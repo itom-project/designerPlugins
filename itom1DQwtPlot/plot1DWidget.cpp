@@ -313,6 +313,7 @@ ito::RetVal Plot1DWidget::init()
     QFont titleFont = QFont("Helvetica",12);
     QFont labelFont =  QFont("Helvetica",12);
     QFont axisFont = QFont("Helvetica",10);
+    m_legendFont  = QFont("Helvetica", 8);
     m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
     int buttonSet = buttonStyle();
 
@@ -341,6 +342,8 @@ ito::RetVal Plot1DWidget::init()
         m_pPlotGrid->setMinorPen(apiGetFigureSetting(parent(), "gridMinorPen", QPen(QBrush(Qt::gray), 1, Qt::DashLine), &retVal).value<QPen>());
 
         m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>();
+
+        m_legendFont = apiGetFigureSetting(parent(), "legendFont", m_legendFont, &retVal).value<QFont>();
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -711,6 +714,11 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
                 maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
                 //item->setLegendIconSize(QSize(8,24));
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+                //set font
+                QwtText text(legendLabel->data().title());
+                text.setFont(m_legendFont);
+                legendLabel->setText(text);
+
 
                 //TODO: the following connection is lost once the single legend entry becomes invisible. If it is displayed again, the signal is not re-established. Changing the legend-position
                 //re-connects it again!
@@ -766,7 +774,28 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
     m_legendVisible = visible;
     m_legendPosition = position;
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setLegendFont(const QFont &font)
+{
+    m_legendFont = font;
+    if (m_pLegend)
+    {
+        QwtLegendLabel* legendLabel;
+        foreach(QwtPlotCurve *item, m_plotCurveItems)
+        {
+            legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+            QwtText text(legendLabel->data().title());
+            text.setFont(m_legendFont);
+            legendLabel->setText(text);
+        }
+    }
+    
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+const QFont Plot1DWidget::getLegendFont() const
+{
+    return m_legendFont;
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataObject *object)
 {

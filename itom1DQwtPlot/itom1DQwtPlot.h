@@ -57,6 +57,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
+    Q_PROPERTY(QFont legendFont READ getLegendFont WRITE setLegendFont USER true)
     
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
     Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
@@ -100,6 +101,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://titleFont", "Font for title.")
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
+    Q_CLASSINFO("prop://legendFont", "Font for legend entries")
     Q_CLASSINFO("prop://grid", "Style of the grid ('GridNo', 'GridMajorXY', 'GridMajorX', 'GridMajorY', 'GridMinorXY', 'GridMinorX', 'GridMinorY').")
 
     Q_CLASSINFO("prop://lineWidth", "width of all curves in pixel.")
@@ -254,6 +256,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         QFont getAxisFont(void) const;
         void setAxisFont(const QFont &font);
+
+        QFont getLegendFont() const;
+        void setLegendFont(const QFont &font);
 
         GridStyle getGrid(void) const;
         void setGrid(const GridStyle &gridStyle);
