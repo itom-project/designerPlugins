@@ -215,7 +215,8 @@ ito::RetVal ItomQwtDObjFigure::savePlot(const QString &filename, float xsize /*=
         {
             s << b;
         }
-        return ito::RetVal::format(ito::retError, 0, "%s is an unsupported file suffix. Supported values are: %s", fileInfo.suffix().toLatin1().data(), s.join("; ").toLatin1().data());
+        return ito::RetVal::format(ito::retError, 0, tr("%s is an unsupported file suffix. Supported values are: %s").toLatin1().data(), 
+            fileInfo.suffix().toLatin1().data(), s.join("; ").toLatin1().data());
     }
 
     if (m_pBaseContent)
@@ -501,7 +502,7 @@ ito::RetVal ItomQwtDObjFigure::setGeometricShapes(QVector<ito::Shape> geometricS
         updatePropertyDock();
         return retval;
     }
-    return ito::RetVal(ito::retError, 0, "content not available");
+    return ito::RetVal(ito::retError, 0, tr("content not available").toLatin1().data());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -513,7 +514,7 @@ ito::RetVal ItomQwtDObjFigure::addGeometricShape(const ito::Shape &geometricShap
         updatePropertyDock();
         return retval;
     }
-    return ito::RetVal(ito::retError, 0, "content not available");
+    return ito::RetVal(ito::retError, 0, tr("content not available").toLatin1().data());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -525,7 +526,7 @@ ito::RetVal ItomQwtDObjFigure::updateGeometricShape(const ito::Shape &geometricS
         updatePropertyDock();
         return retval;
     }
-    return ito::RetVal(ito::retError, 0, "content not available");
+    return ito::RetVal(ito::retError, 0, tr("content not available").toLatin1().data());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -608,7 +609,7 @@ ito::RetVal ItomQwtDObjFigure::plotMarkers(QSharedPointer< ito::DataObject > coo
         return m_pBaseContent->plotMarkers(coordinates, style, id, plane);
     }
 
-    return ito::RetVal(ito::retError, 0, "content not available");
+    return ito::RetVal(ito::retError, 0, tr("content not available").toLatin1().data());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -618,7 +619,7 @@ ito::RetVal ItomQwtDObjFigure::deleteMarkers(QString id /*= ""*/)
     {
         return m_pBaseContent->deleteMarkers(id);
     }
-    return ito::RetVal(ito::retError, 0, "content not available");
+    return ito::RetVal(ito::retError, 0, tr("content not available").toLatin1().data());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -198,7 +198,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
             if ( (dims-prependedOneDims) != 2 && (dims-prependedOneDims) != 3)
             {
                 m_d.valid = false;
-                retval += RetVal(retError,0,"line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
+                retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
             }
             else
             {
@@ -573,7 +573,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
         case 1:
             if ((dims - prependedOneDims) != 3)
             {
-                retval += RetVal(retError,0,"line plot in z-direction requires a 3-dim dataObject");
+                retval += RetVal(retError, 0, "line plot in z-direction requires a 3-dim dataObject");
                 return retval;
             }
             else
@@ -640,7 +640,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
             break;
         default:
-            retval += RetVal(retError,0,"bounds vector must have 1 or 2 entries");
+            retval += RetVal(retError, 0, "bounds vector must have 1 or 2 entries");
             break;
         }    
     }
@@ -2628,7 +2628,7 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
     }
     else
     {
-        retval += RetVal(retError,0,"no dataObject");
+        retval += RetVal(retError, 0, "no dataObject");
     }
     
     return retval;

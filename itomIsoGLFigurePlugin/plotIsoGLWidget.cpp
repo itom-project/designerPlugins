@@ -926,7 +926,7 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
             {
                 m_isInit &= ~HAS_TRIANG;
                 m_NumElements = 0;
-                retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
+                retVal += ito::RetVal(ito::retError, 0, tr("Error allocating memory").toLatin1().data());
             }
         }
     }
@@ -1033,7 +1033,7 @@ ito::RetVal plotGLWidget::GLSetPointsPCL(void)
             m_pPoints = NULL;
         }
         m_NumElements = 0;
-        retVal += ito::RetVal(ito::retError, 0, "Error calculating points / triangles");
+        retVal += ito::RetVal(ito::retError, 0, tr("Error calculating points / triangles").toLatin1().data());
         m_isInit &= ~IS_CALCTRIANG;
     }
 #endif
@@ -1085,7 +1085,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
 #endif
     {
         m_isInit &= ~HAS_TRIANG;
-        return ito::RetVal(ito::retError, 0, "DataObject empty, calc triangles failed");
+        return ito::RetVal(ito::retError, 0, tr("DataObject empty, calc triangles failed").toLatin1().data());
     }
 
     cv::Mat_<float64> scaledTopo(ysizeObj, xsizeObj);
@@ -1146,7 +1146,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
         }
         break;
         default:
-            return ito::RetVal(ito::retError, 0, "Unknown DataObject-Type, calc triangles failed");
+            return ito::RetVal(ito::retError, 0, tr("Unknown DataObject-Type, calc triangles failed").toLatin1().data());
     }
 
     m_NumElements = 0;
@@ -1176,7 +1176,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
             {
                 m_isInit &= ~HAS_TRIANG;
                 m_NumElements = 0;
-                retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
+                retVal += ito::RetVal(ito::retError, 0, tr("Error allocating memory").toLatin1().data());
             }
         }
         else // PAINT_TRIANG
@@ -1191,7 +1191,7 @@ ito::RetVal plotGLWidget::GLSetTriangles(void)
             {
                 m_isInit &= ~HAS_TRIANG;
                 m_NumElements = 0;
-                retVal += ito::RetVal(ito::retError, 0, "Error allocating memory");
+                retVal += ito::RetVal(ito::retError, 0, tr("Error allocating memory").toLatin1().data());
             }
         }
     }
@@ -1432,7 +1432,7 @@ CLEAREXIT:
             m_pPoints = NULL;
         }
         m_NumElements = 0;
-        retVal += ito::RetVal(ito::retError, 0, "Error calculating points / triangles");
+        retVal += ito::RetVal(ito::retError, 0, tr("Error calculating points / triangles").toLatin1().data());
         m_isInit &= ~IS_CALCTRIANG;
     }
 

@@ -76,7 +76,7 @@ ito::RetVal ItemPointCloudNormal::addPointCloud(const ito::PCLPointCloud &cloud)
     }
     else
     {
-        retval += ito::RetVal(ito::retError,0,"type of point cloud not supported for normals");
+        retval += ito::RetVal(ito::retError, 0, tr("type of point cloud not supported for normals").toLatin1().data());
     }
     return retval;
 }

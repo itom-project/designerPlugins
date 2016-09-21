@@ -4,7 +4,7 @@
 <context>
     <name>MatplotlibPlot</name>
     <message>
-        <location filename="../matplotlibplot.cpp" line="+23"/>
+        <location filename="../matplotlibplot.cpp" line="+52"/>
         <source>home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -55,11 +55,20 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>marker</source>
-        <translation>Positionsanzeiger</translation>
+        <source>Marker</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+4"/>
+        <source>Show coordinates under mouse cursor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>marker</source>
+        <translation type="vanished">Positionsanzeiger</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>subplot configuration...</source>
         <translation>Einstellungen...</translation>
     </message>
@@ -92,7 +101,7 @@
         <translation type="obsolete">Symbolleiste MatPlotLib</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>Matplotlib</source>
         <translation></translation>
     </message>

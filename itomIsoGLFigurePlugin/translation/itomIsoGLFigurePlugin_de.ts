@@ -256,13 +256,36 @@
 <context>
     <name>plotGLWidget</name>
     <message>
-        <location filename="../plotIsoGLWidget.cpp" line="+980"/>
+        <location filename="../plotIsoGLWidget.cpp" line="+929"/>
+        <location line="+250"/>
+        <location line="+15"/>
+        <source>Error allocating memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-214"/>
         <location line="+691"/>
         <source>invalid point cloud</source>
         <translation type="unfinished">Ungültige Punktewolke</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="-635"/>
+        <location line="+399"/>
+        <source>Error calculating points / triangles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-347"/>
+        <source>DataObject empty, calc triangles failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
+        <source>Unknown DataObject-Type, calc triangles failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+551"/>
         <source>compiled without pointCloud support</source>
         <translation type="unfinished">Die Anwendung wurde ohne PCL (pointCloud) kompiliert</translation>
     </message>

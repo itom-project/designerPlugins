@@ -84,7 +84,7 @@ void Itom1DQwtPlot::constructor()
     //create dock widget for the line properties
     d->m_pLinePropertiesDock = new QDockWidget(this);
     d->m_pLinePropertiesDock->setObjectName(QStringLiteral("curveProperties"));
-    d->m_pLinePropertiesDock->setWindowTitle("Curve Properties");
+    d->m_pLinePropertiesDock->setWindowTitle(tr("Curve Properties"));
     d->m_pLinePropertiesDock->setVisible(false);
 	d->m_pLinePropertyWidget = new WidgetCurveProperties(m_pContent);
 	d->m_pLinePropertiesDock->setWidget(d->m_pLinePropertyWidget);
@@ -1052,7 +1052,7 @@ ito::RetVal Itom1DQwtPlot::setCurveProperty(int index, const QByteArray &propert
         return m_pContent->setCurveProperty(index, property, value);
     }
 
-    return ito::RetVal(ito::retError, 0, "canvas not available");
+    return ito::RetVal(ito::retError, 0, tr("canvas not available").toLatin1().data());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -1751,7 +1751,7 @@ ito::RetVal ItomQwtPlot::userInteractionStart(int type, bool start, int maxNrOfP
         }
         else
         {
-            retVal += ito::RetVal(ito::retError, 0, "invalid type for userInteractionStart");
+            retVal += ito::RetVal(ito::retError, 0, tr("invalid type for userInteractionStart").toLatin1().data());
         }
     }
     else
@@ -2517,14 +2517,15 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         {
             if (!fileInfo.isWritable())
             {
-                return ito::RetVal::format(ito::retError, 0, "The file '%s' already exists but cannot be overwritten.", fileName.toLatin1().data());
+                return ito::RetVal::format(ito::retError, 0, tr("The file '%s' already exists but cannot be overwritten.").toLatin1().data(), fileName.toLatin1().data());
             }
             else
             {
                 QFile file(fileName);
                 if (!file.open(QIODevice::WriteOnly))
                 {
-                    return ito::RetVal::format(ito::retError, 0, "The file '%s' already exists but cannot be overwritten (Maybe it is opened in another application).", fileName.toLatin1().data());
+                    return ito::RetVal::format(ito::retError, 0, tr("The file '%s' already exists but cannot be overwritten (Maybe it is opened in another application).").toLatin1().data(), 
+                        fileName.toLatin1().data());
                 }
                 file.close();
             }

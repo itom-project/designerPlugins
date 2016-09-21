@@ -143,12 +143,12 @@ ito::RetVal ItemGeometry::updateText(const QString &text, const int x, const int
     {
         if (m_visualizer->updateText(text.toStdString(), x, y, fontsize, color.redF(), color.greenF(), color.blueF(), m_name.toStdString()) == false)
         {
-            retVal += ito::RetVal(ito::retError, 0, "error updating text");
+            retVal += ito::RetVal(ito::retError, 0, tr("error updating text").toLatin1().data());
         }
     }
     else
     {
-        retVal += ito::RetVal(ito::retError, 0, "item was no text item before");
+        retVal += ito::RetVal(ito::retError, 0, tr("item was no text item before").toLatin1().data());
     }
 
     return retVal;
@@ -758,7 +758,7 @@ ito::RetVal ItemGeometry::updatePose(const Eigen::Affine3f &pose)
     {
         if (!m_visualizer->updateShapePose(m_name.toStdString(), pose))
         {
-            return ito::RetVal::format(ito::retError, 0, "could not set pose of geometry '%s'", m_name.toLatin1().data());
+            return ito::RetVal::format(ito::retError, 0, tr("could not set pose of geometry '%s'").toLatin1().data(), m_name.toLatin1().data());
         }
     }
     else
@@ -769,7 +769,7 @@ ito::RetVal ItemGeometry::updatePose(const Eigen::Affine3f &pose)
             name = QString("%1_%2").arg(m_name).arg(i);
             if (!m_visualizer->updateShapePose(m_name.toStdString(), pose))
             {
-                return ito::RetVal::format(ito::retError, 0, "could not set pose of geometry '%s'", name.toLatin1().data());
+                return ito::RetVal::format(ito::retError, 0, tr("could not set pose of geometry '%s'").toLatin1().data(), name.toLatin1().data());
             }
         }
     }

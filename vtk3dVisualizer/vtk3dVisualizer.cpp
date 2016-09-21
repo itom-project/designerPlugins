@@ -308,7 +308,7 @@ ito::RetVal Vtk3dVisualizer::applyUpdate()
         }
         break;
     default:
-        retval += ito::RetVal(ito::retError, 0, "unsupported input type");
+        retval += ito::RetVal(ito::retError, 0, tr("unsupported input type").toLatin1().data());
     }
     
     return retval;
@@ -408,7 +408,7 @@ ito::RetVal Vtk3dVisualizer::searchRecursiveTree(const QString &path, QTreeWidge
 
         if (!found) //create new item
         {
-            retval += ito::RetVal(ito::retError,0,"item not found.");
+            retval += ito::RetVal(ito::retError, 0, tr("item not found.").toLatin1().data());
         }
     }
 
@@ -550,7 +550,7 @@ ito::RetVal Vtk3dVisualizer::addPointCloudNormal(ito::PCLPointCloud pcl, const Q
         }
         else
         {
-            retval += ito::RetVal(ito::retError,0,"the given point cloud has no normal component");
+            retval += ito::RetVal(ito::retError, 0, tr("the given point cloud has no normal component").toLatin1().data());
         }
 
         if (!retval.containsError())
@@ -588,7 +588,7 @@ ito::RetVal Vtk3dVisualizer::updatePointCloud(ito::PCLPointCloud pcl, const QStr
             }
             else if (i->rtti() == Item::rttiPointCloudNormal)
             {
-                retval += ito::RetVal(ito::retError, 0, "an item of type 'point cloud normal' cannot be updated");
+                retval += ito::RetVal(ito::retError, 0, tr("an item of type 'point cloud normal' cannot be updated").toLatin1().data());
             }
         }
     }
@@ -772,7 +772,7 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
     }
     else
     {
-        retval += ito::RetVal(ito::retError, 0, "rotation must have zero or 3 euler angles (in rad)");
+        retval += ito::RetVal(ito::retError, 0, tr("rotation must have zero or 3 euler angles (in rad)").toLatin1().data());
     }
 
     if (translation.size() == 0)
@@ -787,12 +787,12 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
     }
     else
     {
-        retval += ito::RetVal(ito::retError, 0, "translation must have zero or 3 values");
+        retval += ito::RetVal(ito::retError, 0, tr("translation must have zero or 3 values").toLatin1().data());
     }
 
     if (size.size() != 3)
     {
-        retval += ito::RetVal(ito::retError, 0, "size must have 3 values.");
+        retval += ito::RetVal(ito::retError, 0, tr("size must have 3 values.").toLatin1().data());
     }
 
     if (!retval.containsError())
@@ -870,7 +870,7 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
     }
     else
     {
-        retval += ito::RetVal(ito::retError, 0, "center point must have three values.");
+        retval += ito::RetVal(ito::retError, 0, tr("center point must have three values.").toLatin1().data());
     }
 
     if (!retval.containsError())
@@ -1107,7 +1107,7 @@ ito::RetVal Vtk3dVisualizer::setGeometryPose(const QString &name, QVector<double
     }
     else
     {
-        retval += ito::RetVal(ito::retError, 0, "rotation must have zero or 3 euler angles (in rad)");
+        retval += ito::RetVal(ito::retError, 0, tr("rotation must have zero or 3 euler angles (in rad)").toLatin1().data());
     }
 
     if (translation.size() == 0)
@@ -1122,7 +1122,7 @@ ito::RetVal Vtk3dVisualizer::setGeometryPose(const QString &name, QVector<double
     }
     else
     {
-        retval += ito::RetVal(ito::retError, 0, "translation must have zero or 3 values");
+        retval += ito::RetVal(ito::retError, 0, tr("translation must have zero or 3 values").toLatin1().data());
     }
 
     if (!retval.containsError())
@@ -1154,7 +1154,7 @@ ito::RetVal Vtk3dVisualizer::setGeometriesPosition(const QStringList &names, QVe
 
     if (positions.size() != 3*names.size())
     {
-        retval += ito::RetVal(ito::retError, 0, "positions must have three values per named item.");
+        retval += ito::RetVal(ito::retError, 0, tr("positions must have three values per named item.").toLatin1().data());
     }
 
     if (!retval.containsError())
@@ -1194,7 +1194,7 @@ ito::RetVal Vtk3dVisualizer::addMesh(ito::PCLPolygonMesh mesh, const QString &fu
 
     if (mesh.valid() == false)
     {
-        retval += ito::RetVal(ito::retError, 0, "given mesh is not valid");
+        retval += ito::RetVal(ito::retError, 0, tr("given mesh is not valid").toLatin1().data());
     }
     else
     {
@@ -1307,7 +1307,7 @@ ito::RetVal Vtk3dVisualizer::setItemProperty(const QString &name, const QByteArr
             QVariant prop = obj->property(property.data());
             if (prop.isValid() == false)
             {
-                retval += ito::RetVal::format(ito::retError,0,"Property %s does not exist", property.data());
+                retval += ito::RetVal::format(ito::retError, 0, tr("Property %s does not exist").toLatin1().data(), property.data());
             }
             else if (prop.userType() == QMetaType::type("ito::AutoInterval"))
             {
@@ -1326,14 +1326,14 @@ ito::RetVal Vtk3dVisualizer::setItemProperty(const QString &name, const QByteArr
                         float v1 = list[0].toFloat(&ok);
                         if (!ok)
                         {
-                            retval += ito::RetVal(ito::retError, 0, "first value could not be converted to float");
+                            retval += ito::RetVal(ito::retError, 0, tr("first value could not be converted to float").toLatin1().data());
                         }
                         else
                         {
                             float v2 = list[1].toFloat(&ok);
                             if (!ok)
                             {
-                                retval += ito::RetVal(ito::retError, 0, "second value could not be converted to float");
+                                retval += ito::RetVal(ito::retError, 0, tr("second value could not be converted to float").toLatin1().data());
                             }
                             else
                             {
@@ -1347,22 +1347,23 @@ ito::RetVal Vtk3dVisualizer::setItemProperty(const QString &name, const QByteArr
                 {
                     if (!obj->setProperty( property.data(), value_ ))
                     {
-                        retval += ito::RetVal::format(ito::retError,0,"Property %s could not be set", property.data());
+                        retval += ito::RetVal::format(ito::retError, 0, tr("Property %s could not be set").toLatin1().data(), property.data());
                     }
                 }
                 else
                 {
-                    retval += ito::RetVal::format(ito::retError,0,"Given value could not be parsed to the required ito::AutoInterval type ('auto' or [min,max] requested)", property.data());
+                    retval += ito::RetVal::format(ito::retError, 0, tr("Given value could not be parsed to the required ito::AutoInterval type ('auto' or [min,max] requested)").toLatin1().data(), 
+                        property.data());
                 }
             }
             else if (!obj->setProperty( property.data(), value ))
             {
-                retval += ito::RetVal::format(ito::retError,0,"Property %s could not be set", property.data());
+                retval += ito::RetVal::format(ito::retError, 0, tr("Property %s could not be set").toLatin1().data(), property.data());
             }
         }
         else
         {
-            retval += ito::RetVal::format(ito::retError,0,"Item %s is NULL", name.toLatin1().data());
+            retval += ito::RetVal::format(ito::retError, 0, tr("Item %s is NULL").toLatin1().data(), name.toLatin1().data());
         }
     }
 
@@ -1416,7 +1417,7 @@ ito::RetVal Vtk3dVisualizer::setPickPointCloud(ito::PCLPointCloud &pcl)
         }
         break;
     default:
-        retval += ito::RetVal(ito::retError, 0, "point cloud is invalid");
+        retval += ito::RetVal(ito::retError, 0, tr("point cloud is invalid").toLatin1().data());
         break;
     }
 
@@ -1449,7 +1450,7 @@ ito::RetVal Vtk3dVisualizer::setPickPointMesh(ito::PCLPolygonMesh &mesh)
 {
     if (!mesh.valid())
     {
-        return ito::RetVal(ito::retError, 0, "invalid polygon mesh");
+        return ito::RetVal(ito::retError, 0, tr("invalid polygon mesh").toLatin1().data());
     }
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);

@@ -485,7 +485,7 @@ ito::RetVal ItemPointCloud::addPointCloud(const ito::PCLPointCloud &cloud)
     }
     else
     {
-        retval += ito::RetVal(ito::retError,0,"type of point cloud not supported");
+        retval += ito::RetVal(ito::retError, 0, tr("type of point cloud not supported").toLatin1().data());
     }
 
     m_cloud = cloud;
@@ -525,7 +525,7 @@ ito::RetVal ItemPointCloud::updatePointCloud(const ito::PCLPointCloud &cloud)
     }
     else
     {
-        retval += ito::RetVal(ito::retError,0,"type of point cloud not supported");
+        retval += ito::RetVal(ito::retError, 0, tr("type of point cloud not supported").toLatin1().data());
     }
 
     m_cloud = cloud;

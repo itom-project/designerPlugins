@@ -188,8 +188,14 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
     protected:
         ito::RetVal init()
         {
-            if(!m_pContent) return ito::retError;
-            else return m_pContent->init();
+            if (!m_pContent)
+            {
+                return ito::retError;
+            }
+            else
+            {
+                return m_pContent->init();
+            }
         } //called when api-pointers are transmitted, directly after construction
         PlotWidget *m_pContent;
 

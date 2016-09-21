@@ -7,13 +7,13 @@
         <location filename="../dataObjectDelegate.cpp" line="+151"/>
         <location line="+35"/>
         <source>Real part</source>
-        <translation>Realwert</translation>
+        <translation>Realteil</translation>
     </message>
     <message>
         <location line="-27"/>
         <location line="+35"/>
         <source>Imaginary part</source>
-        <translation type="unfinished">Imaginärer Wert</translation>
+        <translation>Imaginärteil</translation>
     </message>
 </context>
 <context>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../dataObjectTable.cpp" line="+429"/>
         <source>number of decimals</source>
-        <translation type="unfinished">Anzahl Dezimalstellen</translation>
+        <translation>Anzahl Dezimalstellen</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>set number of decimals</source>
-        <translation type="unfinished">Anzahl Dezimalstellen einstellen</translation>
+        <translation>Anzahl Dezimalstellen einstellen</translation>
     </message>
 </context>
 <context>

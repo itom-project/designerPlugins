@@ -229,7 +229,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuView->addMenu(m_pMnuCmplxSwitch);
     menuView->addSeparator();
     menuView->addAction(m_pActProperties);
-	QAction *actCurveProperties = new QAction("Curve Properties", menuView);// this instance is created here because it is only needed for the 1DQWT Plot
+	QAction *actCurveProperties = new QAction(tr("Curve Properties"), menuView);// this instance is created here because it is only needed for the 1DQWT Plot
 	menuView->addAction(actCurveProperties);
 	connect(actCurveProperties, SIGNAL(triggered()), (Itom1DQwtPlot*)(this->parent()), SLOT(showCurveProperties()));
 	m_menus.append(menuView);
@@ -2532,16 +2532,16 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<double> &coords, int curveInde
 
     if (curveIndex < 0 || curveIndex >= m_plotCurveItems.size())
     {
-        retVal += ito::RetVal::format(ito::retError, 0, "curveIndex out of bounds [0,%i]", m_plotCurveItems.size() - 1);
+        retVal += ito::RetVal::format(ito::retError, 0, tr("curveIndex out of bounds [0,%i]").toLatin1().data(), m_plotCurveItems.size() - 1);
     }
 
     if (append && coords.size() > (m_pData->m_pickerLimit - m_pickers.size()))
     {
-        retVal += ito::RetVal::format(ito::retError, 0, "number of new pickers exceed the given picker limit of %i", m_pData->m_pickerLimit);
+        retVal += ito::RetVal::format(ito::retError, 0, tr("number of new pickers exceed the given picker limit of %i").toLatin1().data(), m_pData->m_pickerLimit);
     }
     else if (!append && coords.size() > m_pData->m_pickerLimit)
     {
-        retVal += ito::RetVal::format(ito::retError, 0, "number of pickers exceed the given picker limit of %i", m_pData->m_pickerLimit);
+        retVal += ito::RetVal::format(ito::retError, 0, tr("number of pickers exceed the given picker limit of %i").toLatin1().data(), m_pData->m_pickerLimit);
     }
 
     if (!retVal.containsError())
@@ -2622,7 +2622,7 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
     }
     else if (id < 0 || id >= m_pickers.size())
     {
-        return ito::RetVal::format(ito::retError, 0, "id out of range [0,%i]", m_pickers.size() - 1);
+        return ito::RetVal::format(ito::retError, 0, tr("id out of range [0,%i]").toLatin1().data(), m_pickers.size() - 1);
     }
     else
     {
@@ -2986,14 +2986,12 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
     return QSharedPointer<ito::DataObject>(displayed);
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------------------   
 void Plot1DWidget::setPickerText(const QString &coords, const QString &offsets)
 {
     m_pLblMarkerCoords->setText(coords != "" ? coords : "    \n    ");
     m_pLblMarkerOffsets->setText(offsets != "" ? offsets : "    \n    ");
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::enableObjectGUIElements(const int mode)
@@ -3269,11 +3267,11 @@ ito::RetVal Plot1DWidget::setCurveProperty(int index, const QByteArray &property
     ito::RetVal retval;
     if (index < 0 || index >= m_plotCurvePropertyItems.size())
     {
-        retval += ito::RetVal::format(ito::retError, 0, "index out of bounds [0,%i]", m_plotCurvePropertyItems.size() - 1);
+        retval += ito::RetVal::format(ito::retError, 0, tr("index out of bounds [0,%i]").toLatin1().data(), m_plotCurvePropertyItems.size() - 1);
     }
     else if (!m_plotCurvePropertyItems[index])
     {
-        retval += ito::RetVal::format(ito::retError, 0, "properties of curve %i are not available.", index);
+        retval += ito::RetVal::format(ito::retError, 0, tr("properties of curve %i are not available.").toLatin1().data(), index);
     }
     else
     {
@@ -3285,7 +3283,7 @@ ito::RetVal Plot1DWidget::setCurveProperty(int index, const QByteArray &property
         }
         else
         {
-            retval += ito::RetVal(ito::retError, 0, "itom API not available.");
+            retval += ito::RetVal(ito::retError, 0, tr("itom API not available.").toLatin1().data());
         }
 
         if (!retval.containsError())

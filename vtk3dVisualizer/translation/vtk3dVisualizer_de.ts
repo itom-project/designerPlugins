@@ -13,6 +13,35 @@
     </message>
 </context>
 <context>
+    <name>ItemGeometry</name>
+    <message>
+        <source>error updating text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>item was no text item before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>could not set pose of geometry &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ItemPointCloud</name>
+    <message>
+        <source>type of point cloud not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ItemPointCloudNormal</name>
+    <message>
+        <source>type of point cloud not supported for normals</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>3D visualization of point clouds, polygon meshes and geometries using PCL and VTK.</source>
@@ -59,6 +88,78 @@
     <message>
         <source>toolbars</source>
         <translation type="unfinished">Werkzeuge</translation>
+    </message>
+    <message>
+        <source>unsupported input type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>item not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the given point cloud has no normal component</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>an item of type &apos;point cloud normal&apos; cannot be updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>rotation must have zero or 3 euler angles (in rad)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>translation must have zero or 3 values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>size must have 3 values.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>center point must have three values.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>positions must have three values per named item.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>given mesh is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Property %s does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>first value could not be converted to float</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>second value could not be converted to float</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Property %s could not be set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Given value could not be parsed to the required ito::AutoInterval type (&apos;auto&apos; or [min,max] requested)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item %s is NULL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>point cloud is invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>invalid polygon mesh</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
