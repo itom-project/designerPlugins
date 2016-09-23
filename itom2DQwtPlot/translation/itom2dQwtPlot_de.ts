@@ -186,7 +186,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+909"/>
+        <location filename="../itom2dqwtplot.cpp" line="+902"/>
         <location line="+8"/>
         <source>Linecut</source>
         <translation>Linienschnitt</translation>
@@ -878,7 +878,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-1038"/>
+        <location filename="../itom2dqwtplot.cpp" line="-1031"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
     </message>

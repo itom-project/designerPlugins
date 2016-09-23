@@ -187,7 +187,7 @@
         <translation>Kurveneigenschaften</translation>
     </message>
     <message>
-        <location line="+712"/>
+        <location line="+725"/>
         <location line="+10"/>
         <source>Set picker failed, since canvas not initilized</source>
         <translation>Der Picker konnte nicht gesetzt werden, da &apos;Canvas&apos; nicht inizialisiert wurde</translation>
@@ -689,7 +689,7 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+144"/>
+        <location line="+147"/>
         <source>Scale Settings...</source>
         <translation>Skaleneinstellungen...</translation>
     </message>
@@ -740,12 +740,12 @@
     </message>
     <message>
         <location line="+4"/>
-        <location line="+2766"/>
+        <location line="+2818"/>
         <source>To Min-Max</source>
         <translation>Auf Min/Max</translation>
     </message>
     <message>
-        <location line="-2765"/>
+        <location line="-2817"/>
         <source>set two pickers to absolute minimum and maximum of (first) curve</source>
         <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der (ersten) Kurve</translation>
     </message>
@@ -904,7 +904,7 @@
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+566"/>
+        <location line="+608"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -928,7 +928,7 @@
         <translation type="unfinished">rot</translation>
     </message>
     <message>
-        <location line="+1385"/>
+        <location line="+1395"/>
         <source>curveIndex out of bounds [0,%i]</source>
         <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
@@ -963,9 +963,9 @@
         <translation type="unfinished">Die itom-API ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-2431"/>
+        <location line="-2442"/>
         <location line="+10"/>
-        <location line="+403"/>
+        <location line="+404"/>
         <source>curve %1</source>
         <translation>Kurve %1</translation>
     </message>
@@ -995,7 +995,7 @@
         <translation type="unfinished">Ungültige Typ der geometischen Formen</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-841"/>
+        <location filename="../plot1DWidget.cpp" line="-886"/>
         <source>plot1D</source>
         <translation type="unfinished">Plot1D</translation>
     </message>
