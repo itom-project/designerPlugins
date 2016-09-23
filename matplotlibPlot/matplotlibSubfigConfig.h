@@ -45,10 +45,32 @@ public:
 
     ~MatplotlibSubfigConfig() {};
 
+    //-------------------------------------------------------------------------------------------------------------------
+    void modifyValues(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace)
+    {
+        ui.dblRangeLeftRight->blockSignals(true);
+        ui.dblRangeLeftRight->setValues(valLeft / 10.0, valRight / 10.0);
+        ui.dblRangeLeftRight->blockSignals(false);
+
+        ui.dblRangeBottomTop->blockSignals(true);
+        ui.dblRangeBottomTop->setValues(valBottom / 10.0, valTop / 10.0);
+        ui.dblRangeBottomTop->blockSignals(false);
+
+        ui.sliderWSpace->blockSignals(true);
+        ui.sliderWSpace->setValue(valWSpace / 10.0);
+        ui.sliderWSpace->blockSignals(false);
+
+        ui.sliderHSpace->blockSignals(true);
+        ui.sliderHSpace->setValue(valHSpace / 10.0);
+        ui.sliderHSpace->blockSignals(false);
+    }
+
     DoubleRangeWidget *sliderLeftRight()  { return ui.dblRangeLeftRight; }
     DoubleRangeWidget *sliderBottomTop() { return ui.dblRangeBottomTop; }
     SliderWidget *sliderHSpace() { return ui.sliderHSpace; }
     SliderWidget *sliderWSpace() { return ui.sliderWSpace; }
+    QPushButton *resetButton() { return ui.btnReset; }
+    QPushButton *tightButton() { return ui.btnTight; }
 
 private:
     Ui::frmMatplotlibSubfigConfig ui;

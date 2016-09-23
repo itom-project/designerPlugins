@@ -45,12 +45,16 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 {
     Q_OBJECT
 
+    //DESIGNABLE (default: true): property is visible in QtDesigner property editor
+    //USER (default: false): property is visible in property editor of plot
+
     Q_PROPERTY(bool forceWindowResize READ getForceWindowResize WRITE setForceWindowResize USER true)
     Q_PROPERTY(bool keepSizeFixed READ getKeepSizeFixed WRITE setKeepSizeFixed USER true)
+    
 
     Q_CLASSINFO("prop://forceWindowResize", "If set, the plot widget / area is resized to the desired sizes given by matplotlib. Uncheck this option, if you want to keep the canvas unchanged e.g. in an user-defined GUI")
     Q_CLASSINFO("prop://keepSizeFixed", "If you want to control the size of the canvas by python / matplotlib (e.g. set_size_inches), set this to true. The canvas will then have a fixed size, that is not affected by the window size.")
-    
+
     Q_CLASSINFO("slot://showSubplotConfig", "displays the subplot configuration dialog.\n"
     "\n"
     "This slot must usually not be used, since the dialog can be opened by the toolbar.\n"
@@ -124,6 +128,8 @@ private:
 
 signals:
     void subplotConfigSliderChanged(int type, int value);
+    void subplotConfigTight();
+    void subplotConfigReset();
 
 private slots:
     void mnuMarkerClick(bool /*checked*/);
@@ -140,6 +146,7 @@ private slots:
 
 public slots:
     void showSubplotConfig(float left, float top, float right, float bottom, float wSpace, float hSpace);
+    void modifySubplotSliders(float left, float top, float right, float bottom, float wSpace, float hSpace);
     void setLabelText(QString text) { m_lblCoordinates->setText(text); }
     void replot();
 

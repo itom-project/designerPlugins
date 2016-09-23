@@ -258,10 +258,21 @@ void MatplotlibPlot::showSubplotConfig(float valLeft, float valTop, float valRig
         connect((m_pMatplotlibSubfigConfig)->sliderBottomTop(), SIGNAL(maximumValueChanged(double)), this, SLOT(subplotConfigSliderTopChanged(double)));
         connect((m_pMatplotlibSubfigConfig)->sliderWSpace(), SIGNAL(valueChanged(double)), this, SLOT(subplotConfigSliderWSpaceChanged(double)));
         connect((m_pMatplotlibSubfigConfig)->sliderHSpace(), SIGNAL(valueChanged(double)), this, SLOT(subplotConfigSliderHSpaceChanged(double)));
+        connect((m_pMatplotlibSubfigConfig)->resetButton(), SIGNAL(clicked()), this, SIGNAL(subplotConfigTight()));
+        connect((m_pMatplotlibSubfigConfig)->tightButton(), SIGNAL(clicked()), this, SIGNAL(subplotConfigReset()));
     }
 
-    m_pMatplotlibSubfigConfig->setModal(true);
+    m_pMatplotlibSubfigConfig->setModal(false);
     m_pMatplotlibSubfigConfig->show();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MatplotlibPlot::modifySubplotSliders(float left, float top, float right, float bottom, float wSpace, float hSpace)
+{
+    if (m_pMatplotlibSubfigConfig)
+    {
+        m_pMatplotlibSubfigConfig->modifyValues(left, top, right, bottom, wSpace, hSpace);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

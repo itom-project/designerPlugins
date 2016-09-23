@@ -42,6 +42,10 @@
 class MatplotlibWidget : public QGraphicsView
 {
     Q_OBJECT
+
+    //this property will be set by the backend
+    Q_PROPERTY(bool updatePlotOnResize READ getUpdatePlotOnResize WRITE setUpdatePlotOnResize USER true DESIGNABLE true)
+
 public:
     MatplotlibWidget(QMenu *contextMenu, QWidget * parent = 0);
     ~MatplotlibWidget();
@@ -50,6 +54,13 @@ public:
     {
         m_keepSizeFixed = fixed;
     }
+
+    void setUpdatePlotOnResize(bool update)
+    {
+        m_updatePlot = update;
+    }
+
+    bool getUpdatePlotOnResize() const { return m_updatePlot; }
 
     void replot();
 
@@ -100,6 +111,7 @@ private:
     QPixmap m_pixmap;
     QRect m_pixmapRect;
     bool m_keepSizeFixed;
+    bool m_updatePlot;
 
     QTimer m_timer;
     bool m_internalResize; //resize has been done, but resizeEvent should not request a python-side refresh of the image (if true)
@@ -119,7 +131,7 @@ signals:
     void eventLeaveEnter(bool enter);
     void eventMouse(int type, int x, int y, int button);
     void eventWheel(int x, int y, int delta, int orientation);
-    void eventKey(int type, int keyId, QString keyString, bool autoRepeat);
+    void eventKey(int type, int key, int modifiers, bool autoRepeat);
     void eventResize(int w, int h);
     //void eventPaintRequest();
     void eventIdle();

@@ -33,11 +33,12 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
     m_trackerActive(false),
     m_internalResize(false),
     m_keepSizeFixed(false),
+    m_updatePlot(false),
     m_scene(NULL),
     m_rectItem(NULL),
     m_pixmapItem(NULL),
 #ifdef _DEBUG
-    m_debugOutput(false),
+    m_debugOutput(false), //set this to true in order to get qDebug() outputs in _DEBUG mode
 #endif
     m_contextMenu(contextMenu)
 {
@@ -292,8 +293,11 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
         }
 #endif
 
-        m_pendingEvent = PendingEvent(size().height(), size().width());
-        m_timer.start(60);
+        if (m_updatePlot)
+        {
+            m_pendingEvent = PendingEvent(size().height(), size().width());
+            m_timer.start(60);
+        }
     }
     m_internalResize = false;
     
@@ -405,7 +409,7 @@ void MatplotlibWidget::keyPressEvent ( QKeyEvent * event )
     if (!hasFocus())
         return;
 
-    emit eventKey(0, event->key(), event->text(), event->isAutoRepeat());
+    emit eventKey(0, event->key(), event->modifiers(), event->isAutoRepeat());
     event->accept();
 }
 
@@ -414,7 +418,7 @@ void MatplotlibWidget::keyReleaseEvent ( QKeyEvent * event )
 {
     if (!hasFocus())
         return;
-    emit eventKey(1, event->key(), event->text(), event->isAutoRepeat());
+    emit eventKey(1, event->key(), event->modifiers(), event->isAutoRepeat());
     event->accept();
 }
 
