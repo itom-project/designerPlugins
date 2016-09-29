@@ -91,6 +91,7 @@ void Itom1DQwtPlot::constructor()
 	connect(d->m_pLinePropertiesDock, SIGNAL(visibilityChanged(bool)), d->m_pLinePropertyWidget, SLOT(visibilityChanged(bool)));
 	connect(m_pContent, SIGNAL(curveChanged()), d->m_pLinePropertyWidget, SLOT(on_listWidget_itemSelectionChanged()));
 	connect(m_pContent, SIGNAL(legendModified()), d->m_pLinePropertyWidget, SLOT(updateCurveList()));
+    connect(d->m_pLinePropertyWidget, SIGNAL(titleChanged(const QStringList)), this, SLOT(setLegendTitles(const QStringList)));
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
     registerShortcutActions();
@@ -742,7 +743,7 @@ void Itom1DQwtPlot::setLegendTitles(const QStringList &legends)
 {
     if (m_pContent)
     {
-        return m_pContent->setLegendTitles(legends, m_pInput["source"]->getVal<ito::DataObject*>());
+        m_pContent->setLegendTitles(legends, m_pInput["source"]->getVal<ito::DataObject*>());
     }
 
     updatePropertyDock();

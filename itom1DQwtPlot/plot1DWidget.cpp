@@ -804,10 +804,13 @@ void Plot1DWidget::applyLegendFont()
         QwtLegendLabel* legendLabel;
         foreach(QwtPlotCurve *item, m_plotCurveItems)
         {
-            legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
-            QwtText text(legendLabel->data().title());
-            text.setFont(m_legendFont);
-            legendLabel->setText(text);
+            if (item->testItemAttribute(QwtPlotItem::Legend) == true)
+            {
+                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+                QwtText text(legendLabel->data().title());
+                text.setFont(m_legendFont);
+                legendLabel->setText(text);
+            }
         }
     }
 }
@@ -821,7 +824,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
     ito::DataObjectTagType tag;
     QwtPlotCurve *item = NULL;
 
-    for (int index = 0; index < m_plotCurveItems.size(); ++index)
+    for (index = 0; index < m_plotCurveItems.size(); ++index)
     {
         item = m_plotCurveItems[index];
         if (m_legendTitles.size() == 0)
@@ -885,7 +888,7 @@ void Plot1DWidget::setLineWidth(const qreal &width)
             pen.setWidthF(width);
             c->setPen(pen);
         }
-
+        applyLegendFont();
         replot();
 		emit curveChanged();
     }
@@ -904,7 +907,7 @@ void Plot1DWidget::setLineStyle(const Qt::PenStyle &style)
             pen.setStyle(style);
             c->setPen(pen);
         }
-
+        applyLegendFont();
         replot();
 		emit curveChanged();
     }
@@ -929,7 +932,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
                 c->setSymbol(new QwtSymbol(style, QBrush(Qt::white), QPen(pen.color()), newSize));
             }
         }
-
+        applyLegendFont();
         replot();
 		emit curveChanged();
     }
@@ -949,7 +952,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
                 c->setSymbol(new QwtSymbol(style, QBrush(Qt::white), QPen(pen.color()), size));
             }
         }
-
+        applyLegendFont();
         replot();
 		emit curveChanged();
     }
@@ -968,7 +971,7 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
                 c->setSymbol(new QwtSymbol(s ? s->style() : m_pData->m_lineSymbole, QBrush(Qt::white), QPen(pen.color()), QSize(size,size)));
             }
         }
-
+        applyLegendFont();
         replot();
 		emit curveChanged();
     }
@@ -2776,7 +2779,7 @@ void Plot1DWidget::setQwtLineStyle(const ItomQwtPlotEnums::CurveStyle &style)
             break;
         }
     }
-
+    applyLegendFont();
     replot();
 }
 
@@ -2827,7 +2830,7 @@ void Plot1DWidget::setCurveFilled()
             ((QwtPlotCurveDataObject*)c)->setBrush(Qt::NoBrush);
         }
     }
-
+    applyLegendFont();
     replot();
 }
 
@@ -3288,6 +3291,7 @@ ito::RetVal Plot1DWidget::setCurveProperty(int index, const QByteArray &property
 
         if (!retval.containsError())
         {
+            applyLegendFont();
             replot();
         }
 

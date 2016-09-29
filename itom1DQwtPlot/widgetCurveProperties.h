@@ -47,6 +47,7 @@ private:
 	bool m_visible;
 	bool m_isUpdating;
 	QColor getSymbolColor(const QwtPlotCurve* item);
+    const QStringList generateLegendList() const;
 
 private slots:
 	void on_spinBoxSymbolSize_valueChanged(int val);
@@ -69,6 +70,7 @@ public slots:
 	void updateCurveList();
 
 signals:
+    void titleChanged(const QStringList &legends);
 
 };
 

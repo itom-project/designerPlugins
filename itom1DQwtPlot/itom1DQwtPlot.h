@@ -276,7 +276,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         void setLegendPosition(LegendPos legendPosition);
 
         QStringList getLegendTitles() const;
-        void setLegendTitles(const QStringList &legends);
 
         bool getAntiAliased() const;
         void setAntiAliased(bool &antiAliased);
@@ -358,6 +357,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         Itom1DQwtPlotPrivate *d;
 
     public slots:
+        void setLegendTitles(const QStringList &legends);
         ito::RetVal setPicker(const QVector<double> &coordinates, int curveIndex = 0, bool physicalCoordinates = true);
         ito::RetVal appendPicker(const QVector<double> &coordinates, int curveIndex = 0, bool physicalCoordinates = true);
         ito::RetVal deletePicker(int id = -1);

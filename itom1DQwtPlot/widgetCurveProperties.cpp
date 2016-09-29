@@ -338,18 +338,17 @@ void WidgetCurveProperties::on_listWidget_itemChanged(QListWidgetItem *item)
 	{
 		m_pContent->getplotCurveItems().at(ui.listWidget->currentRow())->setTitle(item->text());
         m_pContent->applyLegendFont();
-		QStringList legendList;
-		int curveIdx = ui.listWidget->currentRow();
+        emit titleChanged(generateLegendList());
+		//QStringList legendList;
+		//int curveIdx = ui.listWidget->currentRow();
 
-		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
-		const QwtPlotCurve* curve;
-		foreach(curve, m_pContent->getplotCurveItems())
-		{
-			legendList.append(curve->title().text());
-		}
-		m_pContent->setLegendTitles(legendList, NULL);
-		
-		//ui.lineEditName->setText(item->text());
+		//QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
+		//const QwtPlotCurve* curve;
+		//foreach(curve, m_pContent->getplotCurveItems())
+		//{
+		//	legendList.append(curve->title().text());
+		//}
+		//m_pContent->setLegendTitles(legendList, NULL);
 	}
 }
 //-----------------------------------------------------------------------------------------------
@@ -365,6 +364,7 @@ void WidgetCurveProperties::on_checkBoxLegendVisible_stateChanged(int val)
 			row = ui.listWidget->row(item);
 			m_pContent->getPlotCurveProperty().at(row)->setLegendVisible(val);
 		}
+        m_pContent->applyLegendFont();
 	}
 }
 //-----------------------------------------------------------------------------------------------
@@ -379,7 +379,8 @@ void WidgetCurveProperties::on_spinBoxSymbolSize_valueChanged(int val)
 		{
 			row = ui.listWidget->row(item);
 			m_pContent->getPlotCurveProperty().at(row)->setLineSymbolSize(val);
-		}
+        }
+        m_pContent->applyLegendFont();
 		m_pContent->replot();
 	}
 }
@@ -400,6 +401,7 @@ void WidgetCurveProperties::on_colorPickerButtonLineStyle_colorChanged(QColor co
 			m_pContent->getplotCurveItems().at(row)->setPen(pen);
 
 		}
+        m_pContent->applyLegendFont();
 		m_pContent->replot();
 	}
 }
@@ -418,6 +420,7 @@ void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val)
 			row = ui.listWidget->row(item);
 			m_pContent->getPlotCurveProperty().at(row)->setLineSymbolStyle((Itom1DQwtPlot::Symbol)(enumValue));
 		}
+        m_pContent->applyLegendFont();
 		m_pContent->replot();
 	}
 }
@@ -437,7 +440,6 @@ void WidgetCurveProperties::on_checkBoxVisible_stateChanged(int state)
 			m_pContent->toggleLegendLabel(m_pContent->getplotCurveItems().at(row), state);
 
 		}
-
 
 		m_pContent->replot();
 	}
@@ -459,6 +461,7 @@ void WidgetCurveProperties::on_comboBoxLineStyle_currentIndexChanged(int val)
 			pen.setStyle((Qt::PenStyle)val);
 			m_pContent->getplotCurveItems().at(row)->setPen(pen);
 		}
+        m_pContent->applyLegendFont();
 		m_pContent->replot();
 	}
 }
@@ -480,6 +483,7 @@ void WidgetCurveProperties::on_doubleSpinBoxLineWidth_valueChanged(double i)
 
 
 		}
+        m_pContent->applyLegendFont();
 		m_pContent->replot();
 	}
 }
@@ -527,6 +531,7 @@ void WidgetCurveProperties::on_colorPickerButtonSymbol_colorChanged(QColor color
 				m_pContent->getplotCurveItems().at(row)->setSymbol(newSymbol);
 			}		
 		}
+        m_pContent->applyLegendFont();
 		m_pContent->replot();
 	}
 }
@@ -540,9 +545,23 @@ void WidgetCurveProperties::on_lineEditName_editingFinished()
 		//const QString text(ui.lineEditName->text());
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		int row(ui.listWidget->row(selection.at(0)));//only one can be selected otherwise the editLine is enabled
+        selection[0]->setText(text);
 		m_pContent->getplotCurveItems().at(row)->setTitle(text);
+        emit titleChanged(generateLegendList());
         m_pContent->applyLegendFont();
-		selection[0]->setText(text);
+		
 		m_isUpdating = false;
 	}
+}
+//-----------------------------------------------------------------------------------------------
+const QStringList WidgetCurveProperties::generateLegendList() const
+{
+    QStringList list;
+    for (int i = 0; i < ui.listWidget->count(); ++i)
+    {
+        QListWidgetItem* item = ui.listWidget->item(i);
+        list.append(item->text());
+        
+    }
+    return list;
 }
