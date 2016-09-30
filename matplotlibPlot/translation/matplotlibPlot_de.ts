@@ -164,7 +164,22 @@
         <translation type="unfinished">Horizontaler Abstand</translation>
     </message>
     <message>
-        <location line="-49"/>
+        <location line="+76"/>
+        <source>Tight Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-139"/>
         <source>bottom</source>
         <translation>Unten</translation>
     </message>

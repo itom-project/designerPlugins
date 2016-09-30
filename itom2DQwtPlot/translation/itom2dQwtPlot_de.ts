@@ -332,7 +332,7 @@
     <message>
         <location line="+4"/>
         <source>Clear all existing geometric shapes</source>
-        <translation type="unfinished">Alle existierende geometrische Formen löschen</translation>
+        <translation type="unfinished">Alle geometrische Formen löschen</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -780,51 +780,55 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>min &amp; max</source>
-        <translation type="unfinished">Min &amp; Max</translation>
+        <source>min &amp;&amp; max</source>
+        <translation type="unfinished">Min &amp;&amp; Max</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+5"/>
+        <source>- &amp;&amp; min</source>
+        <translation type="unfinished">- &amp;&amp; Min</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>- &amp;&amp; max</source>
+        <translation type="unfinished">- &amp;&amp; Max</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>| &amp;&amp; min</source>
+        <translation type="unfinished">| &amp;&amp; Min</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>| &amp;&amp; max</source>
+        <translation type="unfinished">| &amp;&amp; Max</translation>
+    </message>
+    <message>
+        <source>min &amp; max</source>
+        <translation type="obsolete">Min &amp; Max</translation>
+    </message>
+    <message>
+        <location line="-19"/>
         <source>line cut through global minimum and maximum value</source>
         <translation type="unfinished">Globales Minimum und Maximum für Linienschnitt übernehmen</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>- &amp; min</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+5"/>
         <source>horizontal line cut through global minimum value</source>
         <translation type="unfinished">Globales Minimum für horizontalen Linienschnitt übernehmen</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>- &amp; max</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+5"/>
         <source>horizontal line cut through global maximum value</source>
         <translation type="unfinished">Globales Maximum für horizontalen Linienschnitt übernehmen</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>| &amp; min</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+5"/>
         <source>vertical line cut through global minimum value</source>
         <translation type="unfinished">Globales Minimum für vertikalen Linienschnitt übernehmen</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>| &amp; max</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+5"/>
         <source>vertical line cut through global maximum value</source>
         <translation type="unfinished">Globales Maximum für vertikalen Linienschnitt übernehmen</translation>
     </message>

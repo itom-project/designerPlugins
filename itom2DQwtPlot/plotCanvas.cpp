@@ -467,30 +467,30 @@ void PlotCanvas::createActions()
     //m_pActLineCutMode
     m_pMnuLineCutMode = new QMenu(tr("Linecut Mode"), p);
     m_pActLineCut->setMenu(m_pMnuLineCutMode);
-    a = m_pMnuLineCutMode->addAction(tr("min & max"));
+    a = m_pMnuLineCutMode->addAction(tr("min && max"));
     a->setToolTip(tr("line cut through global minimum and maximum value"));
     a->setData(0);
-    a->setCheckable(true);
+//    a->setCheckable(true);
 
-    a = m_pMnuLineCutMode->addAction(tr("- & min"));
+    a = m_pMnuLineCutMode->addAction(tr("- && min"));
     a->setToolTip(tr("horizontal line cut through global minimum value"));
     a->setData(1);
-    a->setCheckable(true);
+//    a->setCheckable(true);
 
-    a = m_pMnuLineCutMode->addAction(tr("- & max"));
+    a = m_pMnuLineCutMode->addAction(tr("- && max"));
     a->setToolTip(tr("horizontal line cut through global maximum value"));
     a->setData(2);
-    a->setCheckable(true);
+//    a->setCheckable(true);
 
-    a = m_pMnuLineCutMode->addAction(tr("| & min"));
+    a = m_pMnuLineCutMode->addAction(tr("| && min"));
     a->setToolTip(tr("vertical line cut through global minimum value"));
     a->setData(3);
-    a->setCheckable(true);
+//    a->setCheckable(true);
 
-    a = m_pMnuLineCutMode->addAction(tr("| & max"));
+    a = m_pMnuLineCutMode->addAction(tr("| && max"));
     a->setToolTip(tr("vertical line cut through global maximum value"));
     a->setData(4);
-    a->setCheckable(true);
+//    a->setCheckable(true);
     connect(m_pMnuLineCutMode, SIGNAL(triggered(QAction*)), this, SLOT(mnuLineCutMode(QAction*)));
 
     //m_pOverlaySlider

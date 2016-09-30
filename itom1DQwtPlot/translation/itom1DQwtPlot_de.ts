@@ -187,7 +187,7 @@
         <translation>Kurveneigenschaften</translation>
     </message>
     <message>
-        <location line="+725"/>
+        <location line="+726"/>
         <location line="+10"/>
         <source>Set picker failed, since canvas not initilized</source>
         <translation>Der Picker konnte nicht gesetzt werden, da &apos;Canvas&apos; nicht inizialisiert wurde</translation>
@@ -329,7 +329,7 @@
     <message>
         <location line="+4"/>
         <source>Clear all existing geometric shapes</source>
-        <translation type="unfinished">Alle existierende geometrische Formen löschen</translation>
+        <translation type="unfinished">Alle geometrische Formen löschen</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -740,12 +740,12 @@
     </message>
     <message>
         <location line="+4"/>
-        <location line="+2818"/>
+        <location line="+2821"/>
         <source>To Min-Max</source>
         <translation>Auf Min/Max</translation>
     </message>
     <message>
-        <location line="-2817"/>
+        <location line="-2820"/>
         <source>set two pickers to absolute minimum and maximum of (first) curve</source>
         <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der (ersten) Kurve</translation>
     </message>
@@ -904,7 +904,7 @@
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+608"/>
+        <location line="+611"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -995,7 +995,7 @@
         <translation type="unfinished">Ungültige Typ der geometischen Formen</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-886"/>
+        <location filename="../plot1DWidget.cpp" line="-889"/>
         <source>plot1D</source>
         <translation type="unfinished">Plot1D</translation>
     </message>
@@ -1054,37 +1054,37 @@
         <translation type="unfinished">Anzeigen</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+20"/>
         <source>Legend Visible</source>
         <translation type="unfinished">Legende anzeigen</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+26"/>
         <source>Line Width</source>
         <translation type="unfinished">Linienbreite</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+23"/>
         <source>Line Style</source>
         <translation type="unfinished">Linienstil</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+13"/>
         <source>Line Symbol</source>
         <translation type="unfinished">Liniensymbol</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+13"/>
         <source>Symbol Size</source>
         <translation type="unfinished">Symbolgröße</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+17"/>
         <source>Line Color</source>
         <translation type="unfinished">Linienfarbe</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+13"/>
         <source>Symbol Color</source>
         <translation type="unfinished">Symbolfarbe</translation>
     </message>
