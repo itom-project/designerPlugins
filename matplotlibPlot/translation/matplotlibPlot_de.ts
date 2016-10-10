@@ -56,12 +56,12 @@
     <message>
         <location line="+2"/>
         <source>Marker</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Show coordinates under mouse cursor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zeigt die Koordinaten des aktuellen Mausposition</translation>
     </message>
     <message>
         <source>marker</source>
@@ -166,17 +166,17 @@
     <message>
         <location line="+76"/>
         <source>Tight Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anwenden</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zurücksetzen</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ok</translation>
     </message>
     <message>
         <location line="-139"/>

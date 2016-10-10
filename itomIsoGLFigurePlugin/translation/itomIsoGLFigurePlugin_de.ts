@@ -260,7 +260,7 @@
         <location line="+250"/>
         <location line="+15"/>
         <source>Error allocating memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler bei der Speicheranforderung</translation>
     </message>
     <message>
         <location line="-214"/>
@@ -272,17 +272,17 @@
         <location line="-635"/>
         <location line="+399"/>
         <source>Error calculating points / triangles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Berechnen der Punkte / Dreiecke</translation>
     </message>
     <message>
         <location line="-347"/>
         <source>DataObject empty, calc triangles failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leeres DataObjects. Die Dreiecksberechnung ist fehlgeschlagen</translation>
     </message>
     <message>
         <location line="+61"/>
         <source>Unknown DataObject-Type, calc triangles failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unbekannter Typ des DataObjects. Die Dreiecksberechnung ist fehlgeschlagen</translation>
     </message>
     <message>
         <location line="+551"/>

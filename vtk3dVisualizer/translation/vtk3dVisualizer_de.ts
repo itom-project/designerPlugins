@@ -16,29 +16,29 @@
     <name>ItemGeometry</name>
     <message>
         <source>error updating text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Aktualisieren des Texts</translation>
     </message>
     <message>
         <source>item was no text item before</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das Item ist kein Text-Item</translation>
     </message>
     <message>
         <source>could not set pose of geometry &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die geometrische Form &apos;%s&apos; konnte nicht positioniert werden</translation>
     </message>
 </context>
 <context>
     <name>ItemPointCloud</name>
     <message>
         <source>type of point cloud not supported</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dieser Zeigertyp wird nicht unterstützt</translation>
     </message>
 </context>
 <context>
     <name>ItemPointCloudNormal</name>
     <message>
         <source>type of point cloud not supported for normals</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dieser Zeigertyp wird für Normale nicht unterstützt</translation>
     </message>
 </context>
 <context>
@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>LGPL 2.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>itom widget to show point clouds, polygon meshes, geometries...</source>
@@ -91,11 +91,11 @@
     </message>
     <message>
         <source>unsupported input type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nicht unterstützter Input-Typ</translation>
     </message>
     <message>
         <source>item not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das Item wurde nicht gefunden.</translation>
     </message>
     <message>
         <source>the given point cloud has no normal component</source>
