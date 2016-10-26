@@ -2569,37 +2569,72 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 
         QClipboard *clipboard = QApplication::clipboard();
 
+
         if ((hMyParent->markerWidget()  && hMyParent->markerWidget()->isVisible()) ||
             (hMyParent->pickerWidget()  && hMyParent->pickerWidget()->isVisible()) ||
             (hMyParent->dObjectWidget() && hMyParent->dObjectWidget()->isVisible()) ||
             (hMyParent->shapesWidget()  && hMyParent->shapesWidget()->isVisible()))
         {
+#if QT_VERSION >= 0x050000
             plotInfoVisible = true;
-            emit statusBarMessage(tr("copy current view to clipboard including infoWidgets ..."));
+            emit statusBarMessage(tr("copy current view to clipboard including meta information widgets ..."));
+#else
+            emit statusBarMessage(tr("copy current view to clipboard without meta information widgets (requires Qt5) ..."));
+#endif
         }
         else
         {
             emit statusBarMessage(tr("copy current view to clipboard ..."));
         }
+
         
         QImage img(myRect, QImage::Format_ARGB32);
         QPainter painter(&img);
         painter.scale(resFaktor, resFaktor);
-        
-
-
-        if (plotInfoVisible)
-        {
-
-        }
-        else
-        {
-            renderer.render(this, &painter, rect());
-        }
-
+        renderer.render(this, &painter, rect());
         img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
         img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
+
+#if QT_VERSION >= 0x050000
+        if (plotInfoVisible)
+        {
+            QList<QWidget*> widgets;
+            widgets << hMyParent->dObjectWidget() << hMyParent->pickerWidget() << \
+                hMyParent->markerWidget()  << hMyParent->shapesWidget();
+            QList<QPixmap> pixmaps;
+            int height = 0;
+            int width = 0;
+            int x0 = img.width();
+
+            foreach(QWidget* widget, widgets)
+            {
+                if (widget && widget->isVisible())
+                {
+                    QWidget *parent = qobject_cast<QWidget*>(widget->parent());
+                    widget = parent ? parent : widget;
+                    QPixmap pixmap = widget->grab();
+                    height += pixmap.height();
+                    width = qMax(width, pixmap.width());
+                    pixmaps << pixmap;
+                }
+            }
+
+            QImage imgTotal(img.width() + width, qMax(img.height(), height), QImage::Format_ARGB32);
+            QPainter painter(&imgTotal);
+            painter.drawImage(0, 0, img);
+            int y0 = 0;
+            foreach(QPixmap pixmap, pixmaps)
+            {
+                painter.drawPixmap(x0, y0, pixmap);
+                y0 += pixmap.height();
+            }
+
+            img = imgTotal;
+        }
+#endif
+
         clipboard->setImage(img);
+
         if (plotInfoVisible)
         {
             emit statusBarMessage(tr("copy current view to clipboard including infoWidgets. Done."), 1000);
@@ -2778,7 +2813,15 @@ void ItomQwtPlot::setPlottingEnabled(bool enabled)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mnuCopyToClipboard()
 {
-    exportCanvas(true, "");
+    QSizeF size(0.0, 0.0);
+    int dpi = 300;
+
+    if (ito::ITOM_API_FUNCS_GRAPH)
+    {
+        dpi = qBound(48, apiGetFigureSetting(parent(), "copyClipboardResolutionDpi", 300, NULL).value<int>(), 2000);
+    }
+
+    exportCanvas(true, "", size, dpi);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
