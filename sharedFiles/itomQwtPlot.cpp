@@ -1552,6 +1552,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         m_isUserInteraction = false;
                     }
                     emit p->geometricShapeFinished(shapes, aborted);
+                    if (p->shapesWidget())
+                    {
+                        p->shapesWidget()->updateShapes(shapes);
+                    }
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -1716,6 +1720,10 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         m_isUserInteraction = false;
                     }
                     emit p->geometricShapeFinished(shapes, aborted);
+                    if (p->shapesWidget())
+                    {
+                        p->shapesWidget()->updateShapes(shapes);
+                    }
                 }
 
                 m_pMultiPointPicker->setEnabled(false);

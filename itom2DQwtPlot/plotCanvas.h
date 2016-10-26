@@ -172,6 +172,8 @@ class PlotCanvas : public ItomQwtPlot
         InternalData *m_pData;
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
 
+        int m_currentDataType;
+
         Qt::KeyboardModifiers m_activeModifiers;
 
         bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)

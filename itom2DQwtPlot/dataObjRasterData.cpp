@@ -270,7 +270,16 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                     break;
                 }
             }
-            setInterval(Qt::ZAxis, QwtInterval(min,max));
+
+            QwtInterval zInterval = interval(Qt::ZAxis);
+            setInterval(Qt::ZAxis, QwtInterval(min, max));
+
+            if (qFuzzyCompare(zInterval.minValue(), min) == false || \
+                qFuzzyCompare(zInterval.maxValue(), max) == false)
+            {
+                newHash |= PlotCanvas::changeAppearance;
+            }
+            
         }
         else
         {

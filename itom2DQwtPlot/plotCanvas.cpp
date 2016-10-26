@@ -96,7 +96,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pMnuCmplxSwitch(NULL),
         m_pActCntrMarker(NULL),
         m_pOverlaySlider(NULL),
-        m_pActOverlaySlider(NULL)
+        m_pActOverlaySlider(NULL),
+        m_currentDataType(-1)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -748,31 +749,42 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
         if (p)
         {
-            setColorDataTypeRepresentation(dObj->getType() == ito::tRGBA32);
+            int type = dObj->getType();
 
-            if (dObj->getType() == ito::tRGBA32) //coloured objects have no color bar, therefore the value axis cropping is disabled
+            if (type != m_currentDataType)
             {
-                m_pData->m_valueScaleAuto = false;
-                m_pData->m_valueMin = std::numeric_limits<ito::uint8>::min();
-                m_pData->m_valueMax = std::numeric_limits<ito::uint8>::max();
+                switch (dObj->getType())
+                {
+                case ito::tRGBA32:
+                    //coloured objects have no color bar, therefore the value axis cropping is disabled
+                    setColorDataTypeRepresentation(true);
+                    m_pData->m_valueScaleAuto = false;
+                    m_pData->m_valueMin = std::numeric_limits<ito::uint8>::min();
+                    m_pData->m_valueMax = std::numeric_limits<ito::uint8>::max();
+                    m_pActCmplxSwitch->setVisible(false);
+                    break;
+                case ito::tComplex64:
+                case ito::tComplex128:
+                    setColorDataTypeRepresentation(false);
+                    m_pActCmplxSwitch->setVisible(true);
+                    break;
+                default:
+                    setColorDataTypeRepresentation(false);
+                    m_pActCmplxSwitch->setVisible(false);
+                    break;
+                }
+
+                m_currentDataType = type;
             }
 
-            if (dObj->getType() == ito::tComplex128 || dObj->getType() == ito::tComplex64)
+            if (dObj->getDims() > 2)
             {
-                m_pActCmplxSwitch->setVisible(true);
+                p->setPlaneRange(0, dObj->calcNumMats() - 1);
             }
             else
             {
-                m_pActCmplxSwitch->setVisible(false);
+                p->setPlaneRange(0, 0);
             }
-
-            int maxPlane = 0;
-            if (dObj->getDims() > 2)
-            {
-                maxPlane = dObj->calcNumMats() - 1;
-            }
-
-            p->setPlaneRange(0, maxPlane);
         }
 
         updateScaleValues(false, updateState & changeData); //no replot here
