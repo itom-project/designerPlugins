@@ -35,10 +35,10 @@ class DialogExportProperties : public QDialog
 public:
     
 
-    DialogExportProperties(const QString &type, const QSizeF curSize, QWidget *parent = NULL);
+    DialogExportProperties(const QSizeF &currentSizePx, QWidget *parent = NULL);
     ~DialogExportProperties() {};
 
-    void getData(QSizeF &exportSize, int &resolution);
+    void getData(QSizeF &exportSizePx, QSizeF &exportSizeMm, int &resolution);
 
 protected:
     void updateOutput(void);
@@ -49,7 +49,7 @@ protected:
 private:
     Ui::DialogExport2File ui;
 
-    double m_aspect;
+    double m_aspect; /*!< canvas width / canvas height */
 
     bool m_inEditing;
     bool m_keepAspectRatio;

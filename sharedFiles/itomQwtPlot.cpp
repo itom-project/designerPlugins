@@ -2516,7 +2516,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapeLabelVisible(int idx, bool setVisible)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, QSizeF curSize /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
+ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, const QSizeF &curSizeMm /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
 {
     if (!copyToClipboardNotFile)
     {
@@ -2540,10 +2540,6 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         }
     }
 
-    if (curSize.height() == 0 || curSize.width() == 0)
-    {
-        curSize = size();
-    }
     ItomQwtDObjFigure* hMyParent = (ItomQwtDObjFigure*)parent();
 
     QBrush curBrush = canvasBackground();
@@ -2564,8 +2560,17 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
     if (copyToClipboardNotFile)
     {
         bool plotInfoVisible = false;
-        qreal resFaktor = std::max(qRound(resolution / 72.0), 1);
-        QSize myRect(curSize.width() * resFaktor, curSize.height() * resFaktor);
+        qreal resFactor = std::max(resolution / 92.0, 0.5); //todo: consider dpi of real screen (92.0 is only a default value)
+        QSize newSizePx;
+
+        if (curSizeMm.isEmpty())
+        {
+            newSizePx = size() * resFactor;
+        }
+        else
+        {
+            newSizePx = (curSizeMm * (resolution / 25.4)).toSize();
+        }
 
         QClipboard *clipboard = QApplication::clipboard();
 
@@ -2588,9 +2593,9 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         }
 
         
-        QImage img(myRect, QImage::Format_ARGB32);
+        QImage img(newSizePx, QImage::Format_ARGB32);
         QPainter painter(&img);
-        painter.scale(resFaktor, resFaktor);
+        painter.scale(resFactor, resFactor);
         renderer.render(this, &painter, rect());
         img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
         img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
@@ -2633,6 +2638,8 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         }
 #endif
 
+        img.setDotsPerMeterX(img.dotsPerMeterX() * resFactor); //setDotsPerMeterXY must be set after rendering
+        img.setDotsPerMeterY(img.dotsPerMeterY() * resFactor);
         clipboard->setImage(img);
 
         if (plotInfoVisible)
@@ -2646,7 +2653,14 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
     }
     else
     {
-        renderer.renderDocument(this, fileName, curSize, resolution);
+        QSizeF newSizeMm = curSizeMm;
+
+        if (curSizeMm.isEmpty())
+        {
+            newSizeMm = size() * (25.4 / 92.0); //todo: consider dpi of real screen (92.0 is only a default value)
+        }
+
+        renderer.renderDocument(this, fileName, newSizeMm, resolution);
     }
 
     setPalette(curPalette);
@@ -2685,19 +2699,18 @@ void ItomQwtPlot::mnuActSave()
     //first get the output format information, then the filename (in order to let the user see what can be adjusted before defining a filename)
     bool abort = true;
 
-    QSizeF curSize = size();
+    QSizeF curSizePx = size();
+    QSizeF curSizeMm;
     int resolution = 300;
 
-    DialogExportProperties *dlg = new DialogExportProperties("", curSize, qobject_cast<ItomQwtDObjFigure*>(parent()));
+    DialogExportProperties *dlg = new DialogExportProperties(curSizePx, qobject_cast<ItomQwtDObjFigure*>(parent()));
     if (dlg->exec() == QDialog::Accepted)
     {
-        dlg->getData(curSize, resolution);
-
+        dlg->getData(curSizePx, curSizeMm, resolution);
         abort = false;
     }
 
-    delete dlg;
-    dlg = NULL;
+    DELETE_AND_SET_NULL(dlg);
 
     if (abort)
     {
@@ -2758,7 +2771,7 @@ void ItomQwtPlot::mnuActSave()
         QFileInfo fi(fileName);
         saveDefaultPath = fi.path();
 
-        retval += exportCanvas(false, fileName, curSize, resolution);
+        retval += exportCanvas(false, fileName, curSizeMm, resolution);
     }
 
     if (retval.containsError())

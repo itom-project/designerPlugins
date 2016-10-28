@@ -23,15 +23,15 @@
 #include "dialogExportProperties.h"
 
 //-----------------------------------------------------------------------------------------------
-DialogExportProperties::DialogExportProperties(const QString &type, const QSizeF curSize, QWidget *parent) :
+DialogExportProperties::DialogExportProperties(const QSizeF &currentSizePx, QWidget *parent) :
     QDialog(parent),
     m_inEditing(false),
     m_keepAspectRatio(false)
 {
     ui.setupUi(this);
  
-    ui.lblCanvasWidth->setText(QString("%1 px").arg(curSize.width()));
-    ui.lblCanvasHeight->setText(QString("%1 px").arg(curSize.height()));
+    ui.lblCanvasWidth->setText(QString("%1 px").arg(currentSizePx.width()));
+    ui.lblCanvasHeight->setText(QString("%1 px").arg(currentSizePx.height()));
 
     QStringList items;
     items << tr("user defined");
@@ -51,16 +51,16 @@ DialogExportProperties::DialogExportProperties(const QString &type, const QSizeF
     //set initialize values
     m_inEditing = true;
 
-    m_aspect = curSize.width() / curSize.height();
+    m_aspect = currentSizePx.width() / currentSizePx.height();
 
     ui.cB_ExpType->setCurrentIndex(0); //user defined
     ui.sB_destResolution->setValue(150);
 
-    ui.dSB_destWidth->setValue(pxToMm(curSize.width()));
-    ui.dSB_destHeight->setValue(pxToMm(curSize.height()));
+    ui.dSB_destWidth->setValue(25.4 * currentSizePx.width() / 92.0); //todo: consider dpi of real screen (92.0 is only a default value)
+    ui.dSB_destHeight->setValue(25.4 * currentSizePx.height() / 92.0); //todo: consider dpi of real screen (92.0 is only a default value)
 
-    ui.sB_destWidth->setValue(curSize.width());
-    ui.sB_destHeight->setValue( curSize.height());
+    ui.sB_destWidth->setValue(currentSizePx.width());
+    ui.sB_destHeight->setValue( currentSizePx.height());
 
     m_inEditing = false;
 }
@@ -78,10 +78,12 @@ int DialogExportProperties::mmToPx(const double &mm)
 }
 
 //-----------------------------------------------------------------------------------------------
-void DialogExportProperties::getData(QSizeF &exportSize, int &resolution)
+void DialogExportProperties::getData(QSizeF &exportSizePx, QSizeF &exportSizeMm, int &resolution)
 {
-    exportSize.setHeight(ui.dSB_destHeight->value());
-    exportSize.setWidth(ui.dSB_destWidth->value());
+    exportSizePx.setHeight(ui.sB_destHeight->value());
+    exportSizePx.setWidth(ui.sB_destWidth->value());
+    exportSizeMm.setHeight(ui.dSB_destHeight->value());
+    exportSizeMm.setWidth(ui.dSB_destWidth->value());
     resolution = ui.sB_destResolution->value();
 }
 //-----------------------------------------------------------------------------------------------
