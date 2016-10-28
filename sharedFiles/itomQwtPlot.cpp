@@ -2597,8 +2597,8 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         QPainter painter(&img);
         painter.scale(resFactor, resFactor);
         renderer.render(this, &painter, rect());
-        img.setDotsPerMeterX(img.dotsPerMeterX() * resFaktor); //setDotsPerMeterXY must be set after rendering
-        img.setDotsPerMeterY(img.dotsPerMeterY() * resFaktor);
+        img.setDotsPerMeterX(img.dotsPerMeterX() * resFactor); //setDotsPerMeterXY must be set after rendering
+        img.setDotsPerMeterY(img.dotsPerMeterY() * resFactor);
 
 #if QT_VERSION >= 0x050000
         if (plotInfoVisible)
@@ -2638,8 +2638,6 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         }
 #endif
 
-        img.setDotsPerMeterX(img.dotsPerMeterX() * resFactor); //setDotsPerMeterXY must be set after rendering
-        img.setDotsPerMeterY(img.dotsPerMeterY() * resFactor);
         clipboard->setImage(img);
 
         if (plotInfoVisible)
