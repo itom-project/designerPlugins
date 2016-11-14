@@ -413,7 +413,7 @@ void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val)
 		QList<QListWidgetItem*> selection = ui.listWidget->selectedItems();
 		QListWidgetItem* item;
 		int row;
-        int enumValue = ui.comboBoxLineSymbol->currentData().toInt();
+        int enumValue = ui.comboBoxLineSymbol->itemData(ui.comboBoxLineSymbol->currentIndex()).toInt();
 
 		foreach(item, selection)
 		{

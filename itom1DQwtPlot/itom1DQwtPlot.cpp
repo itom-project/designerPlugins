@@ -83,7 +83,7 @@ void Itom1DQwtPlot::constructor()
 
     //create dock widget for the line properties
     d->m_pLinePropertiesDock = new QDockWidget(this);
-    d->m_pLinePropertiesDock->setObjectName(QStringLiteral("curveProperties"));
+    d->m_pLinePropertiesDock->setObjectName(QLatin1String("curveProperties"));
     d->m_pLinePropertiesDock->setWindowTitle(tr("Curve Properties"));
     d->m_pLinePropertiesDock->setVisible(false);
 	d->m_pLinePropertyWidget = new WidgetCurveProperties(m_pContent);
@@ -480,6 +480,7 @@ QFont Itom1DQwtPlot::getLegendFont() const
     {
        return m_pContent->getLegendFont();
     }
+    return QFont();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLegendFont(const QFont &font)
