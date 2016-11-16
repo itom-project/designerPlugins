@@ -1773,7 +1773,7 @@ void Vtk3dVisualizer::setyAxisLabel(const QString &label)
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Vtk3dVisualizer::getzAxisLabel() const
 {
-    return d->cubeAxesActor->GetYTitle();
+    return d->cubeAxesActor->GetZTitle();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
