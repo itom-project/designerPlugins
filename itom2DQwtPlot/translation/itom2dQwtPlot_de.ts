@@ -301,12 +301,12 @@
     <message>
         <location line="+3"/>
         <source>Copies the current view to the clipboard</source>
-        <translation>Aktuelle Grafik in die Zwischenablage kopieren</translation>
+        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Send current view to workspace...</source>
-        <translation type="unfinished">Aktuelle Grafik an Workspace senden...</translation>
+        <translation type="unfinished">Aktueller Ausschnitt an Workspace senden...</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -386,71 +386,71 @@
         <location line="+90"/>
         <location line="+84"/>
         <location line="+84"/>
-        <location line="+80"/>
+        <location line="+84"/>
         <location line="+84"/>
         <source>Selection has been aborted.</source>
         <translation type="unfinished">Auswahl wurde abgebrochen.</translation>
     </message>
     <message>
-        <location line="-455"/>
+        <location line="-459"/>
         <location line="+38"/>
         <location line="+90"/>
         <location line="+84"/>
         <location line="+84"/>
-        <location line="+80"/>
+        <location line="+84"/>
         <location line="+84"/>
         <source>%1 points have been selected.</source>
         <translation type="unfinished">%1 Punkt(e) wurden ausgewählt.</translation>
     </message>
     <message>
-        <location line="-373"/>
-        <location line="+541"/>
+        <location line="-377"/>
+        <location line="+549"/>
         <source>Please draw %1 points. Esc aborts the selection.</source>
         <translation type="unfinished">%1 Punkte einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-540"/>
-        <location line="+542"/>
+        <location line="-548"/>
+        <location line="+550"/>
         <source>Please draw one point. Esc aborts the selection.</source>
         <translation type="unfinished">Ein Punkt einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-458"/>
-        <location line="+475"/>
+        <location line="-466"/>
+        <location line="+483"/>
         <source>Please draw %1 lines. Esc aborts the selection.</source>
         <translation type="unfinished">%1 Linien einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-474"/>
-        <location line="+476"/>
+        <location line="-482"/>
+        <location line="+484"/>
         <source>Please draw one line. Esc aborts the selection.</source>
         <translation type="unfinished">Eine Linie einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="-401"/>
         <location line="+84"/>
-        <location line="+325"/>
+        <location line="+333"/>
         <source>Please draw %1 rectangles. Esc aborts the selection.</source>
         <translation type="unfinished">%1 Rechtecke einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-408"/>
+        <location line="-416"/>
         <location line="+84"/>
-        <location line="+326"/>
+        <location line="+334"/>
         <source>Please draw one rectangle. Esc aborts the selection.</source>
         <translation type="unfinished">Ein Rechteck einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-247"/>
+        <location line="-251"/>
         <location line="+84"/>
-        <location line="+197"/>
+        <location line="+201"/>
         <source>Please draw %1 ellipses. Esc aborts the selection.</source>
         <translation type="unfinished">%1 Ellipsen einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-280"/>
+        <location line="-284"/>
         <location line="+84"/>
-        <location line="+198"/>
+        <location line="+202"/>
         <source>Please draw one ellipse. Esc aborts the selection.</source>
         <translation type="unfinished">Eine Ellipse einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
@@ -568,27 +568,36 @@
         <translation type="unfinished">Die Datei &apos;%s&apos; existiert bereits, kann aber nicht überschrieben werden. Evtl. ist diese Datei durch ein anderes Programm geöffnet.</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+50"/>
+        <source>copy current view to clipboard including meta information widgets ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>copy current view to clipboard without meta information widgets (requires Qt5) ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
+    </message>
+    <message>
         <source>copy current view to clipboard including infoWidgets ...</source>
-        <translation type="unfinished">Aktuelle Ansicht inklusive infoWidget in die Zwischenablage kopieren...</translation>
+        <translation type="obsolete">Aktuelle Ansicht inklusive infoWidget in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>copy current view to clipboard ...</source>
-        <translation type="unfinished">Aktuelle Ansicht in die Zwischenablage kopieren...</translation>
+        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+53"/>
         <source>copy current view to clipboard including infoWidgets. Done.</source>
-        <translation type="unfinished">Aktuelle Ansicht inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
+        <translation type="unfinished">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>copy current view to clipboard. Done.</source>
-        <translation type="unfinished">Aktuelle Ansicht in die Zwischenablage kopieren. Beendet.</translation>
+        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren. Beendet.</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+87"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished">FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -623,14 +632,14 @@
         <translation type="unfinished">Beim Speichern des Plots ist eine Warnung aufgetreten</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+57"/>
         <source>Could not send object to workspace, api is missing.</source>
         <translation type="unfinished">Das Objekt kann nicht in den Workspace gesendet werden. Die API wurde nicht gefunden.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Current to workspace</source>
-        <translation type="unfinished">Aktueller Plot in den Workspace</translation>
+        <translation type="unfinished">Aktueller Ausschnitt an den Workspace</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -667,7 +676,7 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+971"/>
+        <location filename="../plotCanvas.cpp" line="+983"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
     </message>
@@ -678,7 +687,7 @@
         <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
-        <location line="-778"/>
+        <location line="-789"/>
         <source>plotting tools</source>
         <translation type="unfinished">Symbolleiste Plot</translation>
     </message>
@@ -868,7 +877,7 @@
         <translation type="unfinished">Bildebene auswählen</translation>
     </message>
     <message>
-        <location line="+355"/>
+        <location line="+366"/>
         <location line="+119"/>
         <source>Selected color map has less than two points.</source>
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
@@ -897,7 +906,7 @@
         <translation>Referenz auf Eingangsobjekt</translation>
     </message>
     <message>
-        <location filename="../plotCanvas.cpp" line="-1860"/>
+        <location filename="../plotCanvas.cpp" line="-1871"/>
         <source>plot2D</source>
         <translation type="unfinished">2D-Plot</translation>
     </message>
