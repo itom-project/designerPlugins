@@ -523,7 +523,7 @@ void Slider2D::mousePressEvent(QMouseEvent *ev)
         qreal side = p->squareSize();
         QPointF offset = p->selectorImageOffset();
         QLineF ray = p->lineToPoint(ev->pos());
-        if ( abs(ray.dx()) <= (p->squareSize()/2)*1.1 && abs(ray.dy()) <= (p->squareSize()/2)*1.1)
+        if ( qAbs(ray.dx()) <= (p->squareSize()/2)*1.1 && qAbs(ray.dy()) <= (p->squareSize()/2)*1.1)
             QLineF ray_ = p->lineToPoint(ev->pos());
             if (ev->x() > side*1.15)  //((abs(ev->x() - side*0.13 - p->xVal*side)> 0.1*side) && (abs(ev->y() - side*0.13 - p->yVal*side) < 0.06*side)) || 
                 p->mouseStatus = dragY;
