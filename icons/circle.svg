@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.48.5 r10040"
    sodipodi:docname="circle.svg"
-   inkscape:export-filename="D:\itom\sources\designerplugins\icons\ellipse_lt.png"
+   inkscape:export-filename="D:\itom\sources\designerplugins\icons\circle_lt.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -311,7 +311,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="10.24"
-     inkscape:cx="38.419371"
+     inkscape:cx="19.718199"
      inkscape:cy="22.328926"
      inkscape:document-units="px"
      inkscape:current-layer="g4063"
@@ -340,7 +340,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -361,17 +361,18 @@
            transform="matrix(0.97506412,0,0,1,-0.17577465,0)">
           <path
              sodipodi:type="arc"
-             style="fill:none;stroke:#000000;stroke-width:2.21742415;stroke-linecap:butt;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+             style="fill:none;stroke:#000000;stroke-width:2.21742414999999980;stroke-linecap:butt;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
              id="path3851"
              sodipodi:cx="21"
              sodipodi:cy="32.5"
              sodipodi:rx="22"
              sodipodi:ry="18.5"
              d="m 43,32.5 a 22,18.5 0 1 1 -44,0 22,18.5 0 1 1 44,0 z"
-             transform="matrix(1.6979691,0,0,1.2834501,-2.6286445,978.73406)" />
+             transform="matrix(1.6809319,0,0,1.9491005,-2.2708626,957.10042)" />
           <g
              id="g3980"
-             transform="matrix(0.72919304,-0.69727894,0.7333988,0.72919304,-735.77559,307.65105)">
+             transform="matrix(0.72919304,-0.69727894,0.7333988,0.72919304,-735.77559,307.65105)"
+             style="fill:#000000;fill-opacity:1;stroke:none">
             <rect
                y="1000.1582"
                x="34.329136"
