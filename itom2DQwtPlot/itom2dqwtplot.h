@@ -56,6 +56,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(bool yAxisVisible READ getyAxisVisible WRITE setyAxisVisible USER true)
     Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped USER true)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel USER true)
+	Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
     Q_PROPERTY(bool colorBarVisible READ colorBarVisible WRITE setColorBarVisible DESIGNABLE true USER true)
     Q_PROPERTY(QString colorMap READ getColorMap WRITE setColorMap DESIGNABLE true USER true)
     Q_PROPERTY(QFont titleFont READ getTitleFont WRITE setTitleFont USER true)
@@ -83,6 +84,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://yAxisVisible", "Sets visibility of the y-axis.")
     Q_CLASSINFO("prop://yAxisFlipped", "Sets whether y-axis should be flipped (default: false, zero is at the bottom).")
     Q_CLASSINFO("prop://valueLabel", "Label of the value axis or '<auto>' if the description should be used from data object.")
+	Q_CLASSINFO("prop://valueScale", "linear or logarithmic scale (various bases) can be chosen for the value axis (color bar). Please consider, that a logarithmic scale can only display values > 1e-100 while the lower limit for the double-logarithmic scale is 1+1e-100.")
     Q_CLASSINFO("prop://colorBarVisible", "Defines whether the color bar should be visible.")
     Q_CLASSINFO("prop://colorMap", "Defines which color map should be used [e.g. grayMarked, hotIron].")
     Q_CLASSINFO("prop://titleFont", "Font for title.")
@@ -176,6 +178,9 @@ public:
 
     int getPlaneIndex() const;
     void setPlaneIndex(const int &index);
+
+	ItomQwtPlotEnums::ScaleEngine getValueScale() const;
+	void setValueScale(const ItomQwtPlotEnums::ScaleEngine &scale);
     
     void setPlaneRange(int min, int max);
 

@@ -104,6 +104,7 @@ class PlotCanvas : public ItomQwtPlot
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
+		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
         friend class Itom2dQwtPlot;
 
@@ -156,6 +157,7 @@ class PlotCanvas : public ItomQwtPlot
 
         int m_curColorMapIndex;
         int m_curOverlayColorMapIndex;
+		ItomQwtPlotEnums::ScaleEngine m_valueScale;
 
         bool m_unitLabelChanged;
 

@@ -395,6 +395,26 @@ void Itom2dQwtPlot::resetValueLabel()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::ScaleEngine Itom2dQwtPlot::getValueScale() const
+{
+	if (m_pContent)
+	{
+		return m_pContent->m_valueScale;
+	}
+	return ItomQwtPlotEnums::Linear;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setValueScale(const ItomQwtPlotEnums::ScaleEngine &scale)
+{
+	if (m_pContent)
+	{
+		m_pContent->setValueAxisScaleEngine(scale);
+	}
+	updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 bool Itom2dQwtPlot::getyAxisFlipped() const
 {
     return d->m_pData->m_yaxisFlipped;

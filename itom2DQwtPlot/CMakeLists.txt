@@ -60,7 +60,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
     ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles
 )
 
 LINK_DIRECTORIES(
@@ -84,9 +84,11 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotPicker.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomLogLogScaleEngine.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomColorMap.h
 )
 
 set(plugin_UI
@@ -113,15 +115,17 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotPicker.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomLogLogScaleEngine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomColorMap.cpp
 )
 
 set(plugin_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotenums.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
-	${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.

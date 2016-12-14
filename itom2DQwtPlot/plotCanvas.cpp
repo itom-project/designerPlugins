@@ -33,11 +33,12 @@
 #include "multiPointPickerMachine.h"
 #include "itomPlotZoomer.h"
 #include "dialog2DScale.h"
+#include "itomLogLogScaleEngine.h"
+#include "itomColorMap.h"
 
 #include "plotLegends/infoWidgetDObject.h"
 #include "plotLegends/infoWidgetPickers.h"
 
-#include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
 #include <qwt_matrix_raster_data.h>
 #include <qwt_scale_widget.h>
@@ -97,7 +98,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pActCntrMarker(NULL),
         m_pOverlaySlider(NULL),
         m_pActOverlaySlider(NULL),
-        m_currentDataType(-1)
+        m_currentDataType(-1),
+		m_valueScale(ItomQwtPlotEnums::Linear)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -277,6 +279,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_pContextMenu->addAction(m_pActCntrMarker);
     m_pContextMenu->addSeparator();
     m_pContextMenu->addAction(mainTb->toggleViewAction());
+
+	setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -853,8 +857,8 @@ void PlotCanvas::internalDataUpdated()
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 {
-    QwtLinearColorMap *colorMap = NULL;
-    QwtLinearColorMap *colorBarMap = NULL;
+    ItomColorMap *colorMap = NULL;
+	ItomColorMap *colorBarMap = NULL;
     ito::ItomPalette newPalette;
     ito::RetVal retval(ito::retOk);
     int numPalettes = 1;    
@@ -884,6 +888,10 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
         m_curColorMapIndex = 0;
         retval += apiPaletteGetColorBarIdx(m_curColorMapIndex, newPalette);
     }
+	else if (colormap == "__equal__")
+	{
+		retval += apiPaletteGetColorBarIdx(m_curColorMapIndex, newPalette);
+	}
     else
     {
         retval += apiPaletteGetColorBarName(colormap, newPalette);
@@ -915,8 +923,8 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 
     if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
     {
-        colorMap    = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
+        colorMap    = new ItomColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, m_valueScale, QwtColorMap::Indexed);
+		colorBarMap = new ItomColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, m_valueScale, QwtColorMap::Indexed);
         if (totalStops > 2)
         {
             for (int i = 1; i < totalStops - 2; i++)
@@ -930,8 +938,8 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     }
     else
     {
-        colorMap    = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
-        colorBarMap = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
+		colorMap = new ItomColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, m_valueScale, QwtColorMap::Indexed);
+		colorBarMap = new ItomColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, m_valueScale, QwtColorMap::Indexed);
         if (totalStops > 2)
         {
             for (int i = 1; i < totalStops - 1; i++)
@@ -1065,6 +1073,32 @@ bool PlotCanvas::setOverlayColorMap(QString colormap /*= "__next__"*/)
 
     replot();
     return true;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine)
+{
+	if (scaleEngine != m_valueScale)
+	{
+		if (scaleEngine == ItomQwtPlotEnums::Linear)
+		{
+			setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine());
+		}
+		else if ((int)scaleEngine < 1000)
+		{
+			setAxisScaleEngine(QwtPlot::yRight, new QwtLogScaleEngine((int)scaleEngine));
+		}
+		else
+		{
+			setAxisScaleEngine(QwtPlot::yRight, new ItomLogLogScaleEngine((int)scaleEngine - 1000));
+		}
+
+		m_valueScale = scaleEngine;
+
+		setColorMap("__equal__");
+
+		replot();
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

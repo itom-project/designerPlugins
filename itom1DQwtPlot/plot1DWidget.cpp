@@ -673,6 +673,7 @@ void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine
         updateScaleValues(recalculateBoundaries);
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::toggleLegendLabel(QwtPlotCurve* curve, const bool state)
 {
