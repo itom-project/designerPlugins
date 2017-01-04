@@ -319,6 +319,10 @@ ito::RetVal Plot1DWidget::init()
 
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
+		ito::ItomPalette defaultColorPalette;
+		apiPaletteGetColorBarIdx(0, defaultColorPalette);
+		setInverseColors(defaultColorPalette.inverseColorOne, defaultColorPalette.inverseColorTwo);
+
         trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, &retVal).value<QPen>();
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, &retVal).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, &retVal).value<QBrush>();

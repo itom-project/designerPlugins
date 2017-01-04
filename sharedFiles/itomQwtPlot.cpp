@@ -345,12 +345,22 @@ void ItomQwtPlot::loadStyles()
     QFont trackerFont = QFont("Verdana", 10);
     QBrush trackerBg = QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern);
 
+	QPen shapeRubberBandPen = QPen(QBrush(Qt::red), 2, Qt::DashLine);
+	QPen shapePen = QPen(QBrush(Qt::red), 2);
+	QFont shapeLabelFont = QFont("Verdana", 10);
+	QBrush shapeLabelBg = QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern);
+
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
         rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
         trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>();
-        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern), NULL).value<QBrush>();
+		trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
+
+		shapeRubberBandPen = apiGetFigureSetting(parent(), "shapeRubberBandPen", shapeRubberBandPen, NULL).value<QPen>();
+		shapePen = apiGetFigureSetting(parent(), "shapePen", shapePen, NULL).value<QPen>();
+		shapeLabelBg = apiGetFigureSetting(parent(), "shapeLabelBackground", shapeLabelBg, NULL).value<QBrush>();
+		shapeLabelFont = apiGetFigureSetting(parent(), "shapeLabelFont", shapeLabelFont, NULL).value<QFont>();
 
         m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
         bool enableBoxFrame = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "enableBoxFrame", m_boxFrame, NULL).value<bool>());
@@ -364,9 +374,10 @@ void ItomQwtPlot::loadStyles()
     m_pZoomer->setTrackerFont(trackerFont);
     m_pZoomer->setTrackerPen(trackerPen);
 
-    m_pMultiPointPicker->setTrackerFont(trackerFont);
-    m_pMultiPointPicker->setTrackerPen(trackerPen);
-    m_pMultiPointPicker->setBackgroundFillBrush(trackerBg);
+	m_pMultiPointPicker->setTrackerFont(shapeLabelFont);
+	m_pMultiPointPicker->setTrackerPen(shapePen);
+	m_pMultiPointPicker->setBackgroundFillBrush(shapeLabelBg);
+	m_pMultiPointPicker->setRubberBandPen(shapeRubberBandPen);
 
     foreach(DrawItem *item, m_pShapes)
     {
@@ -561,14 +572,6 @@ void ItomQwtPlot::setInverseColors(const QColor &color0, const QColor &color1)
 {
     m_inverseColor0 = color0;
     m_inverseColor1 = color1;
-
-    foreach(DrawItem *item, m_pShapes)
-    {
-        if (item && item->getAutoColor())
-        {
-            item->setColor(m_inverseColor0, m_inverseColor1);
-        }
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
