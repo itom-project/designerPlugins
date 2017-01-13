@@ -24,6 +24,7 @@
 #include "qwt_math.h"
 #include "qwt_interval.h"
 #include <qnumeric.h>
+#include <limits>
 
 //----------------------------------------------------------------------------------------
 class ItomColorMap::ColorStops
