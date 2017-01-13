@@ -24,7 +24,9 @@
 #include "qwt_math.h"
 #include "qwt_interval.h"
 #include <qnumeric.h>
+#include <qmath.h>
 #include <limits>
+
 
 //----------------------------------------------------------------------------------------
 class ItomColorMap::ColorStops
@@ -242,9 +244,9 @@ ItomColorMap::ItomColorMap(const ItomQwtPlotEnums::ScaleEngine &scale /*= ItomQw
 	d_data->mode = ScaledColors;
 	d_data->scale = scale;
 
-	d_data->invlog2 = 1.0 / std::log(2.0);
-	d_data->invlog10 = 1.0 / std::log(10.0);
-	d_data->invlog16 = 1.0 / std::log(16.0);
+	d_data->invlog2 = 1.0 / qLn(2.0);
+	d_data->invlog10 = 1.0 / qLn(10.0);
+	d_data->invlog16 = 1.0 / qLn(16.0);
 
 	setColorInterval(Qt::blue, Qt::yellow);
 }
@@ -264,9 +266,9 @@ ItomColorMap::ItomColorMap(const QColor &color1, const QColor &color2, const Ito
 	d_data->mode = ScaledColors;
 	d_data->scale = scale;
 
-	d_data->invlog2 = 1.0 / std::log(2.0);
-	d_data->invlog10 = 1.0 / std::log(10.0);
-	d_data->invlog16 = 1.0 / std::log(16.0);
+	d_data->invlog2 = 1.0 / qLn(2.0);
+	d_data->invlog10 = 1.0 / qLn(10.0);
+	d_data->invlog16 = 1.0 / qLn(16.0);
 
 	setColorInterval(color1, color2);
 }
@@ -423,34 +425,34 @@ QRgb ItomColorMap::rgb(
 	switch (d_data->scale)
 	{
 	case ItomQwtPlotEnums::Log2:
-		minimum = std::log(minimum) * d_data->invlog2;
-		maximum = std::log(maximum) * d_data->invlog2;
-		value = std::log(value) * d_data->invlog2;
+		minimum = qLn(minimum) * d_data->invlog2;
+		maximum = qLn(maximum) * d_data->invlog2;
+		value = qLn(value) * d_data->invlog2;
 		break;
 	case ItomQwtPlotEnums::Log10:
-		minimum = std::log(minimum) * d_data->invlog10;
-		maximum = std::log(maximum) * d_data->invlog10;
-		value = std::log(value) * d_data->invlog10;
+		minimum = qLn(minimum) * d_data->invlog10;
+		maximum = qLn(maximum) * d_data->invlog10;
+		value = qLn(value) * d_data->invlog10;
 		break;
 	case ItomQwtPlotEnums::Log16:
-		minimum = std::log(minimum) * d_data->invlog16;
-		maximum = std::log(maximum) * d_data->invlog16;
-		value = std::log(value) * d_data->invlog16;
+		minimum = qLn(minimum) * d_data->invlog16;
+		maximum = qLn(maximum) * d_data->invlog16;
+		value = qLn(value) * d_data->invlog16;
 		break;
 	case ItomQwtPlotEnums::LogLog2:
-		minimum = std::log((std::log(minimum) * d_data->invlog2) * d_data->invlog2);
-		maximum = std::log((std::log(maximum) * d_data->invlog2) * d_data->invlog2);
-		value = std::log((std::log(value) * d_data->invlog2) * d_data->invlog2);
+		minimum = qLn((qLn(minimum) * d_data->invlog2) * d_data->invlog2);
+		maximum = qLn((qLn(maximum) * d_data->invlog2) * d_data->invlog2);
+		value = qLn((qLn(value) * d_data->invlog2) * d_data->invlog2);
 		break;
 	case ItomQwtPlotEnums::LogLog10:
-		minimum = std::log((std::log(minimum) * d_data->invlog10) * d_data->invlog10);
-		maximum = std::log((std::log(maximum) * d_data->invlog10) * d_data->invlog10);
-		value = std::log((std::log(value) * d_data->invlog10) * d_data->invlog10);
+		minimum = qLn((qLn(minimum) * d_data->invlog10) * d_data->invlog10);
+		maximum = qLn((qLn(maximum) * d_data->invlog10) * d_data->invlog10);
+		value = qLn((qLn(value) * d_data->invlog10) * d_data->invlog10);
 		break;
 	case ItomQwtPlotEnums::LogLog16:
-		minimum = std::log((std::log(minimum) * d_data->invlog16) * d_data->invlog16);
-		maximum = std::log((std::log(maximum) * d_data->invlog16) * d_data->invlog16);
-		value = std::log((std::log(value) * d_data->invlog16) * d_data->invlog16);
+		minimum = qLn((qLn(minimum) * d_data->invlog16) * d_data->invlog16);
+		maximum = qLn((qLn(maximum) * d_data->invlog16) * d_data->invlog16);
+		value = qLn((qLn(value) * d_data->invlog16) * d_data->invlog16);
 		break;
 	}
 
@@ -512,34 +514,34 @@ unsigned char ItomColorMap::colorIndex(
 	switch (d_data->scale)
 	{
 	case ItomQwtPlotEnums::Log2:
-		minimum = std::log(minimum) * d_data->invlog2;
-		maximum = std::log(maximum) * d_data->invlog2;
-		value = std::log(value) * d_data->invlog2;
+		minimum = qLn(minimum) * d_data->invlog2;
+		maximum = qLn(maximum) * d_data->invlog2;
+		value = qLn(value) * d_data->invlog2;
 		break;
 	case ItomQwtPlotEnums::Log10:
-		minimum = std::log(minimum) * d_data->invlog10;
-		maximum = std::log(maximum) * d_data->invlog10;
-		value = std::log(value) * d_data->invlog10;
+		minimum = qLn(minimum) * d_data->invlog10;
+		maximum = qLn(maximum) * d_data->invlog10;
+		value = qLn(value) * d_data->invlog10;
 		break;
 	case ItomQwtPlotEnums::Log16:
-		minimum = std::log(minimum) * d_data->invlog16;
-		maximum = std::log(maximum) * d_data->invlog16;
-		value = std::log(value) * d_data->invlog16;
+		minimum = qLn(minimum) * d_data->invlog16;
+		maximum = qLn(maximum) * d_data->invlog16;
+		value = qLn(value) * d_data->invlog16;
 		break;
 	case ItomQwtPlotEnums::LogLog2:
-		minimum = std::log((std::log(minimum) * d_data->invlog2) * d_data->invlog2);
-		maximum = std::log((std::log(maximum) * d_data->invlog2) * d_data->invlog2);
-		value = std::log((std::log(value) * d_data->invlog2) * d_data->invlog2);
+		minimum = qLn((qLn(minimum) * d_data->invlog2) * d_data->invlog2);
+		maximum = qLn((qLn(maximum) * d_data->invlog2) * d_data->invlog2);
+		value = qLn((qLn(value) * d_data->invlog2) * d_data->invlog2);
 		break;
 	case ItomQwtPlotEnums::LogLog10:
-		minimum = std::log((std::log(minimum) * d_data->invlog10) * d_data->invlog10);
-		maximum = std::log((std::log(maximum) * d_data->invlog10) * d_data->invlog10);
-		value = std::log((std::log(value) * d_data->invlog10) * d_data->invlog10);
+		minimum = qLn((qLn(minimum) * d_data->invlog10) * d_data->invlog10);
+		maximum = qLn((qLn(maximum) * d_data->invlog10) * d_data->invlog10);
+		value = qLn((qLn(value) * d_data->invlog10) * d_data->invlog10);
 		break;
 	case ItomQwtPlotEnums::LogLog16:
-		minimum = std::log((std::log(minimum) * d_data->invlog16) * d_data->invlog16);
-		maximum = std::log((std::log(maximum) * d_data->invlog16) * d_data->invlog16);
-		value = std::log((std::log(value) * d_data->invlog16) * d_data->invlog16);
+		minimum = qLn((qLn(minimum) * d_data->invlog16) * d_data->invlog16);
+		maximum = qLn((qLn(maximum) * d_data->invlog16) * d_data->invlog16);
+		value = qLn((qLn(value) * d_data->invlog16) * d_data->invlog16);
 		break;
 	}
 
