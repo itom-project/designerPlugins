@@ -359,8 +359,8 @@ void ItomQwtPlot::loadStyles()
 
 		shapeRubberBandPen = apiGetFigureSetting(parent(), "shapeRubberBandPen", shapeRubberBandPen, NULL).value<QPen>();
 		shapePen = apiGetFigureSetting(parent(), "shapePen", shapePen, NULL).value<QPen>();
-		shapeLabelBg = apiGetFigureSetting(parent(), "shapeLabelBackground", shapeLabelBg, NULL).value<QBrush>();
-		shapeLabelFont = apiGetFigureSetting(parent(), "shapeLabelFont", shapeLabelFont, NULL).value<QFont>();
+		shapeLabelBg = apiGetFigureSetting(parent(), "shapeLabelTrackerBackground", shapeLabelBg, NULL).value<QBrush>();
+		shapeLabelFont = apiGetFigureSetting(parent(), "shapeLabelTrackerFont", shapeLabelFont, NULL).value<QFont>();
 
         m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
         bool enableBoxFrame = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "enableBoxFrame", m_boxFrame, NULL).value<bool>());

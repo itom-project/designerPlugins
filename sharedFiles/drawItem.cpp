@@ -23,7 +23,8 @@
 #include "drawItem.h"
 #include "qwt_scale_map.h"
 #include <qwt_symbol.h>
-
+#include <qwt_plot.h>
+#include "common/apiFunctionsGraphInc.h"
 #include <qrect.h>
 
 QVector<int> DrawItem::idxVec;
@@ -52,6 +53,8 @@ public:
     QColor m_lineColor;
     QBrush m_fillBrush;
     QBrush m_fillBrushSelected;
+    QBrush m_labelBrush;
+    QFont m_labelFont;
 
     QPointF m_point1;
     QPointF m_point2;
@@ -72,7 +75,16 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     d->m_modificationModes = modificationModes;
     d->m_fillBrush = QBrush();
     d->m_fillBrushSelected = QBrush();
-
+    d->m_labelBrush = QBrush(Qt::NoBrush, Qt::SolidPattern);
+    d->m_labelFont = QFont("Helvetica", 8);
+    if (ito::ITOM_API_FUNCS_GRAPH)
+    {
+        if (d->m_pparent->parent())
+        {
+            d->m_labelBrush = apiGetFigureSetting((QObject*)(d->m_pparent->parent()), "shapeLabelBackground", d->m_labelBrush, NULL).value<QBrush>();
+            d->m_labelFont = apiGetFigureSetting((QObject*)(d->m_pparent->parent()), "shapeLabelFont", d->m_labelFont, NULL).value<QFont>();
+        }
+    }
     if (retVal)
     {
         *retVal += setShape(shape);
@@ -805,6 +817,8 @@ void DrawItem::draw( QPainter *painter,
         QRectF myRect(0, 0, 0, 0);
         
         QwtText label(d->m_shape.name());
+        label.setFont(d->m_labelFont);
+        qDebug() << d->m_labelFont;
         if (label.isEmpty())
         {
             label.setText( QString("(%1)").arg(d->m_shape.index()) );
@@ -823,8 +837,7 @@ void DrawItem::draw( QPainter *painter,
 
             if (!label.isEmpty())
             {
-                QBrush myBrush = QBrush(QColor(255, 255, 255, 170), Qt::SolidPattern);
-                painter->fillRect(cRect, myBrush);
+                painter->fillRect(cRect, d->m_labelBrush);
                 label.draw(painter, cRect);
             }
         }

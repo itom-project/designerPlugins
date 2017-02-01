@@ -325,6 +325,8 @@ void PlotCanvas::refreshStyles()
     QFont trackerFont = QFont("Verdana", 10);
     QBrush trackerBg = QBrush(QColor(255, 255, 255, 210), Qt::SolidPattern);
     QPen selectionPen = QPen(QBrush(Qt::gray), 2, Qt::SolidLine);
+    QPen zStackMarkerPen = QPen(QBrush(inverseColor1()), 3);
+    QSize zStackMarkerSize = QSize(7, 7);
 
     QFont titleFont = QFont("Helvetica", 12);
     QFont labelFont = QFont("Helvetica", 12);
@@ -338,7 +340,7 @@ void PlotCanvas::refreshStyles()
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
         rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
-        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>();
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>(); //not sure if this is used any more
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
         selectionPen = apiGetFigureSetting(parent(), "selectionPen", selectionPen, NULL).value<QPen>();
@@ -352,6 +354,8 @@ void PlotCanvas::refreshStyles()
 
         centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", centerMarkerSize, NULL).value<QSize>();
         centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", centerMarkerPen, NULL).value<QPen>();
+        zStackMarkerPen = apiGetFigureSetting(parent(), "zStackMarkerPen", zStackMarkerPen, NULL).value<QPen>();
+        zStackMarkerSize = apiGetFigureSetting(parent(), "zStackMarkerSize", zStackMarkerSize, NULL).value<QSize>();
     }
 
     if (inverseColor1().isValid())
@@ -378,7 +382,7 @@ void PlotCanvas::refreshStyles()
     m_pStackPicker->setTrackerPen(trackerPen);
     m_pStackPicker->setBackgroundFillBrush(trackerBg);
 
-    m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross, QBrush(inverseColor0()), QPen(QBrush(inverseColor1()), 3), QSize(7, 7)));
+    m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross, QBrush(inverseColor0()), zStackMarkerPen, zStackMarkerSize));
 
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
     
