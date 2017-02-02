@@ -308,7 +308,7 @@ ito::RetVal Plot1DWidget::init()
 
     QPen trackerPen = QPen(QBrush(Qt::red),2);
     QFont trackerFont = QFont("Verdana",10);
-    QBrush trackerBg = QBrush(QColor(255,255,255,155), Qt::SolidPattern);
+    QBrush trackerBg = QBrush(Qt::white, Qt::SolidPattern);
 
     QFont titleFont = QFont("Helvetica",12);
     QFont labelFont =  QFont("Helvetica",12);

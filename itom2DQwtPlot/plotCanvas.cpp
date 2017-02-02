@@ -323,7 +323,7 @@ void PlotCanvas::refreshStyles()
     QPen rubberBandPen = QPen(QBrush(Qt::red), 1, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
     QFont trackerFont = QFont("Verdana", 10);
-    QBrush trackerBg = QBrush(QColor(255, 255, 255, 210), Qt::SolidPattern);
+    QBrush trackerBg = QBrush(Qt::white, Qt::SolidPattern);
     QPen selectionPen = QPen(QBrush(Qt::gray), 2, Qt::SolidLine);
     QPen zStackMarkerPen = QPen(QBrush(inverseColor1()), 3);
     QSize zStackMarkerSize = QSize(7, 7);
@@ -340,7 +340,7 @@ void PlotCanvas::refreshStyles()
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
         rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
-        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>(); //not sure if this is used any more
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>(); //defines the color of the tracker
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
         selectionPen = apiGetFigureSetting(parent(), "selectionPen", selectionPen, NULL).value<QPen>();
@@ -366,7 +366,7 @@ void PlotCanvas::refreshStyles()
     if (inverseColor0().isValid())
     {
         selectionPen.setColor(inverseColor0());
-        trackerPen.setColor(inverseColor0());
+        //trackerPen.setColor(inverseColor0());
         centerMarkerPen.setColor(inverseColor0());
     }
 

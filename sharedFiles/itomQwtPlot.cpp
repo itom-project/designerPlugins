@@ -343,7 +343,7 @@ void ItomQwtPlot::loadStyles()
     QPen rubberBandPen = QPen(QBrush(Qt::red), 2, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
     QFont trackerFont = QFont("Verdana", 10);
-    QBrush trackerBg = QBrush(QColor(255, 255, 255, 155), Qt::SolidPattern);
+    QBrush trackerBg = QBrush(Qt::white, Qt::SolidPattern);
 
 	QPen shapeRubberBandPen = QPen(QBrush(Qt::red), 2, Qt::DashLine);
 	QPen shapePen = QPen(QBrush(Qt::red), 2);

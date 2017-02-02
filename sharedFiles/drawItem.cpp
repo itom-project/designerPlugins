@@ -27,6 +27,7 @@
 #include "common/apiFunctionsGraphInc.h"
 #include <qrect.h>
 
+
 QVector<int> DrawItem::idxVec;
 
 class DrawItemPrivate
@@ -51,10 +52,12 @@ public:
 
     QColor m_markerColor;
     QColor m_lineColor;
+    QColor m_labelTextColor;
     QBrush m_fillBrush;
     QBrush m_fillBrushSelected;
     QBrush m_labelBrush;
     QFont m_labelFont;
+    QPen m_elementPen;
 
     QPointF m_point1;
     QPointF m_point2;
@@ -75,14 +78,20 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     d->m_modificationModes = modificationModes;
     d->m_fillBrush = QBrush();
     d->m_fillBrushSelected = QBrush();
-    d->m_labelBrush = QBrush(Qt::NoBrush, Qt::SolidPattern);
-    d->m_labelFont = QFont("Helvetica", 8);
+    d->m_labelBrush = QBrush(Qt::white, Qt::SolidPattern);
+    d->m_labelFont = QFont("Verdana", 10);
+    //this pen is only used to set the style and the width of the elemets. The color is set to the inverse color of the curren palette
+    d->m_elementPen = QPen(QBrush(Qt::red), 1, Qt::SolidLine);
+
+    d->m_labelTextColor = QColor(Qt::red);
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
         if (d->m_pparent->parent())
         {
             d->m_labelBrush = apiGetFigureSetting((QObject*)(d->m_pparent->parent()), "shapeLabelBackground", d->m_labelBrush, NULL).value<QBrush>();
             d->m_labelFont = apiGetFigureSetting((QObject*)(d->m_pparent->parent()), "shapeLabelFont", d->m_labelFont, NULL).value<QFont>();
+            d->m_elementPen = apiGetFigureSetting((QObject*)(d->m_pparent->parent()), "geometricShapePen", d->m_elementPen, NULL).value<QPen>();
+            d->m_labelTextColor = apiGetFigureSetting((QObject*)(d->m_pparent->parent()), "shapeLabelTextColor", d->m_labelTextColor, NULL).value<QColor>();
         }
     }
     if (retVal)
@@ -346,7 +355,7 @@ void DrawItem::setSelected(const bool selected)
     }
     
     //line width of painter path also depends on selected state
-    setPen(d->m_lineColor, d->m_selected ? 3 : 1);
+    setPen(d->m_lineColor, d->m_selected ? d->m_elementPen.width() + 2 : d->m_elementPen.width(), d->m_elementPen.style());
 
     if (selected)
     {
@@ -818,7 +827,8 @@ void DrawItem::draw( QPainter *painter,
         
         QwtText label(d->m_shape.name());
         label.setFont(d->m_labelFont);
-        qDebug() << d->m_labelFont;
+        label.setColor(d->m_labelTextColor); //remove this to set the color equal to the shape color
+        
         if (label.isEmpty())
         {
             label.setText( QString("(%1)").arg(d->m_shape.index()) );
