@@ -4,6 +4,11 @@ project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
 
+#CMAKE Policies
+if (POLICY CMP0028)
+    cmake_policy(SET CMP0028 NEW) #raise an CMake error if an imported target, containing ::, could not be found
+ENDIF (POLICY CMP0028)
+
 message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
@@ -26,7 +31,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomWidgets itomCommonPlotLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-FIND_PACKAGE_QT(ON Core Xml PrintSupport UiTools Widgets Svg OpenGL Designer LinguistTools)
+FIND_PACKAGE_QT(ON Core Xml PrintSupport UiTools Widgets Svg OpenGL Designer)
 
 find_package(VisualLeakDetector QUIET)
 
@@ -108,10 +113,10 @@ ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${plugin_SOURCES} ${plugin_HEADERS} $
 
 #    TARGET_LINK_LIBRARIES(${target_name} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
 #    TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT_QTUITOOLS_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTDESIGNER_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTSVG_LIBRARY} ${ITOM_SDK_qpropertyeditor_LIBRARY} ${VISUALLEAKDETECTOR_LIBRARIES} ${ITOM_SDK_itomCommonLib_LIBRARY} ${ITOM_SDK_itomCommonQtLib_LIBRARY})
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
-if (QT5_FOUND)
-    qt5_use_modules(${target_name} ${QT_COMPONENTS} Concurrent)
-endif (QT5_FOUND)
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+IF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
+    qt5_use_modules(${target_name} ${QT_COMPONENTS})
+ENDIF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
 
 #translation
 set (FILES_TO_TRANSLATE ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_UI})

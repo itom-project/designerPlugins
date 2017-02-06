@@ -4,6 +4,11 @@ project(${target_name})
  
 cmake_minimum_required(VERSION 2.8)
 
+#CMAKE Policies
+if (POLICY CMP0028)
+    cmake_policy(SET CMP0028 NEW) #raise an CMake error if an imported target, containing ::, could not be found
+ENDIF (POLICY CMP0028)
+
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
@@ -23,7 +28,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(ITOM_SDK COMPONENTS itomCommonLib REQUIRED)
 include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-FIND_PACKAGE_QT(ON PrintSupport Xml Designer UiTools Widgets Svg OpenGL LinguistTools)
+FIND_PACKAGE_QT(ON Core Widgets PrintSupport Xml Designer Widgets Svg OpenGL Concurrent)
 
 find_package(VisualLeakDetector QUIET)
 
@@ -49,6 +54,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${ITOM_SDK_INCLUDE_DIRS}
+    ${Qt5OpenGL_INCLUDE_DIRS}
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
 )
 
@@ -272,11 +278,11 @@ else (QT5_FOUND)
 endif (QT5_FOUND)
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${qwt_SOURCES} ${qwt_HEADERS} ${qwt_HEADERS_MOC} ${qwt_ui_MOC} ${qwt_rcc_MOC})
-
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
-if (QT5_FOUND)
-    qt5_use_modules(${target_name} ${QT_COMPONENTS} Concurrent)
-endif (QT5_FOUND)
+message(fatal "sdf ${Qt5Gui_OPENGL_LIBRARIES}")
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+IF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
+    qt5_use_modules(${target_name} ${QT_COMPONENTS})
+ENDIF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
 
 # if (QT5_FOUND)
     # TARGET_LINK_LIBRARIES(${target_name} ${VISUALLEAKDETECTOR_LIBRARIES})

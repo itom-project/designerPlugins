@@ -4,6 +4,11 @@ project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
 
+#CMAKE Policies
+if (POLICY CMP0028)
+    cmake_policy(SET CMP0028 NEW) #raise an CMake error if an imported target, containing ::, could not be found
+ENDIF (POLICY CMP0028)
+
 message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
@@ -31,7 +36,7 @@ include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 IF(ITOM_SDK_PCL_SUPPORT)
     find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib pointcloud qpropertyeditor REQUIRED)
     
-    FIND_PACKAGE_QT(ON Core Widgets LinguistTools Designer OpenGL)
+    FIND_PACKAGE_QT(ON Core Widgets Designer OpenGL)
 
     #SET(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
     #SET(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked
@@ -156,10 +161,10 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
         ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_HEADERS_MOC} ${plugin_ui_MOC} ${plugin_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${PCL_LIBRARIES} ${PCLVTK_LIBS} ${ITOM_SDK_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
-        if (QT5_FOUND)
+        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${PCL_LIBRARIES} ${PCLVTK_LIBS} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+        IF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
             qt5_use_modules(${target_name} ${QT_COMPONENTS})
-        endif (QT5_FOUND)
+        ENDIF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
 
         #translation
         set (FILES_TO_TRANSLATE ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_UI})

@@ -4,6 +4,11 @@ project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
 
+#CMAKE Policies
+if (POLICY CMP0028)
+    cmake_policy(SET CMP0028 NEW) #raise an CMake error if an imported target, containing ::, could not be found
+ENDIF (POLICY CMP0028)
+
 message(STATUS "\n--------------- PLUGIN ${target_name} ---------------")
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
@@ -31,7 +36,7 @@ if (ITOM_SDK_PCL_SUPPORT) #this comes from itom_sdk.cmake, describing the build 
     find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud itomCommonPlotLib REQUIRED)
 endif (ITOM_SDK_PCL_SUPPORT)
 
-FIND_PACKAGE_QT(ON Core Widgets Designer Xml Svg UiTools OpenGL LinguistTools)
+FIND_PACKAGE_QT(ON Core Widgets Designer Xml Svg UiTools OpenGL)
 find_package(OpenGL)
 
 IF(OPENGL_FOUND)
@@ -154,18 +159,16 @@ IF(OPENGL_FOUND)
 
     IF(3DCONNEXION_FOUND)
         Message(STATUS "3DCONNEXION was found ${3DCONNEXION_SIAPP}.")
-        TARGET_LINK_LIBRARIES(${target_name} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+        TARGET_LINK_LIBRARIES(${target_name} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
         
-        if (QT5_FOUND)
-        qt5_use_modules(${target_name} ${QT_COMPONENTS})
-        endif (QT5_FOUND)
     ELSE(3DCONNEXION_FOUND)
         Message(STATUS "WARNING: 3DCONNEXION was not found or disabled.")
-        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
-        if (QT5_FOUND)
-        qt5_use_modules(${target_name} ${QT_COMPONENTS})
-        endif (QT5_FOUND)
+        TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
     ENDIF(3DCONNEXION_FOUND)
+    
+    IF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
+        qt5_use_modules(${target_name} ${QT_COMPONENTS})
+    ENDIF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
 
     #translation
     set (FILES_TO_TRANSLATE ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_UI})
