@@ -36,7 +36,7 @@ include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
 IF(ITOM_SDK_PCL_SUPPORT)
     find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib pointcloud qpropertyeditor REQUIRED)
     
-    FIND_PACKAGE_QT(ON Core Widgets Designer OpenGL)
+    FIND_PACKAGE_QT(ON Core Widgets Designer OpenGL LinguistTools)
 
     #SET(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
     #SET(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked

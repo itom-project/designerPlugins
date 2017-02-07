@@ -36,7 +36,7 @@ if (ITOM_SDK_PCL_SUPPORT) #this comes from itom_sdk.cmake, describing the build 
     find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud itomCommonPlotLib REQUIRED)
 endif (ITOM_SDK_PCL_SUPPORT)
 
-FIND_PACKAGE_QT(ON Core Widgets Designer Xml Svg UiTools OpenGL)
+FIND_PACKAGE_QT(ON Core Widgets Designer Xml Svg UiTools OpenGL LinguistTools)
 find_package(OpenGL)
 
 IF(OPENGL_FOUND)
