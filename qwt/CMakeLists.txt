@@ -278,7 +278,6 @@ else (QT5_FOUND)
 endif (QT5_FOUND)
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${qwt_SOURCES} ${qwt_HEADERS} ${qwt_HEADERS_MOC} ${qwt_ui_MOC} ${qwt_rcc_MOC})
-message(fatal "sdf ${Qt5Gui_OPENGL_LIBRARIES}")
 TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
 IF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
     qt5_use_modules(${target_name} ${QT_COMPONENTS})
