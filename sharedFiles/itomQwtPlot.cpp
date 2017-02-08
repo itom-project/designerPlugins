@@ -252,14 +252,14 @@ void ItomQwtPlot::createBaseActions()
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActPrint()));
 
     //m_actCopyClipboard
-    m_pActCopyClipboard = a = new QAction(tr("Copy to clipboard"), p);
+    m_pActCopyClipboard = a = new QAction(tr("Copy To Clipboard"), p);
     a->setShortcut(QKeySequence::Copy);
     a->setObjectName("actCopyClipboard");
     a->setToolTip(tr("Copies the current view to the clipboard"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuCopyToClipboard()));
 
     //m_pActSendCurrentToWorkspace
-    m_pActSendCurrentToWorkspace = a = new QAction(tr("Send current view to workspace..."), p);
+    m_pActSendCurrentToWorkspace = a = new QAction(tr("Send Current View To Workspace..."), p);
     a->setObjectName("actSendCurrentToWorkspace");
     connect(a, SIGNAL(triggered()), this, SLOT(mnuSendCurrentToWorkspace()));
 
@@ -272,7 +272,7 @@ void ItomQwtPlot::createBaseActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActPan(bool)));
 
     //m_actZoom
-    m_pActZoom = a = new QAction(tr("Zoom to rectangle"), p);
+    m_pActZoom = a = new QAction(tr("Zoom To Rectangle"), p);
     a->setObjectName("actZoom");
     a->setCheckable(true);
     a->setChecked(false);
@@ -280,15 +280,15 @@ void ItomQwtPlot::createBaseActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActZoom(bool)));
 
     //m_pActClearDrawings
-    m_pActClearShapes = a = new QAction(tr("Clear geometric shapes"), p);
+    m_pActClearShapes = a = new QAction(tr("Clear Geometric Shapes"), p);
     a->setObjectName("actClearGeometrics");
     a->setCheckable(false);
     a->setChecked(false);
-    a->setToolTip(tr("Clear all existing geometric shapes"));
+    a->setToolTip(tr("Clear All Existing Geometric Shapes"));
     connect(a, SIGNAL(triggered()), this, SLOT(clearAllGeometricShapes()));
 
     //m_actApectRatio
-    m_pActAspectRatio = a = new QAction(tr("Lock aspect ratio"), p);
+    m_pActAspectRatio = a = new QAction(tr("Lock Aspect Ratio"), p);
     a->setObjectName("actRatio");
     a->setCheckable(true);
     a->setChecked(false);
@@ -296,8 +296,8 @@ void ItomQwtPlot::createBaseActions()
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
     //m_pActShapeType
-    m_pActShapeType = new QAction(tr("Draw geometric shape"), p);
-    m_pMenuShapeType = new QMenu(tr("Draw geometric shape"), p);
+    m_pActShapeType = new QAction(tr("Draw Geometric Shape"), p);
+    m_pMenuShapeType = new QMenu(tr("Draw Geometric Shape"), p);
     m_pActShapeType->setMenu(m_pMenuShapeType);
 
     a = m_pMenuShapeType->addAction(tr("Point"));
@@ -1762,7 +1762,7 @@ ito::RetVal ItomQwtPlot::userInteractionStart(int type, bool start, int maxNrOfP
         }
         else
         {
-            retVal += ito::RetVal(ito::retError, 0, tr("invalid type for userInteractionStart").toLatin1().data());
+            retVal += ito::RetVal(ito::retError, 0, tr("Invalid type for userInteractionStart").toLatin1().data());
         }
     }
     else
@@ -2263,7 +2263,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                         break;
 
                     default:
-                        retVal += ito::RetVal(ito::retError, 0, tr("invalid or unsupported shape type").toLatin1().data());
+                        retVal += ito::RetVal(ito::retError, 0, tr("Invalid or unsupported shape type").toLatin1().data());
                         break;
                     }
 
@@ -2348,7 +2348,7 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
                 break;
 
             default:
-                retVal += ito::RetVal(ito::retError, 0, tr("invalid or unsupported shape type").toLatin1().data());
+                retVal += ito::RetVal(ito::retError, 0, tr("Invalid or unsupported shape type").toLatin1().data());
                 break;                
             }
 
@@ -2442,7 +2442,7 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
                 break;
 
             default:
-                retVal += ito::RetVal(ito::retError, 0, tr("invalid marker type").toLatin1().data());
+                retVal += ito::RetVal(ito::retError, 0, tr("Invalid marker type").toLatin1().data());
                 break;
             }
         }
@@ -2585,14 +2585,14 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         {
 #if QT_VERSION >= 0x050000
             plotInfoVisible = true;
-            emit statusBarMessage(tr("copy current view to clipboard including meta information widgets ..."));
+            emit statusBarMessage(tr("Copy current view to clipboard including meta information widgets ..."));
 #else
-            emit statusBarMessage(tr("copy current view to clipboard without meta information widgets (requires Qt5) ..."));
+            emit statusBarMessage(tr("Copy current view to clipboard without meta information widgets (requires Qt5) ..."));
 #endif
         }
         else
         {
-            emit statusBarMessage(tr("copy current view to clipboard ..."));
+            emit statusBarMessage(tr("Copy current view to clipboard ..."));
         }
 
         
@@ -2645,11 +2645,11 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
 
         if (plotInfoVisible)
         {
-            emit statusBarMessage(tr("copy current view to clipboard including infoWidgets. Done."), 1000);
+            emit statusBarMessage(tr("Copy current view to clipboard including infoWidgets. Done."), 1000);
         }
         else
         {
-            emit statusBarMessage(tr("copy current view to clipboard. Done."), 1000);
+            emit statusBarMessage(tr("Copy current view to clipboard. Done."), 1000);
         }
     }
     else

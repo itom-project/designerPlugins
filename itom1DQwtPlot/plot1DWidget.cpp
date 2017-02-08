@@ -170,7 +170,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     QWidget *guiParent = parent;
     if (!guiParent) guiParent = this;
 
-    QToolBar *mainTb = new QToolBar(tr("plotting tools"), guiParent);
+    QToolBar *mainTb = new QToolBar(tr("Plotting Tools"), guiParent);
     mainTb->setObjectName("mainToolBar");
     m_toolbars.append(mainTb);
 
@@ -242,7 +242,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuTools->addAction(m_pActClearShapes);
     m_menus.append(menuTools);
 
-    m_pContextMenu = new QMenu(QObject::tr("plot1D"), guiParent);
+    m_pContextMenu = new QMenu(QObject::tr("Plot1D"), guiParent);
     m_pContextMenu->addAction(m_pActSave);
     m_pContextMenu->addAction(m_pActPrint);
     m_pContextMenu->addAction(m_pActCopyClipboard);
@@ -474,15 +474,15 @@ void Plot1DWidget::createActions()
     m_pActXVAuto = a = m_pMnuMultiRowSwitch->addAction(tr("Auto"));
     a->setData(ItomQwtPlotEnums::AutoRowCol);
     m_pMnuMultiRowSwitch->setDefaultAction(a);
-    m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(tr("first row"));
+    m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(tr("Airst Row"));
     a->setData(ItomQwtPlotEnums::FirstRow);
-    m_pActXVFC = a = m_pMnuMultiRowSwitch->addAction(tr("first column"));
+    m_pActXVFC = a = m_pMnuMultiRowSwitch->addAction(tr("First Column"));
     a->setData(ItomQwtPlotEnums::FirstCol);
-    m_pActXVMR = a = m_pMnuMultiRowSwitch->addAction(tr("multi row"));
+    m_pActXVMR = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Row"));
     a->setData(ItomQwtPlotEnums::MultiRows);
-    m_pActXVMC = a = m_pMnuMultiRowSwitch->addAction(tr("multi column"));
+    m_pActXVMC = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Column"));
     a->setData(ItomQwtPlotEnums::MultiCols);
-    m_pActXVML = a = m_pMnuMultiRowSwitch->addAction(tr("multi layer"));
+    m_pActXVML = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Layer"));
     a->setData(ItomQwtPlotEnums::MultiLayerAuto);
     m_pActMultiRowSwitch->setVisible(true);
     connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
@@ -491,10 +491,10 @@ void Plot1DWidget::createActions()
     m_pActRGBSwitch = new QAction(tr("Color Representation"), p);
     m_pMnuRGBSwitch = new QMenu(tr("Color Representation"), p);
     m_pActRGBSwitch->setMenu(m_pMnuRGBSwitch);
-    m_pActRGBA = a = m_pMnuRGBSwitch->addAction(tr("auto value"));
+    m_pActRGBA = a = m_pMnuRGBSwitch->addAction(tr("Auto Value"));
     a->setData(ItomQwtPlotEnums::AutoColor);
     m_pMnuRGBSwitch->setDefaultAction(a);
-    m_pActGray = a = m_pMnuRGBSwitch->addAction(tr("gray value"));
+    m_pActGray = a = m_pMnuRGBSwitch->addAction(tr("Gray Value"));
     a->setData(ItomQwtPlotEnums::Gray);
     m_pActRGBL = a = m_pMnuRGBSwitch->addAction(tr("RGB-lines"));
     a->setData(ItomQwtPlotEnums::RGB);
@@ -2540,16 +2540,16 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<double> &coords, int curveInde
 
     if (curveIndex < 0 || curveIndex >= m_plotCurveItems.size())
     {
-        retVal += ito::RetVal::format(ito::retError, 0, tr("curveIndex out of bounds [0,%i]").toLatin1().data(), m_plotCurveItems.size() - 1);
+        retVal += ito::RetVal::format(ito::retError, 0, tr("CurveIndex out of bounds [0,%i]").toLatin1().data(), m_plotCurveItems.size() - 1);
     }
 
     if (append && coords.size() > (m_pData->m_pickerLimit - m_pickers.size()))
     {
-        retVal += ito::RetVal::format(ito::retError, 0, tr("number of new pickers exceed the given picker limit of %i").toLatin1().data(), m_pData->m_pickerLimit);
+        retVal += ito::RetVal::format(ito::retError, 0, tr("Number of new pickers exceed the given picker limit of %i").toLatin1().data(), m_pData->m_pickerLimit);
     }
     else if (!append && coords.size() > m_pData->m_pickerLimit)
     {
-        retVal += ito::RetVal::format(ito::retError, 0, tr("number of pickers exceed the given picker limit of %i").toLatin1().data(), m_pData->m_pickerLimit);
+        retVal += ito::RetVal::format(ito::retError, 0, tr("Number of pickers exceed the given picker limit of %i").toLatin1().data(), m_pData->m_pickerLimit);
     }
 
     if (!retVal.containsError())
@@ -2630,7 +2630,7 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
     }
     else if (id < 0 || id >= m_pickers.size())
     {
-        return ito::RetVal::format(ito::retError, 0, tr("id out of range [0,%i]").toLatin1().data(), m_pickers.size() - 1);
+        return ito::RetVal::format(ito::retError, 0, tr("ID out of range [0,%i]").toLatin1().data(), m_pickers.size() - 1);
     }
     else
     {
@@ -3275,11 +3275,11 @@ ito::RetVal Plot1DWidget::setCurveProperty(int index, const QByteArray &property
     ito::RetVal retval;
     if (index < 0 || index >= m_plotCurvePropertyItems.size())
     {
-        retval += ito::RetVal::format(ito::retError, 0, tr("index out of bounds [0,%i]").toLatin1().data(), m_plotCurvePropertyItems.size() - 1);
+        retval += ito::RetVal::format(ito::retError, 0, tr("Index out of bounds [0,%i]").toLatin1().data(), m_plotCurvePropertyItems.size() - 1);
     }
     else if (!m_plotCurvePropertyItems[index])
     {
-        retval += ito::RetVal::format(ito::retError, 0, tr("properties of curve %i are not available.").toLatin1().data(), index);
+        retval += ito::RetVal::format(ito::retError, 0, tr("Properties of curve %i are not available.").toLatin1().data(), index);
     }
     else
     {
