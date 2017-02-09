@@ -291,22 +291,20 @@
         <translation>Druckervorschau...</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Copy to clipboard</source>
-        <translation>In die Zwischenablage kopieren</translation>
+        <translation type="vanished">In die Zwischenablage kopieren</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+7"/>
         <source>Copies the current view to the clipboard</source>
         <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Send current view to workspace...</source>
-        <translation type="unfinished">Aktueller Ausschnitt an Workspace senden...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt an Workspace senden...</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+9"/>
         <source>Move</source>
         <translation type="unfinished">Verschieben</translation>
     </message>
@@ -316,35 +314,65 @@
         <translation type="unfinished">Achsen verschieben mit linker Maustaste, vergrößern mit rechter Maustaste</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Zoom to rectangle</source>
         <translation type="unfinished">Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Clear geometric shapes</source>
-        <translation type="unfinished">Geometrische Formen löschen</translation>
+        <translation type="obsolete">Geometrische Formen löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Clear all existing geometric shapes</source>
-        <translation type="unfinished">Alle geometrische Formen löschen</translation>
+        <translation type="obsolete">Alle geometrische Formen löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Lock aspect ratio</source>
-        <translation type="unfinished">Bildformat anzeigen</translation>
+        <translation type="obsolete">Bildformat anzeigen</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+16"/>
         <source>Toggle fixed / variable aspect ration between axis x and y</source>
         <translation type="unfinished">Vollbild oder Seitenverhältnis beibehalten</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+1"/>
         <source>Draw geometric shape</source>
+        <translation type="obsolete">Geometrische Formen zeichnen</translation>
+    </message>
+    <message>
+        <location line="-40"/>
+        <source>Copy To Clipboard</source>
+        <translation type="unfinished">In die Zwischenablage kopieren</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Send Current View To Workspace...</source>
+        <translation type="unfinished">Aktueller Ausschnitt an Workspace senden...</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Zoom To Rectangle</source>
+        <translation type="unfinished">Zoom in Rechteck</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Clear Geometric Shapes</source>
+        <translation type="unfinished">Geometrische Formen löschen</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Clear All Existing Geometric Shapes</source>
+        <translation type="unfinished">Clear all existing geometric shapes</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Lock Aspect Ratio</source>
+        <translation type="unfinished">Bildformat anzeigen</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+1"/>
+        <source>Draw Geometric Shape</source>
         <translation type="unfinished">Geometrische Formen zeichnen</translation>
     </message>
     <message>
@@ -378,7 +406,7 @@
         <translation>Kreis</translation>
     </message>
     <message>
-        <location line="+861"/>
+        <location line="+864"/>
         <location line="+38"/>
         <location line="+90"/>
         <location line="+84"/>
@@ -453,11 +481,51 @@
     </message>
     <message>
         <location line="-143"/>
-        <source>invalid type for userInteractionStart</source>
-        <translation type="unfinished">Ungültiger Typ von &apos;userInteractionStart&apos;</translation>
+        <source>Invalid type for userInteractionStart</source>
+        <translation type="unfinished">invalid type for userInteractionStart</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+501"/>
+        <location line="+85"/>
+        <source>Invalid or unsupported shape type</source>
+        <translation type="unfinished">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
+    </message>
+    <message>
+        <location line="+94"/>
+        <source>Invalid marker type</source>
+        <translation type="unfinished">Ungültiger Marker-Typ</translation>
+    </message>
+    <message>
+        <location line="+143"/>
+        <source>Copy current view to clipboard including meta information widgets ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Copy current view to clipboard without meta information widgets (requires Qt5) ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Copy current view to clipboard ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <source>Copy current view to clipboard including infoWidgets. Done.</source>
+        <translation type="unfinished">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Copy current view to clipboard. Done.</source>
+        <translation type="unfinished">Aktueller Ausschnittt in die Zwischenablage kopieren. Beendet.</translation>
+    </message>
+    <message>
+        <source>invalid type for userInteractionStart</source>
+        <translation type="obsolete">Ungültiger Typ von &apos;userInteractionStart&apos;</translation>
+    </message>
+    <message>
+        <location line="-845"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation type="unfinished">%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
@@ -517,13 +585,11 @@
         <translation type="unfinished">Die zuletzt verwendete geometrische Form ist für diesen Plot nicht erlaubt und wird deshalb ignoriert.</translation>
     </message>
     <message>
-        <location line="+48"/>
-        <location line="+85"/>
         <source>invalid or unsupported shape type</source>
-        <translation type="unfinished">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
+        <translation type="obsolete">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
     </message>
     <message>
-        <location line="-49"/>
+        <location line="+84"/>
         <source>Could not add a geometric shape, api is missing</source>
         <translation type="unfinished">Die geometrische Form kann nicht hinzugefügt werden, da die API nicht verfügbar ist</translation>
     </message>
@@ -544,12 +610,11 @@
         <translation type="unfinished">Die geometrische Form kann nicht geändert  werden, da die API nicht verfügbar ist</translation>
     </message>
     <message>
-        <location line="+61"/>
         <source>invalid marker type</source>
-        <translation type="unfinished">Ungültiger Marker-Typ</translation>
+        <translation type="obsolete">Ungültiger Marker-Typ</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+113"/>
         <location line="+14"/>
         <source>Geometric shape not found</source>
         <translation type="unfinished">Die geometrische Form wurde nicht gefunden</translation>
@@ -565,36 +630,31 @@
         <translation type="unfinished">Die Datei &apos;%s&apos; existiert bereits, kann aber nicht überschrieben werden. Evtl. ist diese Datei durch ein anderes Programm geöffnet.</translation>
     </message>
     <message>
-        <location line="+50"/>
         <source>copy current view to clipboard including meta information widgets ...</source>
-        <translation type="unfinished">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>copy current view to clipboard without meta information widgets (requires Qt5) ...</source>
-        <translation type="unfinished">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
     </message>
     <message>
         <source>copy current view to clipboard including infoWidgets ...</source>
         <translation type="obsolete">Aktuelle Ansicht inklusive infoWidget in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>copy current view to clipboard ...</source>
-        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+53"/>
         <source>copy current view to clipboard including infoWidgets. Done.</source>
-        <translation type="unfinished">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
+        <translation type="obsolete">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>copy current view to clipboard. Done.</source>
-        <translation type="unfinished">Aktueller Ausschnittt in die Zwischenablage kopieren. Beendet.</translation>
+        <translation type="obsolete">Aktueller Ausschnittt in die Zwischenablage kopieren. Beendet.</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+201"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished">FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -673,12 +733,11 @@
 <context>
     <name>Plot1DWidget</name>
     <message>
-        <location filename="../plot1DWidget.cpp" line="+173"/>
         <source>plotting tools</source>
-        <translation type="unfinished">Symbolleiste</translation>
+        <translation type="obsolete">Symbolleiste</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location filename="../plot1DWidget.cpp" line="+210"/>
         <source>File</source>
         <translation type="unfinished">Datei</translation>
     </message>
@@ -698,7 +757,7 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+147"/>
+        <location line="+151"/>
         <source>Scale Settings...</source>
         <translation>Skaleneinstellungen...</translation>
     </message>
@@ -749,12 +808,12 @@
     </message>
     <message>
         <location line="+4"/>
-        <location line="+2821"/>
+        <location line="+2822"/>
         <source>To Min-Max</source>
         <translation>Auf Min/Max</translation>
     </message>
     <message>
-        <location line="-2820"/>
+        <location line="-2821"/>
         <source>set two pickers to absolute minimum and maximum of (first) curve</source>
         <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der (ersten) Kurve</translation>
     </message>
@@ -838,47 +897,75 @@
     </message>
     <message>
         <location line="+3"/>
-        <source>first row</source>
+        <source>First Row</source>
         <translation type="unfinished">Erste Zeile</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+2066"/>
+        <source>CurveIndex out of bounds [0,%i]</source>
+        <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Number of new pickers exceed the given picker limit of %i</source>
+        <translation type="unfinished">Die Anzahl neuer Picker überschreitet das Limit für Picker von %i</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Number of pickers exceed the given picker limit of %i</source>
+        <translation type="unfinished">Die Anzahl der Picker überschreitet das Limit für Picker von %i</translation>
+    </message>
+    <message>
+        <location line="+81"/>
+        <source>ID out of range [0,%i]</source>
+        <translation type="unfinished">Die ID liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
+    </message>
+    <message>
+        <location line="+645"/>
+        <source>Index out of bounds [0,%i]</source>
+        <translation type="unfinished">Der Index liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Properties of curve %i are not available.</source>
+        <translation type="unfinished">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>first row</source>
+        <translation type="obsolete">Erste Zeile</translation>
+    </message>
+    <message>
         <source>first column</source>
-        <translation type="unfinished">Erste Spalte</translation>
+        <translation type="obsolete">Erste Spalte</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>multi row</source>
-        <translation type="unfinished">Alle Zeilen</translation>
+        <translation type="obsolete">Alle Zeilen</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>multi column</source>
-        <translation type="unfinished">Alle Spalten</translation>
+        <translation type="obsolete">Alle Spalten</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>multi layer</source>
-        <translation type="unfinished">Alle Schichten</translation>
+        <translation type="obsolete">Alle Schichten</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-2791"/>
         <location line="+1"/>
         <source>Color Representation</source>
         <translation type="unfinished">Farbdarstellung</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>auto value</source>
-        <translation type="unfinished">Autowert</translation>
+        <translation type="obsolete">Autowert</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>gray value</source>
-        <translation type="unfinished">Grauwert</translation>
+        <translation type="obsolete">Grauwert</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+7"/>
         <source>RGB-lines</source>
         <translation type="unfinished">RGB-Linien</translation>
     </message>
@@ -913,7 +1000,7 @@
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+611"/>
+        <location line="+612"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -937,37 +1024,31 @@
         <translation type="unfinished">rot</translation>
     </message>
     <message>
-        <location line="+1395"/>
         <source>curveIndex out of bounds [0,%i]</source>
-        <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
+        <translation type="obsolete">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>number of new pickers exceed the given picker limit of %i</source>
-        <translation type="unfinished">Die Anzahl neuer Picker überschreitet das Limit für Picker von %i</translation>
+        <translation type="obsolete">Die Anzahl neuer Picker überschreitet das Limit für Picker von %i</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>number of pickers exceed the given picker limit of %i</source>
-        <translation type="unfinished">Die Anzahl der Picker überschreitet das Limit für Picker von %i</translation>
+        <translation type="obsolete">Die Anzahl der Picker überschreitet das Limit für Picker von %i</translation>
     </message>
     <message>
-        <location line="+81"/>
         <source>id out of range [0,%i]</source>
-        <translation type="unfinished">Die ID liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
+        <translation type="obsolete">Die ID liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
     <message>
-        <location line="+645"/>
         <source>index out of bounds [0,%i]</source>
-        <translation type="unfinished">Der Index liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
+        <translation type="obsolete">Der Index liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>properties of curve %i are not available.</source>
-        <translation type="unfinished">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
+        <translation type="obsolete">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+2146"/>
         <source>itom API not available.</source>
         <translation type="unfinished">Die itom-API ist nicht verfügbar.</translation>
     </message>
@@ -979,7 +1060,42 @@
         <translation>Kurve %1</translation>
     </message>
     <message>
-        <location line="-135"/>
+        <location line="-1093"/>
+        <source>Plotting Tools</source>
+        <translation type="unfinished">Symbolleiste</translation>
+    </message>
+    <message>
+        <location line="+306"/>
+        <source>First Column</source>
+        <translation type="unfinished">Erste Spalte</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Multi Row</source>
+        <translation type="unfinished">Alle Zeilen</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Multi Column</source>
+        <translation type="unfinished">Alle Spalten</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Multi Layer</source>
+        <translation type="unfinished">Alle Schichten</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Auto Value</source>
+        <translation type="unfinished">Autowert</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Gray Value</source>
+        <translation type="unfinished">Grauwert</translation>
+    </message>
+    <message>
+        <location line="+634"/>
         <location line="+12"/>
         <source>gray</source>
         <translation type="unfinished">grau</translation>
@@ -993,7 +1109,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../sharedFiles/drawItem.cpp" line="+750"/>
+        <location filename="../../sharedFiles/drawItem.cpp" line="+771"/>
         <location line="+16"/>
         <source>rotated shapes are currently not supported.</source>
         <translation type="unfinished">Das Rotieren der geometischen Formen wird derzeit nicht unterstützt.</translation>
@@ -1004,9 +1120,8 @@
         <translation type="unfinished">Ungültige Typ der geometischen Formen</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-889"/>
         <source>plot1D</source>
-        <translation type="unfinished">Plot1D</translation>
+        <translation type="obsolete">Plot1D</translation>
     </message>
     <message>
         <location filename="../itom1DQwtPlotPlugin.cpp" line="+39"/>
@@ -1043,6 +1158,11 @@
         <location line="+75"/>
         <source>z-axis</source>
         <translation>z-Achse</translation>
+    </message>
+    <message>
+        <location filename="../plot1DWidget.cpp" line="-894"/>
+        <source>Plot1D</source>
+        <translation>Plot1D</translation>
     </message>
 </context>
 <context>

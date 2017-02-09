@@ -474,7 +474,7 @@ void Plot1DWidget::createActions()
     m_pActXVAuto = a = m_pMnuMultiRowSwitch->addAction(tr("Auto"));
     a->setData(ItomQwtPlotEnums::AutoRowCol);
     m_pMnuMultiRowSwitch->setDefaultAction(a);
-    m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(tr("Airst Row"));
+    m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(tr("First Row"));
     a->setData(ItomQwtPlotEnums::FirstRow);
     m_pActXVFC = a = m_pMnuMultiRowSwitch->addAction(tr("First Column"));
     a->setData(ItomQwtPlotEnums::FirstCol);

@@ -186,7 +186,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+902"/>
+        <location filename="../itom2dqwtplot.cpp" line="+922"/>
         <location line="+8"/>
         <source>Linecut</source>
         <translation>Linienschnitt</translation>
@@ -294,22 +294,20 @@
         <translation>Druckervorschau...</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Copy to clipboard</source>
-        <translation>In die Zwischenablage kopieren</translation>
+        <translation type="vanished">In die Zwischenablage kopieren</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+7"/>
         <source>Copies the current view to the clipboard</source>
         <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Send current view to workspace...</source>
-        <translation type="unfinished">Aktueller Ausschnitt an Workspace senden...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt an Workspace senden...</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+9"/>
         <source>Move</source>
         <translation type="unfinished">Verschieben</translation>
     </message>
@@ -319,35 +317,65 @@
         <translation type="unfinished">Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Zoom to rectangle</source>
         <translation type="unfinished">Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Clear geometric shapes</source>
-        <translation type="unfinished">Geometrische Formen löschen</translation>
+        <translation type="obsolete">Geometrische Formen löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Clear all existing geometric shapes</source>
-        <translation type="unfinished">Alle geometrische Formen löschen</translation>
+        <translation type="obsolete">Alle geometrische Formen löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Lock aspect ratio</source>
-        <translation type="unfinished">Seitenverhältnis beibehalten</translation>
+        <translation type="obsolete">Seitenverhältnis beibehalten</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+16"/>
         <source>Toggle fixed / variable aspect ration between axis x and y</source>
         <translation type="unfinished">Vollbild oder Seitenverhältnis beibehalten</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+1"/>
         <source>Draw geometric shape</source>
+        <translation type="obsolete">Geometrische Formen zeichnen</translation>
+    </message>
+    <message>
+        <location line="-40"/>
+        <source>Copy To Clipboard</source>
+        <translation type="unfinished">In die Zwischenablage kopieren</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Send Current View To Workspace...</source>
+        <translation type="unfinished">Aktueller Ausschnitt an Workspace senden...</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Zoom To Rectangle</source>
+        <translation type="unfinished">Zoom in Rechteck</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Clear Geometric Shapes</source>
+        <translation type="unfinished">Geometrische Formen löschen</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Clear All Existing Geometric Shapes</source>
+        <translation type="unfinished">Alle geometrische Formen löschen</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Lock Aspect Ratio</source>
+        <translation type="unfinished">Seitenverhältnis beibehalten</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+1"/>
+        <source>Draw Geometric Shape</source>
         <translation type="unfinished">Geometrische Formen zeichnen</translation>
     </message>
     <message>
@@ -381,7 +409,7 @@
         <translation>Kreis</translation>
     </message>
     <message>
-        <location line="+861"/>
+        <location line="+864"/>
         <location line="+38"/>
         <location line="+90"/>
         <location line="+84"/>
@@ -456,11 +484,51 @@
     </message>
     <message>
         <location line="-143"/>
-        <source>invalid type for userInteractionStart</source>
+        <source>Invalid type for userInteractionStart</source>
         <translation type="unfinished">Ungültiger Typ von &apos;userInteractionStart&apos;</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+501"/>
+        <location line="+85"/>
+        <source>Invalid or unsupported shape type</source>
+        <translation type="unfinished">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
+    </message>
+    <message>
+        <location line="+94"/>
+        <source>Invalid marker type</source>
+        <translation type="unfinished">Ungültiger Marker-Typ</translation>
+    </message>
+    <message>
+        <location line="+143"/>
+        <source>Copy current view to clipboard including meta information widgets ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Copy current view to clipboard without meta information widgets (requires Qt5) ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Copy current view to clipboard ...</source>
+        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <source>Copy current view to clipboard including infoWidgets. Done.</source>
+        <translation type="unfinished">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Copy current view to clipboard. Done.</source>
+        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren. Beendet.</translation>
+    </message>
+    <message>
+        <source>invalid type for userInteractionStart</source>
+        <translation type="obsolete">Ungültiger Typ von &apos;userInteractionStart&apos;</translation>
+    </message>
+    <message>
+        <location line="-845"/>
         <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
         <translation type="unfinished">%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
     </message>
@@ -520,13 +588,11 @@
         <translation type="unfinished">Die zuletzt verwendete geometrische Form ist für diesen Plot nicht erlaubt und wird deshalb ignoriert.</translation>
     </message>
     <message>
-        <location line="+48"/>
-        <location line="+85"/>
         <source>invalid or unsupported shape type</source>
-        <translation type="unfinished">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
+        <translation type="obsolete">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
     </message>
     <message>
-        <location line="-49"/>
+        <location line="+84"/>
         <source>Could not add a geometric shape, api is missing</source>
         <translation type="unfinished">Die geometrische Form kann nicht hinzugefügt werden, da die API nicht verfügbar ist</translation>
     </message>
@@ -547,12 +613,11 @@
         <translation type="unfinished">Die geometrische Form kann nicht geändert  werden, da die API nicht verfügbar ist</translation>
     </message>
     <message>
-        <location line="+61"/>
         <source>invalid marker type</source>
-        <translation type="unfinished">Ungültiger Marker-Typ</translation>
+        <translation type="obsolete">Ungültiger Marker-Typ</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+113"/>
         <location line="+14"/>
         <source>Geometric shape not found</source>
         <translation type="unfinished">Die geometrische Form wurde nicht gefunden</translation>
@@ -568,36 +633,31 @@
         <translation type="unfinished">Die Datei &apos;%s&apos; existiert bereits, kann aber nicht überschrieben werden. Evtl. ist diese Datei durch ein anderes Programm geöffnet.</translation>
     </message>
     <message>
-        <location line="+50"/>
         <source>copy current view to clipboard including meta information widgets ...</source>
-        <translation type="unfinished">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>copy current view to clipboard without meta information widgets (requires Qt5) ...</source>
-        <translation type="unfinished">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
     </message>
     <message>
         <source>copy current view to clipboard including infoWidgets ...</source>
         <translation type="obsolete">Aktuelle Ansicht inklusive infoWidget in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>copy current view to clipboard ...</source>
-        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
+        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
     </message>
     <message>
-        <location line="+53"/>
         <source>copy current view to clipboard including infoWidgets. Done.</source>
-        <translation type="unfinished">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
+        <translation type="obsolete">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>copy current view to clipboard. Done.</source>
-        <translation type="unfinished">Aktueller Ausschnitt in die Zwischenablage kopieren. Beendet.</translation>
+        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren. Beendet.</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+201"/>
         <source>PDF Documents (*.pdf)</source>
         <translation type="unfinished">FDP-Dokumente (&apos;.pdf)</translation>
     </message>
@@ -676,18 +736,18 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+983"/>
+        <location filename="../plotCanvas.cpp" line="+995"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="-111"/>
-        <location line="+119"/>
+        <location line="-115"/>
+        <location line="+123"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
-        <location line="-789"/>
+        <location line="-799"/>
         <source>plotting tools</source>
         <translation type="unfinished">Symbolleiste Plot</translation>
     </message>
@@ -707,7 +767,7 @@
         <translation type="unfinished">Werkzeuge</translation>
     </message>
     <message>
-        <location line="+164"/>
+        <location line="+170"/>
         <source>Scale Settings...</source>
         <translation type="unfinished">Skaleneinstellungen...</translation>
     </message>
@@ -877,13 +937,13 @@
         <translation type="unfinished">Bildebene auswählen</translation>
     </message>
     <message>
-        <location line="+366"/>
+        <location line="+370"/>
         <location line="+119"/>
         <source>Selected color map has less than two points.</source>
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="+1110"/>
+        <location line="+1136"/>
         <source>Set lineCut coordinates failed. Could not activate lineCut.</source>
         <translation type="unfinished">Das Setzten der Linienschnittkoordinaten schlug fehl. Der Linienschnitt konnte nicht aktiviert werden.</translation>
     </message>
@@ -891,7 +951,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-1031"/>
+        <location filename="../itom2dqwtplot.cpp" line="-1051"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
     </message>
@@ -906,7 +966,7 @@
         <translation>Referenz auf Eingangsobjekt</translation>
     </message>
     <message>
-        <location filename="../plotCanvas.cpp" line="-1871"/>
+        <location filename="../plotCanvas.cpp" line="-1907"/>
         <source>plot2D</source>
         <translation type="unfinished">2D-Plot</translation>
     </message>
@@ -926,7 +986,7 @@
         <translation>LGPL, für Qwt siehe Qwt-Lizenz</translation>
     </message>
     <message>
-        <location filename="../../sharedFiles/drawItem.cpp" line="+750"/>
+        <location filename="../../sharedFiles/drawItem.cpp" line="+771"/>
         <location line="+16"/>
         <source>rotated shapes are currently not supported.</source>
         <translation type="unfinished">Das Rotieren der geometischen Formen wird derzeit nicht unterstützt.</translation>
