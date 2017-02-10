@@ -50,6 +50,8 @@
 #include "plotLegends/infoWidgetShapes.h"
 #include "plotLegends/infoWidgetMarkers.h"
 
+#include "../DataObject/dataObjectFuncs.h"
+
 #include "common/apiFunctionsGraphInc.h"
 #include "common/retVal.h"
 
@@ -2911,7 +2913,8 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         return ito::RetVal(ito::retError, 0, tr("Could not plot marker, api is missing").toLatin1().data());
     }
 
-    ito::DataObject *dObj = apiCreateFromDataObject(coordinates.data(), 2, ito::tFloat32, limits, &retval);
+    ito::DataObject dObj = ito::dObjHelper::squeezeConvertCheck2DDataObject(coordinates.data(), "coordinates", ito::Range(2, 2), ito::Range::all(), retval, \
+        ito::tFloat32, 8, ito::tUInt8, ito::tInt8, ito::tUInt16, ito::tInt16, ito::tUInt32, ito::tInt32, ito::tFloat32, ito::tFloat64);
 
     if (!retval.containsError())
     {
@@ -3013,9 +3016,9 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         }
 
         QwtPlotMarker *marker = NULL;
-        int nrOfMarkers = dObj->getSize(1);
+        int nrOfMarkers = dObj.getSize(1);
 
-        const cv::Mat *mat = dObj->getCvPlaneMat(0);
+        const cv::Mat *mat = dObj.getCvPlaneMat(0);
 
         const ito::float32 *xRow = mat->ptr<const ito::float32>(0);
         const ito::float32 *yRow = mat->ptr<const ito::float32>(1);
@@ -3059,8 +3062,6 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 
         replot();
     }
-
-    if (dObj) delete dObj;
 
     return retval;
 }
