@@ -37,8 +37,11 @@ class ItemPointCloud : public Item
 {
     Q_OBJECT
 
+#if QT_VERSION < 0x050500
+    //for >= Qt 5.5.0 see Q_ENUM definition below
     Q_ENUMS(ColorMode);
     Q_ENUMS(ColorMap);
+#endif
 
     Q_PROPERTY(int PointSize READ pointSize WRITE setPointSize DESIGNABLE true USER true);
     Q_PROPERTY(int LineWidth READ lineWidth WRITE setLineWidth DESIGNABLE true USER true);
@@ -55,6 +58,13 @@ public:
 
     enum ColorMode { SolidColor, X, Y, Z, XYZ, XY, YZ, XZ, Intensity, NormalX, NormalY, NormalZ, NormalXYZ, RGB, Curvature };
     enum ColorMap { gray, falseColor, falseColorIR, hsv, hsvIR, blue2red };
+
+#if QT_VERSION >= 0x050500
+    //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
+    //values are always accessible.
+    Q_ENUM(ColorMode);
+    Q_ENUM(ColorMap);
+#endif
 
     ito::RetVal addPointCloud(const ito::PCLPointCloud &cloud);
 

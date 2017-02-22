@@ -28,9 +28,10 @@
 class ItomQwtPlotEnums : public QObject
 {
     Q_OBJECT
-       
+
+#if QT_VERSION < 0x050500
+    //for >= Qt 5.5.0 see Q_ENUM definition below
     Q_ENUMS(ComplexType);
-    Q_ENUMS(ModificationState);
     Q_ENUMS(ShapeType);
     Q_ENUMS(PlotPickerType);
     Q_ENUMS(MultiLineMode);    
@@ -41,6 +42,7 @@ class ItomQwtPlotEnums : public QObject
 
     Q_FLAGS(ModificationMode ModificationModes)
     Q_FLAGS(ShapeType ShapeTypes)
+#endif
 
 public:
     
@@ -80,6 +82,22 @@ public:
         Polygon = 0x00000080,
     };
     Q_DECLARE_FLAGS(ShapeTypes, ShapeType)
+
+#if QT_VERSION >= 0x050500
+    //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
+    //values are always accessible.
+    Q_ENUM(ComplexType);
+    Q_ENUM(ShapeType);
+    Q_ENUM(PlotPickerType);
+    Q_ENUM(MultiLineMode);
+    Q_ENUM(ColorHandling);
+    Q_ENUM(CurveStyle);
+    Q_ENUM(FillCurveStyle);
+    Q_ENUM(ScaleEngine);
+
+    Q_FLAG(ModificationModes)
+    Q_FLAG(ShapeTypes)
+#endif
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ItomQwtPlotEnums::ModificationModes)
