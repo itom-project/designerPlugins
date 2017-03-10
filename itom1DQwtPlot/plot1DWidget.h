@@ -187,7 +187,7 @@ class Plot1DWidget : public ItomQwtPlot
         bool m_antiAliased;
 
         int m_Curser[2];
-        int m_actPickerIdx;
+//        int m_actPickerIdx;
 
         QList<QColor> m_colorList;
 

@@ -75,7 +75,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_lineWidth(1.0),
         m_lineStyle(Qt::SolidLine),
         m_hasParentForRescale(false),
-        m_actPickerIdx(-1),
+//        m_actPickerIdx(-1),
         m_cmplxState(false),
         m_colorState(false),
         m_layerState(false),
@@ -2408,6 +2408,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     QVector<QPointF> points;
 
 	QVector< int > idcs;
+    int actIdx = -1;
 
     for (int i = 0 ; i < m_pickers.size() ; i++)
     {
@@ -2420,6 +2421,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
         if (m->active)
         {
             m_pickers[i].item->setSymbol(new QwtSymbol(QwtSymbol::Diamond, Qt::white, QPen(colors[cur],2), QSize(8,8)));
+            actIdx = i;
         }
         else
         {
@@ -2451,8 +2453,8 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     }
 
     setPickerText(coords,offsets);
-
-
+    if (actIdx >= 0)
+        emit((Itom1DQwtPlot*)(this->parent()))->pickerChanged(actIdx, m_pickers[actIdx].item->xValue(), m_pickers[actIdx].item->yValue(), m_pickers[actIdx].curveIdx);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2470,7 +2472,6 @@ void Plot1DWidget::stateChanged(int state)
         break;
     }
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::home()

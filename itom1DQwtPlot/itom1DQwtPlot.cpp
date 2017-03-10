@@ -856,8 +856,6 @@ QVector<float> Itom1DQwtPlot::getPickerPhys() const
     return m_pContent->getPickerPhys();
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerLabelVisible(const bool state)
 {
@@ -1086,13 +1084,46 @@ void Itom1DQwtPlot::setAntiAliased(bool &antiAliased)
         m_pContent->setAntiAliased(antiAliased);
     }
     updatePropertyDock();}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::showCurveProperties()
 {
 	d->m_pLinePropertiesDock->show();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::updatePropertiesDock()
 {
 	updatePropertyDock();
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getCurrentPickerIndex() const
+{
+    if (m_pContent)
+    {
+        for (int i = 0; i < m_pContent->m_pickers.size(); i++)
+        {
+            if (m_pContent->m_pickers[i].active)
+                return i;
+        }
+    }
+    return -1;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setCurrentPickerIndex(int index)
+{
+    if (m_pContent && index < m_pContent->m_pickers.size() && index >= 0)
+    {
+        for (int i = 0; i < m_pContent->m_pickers.size(); i++)
+        {
+            m_pContent->m_pickers[i].active = false;
+        }
+        m_pContent->m_pickers[index].active = true;
+        m_pContent->updatePickerPosition(false, false);
+        refreshPlot();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------

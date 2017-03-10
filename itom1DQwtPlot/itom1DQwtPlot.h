@@ -80,6 +80,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ItomQwtPlotEnums::PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
     Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true USER true)
     Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false USER true)
+    Q_PROPERTY(int currentPickerIndex READ getCurrentPickerIndex WRITE setCurrentPickerIndex DESIGNABLE false USER true)
     Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
     
     Q_PROPERTY(bool pickerLabelVisible READ getPickerLabelVisible WRITE setPickerLabelVisible USER true);
@@ -125,6 +126,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://pickerLimit", "Define the maximal number of picker for this plot.")
     Q_CLASSINFO("prop://pickerCount", "Number of picker within the plot.")
     Q_CLASSINFO("prop://picker", "Get picker defined by a Mx4 float32 data object. Each row represents one picker and contains the following information: [pixelIndex, physIndex, value, curveIndex]. PixelIndex and physIndex are equal if axisScale = 1 and axisOffset = 0 for the corresponding dataObject.")
+    Q_CLASSINFO("prop://currentPickerIndex", "Get / set currently active picker.")
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
     Q_CLASSINFO("prop://legendTitles", "Seq. of strings with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the data object is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
@@ -326,6 +328,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         ItomQwtPlotEnums::PlotPickerType getPickerType() const;
         void setPickerType(const ItomQwtPlotEnums::PlotPickerType val);
 
+        int getCurrentPickerIndex() const;
+        void setCurrentPickerIndex(const int index);
+
         Symbol getLineSymbol() const;
         void setLineSymbol(const Symbol symbol);
         void resetLineSymbol();
@@ -349,8 +354,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
 		QWidget* getWidgetCurveProperties();
 		
-
-
         friend Plot1DWidget;
 
     protected:
@@ -383,6 +386,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     private slots:
 		void updatePropertiesDock();
+
+    signals:
+        ito::RetVal pickerChanged(int pickerIndex, double positionX, double positionY, int curveIndex);
 };
 //----------------------------------------------------------------------------------------------------------------------------------
 
