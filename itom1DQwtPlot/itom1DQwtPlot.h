@@ -208,6 +208,19 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     
     Q_CLASSINFO("slot://getDisplayed", "returns the currently displayed dataObject.")
 
+    Q_CLASSINFO("signal://pickerChanged", "This signal is emitted whenever the current picker changed its position\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "pickerIndex : {int}\n"
+    "    index of the changed picker\n"
+    "positionX : {double}\n"
+    "    horizontal position of currently changed picker\n"
+    "positionY : {double}\n"
+    "    vertical position of the currently changed picker\n"
+    "curveIndex : {int}\n"
+    "    index of the curve the picker is attached to")
+
     public:
         Itom1DQwtPlot(QWidget *parent = 0);
         Itom1DQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -388,7 +401,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 		void updatePropertiesDock();
 
     signals:
-        ito::RetVal pickerChanged(int pickerIndex, double positionX, double positionY, int curveIndex);
+        void pickerChanged(int pickerIndex, double positionX, double positionY, int curveIndex);        
 };
 //----------------------------------------------------------------------------------------------------------------------------------
 

@@ -2454,7 +2454,9 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
 
     setPickerText(coords,offsets);
     if (actIdx >= 0)
+    {
         emit((Itom1DQwtPlot*)(this->parent()))->pickerChanged(actIdx, m_pickers[actIdx].item->xValue(), m_pickers[actIdx].item->yValue(), m_pickers[actIdx].curveIdx);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
