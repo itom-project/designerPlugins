@@ -61,7 +61,6 @@
 //namespace ito {
 //    extern void **ITOM_API_FUNCS_GRAPH;
 //}
-
 //----------------------------------------------------------------------------------------------------------------------------------
 Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         ItomQwtPlot(parent),
@@ -120,7 +119,8 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_pActCmplxSwitch(NULL),
         m_pActLegendSwitch(NULL),
         m_pMnuLegendSwitch(NULL),
-        m_antiAliased(false)
+        m_antiAliased(false),
+		m_pComplexStyle(ItomQwtPlotEnums::CmplxAbs)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -2709,8 +2709,23 @@ QList<QwtPlotCurve*> Plot1DWidget::getplotCurveItems()
 {
 	return this->m_plotCurveItems;
 }
-
-
+//----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::ComplexType Plot1DWidget::getComplexStyle() const
+{
+	return m_pComplexStyle;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
+{
+	foreach(QAction* a, m_pMnuCmplxSwitch->actions())
+	{
+		if (a->data().toInt() == type)
+		{
+			mnuCmplxSwitch(a);
+			break;
+		}
+	}
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
 {
@@ -3125,15 +3140,16 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
     DataObjectSeriesData *seriesData;
     m_pMnuCmplxSwitch->setDefaultAction(action);
     setButtonStyle(buttonStyle()); //to change icon of menu
-
+	int idx = action->data().toInt();
+	
     foreach(QwtPlotCurve *data, m_plotCurveItems)
     {
-        int idx = action->data().toInt();
         seriesData = (DataObjectSeriesData*)data->data();
         
         if (seriesData)
         {
             seriesData->setCmplxState((ItomQwtPlotEnums::ComplexType)idx);
+
 
             //if pickers are visible, stick them to the new line form
             foreach(Picker m, m_pickers)
@@ -3143,7 +3159,7 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
 
         }
     }
-
+	m_pComplexStyle = (ItomQwtPlotEnums::ComplexType)idx;
     //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
     setInterval(Qt::YAxis, m_pData->m_valueScaleAuto, m_pData->m_valueMin, m_pData->m_valueMax); //replot is done here 
 }

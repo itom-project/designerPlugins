@@ -1084,7 +1084,16 @@ void Itom1DQwtPlot::setAntiAliased(bool &antiAliased)
         m_pContent->setAntiAliased(antiAliased);
     }
     updatePropertyDock();}
-
+//----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::ComplexType Itom1DQwtPlot::getComplexStyle() const
+{
+	return m_pContent->getComplexStyle();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
+{
+	m_pContent->setComplexStyle(type);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::showCurveProperties()
 {

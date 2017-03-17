@@ -106,6 +106,10 @@ class PlotCanvas : public ItomQwtPlot
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
 		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
+		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
+		void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type);
+
+
         friend class Itom2dQwtPlot;
 
     protected:

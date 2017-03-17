@@ -1312,3 +1312,14 @@ void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
         m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::ComplexType Itom2dQwtPlot::getComplexStyle() const
+{
+	return m_pContent->getComplexStyle();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
+{
+	m_pContent->setComplexStyle(type);
+}
+//----------------------------------------------------------------------------------------------------------------------------------

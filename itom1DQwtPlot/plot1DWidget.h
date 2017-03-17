@@ -117,6 +117,9 @@ class Plot1DWidget : public ItomQwtPlot
 		QList<QwtPlotCurve*> getplotCurveItems();
 		QList<QwtPlotCurveProperty*> getPlotCurveProperty();
 
+		void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type);
+		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
+
 
         friend Itom1DQwtPlot;
 
@@ -245,6 +248,7 @@ class Plot1DWidget : public ItomQwtPlot
         QAction* m_pActRGBL;
         QAction* m_pActRGBAL;
         QAction* m_pActRGBG;
+		ItomQwtPlotEnums::ComplexType m_pComplexStyle;
 
     signals:
 

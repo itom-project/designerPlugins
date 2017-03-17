@@ -2183,6 +2183,23 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
+{
+	return m_pData->m_cmplxType;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
+{
+	foreach(QAction* a, m_pMnuCmplxSwitch->actions())
+	{
+		if (a->data().toInt() == type)
+		{
+			mnuCmplxSwitch(a);
+			break;
+		}
+	}
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuScaleSettings()
 {
     synchronizeScaleValues();

@@ -91,6 +91,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
 
     Q_PROPERTY(bool antiAliased READ getAntiAliased WRITE setAntiAliased DESIGNABLE true USER true);
+	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
+
 
 #if QT_VERSION < 0x050500
     //for >= Qt 5.5.0 see Q_ENUM definition below
@@ -140,6 +142,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
 
     Q_CLASSINFO("prop://antiAliased", "True, if all curves should be plot with an anti-aliased render mode (slower) or False if not (faster).")
+	Q_CLASSINFO("prop://complexStyle","Defines whether the real, imaginary, phase or absolute of a complex number is shown.")
 
     Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical (axis) or in pixel coordinates.\n"
     "\n"
@@ -364,6 +367,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         void setCurveFillAlpha(const int val);
         int getCurveFillAlpha() const;
+
+		void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type);
+		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
 
 		QWidget* getWidgetCurveProperties();
 		
