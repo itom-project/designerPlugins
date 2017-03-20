@@ -97,6 +97,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
     
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
+	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
     
     Q_CLASSINFO("prop://enableBoxFrame", "If true, a 1px solid border is drawn as a boxed rectangle around the canvas, else no margin is visible on the upper and right side.")
     Q_CLASSINFO("prop://buttonSet", "Get/set the button set used (normal or light color for dark themes).")
@@ -118,6 +119,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
+	Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
 
     Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data.")
 
@@ -397,6 +399,9 @@ public:
     
     ItomQwtPlotEnums::ShapeTypes getAllowedGeometricShapes() const;
     void setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes);
+
+	virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
+	virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
 
     friend ItomQwtPlot;
 

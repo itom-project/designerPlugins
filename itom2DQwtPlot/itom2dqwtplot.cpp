@@ -911,6 +911,10 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             if (zStack)
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Z-Stack"));
+				if (figure->inherits("ItomQwtDObjFigure"))
+				{
+					((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+				}
                 // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
                 // with one plane and cannot display the points in z-direction
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["zCutPoint"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
@@ -920,6 +924,10 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             else if (bounds.size() == 3) // its a 3D-Object
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
+				if (figure->inherits("ItomQwtDObjFigure"))
+				{
+					((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+				}
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
@@ -928,6 +936,10 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             else
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
+				if (figure->inherits("ItomQwtDObjFigure"))
+				{
+					((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+				}
                 // otherwise simply pass on the displayed plane
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);

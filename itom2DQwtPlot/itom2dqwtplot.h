@@ -76,7 +76,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     
     Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false)
     Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false)
-	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
+
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -105,7 +105,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 
     Q_CLASSINFO("prop://lineCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for lateral slicing. The 'uiItem' can be savely cast to 'plotItem'.")
     Q_CLASSINFO("prop://zSlicePlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for z slicing. The 'uiItem' can be savely cast to 'plotItem'.")
-	Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown.")
     Q_CLASSINFO("slot://getDisplayed", "returns the currently displayed dataObject.")
     Q_CLASSINFO("slot://getDisplayedLineCut", "returns the currently displayed line cut dataObject")
 
