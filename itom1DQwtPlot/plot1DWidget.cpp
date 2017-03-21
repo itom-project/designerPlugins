@@ -828,6 +828,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
     bool valid = false;
     ito::DataObjectTagType tag;
     QwtPlotCurve *item = NULL;
+    QList<QString> curveNames; 
 
     for (index = 0; index < m_plotCurveItems.size(); ++index)
     {
@@ -840,28 +841,35 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
                 tag = object->getTag(QString("legendTitle%1").arg(index).toLatin1().toStdString(), valid);
 #else
                 tag = object->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
-#endif
+#endif                
             }
 
             if (valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
             {
                 item->setTitle(QString::fromLatin1(tag.getVal_ToString().data()));
+                curveNames.append(QString(tag.getVal_ToString().data()));
             }
             else // plots with empty tags: curce 0, curve 1, ...
             {
                 item->setTitle(tr("curve %1").arg(index));
+                curveNames.append(tr("curve %1").arg(index));
             }
             
         }
         else if (m_legendTitles.size() > index)
         {
             item->setTitle(m_legendTitles[index]);
+            curveNames.append(m_legendTitles[index]);
         }
         else
         {
-			item->setTitle(tr("curve %1").arg(index));
+            item->setTitle(tr("curve %1").arg(index));
+            curveNames.append(tr("curve %1").arg(index));
         }
     }
+
+    
+    m_legendTitles = curveNames;
     replot();
     applyLegendFont();
 	emit legendModified();
@@ -1245,6 +1253,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         bool valid;
         ito::DataObjectTagType tag;
+        QList<QString> curveNames;
 
         while (m_plotCurveItems.size() < numCurves)
         {
@@ -1257,23 +1266,28 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 tag = dataObj->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
 #endif
                 
+                
 				if(valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
 				{
-					dObjCurve = new QwtPlotCurveDataObject(QString::fromLatin1(tag.getVal_ToString().data()));
+					dObjCurve = new QwtPlotCurveDataObject(QString::fromLatin1(tag.getVal_ToString().data()));   
+                    curveNames.append(QString(tag.getVal_ToString().data()));
 				}
 				else // plots with empty tags: curce 0, curve 1, ...
 				{
 					dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index));
-				}			  
+                    curveNames.append(tr("curve %1").arg(index));
+				}	
             }
             else if (m_legendTitles.size() > index)
             {
                 dObjCurve = new QwtPlotCurveDataObject(m_legendTitles[index]);
+                curveNames.append(m_legendTitles[index]);
             }
             else
             {
                 dObjCurve = new QwtPlotCurveDataObject("");
-            }
+                curveNames.append("");
+            }            
 
             dObjCurve->setData(NULL);
             dObjCurve->setRenderHint(QwtPlotItem::RenderAntialiased, m_antiAliased);
@@ -1369,6 +1383,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 			connect(m_plotCurvePropertyItems.last(), SIGNAL(curveChanged()), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
 			refreshWidgetCurveProperties = 1;
         }
+
+        m_legendTitles = curveNames;
+
 
 		if (refreshWidgetCurveProperties == 1) // if true a curve was added or deleted and the widget has to be updated
 		{	
