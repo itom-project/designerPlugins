@@ -131,7 +131,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://currentPickerIndex", "Get / set currently active picker.")
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
-    Q_CLASSINFO("prop://legendTitles", "Seq. of strings with the legend titles for all curves. If the list has less entries than curves, the last curves don't have any title. If no legends are given, the data object is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
+    Q_CLASSINFO("prop://legendTitles", "Seq. of strings with the legend titles for all curves. If no legends are given, the dataObject is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
 
     Q_CLASSINFO("prop://pickerLabelVisible", "Enable and disable the labels next to each picker.")
     Q_CLASSINFO("prop://pickerLabelOrientation", "Get / set the label orientation for the picker labels.")
