@@ -3,6 +3,7 @@
 
 #include <pcl/visualization/point_cloud_color_handlers.h>
 #include <vector>
+#include <math.h>
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -15,6 +16,7 @@ template <typename PointT>
 class PointCloudColorHandlerGenericFields : public pcl::visualization::PointCloudColorHandler<PointT>
 {
     typedef typename pcl::visualization::PointCloudColorHandler<PointT>::PointCloud PointCloud;
+    typedef typename PointCloud::ConstPtr PointCloudConstPtr;
 
 protected:
     /** \brief Class getName method. */
@@ -22,9 +24,9 @@ protected:
     getName () const { return ("PointCloudColorHandlerGenericFields"); }
 
     private:
-    using PointCloudColorHandler<PointT>::cloud_;
-    using PointCloudColorHandler<PointT>::capable_;
-    using PointCloudColorHandler<PointT>::fields_;
+    using pcl::visualization::PointCloudColorHandler<PointT>::cloud_;
+    using pcl::visualization::PointCloudColorHandler<PointT>::capable_;
+    using pcl::visualization::PointCloudColorHandler<PointT>::fields_;
 
     /** \brief Name of the field used to create the color handler. */
     std::vector<std::string> field_names_;
@@ -143,7 +145,7 @@ public:
                 fields_sum += field_data * field_data;
             }
 
-            colors[j] = std::sqrtf(fields_sum);
+            colors[j] = sqrtf(fields_sum);
             j++;
         }
         }
@@ -163,7 +165,7 @@ public:
             if (!pcl_isfinite (field_data))
                 continue;
 
-            colors[j] = std::sqrtf(fields_sum);
+            colors[j] =sqrtf(fields_sum);
             j++;
         }
         }
@@ -177,7 +179,7 @@ public:
     virtual void
     setInputCloud (const PointCloudConstPtr &cloud)
     {
-        PointCloudColorHandler<PointT>::setInputCloud (cloud);
+        pcl::visualization::PointCloudColorHandler<PointT>::setInputCloud (cloud);
         field_idxs_.clear();
         capable_ = (field_names_.size() > 0);
         for (int i = 0; i < field_names_.size(); ++i)
