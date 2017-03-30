@@ -204,7 +204,7 @@
         <translation>Fehler: &apos;Canvas-Handle&apos; wurde nicht initialisiert.</translation>
     </message>
     <message>
-        <location line="+203"/>
+        <location line="+201"/>
         <source>canvas not available</source>
         <translation>&apos;Canvas&apos; ist nicht verfügbar</translation>
     </message>
@@ -261,7 +261,7 @@
 <context>
     <name>ItomQwtPlot</name>
     <message>
-        <location filename="../../sharedFiles/itomQwtPlot.cpp" line="+234"/>
+        <location filename="../../sharedFiles/itomQwtPlot.cpp" line="+236"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -720,12 +720,12 @@
         <translation type="unfinished">Der Marker konnte nicht gezeichnet werden weil API fehlt</translation>
     </message>
     <message>
-        <location line="+101"/>
+        <location line="+102"/>
         <source>The style tag does not correspond to the required format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</source>
         <translation type="unfinished">Die Stil-Bezeichnung entspricht nicht dem erforderlichen Format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</translation>
     </message>
     <message>
-        <location line="+83"/>
+        <location line="+81"/>
         <source>No marker with id &apos;%1&apos; found.</source>
         <translation type="unfinished">Es wurde kein Marker mit der ID %1 gefunden.</translation>
     </message>
@@ -808,12 +808,12 @@
     </message>
     <message>
         <location line="+4"/>
-        <location line="+2822"/>
+        <location line="+2858"/>
         <source>To Min-Max</source>
         <translation>Auf Min/Max</translation>
     </message>
     <message>
-        <location line="-2821"/>
+        <location line="-2857"/>
         <source>set two pickers to absolute minimum and maximum of (first) curve</source>
         <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der (ersten) Kurve</translation>
     </message>
@@ -901,7 +901,7 @@
         <translation type="unfinished">Erste Zeile</translation>
     </message>
     <message>
-        <location line="+2066"/>
+        <location line="+2086"/>
         <source>CurveIndex out of bounds [0,%i]</source>
         <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
@@ -921,7 +921,7 @@
         <translation type="unfinished">Die ID liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
     <message>
-        <location line="+645"/>
+        <location line="+661"/>
         <source>Index out of bounds [0,%i]</source>
         <translation type="unfinished">Der Index liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
@@ -951,7 +951,7 @@
         <translation type="obsolete">Alle Schichten</translation>
     </message>
     <message>
-        <location line="-2791"/>
+        <location line="-2827"/>
         <location line="+1"/>
         <source>Color Representation</source>
         <translation type="unfinished">Farbdarstellung</translation>
@@ -1000,7 +1000,7 @@
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+612"/>
+        <location line="+620"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -1048,19 +1048,22 @@
         <translation type="obsolete">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="+2146"/>
+        <location line="+2174"/>
         <source>itom API not available.</source>
         <translation type="unfinished">Die itom-API ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-2442"/>
-        <location line="+10"/>
-        <location line="+404"/>
+        <location line="-2476"/>
+        <location line="+1"/>
+        <location line="+11"/>
+        <location line="+1"/>
+        <location line="+410"/>
+        <location line="+1"/>
         <source>curve %1</source>
         <translation>Kurve %1</translation>
     </message>
     <message>
-        <location line="-1093"/>
+        <location line="-1105"/>
         <source>Plotting Tools</source>
         <translation type="unfinished">Symbolleiste</translation>
     </message>
@@ -1095,7 +1098,7 @@
         <translation type="unfinished">Grauwert</translation>
     </message>
     <message>
-        <location line="+634"/>
+        <location line="+642"/>
         <location line="+12"/>
         <source>gray</source>
         <translation type="unfinished">grau</translation>
@@ -1160,7 +1163,7 @@
         <translation>z-Achse</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-894"/>
+        <location filename="../plot1DWidget.cpp" line="-902"/>
         <source>Plot1D</source>
         <translation>Plot1D</translation>
     </message>

@@ -186,13 +186,13 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+922"/>
-        <location line="+8"/>
+        <location filename="../itom2dqwtplot.cpp" line="+926"/>
+        <location line="+12"/>
         <source>Linecut</source>
         <translation>Linienschnitt</translation>
     </message>
     <message>
-        <location line="-140"/>
+        <location line="-148"/>
         <source>Could not spawn lineCut due to missing API-handle</source>
         <translation>Linienschnitt konnte nicht erzeugt werden, API-Handle wurde nicht gefunden</translation>
     </message>
@@ -207,7 +207,7 @@
         <translation>Z-Stapel</translation>
     </message>
     <message>
-        <location line="+212"/>
+        <location line="+224"/>
         <source>Set lineCut coordinates failed. Widget not ready.</source>
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Widget nicht bereit.</translation>
     </message>
@@ -264,7 +264,7 @@
 <context>
     <name>ItomQwtPlot</name>
     <message>
-        <location filename="../../sharedFiles/itomQwtPlot.cpp" line="+234"/>
+        <location filename="../../sharedFiles/itomQwtPlot.cpp" line="+236"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -723,12 +723,12 @@
         <translation type="unfinished">Die Position kann nicht angezeigt werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+101"/>
+        <location line="+102"/>
         <source>The style tag does not correspond to the required format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</source>
         <translation type="unfinished">Die Stil-Bezeichnung entspricht nicht dem erforderlichen Format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</translation>
     </message>
     <message>
-        <location line="+83"/>
+        <location line="+81"/>
         <source>No marker with id &apos;%1&apos; found.</source>
         <translation type="unfinished">Der Marker mit der ID &apos;%1&apos; wurde nicht gefunden.</translation>
     </message>
@@ -951,7 +951,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-1051"/>
+        <location filename="../itom2dqwtplot.cpp" line="-1063"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
     </message>
