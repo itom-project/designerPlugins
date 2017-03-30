@@ -2454,7 +2454,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     if (points.size() > 1)
     {
         coords = QString("[%1; %2]\n[%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
-        offsets = QString(" width: %1\n height: %2").arg(points[1].rx() - points[0].rx(),0,'g',4).arg(points[1].ry() - points[0].ry(), 0, 'g', 4);
+        offsets = QString(" width: %1\n height: %2").arg(points[1].rx() - points[0].rx(),0,'f',2).arg(points[1].ry() - points[0].ry(), 0, 'f', 2);
 		if (((Itom1DQwtPlot*)(this->parent()))->pickerWidget())
 		{
 			(((Itom1DQwtPlot*)(this->parent()))->pickerWidget())->updatePickers(idcs, points);
