@@ -139,6 +139,9 @@ class PlotCanvas : public ItomQwtPlot
         void home();
         void setColorDataTypeRepresentation(bool colorOn);
 
+        void lineCutMovedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
+        void lineCutAppendedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
+
     private:
         void createActions();
 
@@ -208,8 +211,8 @@ class PlotCanvas : public ItomQwtPlot
     private slots:
         void zStackCutTrackerMoved(const QPoint &pt);
         void zStackCutTrackerAppended(const QPoint &pt);
-        void lineCutMoved(const QPoint &pt);
-        void lineCutAppended(const QPoint &pt);
+        void lineCutMovedPx(const QPoint &pt); //pt is in canvas coordinates (pixel)
+        void lineCutAppendedPx(const QPoint &pt); //pt is in canvas coordinates (pixel)
 
         void mnuScaleSettings();
         void mnuCmplxSwitch(QAction*);

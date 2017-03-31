@@ -171,8 +171,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_pLineCutPicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
     m_pLineCutPicker->setKeyPattern(QwtEventPattern::KeyUp, 0);
     m_pLineCutPicker->setKeyPattern(QwtEventPattern::KeyDown, 0);
-    connect(m_pLineCutPicker, SIGNAL(moved(const QPoint&)), SLOT(lineCutMoved(const QPoint&)));
-    connect(m_pLineCutPicker, SIGNAL(appended(const QPoint&)), SLOT(lineCutAppended(const QPoint&)));
+    connect(m_pLineCutPicker, SIGNAL(moved(const QPoint&)), SLOT(lineCutMovedPx(const QPoint&)));
+    connect(m_pLineCutPicker, SIGNAL(appended(const QPoint&)), SLOT(lineCutAppendedPx(const QPoint&)));
 
     //line for line picking
     m_pLineCutLine = new QwtPlotCurve();
@@ -1801,25 +1801,35 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::lineCutMoved(const QPoint &pt)
+void PlotCanvas::lineCutMovedPx(const QPoint &pt)
 {
-    QVector<QPointF> pts;
-    pts.resize(2);
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    lineCutMovedPhys(phys);
+}
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::lineCutMovedPhys(const QPointF &pt)
+{
     if (state() == stateLineCut)
     {
-        QwtInterval xInterval = m_rasterData->interval(Qt::XAxis); 
+        QVector<QPointF> pts;
+        pts.resize(2);
+
+        QwtInterval xInterval = m_rasterData->interval(Qt::XAxis);
         QwtInterval yInterval = m_rasterData->interval(Qt::YAxis);
 
         if (m_pLineCutLine->dataSize() > 0)
+        {
             pts[0] = m_pLineCutLine->sample(0);
+        }
         else
+        {
             return;
+        }
 
         if (m_lineCutValidStart)
         {
-            pts[1].setY(invTransform(QwtPlot::yLeft, pt.y()));
-            pts[1].setX(invTransform(QwtPlot::xBottom, pt.x()));
+            pts[1] = pt;
 
             if (!xInterval.contains(pts[1].x()) || !yInterval.contains(pts[1].y()))
             {
@@ -1828,7 +1838,7 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
                 QPointF lt(xInterval.minValue(), yInterval.maxValue());
                 QPointF rb(xInterval.maxValue(), yInterval.minValue());
                 QPointF lb(xInterval.minValue(), yInterval.minValue());
-                
+
                 if ((pts[1].x() < pts[0].x()) && lineIntersection(pts[1], pts[0], lt, lb, intersection))
                 {
                     //try if pts[1] - pts[0] intersects with left border
@@ -1867,26 +1877,25 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
 
             setCoordinates(pts, true);
 
-            if(m_dObjPtr && m_dObjPtr->getDims() > 2)
+            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
-                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
             }
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
-			{
-				QVector4D vec;
-				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
-			}
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+            }
             replot();
         }
         else //first point is still not valid, try to find a valid first point
         {
             QPointF pts0 = pts[0];
 
-            pts[0].setY(invTransform(QwtPlot::yLeft, pt.y()));
-            pts[0].setX(invTransform(QwtPlot::xBottom, pt.x()));
+            pts[0] = pt;
 
             if (m_rasterData->pointValid(pts[0]))
             {
@@ -1898,7 +1907,7 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
                 QPointF lt(xInterval.minValue(), yInterval.maxValue());
                 QPointF rb(xInterval.maxValue(), yInterval.minValue());
                 QPointF lb(xInterval.minValue(), yInterval.minValue());
-                
+
                 if (lineIntersection(pts[0], pts0, lt, lb, intersection))
                 {
                     //try if pts[1] - pts[0] intersects with left border
@@ -1936,34 +1945,39 @@ void PlotCanvas::lineCutMoved(const QPoint &pt)
             setCoordinates(pts, true);
 
             // check for m_dObjPtr first otherwise crash
-            if(m_dObjPtr && m_dObjPtr->getDims() > 2)
+            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
-                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
             }
 
             ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
-			{
-				QVector4D vec;
-				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
-			}
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+            }
             replot();
         }
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::lineCutAppended(const QPoint &pt)
+void PlotCanvas::lineCutAppendedPx(const QPoint &pt)
 {
-    QVector<QPointF> pts;
-    pts.resize(2);
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    lineCutAppendedPhys(phys);
+}
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::lineCutAppendedPhys(const QPointF &pt)
+{
     if (state() == stateLineCut && m_dObjPtr)
     {
-        pts[0].setY(invTransform(QwtPlot::yLeft, pt.y()));
-        pts[0].setX(invTransform(QwtPlot::xBottom, pt.x()));
+        QVector<QPointF> pts;
+        pts.resize(2);
+        pts[0] = pt;
 
         if (m_rasterData->pointValid(pts[0]))
         {
@@ -1983,19 +1997,19 @@ void PlotCanvas::lineCutAppended(const QPoint &pt)
         setCoordinates(pts, true);
 
         // check for m_dObjPtr first otherwise crash
-        if(m_dObjPtr && m_dObjPtr->getDims() > 2)
+        if (m_dObjPtr && m_dObjPtr->getDims() > 2)
         {
-            pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
+            pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
         }
-        
+
         ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-		if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
-		{
-			QVector4D vec;
-			if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-			else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-			(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
-		}
+        if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+        {
+            QVector4D vec;
+            if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+            else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+            (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+        }
 
         replot();
     }
@@ -2174,10 +2188,8 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
         return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
     }
 
-    QPoint first(transform(QwtPlot::xBottom, x0), transform(QwtPlot::yLeft, y0));
-    QPoint second(transform(QwtPlot::xBottom, x1), transform(QwtPlot::yLeft, y1));
-    lineCutAppended(first);
-    lineCutMoved(second);
+    lineCutAppendedPhys(QPointF(x0, y0));
+    lineCutMovedPhys(QPointF(x1,y1));
 
     return ito::retOk;
 }
@@ -2287,7 +2299,7 @@ void PlotCanvas::mnuLineCutMode(QAction *action)
     switch (action->data().toInt())
     {
     default:
-    case 0:
+    case 0: //interactive line
         if (ito::isFinite(min) && ito::isFinite(max))
         {
 
@@ -2381,32 +2393,44 @@ void PlotCanvas::mnuLineCutMode(QAction *action)
             */
         }
         break;
-    case 1:
+    case 1: //horizontal line through global minimum
         if (ito::isFinite(min) && ito::isFinite(max))
         {
+            QwtInterval xIntervalDataObj = m_rasterData->interval(Qt::XAxis);
+            x.setMinimum(std::max((double)x.minimum(), xIntervalDataObj.minValue()));
+            x.setMaximum(std::min((double)x.maximum(), xIntervalDataObj.maxValue()));
             y.setMinimum(minLoc[1]);
             y.setMaximum(minLoc[1]);
         }
         break;
-    case 2:
+    case 2: //horizontal line through global maximum
         if (ito::isFinite(min) && ito::isFinite(max))
         {
+            QwtInterval xIntervalDataObj = m_rasterData->interval(Qt::XAxis);
+            x.setMinimum(std::max((double)x.minimum(), xIntervalDataObj.minValue()));
+            x.setMaximum(std::min((double)x.maximum(), xIntervalDataObj.maxValue()));
             y.setMinimum(maxLoc[1]);
             y.setMaximum(maxLoc[1]);
         }
         break;
 
-    case 3:
+    case 3: //vertical line through global minimum
         if (ito::isFinite(min) && ito::isFinite(max))
         {
+            QwtInterval yIntervalDataObj = m_rasterData->interval(Qt::YAxis);
+            y.setMinimum(std::max((double)y.minimum(), yIntervalDataObj.minValue()));
+            y.setMaximum(std::min((double)y.maximum(), yIntervalDataObj.maxValue()));
             x.setMinimum(minLoc[2]);
             x.setMaximum(minLoc[2]);
         }
         break;
 
-    case 4:
+    case 4: //vertical line through global maximum
         if (ito::isFinite(min) && ito::isFinite(max))
         {
+            QwtInterval yIntervalDataObj = m_rasterData->interval(Qt::YAxis);
+            y.setMinimum(std::max((double)y.minimum(), yIntervalDataObj.minValue()));
+            y.setMaximum(std::min((double)y.maximum(), yIntervalDataObj.maxValue()));
             x.setMinimum(maxLoc[2]);
             x.setMaximum(maxLoc[2]);
         }
