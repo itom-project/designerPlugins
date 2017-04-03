@@ -719,19 +719,23 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
                 maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
                 //item->setLegendIconSize(QSize(8,24));
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
-                //set font
-                QwtText text(legendLabel->data().title());
-                text.setFont(m_legendFont);
-                legendLabel->setText(text);
 
-
-                //TODO: the following connection is lost once the single legend entry becomes invisible. If it is displayed again, the signal is not re-established. Changing the legend-position
-                //re-connects it again!
-				connect(legendLabel, SIGNAL(checked(bool)), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
                 if (legendLabel)
                 {
-                    //the check status is again set in QwtPlotCurveProperty::setLegendVisible
-                    legendLabel->setChecked(item->isVisible());
+                    //set font
+                    QwtText text(legendLabel->data().title());
+                    text.setFont(m_legendFont);
+                    legendLabel->setText(text);
+
+
+                    //TODO: the following connection is lost once the single legend entry becomes invisible. If it is displayed again, the signal is not re-established. Changing the legend-position
+                    //re-connects it again!
+                    connect(legendLabel, SIGNAL(checked(bool)), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
+                    if (legendLabel)
+                    {
+                        //the check status is again set in QwtPlotCurveProperty::setLegendVisible
+                        legendLabel->setChecked(item->isVisible());
+                    }
                 }
             }
 
@@ -789,9 +793,12 @@ void Plot1DWidget::setLegendFont(const QFont &font)
         foreach(QwtPlotCurve *item, m_plotCurveItems)
         {
             legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
-            QwtText text(legendLabel->data().title());
-            text.setFont(m_legendFont);
-            legendLabel->setText(text);
+            if (legendLabel)
+            {
+                QwtText text(legendLabel->data().title());
+                text.setFont(m_legendFont);
+                legendLabel->setText(text);
+            }
         }
     }
     
@@ -812,9 +819,12 @@ void Plot1DWidget::applyLegendFont()
             if (item->testItemAttribute(QwtPlotItem::Legend) == true)
             {
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
-                QwtText text(legendLabel->data().title());
-                text.setFont(m_legendFont);
-                legendLabel->setText(text);
+                if (legendLabel)
+                {
+                    QwtText text(legendLabel->data().title());
+                    text.setFont(m_legendFont);
+                    legendLabel->setText(text);
+                }
             }
         }
     }
