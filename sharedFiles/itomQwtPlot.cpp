@@ -873,6 +873,10 @@ void ItomQwtPlot::setState(int state)
             canvas()->setCursor(Qt::CrossCursor);
             break;
         }
+
+        default:
+            canvas()->setCursor(Qt::ArrowCursor);
+            break;
         }
 
         m_state = state;
