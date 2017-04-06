@@ -2547,6 +2547,19 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
                 file.close();
             }
         }
+        else
+        {
+            //check if the file can be created and written by creating a "dummy"-file:
+            QFile file(fileName);
+            if (!file.open(QIODevice::WriteOnly))
+            {
+                return ito::RetVal::format(ito::retError, 0, tr("The file '%s' cannot be created. Check the filename and the required permissions.").toLatin1().data(),
+                    fileName.toLatin1().data());
+            }
+            file.close();
+            file.remove();
+            
+        }
     }
 
     ItomQwtDObjFigure* hMyParent = (ItomQwtDObjFigure*)parent();
