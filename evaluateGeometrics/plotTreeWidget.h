@@ -181,8 +181,8 @@ class PlotTreeWidget : public QTreeWidget
 
     signals:
 
-    public slots:
-
+    public slots :
+        void itemPressed(QTreeWidgetItem *item, int column);
 };
 
 

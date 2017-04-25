@@ -62,6 +62,8 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     setColumnWidth(4, 48);
     
     setIconSize(QSize(24, 24));
+
+    connect(this, SIGNAL(itemPressed(QTreeWidgetItem*,int)), SLOT(itemPressed(QTreeWidgetItem*,int)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -829,6 +831,7 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
 
     if (!identical)
     {
+        // check for stale elements and remove them
         for (int dcnt = 0; dcnt < hashKeys.size(); dcnt++)
         {
             found = false;
@@ -892,18 +895,7 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
         this->clear();
     }
 
-    if (identical)
-    {
-        QList<ito::int32> hashTags = m_rowHash.keys();
-
-        for (int dcnt = 0; dcnt < hashTags.size(); dcnt++)
-        {
-            m_rowHash[hashTags[dcnt]] = shapes[dcnt];
-            displayShape(dcnt, true, m_rowHash[hashTags[dcnt]]);
-        }
-        updateRelationShips(true);
-    }
-    else if (changed)
+    if (changed)
     {
         this->clear();
         QList<ito::int32> hashTags = m_rowHash.keys();
@@ -920,7 +912,20 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
     }
     else
     {
+        // if we don't do this in case of identical, altered coordinates of elements
+        // do not get displayed
+        QList<ito::int32> hashTags = m_rowHash.keys();
+
+        for (int dcnt = 0; dcnt < hashTags.size(); dcnt++)
+        {
+            m_rowHash[hashTags[dcnt]] = shapes[dcnt];
+            displayShape(dcnt, true, m_rowHash[hashTags[dcnt]]);
+        }
         updateRelationShips(true);
+
+        QStringList headers;
+        headers << "item" << "" << "" << "" << "";
+        this->setHeaderLabels(headers);
     }
 
     expandAll();
@@ -1291,6 +1296,67 @@ ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx, const ito::Shap
 
     updateRelationShips(true);
     return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotTreeWidget::itemPressed(QTreeWidgetItem *item, int column)
+{
+    QStringList headers;
+    // simple elements first
+    if (item->text(0).startsWith("point"))
+    {
+        headers << "Item" << "x, y" << "" << "" << "";
+    }
+    else if (item->text(0).startsWith("line"))
+    {
+        headers << "Item" << "x0, y0" << "X1/Y1" << "" << "";
+    }
+    else if (item->text(0).startsWith("square"))
+    {
+        headers << "Item" << "x0, y0" << "x1, y1" << "" << "";
+    }
+    else if (item->text(0).startsWith("rectangle"))
+    {
+        headers << "Item" << "x0, y0" << "x1, y1" << "" << "";
+    }
+    else if (item->text(0).startsWith("circle"))
+    {
+        headers << "Item" << "cx, cy" << "radius" << "" << "";
+    }
+    else if (item->text(0).startsWith("ellipse"))
+    {
+        headers << "Item" << "cx, cy" << "rx, ry" << "" << "";
+    }
+    // now relations
+    else if (item->text(0).startsWith("distance"))
+    {
+        headers << "Item" << "Item2" << "d" << "" << "";
+    }
+    else if (item->text(0).startsWith("length"))
+    {
+        headers << "Item" << "" << "l" << "" << "";
+    }
+    else if (item->text(0).startsWith("radius"))
+    {
+        headers << "Item" << "" << "r" << "" << "";
+    }
+    else if (item->text(0).startsWith("area"))
+    {
+        headers << "Item" << "" << "a" << "" << "";
+    }
+    else if (item->text(0).startsWith("angle"))
+    {
+        headers << "Item" << "Item2" << "phi" << "" << "";
+    }
+    else if (item->text(0).startsWith("intersection"))
+    {
+        headers << "Item" << "Item2" << "x, y" << "" << "";
+    }
+    else
+    {
+        headers << "item" << "" << "" << "" << "";
+    }
+    this->setHeaderLabels(headers);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
