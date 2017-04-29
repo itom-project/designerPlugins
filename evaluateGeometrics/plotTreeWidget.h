@@ -155,6 +155,7 @@ class PlotTreeWidget : public QTreeWidget
         void setShapes(const QVector<ito::Shape> &shapes);
         void updateGeometricShapes();                                                 /*! force a replot of all primitives and its relations */
         void autoFitCols();                                                           /*! calculate the idle width of the widget columns */
+        void contextMenuEvent(QContextMenuEvent *event);                              //!> context, i.e. right click menu
 
     private:
         void updateRelationShips(const bool fastUpdate);                                /*! force an update of all relation ships. */

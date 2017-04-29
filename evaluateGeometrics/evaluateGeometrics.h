@@ -94,6 +94,13 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
     Q_CLASSINFO("slot://geometricShapeChanged", "Slot for c++ internal communication between a plot an this widget")
     Q_CLASSINFO("slot://clearAll", "Delete all relations and geometric elements")
 
+    Q_CLASSINFO("signal://fitToObject", "This signal is emitted when the users requests a fit via context menu\n"
+    "\n"
+    "Parameters\n"
+    "-------------\n"
+    "currentItem : {int}\n"
+    "    currently selected item in the table (index), which should be fitted")
+
     DESIGNER_PLUGIN_ITOM_API
 
     public:
@@ -170,6 +177,7 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         QAction *m_actRemoveRel;
         QAction *m_actUpdate;
         QAction *m_actAutoFitCols;
+        QAction *m_actFitToObject;
         QMenu   *m_mnuSaveSwitch;
 
         QString m_lastFolder;
@@ -195,6 +203,10 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         void mnuExport(QAction* action);
         void mnuAddRelation();
         void mnuDeleteRelation();
+        void mnuFitToObject();
+
+    signals:
+        void fitToObject(const int currentItem);
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

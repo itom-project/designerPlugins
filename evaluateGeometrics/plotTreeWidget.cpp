@@ -58,10 +58,11 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     setColumnWidth(0, 142);
     setColumnWidth(1, 72);
     setColumnWidth(2, 72);
-    setColumnWidth(3, 48);
-    setColumnWidth(4, 48);
+    setColumnWidth(3, 72);
+    setColumnWidth(4, 72);
     
     setIconSize(QSize(24, 24));
+
 
     connect(this, SIGNAL(itemPressed(QTreeWidgetItem*,int)), SLOT(itemPressed(QTreeWidgetItem*,int)));
 }
@@ -69,7 +70,6 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotTreeWidget::~PlotTreeWidget()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -599,7 +599,6 @@ bool PlotTreeWidget::calculateAngle(const ito::Shape &first, const ito::Shape &s
         angle = line1.angleTo(line2);
         return true;
     }
-
     angle = quietNaN;
     return false;
 }
@@ -918,7 +917,8 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
 
         for (int dcnt = 0; dcnt < hashTags.size(); dcnt++)
         {
-            m_rowHash[hashTags[dcnt]] = shapes[dcnt];
+            //m_rowHash[hashTags[dcnt]] = shapes[dcnt];
+            m_rowHash[shapes[dcnt].index()] = shapes[dcnt];
             displayShape(dcnt, true, m_rowHash[hashTags[dcnt]]);
         }
         updateRelationShips(true);
@@ -1357,6 +1357,17 @@ void PlotTreeWidget::itemPressed(QTreeWidgetItem *item, int column)
         headers << "item" << "" << "" << "" << "";
     }
     this->setHeaderLabels(headers);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotTreeWidget::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    foreach(QAction *act, m_contextMenu->actions())
+    {
+        menu.addAction(act);
+    }
+    menu.exec(event->globalPos());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

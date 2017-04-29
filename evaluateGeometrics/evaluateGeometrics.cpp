@@ -46,6 +46,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actRemoveRel(NULL),
     m_actUpdate(NULL),
     m_actAutoFitCols(NULL),
+    m_actFitToObject(NULL),
     m_mnuSaveSwitch(NULL),
     m_lastFolder(""),
     m_lastAddedRelation(-1)
@@ -96,6 +97,11 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actAutoFitCols->setToolTip(tr("Adapts columns to idle width."));
     connect(m_actAutoFitCols, SIGNAL(triggered()), this, SLOT(mnuAutoFitCols()));
 
+    // m_actFitToObject
+    m_actFitToObject = new QAction(QIcon("./itomDesignerPlugins/plot/icons/autoscal.png"), tr("Fit currently marked shape to unerlying data"), this);
+    m_actFitToObject->setObjectName("actFitToObject");
+    m_actFitToObject->setToolTip(tr("Fit currently marked shape to unerlying data"));
+    connect(m_actFitToObject, SIGNAL(triggered()), this, SLOT(mnuFitToObject()));
 
     QToolBar *toolbar = new QToolBar(tr("basic options"), this);
     addToolBar(toolbar, "mainToolBar");
@@ -106,6 +112,8 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     contextMenu->addAction(m_actSetting);
     contextMenu->addSeparator();
     contextMenu->addAction(toolbar->toggleViewAction());
+    contextMenu->addSeparator();
+    contextMenu->addAction(m_actFitToObject);
 
     // first block is zoom, scale settings, home
     toolbar->addAction(m_actSave);
@@ -169,6 +177,12 @@ EvaluateGeometricsFigure::~EvaluateGeometricsFigure()
     {
         m_actSave->deleteLater();
         m_actSave = NULL;
+    }
+
+    if (m_actFitToObject)
+    {
+        m_actFitToObject->deleteLater();
+        m_actFitToObject = NULL;
     }
 }
 
@@ -753,6 +767,13 @@ void EvaluateGeometricsFigure::mnuAutoFitCols()
     {
         m_pContent->autoFitCols();
     }
+}
+
+//---------------------------------------------------------------------------------------------------------
+void EvaluateGeometricsFigure::mnuFitToObject()
+{
+    int currentItem = getCurrentItem();
+    emit fitToObject(currentItem);
 }
 
 //---------------------------------------------------------------------------------------------------------
