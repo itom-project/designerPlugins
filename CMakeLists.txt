@@ -16,7 +16,7 @@ OPTION(PLUGIN_motorController "Build with this solution." ON)
 OPTION(PLUGIN_dataObjectTable "Build with this solution." ON)
 OPTION(PLUGIN_dObMetaDataTable "Build with this solution." ON)
 OPTION(PLUGIN_evaluateGeometrics "Build with this solution." ON)
-OPTION(PLUGIN_vtk3dVisualizer "Build with this solution." OFF)
+OPTION(PLUGIN_vtk3dVisualizer "Build with this solution." ON)
 OPTION(PLUGIN_slider2D "Build with this solution." ON)
 
 if (PLUGIN_itom1DQwtPlot OR PLUGIN_itom2DQwtPlot)
