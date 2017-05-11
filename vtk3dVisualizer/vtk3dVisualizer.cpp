@@ -233,9 +233,12 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     d->cubeAxesActor->DrawXGridlinesOff();
     d->cubeAxesActor->DrawYGridlinesOff();
     d->cubeAxesActor->DrawZGridlinesOff();
-#if VTK_MAJOR_VERSION > 5
+
+#if VTK_MAJOR_VERSION >= 7 && VTK_MINOR_VERSION > 0
+    d->cubeAxesActor->SetGridLineLocation(vtkCubeAxesActor::VTK_GRID_LINES_FURTHEST);
+#else VTK_MAJOR_VERSION > 5
     d->cubeAxesActor->SetGridLineLocation(VTK_GRID_LINES_FURTHEST);
-#endif
+#endif	
 
     d->cubeAxesActor->XAxisMinorTickVisibilityOff();
     d->cubeAxesActor->YAxisMinorTickVisibilityOff();
