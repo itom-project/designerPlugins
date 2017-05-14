@@ -296,6 +296,10 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
                         m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
                         m_d.matStepSize= (int)mat->step[1] ; //step in x-direction (in bytes)
+                        if (dataObj->getType() == 5) //since uint32 is not supported by openCV the step method returns the wrong result
+                        {
+                            m_d.matStepSize = 4;
+                        }
                     }
                     else
                     {
