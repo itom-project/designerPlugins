@@ -88,6 +88,8 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         void beginSampling(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect);
         void endSampling();
 
+        QPoint indexRange(const QwtScaleMap &xMap, bool clipMargin) const; //!< returns first and last sample index, that is contained within xMap (physical values). If clipMargin is false, first and last are the closest values to xMap which are not contained in xMap (e.g. for polygonal drawings to see the line going out of the window)
+
         QPointF sample(size_t n) const;
         QRectF boundingRect() const;
         RetVal getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const;

@@ -86,7 +86,24 @@ void QwtPlotCurveDataObject::draw( QPainter *painter, const QwtScaleMap &xMap, c
     if (myData && myData->isDobjInit())
     {
         myData->beginSampling(xMap, yMap, canvasRect);
-        drawSeries( painter, xMap, yMap, canvasRect, 0, -1 );
+
+        if ( testPaintAttribute(ClipPolygons) ) //d_data->paintAttributes & ClipPolygons )
+        {
+            QPoint indices = myData->indexRange(xMap, false);
+            if (indices.ry() >= indices.rx())
+            {
+                drawSeries( painter, xMap, yMap, canvasRect, indices.rx(), indices.ry() );
+            }
+            else
+            {
+                drawSeries( painter, xMap, yMap, canvasRect, 0, -1 );
+            }
+        }
+        else
+        {
+            drawSeries( painter, xMap, yMap, canvasRect, 0, -1 );
+        }
+
         myData->endSampling();
     }
 }
@@ -230,10 +247,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
             if ( doAlign )
             {
                 x = qRound( x );
-                //if(qIsFinite(y))
-                //{
                 y = qRound( y );
-                //}
             }
 
             points[i - from].rx() = x;

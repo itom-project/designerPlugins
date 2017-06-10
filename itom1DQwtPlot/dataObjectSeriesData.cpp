@@ -852,6 +852,26 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+QPoint DataObjectSeriesData::indexRange(const QwtScaleMap &xMap, bool clipMargin) const
+{
+    if (m_pDataObj && m_d.valid && m_d.points.size() == 0)
+    {
+        int start, end;
+        double xMapStartPhys = std::min(xMap.s1(), xMap.s2());
+        double xMapEndPhys = std::max(xMap.s1(), xMap.s2());
+        double start_ = (xMapStartPhys - m_d.startPhys) / m_d.stepSizePhys;
+        double end_ = (xMapEndPhys - m_d.startPhys) / m_d.stepSizePhys;
+        start = clipMargin ? qBound(0, qCeil(start_), m_d.nrPoints - 1) : qBound(0, qCeil(start_) - 1, m_d.nrPoints - 1);
+        end = clipMargin ? qBound(start, qFloor(end_), m_d.nrPoints - 1) : qBound(start, qFloor(end_) + 1, m_d.nrPoints - 1);
+        return QPoint(start, end);
+    }
+    else
+    {
+        return QPoint(0, m_d.points.size() - 1);
+    }        
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QPointF DataObjectSeriesData::sample(size_t n) const
 {
     const cv::Mat *mat;
