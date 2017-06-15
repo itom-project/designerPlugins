@@ -172,6 +172,99 @@ void QwtPlotCurveDataObject::drawSeries( QPainter *painter, const QwtScaleMap &x
         }
     }
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QPolygonF QwtPlotCurveDataObject::reducePoints(const QPolygonF &polyline, const QwtScaleMap &xMap, bool doAlign) const
+{
+    int canvas_pixel_size = qRound(xMap.pDist());
+    int polyline_size = polyline.size() - 2; //start and end of polyline is always included
+
+    if (polyline_size > 2)
+    {
+        qreal start = qMax(xMap.p1(), polyline.first().x());
+        qreal end = qMin(xMap.p2(), polyline.last().x());
+        if (qIsFinite(start) && qIsFinite(end))
+        {
+            canvas_pixel_size = qAbs(end - start);
+        }
+    }
+
+    canvas_pixel_size = std::max(canvas_pixel_size, 100);
+
+    //xMap.pDist() is the width (in pixel) of the area, where polyline should be displayed.
+    /*If polyline contains less than 10 times this width, nothing is filtered.
+    Else: It is desired to place about two points per pixel, one point contains
+    the minimum value in each range around this point and one the local maximum.*/
+    if (!doAlign || polyline_size < 10 * canvas_pixel_size)
+    {
+        return polyline;
+    }
+
+    
+    int chunkSize = polyline_size / canvas_pixel_size;
+    int halfChunk = chunkSize / 2;
+    canvas_pixel_size *= 2;
+    if (qRound(xMap.pDist()) % chunkSize != 0)
+    {
+        canvas_pixel_size += 2;
+    }
+
+    QPolygonF polyline2;
+    polyline2.reserve(canvas_pixel_size);
+    const QPointF *data = polyline.constData();
+
+    //add startpoint
+    polyline2 << data[0];
+    ++data;
+
+    QPointF pmin, pmax;
+    int i = 0;
+    int j;
+    int chunk = chunkSize;
+
+    while (i < polyline_size)
+    {
+        if (chunkSize >= polyline_size - i)
+        {
+            chunk = polyline_size - i;
+            halfChunk = chunk / 2;
+        }
+
+        pmin = data[0];
+        pmax = data[halfChunk];
+
+        for (j = 0; j < chunk; ++j)
+        {
+            if (data[j].y() < pmin.ry())
+            {
+                pmin = data[j];
+            }
+
+            if (data[j].y() > pmax.ry())
+            {
+                pmax = data[j];
+            }
+        }
+
+        i += chunk;
+        data += chunk;
+        
+        if (pmin.rx() < pmax.rx())
+        {
+            polyline2 << pmin << pmax;
+        }
+        else
+        {
+            polyline2 << pmax << pmin;
+        }
+    }
+
+    //add last point
+    polyline2 << polyline.last();
+
+    return polyline2;
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, int from, int to ) const
 {
@@ -207,6 +300,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
                 }
                 else
                 {
+                    polyline = reducePoints(polyline, xMap, doAlign);
                     drawPolyline(painter,polyline,xMap,yMap,canvasRect);
                     polyline.clear();
                 }
@@ -221,6 +315,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
                 }
                 else
                 {
+                    polyline = reducePoints(polyline, xMap, doAlign);
                     drawPolyline(painter,polyline,xMap,yMap,canvasRect);
                     polyline.clear();
                 }
@@ -229,6 +324,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
 
         if(polyline.size() > 0)
         {
+            polyline = reducePoints(polyline, xMap, doAlign);
             drawPolyline(painter,polyline,xMap,yMap,canvasRect);
             polyline.clear();
         }
@@ -254,6 +350,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
             points[i - from].ry() = y;
         }
 
+        polyline = reducePoints(polyline, xMap, doAlign);
         drawPolyline(painter, polyline, xMap, yMap, canvasRect);
     }
 }
@@ -327,6 +424,7 @@ void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &sy
 
         if(polyline.size() > 0)
         {
+            polyline = reducePoints(polyline, xMap, doAlign);
             symbol.drawSymbols( painter, polyline );
             polyline.clear();
         }
@@ -345,16 +443,14 @@ void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &sy
             if ( doAlign )
             {
                 x = qRound( x );
-                //if(qIsFinite(y))
-                //{
                 y = qRound( y );
-                //}
             }
 
             points[i - from].rx() = x;
             points[i - from].ry() = y;
         }
 
+        polyline = reducePoints(polyline, xMap, doAlign);
         symbol.drawSymbols( painter, polyline );
     }
 }

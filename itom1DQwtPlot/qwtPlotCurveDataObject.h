@@ -73,6 +73,8 @@ protected:
     void closePolyline( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, QPolygonF &polygon ) const;
     void fillCurve( QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect, QPolygonF &polygon ) const;
 
+    QPolygonF reducePoints(const QPolygonF &polygon, const QwtScaleMap &xMap, bool doAlign) const;
+
 private:
     //this is a hack in order to access PrivateData
     QBrush m_privBrush;
