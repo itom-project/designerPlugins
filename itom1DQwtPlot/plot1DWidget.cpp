@@ -153,7 +153,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_colorList.append("#fb9a99");
     m_colorList.append("#fdbf6f");
     m_colorList.append("#cab2d6");
-    m_colorList.append("#ffff99");
+    m_colorList.append("#fdff7a"); //("#ffff99");
     
     //value picker
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
