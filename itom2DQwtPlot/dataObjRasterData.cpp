@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2012, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2017, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -161,7 +161,10 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
 
             if (planeIdx == -1)
             {
-                m_D.m_planeIdx = 0;
+                if ((m_dataHash != dataHash) || (m_D.m_planeIdx < 0))
+                {
+                    m_D.m_planeIdx = 0;
+                }
             }
         }
 
