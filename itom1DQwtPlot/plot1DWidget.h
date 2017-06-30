@@ -81,6 +81,7 @@ class Plot1DWidget : public ItomQwtPlot
         ito::RetVal clearPicker(int id = -1, bool doReplot = true);
 
         void setLegendPosition(LegendPosition position, bool visible);
+		void setLegendLabelWidth(const int &width);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
 		void toggleLegendLabel(QwtPlotCurve* curve, const bool state);
         void setLegendFont(const QFont &font);
@@ -200,6 +201,7 @@ class Plot1DWidget : public ItomQwtPlot
         
         LegendPosition m_legendPosition;
         bool m_legendVisible;
+		int m_pLegendLabelWidth;
 
         ItomQwtPlotEnums::CurveStyle m_qwtCurveStyle;
 

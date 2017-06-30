@@ -728,7 +728,23 @@ void Itom1DQwtPlot::setLegendPosition(LegendPos legendPosition)
 
     updatePropertyDock();
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setLegendLabelWidth(const int& len)
+{
+	if (m_pContent)
+	{
+		m_pContent->setLegendLabelWidth(len);
+		updatePropertyDock();
+	}
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+int Itom1DQwtPlot::getLegendLabelWidth() const
+{
+	if (m_pContent)
+	{
+		return m_pContent->m_pLegendLabelWidth;
+	}
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 QStringList Itom1DQwtPlot::getLegendTitles() const
 {

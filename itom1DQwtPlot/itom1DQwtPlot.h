@@ -91,6 +91,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
 
     Q_PROPERTY(bool antiAliased READ getAntiAliased WRITE setAntiAliased DESIGNABLE true USER true);
+	Q_PROPERTY(int legendLabelWidth READ getLegendLabelWidth WRITE setLegendLabelWidth USER true);
 	
 
 
@@ -132,6 +133,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     Q_CLASSINFO("prop://legendPosition", "Position of the legend (Off, Left, Top, Right, Bottom)")
     Q_CLASSINFO("prop://legendTitles", "Seq. of strings with the legend titles for all curves. If no legends are given, the dataObject is checked for tags named 'legendTitle0', 'legendTitle1'... If these tags are not given, the default titles 'curve 0', 'curve 1'... are taken.")
+	Q_CLASSINFO("prop://legendLabelWidth", "Defines the width of a legend label. This can be used to create a longer line in legend entries. The minimal size is 10")
 
     Q_CLASSINFO("prop://pickerLabelVisible", "Enable and disable the labels next to each picker.")
     Q_CLASSINFO("prop://pickerLabelOrientation", "Get / set the label orientation for the picker labels.")
@@ -372,6 +374,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
 
 		QWidget* getWidgetCurveProperties();
+
+		int getLegendLabelWidth() const;
+		void setLegendLabelWidth(const int& length);
 		
         friend Plot1DWidget;
 

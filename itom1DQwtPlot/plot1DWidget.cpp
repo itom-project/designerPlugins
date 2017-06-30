@@ -82,6 +82,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_gridStyle(Itom1DQwtPlot::GridNo),
         m_legendPosition(BottomLegend),
         m_legendVisible(false),
+		m_pLegendLabelWidth(15),
         m_qwtCurveStyle(ItomQwtPlotEnums::Lines),
         m_baseLine(0.0),
         m_fillCurveAlpa(128),
@@ -348,6 +349,7 @@ ito::RetVal Plot1DWidget::init()
         m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>();
 
         m_legendFont = apiGetFigureSetting(parent(), "legendFont", m_legendFont, &retVal).value<QFont>();
+		m_pLegendLabelWidth = apiGetFigureSetting(parent(), "legendLabelWidth", m_pLegendLabelWidth, &retVal).value<int>();
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -710,14 +712,13 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
         if (m_pLegend)
         {
             QwtLegendLabel *legendLabel = NULL;
-            QSize maxLegendIconSize(0,0);
+            QSize maxLegendIconSize(m_pLegendLabelWidth,0);
             foreach (QwtPlotCurve *item, m_plotCurveItems)
             {
                 item->setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
                 item->setLegendAttribute(QwtPlotCurve::LegendShowSymbol, true);
                 maxLegendIconSize.rheight() = std::max(maxLegendIconSize.height(), item->legendIconSize().height());
-                maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
-                //item->setLegendIconSize(QSize(8,24));
+                //maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
                 legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
 
                 if (legendLabel)
@@ -739,9 +740,12 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
                 }
             }
 
+			//maxLegendIconSize.rwidth() = m_pLengendLineLength;
             //max icon size: 30w, 18h
-            maxLegendIconSize.rwidth() = std::min(maxLegendIconSize.width(), 30);
+            //maxLegendIconSize.rwidth() = std::min(maxLegendIconSize.width(), 30);
             maxLegendIconSize.rheight() = std::min(maxLegendIconSize.height(), 18);
+
+
 
             //adjust legend icon size
             foreach (QwtPlotCurve *item, m_plotCurveItems)
@@ -782,6 +786,30 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
 
     m_legendVisible = visible;
     m_legendPosition = position;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setLegendLabelWidth(const int &width)
+{
+	m_pLegendLabelWidth = width;
+	if (m_pLegend)
+	{
+		QSize maxLegendIconSize(width, 0);
+		QwtPlotCurve *item;
+		maxLegendIconSize.rwidth() = std::max(width, 10);
+		foreach(item, m_plotCurveItems)
+		{
+			maxLegendIconSize.rheight() = std::max(maxLegendIconSize.height(), item->legendIconSize().height());
+
+		}
+		//max icon height: 18
+		maxLegendIconSize.rheight() = std::min(maxLegendIconSize.height(), 18);
+		m_pLegendLabelWidth = maxLegendIconSize.rwidth();
+		//adjust legend icon size
+		foreach(QwtPlotCurve *item, m_plotCurveItems)
+		{
+			item->setLegendIconSize(maxLegendIconSize);
+		}
+	}
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendFont(const QFont &font)
