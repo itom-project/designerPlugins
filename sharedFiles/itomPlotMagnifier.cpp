@@ -25,6 +25,7 @@
 #include <qevent.h>
 #include <qwt_plot.h>
 #include <qwt_scale_div.h>
+#include <qwt_scale_engine.h>
 #include <QtCore/qmath.h>
 #include "itomPlotZoomer.h"
 
@@ -120,16 +121,34 @@ void ItomPlotMagnifier::rescale(double factor)
 
     for ( int axisId = 0; axisId < QwtPlot::axisCnt; axisId++ )
     {
+        const QwtTransform *trafo = plt->axisScaleEngine( axisId )->transformation();
         const QwtScaleDiv &scaleDiv = plt->axisScaleDiv( axisId );
-        const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
-        const double width_2 = scaleDiv.range() / 2 * factor;
+        double leftTop;
+        double rightBottom;
+
+        if (!trafo)
+        {
+            leftTop = scaleDiv.lowerBound() + (1 - factor) * scaleDiv.range() / 2.0;
+            rightBottom = scaleDiv.lowerBound() + (1 + factor) * scaleDiv.range() / 2.0;
+        }
+        else
+        {
+            double bord1 = trafo->transform(scaleDiv.lowerBound());
+            double bord2 = trafo->transform(scaleDiv.upperBound());
+            double center = 0.5 * (bord1 + bord2);
+            double width_2 = (bord2 - bord1) / 2.0;
+            bord1 = center - factor * width_2;
+            bord2 = center + factor * width_2;
+            leftTop = trafo->invTransform(bord1);
+            rightBottom = trafo->invTransform(bord2);
+        }
 
         if (xAxisZoomer == axisId)
         {
             if (isAxisEnabledSpecial(axisId))
             {
-                zoomRect.setLeft(center - width_2);
-                zoomRect.setRight(center + width_2);
+                zoomRect.setLeft(leftTop);
+                zoomRect.setRight(rightBottom);
             }
             else
             {
@@ -142,8 +161,8 @@ void ItomPlotMagnifier::rescale(double factor)
         {
             if (isAxisEnabledSpecial(axisId))
             {
-                zoomRect.setTop(center - width_2);
-                zoomRect.setBottom(center + width_2);
+                zoomRect.setTop(leftTop);
+                zoomRect.setBottom(rightBottom);
             }
             else
             {
@@ -154,7 +173,7 @@ void ItomPlotMagnifier::rescale(double factor)
         }
         else if (isAxisEnabledSpecial(axisId))
         {
-            plt->setAxisScale( axisId, center - width_2, center + width_2 );
+            plt->setAxisScale(axisId, leftTop, rightBottom);
             doReplot = true;
         }
     }
@@ -211,22 +230,35 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
 
     for ( int axisId = 0; axisId < QwtPlot::axisCnt; axisId++ )
     {
+        const QwtTransform *trafo = plt->axisScaleEngine( axisId )->transformation();
         const QwtScaleDiv &scaleDiv = plt->axisScaleDiv( axisId );
+
         if (axisId == QwtPlot::xBottom || axisId == QwtPlot::yLeft)
         {
-            const double size = scaleDiv.range() * factor;
             const double scaleXorY = plt->invTransform(axisId, (axisId == QwtPlot::xBottom) ? mouseCoords.x() : mouseCoords.y());
+
+            double border1;
+            double border2;
+
+            if (!trafo)
+            {
+                border1 = scaleXorY * (1 - factor) + factor * scaleDiv.lowerBound();
+                border2 = scaleXorY * (1 - factor) + factor * scaleDiv.upperBound();
+            }
+            else
+            {
+                border1 = trafo->invTransform(trafo->transform(scaleXorY) * (1 - factor) + factor * trafo->transform(scaleDiv.lowerBound()));
+                border2 = trafo->invTransform(trafo->transform(scaleXorY) * (1 - factor) + factor * trafo->transform(scaleDiv.upperBound()));
+            }
 
             if (scaleDiv.contains(scaleXorY))
             {
-                const double factor2 = (scaleXorY - scaleDiv.lowerBound()) / scaleDiv.range();
-
                 if (xAxisZoomer == axisId)
                 {
                     if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setLeft(scaleXorY - size * factor2);
-                        zoomRect.setRight(scaleXorY + size * (1-factor2));
+                        zoomRect.setLeft(border1);
+                        zoomRect.setRight(border2);
                     }
                     else
                     {
@@ -239,8 +271,8 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
                 {
                     if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setTop(scaleXorY - size * factor2);
-                        zoomRect.setBottom(scaleXorY + size * (1-factor2));
+                        zoomRect.setTop(border1);
+                        zoomRect.setBottom(border2);
                     }
                     else
                     {
@@ -251,20 +283,32 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
                 }
                 else if (isAxisEnabledSpecial(axisId))
                 {
-                    plt->setAxisScale( axisId, scaleXorY - size * factor2, scaleXorY + size * (1-factor2) );
+                    plt->setAxisScale( axisId, border1, border2);
                     doReplot = true;
                 }
             }
             else
             {
-                const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
+                double border1, border2;
+                if (!trafo)
+                {
+                    border1 = scaleDiv.lowerBound() + (1 - factor) * (scaleDiv.upperBound() - scaleDiv.lowerBound()) / 2;
+                    border2 = scaleDiv.lowerBound() + (1 + factor) * (scaleDiv.upperBound() - scaleDiv.lowerBound()) / 2;
+                }
+                else
+                {
+                    border1 = trafo->invTransform(trafo->transform(scaleDiv.lowerBound()) + \
+                        (1 - factor) * (trafo->transform(scaleDiv.upperBound()) - trafo->transform(scaleDiv.lowerBound())) / 2);
+                    border2 = trafo->invTransform(trafo->transform(scaleDiv.lowerBound()) + \
+                        (1 + factor) * (trafo->transform(scaleDiv.upperBound()) - trafo->transform(scaleDiv.lowerBound())) / 2);
+                }
 
                 if (xAxisZoomer == axisId)
                 {
                     if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setLeft(center - size / 2);
-                        zoomRect.setRight(center + size / 2);
+                        zoomRect.setLeft(border1);
+                        zoomRect.setRight(border2);
                     }
                     else
                     {
@@ -277,8 +321,8 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
                 {
                     if (isAxisEnabledSpecial(axisId))
                     {
-                        zoomRect.setTop(center - size / 2);
-                        zoomRect.setBottom(center + size / 2);
+                        zoomRect.setTop(border1);
+                        zoomRect.setBottom(border2);
                     }
                     else
                     {
@@ -289,22 +333,33 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
                 }
                 else if (isAxisEnabledSpecial(axisId))
                 {
-                    plt->setAxisScale( axisId, center - size / 2, center + size / 2 );
+                    plt->setAxisScale( axisId, border1, border2 );
                     doReplot = true;
                 }
             }
         }
         else
         {
-            const double width_2 = scaleDiv.range() * factor / 2;
-            const double center = scaleDiv.lowerBound() + scaleDiv.range() / 2;
+            double border1, border2;
+            if (!trafo)
+            {
+                border1 = scaleDiv.lowerBound() + (1 - factor) * (scaleDiv.upperBound() - scaleDiv.lowerBound()) / 2;
+                border2 = scaleDiv.lowerBound() + (1 + factor) * (scaleDiv.upperBound() - scaleDiv.lowerBound()) / 2;
+            }
+            else
+            {
+                border1 = trafo->invTransform(trafo->transform(scaleDiv.lowerBound()) + \
+                    (1 - factor) * (trafo->transform(scaleDiv.upperBound()) - trafo->transform(scaleDiv.lowerBound())) / 2);
+                border2 = trafo->invTransform(trafo->transform(scaleDiv.lowerBound()) + \
+                    (1 + factor) * (trafo->transform(scaleDiv.upperBound()) - trafo->transform(scaleDiv.lowerBound())) / 2);
+            }
 
             if (xAxisZoomer == axisId)
             {
                 if (isAxisEnabledSpecial(axisId))
                 {
-                    zoomRect.setLeft(center - width_2);
-                    zoomRect.setRight(center + width_2);
+                    zoomRect.setLeft(border1);
+                    zoomRect.setRight(border2);
                 }
                 else
                 {
@@ -317,8 +372,8 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
             {
                 if (isAxisEnabledSpecial(axisId))
                 {
-                    zoomRect.setTop(center - width_2);
-                    zoomRect.setBottom(center + width_2);
+                    zoomRect.setTop(border1);
+                    zoomRect.setBottom(border2);
                 }
                 else
                 {
@@ -329,7 +384,7 @@ void ItomPlotMagnifier::rescale(double factor, const QPointF &mouseCoords)
             }
             else if (isAxisEnabledSpecial(axisId))
             {
-                plt->setAxisScale( axisId, center - width_2, center + width_2 );
+                plt->setAxisScale( axisId, border1, border2);
                 doReplot = true;
             }
         }
