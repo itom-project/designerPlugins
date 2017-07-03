@@ -82,6 +82,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pLineCutLine(NULL),
         m_isRefreshingPlot(false),
         m_unitLabelChanged(false),
+		m_pPaletteIsChanging(false),
         m_pActScaleSettings(NULL),
         m_pActColorPalette(NULL),
         m_pActToggleColorBar(NULL),
@@ -385,28 +386,30 @@ void PlotCanvas::refreshStyles()
     m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross, QBrush(inverseColor0()), zStackMarkerPen, zStackMarkerSize));
 
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
-    
-    title().setFont(titleFont);
-    titleLabel()->setFont(titleFont);
+	if (!m_pPaletteIsChanging)
+	{
+		title().setFont(titleFont);
+		titleLabel()->setFont(titleFont);
 
-    axisTitle(QwtPlot::xBottom).setFont(axisFont);
-    axisTitle(QwtPlot::yLeft).setFont(axisFont);
-    axisTitle(QwtPlot::yRight).setFont(axisFont);
-    setAxisFont(QwtPlot::xBottom, axisFont);
-    setAxisFont(QwtPlot::yLeft, axisFont);
-    setAxisFont(QwtPlot::yRight, axisFont);
+		axisTitle(QwtPlot::xBottom).setFont(axisFont);
+		axisTitle(QwtPlot::yLeft).setFont(axisFont);
+		axisTitle(QwtPlot::yRight).setFont(axisFont);
+		setAxisFont(QwtPlot::xBottom, axisFont);
+		setAxisFont(QwtPlot::yLeft, axisFont);
+		setAxisFont(QwtPlot::yRight, axisFont);
 
-    QwtText t = axisWidget(QwtPlot::xBottom)->title();
-    t.setFont(labelFont);
-    axisWidget(QwtPlot::xBottom)->setTitle(t);
+		QwtText t = axisWidget(QwtPlot::xBottom)->title();
+		t.setFont(labelFont);
+		axisWidget(QwtPlot::xBottom)->setTitle(t);
 
-    t = axisWidget(QwtPlot::yLeft)->title();
-    t.setFont(labelFont);
-    axisWidget(QwtPlot::yLeft)->setTitle(t);
+		t = axisWidget(QwtPlot::yLeft)->title();
+		t.setFont(labelFont);
+		axisWidget(QwtPlot::yLeft)->setTitle(t);
 
-    t = axisWidget(QwtPlot::yRight)->title();
-    t.setFont(labelFont);
-    axisWidget(QwtPlot::yRight)->setTitle(t);
+		t = axisWidget(QwtPlot::yRight)->title();
+		t.setFont(labelFont);
+		axisWidget(QwtPlot::yRight)->setTitle(t);
+	}
 
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
@@ -923,7 +926,9 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
     m_colorMapName = newPalette.name;
 
     setInverseColors(newPalette.inverseColorOne, newPalette.inverseColorTwo);
+	m_pPaletteIsChanging = true;
 	refreshStyles();
+	m_pPaletteIsChanging = false;
 
     if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
     {

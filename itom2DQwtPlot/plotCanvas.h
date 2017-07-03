@@ -187,6 +187,7 @@ class PlotCanvas : public ItomQwtPlot
 
         bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)
         bool m_showCenterMarker;
+		bool m_pPaletteIsChanging; //true if the color palette is currently changing in order to avoid that the fonts are set to default
 
         QAction *m_pActScaleSettings; //
         QAction *m_pActColorPalette;  //
