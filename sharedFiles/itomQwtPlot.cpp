@@ -2525,7 +2525,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapeLabelVisible(int idx, bool setVisible)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, const QSizeF &curSizeMm /*= QSizeF(0.0,0.0)*/, const int resolution /*= 300*/)
+ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, const QSizeF &curSizeMm /*= QSizeF(0.0,0.0)*/, const int resolution /*= 200*/)
 {
     if (!copyToClipboardNotFile)
     {

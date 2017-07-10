@@ -121,7 +121,7 @@ class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigur
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
 	Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
 
-    Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data.")
+    Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data (uses the default export resolution).")
 
     Q_CLASSINFO("slot://savePlot", "saves the plot as image, pdf or svg file (the supported file formats are listed in the save dialog of the plot)\n"
     "\n"

@@ -142,7 +142,7 @@ public:
     virtual QList<QToolBar*> getToolbars() { return m_toolbars; }
     virtual QList<QMenu*> getMenus() { return m_menus; }
 
-    ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, const QSizeF &curSizeMm = QSizeF(0.0, 0.0), const int resolution = 300);
+    ito::RetVal exportCanvas(const bool copyToClipboardNotFile, const QString &fileName, const QSizeF &curSizeMm = QSizeF(0.0, 0.0), const int resolution = 200);
     ito::RetVal printCanvas();
 
     ito::RetVal plotMarkers(const QSharedPointer<ito::DataObject> coordinates, const QString &style, const QString &id, int plane);
