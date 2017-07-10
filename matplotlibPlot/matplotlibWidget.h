@@ -64,6 +64,8 @@ public:
 
     void replot();
 
+    void copyToClipboard(int dpi = 200);
+
     bool m_showContextMenu;
 
     bool m_trackerActive;
@@ -133,13 +135,18 @@ signals:
     void eventWheel(int x, int y, int delta, int orientation);
     void eventKey(int type, int key, int modifiers, bool autoRepeat);
     void eventResize(int w, int h);
+    void eventCopyToClipboard(int dpi);
     //void eventPaintRequest();
     void eventIdle();
+
+    void statusBarClear();
+    void statusBarMessage(const QString &message, int timeout = 0);
 
 public slots:
     void externalResize(int width, int height);
     void paintResultDeprecated(QByteArray imageString, int x, int y, int w, int h, bool blit );
     void paintResult(QSharedPointer<char> imageString, int x, int y, int w, int h, bool blit ); //this version is faster than the version above.
+    void copyToClipboardResult(QSharedPointer<char> imageString, int x, int y, int w, int h);
     void paintRect(bool drawRect, int x = 0, int y = 0, int w = 0, int h = 0);
     void paintTimeout();
     void stopTimer()

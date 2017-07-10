@@ -25,6 +25,8 @@
 #include <qimage.h>
 #include <qpixmap.h>
 #include <qdebug.h>
+#include <qclipboard.h>
+#include <qstatusbar.h>
 #include "matplotlibplot.h"
 
 //-------------------------------------------------------------------------------------
@@ -65,6 +67,14 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
 
     m_timer.setSingleShot(true);
     QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(paintTimeout()));
+
+    if (qobject_cast<QMainWindow*>(parent))
+    {
+        QStatusBar *statusBar = qobject_cast<QMainWindow*>(parent)->statusBar();
+        connect(this, SIGNAL(statusBarClear()), statusBar, SLOT(clearMessage()));
+        connect(this, SIGNAL(statusBarMessage(QString)), statusBar, SLOT(showMessage(QString)));
+        connect(this, SIGNAL(statusBarMessage(QString, int)), statusBar, SLOT(showMessage(QString, int)));
+    }
 };
 
 //-------------------------------------------------------------------------------------
@@ -237,6 +247,26 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
 }
 
 //-------------------------------------------------------------------------------------
+void MatplotlibWidget::copyToClipboardResult(QSharedPointer<char> imageString, int x, int y, int w, int h)
+{
+#ifdef _DEBUG
+    if (m_debugOutput)
+    {
+        qDebug() << "MatplotlibWidet::copyToClipboardResult:" << x << y << w << h;
+    }
+#endif
+
+    QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during livetime of image (therefore, copy below)
+    QClipboard *clipboard = QApplication::clipboard();
+    if (clipboard)
+    {
+        clipboard->setImage(image.copy());
+        emit statusBarMessage(tr("Copy current view to clipboard ... Done."), 1000);
+    }
+
+}
+
+//-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintRect(bool drawRect, int x /*= 0*/, int y /*= 0*/, int w /*= 0*/, int h /*= 0*/)
 {
 #ifdef _DEBUG
@@ -344,6 +374,13 @@ void MatplotlibWidget::paintTimeout()
             break;
         }
     }
+}
+
+//-------------------------------------------------------------------------------------
+void MatplotlibWidget::copyToClipboard(int dpi /*= 200*/)
+{
+    emit statusBarMessage(tr("Copy current view to clipboard ..."), 5000);
+    emit eventCopyToClipboard(dpi);
 }
 
 //-------------------------------------------------------------------------------------

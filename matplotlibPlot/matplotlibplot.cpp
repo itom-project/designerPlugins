@@ -49,25 +49,26 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_pResetFixedSizeTimer->setSingleShot(true);
     m_pResetFixedSizeTimer->stop();
 
-    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("home"), this);
+    m_actHome = new QAction(QIcon(":/itomDesignerPlugins/general/icons/home.png"), tr("Home"), this);
     m_actHome->setObjectName("actionHome");
+    m_actHome->setShortcut(Qt::CTRL + Qt::Key_0);
     m_actHome->setToolTip(tr("Reset original view"));
 
-    m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("forward"), this);
+    m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("Forward"), this);
     m_actForward->setObjectName("actionForward");
     m_actForward->setToolTip(tr("Forward to next view"));
 
-    m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("back"), this);
+    m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("Back"), this);
     m_actBack->setObjectName("actionBack");
     m_actBack->setToolTip(tr("Back to previous view"));
 
-    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("move"), this);
+    m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
     m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
 
-    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("zoom to rectangle"), this);
+    m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("Zoom to Rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
@@ -80,13 +81,21 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_actZoomToRect->setToolTip(tr("Show coordinates under mouse cursor"));
     m_actMarker->connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
 
-    m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("subplot configuration..."), this);
+    m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("Subplot Configuration..."), this);
     m_actSubplotConfig->setObjectName("actionSubplotConfig");
     m_actSubplotConfig->setToolTip(tr("Configure subplots..."));
 
-    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("save..."), this);
+    m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
+    m_actSave->setShortcut(QKeySequence::Save);
     m_actSave->setObjectName("actionSave");
     m_actSave->setToolTip(tr("Save the figure..."));
+
+    //m_actCopyClipboard
+    m_actCopyClipboard = new QAction(tr("Copy To Clipboard"), this);
+    m_actCopyClipboard->setShortcut(QKeySequence::Copy);
+    m_actCopyClipboard->setObjectName("actionCopyClipboard");
+    m_actCopyClipboard->setToolTip(tr("Copies the current view to the clipboard"));
+    connect(m_actCopyClipboard, SIGNAL(triggered()), this, SLOT(mnuCopyToClipboard()));
 
     m_actProperties = this->getPropertyDockWidget()->toggleViewAction();
     connect(m_actProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
@@ -116,6 +125,7 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
 
     QMenu *contextMenu = new QMenu(tr("Matplotlib"),this);
     contextMenu->addAction(m_actSave);
+    contextMenu->addAction(m_actCopyClipboard);
     contextMenu->addSeparator();
     contextMenu->addAction(m_actHome);
     contextMenu->addAction(m_actBack);
@@ -226,6 +236,26 @@ void MatplotlibPlot::mnuMarkerClick(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void MatplotlibPlot::mnuCopyToClipboard()
+{
+    if (m_pContent)
+    {
+        m_pContent->copyToClipboard();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal MatplotlibPlot::copyToClipBoard()
+{
+    if (m_pContent)
+    {
+        m_pContent->copyToClipboard();
+        return ito::retOk;
+    }
+    return ito::RetVal(ito::retError, 0, tr("no content widget available.").toLatin1().data());
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::setContextMenuEnabled(bool show)
 {
     if (m_pContent) 
@@ -320,5 +350,7 @@ void MatplotlibPlot::replot()
         m_pContent->replot();
     }
 }
+
+
 
 

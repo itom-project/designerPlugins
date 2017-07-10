@@ -87,6 +87,8 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 
     Q_CLASSINFO("signal://subplotConfigSliderChanged", "internal use between MatplotlibPlot and the subplot configuration dialog.")
 
+    Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data (uses the default export resolution).")
+
     DESIGNER_PLUGIN_ITOM_API
 public:
     MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
@@ -117,6 +119,7 @@ private:
     QAction *m_actSave;
     QAction *m_actMarker;
     QAction *m_actProperties;
+    QAction *m_actCopyClipboard;
     QLabel *m_lblCoordinates;
     QToolBar *m_toolbar;
     QMenu *m_contextMenu;
@@ -134,6 +137,7 @@ signals:
 private slots:
     void mnuMarkerClick(bool /*checked*/);
     inline void mnuShowToolbar(bool /*checked*/) { setToolbarVisible(true); }
+    void mnuCopyToClipboard();
 
     void subplotConfigSliderLeftChanged(double left);
     void subplotConfigSliderRightChanged(double left);
@@ -149,6 +153,8 @@ public slots:
     void modifySubplotSliders(float left, float top, float right, float bottom, float wSpace, float hSpace);
     void setLabelText(QString text) { m_lblCoordinates->setText(text); }
     void replot();
+
+    ito::RetVal copyToClipBoard();
 
 };
 
