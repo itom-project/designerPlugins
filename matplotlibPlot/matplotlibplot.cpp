@@ -238,10 +238,7 @@ void MatplotlibPlot::mnuMarkerClick(bool checked)
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::mnuCopyToClipboard()
 {
-    if (m_pContent)
-    {
-        m_pContent->copyToClipboard();
-    }
+    copyToClipBoard();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -249,7 +246,14 @@ ito::RetVal MatplotlibPlot::copyToClipBoard()
 {
     if (m_pContent)
     {
-        m_pContent->copyToClipboard();
+        int dpi = 200;
+
+        if (ito::ITOM_API_FUNCS_GRAPH)
+        {
+            dpi = qBound(48, apiGetFigureSetting(this, "copyClipboardResolutionDpi", 200, NULL).value<int>(), 2000);
+        }
+
+        m_pContent->copyToClipboard(dpi);
         return ito::retOk;
     }
     return ito::RetVal(ito::retError, 0, tr("no content widget available.").toLatin1().data());

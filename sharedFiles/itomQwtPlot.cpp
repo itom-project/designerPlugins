@@ -2847,11 +2847,11 @@ void ItomQwtPlot::setPlottingEnabled(bool enabled)
 void ItomQwtPlot::mnuCopyToClipboard()
 {
     QSizeF size(0.0, 0.0);
-    int dpi = 300;
+    int dpi = 200;
 
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
-        dpi = qBound(48, apiGetFigureSetting(parent(), "copyClipboardResolutionDpi", 300, NULL).value<int>(), 2000);
+        dpi = qBound(48, apiGetFigureSetting(parent(), "copyClipboardResolutionDpi", 200, NULL).value<int>(), 2000);
     }
 
     exportCanvas(true, "", size, dpi);
