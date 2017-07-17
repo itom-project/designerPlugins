@@ -125,6 +125,7 @@ public:
     void setGeometricShapesFillOpacitySelected(const int &opacity);
 
     void setVisible(bool visible);
+    bool m_copyDisplayedAsComplex;
 
     int countGeometricShapes() const { return m_pShapes.count(); }
     int getSelectedGeometricShapeIdx() const;

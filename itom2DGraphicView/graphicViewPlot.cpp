@@ -420,7 +420,7 @@ ito::RetVal GraphicViewPlot::applyUpdate()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> GraphicViewPlot::getDisplayed(void)
+QSharedPointer<ito::DataObject> GraphicViewPlot::getDisplayed()
 {
     return QSharedPointer<ito::DataObject>(m_pOutput["displayed"]->getVal<ito::DataObject*>());
 }

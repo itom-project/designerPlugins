@@ -99,7 +99,7 @@ class PlotCanvas : public ItomQwtPlot
         void setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval);
 
         ito::int32 getCurrentPlane() const;
-        QSharedPointer<ito::DataObject> getDisplayed(void);
+        QSharedPointer<ito::DataObject> getDisplayed();
         QSharedPointer<ito::DataObject> getOverlayObject(void);
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 

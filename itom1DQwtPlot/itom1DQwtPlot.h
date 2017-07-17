@@ -406,7 +406,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
 		void showCurveProperties();
 
-        QSharedPointer<ito::DataObject> getDisplayed(void);
+        QSharedPointer<ito::DataObject> getDisplayed();
 
     private slots:
 		void updatePropertiesDock();

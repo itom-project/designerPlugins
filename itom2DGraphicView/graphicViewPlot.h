@@ -102,7 +102,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
         ito::RetVal applyUpdate();  //!> does the real update work
 
         QSharedPointer<ito::DataObject> getSource(void) const;
-        QSharedPointer<ito::DataObject> getDisplayed(void);
+        QSharedPointer<ito::DataObject> getDisplayed();
 
         virtual inline void setOutpBounds(QVector<QPointF> bounds)
         {

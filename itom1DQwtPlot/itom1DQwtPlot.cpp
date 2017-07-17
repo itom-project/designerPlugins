@@ -810,7 +810,7 @@ void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed(void)
+QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed()
 {
     if (!m_pContent)
     {

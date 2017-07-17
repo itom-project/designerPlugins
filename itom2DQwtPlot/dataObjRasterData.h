@@ -69,7 +69,7 @@ class DataObjRasterData : public QwtRasterData
        
         ito::int32 getCurrentPlane() const {return (ito::int32)m_D.m_planeIdx;}
         QSharedPointer<ito::DataObject> rasterToObject(void);
-        QSharedPointer<ito::DataObject> rasterToObject(const QwtInterval &xInterval, const QwtInterval &yInterval);
+        QSharedPointer<ito::DataObject> rasterToObject(const QwtInterval &xInterval, const QwtInterval &yInterval, const bool copyDisplayedAsComplex, const int cmplxState);
 
         bool isInit() const {return m_dataObj.getDims() > 0 && m_dataObjPlane != NULL;}
 

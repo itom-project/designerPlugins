@@ -261,7 +261,7 @@ private slots:
     void activatePlot();
 
 public slots:
-    QSharedPointer<ito::DataObject> getDisplayed(void);
+    QSharedPointer<ito::DataObject> getDisplayed();
 
     QSharedPointer<ito::DataObject> getDisplayedLineCut(void);
 

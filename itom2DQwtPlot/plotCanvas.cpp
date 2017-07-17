@@ -2048,14 +2048,14 @@ void PlotCanvas::childFigureDestroyed(QObject* /*obj*/, ito::uint32 UID)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed(void)
+QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed()
 {
     if (!m_rasterData)
     {
         return QSharedPointer<ito::DataObject>(); 
     }
 
-    return m_rasterData->rasterToObject(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft));
+    return m_rasterData->rasterToObject(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft), ItomQwtPlot::m_copyDisplayedAsComplex, PlotCanvas::getComplexStyle());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2065,7 +2065,8 @@ QSharedPointer<ito::DataObject> PlotCanvas::getDisplayedOverlayObject()
     {
         return QSharedPointer<ito::DataObject>(); 
     }
-    return m_rasterOverlayData->rasterToObject(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft));
+    
+    return m_rasterOverlayData->rasterToObject(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft), ItomQwtPlot::m_copyDisplayedAsComplex, PlotCanvas::getComplexStyle());
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -439,15 +439,20 @@ void Plot1DWidget::createActions()
     m_pActCmplxSwitch = new QAction(tr("Complex Switch"), p);
     m_pMnuCmplxSwitch = new QMenu(tr("Complex Switch"), p);
     m_pActCmplxSwitch->setMenu(m_pMnuCmplxSwitch);
+
     a = m_pMnuCmplxSwitch->addAction(tr("Imag"));
     a->setData(ItomQwtPlotEnums::CmplxImag);
+
     a = m_pMnuCmplxSwitch->addAction(tr("Real"));
     a->setData(ItomQwtPlotEnums::CmplxReal);
+
     a = m_pMnuCmplxSwitch->addAction(tr("Abs"));
     a->setData(ItomQwtPlotEnums::CmplxAbs);
     m_pMnuCmplxSwitch->setDefaultAction(a);
+
     a = m_pMnuCmplxSwitch->addAction(tr("Pha"));
     a->setData(ItomQwtPlotEnums::CmplxArg);
+
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
     
@@ -461,12 +466,16 @@ void Plot1DWidget::createActions()
     m_pMnuLegendSwitch->setDefaultAction(a);
     a = m_pMnuLegendSwitch->addAction(tr("Right"));
     a->setData(RightLegend);
+
     a = m_pMnuLegendSwitch->addAction(tr("Bottom"));
     a->setData(BottomLegend);
+
     a = m_pMnuLegendSwitch->addAction(tr("Left"));
     a->setData(LeftLegend);
+
     a = m_pMnuLegendSwitch->addAction(tr("Top"));
     a->setData(TopLegend);
+
     connect(m_pMnuLegendSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuLegendSwitch(QAction*)));
 
     //m_pActMultiRowSwitch
@@ -476,16 +485,22 @@ void Plot1DWidget::createActions()
     m_pActXVAuto = a = m_pMnuMultiRowSwitch->addAction(tr("Auto"));
     a->setData(ItomQwtPlotEnums::AutoRowCol);
     m_pMnuMultiRowSwitch->setDefaultAction(a);
+
     m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(tr("First Row"));
     a->setData(ItomQwtPlotEnums::FirstRow);
+
     m_pActXVFC = a = m_pMnuMultiRowSwitch->addAction(tr("First Column"));
     a->setData(ItomQwtPlotEnums::FirstCol);
+
     m_pActXVMR = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Row"));
     a->setData(ItomQwtPlotEnums::MultiRows);
+
     m_pActXVMC = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Column"));
     a->setData(ItomQwtPlotEnums::MultiCols);
+
     m_pActXVML = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Layer"));
     a->setData(ItomQwtPlotEnums::MultiLayerAuto);
+
     m_pActMultiRowSwitch->setVisible(true);
     connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
 
@@ -496,14 +511,19 @@ void Plot1DWidget::createActions()
     m_pActRGBA = a = m_pMnuRGBSwitch->addAction(tr("Auto Value"));
     a->setData(ItomQwtPlotEnums::AutoColor);
     m_pMnuRGBSwitch->setDefaultAction(a);
+
     m_pActGray = a = m_pMnuRGBSwitch->addAction(tr("Gray Value"));
     a->setData(ItomQwtPlotEnums::Gray);
+
     m_pActRGBL = a = m_pMnuRGBSwitch->addAction(tr("RGB-lines"));
     a->setData(ItomQwtPlotEnums::RGB);
+
     m_pActRGBAL = a = m_pMnuRGBSwitch->addAction(tr("RGBA-lines"));
     a->setData(ItomQwtPlotEnums::RGBA);
+
     m_pActRGBG = a = m_pMnuRGBSwitch->addAction(tr("RGB + Gray"));
     a->setData(ItomQwtPlotEnums::RGBGray);
+
     m_pActRGBSwitch->setVisible(false);
     connect(m_pMnuRGBSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuRGBSwitch(QAction*)));
 
@@ -2754,21 +2774,25 @@ QVector<float> Plot1DWidget::getPickerPhys() const
 
     return exportItem;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QList<QwtPlotCurveProperty*> Plot1DWidget::getPlotCurveProperty()
 {
 	return this->m_plotCurvePropertyItems;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QList<QwtPlotCurve*> Plot1DWidget::getplotCurveItems()
 {
 	return this->m_plotCurveItems;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType Plot1DWidget::getComplexStyle() const
 {
 	return m_pComplexStyle;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
 {
@@ -2781,6 +2805,7 @@ void Plot1DWidget::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
 		}
 	}
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
 {
@@ -2932,7 +2957,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
         }
 
         //complex64 will be mapped to float32 and complex128 to float64
-        type = (type == ito::tComplex64) ? ito::tFloat32 : ((type == ito::tComplex128) ? ito::tFloat64 : type);
+        //type = (type == ito::tComplex64) ? ito::tFloat32 : ((type == ito::tComplex128) ? ito::tFloat64 : type);
 
         //until now, rgba32 will be mapped to uint8
         type = (type == ito::tRGBA32) ? ito::tUInt8 : type;
@@ -2993,7 +3018,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::uint8 *rowPtr = (ito::uint8*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->getDataObject()->at <ito::uint8>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3002,7 +3028,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::int8 *rowPtr = (ito::int8*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->getDataObject()->at <ito::int8>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3011,7 +3038,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::uint16 *rowPtr = (ito::uint16*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->getDataObject()->at <ito::uint16>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3020,7 +3048,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::int16 *rowPtr = (ito::int16*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->getDataObject()->at <ito::int16>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3029,7 +3058,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::uint32 *rowPtr = (ito::uint32*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->getDataObject()->at <ito::uint32>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3038,7 +3068,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::int32 *rowPtr = (ito::int32*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->getDataObject()->at <ito::int32>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3047,7 +3078,8 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::float32 *rowPtr = (ito::float32*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->getDataObject()->at <ito::float32>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3056,7 +3088,33 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 ito::float64 *rowPtr = (ito::float64*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->getDataObject()->at <ito::float64>(firstIdx, lastIdx));
+                }
+                }
+                break;
+            case ito::tComplex64:
+                {
+                ito::complex64 *rowPtr = (ito::complex64*)displayed->rowPtr(0, i);
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
+                {
+                    //*(rowPtr++) = cv::saturate_cast<ito::complex64>(seriesData->sample(n).ry());
+                    *(rowPtr++) = cv::saturate_cast<ito::complex64>(seriesData->getDataObject()->at <ito::complex64>(firstIdx, lastIdx));
+                }
+                }
+                break;
+            case ito::tComplex128:
+                {
+                ito::complex128 *rowPtr = (ito::complex128*)displayed->rowPtr(0, i);
+                
+                seriesData->getDataObject()->copyTo(*(displayed));
+                const cv::Mat *numMat = seriesData->getDataObject()->getCvPlaneMat(0);
+                
+                for (size_t n = firstIdx; n <= lastIdx; ++n)
+                {
+                    *(rowPtr++) = cv::saturate_cast<ito::complex128>(seriesData->sample(n).ry());
+                    //*(rowPtr++) = cv::saturate_cast<ito::complex128>(seriesData->getDataObject()->at <ito::complex128>(firstIdx, lastIdx));
+                    //*(displayed) = cv::saturate_cast<ito::complex128>(seriesData->getDataObject()->at<ito::complex128>(firstIdx, lastIdx));
                 }
                 }
                 break;
@@ -3194,6 +3252,7 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
 {
     DataObjectSeriesData *seriesData;
     m_pMnuCmplxSwitch->setDefaultAction(action);
+
     setButtonStyle(buttonStyle()); //to change icon of menu
 	int idx = action->data().toInt();
 	

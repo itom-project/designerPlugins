@@ -38,6 +38,8 @@
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qprintpreviewdialog.h>
+#include <qdialogbuttonbox.h>
+#include <qcheckbox.h>
 
 #include "itomPlotZoomer.h"
 #include "itomPlotMagnifier.h"
@@ -2860,15 +2862,72 @@ void ItomQwtPlot::mnuCopyToClipboard()
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mnuSendCurrentToWorkspace()
 {
-    bool ok;
+    bool ok = false;
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
+    QString varname = "zoom_object";
+    m_copyDisplayedAsComplex = false;
+
+    const QString textForUser = "Indicate the python varible name for the currently visible object";
+    const QString dialogTitle = "Current to workspace";
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         emit statusBarMessage(tr("Could not send object to workspace, api is missing."), 4000);
     }
 
-    QString varname = QInputDialog::getText(p, tr("Current to workspace"), tr("Indicate the python variable name for the currently visible object"), QLineEdit::Normal, "zoom_object", &ok);
+    if (p->getSource()->getType() == ito::tComplex128 || p->getSource()->getType() == ito::tComplex64) //checkBox if dataObject is complex to copy complex/not-displayed dataObject real and imaginary part. 
+    {
+        QDialog *dialog = new QDialog(this);
+        dialog->setWindowTitle(dialogTitle);
+
+        QVBoxLayout *layout = new QVBoxLayout(dialog);
+        
+        QLabel *label = new QLabel(dialog);
+        label->setText(textForUser);
+        layout->addWidget(label);
+        
+        QLineEdit *lineEdit = new QLineEdit(dialog);
+        lineEdit->setText(varname);
+        lineEdit->setFocus();
+        connect(lineEdit, SIGNAL(returnPressed()), dialog, SLOT(accept()));
+        layout->addWidget(lineEdit);
+        
+        QCheckBox *checkBox = new QCheckBox("copy as complex dataType", dialog);
+        checkBox->setCheckable(true);
+        checkBox->setCheckState(Qt::Checked);
+        layout->addWidget(checkBox);
+        
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+        layout->addWidget(buttonBox);
+        buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+        buttonBox->button(QDialogButtonBox::Cancel)->setDefault(true);
+        connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+        connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+        
+        dialog->setLayout(layout);
+        dialog->setModal(true);
+
+        int dialogCode = dialog->exec();
+
+        if (dialogCode == QDialog::Accepted)
+        {
+            varname = lineEdit->text();
+            m_copyDisplayedAsComplex = checkBox->isChecked();
+            ok = true;
+        }
+        else if (dialogCode == QDialog::Rejected)
+        {
+            ok = false;
+        }
+
+        delete dialog;
+        dialog = NULL;
+    }
+    else
+    {
+        QString varname = QInputDialog::getText(p, tr(dialogTitle.toLatin1().data()), tr(textForUser.toLatin1().data()), QLineEdit::Normal, varname, &ok);
+    }    
+    
     if (ok && varname != "")
     {
         QSharedPointer<ito::DataObject> obj = p->getDisplayed();
@@ -2904,6 +2963,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
             msgBox.exec();
         }
     }
+
 }
 
 

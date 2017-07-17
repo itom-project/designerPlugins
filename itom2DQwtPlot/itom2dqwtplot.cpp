@@ -1087,7 +1087,7 @@ void Itom2dQwtPlot::setOverlayAlpha (const int alpha)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed(void)
+QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed()
 {
     if (!m_pContent)
     {
