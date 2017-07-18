@@ -2938,7 +2938,7 @@ void Plot1DWidget::setCurveFilled()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
+QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsComplex)
 {
     ito::DataObject *displayed = NULL;
 
@@ -2955,9 +2955,12 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
                 return QSharedPointer<ito::DataObject>();
             }
         }
-
+        //for linecuts from a 2d object the data must be copy in a different way, especially in case of a diagonal linecut
         //complex64 will be mapped to float32 and complex128 to float64
-        //type = (type == ito::tComplex64) ? ito::tFloat32 : ((type == ito::tComplex128) ? ito::tFloat64 : type);
+        if (copyDisplayedAsComplex == false || seriesData->getDataObject()->getSize(0) >= 2)
+        {
+            type = (type == ito::tComplex64) ? ito::tFloat32 : ((type == ito::tComplex128) ? ito::tFloat64 : type);
+        }        
 
         //until now, rgba32 will be mapped to uint8
         type = (type == ito::tRGBA32) ? ito::tUInt8 : type;
@@ -3014,110 +3017,105 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed()
             switch (type)
             {
             case ito::tUInt8:
-                {
+            {
                 ito::uint8 *rowPtr = (ito::uint8*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->getDataObject()->at <ito::uint8>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::uint8>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tInt8:
-                {
+            {
                 ito::int8 *rowPtr = (ito::int8*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->getDataObject()->at <ito::int8>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::int8>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tUInt16:
-                {
+            {
                 ito::uint16 *rowPtr = (ito::uint16*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->getDataObject()->at <ito::uint16>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::uint16>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tInt16:
-                {
+            {
                 ito::int16 *rowPtr = (ito::int16*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->getDataObject()->at <ito::int16>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::int16>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tUInt32:
-                {
+            {
                 ito::uint32 *rowPtr = (ito::uint32*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->getDataObject()->at <ito::uint32>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::uint32>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tInt32:
-                {
+            {
                 ito::int32 *rowPtr = (ito::int32*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->getDataObject()->at <ito::int32>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::int32>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tFloat32:
-                {
+            {
                 ito::float32 *rowPtr = (ito::float32*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->getDataObject()->at <ito::float32>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::float32>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tFloat64:
-                {
+            {
                 ito::float64 *rowPtr = (ito::float64*)displayed->rowPtr(0, i);
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->getDataObject()->at <ito::float64>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::float64>(seriesData->sample(n).ry());
                 }
-                }
-                break;
+            }
+            break;
             case ito::tComplex64:
-                {
+            {
                 ito::complex64 *rowPtr = (ito::complex64*)displayed->rowPtr(0, i);
+                const ito::DataObject *dataObj = seriesData->getDataObject();
+                int type = dataObj->getType();
+                int mat = dataObj->seekMat(0);
+                const ito::complex64 *rowPtrD = dataObj->rowPtr<ito::complex64>(mat, 0);
+
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    //*(rowPtr++) = cv::saturate_cast<ito::complex64>(seriesData->sample(n).ry());
-                    *(rowPtr++) = cv::saturate_cast<ito::complex64>(seriesData->getDataObject()->at <ito::complex64>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::complex64>(rowPtrD[n]);
                 }
-                }
-                break;
+            }
+            break;
             case ito::tComplex128:
-                {
+            {
                 ito::complex128 *rowPtr = (ito::complex128*)displayed->rowPtr(0, i);
-                
-                seriesData->getDataObject()->copyTo(*(displayed));
-                const cv::Mat *numMat = seriesData->getDataObject()->getCvPlaneMat(0);
-                
+                const ito::DataObject *dataObj = seriesData->getDataObject();
+                int type = dataObj->getType();
+                int mat = dataObj->seekMat(0);
+                const ito::complex128 *rowPtrD = dataObj->rowPtr<ito::complex128>(mat, 0);
+
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::complex128>(seriesData->sample(n).ry());
-                    //*(rowPtr++) = cv::saturate_cast<ito::complex128>(seriesData->getDataObject()->at <ito::complex128>(firstIdx, lastIdx));
-                    //*(displayed) = cv::saturate_cast<ito::complex128>(seriesData->getDataObject()->at<ito::complex128>(firstIdx, lastIdx));
+                    *(rowPtr++) = cv::saturate_cast<ito::complex128>(rowPtrD[n]);   
                 }
-                }
-                break;
+            }
+            break;
             }
         }
     }

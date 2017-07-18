@@ -2866,15 +2866,14 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
     QString varname = "zoom_object";
     m_copyDisplayedAsComplex = false;
-
-    const QString textForUser = "Indicate the python varible name for the currently visible object";
     const QString dialogTitle = "Current to workspace";
+    const QString userText = "Indicate the python varible name for the currently visible object";
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         emit statusBarMessage(tr("Could not send object to workspace, api is missing."), 4000);
     }
-
+    
     if (p->getSource()->getType() == ito::tComplex128 || p->getSource()->getType() == ito::tComplex64) //checkBox if dataObject is complex to copy complex/not-displayed dataObject real and imaginary part. 
     {
         QDialog *dialog = new QDialog(this);
@@ -2883,7 +2882,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
         QVBoxLayout *layout = new QVBoxLayout(dialog);
         
         QLabel *label = new QLabel(dialog);
-        label->setText(textForUser);
+        label->setText(userText);
         layout->addWidget(label);
         
         QLineEdit *lineEdit = new QLineEdit(dialog);
@@ -2894,7 +2893,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
         
         QCheckBox *checkBox = new QCheckBox("copy as complex dataType", dialog);
         checkBox->setCheckable(true);
-        checkBox->setCheckState(Qt::Checked);
+        checkBox->setCheckState(Qt::Checked); 
         layout->addWidget(checkBox);
         
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -2925,7 +2924,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     }
     else
     {
-        QString varname = QInputDialog::getText(p, tr(dialogTitle.toLatin1().data()), tr(textForUser.toLatin1().data()), QLineEdit::Normal, varname, &ok);
+        QString varname = QInputDialog::getText(p, tr(dialogTitle.toLatin1().data()), tr(userText.toLatin1().data()), QLineEdit::Normal, "zoom_object", &ok);
     }    
     
     if (ok && varname != "")

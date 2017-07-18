@@ -91,7 +91,7 @@ class Plot1DWidget : public ItomQwtPlot
         QVector<int> getPickerPixel() const;
         QVector<float> getPickerPhys() const;
 
-        QSharedPointer<ito::DataObject> getDisplayed();
+        QSharedPointer<ito::DataObject> getDisplayed(bool copyDisplayedAsComplex);
 
         void setSymbolStyle(const QwtSymbol::Style style, int size);
 
@@ -186,7 +186,6 @@ class Plot1DWidget : public ItomQwtPlot
         long m_lineCol;
         qreal m_lineWidth;
         Qt::PenStyle m_lineStyle;
-        int m_linePlotID;
         ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
         bool m_antiAliased;
 

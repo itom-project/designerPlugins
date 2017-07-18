@@ -818,7 +818,7 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed()
     }
     else
     {
-        return m_pContent->getDisplayed();
+        return m_pContent->getDisplayed(m_pContent->m_copyDisplayedAsComplex);
     }
 }
 
