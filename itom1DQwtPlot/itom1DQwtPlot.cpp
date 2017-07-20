@@ -744,6 +744,7 @@ int Itom1DQwtPlot::getLegendLabelWidth() const
 	{
 		return m_pContent->m_pLegendLabelWidth;
 	}
+	return 15;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QStringList Itom1DQwtPlot::getLegendTitles() const
