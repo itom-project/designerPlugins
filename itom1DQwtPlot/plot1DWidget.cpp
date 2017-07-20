@@ -3092,7 +3092,6 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
             {
                 ito::complex64 *rowPtr = (ito::complex64*)displayed->rowPtr(0, i);
                 const ito::DataObject *dataObj = seriesData->getDataObject();
-                int type = dataObj->getType();
                 int mat = dataObj->seekMat(0);
                 const ito::complex64 *rowPtrD = dataObj->rowPtr<ito::complex64>(mat, 0);
 
@@ -3106,7 +3105,6 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
             {
                 ito::complex128 *rowPtr = (ito::complex128*)displayed->rowPtr(0, i);
                 const ito::DataObject *dataObj = seriesData->getDataObject();
-                int type = dataObj->getType();
                 int mat = dataObj->seekMat(0);
                 const ito::complex128 *rowPtrD = dataObj->rowPtr<ito::complex128>(mat, 0);
 

@@ -2924,7 +2924,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     }
     else
     {
-        QString varname = QInputDialog::getText(p, tr(dialogTitle.toLatin1().data()), tr(userText.toLatin1().data()), QLineEdit::Normal, "zoom_object", &ok);
+        varname = QInputDialog::getText(p, tr(dialogTitle.toLatin1().data()), tr(userText.toLatin1().data()), QLineEdit::Normal, "zoom_object", &ok);
     }    
     
     if (ok && varname != "")
