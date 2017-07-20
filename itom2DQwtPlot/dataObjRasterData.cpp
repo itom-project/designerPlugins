@@ -943,7 +943,7 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
 
     ito::DataObject dataObjectOut;
     int type = m_dataObjPlane->getType();
-    if (copyDisplayedAsComplex)
+    if (copyDisplayedAsComplex == false)
     {
         m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
     }
