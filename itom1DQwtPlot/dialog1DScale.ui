@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>211</width>
-    <height>311</height>
+    <height>271</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -83,6 +83,9 @@
           <property name="text">
            <string>to</string>
           </property>
+          <property name="buddy">
+           <cstring>txtMaxX</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="0">
@@ -96,58 +99,28 @@
           <property name="text">
            <string>from</string>
           </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMaxX">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="buddy">
+           <cstring>txtMinX</cstring>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMinX">
+         <widget class="QLineEdit" name="txtMinX">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
-          <property name="toolTip">
-           <string/>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtMaxX">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
          </widget>
         </item>
@@ -202,28 +175,13 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="1" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMaxY">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="txtMinY">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
          </widget>
         </item>
@@ -238,6 +196,9 @@
           <property name="text">
            <string>to</string>
           </property>
+          <property name="buddy">
+           <cstring>txtMaxY</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="0">
@@ -251,46 +212,24 @@
           <property name="text">
            <string>from</string>
           </property>
+          <property name="buddy">
+           <cstring>txtMinY</cstring>
+          </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMinY">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtMaxY">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
          </widget>
         </item>
        </layout>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Hint: Control the number of decimals in the spin boxes by pressing Ctrl+ or Ctrl-</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>
@@ -305,39 +244,79 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>DoubleSpinBox</class>
-   <extends>QWidget</extends>
-   <header>doubleSpinBox.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>radioAutoCalcX</tabstop>
   <tabstop>radioManualX</tabstop>
-  <tabstop>doubleSpinMinX</tabstop>
-  <tabstop>doubleSpinMaxX</tabstop>
+  <tabstop>txtMinX</tabstop>
+  <tabstop>txtMaxX</tabstop>
   <tabstop>radioAutoCalcY</tabstop>
   <tabstop>radioManualY</tabstop>
-  <tabstop>doubleSpinMinY</tabstop>
-  <tabstop>doubleSpinMaxY</tabstop>
-  <tabstop>buttonBox</tabstop>
+  <tabstop>txtMinY</tabstop>
+  <tabstop>txtMaxY</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog1DScale</receiver>
-   <slot>accept()</slot>
+   <sender>radioManualX</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMinX</receiver>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>175</x>
-     <y>261</y>
+     <x>47</x>
+     <y>58</y>
     </hint>
     <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
+     <x>50</x>
+     <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualX</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMaxX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>74</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMinY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>53</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>53</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMaxY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>93</x>
+     <y>166</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>221</y>
     </hint>
    </hints>
   </connection>
@@ -348,76 +327,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>175</x>
-     <y>261</y>
+     <x>112</x>
+     <y>285</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualX</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMinX</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>61</x>
-     <y>54</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>62</x>
-     <y>80</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualX</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMaxX</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>117</x>
-     <y>56</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>124</x>
-     <y>108</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualY</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMinY</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>174</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>62</x>
-     <y>182</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualY</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMaxY</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>106</x>
-     <y>173</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>106</x>
-     <y>209</y>
+     <x>207</x>
+     <y>287</y>
     </hint>
    </hints>
   </connection>

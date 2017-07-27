@@ -22,11 +22,33 @@
 
 #include "dialog1DScale.h"
 
+#include <qvalidator.h>
+#include <qmessagebox.h>
+#include <qregexp.h>
+
 //-----------------------------------------------------------------------------------------------
 Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+	m_minX(-std::numeric_limits<double>::max()),
+	m_maxX(std::numeric_limits<double>::max()),
+	m_minY(-std::numeric_limits<double>::max()),
+	m_maxY(std::numeric_limits<double>::max()),
+	m_locale(QLocale())
 {
     ui.setupUi(this);
+
+	m_locale.setNumberOptions(QLocale::OmitGroupSeparator);
+
+	QString numberRegExp;
+	if (m_locale.decimalPoint() == '.')
+	{
+		numberRegExp = "^[\\+-]?(?:0|[1-9]\\d*)(?:\\.\\d*)?(?:[eE][\\+-]?\\d+)?$";
+	}
+	else
+	{
+		numberRegExp = "^[\\+-]?(?:0|[1-9]\\d*)(?:,\\d*)?(?:[eE][\\+-]?\\d+)?$";
+	}
+	QRegExpValidator *numberValidator = new QRegExpValidator(QRegExp(numberRegExp), this);
 
     double min,max;
 
@@ -40,9 +62,12 @@ Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
         ui.radioManualX->setChecked(true);
     }
 
-    ui.doubleSpinMinX->setValue( data.m_axisMin );
-    ui.doubleSpinMaxX->setValue( data.m_axisMax );
-    
+	ui.txtMinX->setValidator(numberValidator);
+	ui.txtMaxX->setValidator(numberValidator);
+
+    ui.txtMinX->setText(m_locale.toString(data.m_axisMin, 'g') );
+    ui.txtMaxX->setText(m_locale.toString(data.m_axisMax, 'g') );
+
     //y
     if(data.m_valueScaleAuto)
     {
@@ -53,15 +78,13 @@ Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
         ui.radioManualY->setChecked(true);
     }
 
-    getDataTypeRange(data.m_dataType, min, max);
-
-    ui.doubleSpinMinY->setMinimum(min);
-    ui.doubleSpinMinY->setMaximum(max);
-    ui.doubleSpinMaxY->setMinimum(min);
-    ui.doubleSpinMaxY->setMaximum(max);
+    getDataTypeRange(data.m_dataType, m_minY, m_maxY);
     
-    ui.doubleSpinMinY->setValue( data.m_valueMin );
-    ui.doubleSpinMaxY->setValue( data.m_valueMax );
+    ui.txtMinY->setText(m_locale.toString(data.m_valueMin, 'g') );
+    ui.txtMaxY->setText(m_locale.toString(data.m_valueMax, 'g') );
+
+	ui.txtMinY->setValidator(numberValidator);
+	ui.txtMaxY->setValidator(numberValidator);
 
     //ui.groupPlane->setVisible(false);
 }
@@ -70,12 +93,34 @@ Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
 void Dialog1DScale::getData(InternalData &data)
 {
     data.m_valueScaleAuto = ui.radioAutoCalcY->isChecked();
-    data.m_valueMin = ui.doubleSpinMinY->value();
-    data.m_valueMax = ui.doubleSpinMaxY->value();
-    
-    data.m_axisScaleAuto = ui.radioAutoCalcX->isChecked();
-    data.m_axisMin = ui.doubleSpinMinX->value();
-    data.m_axisMax = ui.doubleSpinMaxX->value();
+	data.m_axisScaleAuto = ui.radioAutoCalcX->isChecked();
+
+	bool ok;
+	double number;
+
+	number = m_locale.toDouble(ui.txtMinY->text(), &ok);
+	if (ok)
+	{
+		data.m_valueMin = number;
+	}
+
+	number = m_locale.toDouble(ui.txtMaxY->text(), &ok);
+	if (ok)
+	{
+		data.m_valueMax = number;
+	}
+
+	number = m_locale.toDouble(ui.txtMinX->text(), &ok);
+	if (ok)
+	{
+		data.m_axisMin = number;
+	}
+
+	number = m_locale.toDouble(ui.txtMaxX->text(), &ok);
+	if (ok)
+	{
+		data.m_axisMax = number;
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -118,4 +163,57 @@ void Dialog1DScale::getDataTypeRange(ito::tDataType type, double &min, double &m
         max = -min;
         break;
     }
+}
+
+//-----------------------------------------------------------------------------------------------
+bool Dialog1DScale::checkValue(QLineEdit *lineEdit, const double &min, const double &max, const QString &name)
+{
+	bool ok;
+	double val = m_locale.toDouble(lineEdit->text(), &ok);
+	if (!ok)
+	{
+		QMessageBox::critical(this, tr("invalid number"), tr("The '%1' number is no valid decimal number.").arg(name));
+	}
+	else if ((val < min) || (val > max))
+	{
+		ok = false;
+		QMessageBox::critical(this, tr("out of range"), tr("The '%1' number is out of range [%2,%3]").arg(name).arg(m_locale.toString(min, 'g')).arg(m_locale.toString(max, 'g')));
+	}
+
+	if (!ok)
+	{
+		lineEdit->selectAll();
+	}
+
+	return ok;
+}
+
+
+//-----------------------------------------------------------------------------------------------
+void Dialog1DScale::on_buttonBox_accepted()
+{
+	bool ok = true;
+
+	if (!checkValue(ui.txtMinX, m_minX, m_maxX, "minimum X"))
+	{
+		return;
+	}
+
+	if (!checkValue(ui.txtMaxX, m_minX, m_maxX, "maximum X"))
+	{
+		return;
+	}
+
+	if (!checkValue(ui.txtMinY, m_minY, m_maxY, "minimum Y"))
+	{
+		return;
+	}
+
+	if (!checkValue(ui.txtMaxY, m_minY, m_maxY, "maximum Y"))
+	{
+		return;
+	}
+
+
+	emit accept();
 }

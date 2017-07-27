@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>211</width>
-    <height>430</height>
+    <height>398</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -72,6 +72,16 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtMaxX">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>0,000</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="sizePolicy">
@@ -98,53 +108,13 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMaxX">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMinX">
+         <widget class="QLineEdit" name="txtMinX">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
          </widget>
         </item>
@@ -199,16 +169,13 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtMaxY">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
           <property name="text">
-           <string>from</string>
+           <string>0,000</string>
           </property>
          </widget>
         </item>
@@ -225,53 +192,26 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMinY">
-          <property name="enabled">
-           <bool>false</bool>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>from</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMaxY">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="txtMinY">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
          </widget>
         </item>
@@ -352,69 +292,29 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMinValue">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtMaxValue">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="DoubleSpinBox" name="doubleSpinMaxValue">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="txtMinValue">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
-          </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="decimalsOption">
-           <set>DoubleSpinBox::DecimalsAsMin|DoubleSpinBox::DecimalsByShortcuts|DoubleSpinBox::InsertDecimals</set>
-          </property>
-          <property name="minimum">
-           <double>-999999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>999999999.000000000000000</double>
-          </property>
-          <property name="sizeHintPolicy">
-           <enum>DoubleSpinBox::SizeHintByValue</enum>
+          <property name="text">
+           <string>0,000</string>
           </property>
          </widget>
         </item>
        </layout>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Hint: Control the number of decimals in the spin boxes by pressing Ctrl+ or Ctrl-</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>
@@ -429,46 +329,22 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>DoubleSpinBox</class>
-   <extends>QWidget</extends>
-   <header>doubleSpinBox.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>radioAutoCalcX</tabstop>
   <tabstop>radioManualX</tabstop>
-  <tabstop>doubleSpinMinX</tabstop>
-  <tabstop>doubleSpinMaxX</tabstop>
+  <tabstop>txtMinX</tabstop>
+  <tabstop>txtMaxX</tabstop>
   <tabstop>radioAutoCalcY</tabstop>
   <tabstop>radioManualY</tabstop>
-  <tabstop>doubleSpinMinY</tabstop>
-  <tabstop>doubleSpinMaxY</tabstop>
+  <tabstop>txtMinY</tabstop>
+  <tabstop>txtMaxY</tabstop>
   <tabstop>radioAutoCalcValue</tabstop>
   <tabstop>radioManualValue</tabstop>
-  <tabstop>doubleSpinMinValue</tabstop>
-  <tabstop>doubleSpinMaxValue</tabstop>
-  <tabstop>buttonBox</tabstop>
+  <tabstop>txtMinValue</tabstop>
+  <tabstop>txtMaxValue</tabstop>
  </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog2DScale</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>164</x>
-     <y>376</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
@@ -486,98 +362,98 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioManualValue</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMinValue</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>64</x>
-     <y>288</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>79</x>
-     <y>305</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualY</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMinY</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>70</x>
-     <y>169</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>134</x>
-     <y>190</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualY</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMaxY</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>67</x>
-     <y>214</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>radioManualX</sender>
    <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMinX</receiver>
+   <receiver>txtMinX</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
-     <y>57</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>135</x>
-     <y>71</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioManualX</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMaxX</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>72</x>
+     <x>66</x>
      <y>58</y>
     </hint>
     <hint type="destinationlabel">
-     <x>73</x>
-     <y>97</y>
+     <x>62</x>
+     <y>74</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualX</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMaxX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>86</x>
+     <y>101</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMinY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>45</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>54</x>
+     <y>196</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMaxY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>74</x>
+     <y>223</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>radioManualValue</sender>
    <signal>toggled(bool)</signal>
-   <receiver>doubleSpinMaxValue</receiver>
+   <receiver>txtMinValue</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>48</x>
-     <y>286</y>
+     <x>53</x>
+     <y>291</y>
     </hint>
     <hint type="destinationlabel">
-     <x>59</x>
-     <y>330</y>
+     <x>63</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualValue</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>txtMaxValue</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>293</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>81</x>
+     <y>342</y>
     </hint>
    </hints>
   </connection>

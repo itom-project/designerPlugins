@@ -25,6 +25,7 @@
 
 #include <QtGui>
 #include <qdialog.h>
+#include <qlocale.h>
 
 #include "plot1DWidget.h"
 
@@ -32,6 +33,8 @@
 
 class Dialog1DScale : public QDialog 
 {
+	Q_OBJECT
+
 public:
     Dialog1DScale(const InternalData &data, QWidget *parent = NULL);
     ~Dialog1DScale() {};
@@ -39,13 +42,20 @@ public:
     void getData(InternalData &data);
 
 private:
-
     void getDataTypeRange(ito::tDataType type, double &min, double &max);
+	bool checkValue(QLineEdit *lineEdit, const double &min, const double &max, const QString &name);
+
+	double m_minX;
+	double m_maxX;
+	double m_minY;
+	double m_maxY;
 
     Ui::Dialog1DScale ui;
 
-private slots:
+	QLocale m_locale;
 
+private slots:
+	void on_buttonBox_accepted();
 };
 
 #endif
