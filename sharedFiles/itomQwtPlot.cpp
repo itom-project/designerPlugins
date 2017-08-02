@@ -2621,6 +2621,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         QPainter painter(&img);
         painter.scale(resFactor, resFactor);
         renderer.render(this, &painter, rect());
+        painter.end();
         img.setDotsPerMeterX(img.dotsPerMeterX() * resFactor); //setDotsPerMeterXY must be set after rendering
         img.setDotsPerMeterY(img.dotsPerMeterY() * resFactor);
 
@@ -2649,14 +2650,15 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
             }
 
             QImage imgTotal(img.width() + width, qMax(img.height(), height), QImage::Format_ARGB32);
-            QPainter painter(&imgTotal);
+            QPainter painter2(&imgTotal);
             painter.drawImage(0, 0, img);
             int y0 = 0;
             foreach(QPixmap pixmap, pixmaps)
             {
-                painter.drawPixmap(x0, y0, pixmap);
+                painter2.drawPixmap(x0, y0, pixmap);
                 y0 += pixmap.height();
             }
+            painter2.end();
 
             img = imgTotal;
         }
