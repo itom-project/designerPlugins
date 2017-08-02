@@ -122,7 +122,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://lineSymbol", "Get / Set the current line symbol type")
     Q_CLASSINFO("prop://lineSymbolSize", "Get / Set the current line symbol size")
 
-    Q_CLASSINFO("prop://baseLine", "the position of the baseline if curveStyle is set to 'Sticks', 'SticksVertical' or 'SticksHorizontal'.")
+    Q_CLASSINFO("prop://baseLine", "If curveStyle is set to 'Sticks', 'SticksVertical' or 'SticksHorizontal', the baseline indicates the start point of each line either in vertical or horizontal direction. For all other curve types, the baseline is considered if fillCurve is set to 'FillBaseLine'.")
 
     Q_CLASSINFO("prop://columnInterpretation", "Define the interpretation of M x N objects as Auto, FirstRow, FirstCol, MultiRows, MultiCols.")
 

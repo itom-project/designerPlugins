@@ -1377,44 +1377,57 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             {
                 case ItomQwtPlotEnums::NoCurve:
                     dObjCurve->setStyle(QwtPlotCurve::NoCurve);
-                break;
+                    break;
                 default:
                 case ItomQwtPlotEnums::Lines:
+                    dObjCurve->setOrientation(Qt::Vertical);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
                     dObjCurve->setStyle(QwtPlotCurve::Lines);
                     break;
                 case ItomQwtPlotEnums::FittedLines:
+                    dObjCurve->setOrientation(Qt::Vertical);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, true);
                     dObjCurve->setStyle(QwtPlotCurve::Lines);
-                break;
+                    break;
                 case ItomQwtPlotEnums::StepsLeft:
-                    dObjCurve->setOrientation(Qt::Horizontal);
+                    dObjCurve->setOrientation(Qt::Vertical);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
                     dObjCurve->setStyle(QwtPlotCurve::Steps);
-                break;
+                    break;
                 case ItomQwtPlotEnums::StepsRight:
-                    dObjCurve->setOrientation(Qt::Horizontal);
+                    dObjCurve->setOrientation(Qt::Vertical);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, true);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
                     dObjCurve->setStyle(QwtPlotCurve::Steps);
-                break;
+                    break;
                 case ItomQwtPlotEnums::Steps:
-                    dObjCurve->setOrientation(Qt::Horizontal);
+                    dObjCurve->setOrientation(Qt::Vertical);
                     dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
                     dObjCurve->setStyle(QwtPlotCurve::UserCurve);
-                break;
+                    break;
                 case ItomQwtPlotEnums::SticksHorizontal:
                     dObjCurve->setOrientation(Qt::Horizontal);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
                     dObjCurve->setStyle(QwtPlotCurve::Sticks);
-                break;
-
+                    break;
                 case ItomQwtPlotEnums::Sticks:
                 case ItomQwtPlotEnums::SticksVertical:
                     dObjCurve->setOrientation(Qt::Vertical);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
                     dObjCurve->setStyle(QwtPlotCurve::Sticks);
-                break;
+                    break;
                 case ItomQwtPlotEnums::Dots:
+                    dObjCurve->setOrientation(Qt::Vertical);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
                     dObjCurve->setStyle(QwtPlotCurve::Dots);
-                break;
+                    break;
             }
 
             dObjCurve->setBaseline(m_baseLine);
@@ -2837,48 +2850,62 @@ void Plot1DWidget::setQwtLineStyle(const ItomQwtPlotEnums::CurveStyle &style)
 {
     m_qwtCurveStyle = style;
 
-    foreach(QwtPlotCurve *c, m_plotCurveItems)
+    foreach(QwtPlotCurve *dObjCurve, m_plotCurveItems)
     {
         switch(m_qwtCurveStyle)
         {
-            case ItomQwtPlotEnums::NoCurve:
-                c->setStyle(QwtPlotCurve::NoCurve);
+        case ItomQwtPlotEnums::NoCurve:
+            dObjCurve->setStyle(QwtPlotCurve::NoCurve);
             break;
-            default:
-            case ItomQwtPlotEnums::Lines:
-                c->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                c->setStyle(QwtPlotCurve::Lines);
-                break;
-            case ItomQwtPlotEnums::FittedLines:
-                c->setCurveAttribute(QwtPlotCurve::Fitted, true);
-                c->setStyle(QwtPlotCurve::Lines);
+        default:
+        case ItomQwtPlotEnums::Lines:
+            dObjCurve->setOrientation(Qt::Vertical);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+            dObjCurve->setStyle(QwtPlotCurve::Lines);
             break;
-            case ItomQwtPlotEnums::StepsLeft:
-                c->setOrientation(Qt::Horizontal);
-                c->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                c->setStyle(QwtPlotCurve::Steps);
+        case ItomQwtPlotEnums::FittedLines:
+            dObjCurve->setOrientation(Qt::Vertical);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, true);
+            dObjCurve->setStyle(QwtPlotCurve::Lines);
             break;
-            case ItomQwtPlotEnums::StepsRight:
-                c->setOrientation(Qt::Horizontal);
-                c->setCurveAttribute(QwtPlotCurve::Inverted, true);
-                c->setStyle(QwtPlotCurve::Steps);
+        case ItomQwtPlotEnums::StepsLeft:
+            dObjCurve->setOrientation(Qt::Vertical);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+            dObjCurve->setStyle(QwtPlotCurve::Steps);
             break;
-            case ItomQwtPlotEnums::Steps:
-                c->setOrientation(Qt::Horizontal);
-                c->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                c->setStyle(QwtPlotCurve::UserCurve);
+        case ItomQwtPlotEnums::StepsRight:
+            dObjCurve->setOrientation(Qt::Vertical);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, true);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+            dObjCurve->setStyle(QwtPlotCurve::Steps);
             break;
-            case ItomQwtPlotEnums::SticksHorizontal:
-                c->setOrientation(Qt::Horizontal);
-                c->setStyle(QwtPlotCurve::Sticks);
+        case ItomQwtPlotEnums::Steps:
+            dObjCurve->setOrientation(Qt::Vertical);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+            dObjCurve->setStyle(QwtPlotCurve::UserCurve);
             break;
-            case ItomQwtPlotEnums::Sticks:
-            case ItomQwtPlotEnums::SticksVertical:
-                c->setOrientation(Qt::Vertical);
-                c->setStyle(QwtPlotCurve::Sticks);
+        case ItomQwtPlotEnums::SticksHorizontal:
+            dObjCurve->setOrientation(Qt::Horizontal);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+            dObjCurve->setStyle(QwtPlotCurve::Sticks);
             break;
-            case ItomQwtPlotEnums::Dots:
-                c->setStyle(QwtPlotCurve::Dots);
+        case ItomQwtPlotEnums::Sticks:
+        case ItomQwtPlotEnums::SticksVertical:
+            dObjCurve->setOrientation(Qt::Vertical);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+            dObjCurve->setStyle(QwtPlotCurve::Sticks);
+            break;
+        case ItomQwtPlotEnums::Dots:
+            dObjCurve->setOrientation(Qt::Vertical);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+            dObjCurve->setStyle(QwtPlotCurve::Dots);
             break;
         }
     }
