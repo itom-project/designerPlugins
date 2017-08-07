@@ -1868,7 +1868,12 @@ void PlotCanvas::lineCutMovedPhys(const QPointF &pt)
 
             if (m_activeModifiers.testFlag(Qt::ControlModifier))
             {
-                if (abs(pts[1].x() - pts[0].x()) > abs(pts[1].y() - pts[0].y()))
+                //Ctrl pressed: line should be horizontally or vertically aligned. This has to be checked with respect to screen coordinates,
+                //if it is done on scale coordinates, problems can occur if one dimension has a scaling that varies strongly from the other scaling.
+                int dx = transform(QwtPlot::xBottom, pts[0].x()) - transform(QwtPlot::xBottom, pts[1].x());
+                int dy = transform(QwtPlot::yLeft, pts[0].y()) - transform(QwtPlot::yLeft, pts[1].y());
+
+                if (abs(dx) > abs(dy))
                 {
                     pts[1].setY(pts[0].y());
                 }
