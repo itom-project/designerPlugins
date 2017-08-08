@@ -863,6 +863,9 @@ QPoint DataObjectSeriesData::indexRange(const QwtScaleMap &xMap, bool clipMargin
         double xMapEndPhys = std::max(xMap.s1(), xMap.s2());
         double start_ = (xMapStartPhys - m_d.startPhys) / m_d.stepSizePhys;
         double end_ = (xMapEndPhys - m_d.startPhys) / m_d.stepSizePhys;
+        // z-stack with negative stepSize does not get plot due to bounding of values below, if we do not do order checking here
+        if (end_ < start_)
+            qSwap(start_, end_);
         start = clipMargin ? qBound(0, qCeil(start_), m_d.nrPoints - 1) : qBound(0, qCeil(start_) - 1, m_d.nrPoints - 1);
         end = clipMargin ? qBound(start, qFloor(end_), m_d.nrPoints - 1) : qBound(start, qFloor(end_) + 1, m_d.nrPoints - 1);
         return QPoint(start, end);
