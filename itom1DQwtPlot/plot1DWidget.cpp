@@ -57,6 +57,7 @@
 #include <qdebug.h>
 #include <qmessagebox.h>
 #include <qnumeric.h>
+#include <qinputdialog.h>
 
 //namespace ito {
 //    extern void **ITOM_API_FUNCS_GRAPH;
@@ -425,13 +426,18 @@ void Plot1DWidget::createActions()
     m_pMnuSetPicker = new QMenu("Picker Switch");
     m_pActSetPicker->setMenu(m_pMnuSetPicker);
 
-    a = m_pMnuSetPicker->addAction(tr("To Min-Max"));
-    a->setToolTip(tr("set two pickers to absolute minimum and maximum of (first) curve"));
+    a = m_pMnuSetPicker->addAction(tr("To Global Min-Max"));
+    a->setToolTip(tr("set two pickers to the absolute minimum and maximum of the curve. \nIf multiple curves are visible, the user can select the appropriate one."));
     a->setData(0);
+
+    a = m_pMnuSetPicker->addAction(tr("To Min-Max In Current View"));
+    a->setToolTip(tr("set two pickers to the absolute minimum and maximum of the curve (within the current view). \nIf multiple curves are visible, the user can select the appropriate one."));
+    a->setEnabled(false); //not yet implemented
+    a->setData(1);
 
     a = m_pMnuSetPicker->addAction(tr("Delete Pickers"));
     a->setToolTip(tr("delete all pickers"));
-    a->setData(1);
+    a->setData(2);
     
     connect(m_pMnuSetPicker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetPicker(QAction*)));
 
@@ -560,6 +566,7 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker.png"));
         m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
         m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
+        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
         m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
@@ -1794,26 +1801,80 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
             }
             break;
         case Qt::Key_Up:
+            //jump to next visible line at the same x-coordinate
             for (int i = 0 ; i < m_pickers.size() ; i++)
             {
                 m = &(m_pickers[i]);
                 if (m->active)
                 {
-                    m->curveIdx++;
-                    if (m->curveIdx >= curves) m->curveIdx = 0;
-                    stickPickerToXPx(m, m->item->xValue(), 0);
+                    //find next visible curve
+                    bool found = false;
+                    for (int j = m->curveIdx + 1; j < m_plotCurveItems.size(); ++j)
+                    {
+                        if (m_plotCurveItems[j]->isVisible())
+                        {
+                            m->curveIdx = j;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) //try to restart from beginning
+                    {
+                        for (int j = 0; j < m->curveIdx; ++j)
+                        {
+                            if (m_plotCurveItems[j]->isVisible())
+                            {
+                                m->curveIdx = j;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (found)
+                    {
+                        stickPickerToXPx(m, m->item->xValue(), 0);
+                    }
                 }
             }
             break;
         case Qt::Key_Down:
-            for (int i = 0 ; i < m_pickers.size() ; i++)
+            //jump to previous visible line at the same x-coordinate
+            for (int i = 0; i < m_pickers.size(); i++)
             {
                 m = &(m_pickers[i]);
                 if (m->active)
                 {
-                    m->curveIdx--;
-                    if (m->curveIdx < 0) m->curveIdx = curves-1;
-                    stickPickerToXPx(m, m->item->xValue(), 0);
+                    //find previous visible curve
+                    bool found = false;
+                    for (int j = m->curveIdx - 1; j >= 0; --j)
+                    {
+                        if (m_plotCurveItems[j]->isVisible())
+                        {
+                            m->curveIdx = j;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) //try to restart from the end
+                    {
+                        for (int j = m_plotCurveItems.size() - 1; j > m->curveIdx; --j)
+                        {
+                            if (m_plotCurveItems[j]->isVisible())
+                            {
+                                m->curveIdx = j;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (found)
+                    {
+                        stickPickerToXPx(m, m->item->xValue(), 0);
+                    }
                 }
             }
             break;
@@ -2040,11 +2101,13 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
         if (i == 0)
         {
             m_pickers[0].active = true;
+            m_pickers[0].curveIdx = curveIdx;
             stickPickerToSampleIdx(&(m_pickers[0]), idx1, 0);
         }
         else if (i == 1)
         {
             m_pickers[1].active = false;
+            m_pickers[1].curveIdx = curveIdx;
             stickPickerToSampleIdx(&(m_pickers[1]), idx2, 0);
         }
         else
@@ -3395,31 +3458,58 @@ void Plot1DWidget::mnuParentScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mnuSetPicker(QAction *action)
 {
-    if (action->data().toInt() == 0) //set to min..max
+    if (action->data().toInt() == 0 || action->data().toInt() == 1)
     {
-        if (m_plotCurveItems.size() > 0)
-        {
-            DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
+        //absolute min/max within entire object or within current view
+        QList<int> visibleIndices;
+        QStringList visibleTitles;
+        int index = -1;
 
-            if (action->text() == QString(tr("To Min-Max")))
+        for (int i = 0; i < m_plotCurveItems.size(); ++i)
+        {
+            if (m_plotCurveItems[i]->isVisible())
             {
-                ito::float64 minVal, maxVal;
-                int minLoc, maxLoc;
-                if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
+                visibleIndices << i;
+                visibleTitles << m_plotCurveItems[i]->title().text();
+            }
+        }
+
+        if (visibleIndices.size() == 1)
+        {
+            index = visibleIndices[0];
+        }
+        else if (visibleIndices.size() > 1)
+        {
+            bool ok;
+            QString selectedTitle = QInputDialog::getItem(this, tr("Select a visible curve"), tr("Select the curve the picker values should be referred to"), visibleTitles, 0, false, &ok);
+            if (!ok)
+            {
+                return;
+            }
+
+            index = visibleIndices[visibleTitles.indexOf(selectedTitle)];
+        }
+
+        if (index >= 0)
+        {
+            DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[index]->data());
+
+            ito::float64 minVal, maxVal;
+            int minLoc, maxLoc;
+            if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
+            {
+                if (minLoc < maxLoc)
                 {
-                    if (minLoc < maxLoc)
-                    {
-                        setMainPickersToIndex(minLoc, maxLoc, 0);
-                    }
-                    else
-                    {
-                        setMainPickersToIndex(maxLoc, minLoc, 0);
-                    }
+                    setMainPickersToIndex(minLoc, maxLoc, index);
+                }
+                else
+                {
+                    setMainPickersToIndex(maxLoc, minLoc, index);
                 }
             }
         }
     }
-    else //delete
+    else if (action->data().toInt() == 2) //delete all
     {
         clearPicker(-1, true);
     }

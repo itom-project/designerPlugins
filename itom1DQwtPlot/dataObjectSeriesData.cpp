@@ -2604,9 +2604,6 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
 {
     QRectF res;
 
-    //cv::Mat *mat;
-    //const uchar* ptr[4];
-    //float weights[4];
     minSampleIdx = 0;
     maxSampleIdx = 0;
     RetVal retval;
