@@ -2727,7 +2727,44 @@ QString DataObjectSeriesData::getDObjAxisLabel(const AbstractFigure::UnitLabelSt
     }
     return m_dObjAxisDescription;
 }
+template <typename _Tp> _Tp DataObjectSeriesData::sampleComplex(const size_t& n) const
+{
+    const cv::Mat *mat;
+    const uchar* ptr[4];
+    float fPos;
 
+    if (m_pDataObj && m_d.valid)
+    {
+        if (m_d.points.size() == 0) //no weighted stuff
+        {
+            switch (m_d.dir)
+            {
+            case dirX:
+            case dirY:
+                mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+                ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
+                fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
+
+            case dirZ:
+                mat = m_pDataObj->getCvPlaneMat((int)n);
+                ptr[0] = (mat->data + m_d.matOffset);
+                fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
+
+            case dirXY:
+                mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+                ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
+                fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
+            }
+        }
+    }
+
+    return *(reinterpret_cast<const _Tp*>(ptr[0]));
+}
+template ito::complex64  DataObjectSeriesData::sampleComplex(const size_t& n) const;
+template ito::complex128  DataObjectSeriesData::sampleComplex(const size_t& n) const;
 //----------------------------------------------------------------------------------------------
 void DataObjectSeriesData::getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const
 {

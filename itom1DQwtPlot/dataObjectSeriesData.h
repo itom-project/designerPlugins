@@ -123,42 +123,9 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         void setColorState(int newVal) {m_colorState = (ColorType)newVal;}
 
-        template <typename _Tp> _Tp sampleComplex(size_t n) const
-        {
-            const cv::Mat *mat;
-            const uchar* ptr[4];
-            float fPos;
+        template <typename _Tp> _Tp sampleComplex(const size_t& n) const; //only supports ito::complex64 and ito::complex128
+        
 
-            if (m_pDataObj && m_d.valid)
-            {
-                if (m_d.points.size() == 0) //no weighted stuff
-                {
-                    switch (m_d.dir)
-                    {
-                    case dirX:
-                    case dirY:
-                        mat = m_pDataObj->getCvPlaneMat(m_d.plane);
-                        ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
-                        fPos = m_d.startPhys + m_d.stepSizePhys * n;
-                        break;
-
-                    case dirZ:
-                        mat = m_pDataObj->getCvPlaneMat((int)n);
-                        ptr[0] = (mat->data + m_d.matOffset);
-                        fPos = m_d.startPhys + m_d.stepSizePhys * n;
-                        break;
-
-                    case dirXY:
-                        mat = m_pDataObj->getCvPlaneMat(m_d.plane);
-                        ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
-                        fPos = m_d.startPhys + m_d.stepSizePhys * n;
-                        break;
-                    }
-                }
-            }
-
-            return *(reinterpret_cast<const _Tp*>(ptr[0]));
-        }
 
     protected:
 
