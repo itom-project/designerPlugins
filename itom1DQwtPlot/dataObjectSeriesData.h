@@ -91,6 +91,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         QPoint indexRange(const QwtScaleMap &xMap, bool clipMargin) const; //!< returns first and last sample index, that is contained within xMap (physical values). If clipMargin is false, first and last are the closest values to xMap which are not contained in xMap (e.g. for polygonal drawings to see the line going out of the window)
 
         QPointF sample(size_t n) const;
+
         QRectF boundingRect() const;
         RetVal getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const;
 
@@ -121,6 +122,43 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         void calcHash();
 
         void setColorState(int newVal) {m_colorState = (ColorType)newVal;}
+
+        template <typename _Tp> _Tp sampleComplex(size_t n) const
+        {
+            const cv::Mat *mat;
+            const uchar* ptr[4];
+            float fPos;
+
+            if (m_pDataObj && m_d.valid)
+            {
+                if (m_d.points.size() == 0) //no weighted stuff
+                {
+                    switch (m_d.dir)
+                    {
+                    case dirX:
+                    case dirY:
+                        mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+                        ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
+                        fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                        break;
+
+                    case dirZ:
+                        mat = m_pDataObj->getCvPlaneMat((int)n);
+                        ptr[0] = (mat->data + m_d.matOffset);
+                        fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                        break;
+
+                    case dirXY:
+                        mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+                        ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
+                        fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                        break;
+                    }
+                }
+            }
+
+            return *(reinterpret_cast<const _Tp*>(ptr[0]));
+        }
 
     protected:
 

@@ -873,7 +873,7 @@ QPoint DataObjectSeriesData::indexRange(const QwtScaleMap &xMap, bool clipMargin
     else
     {
         return QPoint(0, m_d.points.size() - 1);
-    }        
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

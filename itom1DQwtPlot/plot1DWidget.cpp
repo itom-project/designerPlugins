@@ -3047,7 +3047,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
         }
         //for linecuts from a 2d object the data must be copy in a different way, especially in case of a diagonal linecut
         //complex64 will be mapped to float32 and complex128 to float64
-        if (copyDisplayedAsComplex == false || seriesData->getDataObject()->getSize(0) >= 2)
+        if (copyDisplayedAsComplex == false)
         {
             type = (type == ito::tComplex64) ? ito::tFloat32 : ((type == ito::tComplex128) ? ito::tFloat64 : type);
         }        
@@ -3181,26 +3181,18 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
             case ito::tComplex64:
             {
                 ito::complex64 *rowPtr = (ito::complex64*)displayed->rowPtr(0, i);
-                const ito::DataObject *dataObj = seriesData->getDataObject();
-                int mat = dataObj->seekMat(0);
-                const ito::complex64 *rowPtrD = dataObj->rowPtr<ito::complex64>(mat, 0);
-
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::complex64>(rowPtrD[n]);
+                    *(rowPtr++) = cv::saturate_cast<ito::complex64>(seriesData->sampleComplex<ito::complex64>(n));
                 }
             }
             break;
             case ito::tComplex128:
             {
                 ito::complex128 *rowPtr = (ito::complex128*)displayed->rowPtr(0, i);
-                const ito::DataObject *dataObj = seriesData->getDataObject();
-                int mat = dataObj->seekMat(0);
-                const ito::complex128 *rowPtrD = dataObj->rowPtr<ito::complex128>(mat, 0);
-
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::complex128>(rowPtrD[n]);   
+                    *(rowPtr++) = cv::saturate_cast<ito::complex128>(seriesData->sampleComplex<ito::complex128>(n));
                 }
             }
             break;
