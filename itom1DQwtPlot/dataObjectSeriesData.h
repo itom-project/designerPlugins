@@ -94,6 +94,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         QRectF boundingRect() const;
         RetVal getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const;
+        RetVal getMinMaxLocCropped(const QwtInterval &xInterval, const QwtInterval &yInterval, double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const; //!< returns retWarning if no valid points are within xInterval and yInterval
 
         size_t size() const;
 

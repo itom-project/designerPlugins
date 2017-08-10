@@ -432,7 +432,6 @@ void Plot1DWidget::createActions()
 
     a = m_pMnuSetPicker->addAction(tr("To Min-Max In Current View"));
     a->setToolTip(tr("set two pickers to the absolute minimum and maximum of the curve (within the current view). \nIf multiple curves are visible, the user can select the appropriate one."));
-    a->setEnabled(false); //not yet implemented
     a->setData(1);
 
     a = m_pMnuSetPicker->addAction(tr("Delete Pickers"));
@@ -566,7 +565,7 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker.png"));
         m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
         m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
-        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
+        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_cropped.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
         m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
@@ -608,6 +607,7 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"));
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_lt.png"));
         m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_lt.png"));
+        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_cropped_lt.png"));
         m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
@@ -3488,7 +3488,17 @@ void Plot1DWidget::mnuSetPicker(QAction *action)
 
             ito::float64 minVal, maxVal;
             int minLoc, maxLoc;
-            if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
+            ito::RetVal retval;
+            if (action->data().toInt() == 0) //global search
+            {
+                retval = seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc);
+            }
+            else
+            {
+                retval = seriesData->getMinMaxLocCropped(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft), minVal, maxVal, minLoc, maxLoc);
+            }
+
+            if (retval == ito::retOk)
             {
                 if (minLoc < maxLoc)
                 {

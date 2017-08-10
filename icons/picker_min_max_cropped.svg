@@ -14,10 +14,10 @@
    id="svg3883"
    version="1.1"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
-   inkscape:export-filename="C:\itom\sources\designerplugins\icons\picker_min_max_lt.png"
+   inkscape:export-filename="C:\itom\sources\designerplugins\icons\picker_min_max_cropped_lt.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
-   sodipodi:docname="picker_min_max.svg">
+   sodipodi:docname="picker_min_max_cropped.svg">
   <defs
      id="defs3885" />
   <sodipodi:namedview
@@ -28,10 +28,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="-6.9349712"
+     inkscape:cx="9.2703859"
      inkscape:cy="19.774028"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g824"
      showgrid="true"
      inkscape:window-width="2560"
      inkscape:window-height="1378"
@@ -60,24 +60,56 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Ebene 1"
+     inkscape:label="Line"
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-988.36218)">
     <path
        style="fill:none;stroke:#0000ff;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m -1.1964286,1024.6836 c 0,0 10.4940984,11.7277 16.9999996,10 6.505902,-1.7277 5.545138,-14.9536 10,-20 4.454862,-5.0464 9.221688,-9.9518 15,-10 5.778312,-0.048 10,5.6667 14,9 4,3.3333 13,12 13,12"
+       d="m -2.5166451,1033.7895 c 0,0 10.6921471,16.7362 17.3208301,14.2707 6.628683,-2.4656 5.649787,-21.3399 10.188724,-28.5415 4.538935,-7.2015 9.395723,-14.2019 15.283086,-14.2707 5.887362,-0.069 10.188723,8.0868 14.264213,12.8437 4.07549,4.7567 13.245341,17.1248 13.245341,17.1248"
        id="path3765"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="czzzzc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Rect_black"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6, 2;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect820"
+       width="48.448868"
+       height="44.785156"
+       x="8.2309227"
+       y="6.0702085" />
+  </g>
+  <g
+     style="display:none"
+     inkscape:label="Rect_white"
+     id="g824"
+     inkscape:groupmode="layer">
+    <rect
+       y="6.0702085"
+       x="8.2309227"
+       height="44.785156"
+       width="48.448868"
+       id="rect822"
+       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6, 2;stroke-dashoffset:0;stroke-opacity:1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Dots">
     <path
        style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1.33333337"
-       d="m 11.803571,1023.6836 10,10 -10,10 -9.9999996,-10 z"
+       d="m 19.660714,39.25002 10,10 -10,10 -9.9999998,-10 z"
        id="path3767"
        inkscape:connector-curvature="0" />
     <path
        style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1.33333337"
-       d="m 40.803571,995.27289 10,10.00001 -10,10 -10,-10 z"
+       d="m 40.714285,7.98214 10,10.00008 -10,10 -10,-10 z"
        id="path3767-1"
        inkscape:connector-curvature="0" />
   </g>
