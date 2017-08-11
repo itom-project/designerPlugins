@@ -161,6 +161,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
+
     //all others settings for tracker are set in init (since they need access to the settings via api)
 
     m_pPlotGrid = new QwtPlotGrid();
@@ -1931,7 +1932,7 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
         event->accept();
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
-        double xScale = invTransform(xBottom, xPx);
+        
         //double yScale = invTransform(yLeft, yPx);
         bool closeToPicker = false;
 
@@ -1967,23 +1968,36 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
                 //check which curve is the closest to the cursor:
                 DataObjectSeriesData *data = NULL;
                 int sampleIdx;
-                int curveIdx = 0;
-                double dist = std::numeric_limits<double>::max();
-                double currentDist;
+                int bestCurveIdx = 0;
+                double bestDist = std::numeric_limits<double>::max();
+                QPointF currentDist;
+                QPointF pt;
+                QPointF mouseCoords(xPx, yPx);
+                double xScale_;
+                double bestXScale = invTransform(QwtPlot::xBottom, xPx);
+
                 for (int i = 0; i < m_plotCurveItems.size(); ++i)
                 {
                     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[i]->data());
-                    sampleIdx = qBound(0, data->getPosToPix(xScale), (int)data->size() - 1);
-                    currentDist = std::abs(transform(yLeft, data->sample(sampleIdx).ry()) - yPx);
-                    if (currentDist < dist)
+
+                    //check for the closest point in a +-5px region
+                    for (int xPx_ = xPx - 5; xPx_ <= xPx + 5; ++xPx_)
                     {
-                        dist = currentDist;
-                        curveIdx = i;
+                        xScale_ = invTransform(QwtPlot::xBottom, xPx_);
+                        sampleIdx = qBound(0, data->getPosToPix(xScale_), (int)data->size() - 1);
+                        pt = data->sample(sampleIdx);
+                        currentDist = QPointF(transform(xBottom, pt.rx()), transform(yLeft, pt.ry())) - mouseCoords;
+                        if (currentDist.manhattanLength() < bestDist)
+                        {
+                            bestDist = currentDist.manhattanLength();
+                            bestCurveIdx = i;
+                            bestXScale = xScale_;
+                        }
                     }
                 }
                 
-                picker.curveIdx = curveIdx;
-                stickPickerToXPx(&picker, xScale, 0);
+                picker.curveIdx = bestCurveIdx;
+                stickPickerToXPx(&picker, bestXScale, 0);
 
                 picker.item->setVisible(true);
                 
@@ -2043,6 +2057,9 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 {
+    ItomQwtPlot::mouseReleaseEvent(event);
+    return;
+
     if (state() == stateValuePicker)
     {
         event->accept();
@@ -2604,9 +2621,30 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     }
 
     setPickerText(coords,offsets);
+
     if (actIdx >= 0)
     {
+        //disable key movements for the picker since one picker is active, clicking any key should not move the mouse cursor but the active picker
+        if (m_pValuePicker->keyPattern()[QwtEventPattern::KeyLeft].key != Qt::Key_Left)
+        {
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyUp, 0);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyDown, 0);
+        }
+
         emit((Itom1DQwtPlot*)(this->parent()))->pickerChanged(actIdx, m_pickers[actIdx].item->xValue(), m_pickers[actIdx].item->yValue(), m_pickers[actIdx].curveIdx);
+    }
+    else
+    {
+        if (m_pValuePicker->keyPattern()[QwtEventPattern::KeyLeft].key == 0)
+        {
+            //enable key movements again since no picker is selected and key movements should now move the mouse cursor again
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyLeft, Qt::Key_Left);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyRight, Qt::Key_Right);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyUp, Qt::Key_Up);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyDown, Qt::Key_Down);
+        }
     }
 }
 
