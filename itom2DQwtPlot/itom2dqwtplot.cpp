@@ -108,7 +108,7 @@ void Itom2dQwtPlot::constructor()
 
     setPropertyObservedObject(this);
 
-    init(); //here, the API is not ready, yet. Usually init() is called again once the event is raised signalling that the api is ready. However, in QtDesigner, the api is not available. Therefore, we want to init the canvas here.
+    m_pContent->init(true); //here, the API is not ready, yet. Usually init() is called again once the event is raised signalling that the api is ready. However, in QtDesigner, the api is not available. Therefore, we want to init the canvas here.
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
 ito::RetVal Itom2dQwtPlot::init() 
 { 
     //called when api-pointers are transmitted, directly after construction
-    return m_pContent->init(); 
+    return m_pContent->init(m_windowMode != ito::AbstractFigure::ModeStandaloneInUi); 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

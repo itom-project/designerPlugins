@@ -77,7 +77,7 @@ class PlotCanvas : public ItomQwtPlot
         PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent = NULL);
         ~PlotCanvas();
 
-        ito::RetVal init();
+        ito::RetVal init(bool overwriteDesignableProperties);
         void refreshPlot(const ito::DataObject *dObj, int plane = -1);
 
         void changePlane(int plane);
@@ -131,7 +131,7 @@ class PlotCanvas : public ItomQwtPlot
         bool setOverlayColorMap(QString colormap = "__next__");
         inline QString colorOverlayMapName() const { return m_colorOverlayMapName; }
 
-        void refreshStyles();
+        void refreshStyles(bool overwriteDesignableProperties);
         
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();

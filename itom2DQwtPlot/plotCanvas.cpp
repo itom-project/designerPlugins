@@ -302,24 +302,35 @@ PlotCanvas::~PlotCanvas()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal PlotCanvas::init()
+ito::RetVal PlotCanvas::init(bool overwriteDesignableProperties)
 {
     if (!setColorMap("__first__"))
     {
-        refreshStyles();
+        refreshStyles(overwriteDesignableProperties);
     }
     else
     {
-        refreshStyles();
+        refreshStyles(overwriteDesignableProperties);
     }
 
     return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshStyles()
+void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 {
-    ItomQwtPlot::loadStyles();
+    //overwriteDesignableProperties: if the plot widget is configured for the first time
+    //(e.g. in the constructor), all styles and properties should be set to their default
+    //value, hence overwriteDesignableProperties is set to true. If the plot is
+    //displayed as standalone-plot, the styles have to be updated once the APIs are available
+    //and the styles can be read from the itom settings. In this case, overwriteDesignableProperties
+    //is also set to true. Only in the case, that the plot is integrated in a ui-file, that
+    //has been configured in the QtDesigner, overwriteDesignableProperties has to be set
+    //to false if not called during the construction, such that the properties from
+    //the QtDesigner are not overwritten again by the itom settings. Properties, that
+    //are not designable by the QtDesigner should nevertheless be obtained by the itom settings.
+
+    ItomQwtPlot::loadStyles(overwriteDesignableProperties);
 
     QPen rubberBandPen = QPen(QBrush(Qt::red), 1, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
@@ -331,7 +342,6 @@ void PlotCanvas::refreshStyles()
 
     QFont titleFont = QFont("Helvetica", 12);
     QFont labelFont = QFont("Helvetica", 12);
-    labelFont.setItalic(false);
     QFont axisFont = QFont("Helvetica", 10);
 
     QSize centerMarkerSize = QSize(25, 25);
@@ -346,17 +356,21 @@ void PlotCanvas::refreshStyles()
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
         selectionPen = apiGetFigureSetting(parent(), "selectionPen", selectionPen, NULL).value<QPen>();
 
-        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot.
-
-        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>();
-        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>();
-        labelFont.setItalic(false);
-        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>();
-
         centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", centerMarkerSize, NULL).value<QSize>();
         centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", centerMarkerPen, NULL).value<QPen>();
         zStackMarkerPen = apiGetFigureSetting(parent(), "zStackMarkerPen", zStackMarkerPen, NULL).value<QPen>();
         zStackMarkerSize = apiGetFigureSetting(parent(), "zStackMarkerSize", zStackMarkerSize, NULL).value<QSize>();
+
+        if (overwriteDesignableProperties)
+        {
+            buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot. //designable
+
+            titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>(); //designable
+            labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>(); //designable
+            axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>(); //designable
+        }
+
+        
     }
 
     if (inverseColor1().isValid())
@@ -386,7 +400,7 @@ void PlotCanvas::refreshStyles()
     m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross, QBrush(inverseColor0()), zStackMarkerPen, zStackMarkerSize));
 
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
-	if (!m_pPaletteIsChanging)
+	if (!m_pPaletteIsChanging && overwriteDesignableProperties)
 	{
 		title().setFont(titleFont);
 		titleLabel()->setFont(titleFont);
@@ -414,7 +428,7 @@ void PlotCanvas::refreshStyles()
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
 
-    if (buttonSet != buttonStyle())
+    if ((buttonSet != buttonStyle()) && overwriteDesignableProperties)
     {
         setButtonStyle(buttonSet);
     }
@@ -927,7 +941,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 
     setInverseColors(newPalette.inverseColorOne, newPalette.inverseColorTwo);
 	m_pPaletteIsChanging = true;
-	refreshStyles();
+	refreshStyles(false);
 	m_pPaletteIsChanging = false;
 
     if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked

@@ -342,8 +342,19 @@ void ItomQwtPlot::createBaseActions()
 }
 
 //---------------------------------------------------------------------------
-void ItomQwtPlot::loadStyles()
+void ItomQwtPlot::loadStyles(bool overwriteDesignableProperties)
 {
+    //overwriteDesignableProperties: if the plot widget is configured for the first time
+    //(e.g. in the constructor), all styles and properties should be set to their default
+    //value, hence overwriteDesignableProperties is set to true. If the plot is
+    //displayed as standalone-plot, the styles have to be updated once the APIs are available
+    //and the styles can be read from the itom settings. In this case, overwriteDesignableProperties
+    //is also set to true. Only in the case, that the plot is integrated in a ui-file, that
+    //has been configured in the QtDesigner, overwriteDesignableProperties has to be set
+    //to false if not called during the construction, such that the properties from
+    //the QtDesigner are not overwritten again by the itom settings. Properties, that
+    //are not designable by the QtDesigner should nevertheless be obtained by the itom settings.
+
     QPen rubberBandPen = QPen(QBrush(Qt::red), 2, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
     QFont trackerFont = QFont("Verdana", 10);
@@ -366,9 +377,13 @@ void ItomQwtPlot::loadStyles()
 		shapeLabelBg = apiGetFigureSetting(parent(), "shapeLabelTrackerBackground", shapeLabelBg, NULL).value<QBrush>();
 		shapeLabelFont = apiGetFigureSetting(parent(), "shapeLabelTrackerFont", shapeLabelFont, NULL).value<QFont>();
 
-        m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
-        bool enableBoxFrame = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "enableBoxFrame", m_boxFrame, NULL).value<bool>());
-        setBoxFrame(enableBoxFrame);
+        if (overwriteDesignableProperties)
+        {
+            //the following settings are designable via properties in QtDesigner
+            m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, NULL).value<int>());
+            bool enableBoxFrame = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "enableBoxFrame", m_boxFrame, NULL).value<bool>());
+            setBoxFrame(enableBoxFrame);
+        }
     }
 
     rubberBandPen.setColor(m_inverseColor0);

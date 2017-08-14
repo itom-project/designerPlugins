@@ -304,21 +304,37 @@ Plot1DWidget::~Plot1DWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::init()
+ito::RetVal Plot1DWidget::init(bool overwriteDesignableProperties)
 {
+    //overwriteDesignableProperties: if the plot widget is configured for the first time
+    //(e.g. in the constructor), all styles and properties should be set to their default
+    //value, hence overwriteDesignableProperties is set to true. If the plot is
+    //displayed as standalone-plot, the styles have to be updated once the APIs are available
+    //and the styles can be read from the itom settings. In this case, overwriteDesignableProperties
+    //is also set to true. Only in the case, that the plot is integrated in a ui-file, that
+    //has been configured in the QtDesigner, overwriteDesignableProperties has to be set
+    //to false if not called during the construction, such that the properties from
+    //the QtDesigner are not overwritten again by the itom settings. Properties, that
+    //are not designable by the QtDesigner should nevertheless be obtained by the itom settings.
+
     ito::RetVal retVal;
-    ItomQwtPlot::loadStyles();
+    ItomQwtPlot::loadStyles(overwriteDesignableProperties);
 
     QPen trackerPen = QPen(QBrush(Qt::red),2);
     QFont trackerFont = QFont("Verdana",10);
     QBrush trackerBg = QBrush(Qt::white, Qt::SolidPattern);
 
-    QFont titleFont = QFont("Helvetica",12);
-    QFont labelFont =  QFont("Helvetica",12);
-    QFont axisFont = QFont("Helvetica",10);
-    m_legendFont  = QFont("Helvetica", 8);
-    m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
-    int buttonSet = buttonStyle();
+    QFont titleFont = QFont("Helvetica",12); //designable
+    QFont labelFont =  QFont("Helvetica",12); //designable
+    QFont axisFont = QFont("Helvetica",10); //designable
+
+    if (overwriteDesignableProperties)
+    {
+        m_legendFont  = QFont("Helvetica", 8); //designable
+        m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash; //designable
+    }
+
+    int buttonSet = buttonStyle(); //designable
 
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -330,53 +346,59 @@ ito::RetVal Plot1DWidget::init()
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, &retVal).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, &retVal).value<QBrush>();
 
-        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, &retVal).value<QFont>();
-        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, &retVal).value<QFont>();
-        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, &retVal).value<QFont>();
-
-        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot.
-
-        m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, &retVal).value<int>());
-        m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, &retVal).value<qreal>();
-
-        m_curveFilled = (ItomQwtPlotEnums::FillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, &retVal).value<int>();
-        m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, &retVal).value<QColor>();
-        m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, &retVal).value<int>());
-
-        m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, &retVal).value<int>());
-
         m_pPlotGrid->setMajorPen(apiGetFigureSetting(parent(), "gridMajorPen", QPen(QBrush(Qt::gray), 1, Qt::SolidLine), &retVal).value<QPen>());
         m_pPlotGrid->setMinorPen(apiGetFigureSetting(parent(), "gridMinorPen", QPen(QBrush(Qt::gray), 1, Qt::DashLine), &retVal).value<QPen>());
 
-        m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>();
+        if (overwriteDesignableProperties)
+        {
+            titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, &retVal).value<QFont>(); //designable
+            labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, &retVal).value<QFont>(); //designable
+            axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, &retVal).value<QFont>(); //designable
 
-        m_legendFont = apiGetFigureSetting(parent(), "legendFont", m_legendFont, &retVal).value<QFont>();
-		m_pLegendLabelWidth = apiGetFigureSetting(parent(), "legendLabelWidth", m_pLegendLabelWidth, &retVal).value<int>();
+            buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot. //designable
+
+            m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, &retVal).value<int>()); //designable
+            m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, &retVal).value<qreal>(); //designable
+
+            m_curveFilled = (ItomQwtPlotEnums::FillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, &retVal).value<int>(); //designable
+            m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, &retVal).value<QColor>(); //designable
+            m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, &retVal).value<int>()); //designable
+
+            m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, &retVal).value<int>()); //designable
+
+            m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>(); //designable
+
+            m_legendFont = apiGetFigureSetting(parent(), "legendFont", m_legendFont, &retVal).value<QFont>(); //designable
+		    m_pLegendLabelWidth = apiGetFigureSetting(parent(), "legendLabelWidth", m_pLegendLabelWidth, &retVal).value<int>(); //designable
+        }
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
     m_pValuePicker->setBackgroundFillBrush(trackerBg);
 
-    title().setFont(titleFont);
-    titleLabel()->setFont(titleFont);
-
-    axisTitle(QwtPlot::xBottom).setFont(axisFont);
-    axisTitle(QwtPlot::yLeft).setFont(axisFont);
-    setAxisFont(QwtPlot::xBottom, axisFont);
-    setAxisFont(QwtPlot::yLeft, axisFont);
-
-    QwtText t = axisWidget(QwtPlot::xBottom)->title();
-    t.setFont(labelFont);
-    axisWidget(QwtPlot::xBottom)->setTitle(t);
-
-    t = axisWidget(QwtPlot::yLeft)->title();
-    t.setFont(labelFont);
-    axisWidget(QwtPlot::yLeft)->setTitle(t);
-
-    if (buttonSet != buttonStyle())
+    if (overwriteDesignableProperties)
     {
-        setButtonStyle(buttonSet);
+        title().setFont(titleFont);
+        titleLabel()->setFont(titleFont);
+
+        axisTitle(QwtPlot::xBottom).setFont(axisFont);
+        axisTitle(QwtPlot::yLeft).setFont(axisFont);
+        setAxisFont(QwtPlot::xBottom, axisFont);
+        setAxisFont(QwtPlot::yLeft, axisFont);
+
+        QwtText t = axisWidget(QwtPlot::xBottom)->title();
+        t.setFont(labelFont);
+        axisWidget(QwtPlot::xBottom)->setTitle(t);
+
+        t = axisWidget(QwtPlot::yLeft)->title();
+        t.setFont(labelFont);
+        axisWidget(QwtPlot::yLeft)->setTitle(t);
+
+        if (buttonSet != buttonStyle())
+        {
+            setButtonStyle(buttonSet);
+        }
     }
 
     return retVal;
@@ -607,8 +629,8 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/forward_lt.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"));
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_lt.png"));
-        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_lt.png"));
-        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_cropped_lt.png"));
+        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_lt.png"));
+        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_cropped_lt.png"));
         m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));

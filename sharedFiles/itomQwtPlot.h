@@ -150,7 +150,7 @@ public:
     ito::RetVal deleteMarkers(const QString &id);
 
 protected:
-    void loadStyles();
+    void loadStyles(bool overwriteDesignableProperties);
     ItomPlotZoomer *zoomer() const;
     QwtPlotPanner *panner() const;
     void configRescaler();
