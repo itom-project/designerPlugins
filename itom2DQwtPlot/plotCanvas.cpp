@@ -96,6 +96,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pActCoordinates(NULL),
         m_pActCmplxSwitch(NULL),
         m_pMnuCmplxSwitch(NULL),
+        m_pActDataChannel(NULL),
+        m_pMnuDataChannel(NULL),
         m_pActCntrMarker(NULL),
         m_pOverlaySlider(NULL),
         m_pActOverlaySlider(NULL),
@@ -109,7 +111,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 
     //main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
-    m_dObjItem->setRenderThreadCount(0);
+    m_dObjItem->setRenderThreadCount(0); //uses ideal thread count
     //m_dObjItem->setColorMap(new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     m_rasterData = new DataObjRasterData(m_pData);
     m_dObjItem->setData(m_rasterData);
@@ -218,6 +220,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActScaleSettings);
     mainTb->addAction(m_pActToggleColorBar);
     mainTb->addAction(m_pActColorPalette);
+    mainTb->addAction(m_pActDataChannel);
     mainTb->addSeparator();
     mainTb->addAction(m_pActValuePicker);
     mainTb->addAction(m_pActCntrMarker);
@@ -247,6 +250,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     menuView->addSeparator();
     menuView->addAction(m_pActToggleColorBar);
     menuView->addAction(m_pActColorPalette);
+    menuView->addAction(m_pActDataChannel);
     menuView->addSeparator();
     menuView->addAction(m_pActScaleSettings);
     menuView->addSeparator();
@@ -475,6 +479,28 @@ void PlotCanvas::createActions()
     a->setToolTip(tr("Toggle visibility of the color bar on the right side"));
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuToggleColorBar(bool)));
 
+    //m_pActDataChannel
+    m_pActDataChannel = new QAction(tr("Data Channel"), p);
+    m_pMnuDataChannel = new QMenu(tr("Data Channel"), p);
+    m_pActDataChannel->setMenu(m_pMnuDataChannel);
+    a = m_pMnuDataChannel->addAction(tr("Auto"));
+    a->setData(ItomQwtPlotEnums::ChannelAuto);
+    m_pMnuDataChannel->setDefaultAction(a);
+    a = m_pMnuDataChannel->addAction(tr("Color"));
+    a->setData(ItomQwtPlotEnums::ChannelRGBA);
+    a = m_pMnuDataChannel->addAction(tr("Gray"));
+    a->setData(ItomQwtPlotEnums::ChannelGray);
+    a = m_pMnuDataChannel->addAction(tr("Red"));
+    a->setData(ItomQwtPlotEnums::ChannelRed);
+    a = m_pMnuDataChannel->addAction(tr("Green"));
+    a->setData(ItomQwtPlotEnums::ChannelGreen);
+    a = m_pMnuDataChannel->addAction(tr("Blue"));
+    a->setData(ItomQwtPlotEnums::ChannelBlue);
+    a = m_pMnuDataChannel->addAction(tr("Alpha"));
+    a->setData(ItomQwtPlotEnums::ChannelAlpha);
+    m_pActDataChannel->setVisible(false);
+    connect(m_pMnuDataChannel, SIGNAL(triggered(QAction*)), this, SLOT(mnuDataChannel(QAction*)));
+
     //m_actMarker
     m_pActValuePicker = a = new QAction(tr("Marker"), p);
     a->setToolTip(tr("Show current coordinates at mouse cursor"));
@@ -585,6 +611,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
+        m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rgba.png"));
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
@@ -613,6 +640,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
+        m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rgba_lt.png"));
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
@@ -782,7 +810,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 {
                 case ito::tRGBA32:
                     //coloured objects have no color bar, therefore the value axis cropping is disabled
-                    setColorDataTypeRepresentation(true);
+                    adjustColorDataTypeRepresentation();
                     m_pData->m_valueScaleAuto = false;
                     m_pData->m_valueMin = std::numeric_limits<ito::uint8>::min();
                     m_pData->m_valueMax = std::numeric_limits<ito::uint8>::max();
@@ -790,11 +818,11 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                     break;
                 case ito::tComplex64:
                 case ito::tComplex128:
-                    setColorDataTypeRepresentation(false);
+                    adjustColorDataTypeRepresentation();
                     m_pActCmplxSwitch->setVisible(true);
                     break;
                 default:
-                    setColorDataTypeRepresentation(false);
+                    adjustColorDataTypeRepresentation();
                     m_pActCmplxSwitch->setVisible(false);
                     break;
                 }
@@ -836,19 +864,35 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setColorDataTypeRepresentation(bool colorOn)
+void PlotCanvas::adjustColorDataTypeRepresentation()
 {
-    if (colorOn)
+    if (m_dObjPtr && \
+        (m_dObjPtr->getType() && ito::tRGBA32) && \
+        ((m_pData->m_dataChannel & 0x0100) == 0x0000))
     {
         setColorBarVisible(false);
         m_pActColorPalette->setVisible(false);
         m_pActToggleColorBar->setVisible(false);
+        m_pActDataChannel->setVisible(true);
     }
     else
     {
         m_pActColorPalette->setVisible(true);
         m_pActToggleColorBar->setVisible(true);
         setColorBarVisible(m_pActToggleColorBar->isChecked());
+        m_pActDataChannel->setVisible(m_dObjPtr->getType() == ito::tRGBA32);
+    }
+
+    if (m_pMnuDataChannel->defaultAction()->data().toInt() != m_pData->m_dataChannel)
+    {
+        foreach (QAction *a, m_pMnuDataChannel->actions())
+        {
+            if (a->data().toInt() == m_pData->m_dataChannel)
+            {
+                m_pMnuDataChannel->setDefaultAction(a);
+                break;
+            }
+        }
     }
 }
 
@@ -2261,6 +2305,18 @@ void PlotCanvas::mnuCmplxSwitch(QAction *action)
     int idx = action->data().toInt();
     m_pData->m_cmplxType = (ItomQwtPlotEnums::ComplexType)idx;
     internalDataUpdated();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mnuDataChannel(QAction* action)
+{
+    m_pMnuDataChannel->setDefaultAction(action);
+    if (action->data().toInt() != m_pData->m_dataChannel)
+    {
+        m_pData->m_dataChannel = (ItomQwtPlotEnums::DataChannel)action->data().toInt();
+        adjustColorDataTypeRepresentation();
+        replot();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

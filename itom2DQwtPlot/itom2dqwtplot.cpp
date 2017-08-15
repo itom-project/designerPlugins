@@ -761,6 +761,53 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::DataChannel Itom2dQwtPlot::getDataChannel() const
+{
+    if (d->m_pData)
+    {
+        return d->m_pData->m_dataChannel;
+    }
+
+    return ItomQwtPlotEnums::ChannelAuto;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setDataChannel(const ItomQwtPlotEnums::DataChannel &dataChannel)
+{
+    if (!d->m_pData)
+    {
+        return;
+    }
+
+    if (dataChannel != d->m_pData->m_dataChannel)
+    {
+        d->m_pData->m_dataChannel = dataChannel;
+        if (m_pContent)
+        {
+            m_pContent->adjustColorDataTypeRepresentation();
+            m_pContent->replot();
+        }
+        updatePropertyDock();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::resetDataChannel()
+{
+    if (!d->m_pData)
+    {
+        return;
+    }
+
+    d->m_pData->m_dataChannel = ItomQwtPlotEnums::ChannelAuto;
+    if (m_pContent)
+    {
+        m_pContent->replot();
+    }
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setPlaneRange(int min, int max)
 {
     if (m_pContent)

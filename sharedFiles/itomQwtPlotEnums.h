@@ -36,6 +36,7 @@ class ItomQwtPlotEnums : public QObject
     Q_ENUMS(PlotPickerType);
     Q_ENUMS(MultiLineMode);    
     Q_ENUMS(ColorHandling); 
+    Q_ENUMS(DataChannel);
     Q_ENUMS(CurveStyle);
     Q_ENUMS(FillCurveStyle);
     Q_ENUMS(ScaleEngine);
@@ -64,6 +65,17 @@ public:
     
     enum MultiLineMode { AutoRowCol, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
     enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
+    enum DataChannel 
+    { 
+        //0x01XX: single channel if rgba data type, 0x00XX: coloured if rgba data type
+        ChannelAuto =  0x0000, 
+        ChannelRGBA =  0x0001,
+        ChannelGray =  0x0100,    
+        ChannelRed =   0x0101,  
+        ChannelGreen = 0x0102,  
+        ChannelBlue =  0x0104, 
+        ChannelAlpha = 0x0108
+    };
     enum PlotPickerType { DefaultMarker, RangeMarker, ValueRangeMarker, AxisRangeMarker };
     enum CurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, SticksHorizontal, SticksVertical, Steps, StepsRight, StepsLeft,  Dots };
     enum FillCurveStyle {   NoCurveFill = -1,  FillBaseLine, FillFromTop, FillFromBottom};
@@ -91,6 +103,7 @@ public:
     Q_ENUM(PlotPickerType);
     Q_ENUM(MultiLineMode);
     Q_ENUM(ColorHandling);
+    Q_ENUM(DataChannel);
     Q_ENUM(CurveStyle);
     Q_ENUM(FillCurveStyle);
     Q_ENUM(ScaleEngine);

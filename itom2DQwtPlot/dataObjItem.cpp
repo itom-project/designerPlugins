@@ -101,9 +101,9 @@ QImage DataObjItem::renderImage(
         return QImage();
     }
 
-    char dataTypeFlag = dObjRasterData->getTypeFlag();
+    DataObjRasterData::RasterDataType dataTypeFlag = dObjRasterData->getTypeFlag();
 
-    QImage::Format format = ( colorMap()->format() == QwtColorMap::RGB || dataTypeFlag )
+    QImage::Format format = ( colorMap()->format() == QwtColorMap::RGB || dataTypeFlag != DataObjRasterData::tInteger )
         ? QImage::Format_ARGB32 : QImage::Format_Indexed8;
 
     QImage image( imageSize, format );
@@ -132,8 +132,6 @@ QImage DataObjItem::renderImage(
     if ( numThreads <= 0 )
         numThreads = 1;
 
-    
-
     const int numRows = imageSize.height() / numThreads;
 
     QList< QFuture<void> > futures;
@@ -159,7 +157,7 @@ QImage DataObjItem::renderImage(
 
 #else // QT_VERSION < 0x040400
     const QRect tile( 0, 0, image.width(), image.height() );
-    renderTile( xMap, yMap, tile, &image );
+    renderTile( xMap, yMap, dataTypeFlag, tile, &image );
 #endif
 
     dObjRasterData->discardRaster();
