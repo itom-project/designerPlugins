@@ -220,8 +220,23 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
             }
 
             //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
-            setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
-            setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling)) );
+            if (m_D.m_xScaling >= 0.0)
+            {
+                setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
+            }
+            else
+            {
+                setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling)) );
+            }
+
+            if (m_D.m_yScaling >= 0.0)
+            {
+                setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling)) );
+            }
+            else
+            {
+                setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling)) );
+            }
         }
 
         ito::float64 min, max;
