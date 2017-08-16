@@ -218,9 +218,9 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActOverlaySlider);
     mainTb->addSeparator();
     mainTb->addAction(m_pActScaleSettings);
+    mainTb->addAction(m_pActDataChannel);
     mainTb->addAction(m_pActToggleColorBar);
     mainTb->addAction(m_pActColorPalette);
-    mainTb->addAction(m_pActDataChannel);
     mainTb->addSeparator();
     mainTb->addAction(m_pActValuePicker);
     mainTb->addAction(m_pActCntrMarker);
@@ -611,7 +611,16 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
-        m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/rgba.png"));
+
+        QList<QAction*> dataChannels = m_pMnuDataChannel->actions();
+        dataChannels[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAuto.png"));
+        dataChannels[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRgba.png"));
+        dataChannels[2]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGray.png"));
+        dataChannels[3]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRed.png"));
+        dataChannels[4]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGreen.png"));
+        dataChannels[5]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelBlue.png"));
+        dataChannels[6]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAlpha.png"));
+        m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
@@ -641,6 +650,16 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
         m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rgba_lt.png"));
+
+        QList<QAction*> dataChannels = m_pMnuDataChannel->actions();
+        dataChannels[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAuto.png"));
+        dataChannels[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRgba.png"));
+        dataChannels[2]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGray.png"));
+        dataChannels[3]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRed.png"));
+        dataChannels[4]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGreen.png"));
+        dataChannels[5]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelBlue.png"));
+        dataChannels[6]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAlpha.png"));
+        m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
@@ -867,7 +886,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 void PlotCanvas::adjustColorDataTypeRepresentation()
 {
     if (m_dObjPtr && \
-        (m_dObjPtr->getType() && ito::tRGBA32) && \
+        (m_dObjPtr->getType() == ito::tRGBA32) && \
         ((m_pData->m_dataChannel & 0x0100) == 0x0000))
     {
         setColorBarVisible(false);
@@ -890,10 +909,13 @@ void PlotCanvas::adjustColorDataTypeRepresentation()
             if (a->data().toInt() == m_pData->m_dataChannel)
             {
                 m_pMnuDataChannel->setDefaultAction(a);
+                m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
                 break;
             }
         }
     }
+
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2311,6 +2333,8 @@ void PlotCanvas::mnuCmplxSwitch(QAction *action)
 void PlotCanvas::mnuDataChannel(QAction* action)
 {
     m_pMnuDataChannel->setDefaultAction(action);
+    m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
+
     if (action->data().toInt() != m_pData->m_dataChannel)
     {
         m_pData->m_dataChannel = (ItomQwtPlotEnums::DataChannel)action->data().toInt();

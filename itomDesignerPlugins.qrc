@@ -60,7 +60,14 @@
         <file>icons/geosRotate.png</file>
         <file>icons/geosMove.png</file>
         <file>icons/picker_min_max_cropped.png</file>
-      <file>icons/picker_min_max.png</file>
+        <file>icons/picker_min_max.png</file>
+        <file>icons/colorChannelRgba.png</file>
+        <file>icons/colorChannelAlpha.png</file>
+        <file>icons/colorChannelAuto.png</file>
+        <file>icons/colorChannelGray.png</file>
+        <file>icons/colorChannelRed.png</file>
+        <file>icons/colorChannelBlue.png</file>
+        <file>icons/colorChannelGreen.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/plot_lt">
         <file>icons/markerPos_lt.png</file>
