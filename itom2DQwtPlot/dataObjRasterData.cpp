@@ -220,8 +220,23 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
             }
 
             //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
-            setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
-            setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling)) );
+            if (m_D.m_xScaling >= 0.0)
+            {
+                setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling)) );
+            }
+            else
+            {
+                setInterval(Qt::XAxis, QwtInterval(pxToScaleCoords(m_D.m_xSize-1,m_D.m_xOffset,m_D.m_xScaling), pxToScaleCoords(0,m_D.m_xOffset,m_D.m_xScaling)) );
+            }
+
+            if (m_D.m_yScaling >= 0.0)
+            {
+                setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling)) );
+            }
+            else
+            {
+                setInterval(Qt::YAxis, QwtInterval(pxToScaleCoords(m_D.m_ySize-1,m_D.m_yOffset,m_D.m_yScaling), pxToScaleCoords(0,m_D.m_yOffset,m_D.m_yScaling)) );
+            }
         }
 
         ito::float64 min, max;
@@ -339,6 +354,29 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
 bool DataObjRasterData::pointValid(const QPointF &point) const
 {
     return interval(Qt::XAxis).contains( point.x() ) && interval(Qt::YAxis).contains( point.y() );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+DataObjRasterData::RasterDataType DataObjRasterData::getTypeFlag() const 
+{ 
+    int type = m_dataObj.getType();
+    if(type == ito::tRGBA32)
+    {
+        switch (m_pInternalData->m_dataChannel)
+        {
+            case ItomQwtPlotEnums::ChannelAuto:
+            case ItomQwtPlotEnums::ChannelRGBA:
+                return tRGB;
+            default:
+                return tInteger;
+        }
+    }
+    else if (type == ito::tFloat32 || type == ito::tFloat64 || type == ito::tComplex64 || type == ito::tComplex128) 
+    {
+        return tFloatOrComplex;
+    }
+
+    return tInteger; 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -576,7 +614,37 @@ double DataObjRasterData::value2(int m, int n) const
             {
                 ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ].gray();
+
+                switch (m_pInternalData->m_dataChannel)
+                {
+                case ItomQwtPlotEnums::ChannelAuto:
+                case ItomQwtPlotEnums::ChannelRGBA:
+                case ItomQwtPlotEnums::ChannelGray:
+                    {
+                        return line[ m_xIndizes[n] ].gray();
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelRed:
+                    {
+                        return line[ m_xIndizes[n] ].r;
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelGreen:
+                    {
+                        return line[ m_xIndizes[n] ].g;
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelBlue:
+                    {
+                        return line[ m_xIndizes[n] ].b;
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelAlpha:
+                    {
+                        return line[ m_xIndizes[n] ].a;
+                    }
+                    break;
+                }
             }
         default:
             return quietNaN;
@@ -695,7 +763,37 @@ double DataObjRasterData::value2_yinv(int m, int n) const
             {
                 ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ].gray();
+
+                switch (m_pInternalData->m_dataChannel)
+                {
+                case ItomQwtPlotEnums::ChannelAuto:
+                case ItomQwtPlotEnums::ChannelRGBA:
+                case ItomQwtPlotEnums::ChannelGray:
+                    {
+                        return line[ m_xIndizes[n] ].gray();
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelRed:
+                    {
+                        return line[ m_xIndizes[n] ].r;
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelGreen:
+                    {
+                        return line[ m_xIndizes[n] ].g;
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelBlue:
+                    {
+                        return line[ m_xIndizes[n] ].b;
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelAlpha:
+                    {
+                        return line[ m_xIndizes[n] ].a;
+                    }
+                    break;
+                }
             }
         default:
             return quietNaN;
@@ -719,7 +817,44 @@ QRgb DataObjRasterData::value2_rgb(int m, int n) const
             {
                 ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
                 if(!line) return transparentColor;
-                return line[ m_xIndizes[n] ].argb();
+
+                switch (m_pInternalData->m_dataChannel)
+                {
+                case ItomQwtPlotEnums::ChannelAuto:
+                case ItomQwtPlotEnums::ChannelRGBA:
+                    return line[ m_xIndizes[n] ].argb();
+                    break;
+                case ItomQwtPlotEnums::ChannelGray:
+                    {
+                        int gray = qRound(line[m_xIndizes[n]].gray());
+                        return qRgb(gray, gray, gray);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelRed:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].r;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelGreen:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].g;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelBlue:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].b;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelAlpha:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].a;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                }
             }
         default:
             return transparentColor;
@@ -744,7 +879,44 @@ QRgb DataObjRasterData::value2_yinv_rgb(int m, int n) const
             {
                 ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
                 if(!line) return transparentColor;
-                return line[ m_xIndizes[n] ].argb();
+                
+                switch (m_pInternalData->m_dataChannel)
+                {
+                case ItomQwtPlotEnums::ChannelAuto:
+                case ItomQwtPlotEnums::ChannelRGBA:
+                    return line[ m_xIndizes[n] ].argb();
+                    break;
+                case ItomQwtPlotEnums::ChannelGray:
+                    {
+                        int gray = qRound(line[m_xIndizes[n]].gray());
+                        return qRgb(gray, gray, gray);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelRed:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].r;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelGreen:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].g;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelBlue:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].b;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                case ItomQwtPlotEnums::ChannelAlpha:
+                    {
+                        ito::uint8 c = line[m_xIndizes[n]].a;
+                        return qRgb(c, c, c);
+                    }
+                    break;
+                }
             }
         default:
             return transparentColor;

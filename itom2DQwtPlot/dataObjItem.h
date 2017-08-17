@@ -36,9 +36,6 @@ public:
     explicit DataObjItem( const QString &title = QString::null );
     virtual ~DataObjItem();
 
-    
-
-
 protected:
     QImage renderImage(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &area, const QSize &imageSize ) const;
     void renderTile(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const char dataTypeFlag, const QRect &tile, QImage *image ) const;

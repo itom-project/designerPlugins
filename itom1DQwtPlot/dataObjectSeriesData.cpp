@@ -873,7 +873,7 @@ QPoint DataObjectSeriesData::indexRange(const QwtScaleMap &xMap, bool clipMargin
     else
     {
         return QPoint(0, m_d.points.size() - 1);
-    }        
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1796,7 +1796,7 @@ ito::DataObject DataObjectSeriesData::getResampledDataObject()
 //}
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState = ItomQwtPlotEnums::CmplxAbs)
+template<typename _Tp> void findMinMaxNonWeightedInteger(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -1847,11 +1847,11 @@ template<typename _Tp> void findMinMaxNonWeighted(const ito::DataObject *obj, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
+template<typename _Tp> void findMinMaxNonWeightedFloat(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx)
 {
     const cv::Mat *mat;
     uchar *ptr;
-    min = std::numeric_limits<float64>::max();
+    min = std::numeric_limits<_Tp>::max();
     max = -min;
     float32 val;
 
@@ -1863,7 +1863,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            val = *(reinterpret_cast<float32*>(ptr));
+            val = *(reinterpret_cast<_Tp*>(ptr));
             ptr += d.matStepSize;
 
             if (!qIsFinite(val))
@@ -1881,7 +1881,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            val = *(reinterpret_cast<float32*>(ptr + d.matSteps[i]));
+            val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
 
             if (!qIsFinite(val))
             {
@@ -1898,7 +1898,7 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
         {
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
-            val = *(reinterpret_cast<float32*>(ptr));
+            val = *(reinterpret_cast<_Tp*>(ptr));
 
             if (!qIsFinite(val))
             {
@@ -1913,78 +1913,11 @@ template<> void findMinMaxNonWeighted<ito::float32>(const ito::DataObject *obj, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::float64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
+template<typename _Tp, typename _Tp2> void findMinMaxNonWeightedComplex(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState = ItomQwtPlotEnums::CmplxAbs)
 {
     const cv::Mat *mat;
     uchar *ptr;
-    min = std::numeric_limits<float64>::max();
-    max = -min;
-    float64 val;
-
-    switch(d.dir)
-    {
-    case DataObjectSeriesData::dirX:
-    case DataObjectSeriesData::dirY:
-        mat = obj->getCvPlaneMat(d.plane);
-        ptr = (mat->data + d.matOffset);
-        for (int i = 0 ; i < d.nrPoints ; i++)
-        {
-            val = *(reinterpret_cast<float64*>(ptr));
-            ptr += d.matStepSize;
-
-            if (!qIsFinite(val))
-            {
-                continue;
-            }
-
-            if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; } 
-        }
-        break;
-
-    case DataObjectSeriesData::dirXY:
-        mat = obj->getCvPlaneMat(d.plane);
-        ptr = (mat->data + d.matOffset);
-        for (int i = 0 ; i < d.nrPoints ; i++)
-        {
-            val = *(reinterpret_cast<float64*>(ptr + d.matSteps[i]));
-
-            if (!qIsFinite(val))
-            {
-                continue;
-            }
-
-            if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; } 
-        }
-        break;
-
-    case DataObjectSeriesData::dirZ:
-
-        for (int i = 0 ; i < d.nrPoints ; i++)
-        {
-            mat = obj->getCvPlaneMat(i);
-            ptr = (mat->data + d.matOffset);
-            val = *(reinterpret_cast<float64*>(ptr));
-
-            if (!qIsFinite(val))
-            {
-                continue;
-            }
-
-            if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; }           
-        }
-        break;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
-{
-    const cv::Mat *mat;
-    uchar *ptr;
-    min = std::numeric_limits<float64>::max();
+    min = std::numeric_limits<_Tp>::max();
     max = -min;
     ito::float32 val;
     ito::complex64 val_;
@@ -1999,7 +1932,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            val_ = *(reinterpret_cast<complex64*>(ptr));
+            val_ = *(reinterpret_cast<_Tp2*>(ptr));
             switch(cmplxState)
             {
             case ItomQwtPlotEnums::CmplxAbs:
@@ -2033,7 +1966,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
         ptr = (mat->data + d.matOffset);
         for (int i = 0 ; i < d.nrPoints ; i++)
         {
-            val_ = *(reinterpret_cast<complex64*>(ptr + d.matSteps[i]));
+            val_ = *(reinterpret_cast<_Tp2*>(ptr + d.matSteps[i]));
             switch(cmplxState)
             {
             case ItomQwtPlotEnums::CmplxAbs:
@@ -2066,7 +1999,7 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
         {
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
-            val_ = *(reinterpret_cast<complex64*>(ptr));
+            val_ = *(reinterpret_cast<_Tp2*>(ptr));
             switch(cmplxState)
             {
             case ItomQwtPlotEnums::CmplxAbs:
@@ -2095,40 +2028,94 @@ template<> void findMinMaxNonWeighted<ito::complex64>(const ito::DataObject *obj
     }
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------------------
-template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState)
+template<typename _Tp> bool findMinMaxNonWeightedIntegerCropped(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, const QwtInterval &xInterval, const QwtInterval &yInterval, double &min, double &max, int &minIdx, int &maxIdx)
 {
     const cv::Mat *mat;
     uchar *ptr;
     min = std::numeric_limits<float64>::max();
     max = -min;
-    ito::float64 val;
-    ito::complex128 val_;
+    _Tp val;
 
-    switch(d.dir)
+    int startIdx = std::max(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys));
+    int endIdx = std::min(qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    if (startIdx > endIdx)
+    {
+        std::swap(startIdx, endIdx);
+    }
+    double yAxisRange[] = { yInterval.minValue(), yInterval.maxValue() };
+
+    switch (d.dir)
     {
     case DataObjectSeriesData::dirX:
     case DataObjectSeriesData::dirY:
         mat = obj->getCvPlaneMat(d.plane);
-        ptr = (mat->data + d.matOffset);
-        for (int i = 0 ; i < d.nrPoints ; i++)
+        ptr = (mat->data + d.matOffset + startIdx * d.matStepSize);
+        for (int i = startIdx; i <= endIdx; ++i)
         {
-            val_ = *(reinterpret_cast<complex128*>(ptr));
-            switch(cmplxState)
-            {
-            case ItomQwtPlotEnums::CmplxAbs:
-                val = abs(val_);
-                break;
-            case ItomQwtPlotEnums::CmplxReal:
-                val = val_.real();
-                break;
-            case ItomQwtPlotEnums::CmplxImag:
-                val = val_.imag();
-                break;
-            case ItomQwtPlotEnums::CmplxArg:
-                val = arg(val_);
-                break;
-            }
+            val = *(reinterpret_cast<_Tp*>(ptr));
+            ptr += d.matStepSize;
+
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
+        }
+        break;
+
+    case DataObjectSeriesData::dirXY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset + startIdx * d.matStepSize);
+        for (int i = startIdx; i <= endIdx; ++i)
+        {
+            val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
+
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
+        }
+        break;
+    case DataObjectSeriesData::dirZ:
+
+        for (int i = startIdx; i <= endIdx; ++i)
+        {
+            mat = obj->getCvPlaneMat(i);
+            ptr = (mat->data + d.matOffset);
+            val = *(reinterpret_cast<_Tp*>(ptr));
+
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
+        }
+        break;
+    }
+
+    return endIdx >= startIdx;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+template<typename _Tp> bool findMinMaxNonWeightedFloatCropped(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, const QwtInterval &xInterval, const QwtInterval &yInterval, double &min, double &max, int &minIdx, int &maxIdx)
+{
+    const cv::Mat *mat;
+    uchar *ptr;
+    min = std::numeric_limits<_Tp>::max();
+    max = -min;
+    float32 val;
+
+    int startIdx = std::max(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys));
+    int endIdx = std::min(qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    if (startIdx > endIdx)
+    {
+        std::swap(startIdx, endIdx);
+    }
+    double yAxisRange[] = { yInterval.minValue(), yInterval.maxValue() };
+
+    switch (d.dir)
+    {
+    case DataObjectSeriesData::dirX:
+    case DataObjectSeriesData::dirY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset + startIdx * d.matStepSize);
+        for (int i = startIdx; i <= endIdx; ++i)
+        {
+            val = *(reinterpret_cast<_Tp*>(ptr));
             ptr += d.matStepSize;
 
             if (!qIsFinite(val))
@@ -2136,18 +2123,113 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
                 continue;
             }
 
-            if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; }
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
         }
         break;
 
     case DataObjectSeriesData::dirXY:
         mat = obj->getCvPlaneMat(d.plane);
-        ptr = (mat->data + d.matOffset);
-        for (int i = 0 ; i < d.nrPoints ; i++)
+        ptr = (mat->data + d.matOffset + startIdx * d.matStepSize);
+        for (int i = startIdx; i <= endIdx; ++i)
         {
-            val_ = *(reinterpret_cast<complex128*>(ptr + d.matSteps[i]));
-            switch(cmplxState)
+            val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
+
+            if (!qIsFinite(val))
+            {
+                continue;
+            }
+
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
+        }
+        break;
+    case DataObjectSeriesData::dirZ:
+
+        for (int i = startIdx; i <= endIdx; ++i)
+        {
+            mat = obj->getCvPlaneMat(i);
+            ptr = (mat->data + d.matOffset);
+            val = *(reinterpret_cast<_Tp*>(ptr));
+
+            if (!qIsFinite(val))
+            {
+                continue;
+            }
+
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
+        }
+        break;
+    }
+
+    return endIdx >= startIdx;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+template<typename _Tp, typename _Tp2> bool findMinMaxNonWeightedComplexCropped(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, const QwtInterval &xInterval, const QwtInterval &yInterval, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState = ItomQwtPlotEnums::CmplxAbs)
+{
+    const cv::Mat *mat;
+    uchar *ptr;
+    min = std::numeric_limits<_Tp>::max();
+    max = -min;
+    ito::float32 val;
+    ito::complex64 val_;
+
+    int startIdx = std::max(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys));
+    int endIdx = std::min(qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    if (startIdx > endIdx)
+    {
+        std::swap(startIdx, endIdx);
+    }
+    double yAxisRange[] = { yInterval.minValue(), yInterval.maxValue() };
+
+    switch (d.dir)
+    {
+    case DataObjectSeriesData::dirX:
+    case DataObjectSeriesData::dirY:
+        mat = obj->getCvPlaneMat(d.plane);
+        if (!mat->data)
+            return false;
+        ptr = (mat->data + d.matOffset + startIdx * d.matStepSize);
+        for (int i = startIdx; i <= endIdx; ++i)
+        {
+            val_ = *(reinterpret_cast<_Tp2*>(ptr));
+            switch (cmplxState)
+            {
+            case ItomQwtPlotEnums::CmplxAbs:
+                val = abs(val_);
+                break;
+            case ItomQwtPlotEnums::CmplxReal:
+                val = val_.real();
+                break;
+            case ItomQwtPlotEnums::CmplxImag:
+                val = val_.imag();
+                break;
+            case ItomQwtPlotEnums::CmplxArg:
+                val = arg(val_);
+                break;
+            }
+
+            ptr += d.matStepSize;
+
+            if (!qIsFinite(val))
+            {
+                continue;
+            }
+
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
+        }
+        break;
+
+    case DataObjectSeriesData::dirXY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset + startIdx * d.matStepSize);
+        for (int i = startIdx; i <= endIdx; ++i)
+        {
+            val_ = *(reinterpret_cast<_Tp2*>(ptr + d.matSteps[i]));
+            switch (cmplxState)
             {
             case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
@@ -2168,19 +2250,19 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
                 continue;
             }
 
-            if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; }
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
         }
         break;
 
     case DataObjectSeriesData::dirZ:
 
-        for (int i = 0 ; i < d.nrPoints ; i++)
+        for (int i = startIdx; i <= endIdx; ++i)
         {
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
-            val_ = *(reinterpret_cast<complex128*>(ptr));
-            switch(cmplxState)
+            val_ = *(reinterpret_cast<_Tp2*>(ptr));
+            switch (cmplxState)
             {
             case ItomQwtPlotEnums::CmplxAbs:
                 val = abs(val_);
@@ -2201,303 +2283,15 @@ template<> void findMinMaxNonWeighted<ito::complex128>(const ito::DataObject *ob
                 continue;
             }
 
-            if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; }            
+            if (val > max && val <= yAxisRange[1]) { max = val; maxIdx = i; }
+            if (val < min && val >= yAxisRange[0]) { min = val; minIdx = i; }
         }
         break;
     }
+
+    return endIdx >= startIdx;
 }
 
-////----------------------------------------------------------------------------------------------------------------------------------
-//template<typename _Tp> void findMinMaxInZ(const ito::DataObject *obj, const QPointF &xyPos, double &min, double &max, DataObjectSeriesData::ComplexType cmplxState = DataObjectSeriesData::cmplxAbs)
-//{
-//    min = std::numeric_limits<_Tp>::max();
-//    if (std::numeric_limits<_Tp>::is_exact)
-//    {
-//        max = std::numeric_limits<_Tp>::min(); //integer numbers
-//    }
-//    else
-//    {
-//        max = -std::numeric_limits<_Tp>::max();
-//    }
-//
-//    int dims = obj->getDims();
-//    bool _unused;
-//    int x = obj->getPhysToPix( dims - 2, xyPos.x(), _unused);
-//    int y = obj->getPhysToPix( dims - 1, xyPos.y(), _unused);
-//
-//    x = std::max(x,0);
-//    x = std::min(x, obj->getSize( dims - 2 ) - 1);
-//
-//    y = std::max(y,0);
-//    y = std::min(y, obj->getSize( dims - 1 ) - 1);
-//
-//    int sizeZ = obj->getSize( dims - 3 );
-//    
-//    double val;
-//    cv::Mat *mat;
-//
-//    for (int n = 0; n < sizeZ; n++)
-//    {
-//        mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//        val = mat->at<_Tp>(y, x);
-//        if (!qIsFinite(val))
-//            continue;
-//        if (val > max)
-//            max = val;
-//        if (val < min)
-//            min = val;
-//    }
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//template<> void findMinMaxInZ<ito::complex64>(const ito::DataObject *obj, const QPointF &xyPos, double &min, double &max, DataObjectSeriesData::ComplexType cmplxState)
-//{
-//    min = std::numeric_limits<_Tp>::max();
-//    if (std::numeric_limits<_Tp>::is_exact)
-//    {
-//        max = std::numeric_limits<_Tp>::min(); //integer numbers
-//    }
-//    else
-//    {
-//        max = -std::numeric_limits<_Tp>::max();
-//    }
-//
-//    int dims = obj->getDims();
-//    bool _unused;
-//    int x = obj->getPhysToPix( dims - 2, xyPos.x(), _unused);
-//    int y = obj->getPhysToPix( dims - 1, xyPos.y(), _unused);
-//
-//    x = std::max(x,0);
-//    x = std::min(x, obj->getSize( dims - 2 ) - 1);
-//
-//    y = std::max(y,0);
-//    y = std::min(y, obj->getSize( dims - 1 ) - 1);
-//
-//    int sizeZ = obj->getSize( dims - 3 );
-//    
-//    double val;
-//    cv::Mat *mat;
-//
-//    switch (cmplxState)
-//    {
-//        default:
-//        case DataObjectSeriesData::cmplxAbs:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = abs( mat->at<ito::complex64>(y, x) );
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//
-//        case DataObjectSeriesData::cmplxReal:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = (mat->at<ito::complex64>(y, x)).real();
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//
-//        case DataObjectSeriesData::cmplxImag:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = (mat->at<ito::complex64>(y, x)).imag();
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//
-//        case DataObjectSeriesData::cmplxArg:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = arg(mat->at<ito::complex64>(y, x));
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//    }
-//}
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//template<> void findMinMaxInZ<ito::complex128>(const ito::DataObject *obj, const QPointF &xyPos, double &min, double &max, DataObjectSeriesData::ComplexType cmplxState)
-//{
-//    min = std::numeric_limits<_Tp>::max();
-//    if (std::numeric_limits<_Tp>::is_exact)
-//    {
-//        max = std::numeric_limits<_Tp>::min(); //integer numbers
-//    }
-//    else
-//    {
-//        max = -std::numeric_limits<_Tp>::max();
-//    }
-//
-//    int dims = obj->getDims();
-//    bool _unused;
-//    int x = obj->getPhysToPix( dims - 2, xyPos.x(), _unused);
-//    int y = obj->getPhysToPix( dims - 1, xyPos.y(), _unused);
-//
-//    x = std::max(x,0);
-//    x = std::min(x, obj->getSize( dims - 2 ) - 1);
-//
-//    y = std::max(y,0);
-//    y = std::min(y, obj->getSize( dims - 1 ) - 1);
-//
-//    int sizeZ = obj->getSize( dims - 3 );
-//    
-//    double val;
-//    cv::Mat *mat;
-//
-//    switch (cmplxState)
-//    {
-//        default:
-//        case DataObjectSeriesData::cmplxAbs:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = abs(mat->at<ito::complex64>(y, x));
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//
-//        case DataObjectSeriesData::cmplxReal:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = (mat->at<ito::complex64>(y, x)).real();
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//
-//        case DataObjectSeriesData::cmplxImag:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = (mat->at<ito::complex64>(y, x)).imag();
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//
-//        case DataObjectSeriesData::cmplxArg:
-//        {
-//            for (int n = 0; n < sizeZ; n++)
-//            {
-//                mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//                val = arg(mat->at<ito::complex64>(y, x));
-//
-//                if (!qIsFinite(val))
-//                    continue;
-//                if (val > max)
-//                    max = val;
-//                if (val < min)
-//                    min = val;
-//            }
-//        }
-//        break;
-//    }
-//}
-//
-//
-//
-//
-////----------------------------------------------------------------------------------------------------------------------------------
-//template<typename _Tp> void findMinMaxInXY(const ito::DataObject *obj, const QPointF &xyStart, const QPointF &xyEnd, double &min, double &max, DataObjectSeriesData::ComplexType cmplxState = DataObjectSeriesData::cmplxAbs)
-//{
-//    min = std::numeric_limits<_Tp>::max();
-//    if (std::numeric_limits<_Tp>::is_exact)
-//    {
-//        max = std::numeric_limits<_Tp>::min(); //integer numbers
-//    }
-//    else
-//    {
-//        max = -std::numeric_limits<_Tp>::max();
-//    }
-//
-//    int dims = obj->getDims();
-//    bool _unused;
-//    int x = obj->getPhysToPix( dims - 2, xyPos.x(), _unused);
-//    int y = obj->getPhysToPix( dims - 1, xyPos.y(), _unused);
-//
-//    x = std::max(x,0);
-//    x = std::min(x, obj->getSize( dims - 2 ) - 1);
-//
-//    y = std::max(y,0);
-//    y = std::min(y, obj->getSize( dims - 1 ) - 1);
-//
-//    int sizeZ = obj->getSize( dims - 3 );
-//    
-//    double val;
-//    cv::Mat *mat;
-//
-//    for (int n = 0; n < sizeZ; n++)
-//    {
-//        mat = (cv::Mat *)(obj.get_mdata())[obj.seekMat(n)];
-//        val = mat->at<_Tp>(y, x);
-//        if (!qIsFinite(val))
-//            continue;
-//        if (val > max)
-//            max = val;
-//        if (val < min)
-//            min = val;
-//    }
-//}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QRectF DataObjectSeriesData::boundingRect() const
@@ -2515,34 +2309,34 @@ QRectF DataObjectSeriesData::boundingRect() const
         switch(m_pDataObj->getType())
         {
             case ito::tInt8:
-                findMinMaxNonWeighted<ito::int8>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedInteger<ito::int8>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tUInt8:
-                findMinMaxNonWeighted<ito::uint8>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedInteger<ito::uint8>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tInt16:
-                findMinMaxNonWeighted<ito::int16>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedInteger<ito::int16>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tUInt16:
-                findMinMaxNonWeighted<ito::uint16>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedInteger<ito::uint16>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tInt32:
-                findMinMaxNonWeighted<ito::int32>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedInteger<ito::int32>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tUInt32:
-                findMinMaxNonWeighted<ito::uint32>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedInteger<ito::uint32>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tFloat32:
-                findMinMaxNonWeighted<ito::float32>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedFloat<ito::float32>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tFloat64:
-                findMinMaxNonWeighted<ito::float64>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
+                findMinMaxNonWeightedFloat<ito::float64>(m_pDataObj, m_d, min, max, minIdx, maxIdx);
             break;
             case ito::tComplex64:
-                findMinMaxNonWeighted<ito::complex64>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
+                findMinMaxNonWeightedComplex<ito::float32, ito::complex64>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
             break;
             case ito::tComplex128:
-                findMinMaxNonWeighted<ito::complex128>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
+                findMinMaxNonWeightedComplex<ito::float64, ito::complex128>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
             break;
             case ito::tRGBA32:
                 min = 0.0;
@@ -2571,23 +2365,14 @@ QRectF DataObjectSeriesData::boundingRect() const
 
         if (m_d.points.size() == 0) //no weighted stuff
         {
-            res = QRectF(m_d.startPhys, min, m_d.stepSizePhys * (m_d.nrPoints-1), max-min);
-            //switch (m_d.dir)
-            //{
-            //case dirX:
-            //case dirY:
-            //    res = QRectF(m_d.startPhys, min, m_d.stepSizePhys * (m_d.nrPoints-1), max-min);
-            //break;
-
-            //case dirZ:
-            //    res = QRectF(m_d.startPhys, min, m_d.stepSizePhys * (m_d.nrPoints-1), max-min);
-            //break;
-
-            //case dirXY:
-            //    res = QRectF(m_d.startPhys, min, m_d.stepSizePhys * (m_d.nrPoints-1), max-min);
-            //    return res;
-            //break;
-            //}
+            float minX = m_d.startPhys;
+            float width = m_d.stepSizePhys * (m_d.nrPoints - 1);
+            if (width < 0)
+            {
+                minX += width;
+                width *= -1;
+            }
+            res = QRectF(minX, min, width, max - min);
         }
         else
         {
@@ -2604,9 +2389,6 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
 {
     QRectF res;
 
-    //cv::Mat *mat;
-    //const uchar* ptr[4];
-    //float weights[4];
     minSampleIdx = 0;
     maxSampleIdx = 0;
     RetVal retval;
@@ -2616,34 +2398,34 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
         switch(m_pDataObj->getType())
         {
             case ito::tInt8:
-                findMinMaxNonWeighted<ito::int8>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedInteger<ito::int8>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tUInt8:
-                findMinMaxNonWeighted<ito::uint8>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedInteger<ito::uint8>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tInt16:
-                findMinMaxNonWeighted<ito::int16>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedInteger<ito::int16>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tUInt16:
-                findMinMaxNonWeighted<ito::uint16>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedInteger<ito::uint16>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tInt32:
-                findMinMaxNonWeighted<ito::int32>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedInteger<ito::int32>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tUInt32:
-                findMinMaxNonWeighted<ito::uint32>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedInteger<ito::uint32>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tFloat32:
-                findMinMaxNonWeighted<ito::float32>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedFloat<ito::float32>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tFloat64:
-                findMinMaxNonWeighted<ito::float64>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
+                findMinMaxNonWeightedFloat<ito::float64>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx);
             break;
             case ito::tComplex64:
-                findMinMaxNonWeighted<ito::complex64>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
+                findMinMaxNonWeightedComplex<ito::float32, ito::complex64>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
             break;
             case ito::tComplex128:
-                findMinMaxNonWeighted<ito::complex128>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
+                findMinMaxNonWeightedComplex<ito::float64, ito::complex128>(m_pDataObj, m_d, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
             break;
             case ito::tRGBA32:
                 min = 0.0;
@@ -2662,6 +2444,74 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
         retval += RetVal(retError, 0, "no dataObject");
     }
     
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+RetVal DataObjectSeriesData::getMinMaxLocCropped(const QwtInterval &xInterval, const QwtInterval &yInterval, double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const
+{
+    QRectF res;
+
+    minSampleIdx = 0;
+    maxSampleIdx = 0;
+    RetVal retval;
+    bool result;
+
+    if (m_pDataObj && m_d.valid)
+    {
+        switch (m_pDataObj->getType())
+        {
+        case ito::tInt8:
+            result = findMinMaxNonWeightedIntegerCropped<ito::int8>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tUInt8:
+            result = findMinMaxNonWeightedIntegerCropped<ito::uint8>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tInt16:
+            result = findMinMaxNonWeightedIntegerCropped<ito::int16>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tUInt16:
+            result = findMinMaxNonWeightedIntegerCropped<ito::uint16>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tInt32:
+            result = findMinMaxNonWeightedIntegerCropped<ito::int32>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tUInt32:
+            result = findMinMaxNonWeightedIntegerCropped<ito::uint32>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tFloat32:
+            result = findMinMaxNonWeightedFloatCropped<ito::float32>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tFloat64:
+            result = findMinMaxNonWeightedFloatCropped<ito::float64>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx);
+            break;
+        case ito::tComplex64:
+            result = findMinMaxNonWeightedComplexCropped<ito::float32, ito::complex64>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
+            break;
+        case ito::tComplex128:
+            result = findMinMaxNonWeightedComplexCropped<ito::float64, ito::complex128>(m_pDataObj, m_d, xInterval, yInterval, min, max, minSampleIdx, maxSampleIdx, m_cmplxState);
+            break;
+        case ito::tRGBA32:
+            min = 0.0;
+            max = 255.0;
+            break;
+        }
+
+        if (!result)
+        {
+            retval += ito::RetVal(retWarning, 0, "dataObject has no valid points within the given axis range.");
+        }
+        else if (max - min < std::numeric_limits<double>::epsilon())
+        {
+            min *= 0.99;
+            max *= 1.01;
+        }
+    }
+    else
+    {
+        retval += RetVal(retError, 0, "no dataObject");
+    }
+
     return retval;
 }
 
@@ -2730,7 +2580,44 @@ QString DataObjectSeriesData::getDObjAxisLabel(const AbstractFigure::UnitLabelSt
     }
     return m_dObjAxisDescription;
 }
+template <typename _Tp> _Tp DataObjectSeriesData::sampleComplex(const size_t& n) const
+{
+    const cv::Mat *mat;
+    const uchar* ptr[4];
+    float fPos;
 
+    if (m_pDataObj && m_d.valid)
+    {
+        if (m_d.points.size() == 0) //no weighted stuff
+        {
+            switch (m_d.dir)
+            {
+            case dirX:
+            case dirY:
+                mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+                ptr[0] = (mat->data + m_d.matOffset + m_d.matStepSize * n);
+                fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
+
+            case dirZ:
+                mat = m_pDataObj->getCvPlaneMat((int)n);
+                ptr[0] = (mat->data + m_d.matOffset);
+                fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
+
+            case dirXY:
+                mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+                ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
+                fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
+            }
+        }
+    }
+
+    return *(reinterpret_cast<const _Tp*>(ptr[0]));
+}
+template ito::complex64  DataObjectSeriesData::sampleComplex(const size_t& n) const;
+template ito::complex128  DataObjectSeriesData::sampleComplex(const size_t& n) const;
 //----------------------------------------------------------------------------------------------
 void DataObjectSeriesData::getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const
 {

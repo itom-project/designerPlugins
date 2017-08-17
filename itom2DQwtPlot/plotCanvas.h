@@ -77,7 +77,7 @@ class PlotCanvas : public ItomQwtPlot
         PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent = NULL);
         ~PlotCanvas();
 
-        ito::RetVal init();
+        ito::RetVal init(bool overwriteDesignableProperties);
         void refreshPlot(const ito::DataObject *dObj, int plane = -1);
 
         void changePlane(int plane);
@@ -131,13 +131,13 @@ class PlotCanvas : public ItomQwtPlot
         bool setOverlayColorMap(QString colormap = "__next__");
         inline QString colorOverlayMapName() const { return m_colorOverlayMapName; }
 
-        void refreshStyles();
+        void refreshStyles(bool overwriteDesignableProperties);
         
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
 
         void home();
-        void setColorDataTypeRepresentation(bool colorOn);
+        void adjustColorDataTypeRepresentation();
 
         void lineCutMovedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
         void lineCutAppendedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
@@ -201,6 +201,8 @@ class PlotCanvas : public ItomQwtPlot
         QWidgetAction *m_pActCoordinates; //
         QAction *m_pActCmplxSwitch; //
         QMenu *m_pMnuCmplxSwitch; //
+        QAction *m_pActDataChannel;
+        QMenu *m_pMnuDataChannel;
         QAction* m_pActCntrMarker; //
         QSlider* m_pOverlaySlider;
         QWidgetAction *m_pActOverlaySlider;
@@ -217,6 +219,7 @@ class PlotCanvas : public ItomQwtPlot
 
         void mnuScaleSettings();
         void mnuCmplxSwitch(QAction*);
+        void mnuDataChannel(QAction*);
         void mnuColorPalette();
         void mnuToggleColorBar(bool checked);
         void mnuValuePicker(bool checked);
@@ -263,6 +266,7 @@ struct InternalData
 
         m_colorBarVisible = false;
         m_cmplxType = ItomQwtPlotEnums::CmplxReal;
+        m_dataChannel = ItomQwtPlotEnums::ChannelAuto;
         m_pConstOutput = NULL;
         
         m_alpha = 0;
@@ -315,6 +319,7 @@ struct InternalData
     unsigned char m_alpha;
 
     ItomQwtPlotEnums::ComplexType m_cmplxType;
+    ItomQwtPlotEnums::DataChannel m_dataChannel;
 
     const QHash<QString, ito::Param*> *m_pConstOutput;
 };

@@ -57,6 +57,7 @@
 #include <qdebug.h>
 #include <qmessagebox.h>
 #include <qnumeric.h>
+#include <qinputdialog.h>
 
 //namespace ito {
 //    extern void **ITOM_API_FUNCS_GRAPH;
@@ -160,6 +161,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pValuePicker = new ValuePicker1D(QwtPlot::xBottom, QwtPlot::yLeft, canvas());
     m_pValuePicker->setEnabled(false);
     m_pValuePicker->setTrackerMode(QwtPicker::AlwaysOn);
+
     //all others settings for tracker are set in init (since they need access to the settings via api)
 
     m_pPlotGrid = new QwtPlotGrid();
@@ -302,21 +304,37 @@ Plot1DWidget::~Plot1DWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::init()
+ito::RetVal Plot1DWidget::init(bool overwriteDesignableProperties)
 {
+    //overwriteDesignableProperties: if the plot widget is configured for the first time
+    //(e.g. in the constructor), all styles and properties should be set to their default
+    //value, hence overwriteDesignableProperties is set to true. If the plot is
+    //displayed as standalone-plot, the styles have to be updated once the APIs are available
+    //and the styles can be read from the itom settings. In this case, overwriteDesignableProperties
+    //is also set to true. Only in the case, that the plot is integrated in a ui-file, that
+    //has been configured in the QtDesigner, overwriteDesignableProperties has to be set
+    //to false if not called during the construction, such that the properties from
+    //the QtDesigner are not overwritten again by the itom settings. Properties, that
+    //are not designable by the QtDesigner should nevertheless be obtained by the itom settings.
+
     ito::RetVal retVal;
-    ItomQwtPlot::loadStyles();
+    ItomQwtPlot::loadStyles(overwriteDesignableProperties);
 
     QPen trackerPen = QPen(QBrush(Qt::red),2);
     QFont trackerFont = QFont("Verdana",10);
     QBrush trackerBg = QBrush(Qt::white, Qt::SolidPattern);
 
-    QFont titleFont = QFont("Helvetica",12);
-    QFont labelFont =  QFont("Helvetica",12);
-    QFont axisFont = QFont("Helvetica",10);
-    m_legendFont  = QFont("Helvetica", 8);
-    m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash;
-    int buttonSet = buttonStyle();
+    QFont titleFont = QFont("Helvetica",12); //designable
+    QFont labelFont =  QFont("Helvetica",12); //designable
+    QFont axisFont = QFont("Helvetica",10); //designable
+
+    if (overwriteDesignableProperties)
+    {
+        m_legendFont  = QFont("Helvetica", 8); //designable
+        m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash; //designable
+    }
+
+    int buttonSet = buttonStyle(); //designable
 
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -328,53 +346,59 @@ ito::RetVal Plot1DWidget::init()
         trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, &retVal).value<QFont>();
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, &retVal).value<QBrush>();
 
-        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, &retVal).value<QFont>();
-        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, &retVal).value<QFont>();
-        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, &retVal).value<QFont>();
-
-        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot.
-
-        m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, &retVal).value<int>());
-        m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, &retVal).value<qreal>();
-
-        m_curveFilled = (ItomQwtPlotEnums::FillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, &retVal).value<int>();
-        m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, &retVal).value<QColor>();
-        m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, &retVal).value<int>());
-
-        m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, &retVal).value<int>());
-
         m_pPlotGrid->setMajorPen(apiGetFigureSetting(parent(), "gridMajorPen", QPen(QBrush(Qt::gray), 1, Qt::SolidLine), &retVal).value<QPen>());
         m_pPlotGrid->setMinorPen(apiGetFigureSetting(parent(), "gridMinorPen", QPen(QBrush(Qt::gray), 1, Qt::DashLine), &retVal).value<QPen>());
 
-        m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>();
+        if (overwriteDesignableProperties)
+        {
+            titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, &retVal).value<QFont>(); //designable
+            labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, &retVal).value<QFont>(); //designable
+            axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, &retVal).value<QFont>(); //designable
 
-        m_legendFont = apiGetFigureSetting(parent(), "legendFont", m_legendFont, &retVal).value<QFont>();
-		m_pLegendLabelWidth = apiGetFigureSetting(parent(), "legendLabelWidth", m_pLegendLabelWidth, &retVal).value<int>();
+            buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot. //designable
+
+            m_lineStyle = (Qt::PenStyle)(apiGetFigureSetting(parent(), "lineStyle", (int)m_lineStyle, &retVal).value<int>()); //designable
+            m_lineWidth = apiGetFigureSetting(parent(), "lineWidth", m_lineWidth, &retVal).value<qreal>(); //designable
+
+            m_curveFilled = (ItomQwtPlotEnums::FillCurveStyle)apiGetFigureSetting(parent(), "fillCurve", (int)m_curveFilled, &retVal).value<int>(); //designable
+            m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, &retVal).value<QColor>(); //designable
+            m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, &retVal).value<int>()); //designable
+
+            m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, &retVal).value<int>()); //designable
+
+            m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>(); //designable
+
+            m_legendFont = apiGetFigureSetting(parent(), "legendFont", m_legendFont, &retVal).value<QFont>(); //designable
+		    m_pLegendLabelWidth = apiGetFigureSetting(parent(), "legendLabelWidth", m_pLegendLabelWidth, &retVal).value<int>(); //designable
+        }
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
     m_pValuePicker->setBackgroundFillBrush(trackerBg);
 
-    title().setFont(titleFont);
-    titleLabel()->setFont(titleFont);
-
-    axisTitle(QwtPlot::xBottom).setFont(axisFont);
-    axisTitle(QwtPlot::yLeft).setFont(axisFont);
-    setAxisFont(QwtPlot::xBottom, axisFont);
-    setAxisFont(QwtPlot::yLeft, axisFont);
-
-    QwtText t = axisWidget(QwtPlot::xBottom)->title();
-    t.setFont(labelFont);
-    axisWidget(QwtPlot::xBottom)->setTitle(t);
-
-    t = axisWidget(QwtPlot::yLeft)->title();
-    t.setFont(labelFont);
-    axisWidget(QwtPlot::yLeft)->setTitle(t);
-
-    if (buttonSet != buttonStyle())
+    if (overwriteDesignableProperties)
     {
-        setButtonStyle(buttonSet);
+        title().setFont(titleFont);
+        titleLabel()->setFont(titleFont);
+
+        axisTitle(QwtPlot::xBottom).setFont(axisFont);
+        axisTitle(QwtPlot::yLeft).setFont(axisFont);
+        setAxisFont(QwtPlot::xBottom, axisFont);
+        setAxisFont(QwtPlot::yLeft, axisFont);
+
+        QwtText t = axisWidget(QwtPlot::xBottom)->title();
+        t.setFont(labelFont);
+        axisWidget(QwtPlot::xBottom)->setTitle(t);
+
+        t = axisWidget(QwtPlot::yLeft)->title();
+        t.setFont(labelFont);
+        axisWidget(QwtPlot::yLeft)->setTitle(t);
+
+        if (buttonSet != buttonStyle())
+        {
+            setButtonStyle(buttonSet);
+        }
     }
 
     return retVal;
@@ -425,13 +449,17 @@ void Plot1DWidget::createActions()
     m_pMnuSetPicker = new QMenu("Picker Switch");
     m_pActSetPicker->setMenu(m_pMnuSetPicker);
 
-    a = m_pMnuSetPicker->addAction(tr("To Min-Max"));
-    a->setToolTip(tr("set two pickers to absolute minimum and maximum of (first) curve"));
+    a = m_pMnuSetPicker->addAction(tr("To Global Min-Max"));
+    a->setToolTip(tr("set two pickers to the absolute minimum and maximum of the curve. \nIf multiple curves are visible, the user can select the appropriate one."));
     a->setData(0);
+
+    a = m_pMnuSetPicker->addAction(tr("To Min-Max In Current View"));
+    a->setToolTip(tr("set two pickers to the absolute minimum and maximum of the curve (within the current view). \nIf multiple curves are visible, the user can select the appropriate one."));
+    a->setData(1);
 
     a = m_pMnuSetPicker->addAction(tr("Delete Pickers"));
     a->setToolTip(tr("delete all pickers"));
-    a->setData(1);
+    a->setData(2);
     
     connect(m_pMnuSetPicker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetPicker(QAction*)));
 
@@ -560,6 +588,7 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker.png"));
         m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
         m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
+        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_cropped.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
         m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
@@ -600,7 +629,8 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/forward_lt.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"));
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_lt.png"));
-        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_lt.png"));
+        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_lt.png"));
+        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_cropped_lt.png"));
         m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
@@ -1794,26 +1824,80 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
             }
             break;
         case Qt::Key_Up:
+            //jump to next visible line at the same x-coordinate
             for (int i = 0 ; i < m_pickers.size() ; i++)
             {
                 m = &(m_pickers[i]);
                 if (m->active)
                 {
-                    m->curveIdx++;
-                    if (m->curveIdx >= curves) m->curveIdx = 0;
-                    stickPickerToXPx(m, m->item->xValue(), 0);
+                    //find next visible curve
+                    bool found = false;
+                    for (int j = m->curveIdx + 1; j < m_plotCurveItems.size(); ++j)
+                    {
+                        if (m_plotCurveItems[j]->isVisible())
+                        {
+                            m->curveIdx = j;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) //try to restart from beginning
+                    {
+                        for (int j = 0; j < m->curveIdx; ++j)
+                        {
+                            if (m_plotCurveItems[j]->isVisible())
+                            {
+                                m->curveIdx = j;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (found)
+                    {
+                        stickPickerToXPx(m, m->item->xValue(), 0);
+                    }
                 }
             }
             break;
         case Qt::Key_Down:
-            for (int i = 0 ; i < m_pickers.size() ; i++)
+            //jump to previous visible line at the same x-coordinate
+            for (int i = 0; i < m_pickers.size(); i++)
             {
                 m = &(m_pickers[i]);
                 if (m->active)
                 {
-                    m->curveIdx--;
-                    if (m->curveIdx < 0) m->curveIdx = curves-1;
-                    stickPickerToXPx(m, m->item->xValue(), 0);
+                    //find previous visible curve
+                    bool found = false;
+                    for (int j = m->curveIdx - 1; j >= 0; --j)
+                    {
+                        if (m_plotCurveItems[j]->isVisible())
+                        {
+                            m->curveIdx = j;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) //try to restart from the end
+                    {
+                        for (int j = m_plotCurveItems.size() - 1; j > m->curveIdx; --j)
+                        {
+                            if (m_plotCurveItems[j]->isVisible())
+                            {
+                                m->curveIdx = j;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (found)
+                    {
+                        stickPickerToXPx(m, m->item->xValue(), 0);
+                    }
                 }
             }
             break;
@@ -1870,7 +1954,7 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
         event->accept();
         int xPx = m_pValuePicker->trackerPosition().x();
         int yPx = m_pValuePicker->trackerPosition().y();
-        double xScale = invTransform(xBottom, xPx);
+        
         //double yScale = invTransform(yLeft, yPx);
         bool closeToPicker = false;
 
@@ -1906,23 +1990,36 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
                 //check which curve is the closest to the cursor:
                 DataObjectSeriesData *data = NULL;
                 int sampleIdx;
-                int curveIdx = 0;
-                double dist = std::numeric_limits<double>::max();
-                double currentDist;
+                int bestCurveIdx = 0;
+                double bestDist = std::numeric_limits<double>::max();
+                QPointF currentDist;
+                QPointF pt;
+                QPointF mouseCoords(xPx, yPx);
+                double xScale_;
+                double bestXScale = invTransform(QwtPlot::xBottom, xPx);
+
                 for (int i = 0; i < m_plotCurveItems.size(); ++i)
                 {
                     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[i]->data());
-                    sampleIdx = qBound(0, data->getPosToPix(xScale), (int)data->size() - 1);
-                    currentDist = std::abs(transform(yLeft, data->sample(sampleIdx).ry()) - yPx);
-                    if (currentDist < dist)
+
+                    //check for the closest point in a +-5px region
+                    for (int xPx_ = xPx - 5; xPx_ <= xPx + 5; ++xPx_)
                     {
-                        dist = currentDist;
-                        curveIdx = i;
+                        xScale_ = invTransform(QwtPlot::xBottom, xPx_);
+                        sampleIdx = qBound(0, data->getPosToPix(xScale_), (int)data->size() - 1);
+                        pt = data->sample(sampleIdx);
+                        currentDist = QPointF(transform(xBottom, pt.rx()), transform(yLeft, pt.ry())) - mouseCoords;
+                        if (currentDist.manhattanLength() < bestDist)
+                        {
+                            bestDist = currentDist.manhattanLength();
+                            bestCurveIdx = i;
+                            bestXScale = xScale_;
+                        }
                     }
                 }
                 
-                picker.curveIdx = curveIdx;
-                stickPickerToXPx(&picker, xScale, 0);
+                picker.curveIdx = bestCurveIdx;
+                stickPickerToXPx(&picker, bestXScale, 0);
 
                 picker.item->setVisible(true);
                 
@@ -1982,6 +2079,9 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
 {
+    ItomQwtPlot::mouseReleaseEvent(event);
+    return;
+
     if (state() == stateValuePicker)
     {
         event->accept();
@@ -2040,11 +2140,13 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
         if (i == 0)
         {
             m_pickers[0].active = true;
+            m_pickers[0].curveIdx = curveIdx;
             stickPickerToSampleIdx(&(m_pickers[0]), idx1, 0);
         }
         else if (i == 1)
         {
             m_pickers[1].active = false;
+            m_pickers[1].curveIdx = curveIdx;
             stickPickerToSampleIdx(&(m_pickers[1]), idx2, 0);
         }
         else
@@ -2541,9 +2643,30 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     }
 
     setPickerText(coords,offsets);
+
     if (actIdx >= 0)
     {
+        //disable key movements for the picker since one picker is active, clicking any key should not move the mouse cursor but the active picker
+        if (m_pValuePicker->keyPattern()[QwtEventPattern::KeyLeft].key != Qt::Key_Left)
+        {
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyUp, 0);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyDown, 0);
+        }
+
         emit((Itom1DQwtPlot*)(this->parent()))->pickerChanged(actIdx, m_pickers[actIdx].item->xValue(), m_pickers[actIdx].item->yValue(), m_pickers[actIdx].curveIdx);
+    }
+    else
+    {
+        if (m_pValuePicker->keyPattern()[QwtEventPattern::KeyLeft].key == 0)
+        {
+            //enable key movements again since no picker is selected and key movements should now move the mouse cursor again
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyLeft, Qt::Key_Left);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyRight, Qt::Key_Right);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyUp, Qt::Key_Up);
+            m_pValuePicker->setKeyPattern(QwtEventPattern::KeyDown, Qt::Key_Down);
+        }
     }
 }
 
@@ -2984,7 +3107,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
         }
         //for linecuts from a 2d object the data must be copy in a different way, especially in case of a diagonal linecut
         //complex64 will be mapped to float32 and complex128 to float64
-        if (copyDisplayedAsComplex == false || seriesData->getDataObject()->getSize(0) >= 2)
+        if (copyDisplayedAsComplex == false)
         {
             type = (type == ito::tComplex64) ? ito::tFloat32 : ((type == ito::tComplex128) ? ito::tFloat64 : type);
         }        
@@ -3118,26 +3241,18 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
             case ito::tComplex64:
             {
                 ito::complex64 *rowPtr = (ito::complex64*)displayed->rowPtr(0, i);
-                const ito::DataObject *dataObj = seriesData->getDataObject();
-                int mat = dataObj->seekMat(0);
-                const ito::complex64 *rowPtrD = dataObj->rowPtr<ito::complex64>(mat, 0);
-
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::complex64>(rowPtrD[n]);
+                    *(rowPtr++) = cv::saturate_cast<ito::complex64>(seriesData->sampleComplex<ito::complex64>(n));
                 }
             }
             break;
             case ito::tComplex128:
             {
                 ito::complex128 *rowPtr = (ito::complex128*)displayed->rowPtr(0, i);
-                const ito::DataObject *dataObj = seriesData->getDataObject();
-                int mat = dataObj->seekMat(0);
-                const ito::complex128 *rowPtrD = dataObj->rowPtr<ito::complex128>(mat, 0);
-
                 for (size_t n = firstIdx; n <= lastIdx; ++n)
                 {
-                    *(rowPtr++) = cv::saturate_cast<ito::complex128>(rowPtrD[n]);   
+                    *(rowPtr++) = cv::saturate_cast<ito::complex128>(seriesData->sampleComplex<ito::complex128>(n));
                 }
             }
             break;
@@ -3395,31 +3510,68 @@ void Plot1DWidget::mnuParentScaleSetting()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mnuSetPicker(QAction *action)
 {
-    if (action->data().toInt() == 0) //set to min..max
+    if (action->data().toInt() == 0 || action->data().toInt() == 1)
     {
-        if (m_plotCurveItems.size() > 0)
-        {
-            DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
+        //absolute min/max within entire object or within current view
+        QList<int> visibleIndices;
+        QStringList visibleTitles;
+        int index = -1;
 
-            if (action->text() == QString(tr("To Min-Max")))
+        for (int i = 0; i < m_plotCurveItems.size(); ++i)
+        {
+            if (m_plotCurveItems[i]->isVisible())
             {
-                ito::float64 minVal, maxVal;
-                int minLoc, maxLoc;
-                if (seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc) == ito::retOk)
+                visibleIndices << i;
+                visibleTitles << m_plotCurveItems[i]->title().text();
+            }
+        }
+
+        if (visibleIndices.size() == 1)
+        {
+            index = visibleIndices[0];
+        }
+        else if (visibleIndices.size() > 1)
+        {
+            bool ok;
+            QString selectedTitle = QInputDialog::getItem(this, tr("Select a visible curve"), tr("Select the curve the picker values should be referred to"), visibleTitles, 0, false, &ok);
+            if (!ok)
+            {
+                return;
+            }
+
+            index = visibleIndices[visibleTitles.indexOf(selectedTitle)];
+        }
+
+        if (index >= 0)
+        {
+            DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[index]->data());
+
+            ito::float64 minVal, maxVal;
+            int minLoc, maxLoc;
+            ito::RetVal retval;
+            if (action->data().toInt() == 0) //global search
+            {
+                retval = seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc);
+            }
+            else
+            {
+                retval = seriesData->getMinMaxLocCropped(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft), minVal, maxVal, minLoc, maxLoc);
+            }
+
+            if (retval == ito::retOk)
+            {
+                if (minLoc < maxLoc)
                 {
-                    if (minLoc < maxLoc)
-                    {
-                        setMainPickersToIndex(minLoc, maxLoc, 0);
-                    }
-                    else
-                    {
-                        setMainPickersToIndex(maxLoc, minLoc, 0);
-                    }
+                    setMainPickersToIndex(minLoc, maxLoc, index);
+                }
+                else
+                {
+                    setMainPickersToIndex(maxLoc, minLoc, index);
                 }
             }
         }
     }
-    else //delete
+    else if (action->data().toInt() == 2) //delete all
     {
         clearPicker(-1, true);
     }

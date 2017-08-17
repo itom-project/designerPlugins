@@ -91,8 +91,10 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         QPoint indexRange(const QwtScaleMap &xMap, bool clipMargin) const; //!< returns first and last sample index, that is contained within xMap (physical values). If clipMargin is false, first and last are the closest values to xMap which are not contained in xMap (e.g. for polygonal drawings to see the line going out of the window)
 
         QPointF sample(size_t n) const;
+
         QRectF boundingRect() const;
         RetVal getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const;
+        RetVal getMinMaxLocCropped(const QwtInterval &xInterval, const QwtInterval &yInterval, double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const; //!< returns retWarning if no valid points are within xInterval and yInterval
 
         size_t size() const;
 
@@ -121,6 +123,10 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         void calcHash();
 
         void setColorState(int newVal) {m_colorState = (ColorType)newVal;}
+
+        template <typename _Tp> _Tp sampleComplex(const size_t& n) const; //only supports ito::complex64 and ito::complex128
+        
+
 
     protected:
 

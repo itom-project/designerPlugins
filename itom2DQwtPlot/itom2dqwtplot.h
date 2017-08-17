@@ -72,6 +72,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
     
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
+    Q_PROPERTY(ItomQwtPlotEnums::DataChannel dataChannel READ getDataChannel WRITE setDataChannel  RESET resetDataChannel DESIGNABLE true USER true);
 
     
     Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false)
@@ -102,6 +103,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
+    Q_CLASSINFO("prop://dataChannel", "Type of visualized dataChannel. This is only considered for rgba32 dataObjects, in all other cases this property is ignored.")
 
     Q_CLASSINFO("prop://lineCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for lateral slicing. The 'uiItem' can be savely cast to 'plotItem'.")
     Q_CLASSINFO("prop://zSlicePlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for z slicing. The 'uiItem' can be savely cast to 'plotItem'.")
@@ -178,6 +180,10 @@ public:
 
     int getPlaneIndex() const;
     void setPlaneIndex(const int &index);
+
+    ItomQwtPlotEnums::DataChannel getDataChannel() const;
+    void setDataChannel(const ItomQwtPlotEnums::DataChannel &dataChannel);
+    void resetDataChannel();
 
 	ItomQwtPlotEnums::ScaleEngine getValueScale() const;
 	void setValueScale(const ItomQwtPlotEnums::ScaleEngine &scale);

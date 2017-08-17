@@ -41,9 +41,9 @@ class DataObjRasterData : public QwtRasterData
     public:
         enum RasterDataType
         {
-            tInteger        = 0,  // Object is an integer
-            tFloatOrComplex = 1,  // Object is floating point or complex value
-            tRGB            = 2   // Object is true color type
+            tInteger        = 0x00,  // Object is an integer (or RGB with channelType unequal to ChannelAuto and ChannelRGBA)
+            tFloatOrComplex = 0x01,  // Object is floating point or complex value
+            tRGB            = 0x02   // Object is true color type
         };
 
         explicit DataObjRasterData(const InternalData *m_internalData, const bool isOverlayData = false);
@@ -73,13 +73,7 @@ class DataObjRasterData : public QwtRasterData
 
         bool isInit() const {return m_dataObj.getDims() > 0 && m_dataObjPlane != NULL;}
 
-        RasterDataType getTypeFlag() const 
-        { 
-            int type = m_dataObj.getType();
-            if(type == ito::tRGBA32) return tRGB;
-            else if (type == ito::tFloat32 || type == ito::tFloat64 || type == ito::tComplex64 || type == ito::tComplex128) return tFloatOrComplex;
-            return tInteger; 
-        }
+        RasterDataType getTypeFlag() const; 
 
         void getPlaneScaleAndOffset(double &scaleY, double &scaleX, double &offsetY, double &offsetX) const;
 

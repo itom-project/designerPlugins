@@ -108,7 +108,7 @@ void Itom2dQwtPlot::constructor()
 
     setPropertyObservedObject(this);
 
-    init(); //here, the API is not ready, yet. Usually init() is called again once the event is raised signalling that the api is ready. However, in QtDesigner, the api is not available. Therefore, we want to init the canvas here.
+    m_pContent->init(true); //here, the API is not ready, yet. Usually init() is called again once the event is raised signalling that the api is ready. However, in QtDesigner, the api is not available. Therefore, we want to init the canvas here.
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
 ito::RetVal Itom2dQwtPlot::init() 
 { 
     //called when api-pointers are transmitted, directly after construction
-    return m_pContent->init(); 
+    return m_pContent->init(m_windowMode != ito::AbstractFigure::ModeStandaloneInUi); 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -757,6 +757,53 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
 
     updateChannels(paramNames);
 
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ItomQwtPlotEnums::DataChannel Itom2dQwtPlot::getDataChannel() const
+{
+    if (d->m_pData)
+    {
+        return d->m_pData->m_dataChannel;
+    }
+
+    return ItomQwtPlotEnums::ChannelAuto;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setDataChannel(const ItomQwtPlotEnums::DataChannel &dataChannel)
+{
+    if (!d->m_pData)
+    {
+        return;
+    }
+
+    if (dataChannel != d->m_pData->m_dataChannel)
+    {
+        d->m_pData->m_dataChannel = dataChannel;
+        if (m_pContent)
+        {
+            m_pContent->adjustColorDataTypeRepresentation();
+            m_pContent->replot();
+        }
+        updatePropertyDock();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::resetDataChannel()
+{
+    if (!d->m_pData)
+    {
+        return;
+    }
+
+    d->m_pData->m_dataChannel = ItomQwtPlotEnums::ChannelAuto;
+    if (m_pContent)
+    {
+        m_pContent->replot();
+    }
     updatePropertyDock();
 }
 

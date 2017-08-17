@@ -96,6 +96,8 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pActCoordinates(NULL),
         m_pActCmplxSwitch(NULL),
         m_pMnuCmplxSwitch(NULL),
+        m_pActDataChannel(NULL),
+        m_pMnuDataChannel(NULL),
         m_pActCntrMarker(NULL),
         m_pOverlaySlider(NULL),
         m_pActOverlaySlider(NULL),
@@ -109,7 +111,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 
     //main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
-    m_dObjItem->setRenderThreadCount(0);
+    m_dObjItem->setRenderThreadCount(0); //uses ideal thread count
     //m_dObjItem->setColorMap(new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     m_rasterData = new DataObjRasterData(m_pData);
     m_dObjItem->setData(m_rasterData);
@@ -216,6 +218,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActOverlaySlider);
     mainTb->addSeparator();
     mainTb->addAction(m_pActScaleSettings);
+    mainTb->addAction(m_pActDataChannel);
     mainTb->addAction(m_pActToggleColorBar);
     mainTb->addAction(m_pActColorPalette);
     mainTb->addSeparator();
@@ -247,6 +250,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     menuView->addSeparator();
     menuView->addAction(m_pActToggleColorBar);
     menuView->addAction(m_pActColorPalette);
+    menuView->addAction(m_pActDataChannel);
     menuView->addSeparator();
     menuView->addAction(m_pActScaleSettings);
     menuView->addSeparator();
@@ -302,24 +306,35 @@ PlotCanvas::~PlotCanvas()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal PlotCanvas::init()
+ito::RetVal PlotCanvas::init(bool overwriteDesignableProperties)
 {
     if (!setColorMap("__first__"))
     {
-        refreshStyles();
+        refreshStyles(overwriteDesignableProperties);
     }
     else
     {
-        refreshStyles();
+        refreshStyles(overwriteDesignableProperties);
     }
 
     return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshStyles()
+void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 {
-    ItomQwtPlot::loadStyles();
+    //overwriteDesignableProperties: if the plot widget is configured for the first time
+    //(e.g. in the constructor), all styles and properties should be set to their default
+    //value, hence overwriteDesignableProperties is set to true. If the plot is
+    //displayed as standalone-plot, the styles have to be updated once the APIs are available
+    //and the styles can be read from the itom settings. In this case, overwriteDesignableProperties
+    //is also set to true. Only in the case, that the plot is integrated in a ui-file, that
+    //has been configured in the QtDesigner, overwriteDesignableProperties has to be set
+    //to false if not called during the construction, such that the properties from
+    //the QtDesigner are not overwritten again by the itom settings. Properties, that
+    //are not designable by the QtDesigner should nevertheless be obtained by the itom settings.
+
+    ItomQwtPlot::loadStyles(overwriteDesignableProperties);
 
     QPen rubberBandPen = QPen(QBrush(Qt::red), 1, Qt::DashLine);
     QPen trackerPen = QPen(QBrush(Qt::red), 2);
@@ -331,7 +346,6 @@ void PlotCanvas::refreshStyles()
 
     QFont titleFont = QFont("Helvetica", 12);
     QFont labelFont = QFont("Helvetica", 12);
-    labelFont.setItalic(false);
     QFont axisFont = QFont("Helvetica", 10);
 
     QSize centerMarkerSize = QSize(25, 25);
@@ -346,17 +360,21 @@ void PlotCanvas::refreshStyles()
         trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
         selectionPen = apiGetFigureSetting(parent(), "selectionPen", selectionPen, NULL).value<QPen>();
 
-        buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot.
-
-        titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>();
-        labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>();
-        labelFont.setItalic(false);
-        axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>();
-
         centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", centerMarkerSize, NULL).value<QSize>();
         centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", centerMarkerPen, NULL).value<QPen>();
         zStackMarkerPen = apiGetFigureSetting(parent(), "zStackMarkerPen", zStackMarkerPen, NULL).value<QPen>();
         zStackMarkerSize = apiGetFigureSetting(parent(), "zStackMarkerSize", zStackMarkerSize, NULL).value<QSize>();
+
+        if (overwriteDesignableProperties)
+        {
+            buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot. //designable
+
+            titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>(); //designable
+            labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>(); //designable
+            axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>(); //designable
+        }
+
+        
     }
 
     if (inverseColor1().isValid())
@@ -386,7 +404,7 @@ void PlotCanvas::refreshStyles()
     m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross, QBrush(inverseColor0()), zStackMarkerPen, zStackMarkerSize));
 
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
-	if (!m_pPaletteIsChanging)
+	if (!m_pPaletteIsChanging && overwriteDesignableProperties)
 	{
 		title().setFont(titleFont);
 		titleLabel()->setFont(titleFont);
@@ -414,7 +432,7 @@ void PlotCanvas::refreshStyles()
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
 
-    if (buttonSet != buttonStyle())
+    if ((buttonSet != buttonStyle()) && overwriteDesignableProperties)
     {
         setButtonStyle(buttonSet);
     }
@@ -460,6 +478,28 @@ void PlotCanvas::createActions()
     a->setObjectName("actShowColorBar");
     a->setToolTip(tr("Toggle visibility of the color bar on the right side"));
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuToggleColorBar(bool)));
+
+    //m_pActDataChannel
+    m_pActDataChannel = new QAction(tr("Data Channel"), p);
+    m_pMnuDataChannel = new QMenu(tr("Data Channel"), p);
+    m_pActDataChannel->setMenu(m_pMnuDataChannel);
+    a = m_pMnuDataChannel->addAction(tr("Auto"));
+    a->setData(ItomQwtPlotEnums::ChannelAuto);
+    m_pMnuDataChannel->setDefaultAction(a);
+    a = m_pMnuDataChannel->addAction(tr("Color"));
+    a->setData(ItomQwtPlotEnums::ChannelRGBA);
+    a = m_pMnuDataChannel->addAction(tr("Gray"));
+    a->setData(ItomQwtPlotEnums::ChannelGray);
+    a = m_pMnuDataChannel->addAction(tr("Red"));
+    a->setData(ItomQwtPlotEnums::ChannelRed);
+    a = m_pMnuDataChannel->addAction(tr("Green"));
+    a->setData(ItomQwtPlotEnums::ChannelGreen);
+    a = m_pMnuDataChannel->addAction(tr("Blue"));
+    a->setData(ItomQwtPlotEnums::ChannelBlue);
+    a = m_pMnuDataChannel->addAction(tr("Alpha"));
+    a->setData(ItomQwtPlotEnums::ChannelAlpha);
+    m_pActDataChannel->setVisible(false);
+    connect(m_pMnuDataChannel, SIGNAL(triggered(QAction*)), this, SLOT(mnuDataChannel(QAction*)));
 
     //m_actMarker
     m_pActValuePicker = a = new QAction(tr("Marker"), p);
@@ -572,6 +612,16 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
 
+        QList<QAction*> dataChannels = m_pMnuDataChannel->actions();
+        dataChannels[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAuto.png"));
+        dataChannels[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRgba.png"));
+        dataChannels[2]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGray.png"));
+        dataChannels[3]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRed.png"));
+        dataChannels[4]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGreen.png"));
+        dataChannels[5]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelBlue.png"));
+        dataChannels[6]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAlpha.png"));
+        m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
+
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
         {
@@ -599,6 +649,17 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
+        m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rgba_lt.png"));
+
+        QList<QAction*> dataChannels = m_pMnuDataChannel->actions();
+        dataChannels[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAuto.png"));
+        dataChannels[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRgba.png"));
+        dataChannels[2]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGray.png"));
+        dataChannels[3]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRed.png"));
+        dataChannels[4]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelGreen.png"));
+        dataChannels[5]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelBlue.png"));
+        dataChannels[6]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAlpha.png"));
+        m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
@@ -768,7 +829,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 {
                 case ito::tRGBA32:
                     //coloured objects have no color bar, therefore the value axis cropping is disabled
-                    setColorDataTypeRepresentation(true);
+                    adjustColorDataTypeRepresentation();
                     m_pData->m_valueScaleAuto = false;
                     m_pData->m_valueMin = std::numeric_limits<ito::uint8>::min();
                     m_pData->m_valueMax = std::numeric_limits<ito::uint8>::max();
@@ -776,11 +837,11 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                     break;
                 case ito::tComplex64:
                 case ito::tComplex128:
-                    setColorDataTypeRepresentation(false);
+                    adjustColorDataTypeRepresentation();
                     m_pActCmplxSwitch->setVisible(true);
                     break;
                 default:
-                    setColorDataTypeRepresentation(false);
+                    adjustColorDataTypeRepresentation();
                     m_pActCmplxSwitch->setVisible(false);
                     break;
                 }
@@ -822,20 +883,39 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setColorDataTypeRepresentation(bool colorOn)
+void PlotCanvas::adjustColorDataTypeRepresentation()
 {
-    if (colorOn)
+    if (m_dObjPtr && \
+        (m_dObjPtr->getType() == ito::tRGBA32) && \
+        ((m_pData->m_dataChannel & 0x0100) == 0x0000))
     {
         setColorBarVisible(false);
         m_pActColorPalette->setVisible(false);
         m_pActToggleColorBar->setVisible(false);
+        m_pActDataChannel->setVisible(true);
     }
     else
     {
         m_pActColorPalette->setVisible(true);
         m_pActToggleColorBar->setVisible(true);
         setColorBarVisible(m_pActToggleColorBar->isChecked());
+        m_pActDataChannel->setVisible(m_dObjPtr->getType() == ito::tRGBA32);
     }
+
+    if (m_pMnuDataChannel->defaultAction()->data().toInt() != m_pData->m_dataChannel)
+    {
+        foreach (QAction *a, m_pMnuDataChannel->actions())
+        {
+            if (a->data().toInt() == m_pData->m_dataChannel)
+            {
+                m_pMnuDataChannel->setDefaultAction(a);
+                m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
+                break;
+            }
+        }
+    }
+
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -927,7 +1007,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 
     setInverseColors(newPalette.inverseColorOne, newPalette.inverseColorTwo);
 	m_pPaletteIsChanging = true;
-	refreshStyles();
+	refreshStyles(false);
 	m_pPaletteIsChanging = false;
 
     if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
@@ -2247,6 +2327,20 @@ void PlotCanvas::mnuCmplxSwitch(QAction *action)
     int idx = action->data().toInt();
     m_pData->m_cmplxType = (ItomQwtPlotEnums::ComplexType)idx;
     internalDataUpdated();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mnuDataChannel(QAction* action)
+{
+    m_pMnuDataChannel->setDefaultAction(action);
+    m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
+
+    if (action->data().toInt() != m_pData->m_dataChannel)
+    {
+        m_pData->m_dataChannel = (ItomQwtPlotEnums::DataChannel)action->data().toInt();
+        adjustColorDataTypeRepresentation();
+        replot();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

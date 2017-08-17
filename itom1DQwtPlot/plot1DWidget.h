@@ -63,7 +63,7 @@ class Plot1DWidget : public ItomQwtPlot
         Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent = 0);
         ~Plot1DWidget();
 
-        ito::RetVal init();
+        ito::RetVal init(bool overwriteDesignableProperties);
 
         void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>() );
 

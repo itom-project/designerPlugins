@@ -4,7 +4,7 @@
     </qresource>
     <qresource prefix="/itomDesignerPlugins/itom_lt">
         <file>icons/q_itoM32_lt.png</file>
-    </qresource>    
+    </qresource>
     <qresource prefix="/itomDesignerPlugins/complex">
         <file>icons/ImRe.png</file>
         <file>icons/ImReAbs.png</file>
@@ -18,7 +18,7 @@
         <file>icons/ImReImag_lt.png</file>
         <file>icons/ImRePhase_lt.png</file>
         <file>icons/ImReReal_lt.png</file>
-    </qresource>    
+    </qresource>
     <qresource prefix="/itomDesignerPlugins/aspect">
         <file>icons/AspRatio14.png</file>
         <file>icons/AspRatio12.png</file>
@@ -44,7 +44,6 @@
         <file>icons/colorPalette.png</file>
         <file>icons/marker.png</file>
         <file>icons/picker.png</file>
-        <file>icons/picker_min_max.png</file>
         <file>icons/ellipse.png</file>
         <file>icons/rectangle.png</file>
         <file>icons/point.png</file>
@@ -60,6 +59,15 @@
         <file>icons/geosResize.png</file>
         <file>icons/geosRotate.png</file>
         <file>icons/geosMove.png</file>
+        <file>icons/picker_min_max_cropped.png</file>
+        <file>icons/picker_min_max.png</file>
+        <file>icons/colorChannelRgba.png</file>
+        <file>icons/colorChannelAlpha.png</file>
+        <file>icons/colorChannelAuto.png</file>
+        <file>icons/colorChannelGray.png</file>
+        <file>icons/colorChannelRed.png</file>
+        <file>icons/colorChannelBlue.png</file>
+        <file>icons/colorChannelGreen.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/plot_lt">
         <file>icons/markerPos_lt.png</file>
@@ -70,7 +78,6 @@
         <file>icons/colorPalette_lt.png</file>
         <file>icons/marker_lt.png</file>
         <file>icons/picker_lt.png</file>
-        <file>icons/picker_min_max_lt.png</file>
         <file>icons/ellipse_lt.png</file>
         <file>icons/rectangle_lt.png</file>
         <file>icons/point_lt.png</file>
@@ -86,7 +93,9 @@
         <file>icons/geosResize_lt.png</file>
         <file>icons/geosRotate_lt.png</file>
         <file>icons/geosMove_lt.png</file>
-    </qresource>    
+        <file>icons/picker_min_max_cropped_lt.png</file>
+      <file>icons/picker_min_max_lt.png</file>
+    </qresource>
     <qresource prefix="/itomDesignerPlugins/general">
         <file>icons/back.png</file>
         <file>icons/filesave.png</file>
@@ -121,7 +130,7 @@
         <file>icons/settings_lt.png</file>
         <file>icons/editDelete_lt.png</file>
         <file>icons/copyImg_lt.png</file>
-      <file>icons/decimals_lt.png</file>
+        <file>icons/decimals_lt.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/axis">
         <file>icons/xvm_plot.png</file>
@@ -133,7 +142,7 @@
         <file>icons/RGB_RGBGray.png</file>
         <file>icons/RGB_Gray.png</file>
         <file>icons/RGBA_RGBA.png</file>
-        <file>icons/RGBA_RGB.png</file>        
+        <file>icons/RGBA_RGB.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/axis_lt">
         <file>icons/xvm_plot_lt.png</file>
