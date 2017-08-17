@@ -7,6 +7,8 @@ OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
 OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 
+load_cache(${ITOM_SDK_DIR}/../)
+
 OPTION(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
 OPTION(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
 OPTION(PLUGIN_itom2DGraphicView "Build with this solution." ON)
