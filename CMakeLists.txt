@@ -9,6 +9,12 @@ SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 
 load_cache(${ITOM_SDK_DIR}/../)
 
+if (WIN32)
+    # add /LTCG flag to remove MSVC linker warning in release build
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
+    set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG")
+endif (WIN32)
+
 OPTION(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
 OPTION(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
 OPTION(PLUGIN_itom2DGraphicView "Build with this solution." ON)
