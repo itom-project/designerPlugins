@@ -190,7 +190,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
             m_d.plane = 0;
             tmpBounds = bounds;
         }
-        if (!(cv::Mat*)(dataObj->get_mdata()[m_d.plane])->data)
+        if (!dataObj->get_mdata() || !(cv::Mat*)(dataObj->get_mdata()[m_d.plane])->data)
             return ito::RetVal(ito::retError, 0, QObject::tr("cv:Mat in data object seems corrupted").toLatin1().data());
 
         switch( tmpBounds.size() )
