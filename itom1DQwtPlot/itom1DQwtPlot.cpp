@@ -60,6 +60,7 @@ void Itom1DQwtPlot::constructor()
     d = new Itom1DQwtPlotPrivate();
 
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
+    m_pInput.insert("xVec", new ito::Param("xVec", ito::ParamBase::DObjPtr, NULL, tr("represents the x-vector of the given source object").toLatin1().data()));
 
     d->m_pData = new InternalData();
     d->m_pData->m_autoAxisLabel = true;
