@@ -189,7 +189,7 @@ inline QRgb ItomColorMap::ColorStops::rgb(
         return d_stops[d_stops.size() - 1].rgb;
     }
 
-	const int index = findUpper(pos);
+	int index = findUpper(pos);
     // 03/09/17 ck, we got a crash here, when pos was a #nan
     if (index == 0)
         index = 1;
