@@ -1,9 +1,9 @@
-SET (target_name itom1DQwtPlot)
+SET (target_name itom1DQwtPlot)     
 SET (figure_name itom1DQwtPlot)
 project(${target_name})
 
 cmake_minimum_required(VERSION 2.8)
-
+ 
 #CMAKE Policies
 if (POLICY CMP0028)
     cmake_policy(SET CMP0028 NEW) #raise an CMake error if an imported target, containing ::, could not be found
@@ -73,6 +73,7 @@ LINK_DIRECTORIES(
 
 set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesData.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesDataXY.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/widgetCurveProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.h
@@ -115,6 +116,7 @@ set(plugin_RCC
 
 set(plugin_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesDataXY.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/widgetCurveProperties.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.cpp

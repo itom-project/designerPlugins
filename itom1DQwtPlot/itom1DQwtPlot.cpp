@@ -252,6 +252,10 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
+    if (m_pInput["xVec"]->getVal<ito::DataObject*>())
+    {
+        
+    }
     if (m_pInput["source"]->getVal<ito::DataObject*>())
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
@@ -265,14 +269,12 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 
     return ito::retOk;
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 {
     d->m_pData->m_forceValueParsing = true; //recalculate boundaries since content of data object may have changed
     AbstractDObjFigure::setSource(source);
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds) 
 { 
