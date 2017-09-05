@@ -114,20 +114,20 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                     case DataObjRasterData::tFloatOrComplex:
                     {
                         double value2 = m_overlayData->value(pos.x(), pos.y());
-                        text.sprintf("\nL1:%.4f\nL2:%.4f", value, value2);
+                        text.append(QString("\nL1:%1\nL2:%2").arg(value, 0, 'g', 4).arg(value2, 0, 'g', 4));
                     }
                     break;
                     case DataObjRasterData::tInteger:
                     {
                         double value2 = m_overlayData->value(pos.x(), pos.y());
-                        text.sprintf("\nL1:%.4f\nL2:%d", value, qRound(value2));
+                        text.append(QString("\nL1:%1\nL2:%2").arg(value, 0, 'g', 4).arg(qRound(value2)));
                     }
                     break;
                 }
             }
             else
             {
-                text.sprintf("\n%.4f", value);
+                text.append(QString("\n%1").arg(value, 0, 'g', 4));
             }
         }
         else if (m_valueData->getTypeFlag() == DataObjRasterData::tInteger)
@@ -146,13 +146,13 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                 case DataObjRasterData::tFloatOrComplex:
                 {
                     double value2 = m_overlayData->value(pos.x(), pos.y());
-                    text.sprintf("\nL1:%d\nL2:%.4f", value, value2);
+                    text.append(QString("\nL1:%1\nL2:%2").arg(value).arg(value2, 0, 'g', 4));
                 }
                 break;
                 case DataObjRasterData::tInteger:
                 {
                     double value2 = m_overlayData->value(pos.x(), pos.y());
-                    text.sprintf("\nL1:%d\nL2:%d", value, qRound(value2));
+                    text.append(QString("\nL1:%1\nL2:%2").arg(value).arg(qRound(value2)));
                 }
                 break;
                 }
