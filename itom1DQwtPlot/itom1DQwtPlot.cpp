@@ -254,7 +254,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 
     if (m_pInput["xVec"]->getVal<ito::DataObject*>())
     {
-        
+        //m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
     }
     if (m_pInput["source"]->getVal<ito::DataObject*>())
     {
@@ -264,7 +264,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
         ito::Channel* dataChannel = getInputChannel("source");
         m_pContent->m_hasParentForRescale = (dataChannel && dataChannel->getParent());
 
-        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds, m_pInput["xVec"]->getVal<ito::DataObject*>());
     }
 
     return ito::retOk;

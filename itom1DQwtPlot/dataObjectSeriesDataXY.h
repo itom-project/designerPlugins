@@ -43,11 +43,32 @@ class DataObjectSeriesDataXY : public DataObjectSeriesData
 public:
         explicit DataObjectSeriesDataXY(const int fastmode);
         ~DataObjectSeriesDataXY();
-
+        RetVal updateDataObject(const ito::DataObject* dataObj,const ito::DataObject* xVec ,QVector<QPointF> bounds, QVector<QPointF> boundsX);
         //size_t size() const;
         //QPointF sample(size_t n) const;
-        //QRectF boundingRect() const;
+        QRectF boundingRect() const;
+        LineData m_dX;
 
+
+private:
+    const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
+
+    ColorType m_colorState;
+    bool inSamplingMode;
+    int m_fast;
+    QByteArray m_hash;
+
+    QString m_dObjValueDescription;
+    QString m_dObjValueUnit;
+    QString m_dObjAxisDescription;
+    QString m_dObjAxisUnit;
+    bool m_autoScaleY;
+    double m_minY;
+    double m_maxY;
+    bool m_autoScaleX;
+    double m_minX;
+    double m_maxX;
+    ItomQwtPlotEnums::ComplexType m_cmplxState;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

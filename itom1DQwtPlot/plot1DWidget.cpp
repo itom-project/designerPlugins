@@ -23,6 +23,7 @@
 #include "itom1DQwtPlot.h"
 #include "plot1DWidget.h"
 #include "dataObjectSeriesData.h"
+#include "dataObjectSeriesDataXY.h"
 #include "DataObject/dataObjectFuncs.h"
 #include "qwtPlotCurveDataObject.h"
 #include "qwtPlotCurveProperty.h"
@@ -1154,7 +1155,7 @@ void Plot1DWidget::updateLabels()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds)
+void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*=NULL*/)
 {
     DataObjectSeriesData* seriesData = NULL;
     int colorIndex;
@@ -1570,8 +1571,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 else
                 {
-                    pts[0].setX(dataObj->getPixToPhys(dims-1, 0, _unused));
-                    pts[1].setX(dataObj->getPixToPhys(dims-1, width-1, _unused));
+                    pts[0].setX(dataObj->getPixToPhys(dims - 1, 0, _unused));
+                    pts[1].setX(dataObj->getPixToPhys(dims - 1, width - 1, _unused));            
                 }
 
                 for (int n = 0; n < numCurves; n++)
@@ -1597,8 +1598,17 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     }
                     else
                     {
-                        seriesData = new DataObjectSeriesData(1);
-                        seriesData->updateDataObject(dataObj, pts);
+                        if (xVec)
+                        {
+                            seriesData = new DataObjectSeriesDataXY(1);
+                            QVector<QPointF> xpts;
+                            ((DataObjectSeriesDataXY*)(seriesData))->updateDataObject(dataObj, xVec,pts, xpts);
+                        }
+                        else 
+                        {
+                            seriesData = new DataObjectSeriesData(1);
+                            seriesData->updateDataObject(dataObj, pts);
+                        }
                         m_plotCurveItems[n]->setData(seriesData);
                     }
 
