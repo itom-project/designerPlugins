@@ -999,7 +999,9 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                 continue;
             }
 
-            hitType = it.value()->hitEdge(scalePos, tol_x, tol_y);
+            if (hitType < 0)
+                hitType = it.value()->hitEdge(scalePos, tol_x, tol_y);
+
             if (hitType >= 0)
             {
                 it.value()->setSelected(true);
