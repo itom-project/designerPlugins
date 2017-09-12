@@ -32,6 +32,8 @@
 #include <pcl/filters/filter.h>
 #include "pcl/search/kdtree.h"
 #include "pcl/octree/octree.h"
+#include "vtkOutputWindow.h"
+#include "vtkFileOutputWindow.h"
 #include <qsharedpointer.h>
 #include <qcolor.h>
 #include <qdebug.h>
@@ -263,6 +265,15 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     mainTb->addAction(d->actions["propertyDock"]);
     mainTb->addAction(d->actions["settingsDock"]);
     mainTb->addAction(d->actions["itemsDock"]);
+
+    //redirect any vtk warnings or errors to a log-file vtk_errors.txt in the current directory.
+    //If desired, the vtkOutputWindow class can also be derived in order to redirect
+    //errors and warnings to the std::cout and std::cerr instead of the default channels stdout or stderr.
+    //see: http://vtk.1045678.n5.nabble.com/How-to-avoid-VTK-warning-window-td3297363.html
+    vtkFileOutputWindow *w = vtkFileOutputWindow::New();
+    w->SetFileName("vtk_errors.txt");
+    vtkOutputWindow::SetInstance(w);
+    w->Delete(); // now SetInstance owns the reference
 }
 
 //-------------------------------------------------------------------------------------
