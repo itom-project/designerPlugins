@@ -648,12 +648,11 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 
                     case 9: // rotation
                     {
-                        float angle = d->m_shape.rotationAngleRad() + M_PI
-                            + d->m_marker[4]->xValue() - newPoint.x() +
-                            d->m_marker[4]->yValue() - newPoint.y();
+                        float angle = d->m_shape.rotationAngleRad()
+                            + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
                         d->m_shape.rtransform().reset();
                         d->m_shape.rtransform().translate(d->m_shape.centerPoint().x(), d->m_shape.centerPoint().y());
-                        d->m_shape.rtransform().rotate(angle, Qt::ZAxis);
+                        d->m_shape.rtransform().rotate(angle / M_PI * 180.0, Qt::ZAxis);
                         d->m_shape.rtransform().translate(-d->m_shape.centerPoint().x(), -d->m_shape.centerPoint().y());
                     }
                     break;
@@ -702,12 +701,11 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 
                     case 5: // rotation
                     {
-                        float angle = d->m_shape.rotationAngleRad() + M_PI
-                            + d->m_marker[4]->xValue() - newPoint.x() +
-                                d->m_marker[4]->yValue() - newPoint.y();
+                        float angle = d->m_shape.rotationAngleRad() 
+                            + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
                         d->m_shape.rtransform().reset();
                         d->m_shape.rtransform().translate(d->m_shape.centerPoint().x(), d->m_shape.centerPoint().y());
-                        d->m_shape.rtransform().rotate(angle, Qt::ZAxis);
+                        d->m_shape.rtransform().rotate(angle / M_PI * 180.0, Qt::ZAxis);
                         d->m_shape.rtransform().translate(-d->m_shape.centerPoint().x(), -d->m_shape.centerPoint().y());
                     }
                     break;
