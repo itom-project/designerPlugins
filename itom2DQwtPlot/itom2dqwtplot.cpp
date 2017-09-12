@@ -1122,12 +1122,17 @@ void Itom2dQwtPlot::setOverlayAlpha (const int alpha)
         return;
     }
 
-    d->m_pData->m_alpha = alpha > 0 && alpha < 255 ? alpha : d->m_pData->m_alpha;
-
-    if (m_pContent)
+    int alphaClipped = qBound(0, alpha, 255);
+    
+    if (d->m_pData->m_alpha != alphaClipped)
     {
-        m_pContent->alphaChanged();
-        m_pContent->m_pOverlaySlider->setValue(d->m_pData->m_alpha);
+        d->m_pData->m_alpha = alphaClipped;
+
+        if (m_pContent)
+        {
+            m_pContent->alphaChanged();
+            m_pContent->m_pOverlaySlider->setValue(d->m_pData->m_alpha);
+        }
     }
 
     this->updatePropertyDock();
