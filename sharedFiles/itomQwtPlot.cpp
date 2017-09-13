@@ -2258,37 +2258,38 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                 {
                     switch (shape.type())
                     {
-                    case ito::Shape::MultiPointPick:
-                    case ito::Shape::Point:
-                    case ito::Shape::Line:
-                    case ito::Shape::Rectangle:
-                    case ito::Shape::Square:
-                    case ito::Shape::Ellipse:
-                    case ito::Shape::Circle:
-                        newItem = new DrawItem(shape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
-                        if (!retVal.containsError())
-                        {
-                            newItem->setColor(m_inverseColor0, m_inverseColor1);
-                            newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
-                            newItem->setVisible(true);
-                            newItem->show();
-                            newItem->attach(this);
-                            m_pShapes.insert(newItem->getIndex(), newItem);
-                            shape.setIndex(newItem->getIndex());
-                            if (p)
+                        case ito::Shape::Polygon:
+                        case ito::Shape::MultiPointPick:
+                        case ito::Shape::Point:
+                        case ito::Shape::Line:
+                        case ito::Shape::Rectangle:
+                        case ito::Shape::Square:
+                        case ito::Shape::Ellipse:
+                        case ito::Shape::Circle:
+                            newItem = new DrawItem(shape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
+                            if (!retVal.containsError())
                             {
-                                if (p->shapesWidget())
+                                newItem->setColor(m_inverseColor0, m_inverseColor1);
+                                newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
+                                newItem->setVisible(true);
+                                newItem->show();
+                                newItem->attach(this);
+                                m_pShapes.insert(newItem->getIndex(), newItem);
+                                shape.setIndex(newItem->getIndex());
+                                if (p)
                                 {
-                                    p->shapesWidget()->updateShape(shape);
+                                    if (p->shapesWidget())
+                                    {
+                                        p->shapesWidget()->updateShape(shape);
+                                    }
+                                    emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
                                 }
-                                emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
+                                updatedShapes << shape;
                             }
-                            updatedShapes << shape;
-                        }
                         break;
 
-                    default:
-                        retVal += ito::RetVal(ito::retError, 0, tr("Invalid or unsupported shape type").toLatin1().data());
+                        default:
+                            retVal += ito::RetVal(ito::retError, 0, tr("Invalid or unsupported shape type").toLatin1().data());
                         break;
                     }
 
@@ -2342,38 +2343,39 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
             DrawItem *newItem = NULL;
             switch (geometricShape.type())
             {
-            case ito::Shape::MultiPointPick:
-            case ito::Shape::Point:
-            case ito::Shape::Line:
-            case ito::Shape::Rectangle:
-            case ito::Shape::Square:
-            case ito::Shape::Ellipse:
-            case ito::Shape::Circle:
-                newItem = new DrawItem(geometricShape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
-                if (!retVal.containsError())
-                {
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
-                    newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
-                    newItem->setVisible(true);
-                    newItem->show();
-                    newItem->attach(this);
-                    m_pShapes.insert(newItem->getIndex(), newItem);
-                    if (newIndex)
+                case ito::Shape::Polygon:
+                case ito::Shape::MultiPointPick:
+                case ito::Shape::Point:
+                case ito::Shape::Line:
+                case ito::Shape::Rectangle:
+                case ito::Shape::Square:
+                case ito::Shape::Ellipse:
+                case ito::Shape::Circle:
+                    newItem = new DrawItem(geometricShape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
+                    if (!retVal.containsError())
                     {
-                        *newIndex = newItem->getIndex();
-                    }
-                    if (p->shapesWidget())
-                    {
-                        p->shapesWidget()->updateShape(newItem->getShape());
-                    }
+                        newItem->setColor(m_inverseColor0, m_inverseColor1);
+                        newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
+                        newItem->setVisible(true);
+                        newItem->show();
+                        newItem->attach(this);
+                        m_pShapes.insert(newItem->getIndex(), newItem);
+                        if (newIndex)
+                        {
+                            *newIndex = newItem->getIndex();
+                        }
+                        if (p->shapesWidget())
+                        {
+                            p->shapesWidget()->updateShape(newItem->getShape());
+                        }
 
-                    emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
-                    updatedShapes << geometricShape;
-                }
+                        emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
+                        updatedShapes << geometricShape;
+                    }
                 break;
 
-            default:
-                retVal += ito::RetVal(ito::retError, 0, tr("Invalid or unsupported shape type").toLatin1().data());
+                default:
+                    retVal += ito::RetVal(ito::retError, 0, tr("Invalid or unsupported shape type").toLatin1().data());
                 break;                
             }
 
