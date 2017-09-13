@@ -595,11 +595,19 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 
             case ito::Shape::Point:
             case ito::Shape::MultiPointPick:
-            case ito::Shape::Polygon:
             {
                 if (markerIdx >= 0 && markerIdx < basePoints.size())
                 {
-                    basePoints[markerIdx-1] = invTrafo.map(markerScaleCoordinate);
+                    basePoints[markerIdx - 1] = invTrafo.map(markerScaleCoordinate);
+                    success = true;
+                }
+            }
+            break;
+            case ito::Shape::Polygon:
+            {
+                if (markerIdx >= 0 && markerIdx <= basePoints.size())
+                {
+                    basePoints[(markerIdx - 1) % basePoints.size()] = invTrafo.map(markerScaleCoordinate);
                     success = true;
                 }
             }
@@ -861,6 +869,27 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
 
                 path.addPath(shape.transform().map(tmpPath));
             }
+        break;
+
+        case ito::Shape::Polygon:
+        {
+            if (!shape.transform().isRotating())
+            {
+                int npts = shape.basePoints().length();
+                for (int nl = 1; nl <= npts; nl++)
+                {
+                    d->m_point1 = shape.transform().map(shape.basePoints()[nl - 1]);
+                    d->m_point2 = shape.transform().map(shape.basePoints()[nl % npts]);
+                    path.moveTo(d->m_point1);
+                    path.lineTo(d->m_point2);
+                }
+            }
+            else
+            {
+                path.moveTo(d->m_point1);
+                path.lineTo(d->m_point2);
+            }
+        }
         break;
 
         default:
