@@ -33,37 +33,37 @@ QVector<int> DrawItem::idxVec;
 
 class DrawItemPrivate
 {
-public:
-    DrawItemPrivate() : m_pparent(NULL) {}
-    ~DrawItemPrivate() {};
+    public:
+        DrawItemPrivate() : m_pparent(NULL) {}
+        ~DrawItemPrivate() {};
 
-    ito::Shape m_shape;
-    QPen m_markerPen;
-    QBrush m_markerBrush;
-    QPen m_linePen;
-    QwtPlot *m_pparent;
+        ito::Shape m_shape;
+        QPen m_markerPen;
+        QBrush m_markerBrush;
+        QPen m_linePen;
+        QwtPlot *m_pparent;
 
-    bool m_selected;
+        bool m_selected;
 
-    QVector<QwtPlotMarker*> m_marker;
-    char m_type;    
+        QVector<QwtPlotMarker*> m_marker;
+        char m_type;    
 
-    bool m_autoColor;
-    bool m_labelVisible;
+        bool m_autoColor;
+        bool m_labelVisible;
 
-    QColor m_markerColor;
-    QColor m_lineColor;
-    QColor m_labelTextColor;
-    QBrush m_fillBrush;
-    QBrush m_fillBrushSelected;
-    QBrush m_labelBrush;
-    QFont m_labelFont;
-    QPen m_elementPen;
+        QColor m_markerColor;
+        QColor m_lineColor;
+        QColor m_labelTextColor;
+        QBrush m_fillBrush;
+        QBrush m_fillBrushSelected;
+        QBrush m_labelBrush;
+        QFont m_labelFont;
+        QPen m_elementPen;
 
-    QPointF m_point1;
-    QPointF m_point2;
+        QPointF m_point1;
+        QPointF m_point2;
 
-    ItomQwtPlotEnums::ModificationModes m_modificationModes;
+        ItomQwtPlotEnums::ModificationModes m_modificationModes;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
