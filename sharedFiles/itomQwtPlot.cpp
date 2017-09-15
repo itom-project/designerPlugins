@@ -1788,8 +1788,33 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         //polygonScale.pop_back(); // remove current cursor position
                         ito::Shape thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
                         QPolygonF poly = thisShape.basePoints();
+
+                        // added new point close to starting point, then we assume editing is finished
+                        if (abs(poly[0].x() - polygonScale.back().x()) < 5 && abs(poly[0].y() - polygonScale.back().y()) < 5)
+                        {
+                            for (int i = 0; i < m_currentShapeIndices.size(); i++)
+                            {
+                                if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
+                                shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
+                            }
+                            m_currentShapeIndices.clear();
+                            if (m_isUserInteraction)
+                            {
+                                emit p->userInteractionDone(ito::Shape::Polygon, false, shapes);
+                                m_isUserInteraction = false;
+                            }
+                            emit p->geometricShapeFinished(shapes, aborted);
+                            if (p->shapesWidget())
+                            {
+                                p->shapesWidget()->updateShapes(shapes);
+                            }
+                            m_pMultiPointPicker->setEnabled(false);
+                            setState(stateIdle);
+
+                            break;
+                        }
                         poly.append(polygonScale.back());
-                        thisShape = thisShape.fromPolygon(poly);
+                        thisShape = thisShape.fromPolygon(poly, thisShape.index());
                         m_pShapes[m_currentShapeIndices[0]]->setShape(thisShape);
                         emit p->geometricShapeCurrentChanged(m_pShapes[m_currentShapeIndices[0]]->getShape());
                     }
@@ -1851,9 +1876,20 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     {
                         for (int i = 0; i < m_currentShapeIndices.size(); i++)
                         {
-                            if (!m_pShapes.contains(m_currentShapeIndices[i])) 
+                            if (!m_pShapes.contains(m_currentShapeIndices[i]))
                                 continue;
                             shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
+
+                            DrawItem *delItem = m_pShapes[m_currentShapeIndices[i]];
+                            delItem->setSelected(false);
+                            ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
+                            if (p)
+                            {
+                                emit p->geometricShapeCurrentChanged(ito::Shape());
+                            }
+                            delItem->detach();
+
+                            m_pShapes.remove(m_currentShapeIndices[i]);
                         }
                         m_currentShapeIndices.clear();
                         if (m_isUserInteraction)
@@ -1870,6 +1906,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     m_pMultiPointPicker->setEnabled(false);
                     setState(stateIdle);
+                    replot();
                 }
             break;
         }
@@ -2076,7 +2113,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
             if (m)
             {
                 m->setMaxNrItems(m_elementsToPick);
-                m_elementsToPick = 1;
+                //m_elementsToPick = 1;
                 m_pMultiPointPicker->setEnabled(true);
 
                 if (m->maxNrItems() > 0)
