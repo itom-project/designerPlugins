@@ -1084,7 +1084,7 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
             foreach(const QPointF &pt, shape.basePoints())
             {
                 line = QLineF(point_trafo, pt);
-                if (std::abs(line.dx() <= tol_x) && std::abs(line.dy() <= tol_y))
+                if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y))
                 {
                     hitEdge = true;
                     break;
