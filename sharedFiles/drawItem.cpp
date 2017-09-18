@@ -876,8 +876,11 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
             {
                 int npts = shape.basePoints().length();
                 int close = 1;
-                if (shape.flags() & ito::Shape::PolygonOpen)
+                if (shape.unclosed())
+                {
                     close = 0;
+                }
+
                 for (int nl = 1; nl < npts + close; nl++)
                 {
                     d->m_point1 = shape.transform().map(shape.basePoints()[nl - 1]);

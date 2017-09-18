@@ -1264,7 +1264,7 @@ void ItomQwtPlot::closePolygon(bool aborted)
     ito::Shape thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
     QPolygonF poly = thisShape.basePoints();
 
-    thisShape.setFlags(thisShape.flags() & ~ito::Shape::PolygonOpen);
+    thisShape.setUnclosed(false);
     m_pShapes[m_currentShapeIndices[0]]->setShape(thisShape);
     for (int i = 0; i < m_currentShapeIndices.size(); i++)
     {
@@ -1872,7 +1872,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         }
                         poly.append(polygonScale.back());
                         thisShape = thisShape.fromPolygon(poly, thisShape.index());
-                        thisShape.setFlags(thisShape.flags() | ito::Shape::PolygonOpen);
+                        thisShape.setUnclosed(true);
                         m_pShapes[m_currentShapeIndices[0]]->setShape(thisShape);
                         emit p->geometricShapeCurrentChanged(m_pShapes[m_currentShapeIndices[0]]->getShape());
                     }
@@ -1883,7 +1883,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                         polygonScale.pop_back(); // remove duplicated point
                         ito::Shape shape = ito::Shape::fromPolygon(polygonScale);
-                        shape.setFlags(shape.flags() | ito::Shape::PolygonOpen);
+                        shape.setUnclosed(true);
                         DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
                         newItem->setColor(m_inverseColor0, m_inverseColor1);
                         newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
