@@ -1074,6 +1074,14 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
         }
         replot();
     }
+    else if (m_state == stateDrawShape && event->button() == Qt::MiddleButton)
+    {
+        if (m_pShapes.size() > 0 && m_currentShapeIndices.size() > 0
+            && m_pShapes[m_currentShapeIndices[0]]->getShape().type() == ito::Shape::Polygon)
+        {
+            closePolygon(0);
+        }
+    }
 
     if (!event->isAccepted())
     {
@@ -1084,6 +1092,36 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
 {
+    // mouse tracking should be only used when drawing polgon, so make a short cut here,
+    // avoiding to run too much of code 
+    if (event->buttons() == Qt::NoButton)
+    {
+        if (m_state == stateDrawShape)
+        {
+            if (m_pShapes.size() > 0 && m_currentShapeIndices.size() > 0 
+                && m_pShapes[m_currentShapeIndices[0]]->getShape().type() == ito::Shape::Polygon)
+            {
+                ito::Shape thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
+                QPolygonF poly = thisShape.basePoints();
+                int canxpos = event->x() - canvas()->x();
+                int canypos = event->y() - canvas()->y();
+
+                QPointF scalePos(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
+                double tol_x = std::abs(invTransform(QwtPlot::xBottom, 5) - invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
+                double tol_y = std::abs(invTransform(QwtPlot::yLeft, 5) - invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
+                QLineF line(poly[0], scalePos);
+                if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y) && !QApplication::overrideCursor())
+                {
+                    QApplication::setOverrideCursor(Qt::PointingHandCursor);
+                }
+                else
+                    //setCursor(Qt::CrossCursor);
+                    QApplication::restoreOverrideCursor();
+            }            
+        }
+        return;
+    }
+
     if (m_ignoreNextMouseEvent)
     {
         m_ignoreNextMouseEvent = false;
@@ -1211,6 +1249,43 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
     {
         QwtPlot::mouseReleaseEvent(event);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::closePolygon(bool aborted)
+{
+    QVector<ito::Shape> shapes;
+    ItomQwtDObjFigure *p = (ItomQwtDObjFigure*)(this->parent());
+
+    // disable mouse tracking
+    setMouseTracking(0);
+    QApplication::restoreOverrideCursor();
+
+    ito::Shape thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
+    QPolygonF poly = thisShape.basePoints();
+
+    thisShape.setFlags(thisShape.flags() & ~ito::Shape::PolygonOpen);
+    m_pShapes[m_currentShapeIndices[0]]->setShape(thisShape);
+    for (int i = 0; i < m_currentShapeIndices.size(); i++)
+    {
+        if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
+        shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
+    }
+    m_currentShapeIndices.clear();
+    if (m_isUserInteraction)
+    {
+        emit p->userInteractionDone(ito::Shape::Polygon, false, shapes);
+        m_isUserInteraction = false;
+    }
+    emit p->geometricShapeFinished(shapes, aborted);
+    if (p->shapesWidget())
+    {
+        p->shapesWidget()->updateShapes(shapes);
+    }
+    m_pMultiPointPicker->setEnabled(false);
+    setState(stateIdle);
+
+    replot();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1792,36 +1867,23 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         // added new point close to starting point, then we assume editing is finished
                         if (abs(poly[0].x() - polygonScale.back().x()) < 5 && abs(poly[0].y() - polygonScale.back().y()) < 5)
                         {
-                            for (int i = 0; i < m_currentShapeIndices.size(); i++)
-                            {
-                                if (!m_pShapes.contains(m_currentShapeIndices[i])) continue;
-                                shapes.append(m_pShapes[m_currentShapeIndices[i]]->getShape());
-                            }
-                            m_currentShapeIndices.clear();
-                            if (m_isUserInteraction)
-                            {
-                                emit p->userInteractionDone(ito::Shape::Polygon, false, shapes);
-                                m_isUserInteraction = false;
-                            }
-                            emit p->geometricShapeFinished(shapes, aborted);
-                            if (p->shapesWidget())
-                            {
-                                p->shapesWidget()->updateShapes(shapes);
-                            }
-                            m_pMultiPointPicker->setEnabled(false);
-                            setState(stateIdle);
-
+                            closePolygon(aborted);
                             break;
                         }
                         poly.append(polygonScale.back());
                         thisShape = thisShape.fromPolygon(poly, thisShape.index());
+                        thisShape.setFlags(thisShape.flags() | ito::Shape::PolygonOpen);
                         m_pShapes[m_currentShapeIndices[0]]->setShape(thisShape);
                         emit p->geometricShapeCurrentChanged(m_pShapes[m_currentShapeIndices[0]]->getShape());
                     }
                     else
                     {
+                        // enable mouse tracking to change curser when passing over starting / end point
+                        setMouseTracking(1);
+
                         polygonScale.pop_back(); // remove duplicated point
                         ito::Shape shape = ito::Shape::fromPolygon(polygonScale);
+                        shape.setFlags(shape.flags() | ito::Shape::PolygonOpen);
                         DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
                         newItem->setColor(m_inverseColor0, m_inverseColor1);
                         newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
@@ -1903,6 +1965,9 @@ void ItomQwtPlot::multiPointActivated(bool on)
                             p->shapesWidget()->updateShapes(shapes);
                         }
                     }
+
+                    QApplication::restoreOverrideCursor();
+                    setMouseTracking(0);
 
                     m_pMultiPointPicker->setEnabled(false);
                     setState(stateIdle);

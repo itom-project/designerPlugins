@@ -210,6 +210,7 @@ protected:
 private:
     void createBaseActions();
     bool m_showContextMenu;
+    void closePolygon(bool aborted);
 
     ItomPlotZoomer *m_pZoomer;
     ItomPlotMagnifier *m_pMagnifier;

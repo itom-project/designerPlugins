@@ -191,8 +191,7 @@ void DrawItem::setSelected(const bool selected)
         break;
 
         case ito::Shape::Point:
-        case ito::Shape::MultiPointPick:
-    
+        case ito::Shape::MultiPointPick:    
             {
                 if (selected && (moveable | resizeable))
                 {
@@ -876,7 +875,10 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
             if (!shape.transform().isRotating())
             {
                 int npts = shape.basePoints().length();
-                for (int nl = 1; nl <= npts; nl++)
+                int close = 1;
+                if (shape.flags() & ito::Shape::PolygonOpen)
+                    close = 0;
+                for (int nl = 1; nl < npts + close; nl++)
                 {
                     d->m_point1 = shape.transform().map(shape.basePoints()[nl - 1]);
                     d->m_point2 = shape.transform().map(shape.basePoints()[nl % npts]);

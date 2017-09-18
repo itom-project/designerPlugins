@@ -913,9 +913,7 @@ void PlotCanvas::adjustColorDataTypeRepresentation()
                 break;
             }
         }
-    }
-
-    
+    }   
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2130,8 +2128,6 @@ void PlotCanvas::childFigureDestroyed(QObject* /*obj*/, ito::uint32 UID)
     replot();
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> PlotCanvas::getDisplayed()
 {
@@ -2240,7 +2236,6 @@ void PlotCanvas::getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, 
     return;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setCoordinates(const QVector<QPointF> &pts, bool visible)
 {
@@ -2263,7 +2258,6 @@ void PlotCanvas::setCoordinates(const QVector<QPointF> &pts, bool visible)
         }
         m_pCoordinates->setText(buf);
     }
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2290,6 +2284,7 @@ ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
 {
 	return m_pData->m_cmplxType;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
 {
@@ -2302,6 +2297,7 @@ void PlotCanvas::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
 		}
 	}
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuScaleSettings()
 {
@@ -2348,8 +2344,6 @@ void PlotCanvas::mnuColorPalette()
 {
     setColorMap("__next__");
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuToggleColorBar(bool checked)
@@ -2588,3 +2582,5 @@ void PlotCanvas::mnuCenterMarker(bool checked)
     if (p)
         p->updatePropertyDock();
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
