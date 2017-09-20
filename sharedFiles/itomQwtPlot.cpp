@@ -958,9 +958,21 @@ void ItomQwtPlot::keyPressEvent(QKeyEvent * event)
             }
         }
 
-        foreach(int index, indices_to_delete)
+        if (indices_to_delete.size() == 1 && m_pShapes[indices_to_delete[0]]->getShape().type() == ito::Shape::Polygon)
         {
-            deleteGeometricShape(index);
+            ito::Shape shape = m_pShapes[indices_to_delete[0]]->getShape();
+            QPolygonF newBasePoints = shape.basePoints();
+            newBasePoints.remove(m_pShapes[indices_to_delete[0]]->getSelectedMarker());
+            ito::Shape newShape(ito::Shape::Polygon, shape.flags(), newBasePoints, shape.index(), shape.transform());
+            m_pShapes[indices_to_delete[0]]->setShape(newShape);
+            replot();
+        }
+        else
+        {
+            foreach(int index, indices_to_delete)
+            {
+                deleteGeometricShape(index);
+            }
         }
         event->accept();
     }
@@ -1020,6 +1032,27 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
 
             if (hitType >= 0)
             {
+                // hit a line of a polygon with shift key pressed, then we add a new point to the line
+                if (hitType == 0 && event->modifiers() == Qt::ShiftModifier && it.value()->getShape().type() == ito::Shape::Polygon)
+                {
+                    DrawItem *ditem = it.value();
+                    ito::Shape shape = ditem->getShape();
+                    int closed = shape.unclosed();
+                    int hitLine;
+                    for (int i = 0; i < shape.basePoints().size() - closed; i++)
+                    {
+                        if (ditem->hitLine(scalePos, QLineF(shape.basePoints()[i], shape.basePoints()[(i + 1) % shape.basePoints().size()]), tol_x, tol_y))
+                        {
+                            hitLine = i;
+                            break;
+                        }
+                    }
+                    QPolygonF newBasePoints = shape.basePoints();
+                    newBasePoints.insert(hitLine + 1, scalePos);
+                    shape = ito::Shape(ito::Shape::Polygon, shape.flags(), newBasePoints, shape.index(), shape.transform());
+                    ditem->setShape(shape);
+                }
+
                 it.value()->setSelected(true, hitType - 1);
 
                 if (m_selectedShape != it.value())

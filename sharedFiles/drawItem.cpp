@@ -69,7 +69,9 @@ class DrawItemPrivate
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/, bool labelVisible /*= false*/) : 
-    QwtPlotShapeItem(shape.name()), d(NULL)
+    QwtPlotShapeItem(shape.name()), 
+    d(NULL),
+    m_currentMarker(-1)
 {
     d = new DrawItemPrivate();
     
@@ -185,6 +187,7 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
     QwtPlotMarker *marker = NULL;
 
     setRenderHint(QwtPlotItem::RenderAntialiased, false);
+    m_currentMarker = -1;
 
     switch (d->m_shape.type())
     {
@@ -221,6 +224,18 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
 
                 if (selected && resizeable)
                 {
+                    m_currentMarker = nMarker;
+                    if (d->m_marker.size() > d->m_shape.rbasePoints().size())
+                    {
+                        // some marker has been deleted, rebuild markers
+                        for (int n = 0; n < d->m_marker.size(); n++)
+                        {
+                            d->m_marker[n]->detach();
+                            delete d->m_marker[n];
+                        }
+                        d->m_marker.clear();
+                    }
+
                     // here we always adjust the markers so only the currently selected gets highlighted
                     for (int nm = 0; nm < d->m_marker.size(); nm++)
                     {
