@@ -407,7 +407,7 @@ void ItomQwtPlot::loadStyles(bool overwriteDesignableProperties)
     {
         if (item && item->getAutoColor())
         {
-            item->setColor(m_inverseColor0, m_inverseColor1);
+            item->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
         }
     }
 }
@@ -1020,7 +1020,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
 
             if (hitType >= 0)
             {
-                it.value()->setSelected(true);
+                it.value()->setSelected(true, hitType - 1);
 
                 if (m_selectedShape != it.value())
                 {
@@ -1146,7 +1146,6 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                 {
                     mousePosScale = QPointF(m_startMouseScale.x(), mousePosScale.y());
                 }
-
             }
 
             if (m_selectedShape->shapeMoveTo(mousePosScale - m_startMouseScaleDiff))
@@ -1351,7 +1350,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     ito::Shape shape = ito::Shape::fromPoint(polygonScale[0]);
                     DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                     newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                     if (this->m_inverseColor0.isValid())
                     {
@@ -1440,7 +1439,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     ito::Shape shape = ito::Shape::fromLine(polygonScale[0], polygonScale[1]);
                     DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                     newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                     if (this->m_inverseColor0.isValid())
                     {
@@ -1524,7 +1523,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     ito::Shape shape = ito::Shape::fromRectangle(QRectF(polygonScale[0], polygonScale[1]));
                     DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                     newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                     if (this->m_inverseColor0.isValid())
                     {
@@ -1608,7 +1607,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     ito::Shape shape = ito::Shape::fromSquare(0.5 * (polygonScale[1] + polygonScale[0]), std::abs((polygonScale[1] - polygonScale[0]).x()));
                     DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                     newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                     if (this->m_inverseColor0.isValid())
                     {
@@ -1692,7 +1691,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     ito::Shape shape = ito::Shape::fromEllipse(QRectF(polygonScale[0], polygonScale[1]));
                     DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                     newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                     if (this->m_inverseColor0.isValid())
                     {
@@ -1776,7 +1775,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     ito::Shape shape = ito::Shape::fromCircle(0.5 * (polygonScale[1] + polygonScale[0]), std::abs((polygonScale[1] - polygonScale[0]).x()) * 0.5);
                     DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                     newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                     if (this->m_inverseColor0.isValid())
                     {
@@ -1885,7 +1884,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         ito::Shape shape = ito::Shape::fromPolygon(polygonScale);
                         shape.setUnclosed(true);
                         DrawItem *newItem = new DrawItem(shape, m_shapeModificationModes, this, NULL, m_shapesLabelVisible);
-                        newItem->setColor(m_inverseColor0, m_inverseColor1);
+                        newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                         newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                         if (this->m_inverseColor0.isValid())
                         {
@@ -2510,7 +2509,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
                             newItem = new DrawItem(shape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
                             if (!retVal.containsError())
                             {
-                                newItem->setColor(m_inverseColor0, m_inverseColor1);
+                                newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                                 newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                                 newItem->setVisible(true);
                                 newItem->show();
@@ -2595,7 +2594,7 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
                     newItem = new DrawItem(geometricShape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
                     if (!retVal.containsError())
                     {
-                        newItem->setColor(m_inverseColor0, m_inverseColor1);
+                        newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                         newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                         newItem->setVisible(true);
                         newItem->show();
@@ -2690,7 +2689,7 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
                 newItem = new DrawItem(geometricShape, m_shapeModificationModes, this, &retVal, m_shapesLabelVisible);
                 if (!retVal.containsError())
                 {
-                    newItem->setColor(m_inverseColor0, m_inverseColor1);
+                    newItem->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
                     newItem->setFillOpacity(m_geometricShapeOpacity, m_geometricShapeOpacitySelected);
                     newItem->setVisible(true);
                     newItem->show();

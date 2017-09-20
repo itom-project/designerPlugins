@@ -52,6 +52,7 @@ class DrawItemPrivate
         bool m_labelVisible;
 
         QColor m_markerColor;
+        QColor m_markerColor2; //!> second marker color, used when a single point (currently only for polygones) is selected for manipulation
         QColor m_lineColor;
         QColor m_labelTextColor;
         QBrush m_fillBrush;
@@ -174,7 +175,7 @@ void DrawItem::setModificationModes(const ItomQwtPlotEnums::ModificationModes &m
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setSelected(const bool selected)
+void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
 {
     d->m_selected = selected;
     int flags = d->m_shape.flags();
@@ -220,14 +221,29 @@ void DrawItem::setSelected(const bool selected)
 
                 if (selected && resizeable)
                 {
+                    // here we always adjust the markers so only the currently selected gets highlighted
+                    for (int nm = 0; nm < d->m_marker.size(); nm++)
+                    {
+                        if (d->m_shape.type() == ito::Shape::Polygon && nm == nMarker)
+                            d->m_marker[nm]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor2), QPen(d->m_markerColor, 1), QSize(9, 9)));
+                        else
+                            d->m_marker[nm]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(d->m_markerColor, 1), QSize(9, 9)));
+                    }
+
+                    // This run only once, creating markers
+                    int npt = 0;
                     while (d->m_marker.size() < d->m_shape.rbasePoints().size())
                     {
                         marker = new QwtPlotMarker();
-                        marker->setLinePen(QPen(d->m_markerColor));
-                        marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
+                        marker->setLinePen(QPen());
+                        if (d->m_shape.type() == ito::Shape::Polygon && npt == nMarker)
+                            marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor2), QPen(d->m_markerColor, 1), QSize(9, 9)));
+                        else
+                            marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(d->m_markerColor, 1), QSize(9, 9)));
                         marker->setVisible(true);
                         marker->attach(d->m_pparent);
                         d->m_marker.append(marker);
+                        npt++;
                     }
 
                     for (int i = 0; i < d->m_shape.rbasePoints().size(); ++i)
@@ -736,12 +752,16 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
+void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor, const QColor &markerColor2 /*= QColor() */)
 {
     if (d->m_markerColor != markerColor || d->m_lineColor != lineColor)
     {
         d->m_markerColor = markerColor;
         d->m_lineColor = lineColor;
+        if (markerColor2 != QColor())
+            d->m_markerColor2 = markerColor2;
+        else
+            d->m_markerColor2 = markerColor;
 
         if (d->m_fillBrush.style() != Qt::NoBrush)
         {
@@ -1081,13 +1101,19 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
         case ito::Shape::Polygon:
         {
             QLineF line;
-            foreach(const QPointF &pt, shape.basePoints())
+            for (int i = 0; i < shape.basePoints().size(); ++i)
             {
-                line = QLineF(point_trafo, pt);
+                line = QLineF(point_trafo, shape.basePoints()[i]);
                 if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y))
                 {
                     hitEdge = true;
                     break;
+                }
+                int closed = shape.unclosed();
+                if (i < shape.basePoints().size() - closed)
+                {
+                    if (hitEdge = hitLine(point, QLineF(shape.basePoints()[i], shape.basePoints()[(i + 1) % shape.basePoints().size()]), tol_x, tol_y))
+                        break;
                 }
             }
         }
