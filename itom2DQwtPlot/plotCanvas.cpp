@@ -2316,7 +2316,7 @@ ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
 {
     if (!m_pData)
         //ItomQwtPlotEnums::ComplexType
-        return (ItomQwtPlotEnums::ComplexType);
+        return (ItomQwtPlotEnums::ComplexType)0;
 
     return m_pData->m_cmplxType;
 }
