@@ -997,12 +997,12 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             if (needChannelUpdate) // we have an updated plot and want to show it
             {
-                if (zStack && m_zSliceType & ito::AbstractFigure::tVisibleOnInit)
+                if (zStack && (m_zSliceType & ito::AbstractFigure::tVisibleOnInit))
                 {
                     m_zSliceType &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
-                else if (!zStack && m_lineCutType & ito::AbstractFigure::tVisibleOnInit)
+                else if (!zStack && (m_lineCutType & ito::AbstractFigure::tVisibleOnInit))
                 {
                     m_lineCutType &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);

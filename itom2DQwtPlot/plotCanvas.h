@@ -164,7 +164,7 @@ class PlotCanvas : public ItomQwtPlot
 
         int m_curColorMapIndex;
         int m_curOverlayColorMapIndex;
-		ItomQwtPlotEnums::ScaleEngine m_valueScale;
+        ItomQwtPlotEnums::ScaleEngine m_valueScale;
 
         bool m_unitLabelChanged;
 
@@ -234,46 +234,41 @@ class PlotCanvas : public ItomQwtPlot
 
 struct InternalData
 {
-    InternalData()
+    InternalData() :
+        m_dataType(ito::tFloat64),
+        m_title(""),
+        m_yaxisLabel(""),
+        m_xaxisLabel(""),
+        m_valueLabel(""),
+        m_titleDObj(""),
+        m_xaxisLabelDObj(""),
+        m_yaxisLabelDObj(""),
+        m_valueLabelDObj(""),
+        m_autoTitle(true),
+        m_autoxAxisLabel(true),
+        m_autoyAxisLabel(true),
+        m_autoValueLabel(true),
+        m_valueScaleAuto(true),
+        m_valueMin(0),
+        m_valueMax(0),
+        m_xaxisScaleAuto(true),
+        m_xaxisMin(0),
+        m_xaxisMax(0),
+        m_xaxisVisible(true),
+        m_yaxisScaleAuto(true),
+        m_yaxisMin(0),
+        m_yaxisMax(0),
+        m_yaxisFlipped(false),
+        m_yaxisVisible(true),
+        m_colorBarVisible(false),
+        m_cmplxType(ItomQwtPlotEnums::CmplxReal),
+        m_dataChannel(ItomQwtPlotEnums::ChannelAuto),
+        m_pConstOutput(NULL),
+        m_alpha(0),
+        m_overlayScaleAuto(true),
+        m_overlayMin(0),
+        m_overlayMax(0)
     {
-        m_title = "";
-        m_yaxisLabel = "";
-        m_xaxisLabel = "";
-        m_valueLabel = "";
-        m_titleDObj = "";
-        m_xaxisLabelDObj = "";
-        m_yaxisLabelDObj = "";
-        m_valueLabelDObj = "";
-        m_autoTitle = true;
-        m_autoxAxisLabel = true;
-        m_autoyAxisLabel = true;
-        m_autoValueLabel = true;
-
-        m_valueScaleAuto = true;
-        m_valueMin = 0;
-        m_valueMax = 0;
-
-        m_xaxisScaleAuto = true;
-        m_xaxisMin = 0;
-        m_xaxisMax = 0;
-        m_xaxisVisible = true;
-
-        m_yaxisScaleAuto = true;
-        m_yaxisMin = 0;
-        m_yaxisMax = 0;
-        m_yaxisFlipped = false;
-        m_yaxisVisible = true;
-
-        m_colorBarVisible = false;
-        m_cmplxType = ItomQwtPlotEnums::CmplxReal;
-        m_dataChannel = ItomQwtPlotEnums::ChannelAuto;
-        m_pConstOutput = NULL;
-        
-        m_alpha = 0;
-
-        m_overlayScaleAuto = true;
-        m_overlayMin = 0;
-        m_overlayMax = 0;
     }
     ~InternalData()
     {

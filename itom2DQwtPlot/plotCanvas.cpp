@@ -82,7 +82,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pLineCutLine(NULL),
         m_isRefreshingPlot(false),
         m_unitLabelChanged(false),
-		m_pPaletteIsChanging(false),
+        m_pPaletteIsChanging(false),
         m_pActScaleSettings(NULL),
         m_pActColorPalette(NULL),
         m_pActToggleColorBar(NULL),
@@ -102,7 +102,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pOverlaySlider(NULL),
         m_pActOverlaySlider(NULL),
         m_currentDataType(-1),
-		m_valueScale(ItomQwtPlotEnums::Linear)
+        m_valueScale(ItomQwtPlotEnums::Linear)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -684,7 +684,7 @@ void PlotCanvas::setButtonStyle(int style)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 {
-    if (m_isRefreshingPlot)
+    if (m_isRefreshingPlot || !m_pData)
     {
         return;
     }
@@ -704,7 +704,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 
         updateState = m_rasterData->updateDataObject(dObj, plane);
 
-        if (updateState & changeData || m_unitLabelChanged)
+        if ((updateState & changeData) || m_unitLabelChanged)
         {
             m_unitLabelChanged = false;
             bool valid;
@@ -733,7 +733,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 }
                 
             }
-            m_pData->m_valueLabelDObj = QString::fromLatin1(descr.data());
+            m_pData->m_valueLabelDObj = QString::fromStdString(descr);
 
             if (dims >= 2)
             {
@@ -757,8 +757,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                             break;
                     }
                 }
-
-                m_pData->m_xaxisLabelDObj = QString::fromLatin1(descr.data());
+                m_pData->m_xaxisLabelDObj = QString::fromStdString(descr);
 
                 descr = dObj->getAxisDescription(dims-2, valid);
                 if (!valid) descr = "";
@@ -780,8 +779,8 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                             break;
                     }
                 }
+                m_pData->m_yaxisLabelDObj = QString::fromStdString(descr);
 
-                m_pData->m_yaxisLabelDObj = QString::fromLatin1(descr.data());
             }
             else
             {
@@ -885,6 +884,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::adjustColorDataTypeRepresentation()
 {
+    if (!m_pData)
+        return;
+
     if (m_dObjPtr && \
         (m_dObjPtr->getType() == ito::tRGBA32) && \
         ((m_pData->m_dataChannel & 0x0100) == 0x0000))
@@ -1366,6 +1368,9 @@ void PlotCanvas::keyReleaseEvent (QKeyEvent* event)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setColorBarVisible(bool visible)
 {
+    if (!m_pData)
+        return;
+    
     m_pData->m_colorBarVisible = visible;
     enableAxis(QwtPlot::yRight, visible);
 }
@@ -1373,6 +1378,9 @@ void PlotCanvas::setColorBarVisible(bool visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel)
 {
+    if (!m_pData)
+        return;
+
     if (m_pData->m_autoValueLabel)
     {
         setAxisTitle(QwtPlot::yRight, valueLabel);
@@ -1413,6 +1421,9 @@ void PlotCanvas::setLabels(const QString &title, const QString &valueLabel, cons
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateLabels()
 {
+    if (!m_pData)
+        return;
+    
     if (m_pData->m_autoValueLabel)
     {
         setAxisTitle(QwtPlot::yRight, m_pData->m_valueLabelDObj);
@@ -1453,6 +1464,9 @@ void PlotCanvas::updateLabels()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::synchronizeScaleValues()
 {
+    if (!m_pData)
+        return;
+    
     QwtInterval ival = m_rasterData->interval(Qt::ZAxis);
     m_pData->m_valueMin = ival.minValue();
     m_pData->m_valueMax = ival.maxValue();
@@ -1488,6 +1502,9 @@ void PlotCanvas::synchronizeScaleValues()
 */
 void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/)
 {
+    if (!m_pData)
+        return;
+    
     QwtInterval ival;
     if (m_pData->m_valueScaleAuto)
     {
@@ -1594,6 +1611,9 @@ void PlotCanvas::home()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setInterval(Qt::Axis axis, const ito::AutoInterval &interval)
 {
+    if (!m_pData)
+        return;
+
     if (axis == Qt::XAxis)
     {
         m_pData->m_xaxisScaleAuto = interval.isAuto();
@@ -1719,6 +1739,9 @@ ito::AutoInterval PlotCanvas::getInterval(Qt::Axis axis) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval)
 {
+    if (!m_pData)
+        return;
+
     if (axis == Qt::ZAxis)
     {
         m_pData->m_overlayScaleAuto = false;
@@ -1734,6 +1757,9 @@ void PlotCanvas::setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &inte
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::AutoInterval PlotCanvas::getOverlayInterval(Qt::Axis axis) const
 {
+    if (!m_pData)
+        return ito::AutoInterval();
+
     QwtInterval i = m_rasterOverlayData->interval(axis);
     double minimum = i.minValue();
     double maximum = i.maxValue();
@@ -2163,6 +2189,9 @@ QSharedPointer<ito::DataObject> PlotCanvas::getOverlayObject()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setOverlayObject(ito::DataObject* newOverlay)
 {
+    if (!m_pData)
+        return;
+
     if(newOverlay)
     {
         m_dObjItem->setVisible(m_pData->m_alpha < 255);
@@ -2185,6 +2214,9 @@ void PlotCanvas::setOverlayObject(ito::DataObject* newOverlay)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::alphaChanged()
 {
+    if (!m_pData)
+        return;
+
     m_dOverlayItem->setVisible(m_pData->m_alpha > 0 && m_rasterOverlayData->isInit());
     m_dOverlayItem->setAlpha(m_pData->m_alpha);
     m_dObjItem->setVisible(m_pData->m_alpha < 255);
@@ -2282,7 +2314,11 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
 {
-	return m_pData->m_cmplxType;
+    if (!m_pData)
+        //ItomQwtPlotEnums::ComplexType
+        return (ItomQwtPlotEnums::ComplexType);
+
+    return m_pData->m_cmplxType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2301,6 +2337,9 @@ void PlotCanvas::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuScaleSettings()
 {
+    if (!m_pData)
+        return;
+
     synchronizeScaleValues();
 
     Dialog2DScale *dlg = new Dialog2DScale(*m_pData, qobject_cast<QWidget*>(parent()));
@@ -2317,6 +2356,9 @@ void PlotCanvas::mnuScaleSettings()
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuCmplxSwitch(QAction *action)
 {
+    if (!m_pData)
+        return;
+
     m_pMnuCmplxSwitch->setDefaultAction(action);
     setButtonStyle(buttonStyle()); //to change icon of menu
 
@@ -2328,6 +2370,9 @@ void PlotCanvas::mnuCmplxSwitch(QAction *action)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuDataChannel(QAction* action)
 {
+    if (!m_pData)
+        return;
+
     m_pMnuDataChannel->setDefaultAction(action);
     m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
 
@@ -2562,10 +2607,8 @@ void PlotCanvas::mnuPlaneSelector(int plane)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuOverlaySliderChanged(int value)
 {
-    if (m_pData == NULL)
-    {
+    if (!m_pData)
         return;
-    }
 
     if (value != m_pData->m_alpha)
     {
