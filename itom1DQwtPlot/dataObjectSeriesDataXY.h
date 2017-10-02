@@ -47,11 +47,13 @@ public:
         //size_t size() const;
         //QPointF sample(size_t n) const;
         QRectF boundingRect() const;
-        LineData m_dX;
+        LineData m_dX; 
 
 
 private:
     const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
+    template<typename _T> void sortValues(const DataObject* obj);
+    //void sortValues(const DataObject* obj);
 
     ColorType m_colorState;
     bool inSamplingMode;

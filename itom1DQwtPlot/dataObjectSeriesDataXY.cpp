@@ -51,14 +51,41 @@ DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
 DataObjectSeriesDataXY::~DataObjectSeriesDataXY()
 {
 }
+template<typename _T> void DataObjectSeriesDataXY::sortValues(const ito::DataObject* obj)
+{
+    cv::Mat* mat = (cv::Mat*)obj->get_mdata()[obj->seekMat(m_dX.plane)];
+    int val = mat->data[m_dX.matOffset];
+    m_dX.matSteps.resize((int)m_dX.nrPoints);
+    bool* mask = new bool[(int)m_dX.nrPoints]();
+
+    int j;
+    //find smallest number
+    for (j = 0; j < m_dX.nrPoints; ++j)
+    {
+        if(val > mat->data[m_dX.matOffset+j*m_dX.matStepSize])
+        {
+            val = mat->data[m_dX.matOffset + j*m_dX.matStepSize];
+            m_dX.matSteps[0] = j;
+            mask[j] = true;
+        }
+    }
+    //fill in the next values
+    for (j = 0; j < m_dX.nrPoints - 1; ++j)
+    {
+
+    }
+    delete[] mask;
+    mask = NULL;
+}
 RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, const ito::DataObject * xVec, QVector<QPointF> bounds, QVector<QPointF> boundsX)
 {
+    DataObjectSeriesData::updateDataObject(dataObj, bounds);
     RetVal retval;
     bool _unused;
     QRectF p;
     float right;
     cv::Mat *mat;
-    int pxX1, pxX2, pxY1, pxY2;
+    int pxX1, pxX2, pxY1, pxY2, pxX1x, pxX2x, pxY1x, pxY2x;
     std::string description, unit;
 
     if (dataObj == NULL || xVec == NULL)
@@ -148,32 +175,99 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         {
             retval += RetVal(retError, 0, "bounds vector must have 2 entries");
         }
-    }
-        /*        switch (tmpBounds.size())
-                {
-                case 2: //dirX, dirY or dirXY
+        if (tmpBounds.size() == 2 && tmpBoundsX.size() == 2)
+        {
+            //dir X, dirY
+            if ((dims - prependedOneDims) != 2)//check if data is 2d
+            {
+                m_d.valid = false;
+                retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
+            }
+            if ((dimsX - prependOneDimsX) != 2)//check if xVec is 2d
+            {
+                m_dX.valid = false;
+                retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject or the first (n-2) dimension must have a size of 1 for representing x-vector");
+            }
+            else if (xVec->getSize(dimsX - 2) != 1)//check if first dimension of xVec is of shape 1
+            {
+                m_dX.valid = false;
+                retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject with a size of 1 for the first dimension");
+            }
+            if (!retval.containsError())
+            {
+                m_d.valid = true;
+                m_dX.valid = true;
+                 //bounds phys to pix of dataObj
+                pxX1 = qRound(dataObj->getPixToPhys(dims - 1, tmpBounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPixToPhys(dims - 2, tmpBounds[0].y(), _unused));
+                pxX2 = qRound(dataObj->getPixToPhys(dims - 1, tmpBounds[1].x(), _unused));
+                pxY2 = qRound(dataObj->getPixToPhys(dims - 2, tmpBounds[1].y(), _unused));
 
-                    if ((dims - prependedOneDims) != 2 && (dims - prependedOneDims) != 3)
+                //bounds phys to pix of xVex
+                pxX1x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[0].x(), _unused));
+                pxY1x = qRound(xVec->getPixToPhys(dimsX - 2, tmpBoundsX[0].y(), _unused));
+                pxX2x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[1].x(), _unused));
+                pxY2x = qRound(xVec->getPixToPhys(dimsX - 2, tmpBoundsX[1].y(), _unused));
+
+                //check if values are in range
+                saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+                saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+                saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
+                saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
+
+
+                mat = (cv::Mat*)xVec->get_mdata()[xVec->seekMat(m_dX.plane)];
+                if (pxY1x == pxY2x) //pure line in x direction of x vector
+                {
+                    if (pxX2x > pxX1x)
                     {
-                        m_d.valid = false;
-                        retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
+                        m_dX.nrPoints = 1 + pxX2x - pxX1x;
+                        m_dX.startPx.setX(pxX1x);
+                        m_dX.startPx.setY(pxY1x);
+
+                        m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
+                        m_dX.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
                     }
                     else
                     {
-                        m_d.valid = true;
-                        //coordinates of y-data
-                        pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
-                        pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
-                        pxX2 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[1].x(), _unused));
-                        pxY2 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[1].y(), _unused));
-
-                        //coordinates of x-data
-                        if(xVec)
-
-                        saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
-                        saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
-                        saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
-                        saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
+                        m_dX.nrPoints = 1 + pxX1x - pxX2x;
+                        m_dX.startPx.setX(pxX2x);
+                        m_dX.startPx.setY(pxY2x);
+                        m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX2x;
+                        m_dX.matStepSize = (int)mat->step[1];
+                    }
+                    switch (xVec->getType())
+                    {
+                    case ito::tUInt8:
+                        sortValues<ito::uint8>(xVec);
+                        break;
+                    case ito::tUInt16:
+                        sortValues<ito::uint16>(xVec);
+                        break;
+                    case ito::tInt8:
+                        sortValues<ito::int8>(xVec);
+                        break;
+                    case ito::tInt16:
+                        sortValues<ito::int16>(xVec);
+                        break;
+                    case ito::tInt32:
+                        sortValues<ito::int32>(xVec);
+                        break;
+                    case ito::tFloat32:
+                        sortValues<ito::float32>(xVec);
+                        break;
+                    case ito::tFloat64:
+                        sortValues<ito::float64>(xVec);
+                         break;
+                    default:
+                        retval += RetVal(retError, 0, "unsorported type of the dataObject representing the x-vector");
+                    }
+                    
+                }
+            }
+        }
+    }
+        /*       
 
                         mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]; //first plane in ROI
 
