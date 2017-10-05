@@ -38,7 +38,6 @@ DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
     m_minX(-1.0),
     m_maxX(1.0),
     m_cmplxState(ItomQwtPlotEnums::CmplxAbs),
-    m_pDataObj(NULL),
     inSamplingMode(false),
     m_colorState(grayColor)
 {
@@ -51,32 +50,122 @@ DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
 DataObjectSeriesDataXY::~DataObjectSeriesDataXY()
 {
 }
-template<typename _T> void DataObjectSeriesDataXY::sortValues(const ito::DataObject* obj)
+template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max)
 {
-    cv::Mat* mat = (cv::Mat*)obj->get_mdata()[obj->seekMat(m_dX.plane)];
-    int val = mat->data[m_dX.matOffset];
-    m_dX.matSteps.resize((int)m_dX.nrPoints);
-    bool* mask = new bool[(int)m_dX.nrPoints]();
+    const cv::Mat *mat;
+    uchar *ptr;
+    min = std::numeric_limits<float64>::max();
+    max = -min;
+    _Tp val;
 
-    int j;
-    //find smallest number
-    for (j = 0; j < m_dX.nrPoints; ++j)
+    switch (d.dir)
     {
-        if(val > mat->data[m_dX.matOffset+j*m_dX.matStepSize])
+    case DataObjectSeriesData::dirX:
+    case DataObjectSeriesData::dirY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+        for (int i = 0; i < d.nrPoints; i++)
         {
-            val = mat->data[m_dX.matOffset + j*m_dX.matStepSize];
-            m_dX.matSteps[0] = j;
-            mask[j] = true;
-        }
-    }
-    //fill in the next values
-    for (j = 0; j < m_dX.nrPoints - 1; ++j)
-    {
+            val = *(reinterpret_cast<_Tp*>(ptr));
+            ptr += d.matStepSize;
 
+            if (val > max) { max = val;}
+            if (val < min) { min = val;}
+        }
+        break;
+
+    case DataObjectSeriesData::dirXY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+        for (int i = 0; i < d.nrPoints; i++)
+        {
+            val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
+
+            if (val > max) { max = val;}
+            if (val < min) { min = val;}
+        }
+        break;
+    case DataObjectSeriesData::dirZ:
+
+        for (int i = 0; i < d.nrPoints; i++)
+        {
+            mat = obj->getCvPlaneMat(i);
+            ptr = (mat->data + d.matOffset);
+            val = *(reinterpret_cast<_Tp*>(ptr));
+
+            if (val > max) { max = val;}
+            if (val < min) { min = val;}
+        }
+        break;
     }
-    delete[] mask;
-    mask = NULL;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max)
+{
+    const cv::Mat *mat;
+    uchar *ptr;
+    min = std::numeric_limits<_Tp>::max();
+    max = -min;
+    float32 val;
+
+    switch (d.dir)
+    {
+    case DataObjectSeriesData::dirX:
+    case DataObjectSeriesData::dirY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+        for (int i = 0; i < d.nrPoints; i++)
+        {
+            val = *(reinterpret_cast<_Tp*>(ptr));
+            ptr += d.matStepSize;
+
+            if (!qIsFinite(val))
+            {
+                continue;
+            }
+
+            if (val > max) { max = val;}
+            if (val < min) { min = val;}
+        }
+        break;
+
+    case DataObjectSeriesData::dirXY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+        for (int i = 0; i < d.nrPoints; i++)
+        {
+            val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
+
+            if (!qIsFinite(val))
+            {
+                continue;
+            }
+
+            if (val > max) { max = val;}
+            if (val < min) { min = val;}
+        }
+        break;
+    case DataObjectSeriesData::dirZ:
+
+        for (int i = 0; i < d.nrPoints; i++)
+        {
+            mat = obj->getCvPlaneMat(i);
+            ptr = (mat->data + d.matOffset);
+            val = *(reinterpret_cast<_Tp*>(ptr));
+
+            if (!qIsFinite(val))
+            {
+                continue;
+            }
+
+            if (val > max) { max = val;}
+            if (val < min) { min = val;}
+        }
+        break;
+    }
+}
+
 RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, const ito::DataObject * xVec, QVector<QPointF> bounds, QVector<QPointF> boundsX)
 {
     DataObjectSeriesData::updateDataObject(dataObj, bounds);
@@ -90,13 +179,6 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
 
     if (dataObj == NULL || xVec == NULL)
     {
-        //data representing yObj
-        m_d.plane = 0;
-        m_d.dir = dirZ;
-        m_d.nrPoints = 0;
-        m_d.points.clear();
-        m_d.matSteps.clear();
-        m_d.valid = false;
         //data representing xObj
         m_dX.plane = 0;
         m_dX.dir = dirZ;
@@ -107,20 +189,10 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
     }
     else
     {
-        int dims = dataObj->getDims();
         int dimsX = xVec->getDims();
 
-        int prependedOneDims = 0;
         int prependOneDimsX = 0;
         int i;
-        for (i = 0; i < dims - 2; ++i)
-        {
-            if (dataObj->getSize(i) != 1)
-            {
-                break;
-            }
-            prependedOneDims++;
-        }
         for (i = 0; i < dimsX - 2; ++i)
         {
             if (xVec->getSize(i) != 1)
@@ -130,24 +202,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             ++prependOneDimsX;
         }
 
-        QVector<QPointF> tmpBounds;
         QVector<QPointF> tmpBoundsX;
-
-        if (bounds.size() == 3) // not sure if needed
-        {
-            m_d.plane = bounds[0].x();
-            m_d.plane = dims > 2 ? std::min(m_d.plane, dataObj->getSize(dims - 3)) : 0;
-            m_d.plane = std::max(m_d.plane, 0);
-            tmpBounds.resize(2);
-            tmpBounds[0] = bounds[1];
-            tmpBounds[1] = bounds[2];
-        }
-        else
-        {
-            m_d.plane = 0;
-            tmpBounds = bounds;
-        }
-
         if (boundsX.size() == 3) // not sure if needed
         {
             m_dX.plane = boundsX[0].x();
@@ -162,27 +217,16 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             m_dX.plane = 0;
             tmpBoundsX = bounds;
         }
-        if (!dataObj->get_mdata() || !(cv::Mat*)(dataObj->get_mdata()[m_d.plane])->data)
-            return ito::RetVal(ito::retError, 0, QObject::tr("cv:Mat in data object seems corrupted").toLatin1().data());
         if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[m_dX.plane])->data)
             return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
 
-        if (tmpBounds.size() != 2 || tmpBoundsX.size() != 2) //size will be one if a line of a Stack is extracted 
-        {
-            //Todo
-        }
-        else
+        if (tmpBoundsX.size() != 2) //size will be one if a line of a Stack is extracted 
         {
             retval += RetVal(retError, 0, "bounds vector must have 2 entries");
         }
-        if (tmpBounds.size() == 2 && tmpBoundsX.size() == 2)
+        if (!retval.containsError())
         {
             //dir X, dirY
-            if ((dims - prependedOneDims) != 2)//check if data is 2d
-            {
-                m_d.valid = false;
-                retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
-            }
             if ((dimsX - prependOneDimsX) != 2)//check if xVec is 2d
             {
                 m_dX.valid = false;
@@ -195,13 +239,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             }
             if (!retval.containsError())
             {
-                m_d.valid = true;
                 m_dX.valid = true;
-                 //bounds phys to pix of dataObj
-                pxX1 = qRound(dataObj->getPixToPhys(dims - 1, tmpBounds[0].x(), _unused));
-                pxY1 = qRound(dataObj->getPixToPhys(dims - 2, tmpBounds[0].y(), _unused));
-                pxX2 = qRound(dataObj->getPixToPhys(dims - 1, tmpBounds[1].x(), _unused));
-                pxY2 = qRound(dataObj->getPixToPhys(dims - 2, tmpBounds[1].y(), _unused));
 
                 //bounds phys to pix of xVex
                 pxX1x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[0].x(), _unused));
@@ -209,24 +247,25 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                 pxX2x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[1].x(), _unused));
                 pxY2x = qRound(xVec->getPixToPhys(dimsX - 2, tmpBoundsX[1].y(), _unused));
 
-                //check if values are in range
-                saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
-                saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
-                saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
-                saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
+                saturation(pxX1x, 0, xVec->getSize(dimsX - 1) - 1);
+                saturation(pxX2x, 0, xVec->getSize(dimsX - 1) - 1);
+                saturation(pxY1x, 0, xVec->getSize(dimsX - 2) - 1);
+                saturation(pxY2x, 0, xVec->getSize(dimsX - 2) - 1);
 
 
                 mat = (cv::Mat*)xVec->get_mdata()[xVec->seekMat(m_dX.plane)];
                 if (pxY1x == pxY2x) //pure line in x direction of x vector
                 {
+                    m_dX.dir = dirX;
                     if (pxX2x > pxX1x)
                     {
                         m_dX.nrPoints = 1 + pxX2x - pxX1x;
                         m_dX.startPx.setX(pxX1x);
                         m_dX.startPx.setY(pxY1x);
-
                         m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
                         m_dX.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
+                        m_dX.stepSizePx.setWidth(1);
+                        m_dX.stepSizePx.setHeight(0);
                     }
                     else
                     {
@@ -235,268 +274,191 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                         m_dX.startPx.setY(pxY2x);
                         m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX2x;
                         m_dX.matStepSize = (int)mat->step[1];
-                    }
-                    switch (xVec->getType())
-                    {
-                    case ito::tUInt8:
-                        sortValues<ito::uint8>(xVec);
-                        break;
-                    case ito::tUInt16:
-                        sortValues<ito::uint16>(xVec);
-                        break;
-                    case ito::tInt8:
-                        sortValues<ito::int8>(xVec);
-                        break;
-                    case ito::tInt16:
-                        sortValues<ito::int16>(xVec);
-                        break;
-                    case ito::tInt32:
-                        sortValues<ito::int32>(xVec);
-                        break;
-                    case ito::tFloat32:
-                        sortValues<ito::float32>(xVec);
-                        break;
-                    case ito::tFloat64:
-                        sortValues<ito::float64>(xVec);
-                         break;
-                    default:
-                        retval += RetVal(retError, 0, "unsorported type of the dataObject representing the x-vector");
-                    }
-                    
+                        m_dX.stepSizePx.setWidth(1);
+                        m_dX.stepSizePx.setHeight(0);
+                    }                    
                 }
+                m_pXVec = xVec;
+                calcHash();
             }
         }
     }
-        /*       
-
-                        mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]; //first plane in ROI
-
-                        if (pxX1 == pxX2) //pure line in y-direction
-                        {
-                            m_d.dir = dirY;
-                            if (pxY2 >= pxY1)
-                            {
-                                m_d.nrPoints = 1 + pxY2 - pxY1;
-                                m_d.startPhys = dataObj->getPixToPhys(dims - 2, pxY1, _unused); //tmpBounds[0].y() ;
-                                right = dataObj->getPixToPhys(dims - 2, pxY2, _unused); //tmpBounds[1].y();
-                                m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints - 1) : 0.0;
-
-                                m_d.startPx.setX(pxX1);
-                                m_d.startPx.setY(pxY1);
-                                m_d.stepSizePx.setWidth(0);
-                                m_d.stepSizePx.setHeight(1);
-
-                                m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                                m_d.matStepSize = (int)mat->step[0]; //step in y-direction (in bytes)
-                            }
-                            else
-                            {
-                                m_d.nrPoints = 1 + pxY1 - pxY2;
-                                m_d.startPhys = dataObj->getPixToPhys(dims - 2, pxY2, _unused); //tmpBounds[1].y();
-                                right = dataObj->getPixToPhys(dims - 2, pxY1, _unused); //tmpBounds[0].y();
-                                m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints - 1) : 0.0;
-
-                                m_d.startPx.setX(pxX1);
-                                m_d.startPx.setY(pxY2);
-                                m_d.stepSizePx.setWidth(0);
-                                m_d.stepSizePx.setHeight(1);
-
-                                m_d.matOffset = (int)mat->step[0] * pxY2 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY2,pxX1) - &mat->at<char>(0,0));
-                                m_d.matStepSize = (int)mat->step[0]; //step in y-direction (in bytes)
-                            }
-
-                            description = dataObj->getAxisDescription(dims - 2, _unused);
-                            unit = dataObj->getAxisUnit(dims - 2, _unused);
-                            if (description == "")
-                            {
-                                description = QObject::tr("y-axis").toLatin1().data();
-                            }
-                            if (unit == "")
-                            {
-                                m_dObjAxisDescription = fromStdLatin1String(description);
-                                m_dObjAxisUnit = "";
-                            }
-                            else
-                            {
-                                m_dObjAxisDescription = fromStdLatin1String(description);
-                                m_dObjAxisUnit = fromStdLatin1String(unit);
-                            }
-
-                            description = dataObj->getValueDescription();
-                            unit = dataObj->getValueUnit();
-                            if (unit == "")
-                            {
-                                m_dObjValueDescription = fromStdLatin1String(description);
-                                m_dObjValueUnit = "";
-                            }
-                            else
-                            {
-                                m_dObjValueDescription = fromStdLatin1String(description);
-                                m_dObjValueUnit = fromStdLatin1String(unit);
-                            }
-                        }
-                        else if (pxY1 == pxY2) //pure line in x-direction
-                        {
-                            m_d.dir = dirX;
-                            if (pxX2 >= pxX1)
-                            {
-                                m_d.nrPoints = 1 + pxX2 - pxX1;
-                                m_d.startPhys = dataObj->getPixToPhys(dims - 1, pxX1, _unused); //tmpBounds[0].y() ;
-                                right = dataObj->getPixToPhys(dims - 1, pxX2, _unused); //tmpBounds[1].y();
-                                m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints - 1) : 0.0;
-
-                                m_d.startPx.setX(pxX1);
-                                m_d.startPx.setY(pxY1);
-                                m_d.stepSizePx.setWidth(1);
-                                m_d.stepSizePx.setHeight(0);
-
-                                m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                                m_d.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
-                                if (dataObj->getType() == ito::tUInt32) //since uint32 is not supported by openCV the step method returns the wrong result
-                                {
-                                    m_d.matStepSize = 4;
-                                }
-                            }
-                            else
-                            {
-                                m_d.nrPoints = 1 + pxX1 - pxX2;
-                                m_d.startPhys = dataObj->getPixToPhys(dims - 1, pxX2, _unused); //tmpBounds[1].y();
-                                right = dataObj->getPixToPhys(dims - 1, pxX1, _unused); //tmpBounds[0].y();
-                                m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints - 1) : 0.0;
-
-                                m_d.startPx.setX(pxX1);
-                                m_d.startPx.setY(pxY2);
-                                m_d.stepSizePx.setWidth(1);
-                                m_d.stepSizePx.setHeight(0);
-
-                                m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX2; //(&mat->at<char>(pxY1,pxX2) - &mat->at<char>(0,0));
-                                m_d.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
-                            }
-
-                            description = dataObj->getAxisDescription(dims - 1, _unused);
-                            unit = dataObj->getAxisUnit(dims - 1, _unused);
-                            if (description == "")
-                            {
-                                description = QObject::tr("x-axis").toLatin1().data();
-                            }
-                            if (unit == "")
-                            {
-                                m_dObjAxisDescription = fromStdLatin1String(description);
-                                m_dObjAxisUnit = "";
-                            }
-                            else
-                            {
-                                m_dObjAxisDescription = fromStdLatin1String(description);
-                                m_dObjAxisUnit = fromStdLatin1String(unit);
-                            }
-
-                            description = dataObj->getValueDescription();
-                            unit = dataObj->getValueUnit();
-                            if (unit == "")
-                            {
-                                m_dObjValueDescription = fromStdLatin1String(description);
-                                m_dObjValueUnit = "";
-                            }
-                            else
-                            {
-                                m_dObjValueDescription = fromStdLatin1String(description);
-                                m_dObjValueUnit = fromStdLatin1String(unit);
-                            }
-                        }
-                    }
-                    break;
-                case 1:
-                    if ((dims - prependedOneDims) != 3)
-                    {
-                        retval += RetVal(retError, 0, "line plot in z-direction requires a 3-dim dataObject");
-                        return retval;
-                    }
-                    else
-                    {
-                        m_d.valid = true;
-                        pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
-                        pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
-
-                        saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
-                        saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
-
-                        m_d.dir = dirZ;
-                        m_d.nrPoints = dataObj->getSize(dims - 3);
-                        m_d.startPhys = dataObj->getPixToPhys(dims - 3, 0, _unused);
-                        if (m_d.nrPoints > 1)
-                        {
-                            right = dataObj->getPixToPhys(dims - 3, m_d.nrPoints - 1, _unused);
-                            m_d.stepSizePhys = (right - m_d.startPhys) / (float)(m_d.nrPoints - 1);
-                        }
-                        else
-                        {
-                            m_d.stepSizePhys = 0.0;
-                        }
-
-                        m_d.startPx.setX(pxX1);
-                        m_d.startPx.setY(pxY1);
-                        m_d.stepSizePx.setWidth(0);
-                        m_d.stepSizePx.setHeight(0);
-
-                        mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]; //first plane in ROI
-                        m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize = 0; //step in x-direction (in bytes)
-
-                        description = dataObj->getAxisDescription(dims - 3, _unused);
-                        unit = dataObj->getAxisUnit(dims - 3, _unused);
-                        if (description == "")
-                        {
-                            description = QObject::tr("z-axis").toLatin1().data();
-                        }
-                        if (unit == "")
-                        {
-                            m_dObjAxisDescription = fromStdLatin1String(description);
-                            m_dObjAxisUnit = "";
-                        }
-                        else
-                        {
-                            m_dObjAxisDescription = fromStdLatin1String(description);
-                            m_dObjAxisUnit = fromStdLatin1String(unit);
-                        }
-
-                        description = dataObj->getValueDescription();
-                        unit = dataObj->getValueUnit();
-                        if (unit == "")
-                        {
-                            m_dObjValueDescription = fromStdLatin1String(description);
-                            m_dObjValueUnit = "";
-                        }
-                        else
-                        {
-                            m_dObjValueDescription = fromStdLatin1String(description);
-                            m_dObjValueUnit = fromStdLatin1String(unit);
-                        }
-                    }
-
-                    break;
-                default:
-                    retval += RetVal(retError, 0, "bounds vector must have 1 or 2 entries");
-                    break;
-                }
-            }
-            m_pDataObj = dataObj;
-
-            calcHash();*/
     
     return retval;
 }
+void DataObjectSeriesDataXY::calcHash()
+{
+    if (m_pXVec == NULL)
+    {
+        m_hash = QCryptographicHash::hash("", QCryptographicHash::Md5);
+    }
+    else
+    {
+        QByteArray ba;
+
+        int dims = m_pXVec->getDims();
+        ba.append(QByteArray().setNum(dims));
+
+        if (dims > 0)
+        {
+            cv::Mat *m = (cv::Mat*)m_pXVec->get_mdata()[m_pXVec->seekMat(m_dX.plane)];
+            uchar* d = m->data;
+            ba.append(QByteArray((const char*)&d, (sizeof(int) / sizeof(char)))); //address to data of first plane
+
+            ba.append(QByteArray().setNum(m->size[0]));
+        }
+
+        ba.append(QByteArray().setNum((uint)(m_dX.nrPoints)));
+        ba.append(QByteArray().setNum(m_dX.startPx.x()));
+        ba.append(QByteArray().setNum(m_dX.startPx.y()));
+        ba.append(QByteArray().setNum(m_dX.stepSizePx.width()));
+        ba.append(QByteArray().setNum(m_dX.stepSizePx.height()));
+        m_hash = QCryptographicHash::hash(ba, QCryptographicHash::Md5);
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
-//QPointF DataObjectSeriesDataXY::sample(size_t n) const
-//{
-//
-//}
-////----------------------------------------------------------------------------------------------------------------------------------
-//size_t DataObjectSeriesDataXY::size() const
-//{
-//    return m_d.nrPoints;
-//}
-////----------------------------------------------------------------------------------------------------------------------------------
+QPointF DataObjectSeriesDataXY::sample(size_t n) const
+{
+    QPointF dObjPoint = DataObjectSeriesData::sample(n);
+    const cv::Mat *mat;
+    const uchar* ptr[1];
+    //float weights[4];
+    float fPos;
+
+    if (m_pXVec && m_dX.valid)
+    {
+            switch (m_dX.dir)
+            {
+            case dirX:
+            case dirY:
+                mat = m_pXVec->getCvPlaneMat(m_dX.plane);
+                ptr[0] = (mat->data + m_dX.matOffset + m_dX.matStepSize * n);
+                //fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;
+
+            /*case dirZ:
+                mat = m_pXVec->getCvPlaneMat((int)n);
+                ptr[0] = (mat->data + m_dX.matOffset);
+                //fPos = m_dX.startPhys + m_dX.stepSizePhys * n;
+                break;
+
+            case dirXY:
+                mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+                ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
+                fPos = m_d.startPhys + m_d.stepSizePhys * n;
+                break;*/
+            default:
+                qDebug() << "Type not implemented";
+            }
+            switch (m_pXVec->getType())
+            {
+            case ito::tInt8:
+                dObjPoint.setX(*(reinterpret_cast<const ito::int8*>(ptr[0])));
+                return dObjPoint;
+                break;
+            case ito::tUInt8:
+                dObjPoint.setX(*(reinterpret_cast<const ito::uint8*>(ptr[0])));
+                return dObjPoint;
+                break;
+            case ito::tInt16:
+                dObjPoint.setX(*(reinterpret_cast<const ito::int16*>(ptr[0])));
+                return dObjPoint;
+                break;
+            case ito::tUInt16:
+                dObjPoint.setX(*(reinterpret_cast<const ito::uint16*>(ptr[0])));
+                return dObjPoint;
+                break;
+            case ito::tInt32:
+                dObjPoint.setX(*(reinterpret_cast<const ito::int32*>(ptr[0])));
+                return dObjPoint;
+                break;
+            case ito::tFloat32:
+                dObjPoint.setX(*(reinterpret_cast<const ito::float32*>(ptr[0])));
+                return dObjPoint;
+                break;
+            case ito::tFloat64:
+                dObjPoint.setX(*(reinterpret_cast<const ito::float64*>(ptr[0])));
+                return dObjPoint;
+                break;
+            default:
+                qDebug() << "Type not implemented yet";
+            }
+        }
+    return QPointF();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 QRectF DataObjectSeriesDataXY::boundingRect() const
 {
-    return DataObjectSeriesData::boundingRect();
+    QRectF rect = DataObjectSeriesData::boundingRect();
+
+
+    //cv::Mat *mat;
+    //const uchar* ptr[4];
+    //float weights[4];
+
+    if (m_pXVec && m_dX.valid)
+    {
+        double min = 0.0, max = 0.0;
+        switch (m_pXVec->getType())
+        {
+        case ito::tInt8:
+            findMinMaxInteger<ito::int8>(m_pXVec, m_dX, min, max);
+            break;
+        case ito::tUInt8:
+            findMinMaxInteger<ito::uint8>(m_pXVec, m_dX, min, max);
+            break;
+        case ito::tInt16:
+            findMinMaxInteger<ito::int16>(m_pXVec, m_dX, min, max);
+            break;
+        case ito::tUInt16:
+            findMinMaxInteger<ito::uint16>(m_pXVec, m_dX, min, max);
+            break;
+        case ito::tInt32:
+            findMinMaxInteger<ito::int32>(m_pXVec, m_dX, min, max);
+            break;
+        case ito::tUInt32:
+            findMinMaxInteger<ito::uint32>(m_pXVec, m_dX, min, max);
+            break;
+        case ito::tFloat32:
+            findMinMaxFloat<ito::float32>(m_pXVec, m_dX, min, max);
+            break;
+        case ito::tFloat64:
+            findMinMaxFloat<ito::float64>(m_pXVec, m_dX, min, max);
+            break;
+        }
+
+        if ((max - min) < std::numeric_limits<double>::epsilon())
+        {
+            if (min > 10.0)
+            {
+                min *= 0.99;
+                max *= 1.01;
+            }
+            else if (min < -10.0)
+            {
+                min *= 1.01;
+                max *= 0.99;
+            }
+            else
+            {
+                min -= 0.1;
+                max += 0.1;
+            }
+        
+
+
+            float width = max-min;
+            if (width < 0)
+            {
+                min += width;
+                width *= -1;
+            }
+            rect.setX(min);
+            rect.setWidth(width);
+        
+
+    }
+
+    return rect;
+}
 }

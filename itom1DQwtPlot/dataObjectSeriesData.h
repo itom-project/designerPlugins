@@ -132,11 +132,12 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         inline void saturation(int &value, int min, int max) { value = ( value < min ? min : ( value > max ? max : value) ); }
         inline QString fromStdLatin1String(const std::string &str) { return QString::fromLatin1(str.data()); }
-        LineData m_d;
+        
 
     private:
+        
+        LineData m_d;
         const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
-
         ColorType m_colorState;
         bool inSamplingMode;
         int m_fast;

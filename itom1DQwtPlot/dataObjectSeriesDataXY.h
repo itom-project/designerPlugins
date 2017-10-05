@@ -45,15 +45,18 @@ public:
         ~DataObjectSeriesDataXY();
         RetVal updateDataObject(const ito::DataObject* dataObj,const ito::DataObject* xVec ,QVector<QPointF> bounds, QVector<QPointF> boundsX);
         //size_t size() const;
-        //QPointF sample(size_t n) const;
         QRectF boundingRect() const;
-        LineData m_dX; 
+        LineData m_dX;
+        QPointF sample(size_t n) const;
 
 
 private:
-    const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
-    template<typename _T> void sortValues(const DataObject* obj);
-    //void sortValues(const DataObject* obj);
+
+    void calcHash();
+
+    const ito::DataObject* m_pXVec;               /*!< borrowed reference, do not delete here */
+    //template<typename _T> RetVal sortValues(const DataObject* obj, const int& x1, const int& y1);
+
 
     ColorType m_colorState;
     bool inSamplingMode;
