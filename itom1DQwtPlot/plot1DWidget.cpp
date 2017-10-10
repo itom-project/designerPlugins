@@ -181,8 +181,8 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addAction(m_pActSave);
     mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
-    mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActProperties);
+    mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActScaleSettings);
     mainTb->addAction(m_pRescaleParent);
     mainTb->addAction(m_pActPan);
