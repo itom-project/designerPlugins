@@ -26,48 +26,52 @@
 #include <qwt_plot.h>
 #include "common/apiFunctionsGraphInc.h"
 #include <qrect.h>
+#include <qmath.h>
 
 
 QVector<int> DrawItem::idxVec;
 
 class DrawItemPrivate
 {
-public:
-    DrawItemPrivate() : m_pparent(NULL) {}
-    ~DrawItemPrivate() {};
+    public:
+        DrawItemPrivate() : m_pparent(NULL) {}
+        ~DrawItemPrivate() {};
 
-    ito::Shape m_shape;
-    QPen m_markerPen;
-    QBrush m_markerBrush;
-    QPen m_linePen;
-    QwtPlot *m_pparent;
+        ito::Shape m_shape;
+        QPen m_markerPen;
+        QBrush m_markerBrush;
+        QPen m_linePen;
+        QwtPlot *m_pparent;
 
-    bool m_selected;
+        bool m_selected;
 
-    QVector<QwtPlotMarker*> m_marker;
-    char m_type;    
+        QVector<QwtPlotMarker*> m_marker;
+        char m_type;    
 
-    bool m_autoColor;
-    bool m_labelVisible;
+        bool m_autoColor;
+        bool m_labelVisible;
 
-    QColor m_markerColor;
-    QColor m_lineColor;
-    QColor m_labelTextColor;
-    QBrush m_fillBrush;
-    QBrush m_fillBrushSelected;
-    QBrush m_labelBrush;
-    QFont m_labelFont;
-    QPen m_elementPen;
+        QColor m_markerColor;
+        QColor m_markerColor2; //!> second marker color, used when a single point (currently only for polygones) is selected for manipulation
+        QColor m_lineColor;
+        QColor m_labelTextColor;
+        QBrush m_fillBrush;
+        QBrush m_fillBrushSelected;
+        QBrush m_labelBrush;
+        QFont m_labelFont;
+        QPen m_elementPen;
 
-    QPointF m_point1;
-    QPointF m_point2;
+        QPointF m_point1;
+        QPointF m_point2;
 
-    ItomQwtPlotEnums::ModificationModes m_modificationModes;
+        ItomQwtPlotEnums::ModificationModes m_modificationModes;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/, bool labelVisible /*= false*/) : 
-    QwtPlotShapeItem(shape.name()), d(NULL)
+    QwtPlotShapeItem(shape.name()), 
+    d(NULL),
+    m_currentMarker(-1)
 {
     d = new DrawItemPrivate();
     
@@ -173,65 +177,219 @@ void DrawItem::setModificationModes(const ItomQwtPlotEnums::ModificationModes &m
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setSelected(const bool selected)
+void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
 {
     d->m_selected = selected;
     int flags = d->m_shape.flags();
     bool moveable = !(flags & ito::Shape::MoveLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Move);
     bool resizeable = !(flags & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
+    bool rotatable = !(flags & ito::Shape::RotateLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Rotate);
     QwtPlotMarker *marker = NULL;
 
     setRenderHint(QwtPlotItem::RenderAntialiased, false);
+    m_currentMarker = -1;
 
     switch (d->m_shape.type())
     {
-    case ito::Shape::Invalid:
+        case ito::Shape::Invalid:
         break;
-    case ito::Shape::Point:
-    case ito::Shape::MultiPointPick:
-    
-        {
-            if (selected && (moveable | resizeable))
+
+        case ito::Shape::Point:
+        case ito::Shape::MultiPointPick:    
             {
-                foreach(QwtPlotMarker* marker, d->m_marker)
+                if (selected && (moveable | resizeable))
                 {
-                    marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Star1 : QwtSymbol::XCross, QBrush(d->m_markerColor),
-                        QPen(QBrush(d->m_markerColor), selected ? 2 : 1), selected ? QSize(15, 15) : QSize(11, 11)));
+                    foreach(QwtPlotMarker* marker, d->m_marker)
+                    {
+                        marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Star1 : QwtSymbol::XCross, QBrush(d->m_markerColor),
+                            QPen(QBrush(d->m_markerColor), selected ? 2 : 1), selected ? QSize(15, 15) : QSize(11, 11)));
+                    }
+                }
+                else
+                {
+                    foreach(QwtPlotMarker* marker, d->m_marker)
+                    {
+                        marker->setSymbol(new QwtSymbol(QwtSymbol::XCross, QBrush(d->m_markerColor),
+                            QPen(QBrush(d->m_markerColor), 1), QSize(11, 11)));
+                    }
                 }
             }
-            else
+        break;
+
+        case ito::Shape::Line:
+        case ito::Shape::Polygon:
             {
-                foreach(QwtPlotMarker* marker, d->m_marker)
+                QTransform &trafo = d->m_shape.rtransform();
+                QPointF pt;
+
+                if (selected && resizeable)
                 {
-                    marker->setSymbol(new QwtSymbol(QwtSymbol::XCross, QBrush(d->m_markerColor),
-                        QPen(QBrush(d->m_markerColor), 1), QSize(11, 11)));
+                    m_currentMarker = nMarker;
+                    if (d->m_marker.size() > d->m_shape.rbasePoints().size())
+                    {
+                        // some marker has been deleted, rebuild markers
+                        for (int n = 0; n < d->m_marker.size(); n++)
+                        {
+                            d->m_marker[n]->detach();
+                            delete d->m_marker[n];
+                        }
+                        d->m_marker.clear();
+                    }
+
+                    // here we always adjust the markers so only the currently selected gets highlighted
+                    for (int nm = 0; nm < d->m_marker.size(); nm++)
+                    {
+                        if (d->m_shape.type() == ito::Shape::Polygon && nm == nMarker)
+                            d->m_marker[nm]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor2), QPen(d->m_markerColor, 1), QSize(9, 9)));
+                        else
+                            d->m_marker[nm]->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(d->m_markerColor, 1), QSize(9, 9)));
+                    }
+
+                    // This run only once, creating markers
+                    int npt = 0;
+                    while (d->m_marker.size() < d->m_shape.rbasePoints().size())
+                    {
+                        marker = new QwtPlotMarker();
+                        marker->setLinePen(QPen());
+                        if (d->m_shape.type() == ito::Shape::Polygon && npt == nMarker)
+                            marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor2), QPen(d->m_markerColor, 1), QSize(9, 9)));
+                        else
+                            marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(d->m_markerColor, 1), QSize(9, 9)));
+                        marker->setVisible(true);
+                        marker->attach(d->m_pparent);
+                        d->m_marker.append(marker);
+                        npt++;
+                    }
+
+                    for (int i = 0; i < d->m_shape.rbasePoints().size(); ++i)
+                    {
+                        pt = trafo.map(d->m_shape.rbasePoints()[i]);
+                        d->m_marker[i]->setXValue(pt.x());
+                        d->m_marker[i]->setYValue(pt.y());
+                    }
+                }
+                else
+                {
+                    //delete markers, since deselected
+                    for (int n = 0; n < d->m_marker.size(); n++)
+                    {
+                        d->m_marker[n]->detach();
+                        delete d->m_marker[n];
+                    }
+                    d->m_marker.clear();
                 }
             }
-        }
+            setRenderHint(QwtPlotItem::RenderAntialiased, true); //set AntiAliasing of geometric objects to true in order to plot them smoother
         break;
-    case ito::Shape::Line:
-    case ito::Shape::Polygon:
+
+        case ito::Shape::Ellipse:
+        case ito::Shape::Circle:
+        case ito::Shape::Rectangle:
+        case ito::Shape::Square:
         {
+            //set AntiAliasing of geometric objects to true in order to plot them smoother
+            setRenderHint(QwtPlotItem::RenderAntialiased, true);
+
+            QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
+            bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
+            int numMarkers = keepAspect ? 4 : 8;
             QTransform &trafo = d->m_shape.rtransform();
             QPointF pt;
 
             if (selected && resizeable)
             {
-                while (d->m_marker.size() < d->m_shape.rbasePoints().size())
+                while (d->m_marker.size() < numMarkers)
                 {
                     marker = new QwtPlotMarker();
                     marker->setLinePen(QPen(d->m_markerColor));
-                    marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
+                    marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
                     marker->setVisible(true);
                     marker->attach(d->m_pparent);
                     d->m_marker.append(marker);
                 }
 
-                for (int i = 0; i < d->m_shape.rbasePoints().size(); ++i)
+                if (keepAspect)
                 {
-                    pt = trafo.map(d->m_shape.rbasePoints()[i]);
-                    d->m_marker[i]->setXValue(pt.x());
-                    d->m_marker[i]->setYValue(pt.y());
+                    //1:
+                    pt = trafo.map(box.topLeft());
+                    d->m_marker[0]->setXValue(pt.x());
+                    d->m_marker[0]->setYValue(pt.y());
+
+                    //2:
+                    pt = trafo.map(box.topRight());
+                    d->m_marker[1]->setXValue(pt.x());
+                    d->m_marker[1]->setYValue(pt.y());
+
+                    //3:
+                    pt = trafo.map(box.bottomRight());
+                    d->m_marker[2]->setXValue(pt.x());
+                    d->m_marker[2]->setYValue(pt.y());
+
+                    //4:
+                    pt = trafo.map(box.bottomLeft());
+                    d->m_marker[3]->setXValue(pt.x());
+                    d->m_marker[3]->setYValue(pt.y());
+                }
+                else
+                {
+                    //1:
+                    pt = trafo.map(box.topLeft());
+                    d->m_marker[0]->setXValue(pt.x());
+                    d->m_marker[0]->setYValue(pt.y());
+
+                    //2:
+                    pt = trafo.map(0.5 * (box.topRight() + box.topLeft()));
+                    d->m_marker[1]->setXValue(pt.x());
+                    d->m_marker[1]->setYValue(pt.y());
+
+                    //3:
+                    pt = trafo.map(box.topRight());
+                    d->m_marker[2]->setXValue(pt.x());
+                    d->m_marker[2]->setYValue(pt.y());
+
+                    //4:
+                    pt = trafo.map(0.5 * (box.bottomRight() + box.topRight()));
+                    d->m_marker[3]->setXValue(pt.x());
+                    d->m_marker[3]->setYValue(pt.y());
+
+                    //5:
+                    pt = trafo.map(box.bottomRight());
+                    d->m_marker[4]->setXValue(pt.x());
+                    d->m_marker[4]->setYValue(pt.y());
+
+                    //6:
+                    pt = trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
+                    d->m_marker[5]->setXValue(pt.x());
+                    d->m_marker[5]->setYValue(pt.y());
+
+                    //7:
+                    pt = trafo.map(box.bottomLeft());
+                    d->m_marker[6]->setXValue(pt.x());
+                    d->m_marker[6]->setYValue(pt.y());
+
+                    //8:
+                    pt = trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
+                    d->m_marker[7]->setXValue(pt.x());
+                    d->m_marker[7]->setYValue(pt.y());
+                }
+                if (selected && rotatable)
+                {
+                    if (d->m_marker.size() < numMarkers + 1)
+                    {
+                        marker = new QwtPlotMarker();
+                        marker->setLinePen(QPen(d->m_markerColor));
+                        marker->setSymbol(new QwtSymbol(QwtSymbol::Ellipse, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
+                        marker->setVisible(true);
+                        marker->attach(d->m_pparent);
+                        d->m_marker.append(marker);
+                    }
+
+                    if (box.bottom() < box.top())
+                        pt = trafo.map(QPointF(0.5 * (box.bottomLeft().x() + box.bottomRight().x()), 0.5 * (box.bottomLeft().y() + box.bottomRight().y()) - 5));
+                    else
+                        pt = trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
+                    d->m_marker[d->m_marker.length() - 1]->setXValue(pt.x());
+                    d->m_marker[d->m_marker.length() - 1]->setYValue(pt.y());
                 }
             }
             else
@@ -245,112 +403,9 @@ void DrawItem::setSelected(const bool selected)
                 d->m_marker.clear();
             }
         }
-        setRenderHint(QwtPlotItem::RenderAntialiased, true); //set AntiAliasing of geometric objects to true in order to plot them smoother
         break;
-    case ito::Shape::Ellipse:
-    case ito::Shape::Circle:
-        setRenderHint(QwtPlotItem::RenderAntialiased, true); //set AntiAliasing of geometric objects to true in order to plot them smoother
-    case ito::Shape::Rectangle:
-    case ito::Shape::Square:
-    {
-        QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
-        bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
-        int numMarkers = keepAspect ? 4 : 8;
-        QTransform &trafo = d->m_shape.rtransform();
-        QPointF pt;
 
-        if (selected && resizeable)
-        {
-            while (d->m_marker.size() < numMarkers)
-            {
-                marker = new QwtPlotMarker();
-                marker->setLinePen(QPen(d->m_markerColor));
-                marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
-                marker->setVisible(true);
-                marker->attach(d->m_pparent);
-                d->m_marker.append(marker);
-            }
-
-            if (keepAspect)
-            {
-                //1:
-                pt = trafo.map(box.topLeft());
-                d->m_marker[0]->setXValue(pt.x());
-                d->m_marker[0]->setYValue(pt.y());
-
-                //2:
-                pt = trafo.map(box.topRight());
-                d->m_marker[1]->setXValue(pt.x());
-                d->m_marker[1]->setYValue(pt.y());
-
-                //3:
-                pt = trafo.map(box.bottomRight());
-                d->m_marker[2]->setXValue(pt.x());
-                d->m_marker[2]->setYValue(pt.y());
-
-                //4:
-                pt = trafo.map(box.bottomLeft());
-                d->m_marker[3]->setXValue(pt.x());
-                d->m_marker[3]->setYValue(pt.y());
-            }
-            else
-            {
-                //1:
-                pt = trafo.map(box.topLeft());
-                d->m_marker[0]->setXValue(pt.x());
-                d->m_marker[0]->setYValue(pt.y());
-
-                //2:
-                pt = trafo.map(0.5 * (box.topRight() + box.topLeft()));
-                d->m_marker[1]->setXValue(pt.x());
-                d->m_marker[1]->setYValue(pt.y());
-
-                //3:
-                pt = trafo.map(box.topRight());
-                d->m_marker[2]->setXValue(pt.x());
-                d->m_marker[2]->setYValue(pt.y());
-
-                //4:
-                pt = trafo.map(0.5 * (box.bottomRight() + box.topRight()));
-                d->m_marker[3]->setXValue(pt.x());
-                d->m_marker[3]->setYValue(pt.y());
-
-                //5:
-                pt = trafo.map(box.bottomRight());
-                d->m_marker[4]->setXValue(pt.x());
-                d->m_marker[4]->setYValue(pt.y());
-
-                //6:
-                pt = trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
-                d->m_marker[5]->setXValue(pt.x());
-                d->m_marker[5]->setYValue(pt.y());
-
-                //7:
-                pt = trafo.map(box.bottomLeft());
-                d->m_marker[6]->setXValue(pt.x());
-                d->m_marker[6]->setYValue(pt.y());
-
-                //8:
-                pt = trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
-                d->m_marker[7]->setXValue(pt.x());
-                d->m_marker[7]->setYValue(pt.y());
-            }
-      
-        }
-        else
-        {
-            //delete markers, since deselected
-            for (int n = 0; n < d->m_marker.size(); n++)
-            {
-                d->m_marker[n]->detach();
-                delete d->m_marker[n];
-            }
-            d->m_marker.clear();
-        }
-    }
-    break;
-    default:
-        
+        default:        
         break;
     }
     
@@ -440,67 +495,73 @@ QPointF DrawItem::getMarkerPosScale(int index) const
 
     switch (d->m_shape.type())
     {
-    case ito::Shape::Invalid:
-        return QPointF();
-    case ito::Shape::Point:
-    case ito::Shape::Line:
-    case ito::Shape::Polygon:
-    case ito::Shape::MultiPointPick:
-        if (index >= 0 || index < d->m_shape.rbasePoints().size())
-        {
-            return d->m_shape.rtransform().map(d->m_shape.rbasePoints()[0]);
-        }
-        else
-        {
+        case ito::Shape::Invalid:
             return QPointF();
-        }
-    case ito::Shape::Rectangle:
-    case ito::Shape::Ellipse:
-    case ito::Shape::Square:
-    case ito::Shape::Circle:
-    {
-        QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
-        bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
-        QTransform &trafo = d->m_shape.rtransform();
-        QPointF pt;
 
-        if (keepAspect)
-        {
-            switch (index)
+        case ito::Shape::Point:
+        case ito::Shape::Line:
+        case ito::Shape::Polygon:
+        case ito::Shape::MultiPointPick:
+            if (index >= 0 || index < d->m_shape.rbasePoints().size())
             {
-            case 0:
-                return trafo.map(box.topLeft());
-            case 1:
-                return trafo.map(box.topRight());
-            case 2:
-                return trafo.map(box.bottomRight());
-            case 3:
-                return trafo.map(box.bottomLeft());
+                return d->m_shape.rtransform().map(d->m_shape.rbasePoints()[0]);
+            }
+            else
+            {
+                return QPointF();
+            }
+
+        case ito::Shape::Rectangle:
+        case ito::Shape::Ellipse:
+        case ito::Shape::Square:
+        case ito::Shape::Circle:
+        {
+            QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
+            bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
+            QTransform &trafo = d->m_shape.rtransform();
+            QPointF pt;
+
+            if (keepAspect)
+            {
+                switch (index)
+                {
+                    case 0:
+                        return trafo.map(box.topLeft());
+                    case 1:
+                        return trafo.map(box.topRight());
+                    case 2:
+                        return trafo.map(box.bottomRight());
+                    case 3:
+                        return trafo.map(box.bottomLeft());
+                    case 4:
+                        return trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
+                }
+            }
+            else
+            {
+                switch (index)
+                {
+                    case 0:
+                        return trafo.map(box.topLeft());
+                    case 1:
+                        return trafo.map(0.5 * (box.topRight() + box.topLeft()));
+                    case 2:
+                        return trafo.map(box.topRight());
+                    case 3:
+                        return trafo.map(0.5 * (box.bottomRight() + box.topRight()));
+                    case 4:
+                        return trafo.map(box.bottomRight());
+                    case 5:
+                        return trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
+                    case 6:
+                        return trafo.map(box.bottomLeft());
+                    case 7:
+                        return trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
+                    case 8:
+                        trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
+                }
             }
         }
-        else
-        {
-            switch (index)
-            {
-            case 0:
-                return trafo.map(box.topLeft());
-            case 1:
-                return trafo.map(0.5 * (box.topRight() + box.topLeft()));
-            case 2:
-                return trafo.map(box.topRight());
-            case 3:
-                return trafo.map(0.5 * (box.bottomRight() + box.topRight()));
-            case 4:
-                return trafo.map(box.bottomRight());
-            case 5:
-                return trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
-            case 6:
-                return trafo.map(box.bottomLeft());
-            case 7:
-                return trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
-            }
-        }
-    }
     }
 
     return QPointF();
@@ -532,127 +593,172 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 
         switch (d->m_shape.type())
         {
-        case ito::Shape::Line:
-        {
-            QPointF newPoint = invTrafo.map(markerScaleCoordinate);
-            if (modifiers & Qt::ControlModifier)
+            case ito::Shape::Line:
             {
-                if (markerIdx == 1)
+                QPointF newPoint = invTrafo.map(markerScaleCoordinate);
+                if (modifiers & Qt::ControlModifier)
                 {
-                    QLineF line(basePoints[1], newPoint);
-                    double angle = 45.0 * qRound(line.angle() / 45.0);
-                    line.setAngle(angle);
-                    basePoints[0] = line.p2();
+                    if (markerIdx == 1)
+                    {
+                        QLineF line(basePoints[1], newPoint);
+                        double angle = 45.0 * qRound(line.angle() / 45.0);
+                        line.setAngle(angle);
+                        basePoints[0] = line.p2();
+                        success = true;
+                    }
+                    else if (markerIdx == 2)
+                    {
+                        QLineF line(basePoints[0], newPoint);
+                        double angle = 45.0 * qRound(line.angle() / 45.0);
+                        line.setAngle(angle);
+                        basePoints[1] = line.p2();
+                        success = true;
+                    }
+                }
+                else if (markerIdx == 1 || markerIdx == 2)
+                {
+                    basePoints[markerIdx-1] = newPoint;
+                    success = true;
+                }            
+            }
+            break;
+
+            case ito::Shape::Point:
+            case ito::Shape::MultiPointPick:
+            {
+                if (markerIdx >= 0 && markerIdx < basePoints.size())
+                {
+                    basePoints[markerIdx - 1] = invTrafo.map(markerScaleCoordinate);
                     success = true;
                 }
-                else if (markerIdx == 2)
+            }
+            break;
+            case ito::Shape::Polygon:
+            {
+                if (markerIdx >= 0 && markerIdx <= basePoints.size())
                 {
-                    QLineF line(basePoints[0], newPoint);
-                    double angle = 45.0 * qRound(line.angle() / 45.0);
-                    line.setAngle(angle);
-                    basePoints[1] = line.p2();
+                    basePoints[(markerIdx - 1) % basePoints.size()] = invTrafo.map(markerScaleCoordinate);
                     success = true;
                 }
             }
-            else if (markerIdx == 1 || markerIdx == 2)
+            break;
+
+            case ito::Shape::Rectangle:
+            case ito::Shape::Ellipse:
             {
-                basePoints[markerIdx-1] = newPoint;
+                QPointF newPoint = invTrafo.map(markerScaleCoordinate);
+                QRectF baseRect(basePoints[0], basePoints[1]);
                 success = true;
+
+                switch (markerIdx)
+                {
+                    case 1: //top, left
+                        baseRect.setTopLeft(newPoint);
+                    break;
+            
+                    case 2: //top, center
+                        baseRect.setTop(newPoint.y());
+                    break;
+            
+                    case 3: //top, right
+                        baseRect.setTopRight(newPoint);
+                    break;
+            
+                    case 4: //right, center
+                        baseRect.setRight(newPoint.x());
+                    break;
+            
+                    case 5: //bottom, right
+                        baseRect.setBottomRight(newPoint);
+                    break;
+            
+                    case 6: //bottom, center
+                        baseRect.setBottom(newPoint.y());
+                    break;
+            
+                    case 7: //bottom, left
+                        baseRect.setBottomLeft(newPoint);
+                    break;
+            
+                    case 8: //left, center
+                        baseRect.setLeft(newPoint.x());
+                    break;
+
+                    case 9: // rotation
+                    {
+                        float angle = d->m_shape.rotationAngleRad()
+                            + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
+                        d->m_shape.rtransform().reset();
+                        d->m_shape.rtransform().translate(d->m_shape.centerPoint().x(), d->m_shape.centerPoint().y());
+                        d->m_shape.rtransform().rotate(angle / M_PI * 180.0, Qt::ZAxis);
+                        d->m_shape.rtransform().translate(-d->m_shape.centerPoint().x(), -d->m_shape.centerPoint().y());
+                    }
+                    break;
+
+                    default:
+                        success = false;
+                }
+
+                if (success)
+                {
+                    basePoints[0] = baseRect.topLeft();
+                    basePoints[1] = baseRect.bottomRight();
+                }
             }
             break;
-        }
-        case ito::Shape::Point:
-        case ito::Shape::MultiPointPick:
-        case ito::Shape::Polygon:
-        {
-            if (markerIdx >= 0 && markerIdx < basePoints.size())
+
+            case ito::Shape::Square:
+            case ito::Shape::Circle:
             {
-                basePoints[markerIdx-1] = invTrafo.map(markerScaleCoordinate);
+                QPointF newPoint = invTrafo.map(markerScaleCoordinate);
+                QRectF baseRect(basePoints[0], basePoints[1]);
+                QPointF diff = newPoint - baseRect.center();
+                qreal sign_x = (diff.x() >= 0 ? 1.0 : -1.0);
+                qreal sign_y = (diff.y() >= 0 ? 1.0 : -1.0);
+                qreal equal_diff = 0.5*(std::abs(diff.x()) + std::abs(diff.y()));
+                newPoint = baseRect.center() + QPointF(sign_x * equal_diff, sign_y * equal_diff);
                 success = true;
+
+                switch (markerIdx)
+                {
+                    case 1: //top, left
+                        baseRect.setTopLeft(newPoint);
+                    break;
+
+                    case 2: //top, right
+                        baseRect.setTopRight(newPoint);
+                    break;
+
+                    case 3: //bottom, right
+                        baseRect.setBottomRight(newPoint);
+                    break;
+
+                    case 4: //bottom, left
+                        baseRect.setBottomLeft(newPoint);
+                    break;
+
+                    case 5: // rotation
+                    {
+                        float angle = d->m_shape.rotationAngleRad() 
+                            + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
+                        d->m_shape.rtransform().reset();
+                        d->m_shape.rtransform().translate(d->m_shape.centerPoint().x(), d->m_shape.centerPoint().y());
+                        d->m_shape.rtransform().rotate(angle / M_PI * 180.0, Qt::ZAxis);
+                        d->m_shape.rtransform().translate(-d->m_shape.centerPoint().x(), -d->m_shape.centerPoint().y());
+                    }
+                    break;
+
+                    default:
+                        success = false;
+                }
+
+                if (success)
+                {
+                    basePoints[0] = baseRect.topLeft();
+                    basePoints[1] = baseRect.bottomRight();
+                }
             }
             break;
-        }
-        case ito::Shape::Rectangle:
-        case ito::Shape::Ellipse:
-        {
-            QPointF newPoint = invTrafo.map(markerScaleCoordinate);
-            QRectF baseRect(basePoints[0], basePoints[1]);
-            success = true;
-
-            switch (markerIdx)
-            {
-            case 1: //top, left
-                baseRect.setTopLeft(newPoint);
-                break;
-            case 2: //top, center
-                baseRect.setTop(newPoint.y());
-                break;
-            case 3: //top, right
-                baseRect.setTopRight(newPoint);
-                break;
-            case 4: //right, center
-                baseRect.setRight(newPoint.x());
-                break;
-            case 5: //bottom, right
-                baseRect.setBottomRight(newPoint);
-                break;
-            case 6: //bottom, center
-                baseRect.setBottom(newPoint.y());
-                break;
-            case 7: //bottom, left
-                baseRect.setBottomLeft(newPoint);
-                break;
-            case 8: //left, center
-                baseRect.setLeft(newPoint.x());
-                break;
-            default:
-                success = false;
-            }
-
-            if (success)
-            {
-                basePoints[0] = baseRect.topLeft();
-                basePoints[1] = baseRect.bottomRight();
-            }
-            break;
-        }
-        case ito::Shape::Square:
-        case ito::Shape::Circle:
-        {
-            QPointF newPoint = invTrafo.map(markerScaleCoordinate);
-            QRectF baseRect(basePoints[0], basePoints[1]);
-            QPointF diff = newPoint - baseRect.center();
-            qreal sign_x = (diff.x() >= 0 ? 1.0 : -1.0);
-            qreal sign_y = (diff.y() >= 0 ? 1.0 : -1.0);
-            qreal equal_diff = 0.5*(std::abs(diff.x()) + std::abs(diff.y()));
-            newPoint = baseRect.center() + QPointF(sign_x * equal_diff, sign_y * equal_diff);
-            success = true;
-
-            switch (markerIdx)
-            {
-            case 1: //top, left
-                baseRect.setTopLeft(newPoint);
-                break;
-            case 2: //top, right
-                baseRect.setTopRight(newPoint);
-                break;
-            case 3: //bottom, right
-                baseRect.setBottomRight(newPoint);
-                break;
-            case 4: //bottom, left
-                baseRect.setBottomLeft(newPoint);
-                break;
-            default:
-                success = false;
-            }
-
-            if (success)
-            {
-                basePoints[0] = baseRect.topLeft();
-                basePoints[1] = baseRect.bottomRight();
-            }
-            break;
-        }
         }
         setShape(d->m_shape);
         return success;
@@ -661,12 +767,16 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor)
+void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor, const QColor &markerColor2 /*= QColor() */)
 {
     if (d->m_markerColor != markerColor || d->m_lineColor != lineColor)
     {
         d->m_markerColor = markerColor;
         d->m_lineColor = lineColor;
+        if (markerColor2 != QColor())
+            d->m_markerColor2 = markerColor2;
+        else
+            d->m_markerColor2 = markerColor;
 
         if (d->m_fillBrush.style() != Qt::NoBrush)
         {
@@ -712,85 +822,118 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
 
     switch (shape.type())
     {
-    case ito::Shape::Point:
-    case ito::Shape::MultiPointPick:
-    {
-        int num = shape.basePoints().size();
-        d->m_point1 = shape.transform().map(shape.rbasePoints()[0]);
-        //path.moveTo(d->m_point1);
-        //path.lineTo(d->m_point1);
-
-        //delete markers, since deselected
-        for (int n = num; n < d->m_marker.size(); n++)
+        case ito::Shape::Point:
+        case ito::Shape::MultiPointPick:
         {
-            d->m_marker[n]->detach();
-            delete d->m_marker[n];
-            d->m_marker.pop_back();
+            int num = shape.basePoints().size();
+            d->m_point1 = shape.transform().map(shape.rbasePoints()[0]);
+            //path.moveTo(d->m_point1);
+            //path.lineTo(d->m_point1);
+
+            //delete markers, since deselected
+            for (int n = num; n < d->m_marker.size(); n++)
+            {
+                d->m_marker[n]->detach();
+                delete d->m_marker[n];
+                d->m_marker.pop_back();
+            }
+
+            QwtPlotMarker *marker;
+
+            while (d->m_marker.size() < num)
+            {
+                marker = new QwtPlotMarker();
+                marker->setLinePen(QPen(d->m_markerColor));
+                marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
+                marker->attach(d->m_pparent);
+                d->m_marker.append(marker);
+            }
+
+            for (int i = 0; i < num; ++i)
+            {
+                d->m_marker[i]->setXValue(shape.transform().map(shape.rbasePoints()[i]).x());
+                d->m_marker[i]->setYValue(shape.transform().map(shape.rbasePoints()[i]).y());
+                d->m_marker[i]->setVisible(true);
+            }
         }
+        break;
 
-        QwtPlotMarker *marker;
-
-        while (d->m_marker.size() < num)
-        {
-            marker = new QwtPlotMarker();
-            marker->setLinePen(QPen(d->m_markerColor));
-            marker->setSymbol(new QwtSymbol(QwtSymbol::Triangle, QBrush(d->m_markerColor), QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
-            marker->attach(d->m_pparent);
-            d->m_marker.append(marker);
-        }
-
-        for (int i = 0; i < num; ++i)
-        {
-            d->m_marker[i]->setXValue(shape.transform().map(shape.rbasePoints()[i]).x());
-            d->m_marker[i]->setYValue(shape.transform().map(shape.rbasePoints()[i]).y());
-            d->m_marker[i]->setVisible(true);
-        }
-    }
-    break;
-
-    case ito::Shape::Line:
-    {
-        d->m_point1 = shape.transform().map(shape.basePoints()[0]);
-        d->m_point2 = shape.transform().map(shape.basePoints()[1]);
-        path.moveTo(d->m_point1);
-        path.lineTo(d->m_point2);
-    }
-    break;
-
-    case ito::Shape::Rectangle:
-    case ito::Shape::Square:
-        if (!shape.transform().isRotating())
+        case ito::Shape::Line:
         {
             d->m_point1 = shape.transform().map(shape.basePoints()[0]);
             d->m_point2 = shape.transform().map(shape.basePoints()[1]);
-            QRectF rect(d->m_point1, d->m_point2);
-            path.addRect(rect);
+            path.moveTo(d->m_point1);
+            path.lineTo(d->m_point2);
         }
-        else
-        {
-            retVal += ito::RetVal(ito::retError, 0, QObject::tr("rotated shapes are currently not supported.").toLatin1().data());
-        }
-        
         break;
 
-    case ito::Shape::Ellipse:
-    case ito::Shape::Circle:
-        if (!shape.transform().isRotating())
-        {
-            d->m_point1 = shape.transform().map(shape.basePoints()[0]);
-            d->m_point2 = shape.transform().map(shape.basePoints()[1]);
-            QRectF rect(d->m_point1, d->m_point2);
-            path.addEllipse(rect);
-        }
-        else
-        {
-            retVal += ito::RetVal(ito::retError, 0, QObject::tr("rotated shapes are currently not supported.").toLatin1().data());
-        }
+        case ito::Shape::Rectangle:
+        case ito::Shape::Square:
+            if (!shape.transform().isRotating())
+            {
+                d->m_point1 = shape.transform().map(shape.basePoints()[0]);
+                d->m_point2 = shape.transform().map(shape.basePoints()[1]);
+                QRectF rect(d->m_point1, d->m_point2);
+                path.addRect(rect);
+            }
+            else
+            {
+                QRectF rect(shape.basePoints()[0], shape.basePoints()[1]);
+                QPainterPath tmpPath;
+                tmpPath.addRect(rect);
 
+                path.addPath(shape.transform().map(tmpPath));
+            }        
         break;
 
-    default:
-        retVal += ito::RetVal(ito::retError, 0, QObject::tr("invalid geometric shape type").toLatin1().data());
+        case ito::Shape::Ellipse:
+        case ito::Shape::Circle:
+            if (!shape.transform().isRotating())
+            {
+                d->m_point1 = shape.transform().map(shape.basePoints()[0]);
+                d->m_point2 = shape.transform().map(shape.basePoints()[1]);
+                QRectF rect(d->m_point1, d->m_point2);
+                path.addEllipse(rect);
+            }
+            else
+            {
+                QRectF rect(shape.basePoints()[0], shape.basePoints()[1]);                
+                QPainterPath tmpPath;
+                tmpPath.addEllipse(rect);
+
+                path.addPath(shape.transform().map(tmpPath));
+            }
+        break;
+
+        case ito::Shape::Polygon:
+        {
+            if (!shape.transform().isRotating())
+            {
+                int npts = shape.basePoints().length();
+                int close = 1;
+                if (shape.unclosed())
+                {
+                    close = 0;
+                }
+
+                for (int nl = 1; nl < npts + close; nl++)
+                {
+                    d->m_point1 = shape.transform().map(shape.basePoints()[nl - 1]);
+                    d->m_point2 = shape.transform().map(shape.basePoints()[nl % npts]);
+                    path.moveTo(d->m_point1);
+                    path.lineTo(d->m_point2);
+                }
+            }
+            else
+            {
+                path.moveTo(d->m_point1);
+                path.lineTo(d->m_point2);
+            }
+        }
+        break;
+
+        default:
+            retVal += ito::RetVal(ito::retError, 0, QObject::tr("invalid geometric shape type").toLatin1().data());
         break;
     }
 
@@ -812,7 +955,6 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape, const QColor &firstColor
     setColor(firstColor, secondColor);
     return setShape(shape);
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::draw( QPainter *painter, 
@@ -850,9 +992,7 @@ void DrawItem::draw( QPainter *painter,
                 painter->fillRect(cRect, d->m_labelBrush);
                 label.draw(painter, cRect);
             }
-        }
-
-        
+        }        
     }
 
     return;
@@ -896,86 +1036,105 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
 {
     ito::RetVal retVal;
     const ito::Shape &shape = d->m_shape;
-    QPointF point_trafo = shape.transform().inverted().map(point); //transform point to base coordinate system of shape
+    //QPointF point_trafo = shape.transform().inverted().map(point); //transform point to base coordinate system of shape
+    QPointF point_trafo = point;
 
     bool hitEdge = false;
 
     switch (d->m_shape.type())
     {
-    case ito::Shape::Point:
-    {
-        QLineF line(point_trafo, shape.basePoints()[0]);
-        hitEdge = (std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y);
-    }
-    break;
-
-    case ito::Shape::Line:
-    {
-        QLineF line(shape.basePoints()[0], shape.basePoints()[1]);
-        hitEdge = hitLine(point_trafo, line, tol_x, tol_y);
-    }
-    break;
-
-    case ito::Shape::Rectangle:
-    case ito::Shape::Square:
-    {
-        QPolygonF contour = shape.contour();
-        hitEdge = (hitLine(point, QLineF(contour[0], contour[1]), tol_x, tol_y) || \
-            hitLine(point, QLineF(contour[1], contour[2]), tol_x, tol_y) || \
-            hitLine(point, QLineF(contour[2], contour[3]), tol_x, tol_y) || \
-            hitLine(point, QLineF(contour[3], contour[0]), tol_x, tol_y));
-    }
-    break;
-
-    case ito::Shape::Ellipse:
-    case ito::Shape::Circle:
-    {
-        //if selected, some markers are out of the circle, therefore their area must be checked separately
-        if (d->m_selected)
+        case ito::Shape::Point:
         {
-            for (int i = 0; i < d->m_marker.size(); ++i)
+            QLineF line(point_trafo, shape.basePoints()[0]);
+            hitEdge = (std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y);
+        }
+        break;
+
+        case ito::Shape::Line:
+        {
+            QLineF line(shape.basePoints()[0], shape.basePoints()[1]);
+            hitEdge = hitLine(point_trafo, line, tol_x, tol_y);
+        }
+        break;
+
+        case ito::Shape::Rectangle:
+        case ito::Shape::Square:
+        {
+            QPolygonF contour = shape.contour();
+            // rotation marker must be checked separately
+            if (d->m_selected)
             {
-                if (std::abs(d->m_marker[i]->xValue() - point_trafo.x()) < tol_x && std::abs(d->m_marker[i]->yValue() - point_trafo.y()) < tol_y)
+                if (std::abs(d->m_marker[d->m_marker.size() - 1]->xValue() - point_trafo.x()) < tol_x 
+                    && std::abs(d->m_marker[d->m_marker.size() - 1]->yValue() - point_trafo.y()) < tol_y)
                 {
                     hitEdge = true;
                     break;
                 }
             }
+
+            hitEdge = (hitLine(point, QLineF(contour[0], contour[1]), tol_x, tol_y) || \
+                hitLine(point, QLineF(contour[1], contour[2]), tol_x, tol_y) || \
+                hitLine(point, QLineF(contour[2], contour[3]), tol_x, tol_y) || \
+                hitLine(point, QLineF(contour[3], contour[0]), tol_x, tol_y));
         }
+        break;
 
-        //inverse transform point
-        QPointF size = shape.basePoints()[1] - shape.basePoints()[0];
-        double a = std::abs(size.x())/2.0 + tol_x;
-        double b = std::abs(size.y())/2.0 + tol_y;
-        QPointF center = (shape.basePoints()[0] + shape.basePoints()[1]) / 2.0;
-        double x = point_trafo.x() - center.x();
-        double y = point_trafo.y() - center.y();
-
-        if ((((x*x) / (a*a)) + ((y*y) / (b*b))) <= 1.0)
+        case ito::Shape::Ellipse:
+        case ito::Shape::Circle:
         {
-            a -= 2 * tol_x;
-            b -= 2 * tol_y;
-            hitEdge =((((x*x) / (a*a)) + ((y*y) / (b*b))) > 1.0);
-        }
-    }
-    break;
-
-    case ito::Shape::MultiPointPick:
-    case ito::Shape::Polygon:
-    {
-        QLineF line;
-        foreach(const QPointF &pt, shape.basePoints())
-        {
-            line = QLineF(point_trafo, pt);
-            if (std::abs(line.dx() <= tol_x) && std::abs(line.dy() <= tol_y))
+            //if selected, some markers are out of the circle, therefore their area must be checked separately
+            if (d->m_selected)
             {
-                hitEdge = true;
-                break;
+                for (int i = 0; i < d->m_marker.size(); ++i)
+                {
+                    if (std::abs(d->m_marker[i]->xValue() - point_trafo.x()) < tol_x && std::abs(d->m_marker[i]->yValue() - point_trafo.y()) < tol_y)
+                    {
+                        hitEdge = true;
+                        break;
+                    }
+                }
+            }
+
+            //inverse transform point
+            QPointF size = shape.basePoints()[1] - shape.basePoints()[0];
+            double a = std::abs(size.x())/2.0 + tol_x;
+            double b = std::abs(size.y())/2.0 + tol_y;
+            QPointF center = (shape.basePoints()[0] + shape.basePoints()[1]) / 2.0;
+            double x = point_trafo.x() - center.x();
+            double y = point_trafo.y() - center.y();
+
+            if ((((x*x) / (a*a)) + ((y*y) / (b*b))) <= 1.0)
+            {
+                a -= 2 * tol_x;
+                b -= 2 * tol_y;
+                hitEdge = ((((x*x) / (a*a)) + ((y*y) / (b*b))) > 1.0);
             }
         }
-    }
-    break;
-    default:
+        break;
+
+        case ito::Shape::MultiPointPick:
+        case ito::Shape::Polygon:
+        {
+            QLineF line;
+            for (int i = 0; i < shape.basePoints().size(); ++i)
+            {
+                line = QLineF(point_trafo, shape.basePoints()[i]);
+                if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y))
+                {
+                    hitEdge = true;
+                    break;
+                }
+                int closed = shape.unclosed();
+                if (i < shape.basePoints().size() - closed)
+                {
+                    if (hitEdge = hitLine(point, QLineF(shape.basePoints()[i], shape.basePoints()[(i + 1) % shape.basePoints().size()]), tol_x, tol_y))
+                        break;
+                }
+            }
+        }
+        break;
+
+        default:
         break;
     }
 
@@ -1027,3 +1186,5 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
 
     return -1;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------

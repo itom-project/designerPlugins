@@ -178,12 +178,22 @@ inline int ItomColorMap::ColorStops::findUpper(double pos) const
 inline QRgb ItomColorMap::ColorStops::rgb(
 	ItomColorMap::Mode mode, double pos) const
 {
+    // 03/09/17 ck, retrieving d_stops.size() - 1 might crash
+    if (d_stops.size() < 1)
+        return qRgb(128, 128, 128);
+
 	if (pos <= 0.0)
 		return d_stops[0].rgb;
-	if (pos >= 1.0)
-		return d_stops[d_stops.size() - 1].rgb;
+    if (pos >= 1.0)
+    {       
+        return d_stops[d_stops.size() - 1].rgb;
+    }
 
-	const int index = findUpper(pos);
+	int index = findUpper(pos);
+    // 03/09/17 ck, we got a crash here, when pos was a #nan
+    if (index == 0)
+        index = 1;
+
 	if (mode == FixedColors)
 	{
 		return d_stops[index - 1].rgb;

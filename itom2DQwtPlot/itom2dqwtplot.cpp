@@ -997,12 +997,12 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             if (needChannelUpdate) // we have an updated plot and want to show it
             {
-                if (zStack && m_zSliceType & ito::AbstractFigure::tVisibleOnInit)
+                if (zStack && (m_zSliceType & ito::AbstractFigure::tVisibleOnInit))
                 {
                     m_zSliceType &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
-                else if (!zStack && m_lineCutType & ito::AbstractFigure::tVisibleOnInit)
+                else if (!zStack && (m_lineCutType & ito::AbstractFigure::tVisibleOnInit))
                 {
                     m_lineCutType &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
@@ -1122,12 +1122,17 @@ void Itom2dQwtPlot::setOverlayAlpha (const int alpha)
         return;
     }
 
-    d->m_pData->m_alpha = alpha > 0 && alpha < 255 ? alpha : d->m_pData->m_alpha;
-
-    if (m_pContent)
+    int alphaClipped = qBound(0, alpha, 255);
+    
+    if (d->m_pData->m_alpha != alphaClipped)
     {
-        m_pContent->alphaChanged();
-        m_pContent->m_pOverlaySlider->setValue(d->m_pData->m_alpha);
+        d->m_pData->m_alpha = alphaClipped;
+
+        if (m_pContent)
+        {
+            m_pContent->alphaChanged();
+            m_pContent->m_pOverlaySlider->setValue(d->m_pData->m_alpha);
+        }
     }
 
     this->updatePropertyDock();

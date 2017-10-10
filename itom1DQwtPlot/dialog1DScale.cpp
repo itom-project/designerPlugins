@@ -50,8 +50,6 @@ Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
 	}
 	QRegExpValidator *numberValidator = new QRegExpValidator(QRegExp(numberRegExp), this);
 
-    double min,max;
-
     //x
     if(data.m_axisScaleAuto)
     {
