@@ -212,6 +212,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
     mainTb->addAction(m_pActHome);
+    mainTb->addAction(m_pActProperties);
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
     mainTb->addAction(m_pActAspectRatio);

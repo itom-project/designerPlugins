@@ -182,6 +182,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
     mainTb->addAction(m_pActHome);
+    mainTb->addAction(m_pActProperties);
     mainTb->addAction(m_pActScaleSettings);
     mainTb->addAction(m_pRescaleParent);
     mainTb->addAction(m_pActPan);
@@ -603,6 +604,7 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActRGBSwitch->setIcon(m_pMnuRGBSwitch->defaultAction()->icon());
         m_pActMultiRowSwitch->setIcon(m_pMnuMultiRowSwitch->defaultAction()->icon());
         m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/grid.png"));
+        
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)

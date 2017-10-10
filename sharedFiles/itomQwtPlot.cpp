@@ -299,6 +299,7 @@ void ItomQwtPlot::createBaseActions()
     a->setToolTip(tr("Toggle fixed / variable aspect ration between axis x and y"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
+
     //m_pActShapeType
     m_pActShapeType = new QAction(tr("Draw Geometric Shape"), p);
     m_pMenuShapeType = new QMenu(tr("Draw Geometric Shape"), p);
@@ -525,6 +526,7 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general/icons/move.png"));
         m_pActClearShapes->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
+        m_pActProperties->setIcon(QIcon(":/itomDesignerPlugins/general/icons/settings.png"));
         m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"));
         m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython.png"));
 
