@@ -50,7 +50,7 @@ DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
 DataObjectSeriesDataXY::~DataObjectSeriesDataXY()
 {
 }
-template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max)
+template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, const size_t &nrPoints)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -64,7 +64,7 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
     case DataObjectSeriesData::dirY:
         mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
-        for (int i = 0; i < d.nrPoints; i++)
+        for (int i = 0; i < nrPoints; i++)
         {
             val = *(reinterpret_cast<_Tp*>(ptr));
             ptr += d.matStepSize;
@@ -77,7 +77,7 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
     case DataObjectSeriesData::dirXY:
         mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
-        for (int i = 0; i < d.nrPoints; i++)
+        for (int i = 0; i < nrPoints; i++)
         {
             val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
 
@@ -87,7 +87,7 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
         break;
     case DataObjectSeriesData::dirZ:
 
-        for (int i = 0; i < d.nrPoints; i++)
+        for (int i = 0; i < nrPoints; i++)
         {
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
@@ -101,7 +101,7 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max)
+template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, const size_t &nrPoints)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -115,7 +115,7 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
     case DataObjectSeriesData::dirY:
         mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
-        for (int i = 0; i < d.nrPoints; i++)
+        for (int i = 0; i < nrPoints; i++)
         {
             val = *(reinterpret_cast<_Tp*>(ptr));
             ptr += d.matStepSize;
@@ -133,7 +133,7 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
     case DataObjectSeriesData::dirXY:
         mat = obj->getCvPlaneMat(d.plane);
         ptr = (mat->data + d.matOffset);
-        for (int i = 0; i < d.nrPoints; i++)
+        for (int i = 0; i < nrPoints; i++)
         {
             val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
 
@@ -148,7 +148,7 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
         break;
     case DataObjectSeriesData::dirZ:
 
-        for (int i = 0; i < d.nrPoints; i++)
+        for (int i = 0; i < nrPoints; i++)
         {
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
@@ -190,6 +190,8 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
     else
     {
         int dimsX = xVec->getDims();
+        int width = dimsX > 0 ? xVec->getSize(dimsX - 1) : 0;
+        int height = dimsX > 1 ? xVec->getSize(dimsX - 2) : (width == 0) ? 0 : 1;
 
         int prependOneDimsX = 0;
         int i;
@@ -215,7 +217,11 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         else
         {
             m_dX.plane = 0;
-            tmpBoundsX = bounds;
+            tmpBoundsX.resize(2);
+            tmpBoundsX[0].setX(xVec->getPixToPhys(dimsX - 1, 0, _unused));
+            tmpBoundsX[1].setX(xVec->getPixToPhys(dimsX - 1, width - 1, _unused));
+            tmpBoundsX[0].setY(xVec->getPixToPhys(dimsX - 2,  0 , _unused));
+            tmpBoundsX[1].setY(xVec->getPixToPhys(dimsX - 2, height-1, _unused));
         }
         if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[m_dX.plane])->data)
             return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
@@ -257,9 +263,22 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                 if (pxY1x == pxY2x) //pure line in x direction of x vector
                 {
                     m_dX.dir = dirX;
+                    bool xFit = false;
                     if (pxX2x > pxX1x)
                     {
                         m_dX.nrPoints = 1 + pxX2x - pxX1x;
+                        if (m_dX.nrPoints != size())
+                        {
+                            if (m_dX.nrPoints > size())
+                            {
+                                retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                            }
+                            else
+                            {
+                                m_dX.valid = false;
+                                retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+                            }
+                        }
                         m_dX.startPx.setX(pxX1x);
                         m_dX.startPx.setY(pxY1x);
                         m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
@@ -270,6 +289,19 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                     else
                     {
                         m_dX.nrPoints = 1 + pxX1x - pxX2x;
+                        if (m_dX.nrPoints != size())
+                        {
+                            if (m_dX.nrPoints > size())
+                            {
+                                retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                            }
+                            else
+                            {
+                                m_dX.valid = false;
+                                retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+                                
+                            }
+                        }
                         m_dX.startPx.setX(pxX2x);
                         m_dX.startPx.setY(pxY2x);
                         m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX2x;
@@ -278,8 +310,11 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                         m_dX.stepSizePx.setHeight(0);
                     }                    
                 }
-                m_pXVec = xVec;
-                calcHash();
+                if (!retval.containsError())
+                {
+                    m_pXVec = xVec;
+                    calcHash();
+                }
             }
         }
     }
@@ -390,6 +425,7 @@ QPointF DataObjectSeriesDataXY::sample(size_t n) const
 QRectF DataObjectSeriesDataXY::boundingRect() const
 {
     QRectF rect = DataObjectSeriesData::boundingRect();
+    size_t samplesY = DataObjectSeriesData::size(); //ask for the number of y-values since this is the maximum numbers of points to be displayed
 
 
     //cv::Mat *mat;
@@ -402,28 +438,28 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
         switch (m_pXVec->getType())
         {
         case ito::tInt8:
-            findMinMaxInteger<ito::int8>(m_pXVec, m_dX, min, max);
+            findMinMaxInteger<ito::int8>(m_pXVec, m_dX, min, max, samplesY);
             break;
         case ito::tUInt8:
-            findMinMaxInteger<ito::uint8>(m_pXVec, m_dX, min, max);
+            findMinMaxInteger<ito::uint8>(m_pXVec, m_dX, min, max, samplesY);
             break;
         case ito::tInt16:
-            findMinMaxInteger<ito::int16>(m_pXVec, m_dX, min, max);
+            findMinMaxInteger<ito::int16>(m_pXVec, m_dX, min, max, samplesY);
             break;
         case ito::tUInt16:
-            findMinMaxInteger<ito::uint16>(m_pXVec, m_dX, min, max);
+            findMinMaxInteger<ito::uint16>(m_pXVec, m_dX, min, max, samplesY);
             break;
         case ito::tInt32:
-            findMinMaxInteger<ito::int32>(m_pXVec, m_dX, min, max);
+            findMinMaxInteger<ito::int32>(m_pXVec, m_dX, min, max, samplesY);
             break;
         case ito::tUInt32:
-            findMinMaxInteger<ito::uint32>(m_pXVec, m_dX, min, max);
+            findMinMaxInteger<ito::uint32>(m_pXVec, m_dX, min, max, samplesY);
             break;
         case ito::tFloat32:
-            findMinMaxFloat<ito::float32>(m_pXVec, m_dX, min, max);
+            findMinMaxFloat<ito::float32>(m_pXVec, m_dX, min, max, samplesY);
             break;
         case ito::tFloat64:
-            findMinMaxFloat<ito::float64>(m_pXVec, m_dX, min, max);
+            findMinMaxFloat<ito::float64>(m_pXVec, m_dX, min, max, samplesY);
             break;
         }
 
@@ -444,21 +480,17 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
                 min -= 0.1;
                 max += 0.1;
             }
-        
 
 
-            float width = max-min;
-            if (width < 0)
-            {
-                min += width;
-                width *= -1;
-            }
-            rect.setX(min);
-            rect.setWidth(width);
-        
-
+        }
+        float width = max-min;
+        if (width < 0)
+        {
+            min += width;
+            width *= -1;
+        }
+        rect.setX(min);
+        rect.setWidth(width);
+        return rect;
     }
-
-    return rect;
-}
 }
