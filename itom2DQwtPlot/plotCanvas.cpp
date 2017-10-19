@@ -758,7 +758,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                             break;
                     }
                 }
-                m_pData->m_xaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_xaxisLabelDObj = QString::fromLatin1(descr.data());
 
                 descr = dObj->getAxisDescription(dims-2, valid);
                 if (!valid) descr = "";
@@ -780,7 +780,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                             break;
                     }
                 }
-                m_pData->m_yaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_yaxisLabelDObj = QString::fromLatin1(descr.data());
 
             }
             else
