@@ -171,6 +171,9 @@ public slots:
         case Qt::PointingHandCursor:
             setCursor( QCursor(Qt::PointingHandCursor) );
             break;
+        case Qt::WaitCursor:
+            setCursor(QCursor(Qt::WaitCursor));
+            break;
         }
     };
 };

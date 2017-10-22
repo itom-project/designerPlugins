@@ -211,6 +211,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActSave);
     mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
+    mainTb->addAction(m_pActProperties);
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
@@ -757,7 +758,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                             break;
                     }
                 }
-                m_pData->m_xaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_xaxisLabelDObj = QString::fromLatin1(descr.data());
 
                 descr = dObj->getAxisDescription(dims-2, valid);
                 if (!valid) descr = "";
@@ -779,7 +780,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                             break;
                     }
                 }
-                m_pData->m_yaxisLabelDObj = QString::fromStdString(descr);
+                m_pData->m_yaxisLabelDObj = QString::fromLatin1(descr.data());
 
             }
             else
