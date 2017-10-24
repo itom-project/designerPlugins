@@ -40,11 +40,13 @@ IF(ITOM_SDK_PCL_SUPPORT)
 
     #SET(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
     #SET(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked
-    find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
-    find_package(VisualLeakDetector QUIET)
+
     
     IF(EXISTS ${VTK_DIR})
-
+    
+        find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
+        find_package(VisualLeakDetector QUIET)
+        
         IF (BUILD_UNICODE)
             ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
         ENDIF (BUILD_UNICODE)
