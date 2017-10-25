@@ -102,7 +102,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         bool floatingPointValues() const;
 
-        RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds);
+        virtual RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec = NULL);
         const ito::DataObject* getDataObject() const { return m_pDataObj; }
 
         inline void setCmplxState(ItomQwtPlotEnums::ComplexType state) { m_cmplxState = state; }
@@ -120,6 +120,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         void setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue);
 
         inline QByteArray getHash() const { return m_hash; }
+        
         void calcHash();
 
         void setColorState(int newVal) {m_colorState = (ColorType)newVal;}
@@ -130,7 +131,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
     protected:
 
-        inline void saturation(int &value, int min, int max) { value = ( value < min ? min : ( value > max ? max : value) ); }
+        inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
         inline QString fromStdLatin1String(const std::string &str) { return QString::fromLatin1(str.data()); }
         
 

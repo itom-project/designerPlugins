@@ -1168,7 +1168,6 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
     QwtLegendLabel *legendLabel = NULL;
     int index;
-
     if (dataObj)
     {
         int dims = dataObj->getDims();
@@ -1602,9 +1601,19 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     {
                         if (xVec)
                         {
-                            seriesData = new DataObjectSeriesDataXY(1);
-                            QVector<QPointF> xpts;
-                            ((DataObjectSeriesDataXY*)(seriesData))->updateDataObject(dataObj, xVec,pts, xpts);
+                            ito::RetVal retval(validateXVec(dataObj, pts, xVec));
+                            if (retval.containsError())
+                            {
+                                xVec = NULL; //x-vector doesn't match
+                                seriesData = new DataObjectSeriesData(1);
+                                seriesData->updateDataObject(dataObj, pts);
+                            }
+                            else
+                            {
+                                seriesData = new DataObjectSeriesDataXY(1);
+                                QVector<QPointF> xpts;
+                                ((DataObjectSeriesDataXY*)(seriesData))->updateDataObject(dataObj, pts, xVec);
+                            }
                         }
                         else 
                         {
@@ -1799,7 +1808,203 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         replot();
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
 
+ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec)
+{
+    ito::RetVal retval;
+    bool _unused;
+    cv::Mat *mat;
+    int pxX1, pxX2, pxY1, pxY2, pxX1x, pxX2x, pxY1x, pxY2x;
+    int planeX, nrPointsX, plane, nrPoints;
+
+    if (dataObj != NULL || xVec != NULL)
+    {
+        int dimsX = xVec->getDims();
+        int dims = dataObj->getDims();
+        int width = dimsX > 0 ? xVec->getSize(dimsX - 1) : 0;
+        int height = dimsX > 1 ? xVec->getSize(dimsX - 2) : (width == 0) ? 0 : 1;
+
+        int prependOneDimsX = 0;
+        int i;
+        for (i = 0; i < dimsX - 2; ++i)
+        {
+            if (xVec->getSize(i) != 1)
+            {
+                break;
+            }
+            ++prependOneDimsX;
+        }
+        int prependedOneDims = 0;
+        for (int i = 0; i < dims - 2; i++)
+        {
+            if (dataObj->getSize(i) != 1)
+            {
+                break;
+            }
+            prependedOneDims++;
+        }
+        QVector<QPointF> tmpBounds;
+        if (bounds.size() == 3)
+        {
+            plane = bounds[0].x();
+            plane = dims > 2 ? std::min(plane, dataObj->getSize(dims - 3)) : 0;
+            plane = std::max(plane, 0);
+            tmpBounds.resize(2);
+            tmpBounds[0] = bounds[1];
+            tmpBounds[1] = bounds[2];
+        }
+        else
+        {
+            plane = 0;
+            tmpBounds = bounds;
+        }
+        if (!dataObj->get_mdata() || !(cv::Mat*)(dataObj->get_mdata()[plane])->data)
+            return ito::RetVal(ito::retError, 0, QObject::tr("cv:Mat in data object seems corrupted").toLatin1().data());
+        switch (tmpBounds.size())
+        {
+        case 2:
+            if ((dims - prependedOneDims) != 2 && (dims - prependedOneDims) != 3)
+            {
+                retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
+            }
+            else
+            {
+                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
+                pxX2 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[1].x(), _unused));
+                pxY2 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[1].y(), _unused));
+
+                saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+                saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+                saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
+                saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
+
+                mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(plane)]; //first plane in ROI
+                if (pxX1 == pxX2) //pure line in y-direction
+                {
+                    if (pxY2 >= pxY1)
+                    {
+                        nrPoints = 1 + pxY2 - pxY1;
+                    }
+                    else
+                    {
+                        nrPoints = 1 + pxY1 - pxY2;
+                    }
+                }
+                else if (pxY1 == pxY2)//pure line in x-direction
+                {
+                    if (pxX2 >= pxX1)
+                    {
+                        nrPoints = 1 + pxX2 - pxX1;
+                    }
+                    else
+                    {
+                        nrPoints = 1 + pxX1 - pxX2;
+                    }
+                }
+                else
+                {
+                    retval += RetVal(retError, 0, "assignment of a x-vector to a line cut is not implemented yet");
+                }
+            }
+            break;
+        case 1:
+            if ((dims - prependedOneDims) != 3)
+            {
+                retval += RetVal(retError, 0, "line plot in z-direction requires a 3-dim dataObject");
+                return retval;
+            }
+            else
+            {
+                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
+
+                saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+                saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+                nrPoints = dataObj->getSize(dims - 3);
+            }
+        }
+            QVector<QPointF> tmpBoundsX(2);
+
+            planeX = 0;
+            tmpBoundsX[0].setX(xVec->getPixToPhys(dimsX - 1, 0, _unused));
+            tmpBoundsX[1].setX(xVec->getPixToPhys(dimsX - 1, width - 1, _unused));
+            tmpBoundsX[0].setY(xVec->getPixToPhys(dimsX - 2, 0, _unused));
+            tmpBoundsX[1].setY(xVec->getPixToPhys(dimsX - 2, height - 1, _unused));
+
+            if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[planeX])->data)
+                retval += ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
+            if (tmpBoundsX.size() != 2)
+            {
+                retval += RetVal(retError, 0, "bounds vector must have 2 entries");
+            }
+            if (!retval.containsError())
+            {
+                //dir X, dirY
+                if ((dimsX - prependOneDimsX) != 2)//check if xVec is 2d
+                {
+                    retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject or the first (n-2) dimension must have a size of 1 for representing x-vector");
+                }
+                else if (xVec->getSize(dimsX - 2) != 1)//check if first dimension of xVec is of shape 1
+                {
+                    retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject with a size of 1 for the first dimension");
+                }
+                if (!retval.containsError())
+                {
+                    //bounds phys to pix of xVex
+                    pxX1x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[0].x(), _unused));
+                    pxY1x = qRound(xVec->getPixToPhys(dimsX - 2, tmpBoundsX[0].y(), _unused));
+                    pxX2x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[1].x(), _unused));
+                    pxY2x = qRound(xVec->getPixToPhys(dimsX - 2, tmpBoundsX[1].y(), _unused));
+
+                    saturation(pxX1x, 0, xVec->getSize(dimsX - 1) - 1);
+                    saturation(pxX2x, 0, xVec->getSize(dimsX - 1) - 1);
+                    saturation(pxY1x, 0, xVec->getSize(dimsX - 2) - 1);
+                    saturation(pxY2x, 0, xVec->getSize(dimsX - 2) - 1);
+
+
+                    mat = (cv::Mat*)xVec->get_mdata()[xVec->seekMat(planeX)];
+                    if (pxY1x == pxY2x) //pure line in x direction of x vector
+                    {
+                        if (pxX2x > pxX1x)
+                        {
+                            nrPointsX = 1 + pxX2x - pxX1x;
+                            if (nrPointsX != nrPoints)
+                            {
+                                if (nrPointsX > nrPoints)
+                                {
+                                    retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                                }
+                                else
+                                {
+                                    retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            nrPointsX = 1 + pxX1x - pxX2x;
+                            if (nrPoints != nrPointsX)
+                            {
+                                if (nrPointsX > nrPoints)
+                                {
+                                    retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                                }
+                                else
+                                {
+                                    retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        
+    }
+    return retval;
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 {

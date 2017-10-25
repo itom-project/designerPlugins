@@ -43,7 +43,7 @@ class DataObjectSeriesDataXY : public DataObjectSeriesData
 public:
         explicit DataObjectSeriesDataXY(const int fastmode);
         ~DataObjectSeriesDataXY();
-        RetVal updateDataObject(const ito::DataObject* dataObj,const ito::DataObject* xVec ,QVector<QPointF> bounds, QVector<QPointF> boundsX);
+        RetVal updateDataObject(const ito::DataObject* dataObj,QVector<QPointF> bounds, const ito::DataObject* xVec = NULL);
         //size_t size() const;
         QRectF boundingRect() const;
         LineData m_dX;

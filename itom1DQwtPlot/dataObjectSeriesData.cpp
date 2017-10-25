@@ -141,8 +141,9 @@ void DataObjectSeriesData::calcHash()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds)
+RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/)
 {
+    Q_UNUSED(xVec);
     RetVal retval;
     bool _unused;
     QRectF p;

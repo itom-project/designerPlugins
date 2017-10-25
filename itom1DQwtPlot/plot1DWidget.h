@@ -165,6 +165,8 @@ class Plot1DWidget : public ItomQwtPlot
         void stickPickerToSampleIdx(Picker *m, int idx, int dir);
         void updatePickerPosition(bool updatePositions, bool clear = false);
         void createActions();
+        ito::RetVal validateXVec(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec);
+        inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
 
         QList<QwtPlotCurve*> m_plotCurveItems;
         QList<QwtPlotCurveProperty*> m_plotCurvePropertyItems; //sychrone with m_plotCurveItems. Every item is derived from QObject and therefore propagate a Q_PROPERTY based set of properties for each curve!

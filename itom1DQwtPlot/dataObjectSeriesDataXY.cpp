@@ -166,7 +166,7 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
     }
 }
 
-RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, const ito::DataObject * xVec, QVector<QPointF> bounds, QVector<QPointF> boundsX)
+RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/)
 {
     DataObjectSeriesData::updateDataObject(dataObj, bounds);
     RetVal retval;
@@ -174,7 +174,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
     QRectF p;
     float right;
     cv::Mat *mat;
-    int pxX1, pxX2, pxY1, pxY2, pxX1x, pxX2x, pxY1x, pxY2x;
+    int pxX1x, pxX2x, pxY1x, pxY2x;
     std::string description, unit;
 
     if (dataObj == NULL || xVec == NULL)
@@ -204,25 +204,14 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             ++prependOneDimsX;
         }
 
-        QVector<QPointF> tmpBoundsX;
-        if (boundsX.size() == 3) // not sure if needed
-        {
-            m_dX.plane = boundsX[0].x();
-            m_dX.plane = dimsX > 2 ? std::min(m_dX.plane, xVec->getSize(dimsX - 3)) : 0;
-            m_dX.plane = std::max(m_dX.plane, 0);
-            tmpBoundsX.resize(2);
-            tmpBoundsX[0] = boundsX[1];
-            tmpBoundsX[1] = boundsX[2];
-        }
-        else
-        {
-            m_dX.plane = 0;
-            tmpBoundsX.resize(2);
-            tmpBoundsX[0].setX(xVec->getPixToPhys(dimsX - 1, 0, _unused));
-            tmpBoundsX[1].setX(xVec->getPixToPhys(dimsX - 1, width - 1, _unused));
-            tmpBoundsX[0].setY(xVec->getPixToPhys(dimsX - 2,  0 , _unused));
-            tmpBoundsX[1].setY(xVec->getPixToPhys(dimsX - 2, height-1, _unused));
-        }
+        QVector<QPointF> tmpBoundsX(2);
+
+        m_dX.plane = 0;
+        tmpBoundsX[0].setX(xVec->getPixToPhys(dimsX - 1, 0, _unused));
+        tmpBoundsX[1].setX(xVec->getPixToPhys(dimsX - 1, width - 1, _unused));
+        tmpBoundsX[0].setY(xVec->getPixToPhys(dimsX - 2,  0 , _unused));
+        tmpBoundsX[1].setY(xVec->getPixToPhys(dimsX - 2, height-1, _unused));
+        
         if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[m_dX.plane])->data)
             return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
 
