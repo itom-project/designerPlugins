@@ -78,7 +78,7 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_actMarker->setObjectName("actionMarker");
     m_actMarker->setCheckable(true);
     m_actMarker->setChecked(false);
-    m_actZoomToRect->setToolTip(tr("Show coordinates under mouse cursor"));
+    m_actMarker->setToolTip(tr("Show coordinates under mouse cursor"));
     m_actMarker->connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
 
     m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("Subplot Configuration..."), this);
