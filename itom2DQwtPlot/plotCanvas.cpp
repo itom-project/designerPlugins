@@ -734,7 +734,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
                 }
                 
             }
-            m_pData->m_valueLabelDObj = QString::fromStdString(descr);
+            m_pData->m_valueLabelDObj = QString::fromLatin1(descr.data());
 
             if (dims >= 2)
             {
