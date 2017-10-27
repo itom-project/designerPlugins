@@ -90,6 +90,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
 
+    Q_PROPERTY(QSharedPointer<ito::DataObject> xVector READ getXObj WRITE setXObj DESIGNABLE false USER false);
+
     Q_PROPERTY(bool antiAliased READ getAntiAliased WRITE setAntiAliased DESIGNABLE true USER true);
 	Q_PROPERTY(int legendLabelWidth READ getLegendLabelWidth WRITE setLegendLabelWidth USER true);
 	
@@ -377,6 +379,9 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
 		int getLegendLabelWidth() const;
 		void setLegendLabelWidth(const int& length);
+
+        void setXObj(QSharedPointer<ito::DataObject> obj);
+        QSharedPointer<ito::DataObject> getXObj();
 		
         friend Plot1DWidget;
 

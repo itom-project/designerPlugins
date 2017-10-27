@@ -740,6 +740,14 @@ void Itom1DQwtPlot::setLegendLabelWidth(const int& len)
 		updatePropertyDock();
 	}
 }
+void Itom1DQwtPlot::setXObj(QSharedPointer<ito::DataObject> obj)
+{
+    setAxisObj(obj, 1);
+}
+QSharedPointer<ito::DataObject> Itom1DQwtPlot::getXObj()
+{
+    return getAxisObj(1);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getLegendLabelWidth() const
 {

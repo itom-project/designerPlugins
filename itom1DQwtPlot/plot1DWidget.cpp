@@ -1605,11 +1605,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                             if (retval.containsError())
                             {
                                 xVec = NULL; //x-vector doesn't match
+                                emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(),5000);
                                 seriesData = new DataObjectSeriesData(1);
                                 seriesData->updateDataObject(dataObj, pts);
                             }
                             else
                             {
+                                if (retval.containsWarning())
+                                {
+                                    emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 5000);
+                                }
                                 seriesData = new DataObjectSeriesDataXY(1);
                                 QVector<QPointF> xpts;
                                 ((DataObjectSeriesDataXY*)(seriesData))->updateDataObject(dataObj, pts, xVec);
@@ -1974,7 +1979,7 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
                             {
                                 if (nrPointsX > nrPoints)
                                 {
-                                    retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                                    retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored.");
                                 }
                                 else
                                 {
@@ -1989,7 +1994,7 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
                             {
                                 if (nrPointsX > nrPoints)
                                 {
-                                    retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                                    retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored.");
                                 }
                                 else
                                 {
