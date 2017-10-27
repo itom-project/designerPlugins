@@ -98,7 +98,10 @@ public:
     bool plottingEnabled() const { return m_plottingEnabled; }
 
     ito::AbstractFigure::UnitLabelStyle unitLabelStyle() const { return m_unitLabelStyle; }
-    virtual void setUnitLabelStyle(ito::AbstractFigure::UnitLabelStyle style) { m_unitLabelStyle = style; };
+    virtual void setUnitLabelStyle(ito::AbstractFigure::UnitLabelStyle style) 
+	{ 
+		m_unitLabelStyle = style; 
+	};
 
     ItomQwtPlotEnums::ModificationModes shapeModificationModes() const { return m_shapeModificationModes; }
     void setShapeModificationModes(const ItomQwtPlotEnums::ModificationModes &modes);

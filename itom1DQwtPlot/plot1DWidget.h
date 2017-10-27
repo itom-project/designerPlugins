@@ -186,7 +186,6 @@ class Plot1DWidget : public ItomQwtPlot
         long m_lineCol;
         qreal m_lineWidth;
         Qt::PenStyle m_lineStyle;
-        ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
         bool m_antiAliased;
 
         int m_Curser[2];
