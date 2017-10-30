@@ -333,7 +333,7 @@ ito::RetVal Plot1DWidget::init(bool overwriteDesignableProperties)
     if (overwriteDesignableProperties)
     {
         m_legendFont  = QFont("Helvetica", 8); //designable
-        m_unitLabelStyle = ito::AbstractFigure::UnitLabelSlash; //designable
+        setUnitLabelStyle(ito::AbstractFigure::UnitLabelSlash); //designable
     }
 
     int buttonSet = buttonStyle(); //designable
@@ -366,7 +366,7 @@ ito::RetVal Plot1DWidget::init(bool overwriteDesignableProperties)
             m_filledColor = apiGetFigureSetting(parent(), "curveFillColor", m_filledColor, &retVal).value<QColor>(); //designable
             m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(apiGetFigureSetting(parent(), "curveFillAlpha", m_fillCurveAlpa, &retVal).value<int>()); //designable
 
-            m_unitLabelStyle = (ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", m_unitLabelStyle, &retVal).value<int>()); //designable
+			setUnitLabelStyle((ito::AbstractFigure::UnitLabelStyle)(apiGetFigureSetting(parent(), "unitLabelStyle", unitLabelStyle(), &retVal).value<int>())); //designable
 
             m_antiAliased = apiGetFigureSetting(parent(), "antiAliased", m_antiAliased, &retVal).value<bool>(); //designable
 
@@ -1553,8 +1553,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 if (numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
-                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
+                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(unitLabelStyle());
+                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(unitLabelStyle());
                 }
                 break;
 
@@ -1639,8 +1639,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 if (numCurves > 0)
                 {
                     seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
-                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
+                    m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(unitLabelStyle());
+                    m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(unitLabelStyle());
                 }
                 break;
             } 
@@ -1677,8 +1677,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             if (numCurves > 0)
             {
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
-                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
+                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(unitLabelStyle());
+                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(unitLabelStyle());
             }
         }
         else if (bounds.size() == 1) //point in third dimension
@@ -1707,8 +1707,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             if (numCurves > 0)
             {
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
-                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(m_unitLabelStyle);
-                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(m_unitLabelStyle);
+                m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(unitLabelStyle());
+                m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(unitLabelStyle());
             }
         }
 
