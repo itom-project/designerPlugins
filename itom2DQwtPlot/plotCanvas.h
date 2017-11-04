@@ -125,10 +125,10 @@ class PlotCanvas : public ItomQwtPlot
         void synchronizeScaleValues();
         void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
         void setColorBarVisible(bool visible);
-        bool setColorMap(QString colormap = "__next__");
+        bool setColorMap(const QString &colormap = "__next__");
         inline QString colorMapName() const { return m_colorMapName; }
 
-        bool setOverlayColorMap(QString colormap = "__next__");
+        bool setOverlayColorMap(const QString &colormap = "__next__");
         inline QString colorOverlayMapName() const { return m_colorOverlayMapName; }
 
         void refreshStyles(bool overwriteDesignableProperties);

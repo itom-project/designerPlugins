@@ -944,7 +944,7 @@ void PlotCanvas::internalDataUpdated()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
+bool PlotCanvas::setColorMap(const QString &colormap /*= "__next__"*/)
 {
     ItomColorMap *colorMap = NULL;
 	ItomColorMap *colorBarMap = NULL;
@@ -1070,7 +1070,7 @@ bool PlotCanvas::setColorMap(QString colormap /*= "__next__"*/)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool PlotCanvas::setOverlayColorMap(QString colormap /*= "__next__"*/)
+bool PlotCanvas::setOverlayColorMap(const QString &colormap /*= "__next__"*/)
 {
     QwtLinearColorMap *colorMap = NULL;
     ito::ItomPalette newPalette;
