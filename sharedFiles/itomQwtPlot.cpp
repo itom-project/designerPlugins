@@ -1192,7 +1192,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                 event->ignore();
             }
         }
-        else if (m_selectedShapeHitType > 0) //rescale
+        else if (m_selectedShapeHitType > 0) //rescale or rotation
         {
             if (event->modifiers() == Qt::ControlModifier && \
                 (m_selectedShape->getShape().type() == ito::Shape::Point || \
@@ -1211,7 +1211,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
             }
 
             //todo: line + alt: leep line size constant
-            if (m_selectedShape->shapeResize(m_selectedShapeHitType, mousePosScale - m_startMouseScaleDiff, event->modifiers()))
+            if (m_selectedShape->shapeResizeOrRotate(m_selectedShapeHitType, mousePosScale - m_startMouseScaleDiff, event->modifiers()))
             {
                 event->accept();
             }

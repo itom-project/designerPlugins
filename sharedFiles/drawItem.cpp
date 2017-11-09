@@ -581,7 +581,7 @@ bool DrawItem::shapeMoveTo(const QPointF &marker1ScaleCoordinate)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers /*= Qt::NoModifier*/)
+bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers /*= Qt::NoModifier*/)
 {
     bool resizeable = !(d->m_shape.flags() & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
     if (resizeable)
@@ -686,8 +686,34 @@ bool DrawItem::shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, 
 
                     case 9: // rotation
                     {
+                        QPointF diffScreen;
+                        QPointF centerScale = d->m_shape.centerPoint();
+
+                        QwtPlot *canvas = plot();
+                        if (canvas)
+                        {
+                            
+                            diffScreen = QPointF(canvas->transform(QwtPlot::xBottom, markerScaleCoordinate.x()), canvas->transform(QwtPlot::yLeft, markerScaleCoordinate.y())) - \
+                                QPointF(canvas->transform(QwtPlot::xBottom, centerScale.x()), canvas->transform(QwtPlot::yLeft, centerScale.y()));
+                        }
+                        else
+                        {
+                            diffScreen = markerScaleCoordinate - centerScale;
+                        }
+                        
+                        qDebug() << d->m_shape.rotationAngleRad() << atan2(diffScreen.y(), diffScreen.x()) << d->m_shape.rotationAngleRad() - atan2(diffScreen.y(), diffScreen.x());
                         float angle = d->m_shape.rotationAngleRad()
-                            + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
+                            + (+atan2(diffScreen.y(), diffScreen.x()) - d->m_shape.rotationAngleRad() - (M_PI / 2));
+
+                        if (modifiers & Qt::ShiftModifier)
+                        {
+                            //round to 22.5deg steps
+                            float stepSize = (22.5 * (float)M_PI / 180.0);
+                            angle = stepSize * (qRound(angle / stepSize));
+                        }
+
+                        //float angle = d->m_shape.rotationAngleRad()
+                        //    + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
                         d->m_shape.rtransform().reset();
                         d->m_shape.rtransform().translate(d->m_shape.centerPoint().x(), d->m_shape.centerPoint().y());
                         d->m_shape.rtransform().rotate(angle / M_PI * 180.0, Qt::ZAxis);

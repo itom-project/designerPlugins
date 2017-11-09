@@ -223,7 +223,7 @@ private:
     //geometric shapes
     QMap<int, DrawItem *> m_pShapes; /*!< map table with all geometric shapes (besides marker sets) currently displayed (lookup is sorted by the integer index) */
     DrawItem *m_selectedShape;
-    char m_selectedShapeHitType; /*!< 0: edge only, 1..8 marker number */
+    char m_selectedShapeHitType; /*!< 0: edge only, 1..8 marker number, 9 rotation marker */
     QPointF m_startMouseScale; /*!< position of mouse click on mousePressEvent based on scale coordinate system */
     QPoint m_startMousePx; /*!< position of mouse click on mousePressEvent based on screen coordinate system */
     QPointF m_startMouseScaleDiff; /*!< difference from startMouseScale to marker1..marker8 (edge is marker1, too)*/
