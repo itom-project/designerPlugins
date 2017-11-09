@@ -64,7 +64,7 @@ class DrawItem : public QwtPlotShapeItem
         QPointF getMarkerPosScale(int index) const;
 
         bool shapeMoveTo(const QPointF &marker1ScaleCoordinate);
-        bool shapeResize(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers = Qt::NoModifier);
+        bool shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers = Qt::NoModifier);
 
         char hitEdge(const QPointF &point, double tol_x, double tol_y) const;
         bool hitLine(const QPointF &point_transformed, const QLineF &line, double tol_x, double tol_y) const;
