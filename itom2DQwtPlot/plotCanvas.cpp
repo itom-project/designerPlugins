@@ -388,6 +388,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
         selectionPen.setColor(inverseColor0());
         //trackerPen.setColor(inverseColor0());
         centerMarkerPen.setColor(inverseColor0());
+        zStackMarkerPen.setColor(inverseColor1());
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
