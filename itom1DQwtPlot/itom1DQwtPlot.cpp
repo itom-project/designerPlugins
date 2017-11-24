@@ -254,7 +254,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 
     if (m_pInput["xVec"]->getVal<ito::DataObject*>())
     {
-        //m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
+ 
     }
     if (m_pInput["source"]->getVal<ito::DataObject*>())
     {

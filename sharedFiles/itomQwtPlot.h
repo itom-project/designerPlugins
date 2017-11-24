@@ -267,6 +267,7 @@ private:
     ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
 
     QPrinter *m_pPrinter;
+    
 
     
 public slots:

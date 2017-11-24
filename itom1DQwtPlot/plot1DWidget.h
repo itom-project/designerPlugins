@@ -306,7 +306,8 @@ struct InternalData
         m_pickerLabelVisible(false),
         m_pickerLabelOrientation(Qt::Horizontal),
         m_pickerLabelAlignment(Qt::AlignRight),
-        m_lineSymbole(QwtSymbol::NoSymbol)
+        m_lineSymbole(QwtSymbol::NoSymbol),
+        m_axisState(ItomQwtPlotEnums::evenlySpaced)
     {
     }
 
@@ -356,6 +357,7 @@ struct InternalData
     
     QwtSymbol::Style m_lineSymbole;
     int m_lineSymboleSize;
+    int m_axisState; /*!< indicates if there is an object for axis scaling or if the values are evenly space (default). */
 };
 
 #endif

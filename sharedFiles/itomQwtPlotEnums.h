@@ -63,6 +63,14 @@ public:
     };
     Q_DECLARE_FLAGS(ModificationModes, ModificationMode)
     
+    enum AxisState 
+    {
+        evenlySpaced = 0x0001,
+        xAxisObject = 0x00002,
+        yAxisObject = 0x00004,
+        noPerfektFit = 0x0008,
+        mismatch = 0x0010
+    };
     enum MultiLineMode { AutoRowCol, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
     enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
     enum DataChannel 
@@ -98,6 +106,7 @@ public:
 #if QT_VERSION >= 0x050500
     //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
     //values are always accessible.
+
     Q_ENUM(ComplexType);
     Q_ENUM(ShapeType);
     Q_ENUM(PlotPickerType);
@@ -107,6 +116,7 @@ public:
     Q_ENUM(CurveStyle);
     Q_ENUM(FillCurveStyle);
     Q_ENUM(ScaleEngine);
+    Q_ENUM(AxisState);
 
     Q_FLAG(ModificationModes)
     Q_FLAG(ShapeTypes)

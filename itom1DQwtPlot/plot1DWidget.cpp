@@ -1159,6 +1159,7 @@ void Plot1DWidget::updateLabels()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*=NULL*/)
 {
+    ito::RetVal retval(ito::retOk);
     DataObjectSeriesData* seriesData = NULL;
     int colorIndex;
     int numCurves = 1;
@@ -1592,33 +1593,45 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         pts[0].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));
                         pts[1].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));               
                     }
-
+                    int previousAxisState = m_pData->m_axisState;
+                    if (xVec) //we need to check if the dataObject is valid
+                    {
+                        m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject;
+                        retval += validateXVec(dataObj, pts, xVec);
+                        if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch)||(m_pData->m_axisState & ItomQwtPlotEnums::noPerfektFit))
+                        {
+                            emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 5000);
+                        }
+                        if (m_pData->m_axisState & ItomQwtPlotEnums::mismatch)
+                        {
+                            xVec = NULL;
+                            m_pData->m_axisState = ItomQwtPlotEnums::evenlySpaced; //since the xVec does not fit we go back to evenlyspaced plot
+                        }
+                    }
+                    else
+                    {
+                        m_pData->m_axisState = ItomQwtPlotEnums::evenlySpaced;
+                    }
                     if (seriesData && seriesData->isDobjInit())
                     {
-                        seriesData->updateDataObject(dataObj, pts);
+                        if (m_pData->m_axisState & ItomQwtPlotEnums::evenlySpaced)
+                        {
+                            seriesData->updateDataObject(dataObj, pts);
+                        }
+                        else if(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject)
+                        {
+                            seriesData->updateDataObject(dataObj, pts, xVec);
+                        }
                     }
                     else
                     {
                         if (xVec)
                         {
-                            ito::RetVal retval(validateXVec(dataObj, pts, xVec));
-                            if (retval.containsError())
-                            {
-                                xVec = NULL; //x-vector doesn't match
-                                emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(),5000);
-                                seriesData = new DataObjectSeriesData(1);
-                                seriesData->updateDataObject(dataObj, pts);
-                            }
-                            else
-                            {
-                                if (retval.containsWarning())
-                                {
-                                    emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 5000);
-                                }
-                                seriesData = new DataObjectSeriesDataXY(1);
-                                QVector<QPointF> xpts;
-                                ((DataObjectSeriesDataXY*)(seriesData))->updateDataObject(dataObj, pts, xVec);
-                            }
+                            seriesData = new DataObjectSeriesDataXY(1);
+                            QVector<QPointF> xpts;
+                            ((DataObjectSeriesDataXY*)(seriesData))->updateDataObject(dataObj, pts, xVec);
+                            m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject;
+                            
                         }
                         else 
                         {
@@ -1872,6 +1885,7 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
             if ((dims - prependedOneDims) != 2 && (dims - prependedOneDims) != 3)
             {
                 retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
+                m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
             }
             else
             {
@@ -1911,6 +1925,7 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
                 else
                 {
                     retval += RetVal(retError, 0, "assignment of a x-vector to a line cut is not implemented yet");
+                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                 }
             }
             break;
@@ -1918,6 +1933,7 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
             if ((dims - prependedOneDims) != 3)
             {
                 retval += RetVal(retError, 0, "line plot in z-direction requires a 3-dim dataObject");
+                m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                 return retval;
             }
             else
@@ -1939,10 +1955,9 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
             tmpBoundsX[1].setY(xVec->getPixToPhys(dimsX - 2, height - 1, _unused));
 
             if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[planeX])->data)
-                retval += ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
-            if (tmpBoundsX.size() != 2)
             {
-                retval += RetVal(retError, 0, "bounds vector must have 2 entries");
+                retval += ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
+                m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
             }
             if (!retval.containsError())
             {
@@ -1950,10 +1965,12 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
                 if ((dimsX - prependOneDimsX) != 2)//check if xVec is 2d
                 {
                     retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject or the first (n-2) dimension must have a size of 1 for representing x-vector");
+                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                 }
                 else if (xVec->getSize(dimsX - 2) != 1)//check if first dimension of xVec is of shape 1
                 {
                     retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject with a size of 1 for the first dimension");
+                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                 }
                 if (!retval.containsError())
                 {
@@ -1980,10 +1997,12 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
                                 if (nrPointsX > nrPoints)
                                 {
                                     retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored.");
+                                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::noPerfektFit;
                                 }
                                 else
                                 {
                                     retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+                                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                                 }
                             }
                         }
@@ -1995,11 +2014,12 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
                                 if (nrPointsX > nrPoints)
                                 {
                                     retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored.");
+                                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::noPerfektFit;
                                 }
                                 else
                                 {
                                     retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
-
+                                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                                 }
                             }
                         }

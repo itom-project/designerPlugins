@@ -177,7 +177,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
     int pxX1x, pxX2x, pxY1x, pxY2x;
     std::string description, unit;
 
-    if (dataObj == NULL || xVec == NULL)
+    if (dataObj == NULL )
     {
         //data representing xObj
         m_dX.plane = 0;
@@ -187,7 +187,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         m_dX.matSteps.clear();
         m_dX.valid = false;
     }
-    else
+    if(xVec != NULL)
     {
         int dimsX = xVec->getDims();
         int width = dimsX > 0 ? xVec->getSize(dimsX - 1) : 0;
