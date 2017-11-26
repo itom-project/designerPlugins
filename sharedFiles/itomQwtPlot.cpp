@@ -1000,7 +1000,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
         double tol_x = std::abs(invTransform(QwtPlot::xBottom, 15) - invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
         double tol_y = std::abs(invTransform(QwtPlot::yLeft, 15) - invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
         ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
-        char hitType = -1; //not hit
+        int hitType = DrawItem::hitNone; //not hit
         bool currentShapeFound = false;
 
         //at first check if the currently selected item is hit: If so, take this; else take any other item
@@ -1017,7 +1017,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
             }
         }
 
-        if (hitType == -1) //current shape is not hit, reset it to begin()
+        if (hitType == DrawItem::hitNone) //current shape is not hit, reset it to begin()
         {
             it = m_pShapes.begin();
         }
@@ -1029,16 +1029,18 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                 continue;
             }
 
-            if (hitType < 0)
+            if (hitType == DrawItem::hitNone)
+            {
                 hitType = it.value()->hitEdge(scalePos, tol_x, tol_y);
+            }
 
-            if (hitType >= 0)
+            if (hitType != DrawItem::hitNone)
             {
                 // hit a line of a polygon with shift key pressed, then we add a new point to the line
-                if (hitType == 0 && event->modifiers() == Qt::ShiftModifier && it.value()->getShape().type() == ito::Shape::Polygon)
+                if (hitType == DrawItem::hitMove && event->modifiers() == Qt::ShiftModifier && it.value()->getShape().type() == ito::Shape::Polygon)
                 {
                     DrawItem *ditem = it.value();
-                    ito::Shape shape = ditem->getShape();
+                    const ito::Shape &shape = ditem->getShape();
                     int closed = shape.unclosed();
                     int hitLine;
                     for (int i = 0; i < shape.basePoints().size() - closed; i++)
@@ -1051,11 +1053,21 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                     }
                     QPolygonF newBasePoints = shape.basePoints();
                     newBasePoints.insert(hitLine + 1, scalePos);
-                    shape = ito::Shape(ito::Shape::Polygon, shape.flags(), newBasePoints, shape.index(), shape.transform());
-                    ditem->setShape(shape);
+                    ditem->setShape(ito::Shape(ito::Shape::Polygon, shape.flags(), newBasePoints, shape.index(), shape.transform()));
                 }
 
-                it.value()->setSelected(true, hitType - 1);
+                if (hitType == DrawItem::hitMove)
+                {
+                    it.value()->setSelected(true, -1);
+                }
+                else if (hitType >= DrawItem::hitResize)
+                {
+                    it.value()->setSelected(true, hitType - DrawItem::hitResize);
+                }
+                else if (hitType <= DrawItem::hitRotation)
+                {
+                    it.value()->setSelected(true, DrawItem::hitRotation - hitType);
+                }
 
                 if (m_selectedShape != it.value())
                 {
@@ -1071,13 +1083,17 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                 m_mouseDragReplotCounter = 0;
                 currentShapeFound = true;
 
-                if (hitType == 0)
+                if (hitType == DrawItem::hitMove)
                 {
                     m_startMouseScaleDiff = m_startMouseScale - m_selectedShape->getMarkerPosScale(0);
                 }
-                else
+                else if (hitType >= DrawItem::hitResize)
                 {
-                    m_startMouseScaleDiff = m_startMouseScale - m_selectedShape->getMarkerPosScale(hitType - 1);
+                    m_startMouseScaleDiff = m_startMouseScale - m_selectedShape->getMarkerPosScale(hitType - DrawItem::hitResize);
+                }
+                else if (hitType <= DrawItem::hitRotation)
+                {
+                    m_startMouseScaleDiff = m_startMouseScale - m_selectedShape->getMarkerPosScale(DrawItem::hitRotation - hitType);
                 }
                 ++it; //such that the following for loop does not affect the newly selected item.
                 break;
@@ -1096,7 +1112,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
             }
 
             m_selectedShape = NULL;
-            m_selectedShapeHitType = -1;
+            m_selectedShapeHitType = DrawItem::hitNone;
         }
 
         for (; it != m_pShapes.end(); ++it)
@@ -1136,7 +1152,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
             if (m_pShapes.size() > 0 && m_currentShapeIndices.size() > 0 
                 && m_pShapes[m_currentShapeIndices[0]]->getShape().type() == ito::Shape::Polygon)
             {
-                ito::Shape thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
+                const ito::Shape &thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
                 QPolygonF poly = thisShape.basePoints();
                 int canxpos = event->x() - canvas()->x();
                 int canypos = event->y() - canvas()->y();
@@ -1167,7 +1183,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
     {
         QPointF mousePosScale(invTransform(QwtPlot::xBottom, event->x() - canvas()->x()), invTransform(QwtPlot::yLeft, event->y() - canvas()->y()));
 
-        if (m_selectedShapeHitType == 0) //mouse move
+        if (m_selectedShapeHitType == DrawItem::hitMove) //mouse move
         {
             if (event->modifiers() == Qt::ControlModifier)
             {
@@ -1192,7 +1208,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                 event->ignore();
             }
         }
-        else if (m_selectedShapeHitType > 0) //rescale or rotation
+        else if ((m_selectedShapeHitType >= DrawItem::hitResize) || (m_selectedShapeHitType <= DrawItem::hitRotation)) //rescale or rotation
         {
             if (event->modifiers() == Qt::ControlModifier && \
                 (m_selectedShape->getShape().type() == ito::Shape::Point || \
@@ -1210,7 +1226,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                 }
             }
 
-            //todo: line + alt: leep line size constant
+            //todo: line + alt: keep line size constant
             if (m_selectedShape->shapeResizeOrRotate(m_selectedShapeHitType, mousePosScale - m_startMouseScaleDiff, event->modifiers()))
             {
                 event->accept();
@@ -1411,7 +1427,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     newItem->attach(this);
                     newItem->setSelected(true);
                     m_selectedShape = newItem;
-                    m_selectedShapeHitType = 0;
+                    m_selectedShapeHitType = DrawItem::hitMove;
                     m_pShapes.insert(newItem->getIndex(), newItem);
                     m_currentShapeIndices.append(newItem->getIndex());
                     emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
@@ -1500,7 +1516,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     newItem->attach(this);
                     newItem->setSelected(true);
                     m_selectedShape = newItem;
-                    m_selectedShapeHitType = 0;
+                    m_selectedShapeHitType = DrawItem::hitMove;
                     m_pShapes.insert(newItem->getIndex(), newItem);
                     m_currentShapeIndices.append(newItem->getIndex());
                     emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
@@ -1584,7 +1600,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     newItem->attach(this);
                     newItem->setSelected(true);
                     m_selectedShape = newItem;
-                    m_selectedShapeHitType = 0;
+                    m_selectedShapeHitType = DrawItem::hitMove;
                     m_pShapes.insert(newItem->getIndex(), newItem);
                     m_currentShapeIndices.append(newItem->getIndex());
                     emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
@@ -1668,7 +1684,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     newItem->attach(this);
                     newItem->setSelected(true);
                     m_selectedShape = newItem;
-                    m_selectedShapeHitType = 0;
+                    m_selectedShapeHitType = DrawItem::hitMove;
                     m_pShapes.insert(newItem->getIndex(), newItem);
                     m_currentShapeIndices.append(newItem->getIndex());
                     emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
@@ -1752,7 +1768,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     newItem->attach(this);
                     newItem->setSelected(true);
                     m_selectedShape = newItem;
-                    m_selectedShapeHitType = 0;
+                    m_selectedShapeHitType = DrawItem::hitMove;
                     m_pShapes.insert(newItem->getIndex(), newItem);
                     m_currentShapeIndices.append(newItem->getIndex());
                     emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
@@ -1836,7 +1852,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     newItem->attach(this);
                     newItem->setSelected(true);
                     m_selectedShape = newItem;
-                    m_selectedShapeHitType = 0;
+                    m_selectedShapeHitType = DrawItem::hitMove;
                     m_pShapes.insert(newItem->getIndex(), newItem);
                     m_currentShapeIndices.append(newItem->getIndex());
                     emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
@@ -1945,7 +1961,7 @@ void ItomQwtPlot::multiPointActivated(bool on)
                         newItem->attach(this);
                         newItem->setSelected(true);
                         m_selectedShape = newItem;
-                        m_selectedShapeHitType = 0;
+                        m_selectedShapeHitType = DrawItem::hitMove;
                         m_pShapes.insert(newItem->getIndex(), newItem);
                         m_currentShapeIndices.append(newItem->getIndex());
                         emit p->geometricShapeAdded(newItem->getIndex(), newItem->getShape());
@@ -2330,7 +2346,7 @@ void ItomQwtPlot::clearAllGeometricShapes()
             emit p->geometricShapeCurrentChanged(ito::Shape());
         }
         m_selectedShape = NULL;
-        m_selectedShapeHitType = -1;
+        m_selectedShapeHitType = DrawItem::hitNone;
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
@@ -2355,7 +2371,7 @@ ito::RetVal ItomQwtPlot::deleteGeometricShape(const int idx)
                 emit p->geometricShapeCurrentChanged(ito::Shape());
             }
             m_selectedShape = NULL;
-            m_selectedShapeHitType = -1;
+            m_selectedShapeHitType = DrawItem::hitNone;
         }
 
         delItem->detach();
@@ -2461,7 +2477,7 @@ void ItomQwtPlot::setSelectedGeometricShapeIdx(int idx)
                 }
             }
             m_selectedShape = it.value();
-            m_selectedShapeHitType = 0;
+            m_selectedShapeHitType = DrawItem::hitMove;
             it.value()->setSelected(true);
             failed = false;
             do_replot = true;
@@ -2486,7 +2502,7 @@ void ItomQwtPlot::setSelectedGeometricShapeIdx(int idx)
             }
             m_selectedShape = NULL;
         }
-        m_selectedShapeHitType = -1;
+        m_selectedShapeHitType = DrawItem::hitNone;
         emit statusBarMessage(tr("Could not set active element, index out of range."), 12000);
     }
 }

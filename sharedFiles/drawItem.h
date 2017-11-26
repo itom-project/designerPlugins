@@ -40,6 +40,14 @@ class DrawItemPrivate; //forward declaration
 class DrawItem : public QwtPlotShapeItem
 {
     public:
+        enum HitType
+        {
+            hitRotation = -2, /*rotation are all values <= hitRotation, the marker index, that was clicked to be rotated, is index = hitRotation - type*/
+            hitNone = -1,
+            hitMove = 0,
+            hitResize = 1, /*resize are all values >= hitResize, the marker index, that was clicked to be resized, is index = type - hitResize*/
+        };
+
         explicit DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal = NULL, bool labelVisible = false);
         virtual ~DrawItem();
         ito::RetVal setShape(const ito::Shape &shape);
@@ -64,9 +72,12 @@ class DrawItem : public QwtPlotShapeItem
         QPointF getMarkerPosScale(int index) const;
 
         bool shapeMoveTo(const QPointF &marker1ScaleCoordinate);
-        bool shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers = Qt::NoModifier);
+        bool shapeResizeOrRotate(int hitTypeAndMarkerIndex, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers = Qt::NoModifier);
 
-        char hitEdge(const QPointF &point, double tol_x, double tol_y) const;
+        //returns -1 if not hit, 0: if contour hit for moving (only if moving is allowed) or 1..8 if markers hit for resizing (only if resizing is allowed), -2 if rotation marker hit (only if rotating is allowed)
+        //the return values are values from the enumeration HitType (all hits to resize corner points are hitResize + X)
+        int hitEdge(const QPointF &point, double tol_x, double tol_y) const;
+
         bool hitLine(const QPointF &point_transformed, const QLineF &line, double tol_x, double tol_y) const;
 
         void setLabelVisible(const bool labelVisible);
