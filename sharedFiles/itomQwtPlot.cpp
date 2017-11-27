@@ -110,7 +110,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pPrinter(NULL),
     m_shapeModifiedByMouseMove(false),
     m_geometricShapeOpacity(0),
-    m_geometricShapeOpacitySelected(0)
+    m_geometricShapeOpacitySelected(0),
+	m_mouseCatchTolerancePx(8)
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -962,12 +963,23 @@ void ItomQwtPlot::keyPressEvent(QKeyEvent * event)
 
         if (indices_to_delete.size() == 1 && m_pShapes[indices_to_delete[0]]->getShape().type() == ito::Shape::Polygon)
         {
-            ito::Shape shape = m_pShapes[indices_to_delete[0]]->getShape();
-            QPolygonF newBasePoints = shape.basePoints();
-            newBasePoints.remove(m_pShapes[indices_to_delete[0]]->getSelectedMarker());
-            ito::Shape newShape(ito::Shape::Polygon, shape.flags(), newBasePoints, shape.index(), shape.transform());
-            m_pShapes[indices_to_delete[0]]->setShape(newShape);
-            replot();
+            const ito::Shape &shape = m_pShapes[indices_to_delete[0]]->getShape();
+			QPolygonF newBasePoints = shape.basePoints();
+			int marker_index = m_pShapes[indices_to_delete[0]]->getSelectedMarker();
+
+			if (marker_index >= 0 && marker_index < newBasePoints.size())
+			{
+				//delete single point
+				newBasePoints.remove(marker_index);
+				ito::Shape newShape(ito::Shape::Polygon, shape.flags(), newBasePoints, shape.index(), shape.transform());
+				m_pShapes[indices_to_delete[0]]->setShape(newShape);
+				replot();
+			}
+			else
+			{
+				//delete entire polygon
+				deleteGeometricShape(indices_to_delete[0]);
+			}
         }
         else
         {
@@ -997,8 +1009,8 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
         int canxpos = event->x() - canvas()->x();
         int canypos = event->y() - canvas()->y();
         QPointF scalePos(invTransform(QwtPlot::xBottom, canxpos), invTransform(QwtPlot::yLeft, canypos));
-        double tol_x = std::abs(invTransform(QwtPlot::xBottom, 15) - invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
-        double tol_y = std::abs(invTransform(QwtPlot::yLeft, 15) - invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
+        double tol_x_scale = std::abs(invTransform(QwtPlot::xBottom, m_mouseCatchTolerancePx) - invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
+        double tol_y_scale = std::abs(invTransform(QwtPlot::yLeft, m_mouseCatchTolerancePx) - invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
         ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
         int hitType = DrawItem::hitNone; //not hit
         bool currentShapeFound = false;
@@ -1011,7 +1023,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
             {
                 if (it.value() == m_selectedShape)
                 {
-                    hitType = it.value()->hitEdge(scalePos, tol_x, tol_y);
+                    hitType = it.value()->hitEdge(scalePos, tol_x_scale, tol_y_scale);
                     break;
                 }
             }
@@ -1031,7 +1043,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
 
             if (hitType == DrawItem::hitNone)
             {
-                hitType = it.value()->hitEdge(scalePos, tol_x, tol_y);
+                hitType = it.value()->hitEdge(scalePos, tol_x_scale, tol_y_scale);
             }
 
             if (hitType != DrawItem::hitNone)
@@ -1045,7 +1057,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
                     int hitLine;
                     for (int i = 0; i < shape.basePoints().size() - closed; i++)
                     {
-                        if (ditem->hitLine(scalePos, QLineF(shape.basePoints()[i], shape.basePoints()[(i + 1) % shape.basePoints().size()]), tol_x, tol_y))
+                        if (ditem->hitLine(scalePos, QLineF(shape.basePoints()[i], shape.basePoints()[(i + 1) % shape.basePoints().size()]), tol_x_scale, tol_y_scale))
                         {
                             hitLine = i;
                             break;
@@ -1911,19 +1923,23 @@ void ItomQwtPlot::multiPointActivated(bool on)
                     if (m_currentShapeIndices.size() > 0)
                     {
                         //polygonScale.pop_back(); // remove current cursor position
-                        ito::Shape thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
+                        const ito::Shape &thisShape = m_pShapes[m_currentShapeIndices[0]]->getShape();
                         QPolygonF poly = thisShape.basePoints();
 
                         // added new point close to starting point, then we assume editing is finished
-                        if (abs(poly[0].x() - polygonScale.back().x()) < 5 && abs(poly[0].y() - polygonScale.back().y()) < 5)
+
+						double tol_x_scale = std::abs(invTransform(QwtPlot::xBottom, m_mouseCatchTolerancePx) - invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
+						double tol_y_scale = std::abs(invTransform(QwtPlot::yLeft, m_mouseCatchTolerancePx) - invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
+
+                        if (abs(poly[0].x() - polygonScale.back().x()) < tol_x_scale && abs(poly[0].y() - polygonScale.back().y()) < tol_y_scale)
                         {
                             closePolygon(aborted);
                             break;
                         }
                         poly.append(polygonScale.back());
-                        thisShape = thisShape.fromPolygon(poly, thisShape.index());
-                        thisShape.setUnclosed(true);
-                        m_pShapes[m_currentShapeIndices[0]]->setShape(thisShape);
+                        ito::Shape newShape = ito::Shape::fromPolygon(poly, thisShape.index());
+						newShape.setUnclosed(true);
+                        m_pShapes[m_currentShapeIndices[0]]->setShape(newShape);
                         emit p->geometricShapeCurrentChanged(m_pShapes[m_currentShapeIndices[0]]->getShape());
                     }
                     else
