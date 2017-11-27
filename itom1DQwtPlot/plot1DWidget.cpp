@@ -1616,11 +1616,29 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     {
                         if (m_pData->m_axisState & ItomQwtPlotEnums::evenlySpaced)
                         {
-                            seriesData->updateDataObject(dataObj, pts);
+                            if (previousAxisState & ItomQwtPlotEnums::evenlySpaced)
+                            {
+                                seriesData->updateDataObject(dataObj, pts);
+                            }
+                            else
+                            {
+                                seriesData = new DataObjectSeriesData(1);
+                                seriesData->updateDataObject(dataObj, pts);
+                                m_plotCurveItems[n]->setData(seriesData);
+                            }
                         }
                         else if(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject)
                         {
-                            seriesData->updateDataObject(dataObj, pts, xVec);
+                            if (previousAxisState & ItomQwtPlotEnums::xAxisObject)
+                            {
+                                seriesData->updateDataObject(dataObj, pts, xVec);
+                            }
+                            else
+                            {
+                                seriesData = new DataObjectSeriesDataXY(1);
+                                seriesData->updateDataObject(dataObj, pts, xVec);
+                                m_plotCurveItems[n]->setData(seriesData);
+                            }
                         }
                     }
                     else
