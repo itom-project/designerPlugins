@@ -39,6 +39,7 @@ DataObjectSeriesData::DataObjectSeriesData(const int fastmode) :
     m_cmplxState(ItomQwtPlotEnums::CmplxAbs),
     m_pDataObj(NULL),
     inSamplingMode(false),
+    hasXObj(false),
     m_colorState(grayColor)
 {
     m_d.nrPoints = 0;

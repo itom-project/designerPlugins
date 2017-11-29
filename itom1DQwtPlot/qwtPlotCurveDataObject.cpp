@@ -87,7 +87,7 @@ void QwtPlotCurveDataObject::draw( QPainter *painter, const QwtScaleMap &xMap, c
     {
         myData->beginSampling(xMap, yMap, canvasRect);
 
-        if ( testPaintAttribute(ClipPolygons) ) //d_data->paintAttributes & ClipPolygons )
+        if ( testPaintAttribute(ClipPolygons) && !myData->hasAxisObj()) // xy plot loses line between points inside and outside of the displayed area
         {
             QPoint indices = myData->indexRange(xMap, false);
             if (indices.ry() >= indices.rx())

@@ -1647,7 +1647,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         {
                             seriesData = new DataObjectSeriesDataXY(1);
                             QVector<QPointF> xpts;
-                            ((DataObjectSeriesDataXY*)(seriesData))->updateDataObject(dataObj, pts, xVec);
+                            seriesData->updateDataObject(dataObj, pts, xVec);
                             m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject;
                             
                         }

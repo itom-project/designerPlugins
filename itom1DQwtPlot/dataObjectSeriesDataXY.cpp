@@ -44,6 +44,7 @@ DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
     m_dX.nrPoints = 0;
     m_dX.points.clear();
     m_dX.valid = false;
+    hasXObj = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -99,7 +100,6 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
         break;
     }
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, const size_t &nrPoints)
 {
