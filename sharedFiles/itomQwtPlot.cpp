@@ -308,37 +308,37 @@ void ItomQwtPlot::createBaseActions()
 
     a = m_pMenuShapeType->addAction(tr("Point"));
     a->setData(ito::Shape::Point);
-    m_pMenuShapeType->addAction(a);
+    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Line"));
     a->setData(ito::Shape::Line);
-    m_pMenuShapeType->addAction(a);
+    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Rectangle"));
     a->setData(ito::Shape::Rectangle);
-    m_pMenuShapeType->addAction(a);
+    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Square"));
     a->setData(ito::Shape::Square);
-    m_pMenuShapeType->addAction(a);
+    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Ellipse"));
     a->setData(ito::Shape::Ellipse);
-    m_pMenuShapeType->addAction(a);
+    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Circle"));
     a->setData(ito::Shape::Circle);
-    m_pMenuShapeType->addAction(a);
+    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Polygon"));
     a->setData(ito::Shape::Polygon);
-    m_pMenuShapeType->addAction(a);
+    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     m_pActShapeType->setData(ito::Shape::Rectangle);

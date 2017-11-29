@@ -191,6 +191,7 @@ class PlotCanvas : public ItomQwtPlot
 
         QAction *m_pActScaleSettings; //
         QAction *m_pActColorPalette;  //
+		QMenu *m_pMenuColorPalette; //sub-menu for all available color palettes, will be created in init, when apis are available
         QAction *m_pActToggleColorBar;
         QAction *m_pActValuePicker;
         QAction *m_pActLineCut;
@@ -221,6 +222,7 @@ class PlotCanvas : public ItomQwtPlot
         void mnuCmplxSwitch(QAction*);
         void mnuDataChannel(QAction*);
         void mnuColorPalette();
+		void mnuGroupColorPalette(QAction*);
         void mnuToggleColorBar(bool checked);
         void mnuValuePicker(bool checked);
         void mnuLineCut(bool checked);
