@@ -331,7 +331,6 @@ void DataObjectSeriesDataXY::calcHash()
 
             ba.append(QByteArray().setNum(m->size[0]));
         }
-
         ba.append(QByteArray().setNum((uint)(m_dX.nrPoints)));
         ba.append(QByteArray().setNum(m_dX.startPx.x()));
         ba.append(QByteArray().setNum(m_dX.startPx.y()));

@@ -174,6 +174,7 @@ class Plot1DWidget : public ItomQwtPlot
         QwtLegend *m_pLegend;
         QStringList m_legendTitles;
         QByteArray m_hash; //hash of recently loaded dataObject
+        QByteArray m_hashX; //hash of recently loaded axisObject
 
         InternalData *m_pData;
 

@@ -48,7 +48,7 @@ public:
         QRectF boundingRect() const;
         LineData m_dX;
         QPointF sample(size_t n) const;
-
+        inline QByteArray getHash() const { return m_hash; }
 
 private:
 

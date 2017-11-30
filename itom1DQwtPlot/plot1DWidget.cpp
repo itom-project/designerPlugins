@@ -1752,8 +1752,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     if (seriesData)
     {
         QByteArray hash = seriesData->getHash();
-
-        if (hash != m_hash)
+        QByteArray hashX(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject ? seriesData->getHash() : "");
+        if (hash != m_hash || hashX != m_hashX)
         {
             updatePickerPosition(true);
 
@@ -1818,6 +1818,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
 
         m_hash = hash;
+        m_hashX = hashX;
 
 		if (dataObj && ((Itom1DQwtPlot*)(this->parent()))->dObjectWidget())
 		{

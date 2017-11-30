@@ -742,6 +742,7 @@ void Itom1DQwtPlot::setLegendLabelWidth(const int& len)
 }
 void Itom1DQwtPlot::setXObj(QSharedPointer<ito::DataObject> obj)
 {
+    d->m_pData->m_forceValueParsing = true;
     setAxisObj(obj, 1);
 }
 QSharedPointer<ito::DataObject> Itom1DQwtPlot::getXObj()
