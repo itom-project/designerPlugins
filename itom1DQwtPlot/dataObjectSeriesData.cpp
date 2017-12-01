@@ -88,7 +88,7 @@ bool DataObjectSeriesData::floatingPointValues() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectSeriesData::getPosToPix(const double phys)
+int DataObjectSeriesData::getPosToPix(const double phys) const
 {
     if (m_d.valid && m_d.nrPoints > 0)
     {

@@ -44,6 +44,9 @@ public:
         explicit DataObjectSeriesDataXY(const int fastmode);
         ~DataObjectSeriesDataXY();
         RetVal updateDataObject(const ito::DataObject* dataObj,QVector<QPointF> bounds, const ito::DataObject* xVec = NULL);
+        
+        int getPosToPix(const double phys) const;
+
         //size_t size() const;
         QRectF boundingRect() const;
         LineData m_dX;

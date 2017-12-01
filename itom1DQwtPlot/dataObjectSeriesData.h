@@ -110,7 +110,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         ito::DataObject getResampledDataObject();
 
-        int getPosToPix(const double phys);
+        virtual int getPosToPix(const double phys) const;
         
         QString getDObjValueLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle) const;
         QString getDObjAxisLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle)  const;
