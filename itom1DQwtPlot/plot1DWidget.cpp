@@ -1857,114 +1857,121 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
 
     if (dataObj != NULL || xVec != NULL)
     {
-        int dimsX = xVec->getDims();
-        int dims = dataObj->getDims();
-        int width = dimsX > 0 ? xVec->getSize(dimsX - 1) : 0;
-        int height = dimsX > 1 ? xVec->getSize(dimsX - 2) : (width == 0) ? 0 : 1;
+        if (xVec->getType() == ito::tComplex128 || xVec->getType() == ito::tComplex64 || xVec->getType() == ito::tRGBA32)
+        {
+            retval += ito::RetVal(ito::retError, 0, QObject::tr("wrong x-vector data type. Complex64 and RGBA32 are not supported.").toLatin1().data());
+            m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
+        }
+        if (!retval.containsError())
+        {
+            int dimsX = xVec->getDims();
+            int dims = dataObj->getDims();
+            int width = dimsX > 0 ? xVec->getSize(dimsX - 1) : 0;
+            int height = dimsX > 1 ? xVec->getSize(dimsX - 2) : (width == 0) ? 0 : 1;
 
-        int prependOneDimsX = 0;
-        int i;
-        for (i = 0; i < dimsX - 2; ++i)
-        {
-            if (xVec->getSize(i) != 1)
+            int prependOneDimsX = 0;
+            int i;
+            for (i = 0; i < dimsX - 2; ++i)
             {
-                break;
+                if (xVec->getSize(i) != 1)
+                {
+                    break;
+                }
+                ++prependOneDimsX;
             }
-            ++prependOneDimsX;
-        }
-        int prependedOneDims = 0;
-        for (int i = 0; i < dims - 2; i++)
-        {
-            if (dataObj->getSize(i) != 1)
+            int prependedOneDims = 0;
+            for (int i = 0; i < dims - 2; i++)
             {
-                break;
+                if (dataObj->getSize(i) != 1)
+                {
+                    break;
+                }
+                prependedOneDims++;
             }
-            prependedOneDims++;
-        }
-        QVector<QPointF> tmpBounds;
-        if (bounds.size() == 3)
-        {
-            plane = bounds[0].x();
-            plane = dims > 2 ? std::min(plane, dataObj->getSize(dims - 3)) : 0;
-            plane = std::max(plane, 0);
-            tmpBounds.resize(2);
-            tmpBounds[0] = bounds[1];
-            tmpBounds[1] = bounds[2];
-        }
-        else
-        {
-            plane = 0;
-            tmpBounds = bounds;
-        }
-        if (!dataObj->get_mdata() || !(cv::Mat*)(dataObj->get_mdata()[plane])->data)
-            return ito::RetVal(ito::retError, 0, QObject::tr("cv:Mat in data object seems corrupted").toLatin1().data());
-        switch (tmpBounds.size())
-        {
-        case 2:
-            if ((dims - prependedOneDims) != 2 && (dims - prependedOneDims) != 3)
+            QVector<QPointF> tmpBounds;
+            if (bounds.size() == 3)
             {
-                retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
-                m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
+                plane = bounds[0].x();
+                plane = dims > 2 ? std::min(plane, dataObj->getSize(dims - 3)) : 0;
+                plane = std::max(plane, 0);
+                tmpBounds.resize(2);
+                tmpBounds[0] = bounds[1];
+                tmpBounds[1] = bounds[2];
             }
             else
             {
-                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
-                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
-                pxX2 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[1].x(), _unused));
-                pxY2 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[1].y(), _unused));
-
-                saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
-                saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
-                saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
-                saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
-
-                mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(plane)]; //first plane in ROI
-                if (pxX1 == pxX2) //pure line in y-direction
+                plane = 0;
+                tmpBounds = bounds;
+            }
+            if (!dataObj->get_mdata() || !(cv::Mat*)(dataObj->get_mdata()[plane])->data)
+                return ito::RetVal(ito::retError, 0, QObject::tr("cv:Mat in data object seems corrupted").toLatin1().data());
+            switch (tmpBounds.size())
+            {
+            case 2:
+                if ((dims - prependedOneDims) != 2 && (dims - prependedOneDims) != 3)
                 {
-                    if (pxY2 >= pxY1)
-                    {
-                        nrPoints = 1 + pxY2 - pxY1;
-                    }
-                    else
-                    {
-                        nrPoints = 1 + pxY1 - pxY2;
-                    }
-                }
-                else if (pxY1 == pxY2)//pure line in x-direction
-                {
-                    if (pxX2 >= pxX1)
-                    {
-                        nrPoints = 1 + pxX2 - pxX1;
-                    }
-                    else
-                    {
-                        nrPoints = 1 + pxX1 - pxX2;
-                    }
+                    retval += RetVal(retError, 0, "line plot requires a 2-dim dataObject or the first (n-2) dimensions must have a size of 1");
+                    m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                 }
                 else
                 {
-                    retval += RetVal(retError, 0, "assignment of a x-vector to a line cut is not implemented yet");
+                    pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
+                    pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
+                    pxX2 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[1].x(), _unused));
+                    pxY2 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[1].y(), _unused));
+
+                    saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+                    saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+                    saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
+                    saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
+
+                    mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(plane)]; //first plane in ROI
+                    if (pxX1 == pxX2) //pure line in y-direction
+                    {
+                        if (pxY2 >= pxY1)
+                        {
+                            nrPoints = 1 + pxY2 - pxY1;
+                        }
+                        else
+                        {
+                            nrPoints = 1 + pxY1 - pxY2;
+                        }
+                    }
+                    else if (pxY1 == pxY2)//pure line in x-direction
+                    {
+                        if (pxX2 >= pxX1)
+                        {
+                            nrPoints = 1 + pxX2 - pxX1;
+                        }
+                        else
+                        {
+                            nrPoints = 1 + pxX1 - pxX2;
+                        }
+                    }
+                    else
+                    {
+                        retval += RetVal(retError, 0, "assignment of a x-vector to a line cut is not implemented yet");
+                        m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
+                    }
+                }
+                break;
+            case 1:
+                if ((dims - prependedOneDims) != 3)
+                {
+                    retval += RetVal(retError, 0, "line plot in z-direction requires a 3-dim dataObject");
                     m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
+                    return retval;
+                }
+                else
+                {
+                    pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
+                    pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
+
+                    saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+                    saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+                    nrPoints = dataObj->getSize(dims - 3);
                 }
             }
-            break;
-        case 1:
-            if ((dims - prependedOneDims) != 3)
-            {
-                retval += RetVal(retError, 0, "line plot in z-direction requires a 3-dim dataObject");
-                m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
-                return retval;
-            }
-            else
-            {
-                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
-                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
-
-                saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
-                saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
-                nrPoints = dataObj->getSize(dims - 3);
-            }
-        }
             QVector<QPointF> tmpBoundsX(2);
 
             planeX = 0;
@@ -2045,7 +2052,8 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, QVector<Q
                     }
                 }
             }
-        
+
+        }
     }
     return retval;
 }
