@@ -482,8 +482,10 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
         return rect;
     }
 }
-template<typename _Tp> int closestIdx(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d,  const size_t &nrPoints, const double &val)
+template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const ito::DataObject *obj,  const QPointF& val)
 {
+    const DataObjectSeriesData::LineData& d= data->m_dX;
+    const size_t& nrPoints = data->size();
     int layer = obj->seekMat(0);
     int dims = obj->getDims();
     int width = obj->getSize(dims - 1);
@@ -495,15 +497,13 @@ template<typename _Tp> int closestIdx(const ito::DataObject *obj, const DataObje
     double dif;
     double previous = INFINITY;
     rowPtr = (_Tp*)mat->ptr(d.startPx.y());
+    QPointF currentVal;
     for (col = 0; col < width; ++col) //search along one row
     {
-            
-        dif =rowPtr[col]-val;
+        currentVal =  data->sample(col)-val;
+        dif = currentVal.manhattanLength();
 
-        if (dif < 0)
-        {
-            dif = -1 * dif;
-        }
+
         if (previous > dif)
         {
             previous = dif;
@@ -513,34 +513,35 @@ template<typename _Tp> int closestIdx(const ito::DataObject *obj, const DataObje
     return idx;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectSeriesDataXY::getPosToPix(const double phys) const
+int DataObjectSeriesDataXY::getPosToPix(const double physx, const double physy) const
 {
+    const QPointF coord(physx, physy);
     int idx = 0;
     switch (m_pXVec->getType())
     {
     case ito::tInt8:
-        idx = closestIdx<ito::int8>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::int8>(this, m_pXVec, coord);
         break;
     case ito::tUInt8:
-        idx = closestIdx<ito::uint8>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::uint8>(this, m_pXVec, coord);
         break;
     case ito::tInt16:
-        idx = closestIdx<ito::int16>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::int16>(this, m_pXVec, coord);
         break;
     case ito::tUInt16:
-        idx = closestIdx<ito::uint16>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::uint16>(this, m_pXVec, coord);
         break;
     case ito::tInt32:
-        idx = closestIdx<ito::int32>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::int32>(this, m_pXVec, coord);
         break;
     case ito::tUInt32:
-        idx = closestIdx<ito::uint32>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::uint32>(this,m_pXVec, coord);
         break;
     case ito::tFloat32:
-        idx = closestIdx<ito::float32>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::float32>(this, m_pXVec, coord);
         break;
     case ito::tFloat64:
-        idx = closestIdx<ito::float64>(m_pXVec, m_dX, size(), phys);
+        idx = closestIdx<ito::float64>(this, m_pXVec, coord);
         break;
     }
     return idx;

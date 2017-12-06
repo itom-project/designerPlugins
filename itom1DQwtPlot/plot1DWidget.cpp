@@ -2078,7 +2078,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                 m = &(m_pickers[i]);
                 if (m->active)
                 {
-                    stickPickerToXPx(m, m->item->xValue(), -1);
+                    stickPickerToXPx(m, m->item->xValue(), -1, m->item->yValue());
                 }
             }
             break;
@@ -2088,7 +2088,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
                 m = &(m_pickers[i]);
                 if (m->active)
                 {
-                     stickPickerToXPx(m, m->item->xValue(), 1);
+                     stickPickerToXPx(m, m->item->xValue(), 1, m->item->yValue());
                 }
             }
             break;
@@ -2126,7 +2126,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 
                     if (found)
                     {
-                        stickPickerToXPx(m, m->item->xValue(), 0);
+                        stickPickerToXPx(m, m->item->xValue(), 0, m->item->yValue());
                     }
                 }
             }
@@ -2165,7 +2165,7 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
 
                     if (found)
                     {
-                        stickPickerToXPx(m, m->item->xValue(), 0);
+                        stickPickerToXPx(m, m->item->xValue(), 0, m->item->yValue());
                     }
                 }
             }
@@ -2265,8 +2265,9 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
                 QPointF pt;
                 QPointF mouseCoords(xPx, yPx);
                 double xScale_;
+                double yScale;
                 double bestXScale = invTransform(QwtPlot::xBottom, xPx);
-
+                double bestYScale = invTransform(QwtPlot::xBottom, yPx);
                 for (int i = 0; i < m_plotCurveItems.size(); ++i)
                 {
                     DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[i]->data());
@@ -2275,7 +2276,8 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
                     for (int xPx_ = xPx - 5; xPx_ <= xPx + 5; ++xPx_)
                     {
                         xScale_ = invTransform(QwtPlot::xBottom, xPx_);
-                        sampleIdx = qBound(0, data->getPosToPix(xScale_), (int)data->size() - 1);
+                        yScale = invTransform(QwtPlot::yLeft, yPx);
+                        sampleIdx = qBound(0, data->getPosToPix(xScale_, yScale), (int)data->size() - 1);
                         pt = data->sample(sampleIdx);
                         currentDist = QPointF(transform(xBottom, pt.rx()), transform(yLeft, pt.ry())) - mouseCoords;
                         if (currentDist.manhattanLength() < bestDist)
@@ -2283,12 +2285,13 @@ void Plot1DWidget::mousePressEvent (QMouseEvent * event)
                             bestDist = currentDist.manhattanLength();
                             bestCurveIdx = i;
                             bestXScale = xScale_;
+                            bestYScale = yScale;
                         }
                     }
                 }
                 
                 picker.curveIdx = bestCurveIdx;
-                stickPickerToXPx(&picker, bestXScale, 0);
+                stickPickerToXPx(&picker, bestXScale, 0, bestYScale);
 
                 picker.item->setVisible(true);
                 
@@ -2318,7 +2321,9 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
     {
         event->accept();
         int xPx = m_pValuePicker->trackerPosition().x();
+        int yPx = m_pValuePicker->trackerPosition().y();
         double xScale = invTransform(xBottom, xPx);
+        double yScale = invTransform(yLeft, yPx);
 
         if (event->buttons() & Qt::LeftButton)
         {
@@ -2326,7 +2331,7 @@ void Plot1DWidget::mouseMoveEvent (QMouseEvent * event)
             {
                 if (m_pickers[i].active == true)
                 {
-                    stickPickerToXPx(&m_pickers[i], xScale, 0);
+                    stickPickerToXPx(&m_pickers[i], xScale, 0, yScale);
                 }
             }
             updatePickerPosition(false,false);
@@ -2356,7 +2361,9 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
         event->accept();
         Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
         int xPx = m_pValuePicker->trackerPosition().x();
+        int yPx = m_pValuePicker->trackerPosition().y();
         double xScale = invTransform(xBottom, xPx);
+        double yScale = invTransform(yLeft, yPx);
 
         if (event->button() == Qt::LeftButton)
         {
@@ -2364,7 +2371,7 @@ void Plot1DWidget::mouseReleaseEvent (QMouseEvent * event)
             {
                 if (m_pickers[i].active == true)
                 {
-                    stickPickerToXPx(&m_pickers[i], xScale, 0);
+                    stickPickerToXPx(&m_pickers[i], xScale, 0, yScale);
                 }
             }
 
@@ -2430,7 +2437,7 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir) //dir: 0: this point, -1: next valid to the left or this if not possible, 1: next valid to the right or this if not possible
+void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart) //dir: 0: this point, -1: next valid to the left or this if not possible, 1: next valid to the right or this if not possible
 {
     if (m_plotCurveItems.size() <= m->curveIdx) 
     {
@@ -2443,7 +2450,7 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir) //di
         xScaleStart = m->item->xValue();
     }
 
-    int thisIdx = data->getPosToPix(xScaleStart);
+    int thisIdx = data->getPosToPix(xScaleStart, yScaleStart);
     int s = (int)data->size();
     QPointF p;
     bool found = false;

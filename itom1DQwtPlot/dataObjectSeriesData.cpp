@@ -88,11 +88,11 @@ bool DataObjectSeriesData::floatingPointValues() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectSeriesData::getPosToPix(const double phys) const
+int DataObjectSeriesData::getPosToPix(const double physx, const double physy /*=-1*/) const
 {
     if (m_d.valid && m_d.nrPoints > 0)
     {
-        double dist = (phys - m_d.startPhys);
+        double dist = (physx - m_d.startPhys);
         return qRound(dist / m_d.stepSizePhys);
     }
     else
