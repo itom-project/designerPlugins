@@ -2450,7 +2450,7 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
         xScaleStart = m->item->xValue();
     }
 
-    int thisIdx = data->getPosToPix(xScaleStart, yScaleStart);
+    int thisIdx = data->getPosToPix(xScaleStart, yScaleStart); //yScaleStart is ignored in case of DatsaObjectSeriesData
     int s = (int)data->size();
     QPointF p;
     bool found = false;
@@ -2476,6 +2476,7 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
+                    m->dObjDataIdx = thisIdx;
                     found = true;
                 }
             }
@@ -2517,6 +2518,7 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
+                    m->dObjDataIdx = thisIdx;
                     found = true;
                 }
             }
@@ -2547,6 +2549,7 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
+                    m->dObjDataIdx = thisIdx;
                     found = true;
                 }
             }
@@ -2580,6 +2583,7 @@ void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int dir)
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
+                    m->dObjDataIdx = thisIdx;
                     found = true;
                 }
             }
@@ -2612,6 +2616,7 @@ void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int dir)
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
+                    m->dObjDataIdx = thisIdx;
                     found = true;
                 }
             }
@@ -2633,6 +2638,7 @@ void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int dir)
                 {
                     m->item->setXValue(p.rx());
                     m->item->setYValue(p.ry());
+                    m->dObjDataIdx = thisIdx;
                     found = true;
                 }
             }
@@ -3669,7 +3675,6 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
 
     setButtonStyle(buttonStyle()); //to change icon of menu
 	int idx = action->data().toInt();
-	
     foreach(QwtPlotCurve *data, m_plotCurveItems)
     {
         seriesData = (DataObjectSeriesData*)data->data();
@@ -3682,7 +3687,8 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
             //if pickers are visible, stick them to the new line form
             foreach(Picker m, m_pickers)
             {
-                stickPickerToXPx(&m, m.item->xValue(), 0);
+                stickPickerToSampleIdx(&m, m.dObjDataIdx, 0);
+                //stickPickerToXPx(&m, m.item->xValue(), 0);
             }
 
         }

@@ -155,10 +155,11 @@ class Plot1DWidget : public ItomQwtPlot
 
         struct Picker
         {
-            Picker() : item(NULL), active(0), curveIdx(0) {}
+            Picker() : item(NULL), active(0), curveIdx(0), dObjDataIdx(-1) {}
             ItomPlotMarker *item;
             bool active;
             int curveIdx;
+            int dObjDataIdx;
         };
 
         void stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart = -1);
