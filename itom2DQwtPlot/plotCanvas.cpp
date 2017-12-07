@@ -64,27 +64,28 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NULL*/) :
-        ItomQwtPlot(parent),
-        m_pLineCutPicker(NULL),
-        m_pCenterMarker(NULL),
-//        m_pStackCut(NULL),
-        m_dObjItem(NULL),
-        m_rasterData(NULL),
-        m_dOverlayItem(NULL),
-        m_pData(m_pData),
-        m_curOverlayColorMapIndex(0),
-        m_curColorMapIndex(0),
-        m_pValuePicker(NULL),
-        m_dObjPtr(NULL),
-        m_pStackPicker(NULL),
-        m_zstackCutUID(0),
-        m_lineCutUID(0),
-        m_pLineCutLine(NULL),
-        m_isRefreshingPlot(false),
-        m_unitLabelChanged(false),
-        m_pPaletteIsChanging(false),
-        m_pActScaleSettings(NULL),
-        m_pActColorPalette(NULL),
+		ItomQwtPlot(parent),
+		m_pLineCutPicker(NULL),
+		m_pCenterMarker(NULL),
+		//        m_pStackCut(NULL),
+		m_dObjItem(NULL),
+		m_rasterData(NULL),
+		m_dOverlayItem(NULL),
+		m_pData(m_pData),
+		m_curOverlayColorMapIndex(0),
+		m_curColorMapIndex(0),
+		m_pValuePicker(NULL),
+		m_dObjPtr(NULL),
+		m_pStackPicker(NULL),
+		m_zstackCutUID(0),
+		m_lineCutUID(0),
+		m_pLineCutLine(NULL),
+		m_isRefreshingPlot(false),
+		m_unitLabelChanged(false),
+		m_pPaletteIsChanging(false),
+		m_pActScaleSettings(NULL),
+		m_pActColorPalette(NULL),
+		m_pMenuColorPalette(NULL),
         m_pActToggleColorBar(NULL),
         m_pActValuePicker(NULL),
         m_pActLineCut(NULL),
@@ -309,6 +310,28 @@ PlotCanvas::~PlotCanvas()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotCanvas::init(bool overwriteDesignableProperties)
 {
+	if (ito::ITOM_API_FUNCS_GRAPH && m_pMenuColorPalette && (m_pMenuColorPalette->actions().size() == 0))
+	{
+		int numPalettes;
+		ito::RetVal retval = apiPaletteGetNumberOfColorBars(numPalettes);
+
+		if (!retval.containsError())
+		{
+			ito::ItomPalette palette;
+			QAction *a;
+
+			for (int i = 0; i < numPalettes; ++i)
+			{
+				if (!apiPaletteGetColorBarIdx(i, palette).containsError())
+				{
+					a = m_pMenuColorPalette->addAction(palette.name);
+					a->setData(palette.name);
+					a->setCheckable(true);
+				}
+			}
+		}
+	}
+
     if (!setColorMap("__first__"))
     {
         refreshStyles(overwriteDesignableProperties);
@@ -455,8 +478,13 @@ void PlotCanvas::createActions()
     //m_actPalette
     m_pActColorPalette = a = new QAction(tr("Palette"), p);
     a->setObjectName("actColorPalette");
-    a->setToolTip(tr("Switch between color palettes"));
+    a->setToolTip(tr("Click to switch to next color palette"));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuColorPalette()));
+
+	m_pMenuColorPalette = new QMenu(tr("Color palettes"), p);
+	m_pActColorPalette->setMenu(m_pMenuColorPalette);
+	//items of m_pMenuColorPalette will be added in ::init()
+	connect(m_pMenuColorPalette, SIGNAL(triggered(QAction*)), this, SLOT(mnuGroupColorPalette(QAction*)));
 
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(tr("Complex Switch"), p);
@@ -983,7 +1011,13 @@ bool PlotCanvas::setColorMap(const QString &colormap /*= "__next__"*/)
 	}
     else
     {
-        retval += apiPaletteGetColorBarName(colormap, newPalette);
+		ito::int32 idx;
+		retval += apiPaletteGetColorBarIdxFromName(colormap, idx);
+        retval += apiPaletteGetColorBarIdx(idx, newPalette);
+		if (!retval.containsError())
+		{
+			m_curColorMapIndex = idx;
+		}
     }
 
     if (retval.containsError() && retval.errorMessage() != NULL)
@@ -1006,6 +1040,16 @@ bool PlotCanvas::setColorMap(const QString &colormap /*= "__next__"*/)
     }
 
     m_colorMapName = newPalette.name;
+
+	//refresh check state of all color palette sub items in menu
+	if (m_pMenuColorPalette)
+	{
+		QList<QAction*> actions = m_pMenuColorPalette->actions();
+		for (int i = 0; i < actions.size(); ++i)
+		{
+			actions[i]->setChecked(actions[i]->data().toString() == m_colorMapName);
+		}
+	}
 
     setInverseColors(newPalette.inverseColorOne, newPalette.inverseColorTwo);
 	m_pPaletteIsChanging = true;
@@ -2390,6 +2434,22 @@ void PlotCanvas::mnuDataChannel(QAction* action)
 void PlotCanvas::mnuColorPalette()
 {
     setColorMap("__next__");
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mnuGroupColorPalette(QAction *action)
+{
+	if (action)
+	{
+		QString colorPalette = action->data().toString();
+		if (colorPalette != "")
+		{
+			if (!setColorMap(colorPalette))
+			{
+				action->setChecked(false);
+			}
+		}
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

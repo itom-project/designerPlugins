@@ -63,7 +63,14 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
             int y = qRound((pos.y() / sy) + oy);
             double temp = std::min(std::abs(sy), std::abs(sx));
             int prec = (temp >= 0.1) ? 1 : (temp >= 0.01 ? 2 : ((temp >= 0.001) ? 3 : 4));
-            coordinates = QString("Phys.: [x: %3, y: %4]\nPx: [x: %1, y: %2]").arg(x).arg(y).arg(pos.x(), 0, 'g', prec).arg(pos.y(), 0, 'g', prec);
+            if (prec > 1)
+            {
+                coordinates = QString("Phys.: [x: %3, y: %4]\nPx: [x: %1, y: %2]").arg(x).arg(y).arg(pos.x(), 0, 'e', prec).arg(pos.y(), 0, 'e', prec);
+            }
+            else
+            {
+                coordinates = QString("Phys.: [x: %3, y: %4]\nPx: [x: %1, y: %2]").arg(x).arg(y).arg(pos.x(), 0, 'g', 5).arg(pos.y(), 0, 'g', 5);
+            }
         }
 
         if (m_valueData->getTypeFlag() == DataObjRasterData::tRGB)

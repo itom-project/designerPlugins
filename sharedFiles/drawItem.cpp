@@ -292,87 +292,91 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
 
             QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
             bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
-            int numMarkers = keepAspect ? 4 : 8;
+            int numMarkers = resizeable ? (keepAspect ? 4 : 8) : 0;
             QTransform &trafo = d->m_shape.rtransform();
             QPointF pt;
 
-            if (selected && resizeable)
+            if (selected)
             {
-                while (d->m_marker.size() < numMarkers)
+                if (resizeable)
                 {
-                    marker = new QwtPlotMarker();
-                    marker->setLinePen(QPen(d->m_markerColor));
-                    marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
-                    marker->setVisible(true);
-                    marker->attach(d->m_pparent);
-                    d->m_marker.append(marker);
+                    while (d->m_marker.size() < numMarkers)
+                    {
+                        marker = new QwtPlotMarker();
+                        marker->setLinePen(QPen(d->m_markerColor));
+                        marker->setSymbol(new QwtSymbol(QwtSymbol::Rect, QBrush(d->m_markerColor) /*)*/, QPen(QBrush(d->m_markerColor), 1), QSize(9, 9)));
+                        marker->setVisible(true);
+                        marker->attach(d->m_pparent);
+                        d->m_marker.append(marker);
+                    }
+
+                    if (keepAspect)
+                    {
+                        //1:
+                        pt = trafo.map(box.topLeft());
+                        d->m_marker[0]->setXValue(pt.x());
+                        d->m_marker[0]->setYValue(pt.y());
+
+                        //2:
+                        pt = trafo.map(box.topRight());
+                        d->m_marker[1]->setXValue(pt.x());
+                        d->m_marker[1]->setYValue(pt.y());
+
+                        //3:
+                        pt = trafo.map(box.bottomRight());
+                        d->m_marker[2]->setXValue(pt.x());
+                        d->m_marker[2]->setYValue(pt.y());
+
+                        //4:
+                        pt = trafo.map(box.bottomLeft());
+                        d->m_marker[3]->setXValue(pt.x());
+                        d->m_marker[3]->setYValue(pt.y());
+                    }
+                    else
+                    {
+                        //1:
+                        pt = trafo.map(box.topLeft());
+                        d->m_marker[0]->setXValue(pt.x());
+                        d->m_marker[0]->setYValue(pt.y());
+
+                        //2:
+                        pt = trafo.map(0.5 * (box.topRight() + box.topLeft()));
+                        d->m_marker[1]->setXValue(pt.x());
+                        d->m_marker[1]->setYValue(pt.y());
+
+                        //3:
+                        pt = trafo.map(box.topRight());
+                        d->m_marker[2]->setXValue(pt.x());
+                        d->m_marker[2]->setYValue(pt.y());
+
+                        //4:
+                        pt = trafo.map(0.5 * (box.bottomRight() + box.topRight()));
+                        d->m_marker[3]->setXValue(pt.x());
+                        d->m_marker[3]->setYValue(pt.y());
+
+                        //5:
+                        pt = trafo.map(box.bottomRight());
+                        d->m_marker[4]->setXValue(pt.x());
+                        d->m_marker[4]->setYValue(pt.y());
+
+                        //6:
+                        pt = trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
+                        d->m_marker[5]->setXValue(pt.x());
+                        d->m_marker[5]->setYValue(pt.y());
+
+                        //7:
+                        pt = trafo.map(box.bottomLeft());
+                        d->m_marker[6]->setXValue(pt.x());
+                        d->m_marker[6]->setYValue(pt.y());
+
+                        //8:
+                        pt = trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
+                        d->m_marker[7]->setXValue(pt.x());
+                        d->m_marker[7]->setYValue(pt.y());
+                    }
                 }
 
-                if (keepAspect)
-                {
-                    //1:
-                    pt = trafo.map(box.topLeft());
-                    d->m_marker[0]->setXValue(pt.x());
-                    d->m_marker[0]->setYValue(pt.y());
-
-                    //2:
-                    pt = trafo.map(box.topRight());
-                    d->m_marker[1]->setXValue(pt.x());
-                    d->m_marker[1]->setYValue(pt.y());
-
-                    //3:
-                    pt = trafo.map(box.bottomRight());
-                    d->m_marker[2]->setXValue(pt.x());
-                    d->m_marker[2]->setYValue(pt.y());
-
-                    //4:
-                    pt = trafo.map(box.bottomLeft());
-                    d->m_marker[3]->setXValue(pt.x());
-                    d->m_marker[3]->setYValue(pt.y());
-                }
-                else
-                {
-                    //1:
-                    pt = trafo.map(box.topLeft());
-                    d->m_marker[0]->setXValue(pt.x());
-                    d->m_marker[0]->setYValue(pt.y());
-
-                    //2:
-                    pt = trafo.map(0.5 * (box.topRight() + box.topLeft()));
-                    d->m_marker[1]->setXValue(pt.x());
-                    d->m_marker[1]->setYValue(pt.y());
-
-                    //3:
-                    pt = trafo.map(box.topRight());
-                    d->m_marker[2]->setXValue(pt.x());
-                    d->m_marker[2]->setYValue(pt.y());
-
-                    //4:
-                    pt = trafo.map(0.5 * (box.bottomRight() + box.topRight()));
-                    d->m_marker[3]->setXValue(pt.x());
-                    d->m_marker[3]->setYValue(pt.y());
-
-                    //5:
-                    pt = trafo.map(box.bottomRight());
-                    d->m_marker[4]->setXValue(pt.x());
-                    d->m_marker[4]->setYValue(pt.y());
-
-                    //6:
-                    pt = trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
-                    d->m_marker[5]->setXValue(pt.x());
-                    d->m_marker[5]->setYValue(pt.y());
-
-                    //7:
-                    pt = trafo.map(box.bottomLeft());
-                    d->m_marker[6]->setXValue(pt.x());
-                    d->m_marker[6]->setYValue(pt.y());
-
-                    //8:
-                    pt = trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
-                    d->m_marker[7]->setXValue(pt.x());
-                    d->m_marker[7]->setYValue(pt.y());
-                }
-                if (selected && rotatable)
+                if (rotatable)
                 {
                     if (d->m_marker.size() < numMarkers + 1)
                     {
@@ -388,8 +392,8 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
                         pt = trafo.map(QPointF(0.5 * (box.bottomLeft().x() + box.bottomRight().x()), 0.5 * (box.bottomLeft().y() + box.bottomRight().y()) - 5));
                     else
                         pt = trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
-                    d->m_marker[d->m_marker.length() - 1]->setXValue(pt.x());
-                    d->m_marker[d->m_marker.length() - 1]->setYValue(pt.y());
+                    d->m_marker[d->m_marker.size() - 1]->setXValue(pt.x());
+                    d->m_marker[d->m_marker.size() - 1]->setYValue(pt.y());
                 }
             }
             else
@@ -519,7 +523,6 @@ QPointF DrawItem::getMarkerPosScale(int index) const
             QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
             bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
             QTransform &trafo = d->m_shape.rtransform();
-            QPointF pt;
 
             if (keepAspect)
             {
@@ -533,7 +536,7 @@ QPointF DrawItem::getMarkerPosScale(int index) const
                         return trafo.map(box.bottomRight());
                     case 3:
                         return trafo.map(box.bottomLeft());
-                    case 4:
+                    case 4: //rotation marker
                         return trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
                 }
             }
@@ -557,7 +560,7 @@ QPointF DrawItem::getMarkerPosScale(int index) const
                         return trafo.map(box.bottomLeft());
                     case 7:
                         return trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
-                    case 8:
+                    case 8: //rotation marker
                         trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
                 }
             }
@@ -581,16 +584,31 @@ bool DrawItem::shapeMoveTo(const QPointF &marker1ScaleCoordinate)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers /*= Qt::NoModifier*/)
+bool DrawItem::shapeResizeOrRotate(int hitTypeAndMarkerIndex, const QPointF &markerScaleCoordinate, const Qt::KeyboardModifiers &modifiers /*= Qt::NoModifier*/)
 {
     bool resizeable = !(d->m_shape.flags() & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
-    if (resizeable)
-    {
-        const QTransform &trafo = d->m_shape.rtransform();
-        QTransform invTrafo = trafo.inverted();
-        QPolygonF &basePoints = d->m_shape.rbasePoints();
-        bool success = false;
+    bool rotatable = !(d->m_shape.flags() & ito::Shape::RotateLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Rotate);
 
+    int hitType = hitNone;
+    int markerIndex = -1;
+    const QTransform &trafo = d->m_shape.rtransform();
+    QTransform invTrafo = trafo.inverted();
+    QPolygonF &basePoints = d->m_shape.rbasePoints();
+    bool success = false;
+
+    if (hitTypeAndMarkerIndex >= hitResize)
+    {
+        hitType = hitResize;
+        markerIndex = hitTypeAndMarkerIndex - hitResize;
+    }
+    else if (hitTypeAndMarkerIndex <= hitRotation)
+    {
+        hitType = hitRotation;
+        markerIndex = hitRotation - hitTypeAndMarkerIndex;
+    }
+
+    if (resizeable && hitType == hitResize)
+    {
         switch (d->m_shape.type())
         {
             case ito::Shape::Line:
@@ -598,7 +616,7 @@ bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoor
                 QPointF newPoint = invTrafo.map(markerScaleCoordinate);
                 if (modifiers & Qt::ControlModifier)
                 {
-                    if (markerIdx == 1)
+                    if (markerIndex == 0)
                     {
                         QLineF line(basePoints[1], newPoint);
                         double angle = 45.0 * qRound(line.angle() / 45.0);
@@ -606,7 +624,7 @@ bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoor
                         basePoints[0] = line.p2();
                         success = true;
                     }
-                    else if (markerIdx == 2)
+                    else if (markerIndex == 1)
                     {
                         QLineF line(basePoints[0], newPoint);
                         double angle = 45.0 * qRound(line.angle() / 45.0);
@@ -615,9 +633,9 @@ bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoor
                         success = true;
                     }
                 }
-                else if (markerIdx == 1 || markerIdx == 2)
+                else if (markerIndex == 0 || markerIndex == 1)
                 {
-                    basePoints[markerIdx-1] = newPoint;
+                    basePoints[markerIndex] = newPoint;
                     success = true;
                 }            
             }
@@ -626,18 +644,18 @@ bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoor
             case ito::Shape::Point:
             case ito::Shape::MultiPointPick:
             {
-                if (markerIdx >= 0 && markerIdx < basePoints.size())
+                if (markerIndex >= 0 && markerIndex < basePoints.size())
                 {
-                    basePoints[markerIdx - 1] = invTrafo.map(markerScaleCoordinate);
+                    basePoints[markerIndex - 1] = invTrafo.map(markerScaleCoordinate);
                     success = true;
                 }
             }
             break;
             case ito::Shape::Polygon:
             {
-                if (markerIdx >= 0 && markerIdx <= basePoints.size())
+                if (markerIndex >= 0 && markerIndex <= basePoints.size())
                 {
-                    basePoints[(markerIdx - 1) % basePoints.size()] = invTrafo.map(markerScaleCoordinate);
+                    basePoints[markerIndex % basePoints.size()] = invTrafo.map(markerScaleCoordinate);
                     success = true;
                 }
             }
@@ -650,79 +668,43 @@ bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoor
                 QRectF baseRect(basePoints[0], basePoints[1]);
                 success = true;
 
-                switch (markerIdx)
+                switch (markerIndex)
                 {
-                    case 1: //top, left
+                    case 0: //top, left
                         baseRect.setTopLeft(newPoint);
                     break;
             
-                    case 2: //top, center
+                    case 1: //top, center
                         baseRect.setTop(newPoint.y());
                     break;
             
-                    case 3: //top, right
+                    case 2: //top, right
                         baseRect.setTopRight(newPoint);
                     break;
             
-                    case 4: //right, center
+                    case 3: //right, center
                         baseRect.setRight(newPoint.x());
                     break;
             
-                    case 5: //bottom, right
+                    case 4: //bottom, right
                         baseRect.setBottomRight(newPoint);
                     break;
             
-                    case 6: //bottom, center
+                    case 5: //bottom, center
                         baseRect.setBottom(newPoint.y());
                     break;
             
-                    case 7: //bottom, left
+                    case 6: //bottom, left
                         baseRect.setBottomLeft(newPoint);
                     break;
             
-                    case 8: //left, center
+                    case 7: //left, center
                         baseRect.setLeft(newPoint.x());
-                    break;
-
-                    case 9: // rotation
-                    {
-                        QPointF diffScreen;
-                        QPointF centerScale = d->m_shape.centerPoint();
-
-                        QwtPlot *canvas = plot();
-                        if (canvas)
-                        {
-                            
-                            diffScreen = QPointF(canvas->transform(QwtPlot::xBottom, markerScaleCoordinate.x()), canvas->transform(QwtPlot::yLeft, markerScaleCoordinate.y())) - \
-                                QPointF(canvas->transform(QwtPlot::xBottom, centerScale.x()), canvas->transform(QwtPlot::yLeft, centerScale.y()));
-                        }
-                        else
-                        {
-                            diffScreen = markerScaleCoordinate - centerScale;
-                        }
-                        
-                        qDebug() << d->m_shape.rotationAngleRad() << atan2(diffScreen.y(), diffScreen.x()) << d->m_shape.rotationAngleRad() - atan2(diffScreen.y(), diffScreen.x());
-                        float angle = d->m_shape.rotationAngleRad()
-                            + (+atan2(diffScreen.y(), diffScreen.x()) - d->m_shape.rotationAngleRad() - (M_PI / 2));
-
-                        if (modifiers & Qt::ShiftModifier)
-                        {
-                            //round to 22.5deg steps
-                            float stepSize = (22.5 * (float)M_PI / 180.0);
-                            angle = stepSize * (qRound(angle / stepSize));
-                        }
-
-                        //float angle = d->m_shape.rotationAngleRad()
-                        //    + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
-                        d->m_shape.rtransform().reset();
-                        d->m_shape.rtransform().translate(d->m_shape.centerPoint().x(), d->m_shape.centerPoint().y());
-                        d->m_shape.rtransform().rotate(angle / M_PI * 180.0, Qt::ZAxis);
-                        d->m_shape.rtransform().translate(-d->m_shape.centerPoint().x(), -d->m_shape.centerPoint().y());
-                    }
                     break;
 
                     default:
                         success = false;
+                    break;
                 }
 
                 if (success)
@@ -745,37 +727,27 @@ bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoor
                 newPoint = baseRect.center() + QPointF(sign_x * equal_diff, sign_y * equal_diff);
                 success = true;
 
-                switch (markerIdx)
+                switch (markerIndex)
                 {
-                    case 1: //top, left
+                    case 0: //top, left
                         baseRect.setTopLeft(newPoint);
                     break;
 
-                    case 2: //top, right
+                    case 1: //top, right
                         baseRect.setTopRight(newPoint);
                     break;
 
-                    case 3: //bottom, right
+                    case 2: //bottom, right
                         baseRect.setBottomRight(newPoint);
                     break;
 
-                    case 4: //bottom, left
+                    case 3: //bottom, left
                         baseRect.setBottomLeft(newPoint);
-                    break;
-
-                    case 5: // rotation
-                    {
-                        float angle = d->m_shape.rotationAngleRad() 
-                            + atan2(markerScaleCoordinate.y(), markerScaleCoordinate.x()) * 20.0;
-                        d->m_shape.rtransform().reset();
-                        d->m_shape.rtransform().translate(d->m_shape.centerPoint().x(), d->m_shape.centerPoint().y());
-                        d->m_shape.rtransform().rotate(angle / M_PI * 180.0, Qt::ZAxis);
-                        d->m_shape.rtransform().translate(-d->m_shape.centerPoint().x(), -d->m_shape.centerPoint().y());
-                    }
                     break;
 
                     default:
                         success = false;
+                    break;
                 }
 
                 if (success)
@@ -786,10 +758,103 @@ bool DrawItem::shapeResizeOrRotate(int markerIdx, const QPointF &markerScaleCoor
             }
             break;
         }
-        setShape(d->m_shape);
-        return success;
     }
-    return false;
+    else if (rotatable && hitType == hitRotation)
+    {
+        switch (d->m_shape.type())
+        {
+            case ito::Shape::Rectangle:
+            case ito::Shape::Ellipse:
+            {
+                if ((markerIndex == 8 && resizeable) || markerIndex == 0)
+                {
+                    // rotation
+                    QPointF diffScreen;
+                    QPointF centerScale = d->m_shape.centerPoint();
+
+                    QwtPlot *canvas = plot();
+                    if (canvas)
+                    {
+                            
+                        diffScreen = QPointF(canvas->transform(QwtPlot::xBottom, markerScaleCoordinate.x()), canvas->transform(QwtPlot::yLeft, markerScaleCoordinate.y())) - \
+                            QPointF(canvas->transform(QwtPlot::xBottom, centerScale.x()), canvas->transform(QwtPlot::yLeft, centerScale.y()));
+                    }
+                    else
+                    {
+                        diffScreen = markerScaleCoordinate - centerScale;
+                    }
+                        
+					float angle = - (+atan2(diffScreen.y(), diffScreen.x()) - (M_PI / 2)) - d->m_shape.rotationAngleRad();
+
+                    //qDebug() << d->m_shape.rotationAngleRad() << (+atan2(diffScreen.y(), diffScreen.x()) + (M_PI / 2)) << angle;
+                        
+
+                    if (modifiers & Qt::ShiftModifier)
+                    {
+                        //round to 22.5deg steps
+						angle += d->m_shape.rotationAngleRad();
+                        float stepSize = (22.5 * (float)M_PI / 180.0);
+                        angle = stepSize * (qRound(angle / stepSize));
+						angle -= d->m_shape.rotationAngleRad();
+                    }
+
+                    d->m_shape.rotateByCenterRad(angle);
+
+                    success = true;
+                }
+            }
+            break;
+
+            case ito::Shape::Square:
+            case ito::Shape::Circle:
+            {
+                if ((markerIndex == 4 && resizeable) || markerIndex == 0)
+                {
+                    // rotation
+					QPointF diffScreen;
+					QPointF centerScale = d->m_shape.centerPoint();
+
+					QwtPlot *canvas = plot();
+					if (canvas)
+					{
+
+						diffScreen = QPointF(canvas->transform(QwtPlot::xBottom, markerScaleCoordinate.x()), canvas->transform(QwtPlot::yLeft, markerScaleCoordinate.y())) - \
+							QPointF(canvas->transform(QwtPlot::xBottom, centerScale.x()), canvas->transform(QwtPlot::yLeft, centerScale.y()));
+					}
+					else
+					{
+						diffScreen = markerScaleCoordinate - centerScale;
+					}
+
+					float angle = -(+atan2(diffScreen.y(), diffScreen.x()) - (M_PI / 2)) - d->m_shape.rotationAngleRad();
+
+					//qDebug() << d->m_shape.rotationAngleRad() << (+atan2(diffScreen.y(), diffScreen.x()) + (M_PI / 2)) << angle;
+
+
+					if (modifiers & Qt::ShiftModifier)
+					{
+						//round to 22.5deg steps
+						angle += d->m_shape.rotationAngleRad();
+						float stepSize = (22.5 * (float)M_PI / 180.0);
+						angle = stepSize * (qRound(angle / stepSize));
+						angle -= d->m_shape.rotationAngleRad();
+					}
+
+					d->m_shape.rotateByCenterRad(angle);
+
+					success = true;
+                }
+            }
+            break;
+        }
+    }
+
+    if (success)
+    {
+        setShape(d->m_shape);
+    }
+
+    return success;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -933,27 +998,21 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
 
         case ito::Shape::Polygon:
         {
-            if (!shape.transform().isRotating())
+            QPolygonF basePoints = shape.basePoints();
+            if (!shape.unclosed() && basePoints.size() > 1)
             {
-                int npts = shape.basePoints().length();
-                int close = 1;
-                if (shape.unclosed())
-                {
-                    close = 0;
-                }
-
-                for (int nl = 1; nl < npts + close; nl++)
-                {
-                    d->m_point1 = shape.transform().map(shape.basePoints()[nl - 1]);
-                    d->m_point2 = shape.transform().map(shape.basePoints()[nl % npts]);
-                    path.moveTo(d->m_point1);
-                    path.lineTo(d->m_point2);
-                }
+                basePoints.append(basePoints[0]);
             }
-            else
+
+            QPolygonF transformedPoints = shape.transform().map(basePoints);
+
+            if (transformedPoints.size() > 0)
             {
-                path.moveTo(d->m_point1);
-                path.lineTo(d->m_point2);
+                path.moveTo(transformedPoints[0]);
+                for (int nl = 1; nl < transformedPoints.size(); ++nl)
+                {
+                    path.lineTo(transformedPoints[nl]);
+                }
             }
         }
         break;
@@ -969,7 +1028,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
         QwtPlotShapeItem::setShape(path);
         QwtPlotShapeItem::setTitle(d->m_shape.name());
 
-        setSelected(d->m_selected); //to possibly adjust the position of markers
+        setSelected(d->m_selected, m_currentMarker); //to possibly adjust the position of markers
     }
 
     return retVal;
@@ -1004,14 +1063,15 @@ void DrawItem::draw( QPainter *painter,
 
         const QSizeF textSize = label.textSize( painter->font() );
         const QPointF textSizeScales = QPointF(textSize.width() * fabs(xMap.sDist()/xMap.pDist()), textSize.height() * fabs(yMap.sDist()/yMap.pDist()));
-        QPointF marker0Position = this->getMarkerPosScale(0);
+        QPointF marker0Position = getMarkerPosScale(0);
 
         if (marker0Position.isNull() == false)
         {
             myRect = QRectF(marker0Position - textSizeScales, marker0Position);
             
             QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect);
-            cRect.translate(QPoint(-10, -10));
+            //cRect.translate(QPoint(-10, -10));
+            cRect.adjust(-12,-8,-6,-4);
 
             if (!label.isEmpty())
             {
@@ -1057,104 +1117,242 @@ bool DrawItem::hitLine(const QPointF &point_transformed, const QLineF &line, dou
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-//returns -1 if not hit, 0: if contour hit for moving or 1..8 if markers hit for resizing (only if moving or resizing is allowed)
-char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
+//returns -1 if not hit, 0: if contour hit for moving (only if moving is allowed) or 1..8 if markers hit for resizing (only if resizing is allowed), -2 if rotation marker hit (only if rotating is allowed)
+int DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
 {
     ito::RetVal retVal;
     const ito::Shape &shape = d->m_shape;
-    //QPointF point_trafo = shape.transform().inverted().map(point); //transform point to base coordinate system of shape
-    QPointF point_trafo = point;
+    QPointF point_trafo = shape.transform().inverted().map(point); //transform point to base coordinate system of shape
 
-    bool hitEdge = false;
+    unsigned int flags = d->m_shape.flags();
+    bool moveable = !(flags & ito::Shape::MoveLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Move);
+    bool resizeable = !(flags & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
+    bool rotatable = !(flags & ito::Shape::RotateLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Rotate);
+
+    int result = hitNone; //default: nothing hit
 
     switch (d->m_shape.type())
     {
         case ito::Shape::Point:
         {
-            QLineF line(point_trafo, shape.basePoints()[0]);
-            hitEdge = (std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y);
+            if (moveable)
+            {
+                QLineF line(point_trafo, shape.basePoints()[0]);
+                if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y))
+                {
+                    result = hitMove;
+                }
+            }
         }
         break;
 
         case ito::Shape::Line:
         {
             QLineF line(shape.basePoints()[0], shape.basePoints()[1]);
-            hitEdge = hitLine(point_trafo, line, tol_x, tol_y);
+            if (hitLine(point_trafo, line, tol_x, tol_y))
+            {
+                if (resizeable)
+                {
+                    qreal dist_x, dist_y;
+
+                    for (int i = 0; i < d->m_marker.size(); ++i)
+                    {
+                        dist_x = std::abs(d->m_marker[i]->xValue() - point.x());
+                        dist_y = std::abs(d->m_marker[i]->yValue() - point.y());
+                        if ((dist_x <= tol_x) && (dist_y <= tol_y))
+                        {
+                            result = (i + hitResize);
+                            break;
+                        }
+                    }
+
+                    //if not yet selected, but not moveable. The user clicked any part of the
+                    //contour but not the corner squares, nevertheless, the item should be
+                    //selected for any resize operation.
+                    if (result == hitNone && !d->m_selected && !moveable)
+                    {
+                        result = hitMove;
+                    }
+                }
+
+                if (result == hitNone && moveable)
+                {
+                    result = hitMove;
+                }
+            }
         }
         break;
 
         case ito::Shape::Rectangle:
         case ito::Shape::Square:
         {
-            QPolygonF contour = shape.contour();
+            QPolygonF contour = shape.contour(/*applyTrafo = */ false);
+
             // rotation marker must be checked separately
-            if (d->m_selected)
+            if (rotatable && d->m_selected && d->m_marker.size() > 0)
             {
-                if (std::abs(d->m_marker[d->m_marker.size() - 1]->xValue() - point_trafo.x()) < tol_x 
-                    && std::abs(d->m_marker[d->m_marker.size() - 1]->yValue() - point_trafo.y()) < tol_y)
+                if (std::abs(d->m_marker[d->m_marker.size() - 1]->xValue() - point.x()) < tol_x 
+                    && std::abs(d->m_marker[d->m_marker.size() - 1]->yValue() - point.y()) < tol_y)
                 {
-                    hitEdge = true;
-                    break;
+                    result = hitRotation - (d->m_marker.size() - 1); //rotation marker clicked
                 }
             }
 
-            hitEdge = (hitLine(point, QLineF(contour[0], contour[1]), tol_x, tol_y) || \
-                hitLine(point, QLineF(contour[1], contour[2]), tol_x, tol_y) || \
-                hitLine(point, QLineF(contour[2], contour[3]), tol_x, tol_y) || \
-                hitLine(point, QLineF(contour[3], contour[0]), tol_x, tol_y));
+            if (result == hitNone && \
+                (hitLine(point_trafo, QLineF(contour[0], contour[1]), tol_x, tol_y) || \
+                hitLine(point_trafo, QLineF(contour[1], contour[2]), tol_x, tol_y) || \
+                hitLine(point_trafo, QLineF(contour[2], contour[3]), tol_x, tol_y) || \
+                hitLine(point_trafo, QLineF(contour[3], contour[0]), tol_x, tol_y)))
+            {
+                if (resizeable)
+                {
+                    qreal dist_x, dist_y;
+
+                    for (int i = 0; i < d->m_marker.size(); ++i)
+                    {
+                        dist_x = std::abs(d->m_marker[i]->xValue() - point.x());
+                        dist_y = std::abs(d->m_marker[i]->yValue() - point.y());
+                        if ((dist_x <= tol_x) && (dist_y <= tol_y))
+                        {
+                            result = (i + hitResize);
+                            break;
+                        }
+                    }
+
+                    //if not yet selected, but not moveable. The user clicked any part of the
+                    //contour but not the corner squares, nevertheless, the item should be
+                    //selected for any resize operation.
+                    if (result == hitNone && !d->m_selected && !moveable)
+                    {
+                        result = hitMove;
+                    }
+                }
+
+                if (result == hitNone && moveable)
+                {
+                    result = hitMove;
+                }
+                else if (result == hitNone && rotatable)
+                {
+                    result = hitRotation;
+                }
+            }
         }
         break;
 
         case ito::Shape::Ellipse:
         case ito::Shape::Circle:
         {
-            //if selected, some markers are out of the circle, therefore their area must be checked separately
-            if (d->m_selected)
-            {
-                for (int i = 0; i < d->m_marker.size(); ++i)
-                {
-                    if (std::abs(d->m_marker[i]->xValue() - point_trafo.x()) < tol_x && std::abs(d->m_marker[i]->yValue() - point_trafo.y()) < tol_y)
-                    {
-                        hitEdge = true;
-                        break;
-                    }
-                }
-            }
+            bool hit_edge = false;
 
-            //inverse transform point
-            QPointF size = shape.basePoints()[1] - shape.basePoints()[0];
-            double a = std::abs(size.x())/2.0 + tol_x;
-            double b = std::abs(size.y())/2.0 + tol_y;
-            QPointF center = (shape.basePoints()[0] + shape.basePoints()[1]) / 2.0;
-            double x = point_trafo.x() - center.x();
-            double y = point_trafo.y() - center.y();
+			// rotation marker must be checked separately
+			if (rotatable &&  d->m_selected && d->m_marker.size() > 0)
+			{
+				if (std::abs(d->m_marker[d->m_marker.size() - 1]->xValue() - point.x()) < tol_x
+					&& std::abs(d->m_marker[d->m_marker.size() - 1]->yValue() - point.y()) < tol_y)
+				{
+					result = hitRotation - (d->m_marker.size() - 1); //rotation marker clicked
+				}
+			}
 
-            if ((((x*x) / (a*a)) + ((y*y) / (b*b))) <= 1.0)
-            {
-                a -= 2 * tol_x;
-                b -= 2 * tol_y;
-                hitEdge = ((((x*x) / (a*a)) + ((y*y) / (b*b))) > 1.0);
-            }
+			//if selected, some markers are out of the circle, therefore their area must be checked separately
+			if (result == hitNone && resizeable && d->m_selected)
+			{ 
+				for (int i = 0; i < d->m_marker.size() - 1; ++i)
+				{
+					if (std::abs(d->m_marker[i]->xValue() - point.x()) < tol_x && std::abs(d->m_marker[i]->yValue() - point.y()) < tol_y)
+					{
+						result = (i + hitResize);
+						break;
+					}
+				}
+			}
+
+			if (result == hitNone)
+			{
+				//inverse transform point
+				QPointF size = shape.basePoints()[1] - shape.basePoints()[0];
+				double a = std::abs(size.x()) / 2.0 + tol_x;
+				double b = std::abs(size.y()) / 2.0 + tol_y;
+				QPointF center = shape.baseCenterPoint();
+				double x = point_trafo.x() - center.x();
+				double y = point_trafo.y() - center.y();
+
+				if ((((x*x) / (a*a)) + ((y*y) / (b*b))) <= 1.0)
+				{
+					a -= 2 * tol_x;
+					b -= 2 * tol_y;
+					if ((((x*x) / (a*a)) + ((y*y) / (b*b))) > 1.0)
+					{
+                        if (moveable)
+                        {
+						    result = hitMove;
+                        }
+                        else if (rotatable)
+                        {
+                            result = hitRotation;
+                        }
+					}
+				}
+			}
         }
         break;
 
         case ito::Shape::MultiPointPick:
         case ito::Shape::Polygon:
         {
-            QLineF line;
-            for (int i = 0; i < shape.basePoints().size(); ++i)
+            if (moveable || resizeable)
             {
-                line = QLineF(point_trafo, shape.basePoints()[i]);
-                if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y))
+                QLineF line;
+                bool hit_edge = false;
+                const QPolygonF &basePoints = shape.basePoints();
+
+                for (int i = 0; i < basePoints.size(); ++i)
                 {
-                    hitEdge = true;
-                    break;
-                }
-                int closed = shape.unclosed();
-                if (i < shape.basePoints().size() - closed)
-                {
-                    if (hitEdge = hitLine(point, QLineF(shape.basePoints()[i], shape.basePoints()[(i + 1) % shape.basePoints().size()]), tol_x, tol_y))
+                    line = QLineF(point_trafo, basePoints[i]);
+                    if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y))
+                    {
+                        hit_edge = true;
                         break;
+                    }
+                    int closed = shape.unclosed() ? 1 : 0;
+                    if (i < shape.basePoints().size() - closed)
+                    {
+                        if (hit_edge = hitLine(point_trafo, QLineF(basePoints[i], basePoints[(i + 1) % basePoints.size()]), tol_x, tol_y))
+                            break;
+                    }
+                }
+
+                if (hit_edge)
+                {
+                    if (resizeable)
+                    {
+                        qreal dist_x, dist_y;
+
+                        for (int i = 0; i < d->m_marker.size(); ++i)
+                        {
+                            dist_x = std::abs(d->m_marker[i]->xValue() - point.x());
+                            dist_y = std::abs(d->m_marker[i]->yValue() - point.y());
+                            if ((dist_x <= tol_x) && (dist_y <= tol_y))
+                            {
+                                result = (i + hitResize);
+                                break;
+                            }
+                        }
+
+                        //if not yet selected, but not moveable. The user clicked any part of the
+                        //contour but not the corner squares, nevertheless, the item should be
+                        //selected for any resize operation.
+                        if (result == hitNone && !d->m_selected && !moveable)
+                        {
+                            result = hitMove;
+                        }
+                    }
+
+                    if (result == hitNone && moveable)
+                    {
+                        result = hitMove;
+                    }
                 }
             }
         }
@@ -1164,53 +1362,8 @@ char DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
         break;
     }
 
-    if (hitEdge)
-    {
-        int flags = d->m_shape.flags();
-        bool moveable = !(flags & ito::Shape::MoveLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Move);
-        bool resizeable = !(flags & ito::Shape::ResizeLock) && d->m_modificationModes.testFlag(ItomQwtPlotEnums::Resize);
 
-        if (d->m_shape.type() == ito::Shape::Point)
-        {
-            if (moveable)
-            {
-                return 0;
-            }
-        }
-        else
-        {
-            if (resizeable)
-            {
-                qreal dist_x, dist_y;
-
-                for (int i = 0; i < d->m_marker.size(); ++i)
-                {
-                    dist_x = std::abs(d->m_marker[i]->xValue() - point.x());
-                    dist_y = std::abs(d->m_marker[i]->yValue() - point.y());
-                    if (dist_x <= tol_x && \
-                        dist_y <= tol_y)
-                    {
-                        return (i + 1);
-                    }
-                }
-
-                //if not yet selected, but not moveable. The user clicked any part of the
-                //contour but not the corner squares, nevertheless, the item should be
-                //selected for any resize operation.
-                if (!d->m_selected && !moveable)
-                {
-                    return 0;
-                }
-            }
-
-            if (moveable)
-            {
-                return 0;
-            }
-        }
-    }
-
-    return -1;
+    return result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

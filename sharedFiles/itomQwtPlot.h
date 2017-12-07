@@ -254,6 +254,7 @@ private:
 
     int m_buttonStyle; /*!< 0: dark buttons for bright theme, 1: bright buttons for dark theme */
     bool m_boxFrame;
+	int m_mouseCatchTolerancePx; /*!< number of pixels used as tolerance for clicking a certain marker or object with the mouse (default: 8px).*/
     
     int m_state; /*!< current state (value of enum State or stateUser + X) */
     bool m_stateIsChanging;
