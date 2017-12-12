@@ -135,7 +135,8 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
         inline QString fromStdLatin1String(const std::string &str) { return QString::fromLatin1(str.data()); }
         bool hasXObj;
-        
+        QString m_dObjAxisDescription;
+        QString m_dObjAxisUnit;
 
     private:
         
@@ -148,8 +149,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         
         QString m_dObjValueDescription;
         QString m_dObjValueUnit;
-        QString m_dObjAxisDescription;
-        QString m_dObjAxisUnit;
+
         bool m_autoScaleY;
         double m_minY;
         double m_maxY;

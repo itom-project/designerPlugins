@@ -59,24 +59,10 @@ private:
 
     const ito::DataObject* m_pXVec;               /*!< borrowed reference, do not delete here */
     //template<typename _T> RetVal sortValues(const DataObject* obj, const int& x1, const int& y1);
+    
 
-
-    ColorType m_colorState;
-    bool inSamplingMode;
-    int m_fast;
     QByteArray m_hash;
 
-    QString m_dObjValueDescription;
-    QString m_dObjValueUnit;
-    QString m_dObjAxisDescription;
-    QString m_dObjAxisUnit;
-    bool m_autoScaleY;
-    double m_minY;
-    double m_maxY;
-    bool m_autoScaleX;
-    double m_minX;
-    double m_maxX;
-    ItomQwtPlotEnums::ComplexType m_cmplxState;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

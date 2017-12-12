@@ -29,17 +29,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
-    DataObjectSeriesData(fastmode),
-    m_fast(fastmode),
-    m_autoScaleY(true),
-    m_minY(-1.0),
-    m_maxY(2.0),
-    m_autoScaleX(true),
-    m_minX(-1.0),
-    m_maxX(1.0),
-    m_cmplxState(ItomQwtPlotEnums::CmplxAbs),
-    inSamplingMode(false),
-    m_colorState(grayColor)
+    DataObjectSeriesData(fastmode)
 {
     m_dX.nrPoints = 0;
     m_dX.points.clear();
@@ -301,6 +291,22 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                 }
                 if (!retval.containsError())
                 {
+                    description = xVec->getValueDescription();
+                    unit = xVec->getValueUnit();
+                    if (description == "")
+                    {
+                        description = QObject::tr("x-axis").toLatin1().data();
+                    }
+                    if (unit == "")
+                    {
+                        m_dObjAxisUnit = "";
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                    }
+                    else
+                    {
+                        m_dObjAxisUnit = fromStdLatin1String(unit);
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                    }
                     m_pXVec = xVec;
                     calcHash();
                 }
