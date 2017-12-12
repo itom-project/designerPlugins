@@ -293,19 +293,15 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                 {
                     description = xVec->getValueDescription();
                     unit = xVec->getValueUnit();
-                    if (description == "")
+                    if (unit != "" || description != "") //xVec value description dominates over source axis- and unit decription
                     {
-                        description = QObject::tr("x-axis").toLatin1().data();
-                    }
-                    if (unit == "")
-                    {
-                        m_dObjAxisUnit = "";
+                        if (description == "")
+                        {
+                            description = "x-Axis";
+                        }
                         m_dObjAxisDescription = fromStdLatin1String(description);
-                    }
-                    else
-                    {
                         m_dObjAxisUnit = fromStdLatin1String(unit);
-                        m_dObjAxisDescription = fromStdLatin1String(description);
+
                     }
                     m_pXVec = xVec;
                     calcHash();
