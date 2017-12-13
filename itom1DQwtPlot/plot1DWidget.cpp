@@ -1612,6 +1612,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     {
                         m_pData->m_axisState = ItomQwtPlotEnums::evenlySpaced;
                     }
+                    m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject ? setSendCurrentViewState(false) : setSendCurrentViewState(true);
                     if (seriesData && seriesData->isDobjInit())
                     {
                         if (m_pData->m_axisState & ItomQwtPlotEnums::evenlySpaced)
@@ -3551,7 +3552,11 @@ void Plot1DWidget::setPickerText(const QString &coords, const QString &offsets)
     m_pLblMarkerCoords->setText(coords != "" ? coords : "    \n    ");
     m_pLblMarkerOffsets->setText(offsets != "" ? offsets : "    \n    ");
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setSendCurrentViewState(bool state)
+{
+    m_pActSendCurrentToWorkspace->setEnabled(state);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::enableObjectGUIElements(const int mode)
 {

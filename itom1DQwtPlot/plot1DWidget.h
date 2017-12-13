@@ -161,8 +161,8 @@ class Plot1DWidget : public ItomQwtPlot
             int curveIdx;
             int dObjDataIdx;
         };
-
-        void stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart = -1);
+        void setSendCurrentViewState(bool state);
+        void stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart = NAN);
         void stickPickerToSampleIdx(Picker *m, int idx, int dir);
         void updatePickerPosition(bool updatePositions, bool clear = false);
         void createActions();

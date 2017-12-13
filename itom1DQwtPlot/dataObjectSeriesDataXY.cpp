@@ -499,17 +499,34 @@ template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const 
     double dif;
     double previous = INFINITY;
     rowPtr = (_Tp*)mat->ptr(d.startPx.y());
-    QPointF currentVal;
-    for (col = 0; col < width; ++col) //search along one row
+    const double epsilon = std::numeric_limits<double>::epsilon();
+    if (qIsFinite(val.y()))
     {
-        currentVal =  data->sample(col)-val;
-        dif = currentVal.manhattanLength();
-
-
-        if (previous > dif)
+        QPointF currentVal;
+        for (col = 0; col < width; ++col) //search along one row
         {
-            previous = dif;
-            idx = col;
+            currentVal = data->sample(col) - val;
+            dif = currentVal.manhattanLength();
+
+            
+            if ((previous - dif) > epsilon)
+            {
+                previous = dif;
+                idx = col;
+            }
+        }
+    }
+    else
+    {
+        double currentDist;
+        for (col = 0; col < width; ++col)
+        {
+            currentDist = qAbs(data->sample(col).x() - val.x());
+            if ((previous - currentDist) > epsilon)
+            {
+                previous = currentDist;
+                idx = col;
+            }
         }
     }
     return idx;
