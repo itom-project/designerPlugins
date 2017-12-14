@@ -1594,6 +1594,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         pts[1].setY(dataObj->getPixToPhys(dims-2, m_colorState ? 0 : n, _unused));               
                     }
                     int previousAxisState = m_pData->m_axisState;
+                    if (xVec->getDims() == 0)
+                    {
+                        xVec = NULL; // if XVec is set to None the dataObject will have no dimensions
+                    }
                     if (xVec) //we need to check if the dataObject is valid
                     {
                         m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject;
