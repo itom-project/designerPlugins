@@ -146,7 +146,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
 
     Q_CLASSINFO("prop://antiAliased", "True, if all curves should be plot with an anti-aliased render mode (slower) or False if not (faster).")
-
+    Q_CLASSINFO("prop://xVector", "DataObject representing the x-vector of the plot. Expect a two dimensional dataObject with the last dimension equivalent to the source object. The first dimension must be one.")
 
     Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical (axis) or in pixel coordinates.\n"
     "\n"
