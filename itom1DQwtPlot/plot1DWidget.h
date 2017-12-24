@@ -166,7 +166,7 @@ class Plot1DWidget : public ItomQwtPlot
         void stickPickerToSampleIdx(Picker *m, int idx, int dir);
         void updatePickerPosition(bool updatePositions, bool clear = false);
         void createActions();
-        ito::RetVal validateXVec(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec);
+        ito::RetVal validateXVec(const ito::DataObject* dataObj, const ito::DataObject* xVec, const QVector<QPointF> &bounds);
         inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
 
         QList<QwtPlotCurve*> m_plotCurveItems;

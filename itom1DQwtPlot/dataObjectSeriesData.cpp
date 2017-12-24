@@ -90,6 +90,7 @@ bool DataObjectSeriesData::floatingPointValues() const
 //----------------------------------------------------------------------------------------------------------------------------------
 int DataObjectSeriesData::getPosToPix(const double physx, const double physy /*=-1*/) const
 {
+    Q_UNUSED(physy);
     if (m_d.valid && m_d.nrPoints > 0)
     {
         double dist = (physx - m_d.startPhys);
@@ -142,8 +143,9 @@ void DataObjectSeriesData::calcHash()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/)
+RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/, const QVector<QPointF>& boundsX)
 {
+    Q_UNUSED(boundsX);
     Q_UNUSED(xVec);
     RetVal retval;
     bool _unused;

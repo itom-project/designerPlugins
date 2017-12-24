@@ -102,7 +102,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         bool floatingPointValues() const;
 
-        virtual RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec = NULL);
+        virtual RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec = NULL, const QVector<QPointF>& boundsX = QVector<QPointF>());
         const ito::DataObject* getDataObject() const { return m_pDataObj; }
 
         inline void setCmplxState(ItomQwtPlotEnums::ComplexType state) { m_cmplxState = state; }

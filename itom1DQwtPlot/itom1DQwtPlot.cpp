@@ -252,10 +252,6 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
-    if (m_pInput["xVec"]->getVal<ito::DataObject*>())
-    {
- 
-    }
     if (m_pInput["source"]->getVal<ito::DataObject*>())
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);

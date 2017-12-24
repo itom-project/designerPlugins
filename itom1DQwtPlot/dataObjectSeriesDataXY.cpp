@@ -156,7 +156,7 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
     }
 }
 
-RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/)
+RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/, const QVector<QPointF>& boundsX /*= QVector<QPointF>()*/)
 {
     DataObjectSeriesData::updateDataObject(dataObj, bounds);
     RetVal retval;
@@ -194,48 +194,26 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             ++prependOneDimsX;
         }
 
-        QVector<QPointF> tmpBoundsX(2);
-
         m_dX.plane = 0;
-        tmpBoundsX[0].setX(xVec->getPixToPhys(dimsX - 1, 0, _unused));
-        tmpBoundsX[1].setX(xVec->getPixToPhys(dimsX - 1, width - 1, _unused));
-        tmpBoundsX[0].setY(xVec->getPixToPhys(dimsX - 2,  0 , _unused));
-        tmpBoundsX[1].setY(xVec->getPixToPhys(dimsX - 2, height-1, _unused));
         
         if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[m_dX.plane])->data)
             return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
 
-        if (tmpBoundsX.size() != 2) //size will be one if a line of a Stack is extracted 
-        {
-            retval += RetVal(retError, 0, "bounds vector must have 2 entries");
-        }
-        if (!retval.containsError())
-        {
-            //dir X, dirY
-            if ((dimsX - prependOneDimsX) != 2)//check if xVec is 2d
-            {
-                m_dX.valid = false;
-                retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject or the first (n-2) dimension must have a size of 1 for representing x-vector");
-            }
-            else if (xVec->getSize(dimsX - 2) != 1)//check if first dimension of xVec is of shape 1
-            {
-                m_dX.valid = false;
-                retval += RetVal(retError, 0, "xy line plot requires a 2-dim dataObject with a size of 1 for the first dimension");
-            }
             if (!retval.containsError())
             {
                 m_dX.valid = true;
 
-                //bounds phys to pix of xVex
-                pxX1x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[0].x(), _unused));
-                pxY1x = qRound(xVec->getPixToPhys(dimsX - 2, tmpBoundsX[0].y(), _unused));
-                pxX2x = qRound(xVec->getPixToPhys(dimsX - 1, tmpBoundsX[1].x(), _unused));
-                pxY2x = qRound(xVec->getPixToPhys(dimsX - 2, tmpBoundsX[1].y(), _unused));
+
+                pxX1x = qRound(xVec->getPhysToPix(dimsX - 1, boundsX[0].x(), _unused));
+                pxY1x = qRound(xVec->getPhysToPix(dimsX - 2, boundsX[0].y(), _unused));
+                pxX2x = qRound(xVec->getPhysToPix(dimsX - 1, boundsX[1].x(), _unused));
+                pxY2x = qRound(xVec->getPhysToPix(dimsX - 2, boundsX[1].y(), _unused));
 
                 saturation(pxX1x, 0, xVec->getSize(dimsX - 1) - 1);
                 saturation(pxX2x, 0, xVec->getSize(dimsX - 1) - 1);
                 saturation(pxY1x, 0, xVec->getSize(dimsX - 2) - 1);
                 saturation(pxY2x, 0, xVec->getSize(dimsX - 2) - 1);
+
 
 
                 mat = (cv::Mat*)xVec->get_mdata()[xVec->seekMat(m_dX.plane)];
@@ -267,27 +245,8 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                     }
                     else
                     {
-                        m_dX.nrPoints = 1 + pxX1x - pxX2x;
-                        if (m_dX.nrPoints != size())
-                        {
-                            if (m_dX.nrPoints > size())
-                            {
-                                retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
-                            }
-                            else
-                            {
-                                m_dX.valid = false;
-                                retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
-                                
-                            }
-                        }
-                        m_dX.startPx.setX(pxX2x);
-                        m_dX.startPx.setY(pxY2x);
-                        m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX2x;
-                        m_dX.matStepSize = (int)mat->step[1];
-                        m_dX.stepSizePx.setWidth(1);
-                        m_dX.stepSizePx.setHeight(0);
-                    }                    
+                        retval += RetVal(retError, 0, "recieved wrong bounds. Y-direction of x-vector no implemented.");
+                    }
                 }
                 if (!retval.containsError())
                 {
@@ -307,7 +266,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                     calcHash();
                 }
             }
-        }
+        
     }
     
     return retval;
@@ -347,8 +306,6 @@ QPointF DataObjectSeriesDataXY::sample(size_t n) const
     QPointF dObjPoint = DataObjectSeriesData::sample(n);
     const cv::Mat *mat;
     const uchar* ptr[1];
-    //float weights[4];
-    float fPos;
 
     if (m_pXVec && m_dX.valid)
     {
@@ -399,15 +356,26 @@ QPointF DataObjectSeriesDataXY::sample(size_t n) const
                 break;
             case ito::tFloat32:
                 dObjPoint.setX(*(reinterpret_cast<const ito::float32*>(ptr[0])));
+                if (qIsNaN(dObjPoint.x()))
+                {
+                    dObjPoint.setY(dObjPoint.x());
+                }
                 return dObjPoint;
                 break;
             case ito::tFloat64:
                 dObjPoint.setX(*(reinterpret_cast<const ito::float64*>(ptr[0])));
+                if (qIsNaN(dObjPoint.x()))
+                {
+                    dObjPoint.setY(dObjPoint.x());
+                }
                 return dObjPoint;
                 break;
             default:
                 qDebug() << "Type not implemented yet";
+                return QPointF();
+                break;
             }
+
         }
     return QPointF();
 }

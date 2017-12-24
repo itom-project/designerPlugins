@@ -43,7 +43,7 @@ class DataObjectSeriesDataXY : public DataObjectSeriesData
 public:
         explicit DataObjectSeriesDataXY(const int fastmode);
         ~DataObjectSeriesDataXY();
-        RetVal updateDataObject(const ito::DataObject* dataObj,QVector<QPointF> bounds, const ito::DataObject* xVec = NULL);
+        RetVal updateDataObject(const ito::DataObject* dataObj,QVector<QPointF> bounds, const ito::DataObject* xVec = NULL, const QVector<QPointF>& boundsX = QVector<QPointF>());
         
         int getPosToPix(const double physx, const double physy = -1) const;
 
