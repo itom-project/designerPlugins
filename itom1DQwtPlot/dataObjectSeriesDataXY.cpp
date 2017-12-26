@@ -220,7 +220,6 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                 if (pxY1x == pxY2x) //pure line in x direction of x vector
                 {
                     m_dX.dir = dirX;
-                    bool xFit = false;
                     if (pxX2x > pxX1x)
                     {
                         m_dX.nrPoints = 1 + pxX2x - pxX1x;
@@ -243,9 +242,33 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                         m_dX.stepSizePx.setWidth(1);
                         m_dX.stepSizePx.setHeight(0);
                     }
+                    else if(pxX1x == pxX2x)
+                    {
+                        m_dX.dir = dirY;
+                        if (pxY2x > pxY1x)
+                        {
+                            m_dX.nrPoints = 1 + pxY2x -pxY1x;
+                            if(m_dX.nrPoints > size())
+                            {
+                                retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                            }
+                            else
+                            {
+                                m_dX.valid = false;
+                                retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+                            }
+                        }
+                        m_dX.startPx.setX(pxX1x);
+                        m_dX.startPx.setY(pxY1x);
+                        m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
+                        m_dX.stepSizePx.setWidth(0);
+                        m_dX.stepSizePx.setHeight(1);
+                        m_dX.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
+
+                    }
                     else
                     {
-                        retval += RetVal(retError, 0, "recieved wrong bounds. Y-direction of x-vector no implemented.");
+                        retval += RetVal(retError, 0, "recieved invalid bounds.");
                     }
                 }
                 if (!retval.containsError())

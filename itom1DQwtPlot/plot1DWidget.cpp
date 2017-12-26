@@ -1500,7 +1500,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         {
             QVector<QPointF> pts(2);
             QVector<QPointF> ptsX(2);
-
+            int previousAxisState;
             switch(multiLineMode)
             {
             case ItomQwtPlotEnums::MultiLayerCols:
@@ -1516,6 +1516,31 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 {
                     pts[0].setY(dataObj->getPixToPhys(dims-2, 0, _unused));
                     pts[1].setY(dataObj->getPixToPhys(dims-2, height-1, _unused)); 
+                }
+                previousAxisState = m_pData->m_axisState;
+                if (xVec) //we need to check if the dataObject is valid
+                {
+
+                        m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject | ItomQwtPlotEnums::colState;
+                        retval += validateXVec(dataObj, xVec, pts);
+                        if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfektFit))
+                        {
+                            emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
+                        }
+                        if (m_pData->m_axisState & ItomQwtPlotEnums::mismatch)
+                        {
+                            //xVec = NULL;
+                            m_pData->m_axisState = ItomQwtPlotEnums::evenlySpaced; //since the xVec does not fit we go back to evenlyspaced plot
+                        }
+                        else
+                        {
+                            ptsX[0].setY(xVec->getPixToPhys(xVec->getDims() - 2, 0, _unused));
+                            ptsX[1].setY(xVec->getPixToPhys(xVec->getDims() - 2, xVec->getSize(xVec->getDims() - 2)-1, _unused));
+                        }
+                }
+                else
+                {
+                    m_pData->m_axisState = ItomQwtPlotEnums::evenlySpaced;
                 }
 
                 for (int n = 0; n < numCurves; n++)
@@ -1533,15 +1558,54 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                         pts[0].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));
                         pts[1].setX(dataObj->getPixToPhys(dims-1, m_colorState ? 0 : n, _unused));                    
                     }
-
+                    if (m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject)
+                    {
+                        ptsX[0].setX(xVec->getPixToPhys(xVec->getDims() - 1, n, _unused));
+                        ptsX[1].setX(ptsX[0].x());
+                    }
+                    m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject ? setSendCurrentViewState(false) : setSendCurrentViewState(true);
                     if (seriesData && seriesData->isDobjInit())
                     {
-                        seriesData->updateDataObject(dataObj, pts);
+                        if (m_pData->m_axisState & ItomQwtPlotEnums::evenlySpaced)
+                        {
+                            if (previousAxisState & ItomQwtPlotEnums::evenlySpaced)
+                            {
+                                seriesData->updateDataObject(dataObj, pts);
+                            }
+                            else
+                            {
+                                seriesData = new DataObjectSeriesData(1);
+                                seriesData->updateDataObject(dataObj, pts);
+                                m_plotCurveItems[n]->setData(seriesData);
+                            }
+                        }
+                        else if(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject)
+                        {
+                            if (previousAxisState & ItomQwtPlotEnums::xAxisObject)
+                            {
+                                seriesData->updateDataObject(dataObj, pts, xVec, ptsX);
+                            }
+                            else
+                            {
+                                seriesData = new DataObjectSeriesDataXY(1);
+                                seriesData->updateDataObject(dataObj, pts, xVec, ptsX);
+                                m_plotCurveItems[n]->setData(seriesData);
+                            }
+                        }
                     }
                     else
                     {
-                        seriesData = new DataObjectSeriesData(1);
-                        seriesData->updateDataObject(dataObj, pts);
+                        if (m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject)
+                        {
+                            seriesData = new DataObjectSeriesDataXY(1);
+                            seriesData->updateDataObject(dataObj, pts, xVec, ptsX);
+
+                        }
+                        else
+                        {
+                            seriesData = new DataObjectSeriesData(1);
+                            seriesData->updateDataObject(dataObj, pts);
+                        }
                         m_plotCurveItems[n]->setData(seriesData);
                     }
                     if (m_colorState)
@@ -1577,11 +1641,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     pts[0].setX(dataObj->getPixToPhys(dims - 1, 0, _unused));
                     pts[1].setX(dataObj->getPixToPhys(dims - 1, width - 1, _unused));            
                 }
-                int previousAxisState = m_pData->m_axisState;
+                previousAxisState = m_pData->m_axisState;
                 if (xVec) //we need to check if the dataObject is valid
                 {
 
-                        m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject;
+                        m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject | ItomQwtPlotEnums::rowState;
                         retval += validateXVec(dataObj, xVec, pts);
                         if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfektFit))
                         {
@@ -1861,8 +1925,23 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, const ito
     ito::RetVal retval;
     if (dataObj != NULL && xVec != NULL)
     {
+        int curveAxisShapeX, dataAxisShapeX, dataAxisShapeDObj ,curveAxisShapeDObj;
         if (bounds.size() == 2)
         {
+            if(m_pData->m_axisState & ItomQwtPlotEnums::rowState)
+            {
+                curveAxisShapeX = xVec->getSize(xVec->getDims() - 2);//representing the number of x-vectors
+                curveAxisShapeDObj = dataObj -> getSize(dataObj->getDims()-2);//representing the number of values inside an x-vector
+                dataAxisShapeX = xVec->getSize(xVec->getDims() - 1);
+                dataAxisShapeDObj = dataObj -> getSize(dataObj->getDims()-1);
+            }
+            else
+            {
+                curveAxisShapeX = xVec->getSize(xVec->getDims() - 1);
+                curveAxisShapeDObj = dataObj -> getSize(dataObj->getDims()-1);
+                dataAxisShapeX = xVec->getSize(xVec->getDims() - 2);
+                dataAxisShapeDObj = dataObj -> getSize(dataObj->getDims()-2);
+            }
             int dimsX = xVec->getDims();
             int prependOneDimsX = 0;
             int i;
@@ -1885,15 +1964,37 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, const ito
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
             }
 
-            else if (dataObj->getSize(dataObj->getDims() - 1) > xVec->getSize(xVec->getDims() - 1))
+            else if (dataAxisShapeDObj > dataAxisShapeX)
             {
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
-                retval += RetVal(retError, 0, "shape of thex-axis object does not fit to source obj. Expect an xObj with a shape of (1 x m) or (n x m) for an (n x m) source object");
+                if(m_pData->m_axisState & ItomQwtPlotEnums::rowState)
+                {
+                    retval += RetVal(retError, 0, QString("wrong xObject shape. Expect a shape of (1 x %2) or (%1 x %2)").arg(curveAxisShapeDObj).arg(dataAxisShapeDObj).toLatin1().data());
+                }
+                else if(m_pData->m_axisState & ItomQwtPlotEnums::colState)
+                {
+                    retval += RetVal(retError, 0, QString("wrong xObject shape. Expect a shape of (%1 x 1) or (%1 x %2)").arg(dataAxisShapeDObj).arg(curveAxisShapeDObj).toLatin1().data());
+                }
+                else
+                {
+                    retval += RetVal(retError, 0, "unexpected axis state");
+                }
             }
-            else if (dataObj->getSize(dataObj->getDims() - 2) > xVec->getSize(xVec->getDims() - 2) && xVec->getSize(xVec->getDims() - 2) != 1) //todo for other dimension and check if correct
+            else if (curveAxisShapeDObj > curveAxisShapeX && curveAxisShapeX != 1) //todo for other dimension and check if correct
             {
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
-                retval += RetVal(retError, 0, "xObj shape does not fit to source obj. Expect an xObj with a shpe of (1 x m) or (n x m) for an (n x m) source object");
+                if(m_pData->m_axisState & ItomQwtPlotEnums::rowState)
+                {
+                    retval += RetVal(retError, 0, QString("wrong xObject shape. Expect a shape of (1 x %2) or (%1 x %2)").arg(curveAxisShapeDObj).arg(dataAxisShapeDObj).toLatin1().data());
+                }
+                else if(m_pData->m_axisState & ItomQwtPlotEnums::colState)
+                {
+                    retval += RetVal(retError, 0, QString("wrong xObject shape. Expect a shape of (%1 x 1) or (%1 x %2)").arg(dataAxisShapeDObj).arg(curveAxisShapeDObj).toLatin1().data());
+                }
+                else
+                {
+                    retval += RetVal(retError, 0, "unexpected axis state");
+                }
 
             }
             else if (xVec->getType() == ito::tComplex128 || xVec->getType() == ito::tComplex64 || xVec->getType() == ito::tRGBA32)
@@ -1901,7 +2002,7 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, const ito
                 retval += ito::RetVal(ito::retError, 0, QObject::tr("wrong x-vector data type. Complex64 and RGBA32 are not supported.").toLatin1().data());
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
             }
-            if (dataObj->getSize(dataObj->getDims() - 2) < xVec->getSize(xVec->getDims() - 2) || dataObj->getSize(dataObj->getDims() - 1) < xVec->getSize(xVec->getDims() - 1))
+            if (curveAxisShapeDObj < curveAxisShapeX || dataAxisShapeDObj < dataAxisShapeX)
             {
                 retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. Unused values will be ignored.");
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::noPerfektFit;

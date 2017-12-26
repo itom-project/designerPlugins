@@ -90,7 +90,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine valueScale READ getValueScale WRITE setValueScale USER true);
     Q_PROPERTY(ItomQwtPlotEnums::ScaleEngine axisScale READ getAxisScale WRITE setAxisScale USER true);
 
-    Q_PROPERTY(QSharedPointer<ito::DataObject> xVector READ getXObj WRITE setXObj DESIGNABLE false USER false);
+    Q_PROPERTY(QSharedPointer<ito::DataObject> xObject READ getXObj WRITE setXObj DESIGNABLE false USER false);
 
     Q_PROPERTY(bool antiAliased READ getAntiAliased WRITE setAntiAliased DESIGNABLE true USER true);
 	Q_PROPERTY(int legendLabelWidth READ getLegendLabelWidth WRITE setLegendLabelWidth USER true);
@@ -146,7 +146,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
 
     Q_CLASSINFO("prop://antiAliased", "True, if all curves should be plot with an anti-aliased render mode (slower) or False if not (faster).")
-    Q_CLASSINFO("prop://xVector", "DataObject representing the x-vector of the plot. Expect a two dimensional dataObject with the last dimension equivalent to the source object. The first dimension must be one.")
+    Q_CLASSINFO("prop://xObject", "DataObject representing the x-vector of the plot. Expect a two dimensional dataObject with a (n x m) or (1 x m) shape for an (n x m) source object with n < m. For n > m a shape of (n x 1) or (n x m) is exspected.")
 
     Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical (axis) or in pixel coordinates.\n"
     "\n"
