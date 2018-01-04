@@ -162,7 +162,6 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
     RetVal retval;
     bool _unused;
     QRectF p;
-    float right;
     cv::Mat *mat;
     int pxX1x, pxX2x, pxY1x, pxY2x;
     std::string description, unit;
@@ -442,6 +441,7 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
         case ito::tFloat64:
             findMinMaxFloat<ito::float64>(m_pXVec, m_dX, min, max, samplesY);
             break;
+        //todo xy: what about complex and rgba data types? are they blocked (which would be reasonable)
         }
 
         if ((max - min) < std::numeric_limits<double>::epsilon())
@@ -474,7 +474,9 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
         rect.setWidth(width);
         return rect;
     }
+    //todo xy: what is returned in the non-existing else-case?
 }
+
 template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const ito::DataObject *obj,  const QPointF& val)
 {
     const DataObjectSeriesData::LineData& d= data->m_dX;
@@ -488,7 +490,7 @@ template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const 
     int idx = 0;
     _Tp* rowPtr;
     double dif;
-    double previous = INFINITY;
+    double previous = std::numeric_limits<double>::infinity();
     rowPtr = (_Tp*)mat->ptr(d.startPx.y());
     const double epsilon = std::numeric_limits<double>::epsilon();
     if (qIsFinite(val.y()))

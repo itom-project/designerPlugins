@@ -162,7 +162,7 @@ class Plot1DWidget : public ItomQwtPlot
             int dObjDataIdx;
         };
         void setSendCurrentViewState(bool state);
-        void stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart = NAN);
+        void stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart = std::numeric_limits<double>::quiet_NaN());
         void stickPickerToSampleIdx(Picker *m, int idx, int dir);
         void updatePickerPosition(bool updatePositions, bool clear = false);
         void createActions();
