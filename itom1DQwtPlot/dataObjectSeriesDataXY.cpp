@@ -196,7 +196,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         m_dX.plane = 0;
         
         if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[m_dX.plane])->data)
-            return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the x-vector seems corrupted").toLatin1().data());
+            return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the xData seems corrupted").toLatin1().data());
 
             if (!retval.containsError())
             {
@@ -226,12 +226,12 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                         {
                             if (m_dX.nrPoints > size())
                             {
-                                retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                                retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
                             }
                             else
                             {
                                 m_dX.valid = false;
-                                retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+                                retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
                             }
                         }
                         m_dX.startPx.setX(pxX1x);
@@ -249,12 +249,12 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                             m_dX.nrPoints = 1 + pxY2x -pxY1x;
                             if(m_dX.nrPoints > size())
                             {
-                                retval += RetVal(retWarning, 0, "x-vector contains more values than the source dataObject. The last values will be ignored ignored.");
+                                retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
                             }
                             else
                             {
                                 m_dX.valid = false;
-                                retval += RetVal(retError, 0, "the x-vector does not contain enough values for the current source dataObject");
+                                retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
                             }
                         }
                         m_dX.startPx.setX(pxX1x);
@@ -442,6 +442,7 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
             findMinMaxFloat<ito::float64>(m_pXVec, m_dX, min, max, samplesY);
             break;
         //todo xy: what about complex and rgba data types? are they blocked (which would be reasonable)
+            //they are blocked before
         }
 
         if ((max - min) < std::numeric_limits<double>::epsilon())
@@ -472,9 +473,9 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
         }
         rect.setX(min);
         rect.setWidth(width);
-        return rect;
+        
     }
-    //todo xy: what is returned in the non-existing else-case?
+    return rect;
 }
 
 template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const ito::DataObject *obj,  const QPointF& val)
