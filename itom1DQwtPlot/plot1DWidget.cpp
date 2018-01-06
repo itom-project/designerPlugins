@@ -1522,7 +1522,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 {
 
                         m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject | ItomQwtPlotEnums::colState;
-                        retval += validateXVec(dataObj, xVec, pts);
+                        retval += validateXData(dataObj, xVec, pts);
                         if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfektFit))
                         {
                             emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
@@ -1646,7 +1646,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 {
 
                         m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject | ItomQwtPlotEnums::rowState;
-                        retval += validateXVec(dataObj, xVec, pts);
+                        retval += validateXData(dataObj, xVec, pts);
                         if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfektFit))
                         {
                             emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
@@ -1920,7 +1920,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, const ito::DataObject* xVec, const QVector<QPointF> &bounds)
+ito::RetVal Plot1DWidget::validateXData(const ito::DataObject* dataObj, const ito::DataObject* xVec, const QVector<QPointF> &bounds)
 {
     ito::RetVal retval;
     if (dataObj != NULL && xVec != NULL)
@@ -1999,7 +1999,7 @@ ito::RetVal Plot1DWidget::validateXVec(const ito::DataObject* dataObj, const ito
             }
             else if (xVec->getType() == ito::tComplex128 || xVec->getType() == ito::tComplex64 || xVec->getType() == ito::tRGBA32)
             {
-                retval += ito::RetVal(ito::retError, 0, QObject::tr("wrong xData data type. Complex64 and RGBA32 are not supported.").toLatin1().data());
+                retval += ito::RetVal(ito::retError, 0, QObject::tr("wrong xData data type. Complex64 and Rgba32 are not supported.").toLatin1().data());
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
             }
             if (curveAxisShapeDObj < curveAxisShapeX || dataAxisShapeDObj < dataAxisShapeX)

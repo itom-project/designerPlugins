@@ -60,7 +60,7 @@ void Itom1DQwtPlot::constructor()
     d = new Itom1DQwtPlotPrivate();
 
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
-    m_pInput.insert("xVec", new ito::Param("xVec", ito::ParamBase::DObjPtr, NULL, tr("represents the xData of the given source object").toLatin1().data()));
+    m_pInput.insert("xData", new ito::Param("xData", ito::ParamBase::DObjPtr, NULL, tr("represents the xData of the given source object").toLatin1().data()));
 
     d->m_pData = new InternalData();
     d->m_pData->m_autoAxisLabel = true;
@@ -252,7 +252,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
-    if (m_pInput["source"]->getVal<ito::DataObject*>())
+    if (m_pInput["source"]->getVal<const ito::DataObject*>())
     {
         m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
         // why "source" is used here and not "displayed" .... ck 05/15/2013
@@ -260,7 +260,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
         ito::Channel* dataChannel = getInputChannel("source");
         m_pContent->m_hasParentForRescale = (dataChannel && dataChannel->getParent());
 
-        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds, m_pInput["xVec"]->getVal<ito::DataObject*>());
+        m_pContent->refreshPlot(m_pInput["source"]->getVal<const ito::DataObject*>(), bounds, m_pInput["xData"]->getVal<const ito::DataObject*>());
     }
 
     return ito::retOk;
