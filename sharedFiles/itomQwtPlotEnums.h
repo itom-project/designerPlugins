@@ -69,7 +69,7 @@ public:
         xAxisObject = 0x00002,
         colState = 0x00004,
         rowState = 0x00008,
-        noPerfektFit = 0x0010,
+        noPerfectFit = 0x0010,
         mismatch = 0x0020
     };
     enum MultiLineMode { AutoRowCol, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };

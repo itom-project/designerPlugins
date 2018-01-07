@@ -1523,7 +1523,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
                         m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject | ItomQwtPlotEnums::colState;
                         retval += validateXData(dataObj, xVec, pts);
-                        if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfektFit))
+                        if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfectFit))
                         {
                             emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
                         }
@@ -1647,7 +1647,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
                         m_pData->m_axisState = ItomQwtPlotEnums::xAxisObject | ItomQwtPlotEnums::rowState;
                         retval += validateXData(dataObj, xVec, pts);
-                        if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfektFit))
+                        if ((m_pData->m_axisState & ItomQwtPlotEnums::mismatch) || (m_pData->m_axisState & ItomQwtPlotEnums::noPerfectFit))
                         {
                             emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
                         }
@@ -2005,7 +2005,7 @@ ito::RetVal Plot1DWidget::validateXData(const ito::DataObject* dataObj, const it
             if (curveAxisShapeDObj < curveAxisShapeX || dataAxisShapeDObj < dataAxisShapeX)
             {
                 retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. Unused values will be ignored.");
-                m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::noPerfektFit;
+                m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::noPerfectFit;
             }
         }
     }
