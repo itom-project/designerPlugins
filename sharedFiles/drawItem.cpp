@@ -65,13 +65,18 @@ class DrawItemPrivate
         QPointF m_point2;
 
         ItomQwtPlotEnums::ModificationModes m_modificationModes;
+
+        int m_currentMarker;
+
+        int m_rotationMarkerIndex;
+        QPointF m_rotationMarkerBasePoint; //this is the point that lies in the middle between the two corner points of the bottom line
+        QPointF m_rotationMarkerPoint; //this is the real point of the rotation marker, however the distance to the base point might change, depending on the current axis scales
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/, bool labelVisible /*= false*/) : 
     QwtPlotShapeItem(shape.name()), 
-    d(NULL),
-    m_currentMarker(-1)
+    d(NULL)
 {
     d = new DrawItemPrivate();
     
@@ -88,6 +93,12 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     d->m_elementPen = QPen(QBrush(Qt::red), 1, Qt::SolidLine);
 
     d->m_labelTextColor = QColor(Qt::red);
+
+    d->m_rotationMarkerIndex = -1;
+    d->m_rotationMarkerBasePoint = QPointF();
+    d->m_rotationMarkerPoint = QPointF();
+    d->m_currentMarker = -1;
+
     if (ito::ITOM_API_FUNCS_GRAPH)
     {
         if (d->m_pparent->parent())
@@ -142,6 +153,12 @@ DrawItem::~DrawItem()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+int DrawItem::getSelectedMarker() const
+{ 
+    return d->m_currentMarker; 
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void DrawItem::setFillOpacity(int opacity, int opacitySelected)
 {
     if (opacity <= 0)
@@ -187,7 +204,8 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
     QwtPlotMarker *marker = NULL;
 
     setRenderHint(QwtPlotItem::RenderAntialiased, false);
-    m_currentMarker = -1;
+    d->m_currentMarker = -1;
+    d->m_rotationMarkerIndex = -1;
 
     switch (d->m_shape.type())
     {
@@ -224,7 +242,7 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
 
                 if (selected && resizeable)
                 {
-                    m_currentMarker = nMarker;
+                    d->m_currentMarker = nMarker;
                     if (d->m_marker.size() > d->m_shape.rbasePoints().size())
                     {
                         // some marker has been deleted, rebuild markers
@@ -389,11 +407,24 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
                     }
 
                     if (box.bottom() < box.top())
-                        pt = trafo.map(QPointF(0.5 * (box.bottomLeft().x() + box.bottomRight().x()), 0.5 * (box.bottomLeft().y() + box.bottomRight().y()) - 5));
+                    {
+                        d->m_rotationMarkerBasePoint = trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
+                        d->m_rotationMarkerPoint = trafo.map(QPointF(0.5 * (box.bottomLeft().x() + box.bottomRight().x()), 0.5 * (box.bottomLeft().y() + box.bottomRight().y()) - 5));
+
+                        pt = d->m_rotationMarkerPoint;
+                    }
                     else
-                        pt = trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
-                    d->m_marker[d->m_marker.size() - 1]->setXValue(pt.x());
-                    d->m_marker[d->m_marker.size() - 1]->setYValue(pt.y());
+                    {
+                        d->m_rotationMarkerBasePoint = trafo.map(0.5 * (box.topLeft() + box.topRight()));
+                        d->m_rotationMarkerPoint = trafo.map(QPointF(0.5 * (box.topLeft().x() + box.topRight().x()), 0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
+
+                        pt = d->m_rotationMarkerPoint;
+                    }
+
+                    d->m_rotationMarkerIndex = d->m_marker.size() - 1;
+                    d->m_marker[d->m_rotationMarkerIndex]->setXValue(pt.x());
+                    d->m_marker[d->m_rotationMarkerIndex]->setYValue(pt.y());
+                    
                 }
             }
             else
@@ -1028,7 +1059,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
         QwtPlotShapeItem::setShape(path);
         QwtPlotShapeItem::setTitle(d->m_shape.name());
 
-        setSelected(d->m_selected, m_currentMarker); //to possibly adjust the position of markers
+        setSelected(d->m_selected, d->m_currentMarker); //to possibly adjust the position of markers
     }
 
     return retVal;
@@ -1046,6 +1077,17 @@ void DrawItem::draw( QPainter *painter,
             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
             const QRectF &canvasRect ) const
 {
+    if (d->m_rotationMarkerIndex >= 0)
+    {
+        QPointF diffScale = d->m_rotationMarkerPoint - d->m_rotationMarkerBasePoint;
+        QPointF diffPixel = QPointF(xMap.transform(diffScale.x()) - xMap.transform(0.0), yMap.transform(diffScale.y()) - yMap.transform(0.0));
+        qreal lenPx = qSqrt(diffPixel.x() * diffPixel.x() + diffPixel.y() * diffPixel.y());
+        diffPixel = diffPixel / lenPx * 25.0; //25.0 is the distance of the rotation marker from the shape in px
+        diffScale = QPointF(xMap.invTransform(diffPixel.x()) - xMap.invTransform(0.0), yMap.invTransform(diffPixel.y()) - yMap.invTransform(0.0));
+        d->m_marker[d->m_rotationMarkerIndex]->setXValue(d->m_rotationMarkerBasePoint.x() + diffScale.x());
+        d->m_marker[d->m_rotationMarkerIndex]->setYValue(d->m_rotationMarkerBasePoint.y() + diffScale.y());
+    }
+
     QwtPlotShapeItem::draw(painter, xMap, yMap, canvasRect);
 
     if(d->m_labelVisible)

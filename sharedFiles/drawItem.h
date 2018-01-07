@@ -91,11 +91,12 @@ class DrawItem : public QwtPlotShapeItem
             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
             const QRectF &canvasRect ) const;
 
-        int getSelectedMarker() { return m_currentMarker; }
+        int getSelectedMarker() const;
 
     private:
         DrawItemPrivate *d;
-        int m_currentMarker;
+        
+        
 };
 
 #endif //DRAWITEM_H
