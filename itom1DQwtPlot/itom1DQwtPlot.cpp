@@ -728,6 +728,7 @@ void Itom1DQwtPlot::setLegendPosition(LegendPos legendPosition)
 
     updatePropertyDock();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLegendLabelWidth(const int& len)
 {
@@ -737,16 +738,21 @@ void Itom1DQwtPlot::setLegendLabelWidth(const int& len)
 		updatePropertyDock();
 	}
 }
-ito::RetVal Itom1DQwtPlot::setXObj(QSharedPointer<ito::DataObject> obj)
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom1DQwtPlot::setXData(QSharedPointer<ito::DataObject> data)
 {
-    d->m_pData->m_forceValueParsing = true;
-    setAxisObj(obj, 1);
+    d->m_pData->m_forceValueParsing = true; //recalculate boundaries since content of data object may have changed
+    setAxisData(data, Qt::XAxis);
     return ito::retOk;
 }
-QSharedPointer<ito::DataObject> Itom1DQwtPlot::getXObj()
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> Itom1DQwtPlot::getXData() const
 {
-    return getAxisObj(1);
+    return getAxisData(Qt::XAxis);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getLegendLabelWidth() const
 {
@@ -756,6 +762,7 @@ int Itom1DQwtPlot::getLegendLabelWidth() const
 	}
 	return 15;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QStringList Itom1DQwtPlot::getLegendTitles() const
 {
