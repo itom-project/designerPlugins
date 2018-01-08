@@ -266,10 +266,11 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
+ito::RetVal Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 {
     d->m_pData->m_forceValueParsing = true; //recalculate boundaries since content of data object may have changed
     AbstractDObjFigure::setSource(source);
+    return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds) 
@@ -736,10 +737,11 @@ void Itom1DQwtPlot::setLegendLabelWidth(const int& len)
 		updatePropertyDock();
 	}
 }
-void Itom1DQwtPlot::setXObj(QSharedPointer<ito::DataObject> obj)
+ito::RetVal Itom1DQwtPlot::setXObj(QSharedPointer<ito::DataObject> obj)
 {
     d->m_pData->m_forceValueParsing = true;
     setAxisObj(obj, 1);
+    return ito::retOk;
 }
 QSharedPointer<ito::DataObject> Itom1DQwtPlot::getXObj()
 {

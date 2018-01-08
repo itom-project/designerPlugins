@@ -314,7 +314,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         bool getAntiAliased() const;
         void setAntiAliased(bool &antiAliased);
 
-        void setSource(QSharedPointer<ito::DataObject> source);
+        ito::RetVal setSource(QSharedPointer<ito::DataObject> source);
 
         void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
     
@@ -380,7 +380,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 		int getLegendLabelWidth() const;
 		void setLegendLabelWidth(const int& length);
 
-        void setXObj(QSharedPointer<ito::DataObject> obj);
+        ito::RetVal setXObj(QSharedPointer<ito::DataObject> obj);
         QSharedPointer<ito::DataObject> getXObj();
 		
         friend Plot1DWidget;
