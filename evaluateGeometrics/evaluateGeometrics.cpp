@@ -883,7 +883,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
         pos.setX(m_pContent->iconSize().width() + xSpacing);
         posI.setX(0);
         painter.setFont(  m_pContent->topLevelItem(topItem)->font(0) );
-        painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->text(0));
+        painter.drawStaticText(pos, (QStaticText)m_pContent->topLevelItem(topItem)->text(0));
         painter.drawPixmap(posI, m_pContent->topLevelItem(topItem)->icon(0).pixmap(m_pContent->iconSize()));
         pos.setY(pos.y() + linesize);
         posI.setY(posI.y() + linesize);
@@ -894,7 +894,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
             for (int childItem = 0; childItem < m_pContent->topLevelItem(topItem)->childCount(); childItem++)
             {
                 painter.setFont(  m_pContent->topLevelItem(topItem)->child(childItem)->font(0) );
-                painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->child(childItem)->text(0));
+                painter.drawStaticText(pos, (QStaticText)m_pContent->topLevelItem(topItem)->child(childItem)->text(0));
                 painter.drawPixmap(posI, m_pContent->topLevelItem(topItem)->child(childItem)->icon(0).pixmap(m_pContent->iconSize()));
                 pos.setY(pos.y() + linesize);
                 posI.setY(posI.y() + linesize);
@@ -912,7 +912,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
         {
             
             painter.setFont(  m_pContent->topLevelItem(topItem)->font(col) );
-            painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->text(col));
+            painter.drawStaticText(pos, (QStaticText)m_pContent->topLevelItem(topItem)->text(col));
             pos.setY(pos.y() + linesize);
 
             if (m_pContent->topLevelItem(topItem)->childCount() > 0)
@@ -920,7 +920,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
                 for (int childItem = 0; childItem < m_pContent->topLevelItem(topItem)->childCount(); childItem++)
                 {
                     painter.setFont(  m_pContent->topLevelItem(topItem)->child(childItem)->font(col) );
-                    painter.drawStaticText( pos, m_pContent->topLevelItem(topItem)->child(childItem)->text(col));
+                     painter.drawStaticText(pos, (QStaticText)m_pContent->topLevelItem(topItem)->child(childItem)->text(col));
                     pos.setY(pos.y() + linesize);
                 }            
             }
