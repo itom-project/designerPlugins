@@ -1887,8 +1887,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         else
         {
             updatePickerPosition(true, false);
-
-            replot();
+            updateScaleValues(true, false); //do replot
+            //replot();
         }
 
         m_hash = hash;
@@ -2741,9 +2741,11 @@ void Plot1DWidget::synchronizeCurrentScaleValues()
 */
 void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/)
 {
+    
     if (m_pData->m_valueScaleAuto || m_pData->m_axisScaleAuto)
     {
         QRectF rect;
+        QRect prevRect(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
 
         foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
@@ -2768,6 +2770,11 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
         {
             m_pData->m_axisMin = rect.left();
             m_pData->m_axisMax = rect.right();
+        }
+        if (prevRect == zoomer()->zoomRect())// if the plot wasn't zoomed we need to adjust the window to the current bounds
+        {
+            zoomer()->zoom(QRectF(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin)));
+            zoomer()->rescale(false);
         }
     }
 
@@ -2798,7 +2805,6 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
 
             QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
             zoom = zoom.normalized();
-
             if (zoom == zoomer()->zoomRect())
             {
                 zoomer()->zoom(zoom);
@@ -2810,7 +2816,6 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             }
         }
     }
-
     if (doReplot)
     {
         replot();
