@@ -884,7 +884,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     QWidget *w = this;
     while (w)
     {
-        qDebug() << w->geometry() << w->frameGeometry();
+        //qDebug() << w->geometry() << w->frameGeometry();
         w = qobject_cast<QWidget*>(w->parent());
     }
 
