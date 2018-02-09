@@ -775,7 +775,7 @@ void ItomQwtPlot::setVisible(bool visible)
     {
         if (!m_firstTimeVisible)
         {
-            this->updateScaleValues(true, true);
+            this->updateScaleValues(true, true, true);
         }
         else
         {

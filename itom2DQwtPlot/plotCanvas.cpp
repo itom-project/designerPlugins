@@ -1546,8 +1546,10 @@ void PlotCanvas::synchronizeScaleValues()
 @param doReplot forces a replot of the content
 @param doZoomBase if true, the x/y-zoom is reverted to the full x-y-area of the manually set ranges (the same holds for the value range)
 */
-void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/)
+void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/, bool clearStack /*=false*/)
 {
+    Q_UNUSED(clearStack);
+
     if (!m_pData)
         return;
     

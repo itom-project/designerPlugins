@@ -261,6 +261,10 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pContextMenu->addAction(m_pActPicker);
     m_pContextMenu->addSeparator();
     m_pContextMenu->addAction(mainTb->toggleViewAction());
+
+    idx1 = zoomer()->zoomRectIndex();
+    rect1 = zoomer()->zoomRect();
+    base = zoomer()->zoomBase();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1827,7 +1831,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     {
         QByteArray hash = seriesData->getHash();
         QByteArray hashX(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject ? seriesData->getHash() : "");
-        if (hash != m_hash || hashX != m_hashX)
+        if (hash != m_hash || hashX != m_hashX|| m_pData->m_valueScaleAuto)
         {
             updatePickerPosition(true);
 
@@ -1853,8 +1857,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
 
             updateScaleValues(false, true); //replot is done here
+            zoomer()->rescale(false);
 
-            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
         }
         else if (m_pData->m_forceValueParsing)
         {
@@ -2644,8 +2648,14 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
             }
         break;
     }
-
-    updateScaleValues(recalculateBoundaries); //replot is done here
+    if (m_hash.size() != 0)
+    {
+        updateScaleValues(recalculateBoundaries); //replot is done here
+    }
+    else
+    {
+        updateScaleValues(recalculateBoundaries, true, true);
+    }
 
     return retOk;
 }
@@ -2739,13 +2749,15 @@ void Plot1DWidget::synchronizeCurrentScaleValues()
 @param doReplot forces a replot of the content
 @param doZoomBase if true, the x/y-zoom is reverted to the full x-y-area of the manually set ranges (the same holds for the value range)
 */
-void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/)
+void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*= true*/, bool clearStack /*= false*/)
 {
-    
+    QStack<QRectF> prevStack = zoomer()->zoomStack();
+    QRectF initialRect = zoomer()->zoomRect();
+    int initialIdx = zoomer()->zoomRectIndex();
     if (m_pData->m_valueScaleAuto || m_pData->m_axisScaleAuto)
     {
         QRectF rect;
-        QRect prevRect(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
+        
 
         foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
@@ -2771,21 +2783,21 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             m_pData->m_axisMin = rect.left();
             m_pData->m_axisMax = rect.right();
         }
-        if (prevRect == zoomer()->zoomRect())// if the plot wasn't zoomed we need to adjust the window to the current bounds
+        if (initialIdx == 0)// if the plot wasn't zoomed we need to adjust the window to the current bounds
         {
             zoomer()->zoom(QRectF(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin)));
             zoomer()->rescale(false);
         }
+        
     }
 
     if (doZoomBase)
     {
+        QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
+        zoom = zoom.normalized();
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
         if (zoomer()->isEnabled())
         {
-            QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
-            zoom = zoom.normalized();
-
             if (zoom == zoomer()->zoomRect())
             {
                 zoomer()->zoom(zoom);
@@ -2803,8 +2815,14 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
 
             updateGeometry(); //if the interval changes, the tick positions... change as well. Therefore, the sizeHint() might change, too, possibly allowing a smaller plot window
 
-            QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
-            zoom = zoom.normalized();
+            QStack<QRectF> stack = zoomer()->zoomStack();
+            stack[0] = zoom;
+            zoomer()->setZoomStack(stack, initialIdx);
+
+            zoomer()->rescale(true);
+            /*zoomer()->setZoomBase(base); //set the new base
+            int idx = zoomer()->zoomRectIndex();
+            int i = 0;
             if (zoom == zoomer()->zoomRect())
             {
                 zoomer()->zoom(zoom);
@@ -2813,8 +2831,16 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             else
             {
                 zoomer()->appendZoomStack(zoom);
-            }
+            }*/
         }
+    }
+    if (clearStack)//set zoom to base and clear history
+    {
+        
+        QStack<QRectF> stack;
+        stack.push((zoomer()->zoomBase()));
+        zoomer()->setZoomStack(stack);
+
     }
     if (doReplot)
     {

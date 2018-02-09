@@ -98,7 +98,7 @@ class Plot1DWidget : public ItomQwtPlot
         virtual void setButtonStyle(int style);
 
         void synchronizeCurrentScaleValues();
-        void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
+        void updateScaleValues(bool doReplot = true, bool doZoomBase = true, bool clearStack = false);
         
         void enableObjectGUIElements(const int mode);
 
@@ -253,6 +253,9 @@ class Plot1DWidget : public ItomQwtPlot
         QAction* m_pActRGBAL;
         QAction* m_pActRGBG;
 		ItomQwtPlotEnums::ComplexType m_pComplexStyle;
+        int idx1;
+        QRectF rect1;
+        QRectF base;
 
     signals:
 

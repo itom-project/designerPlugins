@@ -123,7 +123,7 @@ class PlotCanvas : public ItomQwtPlot
         void setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel);
         void updateLabels();
         void synchronizeScaleValues();
-        void updateScaleValues(bool doReplot = true, bool doZoomBase = true);
+        void updateScaleValues(bool doReplot = true, bool doZoomBase = true, bool clearStack = false);
         void setColorBarVisible(bool visible);
         bool setColorMap(const QString &colormap = "__next__");
         inline QString colorMapName() const { return m_colorMapName; }

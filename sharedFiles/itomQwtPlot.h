@@ -153,6 +153,7 @@ public:
     ito::RetVal deleteMarkers(const QString &id);
 
 protected:
+    
     void loadStyles(bool overwriteDesignableProperties);
     ItomPlotZoomer *zoomer() const;
     QwtPlotPanner *panner() const;
@@ -164,7 +165,7 @@ protected:
     @param doReplot forces a replot of the content
     @param doZoomBase if true, the x/y-zoom is reverted to the full x-y-area of the manually set ranges (the same holds for the value range)
     */
-    virtual void updateScaleValues(bool doReplot = true, bool doZoomBase = true) = 0; //to be overwritten in every plot.
+    virtual void updateScaleValues(bool doReplot = true, bool doZoomBase = true, bool clearStack = false) = 0; //to be overwritten in every plot.
 
     virtual void contextMenuEvent(QContextMenuEvent * event);
     virtual void resizeEvent(QResizeEvent * event);
@@ -208,6 +209,7 @@ protected:
     QList<QMenu*> m_menus;
     QMenu *m_pContextMenu;
     bool m_styledBackground;
+    bool m_firstTimeVisible; /*!< true if this plot becomes visible for the first time */
     
 
 private:
@@ -249,7 +251,6 @@ private:
     QColor m_inverseColor1;
 
     bool m_keepAspectRatio;
-    bool m_firstTimeVisible; /*!< true if this plot becomes visible for the first time */
     bool m_plottingEnabled;
 
     int m_buttonStyle; /*!< 0: dark buttons for bright theme, 1: bright buttons for dark theme */
