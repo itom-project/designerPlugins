@@ -2798,6 +2798,7 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
         if (zoomer()->isEnabled())
         {
+
             if (zoom == zoomer()->zoomRect())
             {
                 zoomer()->zoom(zoom);
@@ -2819,7 +2820,7 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             stack[0] = zoom;
             zoomer()->setZoomStack(stack, initialIdx);
 
-            zoomer()->rescale(true);
+            zoomer()->rescale(false);
             /*zoomer()->setZoomBase(base); //set the new base
             int idx = zoomer()->zoomRectIndex();
             int i = 0;
