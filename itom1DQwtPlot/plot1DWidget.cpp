@@ -2783,12 +2783,14 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             m_pData->m_axisMin = rect.left();
             m_pData->m_axisMax = rect.right();
         }
+
         if (initialIdx == 0)// if the plot wasn't zoomed we need to adjust the window to the current bounds
         {
+
             zoomer()->zoom(QRectF(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin)));
             zoomer()->rescale(false);
+
         }
-        
     }
 
     if (doZoomBase)
@@ -2796,10 +2798,14 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
         QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
         zoom = zoom.normalized();
         // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
-        if (zoomer()->isEnabled())
+        if (zoomer()->isActive())
         {
+            if (initialIdx == 0)
+            {
+                zoomer()->zoom(0);
+            }
 
-            if (zoom == zoomer()->zoomRect())
+           /* if (zoom == zoomer()->zoomRect())
             {
                 zoomer()->zoom(zoom);
                 zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
@@ -2807,7 +2813,7 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             else
             {
                 zoomer()->zoom(zoom);
-            }
+            }*/
         }
         else
         {
