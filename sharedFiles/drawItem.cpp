@@ -1090,37 +1090,44 @@ void DrawItem::draw( QPainter *painter,
 
     QwtPlotShapeItem::draw(painter, xMap, yMap, canvasRect);
 
+	//label will only be print, if the property 'geometricShapesLabelsVisible' is true, if the label is empty (then a default name is chosen) or
+	//if the trimmed label name is not empty. Hence, if you choose a label name consisting of spaces, the label is not printed!
     if(d->m_labelVisible)
     {
-        QRectF myRect(0, 0, 0, 0);
-        
-        QwtText label(d->m_shape.name());
-        label.setFont(d->m_labelFont);
-        label.setColor(d->m_labelTextColor); //remove this to set the color equal to the shape color
-        
-        if (label.isEmpty())
-        {
-            label.setText( QString("(%1)").arg(d->m_shape.index()) );
-        }
+		QString name = d->m_shape.name();
+		
+		if (name.isEmpty())
+		{
+			name = QString("(%1)").arg(d->m_shape.index());
+		}
 
-        const QSizeF textSize = label.textSize( painter->font() );
-        const QPointF textSizeScales = QPointF(textSize.width() * fabs(xMap.sDist()/xMap.pDist()), textSize.height() * fabs(yMap.sDist()/yMap.pDist()));
-        QPointF marker0Position = getMarkerPosScale(0);
+		if (!name.isEmpty() && !name.trimmed().isEmpty())
+		{
+			QRectF myRect(0, 0, 0, 0);
 
-        if (marker0Position.isNull() == false)
-        {
-            myRect = QRectF(marker0Position - textSizeScales, marker0Position);
-            
-            QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect);
-            //cRect.translate(QPoint(-10, -10));
-            cRect.adjust(-12,-8,-6,-4);
+			QwtText label(d->m_shape.name());
+			label.setFont(d->m_labelFont);
+			label.setColor(d->m_labelTextColor); //remove this to set the color equal to the shape color
 
-            if (!label.isEmpty())
-            {
-                painter->fillRect(cRect, d->m_labelBrush);
-                label.draw(painter, cRect);
-            }
-        }        
+			const QSizeF textSize = label.textSize(painter->font());
+			const QPointF textSizeScales = QPointF(textSize.width() * fabs(xMap.sDist() / xMap.pDist()), textSize.height() * fabs(yMap.sDist() / yMap.pDist()));
+			QPointF marker0Position = getMarkerPosScale(0);
+
+			if (marker0Position.isNull() == false)
+			{
+				myRect = QRectF(marker0Position - textSizeScales, marker0Position);
+
+				QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect);
+				//cRect.translate(QPoint(-10, -10));
+				cRect.adjust(-12, -8, -6, -4);
+
+				if (!label.isEmpty())
+				{
+					painter->fillRect(cRect, d->m_labelBrush);
+					label.draw(painter, cRect);
+				}
+			}
+		}
     }
 
     return;
