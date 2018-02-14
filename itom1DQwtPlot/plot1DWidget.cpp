@@ -2797,7 +2797,6 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
     {
         QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
         zoom = zoom.normalized();
-        // 10.02.15 ck we don't want to check if a zoomer exists, as it is always created in the constructor but if it is enabled
         if (zoomer()->isActive())
         {
             if (initialIdx == 0)
