@@ -261,10 +261,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pContextMenu->addAction(m_pActPicker);
     m_pContextMenu->addSeparator();
     m_pContextMenu->addAction(mainTb->toggleViewAction());
-
-    idx1 = zoomer()->zoomRectIndex();
-    rect1 = zoomer()->zoomRect();
-    base = zoomer()->zoomBase();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1773,6 +1769,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 {
                     seriesData = new DataObjectSeriesData(1);
                     seriesData->updateDataObject(dataObj, tmpBounds);
+                    seriesData->setCmplxState(m_pComplexStyle);
                     m_plotCurveItems[n]->setData(seriesData);
                 }
                 if (m_colorState)
