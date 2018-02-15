@@ -99,67 +99,67 @@
     </message>
     <message>
         <source>the given point cloud has no normal component</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die übergebene Punktewolke hat keine Normal-Komponente&apos;</translation>
     </message>
     <message>
         <source>an item of type &apos;point cloud normal&apos; cannot be updated</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ein Item des Typs &apos;Punktewolkennormal&apos; kann nicht upgedatet werden</translation>
     </message>
     <message>
         <source>rotation must have zero or 3 euler angles (in rad)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rotation muss entweder 0 sein oder drei Euler-Winkel (in rad) besitzen</translation>
     </message>
     <message>
         <source>translation must have zero or 3 values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der Wert &apos;translation&apos; muss entweder 0 sein oder drei Werte besitzen</translation>
     </message>
     <message>
         <source>size must have 3 values.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eine Größe besteht aus drei Werten.</translation>
     </message>
     <message>
         <source>center point must have three values.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ein Zentrumspunkt muss drei Werte besitzen.</translation>
     </message>
     <message>
         <source>positions must have three values per named item.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Für Positionen müssen jeweils drei Werte je Item angegeben werden.</translation>
     </message>
     <message>
         <source>given mesh is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das übergebene Polygonnetz ist ungültig</translation>
     </message>
     <message>
         <source>Property %s does not exist</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die Eigenschaft %s existiert nicht</translation>
     </message>
     <message>
         <source>first value could not be converted to float</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der erste Wert kann nicht in ein Float konvertiert werden</translation>
     </message>
     <message>
         <source>second value could not be converted to float</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der zweite Wert kann nicht in ein Float konvertiert werden</translation>
     </message>
     <message>
         <source>Property %s could not be set</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die Eigenschaft %s kann nicht gesetzt werden</translation>
     </message>
     <message>
         <source>Given value could not be parsed to the required ito::AutoInterval type (&apos;auto&apos; or [min,max] requested)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der übergebene Wert passt nicht zum benötigten ito::AutoInterval-Typ (&apos;auto&apos; or [min,max] requested)</translation>
     </message>
     <message>
         <source>Item %s is NULL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das Item %s ist NULL</translation>
     </message>
     <message>
         <source>point cloud is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die Punktewolke ist ungültig</translation>
     </message>
     <message>
         <source>invalid polygon mesh</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Das Polygonnetz ist ungültig</translation>
     </message>
 </context>
 </TS>
