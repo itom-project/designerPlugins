@@ -2976,8 +2976,9 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
             }
 
             QImage imgTotal(img.width() + width, qMax(img.height(), height), QImage::Format_ARGB32);
+			imgTotal.fill(QColor(255, 255, 255, 0));
             QPainter painter2(&imgTotal);
-            painter.drawImage(0, 0, img);
+            painter2.drawImage(0, 0, img);
             int y0 = 0;
             foreach(QPixmap pixmap, pixmaps)
             {
