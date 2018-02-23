@@ -32,30 +32,30 @@
 <context>
     <name>EvaluateGeometricsFigure</name>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="+60"/>
-        <location line="+204"/>
+        <location filename="../evaluateGeometrics.cpp" line="+61"/>
+        <location line="+217"/>
         <source>table</source>
         <translation>Tabelle</translation>
     </message>
     <message>
-        <location line="-203"/>
+        <location line="-216"/>
         <source>tree</source>
         <translation>Baum</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+211"/>
+        <location line="+224"/>
         <source>list</source>
         <translation>Liste</translation>
     </message>
     <message>
-        <location line="-210"/>
-        <location line="+205"/>
+        <location line="-223"/>
+        <location line="+218"/>
         <source>xml</source>
         <translation>XML</translation>
     </message>
     <message>
-        <location line="-200"/>
+        <location line="-213"/>
         <source>system settings</source>
         <translation>Systemeinstellungen</translation>
     </message>
@@ -105,12 +105,12 @@
         <translation>Passt die Spaltenbreite an deren Inhalt an.</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+9"/>
         <source>basic options</source>
         <translation>Grundeinstellungen</translation>
     </message>
     <message>
-        <location line="+392"/>
+        <location line="+400"/>
         <location line="+127"/>
         <source>set relation failed due to invalid object type</source>
         <translation>Setzen einer Verknüpfung wegen eines unzulässigen Datentyps gescheitert</translation>
@@ -142,7 +142,7 @@
         <translation>Speichern unter</translation>
     </message>
     <message>
-        <location line="-271"/>
+        <location line="-284"/>
         <source>Save...</source>
         <translation>Speichern...</translation>
     </message>
@@ -152,7 +152,13 @@
         <translation>Export der aktuellen Daten als Tabelle, Baum, XML...</translation>
     </message>
     <message>
-        <location line="+419"/>
+        <location line="+42"/>
+        <location line="+2"/>
+        <source>Fit currently marked shape to underlying data</source>
+        <translation type="unfinished">Aktuell markierten Formen mit den darunter liegenden Daten verknüpfen</translation>
+    </message>
+    <message>
+        <location line="+388"/>
         <source>imported data was Null-pointer</source>
         <translation>Es wurde ein Null-Pointer übergeben</translation>
     </message>
@@ -186,7 +192,7 @@
 <context>
     <name>PlotTreeWidget</name>
     <message>
-        <location filename="../plotTreeWidget.cpp" line="+92"/>
+        <location filename="../plotTreeWidget.cpp" line="+94"/>
         <source>%1 (%2)</source>
         <translation></translation>
     </message>
@@ -196,7 +202,7 @@
         <translation>Unbekannter Typ (%1)</translation>
     </message>
     <message>
-        <location line="+839"/>
+        <location line="+842"/>
         <location line="+73"/>
         <location line="+146"/>
         <source>could not write csv-data to file %1</source>
@@ -206,7 +212,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="-546"/>
+        <location filename="../evaluateGeometrics.cpp" line="-554"/>
         <source>Calculate</source>
         <translation>Betrechne</translation>
     </message>

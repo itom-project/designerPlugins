@@ -4,49 +4,69 @@
 <context>
     <name>MatplotlibPlot</name>
     <message>
-        <location filename="../matplotlibplot.cpp" line="+52"/>
         <source>home</source>
-        <translation>Ansicht zurücksetzen</translation>
+        <translation type="vanished">Ansicht zurücksetzen</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location filename="../matplotlibplot.cpp" line="+55"/>
         <source>Reset original view</source>
         <translation>Ursprüngliche Ansicht wiederherstellen</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>forward</source>
-        <translation>Wiederholen</translation>
+        <translation type="vanished">Wiederholen</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+4"/>
         <source>Forward to next view</source>
         <translation>Wiederholen</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>back</source>
-        <translation>Rückgängig</translation>
+        <translation type="vanished">Rückgängig</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+4"/>
         <source>Back to previous view</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>move</source>
-        <translation>Verschieben</translation>
+        <translation type="vanished">Verschieben</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+6"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation>Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>zoom to rectangle</source>
-        <translation>Zoom in Rechteck</translation>
+        <translation type="vanished">Zoom in Rechteck</translation>
+    </message>
+    <message>
+        <location line="-17"/>
+        <source>Home</source>
+        <translation type="unfinished">Ansicht zurücksetzen</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Forward</source>
+        <translation type="unfinished">Weiter</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Back</source>
+        <translation type="unfinished">Zurück</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Move</source>
+        <translation type="unfinished">Verschieben</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Zoom to Rectangle</source>
+        <translation type="unfinished">Zoom in Rechteck</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,31 +84,54 @@
         <translation type="unfinished">Zeigt die Koordinaten des aktuellen Mausposition</translation>
     </message>
     <message>
+        <location line="+3"/>
+        <source>Subplot Configuration...</source>
+        <translation type="unfinished">Einstellungen...</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Save...</source>
+        <translation type="unfinished">Speichern...</translation>
+    </message>
+    <message>
+        <location line="+171"/>
+        <source>no content widget available.</source>
+        <translation type="unfinished">Es wurde nichts zum Kopieren gefunden.</translation>
+    </message>
+    <message>
         <source>marker</source>
         <translation type="vanished">Positionsanzeiger</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>subplot configuration...</source>
-        <translation>Einstellungen...</translation>
+        <translation type="vanished">Einstellungen...</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-173"/>
         <source>Configure subplots...</source>
         <translation>Einstellungen...</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>save...</source>
-        <translation>Speichern...</translation>
+        <translation type="vanished">Speichern...</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+5"/>
         <source>Save the figure...</source>
         <translation>Abbildung speichern...</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+3"/>
+        <source>Copy To Clipboard</source>
+        <translation type="unfinished">In die Zwischenablage kopieren</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Copies the current view to the clipboard</source>
+        <translation type="unfinished">Die aktuelle Ansicht in die Zwischenablage kopieren</translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>matplotlib toolbar</source>
         <translation>Symbolleiste Matplotlib</translation>
     </message>
@@ -104,6 +147,19 @@
         <location line="+18"/>
         <source>Matplotlib</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>MatplotlibWidget</name>
+    <message>
+        <location filename="../matplotlibWidget.cpp" line="+264"/>
+        <source>Copy current view to clipboard ... Done.</source>
+        <translation type="unfinished">Die aktuelle Ansicht in die Zwischenablage kopieren... Beendet.</translation>
+    </message>
+    <message>
+        <location line="+118"/>
+        <source>Copy current view to clipboard ...</source>
+        <translation type="unfinished">Die aktuelle Ansicht in die Zwischenablage kopieren...</translation>
     </message>
 </context>
 <context>

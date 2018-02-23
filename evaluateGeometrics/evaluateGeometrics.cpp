@@ -98,9 +98,9 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     connect(m_actAutoFitCols, SIGNAL(triggered()), this, SLOT(mnuAutoFitCols()));
 
     // m_actFitToObject
-    m_actFitToObject = new QAction(QIcon("./itomDesignerPlugins/plot/icons/autoscal.png"), tr("Fit currently marked shape to unerlying data"), this);
+    m_actFitToObject = new QAction(QIcon("./itomDesignerPlugins/plot/icons/autoscal.png"), tr("Fit currently marked shape to underlying data"), this);
     m_actFitToObject->setObjectName("actFitToObject");
-    m_actFitToObject->setToolTip(tr("Fit currently marked shape to unerlying data"));
+    m_actFitToObject->setToolTip(tr("Fit currently marked shape to underlying data"));
     connect(m_actFitToObject, SIGNAL(triggered()), this, SLOT(mnuFitToObject()));
 
     QToolBar *toolbar = new QToolBar(tr("basic options"), this);
