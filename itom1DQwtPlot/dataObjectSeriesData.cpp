@@ -2298,6 +2298,216 @@ template<typename _Tp, typename _Tp2> bool findMinMaxNonWeightedComplexCropped(c
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void findMinMaxNonWeighteRGBA(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ColorType type)
+{
+    const cv::Mat *mat;
+    uchar *ptr;
+    min = std::numeric_limits<ito::uint8>::max();
+    max = -min;
+    ito::uint8 val;
+
+    switch (d.dir)
+    {
+    case DataObjectSeriesData::dirX:
+    case DataObjectSeriesData::dirY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+        if(type == DataObjectSeriesData::grayColor)
+        {
+            float valf;
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                valf = (*(reinterpret_cast<ito::Rgba32*>(ptr))).gray();
+                ptr += d.matStepSize;
+                if (!qIsFinite(valf))
+                {
+                    continue;
+                }
+                if (valf > max) { max = valf; maxIdx = i; }
+                if (valf < min) { min = valf; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::blueColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).b;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::greenColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).g;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::redColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).r;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::alphaColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).a;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        break;
+
+    case DataObjectSeriesData::dirXY:
+
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+        if (type == DataObjectSeriesData::grayColor)
+        {
+            float valf;
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                valf = (*(reinterpret_cast<ito::Rgba32*>(ptr+d.matSteps[i]))).gray();
+                ptr += d.matStepSize;
+                if (!qIsFinite(valf))
+                {
+                    continue;
+                }
+                if (valf > max) { max = valf; maxIdx = i; }
+                if (valf < min) { min = valf; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::blueColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr + d.matSteps[i]))).b;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::greenColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr + d.matSteps[i]))).g;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::redColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr + d.matSteps[i]))).r;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::alphaColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr + d.matSteps[i]))).a;
+                ptr += d.matStepSize;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        break;
+    case DataObjectSeriesData::dirZ:
+        if (type == DataObjectSeriesData::grayColor)
+        {
+            float valf;
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                mat = obj->getCvPlaneMat(i);
+                ptr = (mat->data + d.matOffset);
+                valf = (*(reinterpret_cast<ito::Rgba32*>(ptr))).gray();
+
+                if (!qIsFinite(valf))
+                {
+                    continue;
+                }
+
+                if (valf > max) { max = valf; maxIdx = i; }
+                if (valf < min) { min = valf; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::redColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                mat = obj->getCvPlaneMat(i);
+                ptr = (mat->data + d.matOffset);
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).r;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::greenColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                mat = obj->getCvPlaneMat(i);
+                ptr = (mat->data + d.matOffset);
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).g;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::blueColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                mat = obj->getCvPlaneMat(i);
+                ptr = (mat->data + d.matOffset);
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).b;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        else if (type == DataObjectSeriesData::alphaColor)
+        {
+            for (int i = 0; i < d.nrPoints; i++)
+            {
+                mat = obj->getCvPlaneMat(i);
+                ptr = (mat->data + d.matOffset);
+                val = (*(reinterpret_cast<ito::Rgba32*>(ptr))).a;
+
+                if (val > max) { max = val; maxIdx = i; }
+                if (val < min) { min = val; minIdx = i; }
+            }
+        }
+        break;
+    }
+}
+
 QRectF DataObjectSeriesData::boundingRect() const
 {
     QRectF res;
@@ -2343,8 +2553,7 @@ QRectF DataObjectSeriesData::boundingRect() const
                 findMinMaxNonWeightedComplex<ito::float64, ito::complex128>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
             break;
             case ito::tRGBA32:
-                min = 0.0;
-                max = 255.0;
+                findMinMaxNonWeighteRGBA(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_colorState);
             break;
         }
 
