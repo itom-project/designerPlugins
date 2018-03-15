@@ -3430,31 +3430,37 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         QPolygonF markerPolygon;
         markerPolygon.clear();
 
+		QwtText label(QString(" %1").arg(tmpID));
+
         for (int i = 0; i < nrOfMarkers; ++i)
         {
-            marker = new QwtPlotMarker();
-            marker->setSymbol(new QwtSymbol(symStyle, symBrush, symPen, symSize));
-            marker->setValue(xRow[i], yRow[i]);
-            marker->attach(this);
-            
-            markerPolygon.append(QPointF(xRow[i], yRow[i]));
+			//always add coordinates to markerPolygon, such that all points, even NaN points, are displayed in the marker info toolbox
+			markerPolygon.append(QPointF(xRow[i], yRow[i]));
 
-            if (m_markerLabelVisible)
-            {
-                QwtText label(QString(" %1").arg(tmpID));
-                marker->setLabel(label);
-            }
+			if (qIsFinite(xRow[i]) && qIsFinite(yRow[i]))
+			{
+				//... however, NaN points should not be visible on the canvas, since they are displayed in the left, upper corner (independent on zoom...)
+				marker = new QwtPlotMarker();
+				marker->setSymbol(new QwtSymbol(symStyle, symBrush, symPen, symSize));
+				marker->setValue(xRow[i], yRow[i]);
+				marker->attach(this);
 
-            if (plane == -1 || plane == m_currentPlane)
-            {
-                marker->setVisible(true);
-            }
-            else
-            {
-                marker->setVisible(false);
-            }
+				if (m_markerLabelVisible)
+				{
+					marker->setLabel(label);
+				}
 
-            m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
+				if (plane == -1 || plane == m_currentPlane)
+				{
+					marker->setVisible(true);
+				}
+				else
+				{
+					marker->setVisible(false);
+				}
+
+				m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
+			}
         }
 
         PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
