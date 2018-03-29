@@ -3395,10 +3395,14 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
         QwtInterval ival = axisInterval(QwtPlot::xBottom);
         size_t firstIdx = std::numeric_limits<size_t>::max();
         size_t lastIdx = 0;
-
+        if (ival.minValue() > ival.maxValue())//change boarders to make the interval valid.
+        {
+            ival.setInterval(ival.maxValue(), ival.minValue());
+        }
         //get start and end index of sample within interval
         for (size_t i = 0; i < seriesData->size(); ++i)
         {
+
             if (ival.contains(seriesData->sample(i).x()))
             {
                 firstIdx = std::min(firstIdx, i);

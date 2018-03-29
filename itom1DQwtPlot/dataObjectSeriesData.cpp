@@ -227,33 +227,30 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     if (pxY2 >= pxY1)
                     {
                         m_d.nrPoints = 1 + pxY2 - pxY1;
-                        m_d.startPhys= dataObj->getPixToPhys(dims-2, pxY1, _unused); //tmpBounds[0].y() ;
-                        right = dataObj->getPixToPhys(dims-2, pxY2, _unused); //tmpBounds[1].y();
-                        m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
-                        
-                        m_d.startPx.setX(pxX1);
-                        m_d.startPx.setY(pxY1);
-                        m_d.stepSizePx.setWidth(0);
-                        m_d.stepSizePx.setHeight(1);
-
-                        m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
                     }
                     else
                     {
                         m_d.nrPoints = 1 + pxY1 - pxY2;
-                        m_d.startPhys = dataObj->getPixToPhys(dims-2, pxY2, _unused); //tmpBounds[1].y();
-                        right = dataObj->getPixToPhys(dims-2, pxY1, _unused); //tmpBounds[0].y();
-                        m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
-
-                        m_d.startPx.setX(pxX1);
-                        m_d.startPx.setY(pxY2);
-                        m_d.stepSizePx.setWidth(0);
-                        m_d.stepSizePx.setHeight(1);
-
-                        m_d.matOffset = (int)mat->step[0] * pxY2 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY2,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
                     }
+                    m_d.startPhys= dataObj->getPixToPhys(dims-2, pxY1, _unused); //tmpBounds[0].y() ;
+                    right = dataObj->getPixToPhys(dims-2, pxY2, _unused); //tmpBounds[1].y();
+                    m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
+                        
+                    m_d.startPx.setX(pxX1);
+                    m_d.startPx.setY(pxY1);
+                    m_d.stepSizePx.setWidth(0);
+                    m_d.stepSizePx.setHeight(1);
+
+                    m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                    if (pxY2 >= pxY1)
+                    {
+                        m_d.matStepSize = (int)mat->step[0]; //step in y-direction (in bytes)
+                    }
+                    else
+                    {
+                        m_d.matStepSize = -(int)mat->step[0]; //step in y-direction (in bytes)
+                    }
+                    
 
                     description = dataObj->getAxisDescription(dims-2,_unused);
                     unit = dataObj->getAxisUnit(dims-2,_unused);
@@ -291,22 +288,39 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     if (pxX2 >= pxX1)
                     {
                         m_d.nrPoints = 1 + pxX2 - pxX1;
-                        m_d.startPhys= dataObj->getPixToPhys(dims-1, pxX1, _unused); //tmpBounds[0].y() ;
-                        right = dataObj->getPixToPhys(dims-1, pxX2, _unused); //tmpBounds[1].y();
-                        m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
-                        
-                        m_d.startPx.setX(pxX1);
-                        m_d.startPx.setY(pxY1);
-                        m_d.stepSizePx.setWidth(1);
-                        m_d.stepSizePx.setHeight(0);
+                    }
+                    else {
+                        m_d.nrPoints = 1 + pxX1 - pxX2;
+                    }
 
-                        m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= (int)mat->step[1] ; //step in x-direction (in bytes)
+                    m_d.startPhys= dataObj->getPixToPhys(dims-1, pxX1, _unused); //tmpBounds[0].y() ;
+                    right = dataObj->getPixToPhys(dims-1, pxX2, _unused); //tmpBounds[1].y();
+                    m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
+                        
+                    m_d.startPx.setX(pxX1);
+                    m_d.startPx.setY(pxY1);
+                    m_d.stepSizePx.setWidth(1);
+                    m_d.stepSizePx.setHeight(0);
+
+                    m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                    if (pxX2 >= pxX1)
+                    {
+                        m_d.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
                         if (dataObj->getType() == ito::tUInt32) //since uint32 is not supported by openCV the step method returns the wrong result
                         {
                             m_d.matStepSize = 4;
                         }
                     }
+                    else
+                    {
+                        m_d.matStepSize = -(int)mat->step[1];
+                        if (dataObj->getType() == ito::tUInt32) //since uint32 is not supported by openCV the step method returns the wrong result
+                        {
+                            m_d.matStepSize = -4;
+                        }
+                    }
+                        
+                    /*}
                     else
                     {
                         m_d.nrPoints = 1 + pxX1 - pxX2;
@@ -321,7 +335,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
                         m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX2; //(&mat->at<char>(pxY1,pxX2) - &mat->at<char>(0,0));
                         m_d.matStepSize= (int)mat->step[1] ; //step in x-direction (in bytes)
-                    }
+                    }*/
 
                     description = dataObj->getAxisDescription(dims-1,_unused);
                     unit = dataObj->getAxisUnit(dims-1,_unused);
@@ -2580,11 +2594,11 @@ QRectF DataObjectSeriesData::boundingRect() const
         {
             float minX = m_d.startPhys;
             float width = m_d.stepSizePhys * (m_d.nrPoints - 1);
-            if (width < 0)
+           /* if (width < 0)
             {
                 minX += width;
                 width *= -1;
-            }
+            }*/
             res = QRectF(minX, min, width, max - min);
         }
         else
