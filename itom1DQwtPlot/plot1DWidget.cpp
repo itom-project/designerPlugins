@@ -1165,6 +1165,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     int numCurves = 1;
     QwtPlotCurve *curve = NULL;
     QwtPlotCurveDataObject *dObjCurve = NULL;
+    bool boundsChanged = false;
     bool _unused;
 
     QwtLegendLabel *legendLabel = NULL;
@@ -1214,7 +1215,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
             }
         }
+        if (m_currentBounds != bounds)
+        {
+            boundsChanged = true;
+        }
         m_currentBounds = bounds;
+        
 
         ItomQwtPlotEnums::MultiLineMode multiLineMode = m_pData->m_multiLine;
 
@@ -1833,6 +1839,14 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             updatePickerPosition(true);
 
             QRectF rect = seriesData->boundingRect();
+            if (rect.width() < 0 || rect.height() <0)
+            {
+                axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Inverted);
+            }
+            else
+            {
+                axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Inverted, false);
+            }
             if (m_pData->m_valueScaleAuto)
             {
                 if (qIsFinite(rect.height()))
@@ -1853,7 +1867,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 m_pData->m_axisMax = rect.right();
             }
 
-            updateScaleValues(false, true); //replot is done here
+            updateScaleValues(false, true, boundsChanged);
+
             zoomer()->rescale(false);
 
         }
