@@ -310,6 +310,7 @@ struct InternalData
         m_pickerLimit(2),
         m_pickerLabelVisible(false),
         m_pickerLabelOrientation(Qt::Horizontal),
+		m_pickerType(ItomQwtPlotEnums::DefaultMarker),
         m_pickerLabelAlignment(Qt::AlignRight),
         m_lineSymbole(QwtSymbol::NoSymbol),
         m_axisState(ItomQwtPlotEnums::evenlySpaced)
