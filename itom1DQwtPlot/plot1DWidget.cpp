@@ -103,7 +103,8 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
         m_pActSetPicker(NULL),
         m_pMnuCmplxSwitch(NULL),
         m_pMnuRGBSwitch(NULL),
-        m_pLblMarkerOffsets(NULL),
+		m_pMnuGrid(NULL),
+		m_pLblMarkerOffsets(NULL),
         m_pLblMarkerCoords(NULL),
         m_pMnuMultiRowSwitch(NULL),
         m_pActXVAuto(NULL),
@@ -573,7 +574,34 @@ void Plot1DWidget::createActions()
     a->setCheckable(true);
     a->setChecked(false);
     a->setToolTip(tr("Shows/hides a grid"));
-    connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuGridEnabled(bool)));
+    //connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuGridEnabled(bool)));
+
+	m_pMnuGrid = new QMenu(tr("Grid"), p);
+	m_pActGrid->setMenu(m_pMnuGrid);
+	
+	a = m_pMnuGrid->addAction(tr("No Grid"));
+	a->setData(Itom1DQwtPlot::GridNo);
+	m_pMnuGrid->setDefaultAction(a);
+
+	a = m_pMnuGrid->addAction(tr("Major XY"));
+	a->setData(Itom1DQwtPlot::GridMajorXY);
+
+	a = m_pMnuGrid->addAction(tr("Major X"));
+	a->setData(Itom1DQwtPlot::GridMajorX);
+
+	a = m_pMnuGrid->addAction(tr("Major Y"));
+	a->setData(Itom1DQwtPlot::GridMajorY);
+
+	a = m_pMnuGrid->addAction(tr("Minor XY"));
+	a->setData(Itom1DQwtPlot::GridMinorXY);
+
+	a = m_pMnuGrid->addAction(tr("Minor X"));
+	a->setData(Itom1DQwtPlot::GridMinorX);
+
+	a = m_pMnuGrid->addAction(tr("Minor Y"));
+	a->setData(Itom1DQwtPlot::GridMinorY);
+
+	connect(m_pMnuGrid, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetGrid(QAction*)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3789,6 +3817,33 @@ void Plot1DWidget::mnuScaleSettings()
 void Plot1DWidget::mnuGridEnabled(bool checked)
 {
     setGridStyle(checked ? Itom1DQwtPlot::GridMajorXY : Itom1DQwtPlot::GridNo);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::mnuSetGrid(QAction *action)
+{
+	Itom1DQwtPlot::GridStyle style = Itom1DQwtPlot::GridNo;
+
+	if (action)
+	{
+		style = (Itom1DQwtPlot::GridStyle)action->data().toInt();
+		if (style != action->data().toInt())
+		{
+			style = Itom1DQwtPlot::GridNo;
+		}
+	}
+
+	bool ok;
+	foreach(QAction *a, m_pMnuGrid->actions())
+	{
+		if (a->data().toInt(&ok) == style && ok)
+		{
+			//m_pMnuGrid->setIcon(a->icon());
+			m_pMnuGrid->setDefaultAction(a);
+		}
+	}
+
+	setGridStyle(style);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

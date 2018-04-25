@@ -235,6 +235,7 @@ class Plot1DWidget : public ItomQwtPlot
         QLabel *m_pLblMarkerOffsets;
         QLabel *m_pLblMarkerCoords;
         QAction *m_pActGrid;
+		QMenu *m_pMnuGrid;
         QAction *m_pActGridSettings;
         QAction *m_pActMultiRowSwitch;
         QMenu *m_pMnuMultiRowSwitch;
@@ -279,6 +280,7 @@ class Plot1DWidget : public ItomQwtPlot
         void mnuSetPicker(QAction *action);
         void mnuParentScaleSetting();
         void mnuGridEnabled(bool checked);
+		void mnuSetGrid(QAction *action);
         void mnuScaleSettings();
         void mnuPickerClick(bool checked);
         
