@@ -1522,6 +1522,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 			refreshWidgetCurveProperties = 1;
         }
 
+		//re-use old legend titles entries, if no new curves have been appended (e.g. important if 'the' same shape of object is only updated via resetting its source property
+		for (int i = curveNames.size(); i < std::min(numCurves, m_legendTitles.size()); ++i)
+		{
+			curveNames.append(m_legendTitles[i]);
+		}
+
         m_legendTitles = curveNames;
 
 
