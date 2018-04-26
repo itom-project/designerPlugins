@@ -1806,6 +1806,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 {
                     seriesData = new DataObjectSeriesData(1);
                     seriesData->updateDataObject(dataObj, bounds);
+                    seriesData->setCmplxState(m_pComplexStyle);
                     m_plotCurveItems[n]->setData(seriesData);
                 }
 
