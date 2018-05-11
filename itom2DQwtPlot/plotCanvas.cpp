@@ -1500,10 +1500,20 @@ void PlotCanvas::updateLabels()
     if (m_pData->m_autoTitle)
     {
         setTitle(m_pData->m_titleDObj);
+        if (!m_pData->m_titleDObj.isEmpty())
+        {
+            QString title = m_pData->m_titleDObj;
+            ((ito::AbstractFigure*)(this->parent()))->setWindowTitleExtension(title.insert(0, ": "));
+        }
     }
     else
     {
         setTitle(m_pData->m_title);
+        if (!m_pData->m_title.isEmpty())
+        {
+            QString title = m_pData->m_title;
+            ((ito::AbstractFigure*)(this->parent()))->setWindowTitleExtension(title.insert(0, ": "));
+        }
     }
 }
 

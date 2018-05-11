@@ -1177,10 +1177,18 @@ void Plot1DWidget::updateLabels()
     if (m_pData->m_autoTitle)
     {
         setTitle(m_pData->m_titleDObj);
+        if (!m_pData->m_titleDObj.isEmpty())
+        {
+            ((ito::AbstractFigure*)(this->parent()))->setWindowTitle(m_pData->m_titleDObj.insert(0, ": "));
+        }
     }
     else
     {
         setTitle(m_pData->m_title);
+        if (!m_pData->m_title.isEmpty())
+        {
+            ((ito::AbstractFigure*)(this->parent()))->setWindowTitle(m_pData->m_title.insert(0, ": "));
+        }
     }
 }
 
