@@ -1113,42 +1113,6 @@ void Plot1DWidget::setSymbolStyle(const QwtSymbol::Style style, int size)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel)
-{
-    QwtText t;
-    t = axisTitle(QwtPlot::yLeft);
-    if (m_pData->m_autoValueLabel)
-    {
-        t.setText(valueLabel);
-    }
-    else
-    {
-        t.setText(m_pData->m_valueLabel);
-    }
-    setAxisTitle(QwtPlot::yLeft, t);
-
-    t = axisTitle(QwtPlot::xBottom);
-    if (m_pData->m_autoAxisLabel)
-    {
-        t.setText(axisLabel);
-    }
-    else
-    {
-        t.setText(m_pData->m_axisLabel);
-    }
-    setAxisTitle(QwtPlot::xBottom, t);
-
-    if (m_pData->m_autoTitle)
-    {
-        setTitle(title);
-    }
-    else
-    {
-        setTitle(m_pData->m_title);
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updateLabels()
 {
     QwtText t;

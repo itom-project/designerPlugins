@@ -130,7 +130,6 @@ class Plot1DWidget : public ItomQwtPlot
         void mouseMoveEvent ( QMouseEvent * event );
         void mouseReleaseEvent ( QMouseEvent * event );
 
-        void setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel);
         void updateLabels();
         void setPickerText(const QString &coords, const QString &offsets);
 		

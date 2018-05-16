@@ -1422,49 +1422,6 @@ void PlotCanvas::setColorBarVisible(bool visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel)
-{
-    if (!m_pData)
-        return;
-
-    if (m_pData->m_autoValueLabel)
-    {
-        setAxisTitle(QwtPlot::yRight, valueLabel);
-    }
-    else
-    {
-        setAxisTitle(QwtPlot::yRight, m_pData->m_valueLabel);
-    }
-
-    if (m_pData->m_autoxAxisLabel)
-    {
-        setAxisTitle(QwtPlot::xBottom, xAxisLabel);
-    }
-    else
-    {
-        setAxisTitle(QwtPlot::xBottom, m_pData->m_xaxisLabel);
-    }
-
-    if (m_pData->m_autoyAxisLabel)
-    {
-        setAxisTitle(QwtPlot::yLeft, yAxisLabel);
-    }
-    else
-    {
-        setAxisTitle(QwtPlot::yLeft, m_pData->m_yaxisLabel);
-    }
-
-    if (m_pData->m_autoTitle)
-    {
-        setTitle(title);
-    }
-    else
-    {
-        setTitle(m_pData->m_title);
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::updateLabels()
 {
     if (!m_pData)

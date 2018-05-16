@@ -120,7 +120,6 @@ class PlotCanvas : public ItomQwtPlot
         void keyPressEvent ( QKeyEvent * event );
         void keyReleaseEvent ( QKeyEvent * event );
 
-        void setLabels(const QString &title, const QString &valueLabel, const QString &xAxisLabel, const QString &yAxisLabel);
         void updateLabels();
         void synchronizeScaleValues();
         void updateScaleValues(bool doReplot = true, bool doZoomBase = true, bool clearStack = false);
