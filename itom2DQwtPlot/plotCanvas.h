@@ -103,6 +103,10 @@ class PlotCanvas : public ItomQwtPlot
         QSharedPointer<ito::DataObject> getOverlayObject(void);
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 
+        void setContourLevels(const QSharedPointer<ito::DataObject> contourLevels);
+        bool setContourColorMap(const QString & name = "__next__");
+        inline QString getContourColorMap() const { return m_colorContourMapName; }
+
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
 		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
@@ -157,12 +161,14 @@ class PlotCanvas : public ItomQwtPlot
         QwtPlotMarker *m_pStackCutMarker;
         QwtPlotMarker *m_pCenterMarker;
 
+        QString m_colorContourMapName;
         QString m_colorOverlayMapName;
         QString m_colorMapName;
         
 
         int m_curColorMapIndex;
         int m_curOverlayColorMapIndex;
+        int m_curContourColorMapIndex;
         ItomQwtPlotEnums::ScaleEngine m_valueScale;
 
         bool m_unitLabelChanged;

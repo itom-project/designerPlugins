@@ -74,6 +74,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 		m_pData(m_pData),
 		m_curOverlayColorMapIndex(0),
 		m_curColorMapIndex(0),
+        m_curContourColorMapIndex(-1),
 		m_pValuePicker(NULL),
 		m_dObjPtr(NULL),
 		m_pStackPicker(NULL),
@@ -117,8 +118,9 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_rasterData = new DataObjRasterData(m_pData);
     m_dObjItem->setData(m_rasterData);
     m_dObjItem->attach(this);
+    m_colorContourMapName = "";
 
-    //overlayobject ttem on canvas -> the data object
+    //overlayobject item on canvas -> the data object
     m_dOverlayItem = new DataObjItem("Overlay Object");
     m_dOverlayItem->setRenderThreadCount(0);
     m_rasterOverlayData = new DataObjRasterData(m_pData, true);
@@ -909,6 +911,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
     }
 
     m_isRefreshingPlot = false;
+    replot();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2217,7 +2220,201 @@ void PlotCanvas::setOverlayObject(ito::DataObject* newOverlay)
     p->enableOverlaySlider(m_rasterOverlayData->isInit());
     replot();
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+template<typename _Tp> void parseContourLevels(const QSharedPointer<ito::DataObject> &obj, QList<double>* list)
+{
+    if (list)
+    {
+        const _Tp* rowPtr = NULL;
+        cv::Mat_<_Tp> *mat = NULL;
+        int m, n;
+        mat = (cv::Mat_<_Tp>*)obj->get_mdata()[obj->seekMat(0)];
+        for (m = 0; m < mat->rows; ++m)
+        {
+            rowPtr = (_Tp*)mat->ptr(m);
+            for (n = 0; n < mat->cols; ++n)
+                list->append(rowPtr[n]);
+        }
+    }
+}
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setContourLevels(const QSharedPointer<ito::DataObject> contourLevels)
+{
+    ito::RetVal retval(ito::retOk);
+    m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+    int dims = contourLevels->getDims();
+    int trueDims = 0;
+    bool isInPlane = true;
+    if (contourLevels->getType() == ito::tRGBA32 || contourLevels->getType() == ito::tComplex128 || contourLevels->getType() == ito::tComplex64)
+    {
+        retval += ito::RetVal(ito::retError, 0, "Can not use dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines");
+    }
+    if (!retval.containsError())
+    {
+        for (int i = 0; i < dims; ++i)
+        {
+            if (contourLevels->getSize(i) != 1)
+            {
+                ++trueDims;
+                if (dims - i > 2)
+                {
+                    isInPlane = false;
+
+                }
+            }
+
+        }
+        if (trueDims != 1 && isInPlane)
+        {
+            retval += ito::RetVal(ito::retError, 0, QString("expected a 2d DataObject of shape (1xn) or (nx1), but a %1d object was given").arg(trueDims).toLatin1().data());
+        }
+    }
+    if (!retval.containsError())
+    {
+        QList<double> list;
+        parseContourLevels<ito::int8>(contourLevels, &list);
+        m_dObjItem->setConrecFlag(QwtRasterData::IgnoreAllVerticesOnLevel, true);
+        m_dObjItem->setContourLevels(list);
+        m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+        if (m_curContourColorMapIndex == -1)
+        {
+            m_dObjItem->setDefaultContourPen(Qt::black, 1.0);
+        }
+        replot();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
+{
+    ito::ItomPalette newPalette;
+    ito::RetVal retval(ito::retOk);
+    int numPalettes = 1;
+
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        emit statusBarMessage(tr("Could not change color bar, api is missing"), 4000);
+        return false;
+    }
+
+    retval += apiPaletteGetNumberOfColorBars(numPalettes);
+
+    if (numPalettes == 0 || retval.containsError())
+    {
+        emit statusBarMessage(tr("No color maps defined."), 4000);
+        return false;
+    }
+
+    if (name == "__next__")
+    {
+        m_curContourColorMapIndex++;
+        m_curContourColorMapIndex %= numPalettes; //map index to [0,numPalettes)
+        retval += apiPaletteGetColorBarIdx(m_curContourColorMapIndex, newPalette);
+    }
+    else if (name == "__first__")
+    {
+        m_curContourColorMapIndex = 0;
+        retval += apiPaletteGetColorBarIdx(m_curContourColorMapIndex, newPalette);
+    }
+    else
+    {
+        retval += apiPaletteGetColorBarName(name, newPalette);
+    }
+
+    if (retval.containsError() && retval.errorMessage() != NULL)
+    {
+        emit statusBarMessage(QString("%1").arg(QLatin1String(retval.errorMessage())), 4000);
+        return false;
+    }
+    else if (retval.containsError())
+    {
+        emit statusBarMessage("error when loading color map", 4000);
+        return false;
+    }
+
+    int totalStops = newPalette.colorStops.size();
+
+    if (totalStops < 2)
+    {
+        emit statusBarMessage(tr("Selected color map has less than two points."), 4000);
+        return false;
+    }
+
+    m_colorContourMapName = newPalette.name;
+
+
+
+    if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
+    {
+        //QwtLinearColorMap colorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
+        //if (totalStops > 2)
+        //{
+        //    for (int i = 1; i < totalStops - 2; i++)
+        //    {
+        //        colorMap.addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+        //    }
+        //    colorMap.addColorStop(newPalette.colorStops[totalStops - 1].first, newPalette.colorStops[totalStops - 1].second);
+        //}
+        if (m_dObjItem)
+        {
+            m_dObjItem->setContourPalette(newPalette);
+        }
+
+    }
+    else
+    {
+        //QwtLinearColorMap colorMap(QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed));
+        //if (totalStops > 2)
+        //{
+        //    for (int i = 1; i < totalStops - 1; i++)
+        //    {
+        //        colorMap.addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+        //    }
+        //}
+        if (m_dObjItem)
+        {
+            m_dObjItem->setContourPalette(newPalette);
+        }
+    }
+
+
+
+    //if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
+    //{
+    //    colorMap = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
+    //    if (totalStops > 2)
+    //    {
+    //        for (int i = 1; i < totalStops - 2; i++)
+    //        {
+    //            colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+    //        }
+    //        colorMap->addColorStop(newPalette.colorStops[totalStops - 1].first, newPalette.colorStops[totalStops - 1].second);
+    //    }
+    //}
+    //else
+    //{
+    //    colorMap = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
+    //    if (totalStops > 2)
+    //    {
+    //        for (int i = 1; i < totalStops - 1; i++)
+    //        {
+    //           colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
+    //        }
+    //    }
+    //}
+
+    //if (colorMap)
+    //{
+    //    this->m_dOverlayItem->setColorMap(colorMap);
+    //}
+    //else
+    //{
+    //    delete colorMap;
+    //}
+
+    replot();
+    return true;
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::alphaChanged()
 {

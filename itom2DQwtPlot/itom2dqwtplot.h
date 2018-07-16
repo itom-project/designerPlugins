@@ -69,6 +69,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ito::AutoInterval overlayInterval READ getOverlayInterval WRITE setOverlayInterval DESIGNABLE true USER true)
     Q_PROPERTY(QString overlayColorMap READ getOverlayColorMap WRITE setOverlayColorMap DESIGNABLE true USER true)
 
+    Q_PROPERTY(QSharedPointer <ito::DataObject> contourLevels READ getContourLevels WRITE setContourLevels RESET resetContourLevels DESIGNABLE false)
+    Q_PROPERTY(QString contourColorMap READ getContourColorMap WRITE setContourColorMap DESIGNABLE true USER true)
+
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
     
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
@@ -99,6 +102,9 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
 
     Q_CLASSINFO("prop://overlayColorMap", "Defines which color map should be used for the overlay channel [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
+
+    Q_CLASSINFO("prop://contourLevel","Defines the levels of the contoour lines.")
+    Q_CLASSINFO("prop://contourColorMap", "Defines which color map should be used for the contour lines [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
 
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
@@ -177,6 +183,16 @@ public:
 
     QString getOverlayColorMap() const;
     void setOverlayColorMap(const QString &name);
+
+    QSharedPointer< ito::DataObject > getContourLevels() const {
+        return QSharedPointer< ito::DataObject >
+            ();
+    };
+    void setContourLevels(QSharedPointer< ito::DataObject > newContourLevels);
+    void resetContourLevels(void) {};
+
+    void setContourColorMap(const QString &name);
+    QString getContourColorMap() const;
 
     int getPlaneIndex() const;
     void setPlaneIndex(const int &index);

@@ -40,7 +40,8 @@
 
 
 DataObjItem::DataObjItem( const QString &title ):
-    QwtPlotSpectrogram( title )
+    QwtPlotSpectrogram( title ),
+    m_pContourPalette()
 {
     m_counter = 0;
     /*QList<double> levels;
@@ -54,6 +55,16 @@ DataObjItem::DataObjItem( const QString &title ):
 //! Destructor
 DataObjItem::~DataObjItem()
 {
+}
+
+//QPen DataObjItem::contourPen(double level) const
+//{
+//    
+//}
+
+void DataObjItem::setContourPalette(const ito::ItomPalette &palette)
+{
+    m_pContourPalette = palette;
 }
 
 /*!

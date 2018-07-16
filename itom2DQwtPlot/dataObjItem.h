@@ -26,6 +26,7 @@
 
 #include <qwt_plot_spectrogram.h>
 #include <qelapsedtimer.h>
+#include "common/sharedStructuresGraphics.h"
 
 
 
@@ -35,12 +36,18 @@ public:
 
     explicit DataObjItem( const QString &title = QString::null );
     virtual ~DataObjItem();
+    //virtual QPen contourPen(double level) const;
+    void setContourPalette(const ito::ItomPalette &palette);
+
 
 protected:
     QImage renderImage(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &area, const QSize &imageSize ) const;
     void renderTile(const QwtScaleMap &xMap, const QwtScaleMap &yMap, const char dataTypeFlag, const QRect &tile, QImage *image ) const;
 
     int m_counter;
+
+private:
+    ito::ItomPalette m_pContourPalette;
 
 };
 

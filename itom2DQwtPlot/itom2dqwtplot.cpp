@@ -1206,7 +1206,43 @@ QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const
 
     return QSharedPointer< ito::DataObject >(NULL); 
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setContourLevels(QSharedPointer<ito::DataObject> newLevelObj)
+{
+    if (m_dataPointer.contains("contourLevls"))
+    {
+        if (m_dataPointer["contourLevels"].data() != newLevelObj.data())
+        {
+            QSharedPointer<ito::DataObject> oldLevels = m_dataPointer["contourLevels"];//possible backup for previous source, this backup must be alive until updateParam with the new one has been completely propagated
+            m_dataPointer["contourLevels"] = newLevelObj;
+        }
+    }
+    else
+    {
+        m_dataPointer["contourLevels"] = newLevelObj;
+    }
+    if (m_pContent)
+    {
+        m_pContent->setContourLevels(newLevelObj);
+    }
 
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setContourColorMap(const QString &name)
+{
+    if (m_pContent)
+    {
+        m_pContent->setContourColorMap(name);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QString Itom2dQwtPlot::getContourColorMap() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->getContourColorMap();
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
 {
