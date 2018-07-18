@@ -1227,6 +1227,15 @@ void Itom2dQwtPlot::setContourLevels(QSharedPointer<ito::DataObject> newLevelObj
     }
 
 }
+QSharedPointer< ito::DataObject > Itom2dQwtPlot::getContourLevels() const 
+{
+    if (m_pContent)
+    {
+        return m_pContent->getContourLevels();
+    }
+
+    return QSharedPointer< ito::DataObject >(NULL);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setContourColorMap(const QString &name)
 {

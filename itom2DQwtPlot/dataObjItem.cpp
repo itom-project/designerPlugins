@@ -57,14 +57,34 @@ DataObjItem::~DataObjItem()
 {
 }
 
-//QPen DataObjItem::contourPen(double level) const
-//{
-//    
-//}
+QPen DataObjItem::contourPen(double level) const
+{
+    QList<double> list(contourLevels());
+    qSort(list.begin(), list.end());
+    double min = list.first();
+    double max = list.last();
+    double range = max - min;
+    QPen pen(defaultContourPen());
+
+    int idx = qRound(255.0 / range*(level-min));
+    ito::uint32 color = m_pContourPalette.colorVector256 [idx];
+    ito::uint8 r, g, b;
+    r = (ito::uint8)(color >> 16);
+    g = (ito::uint8)(color >> 8);
+    b = (ito::uint8)(color);
+
+    pen.setColor(qRgb(r, g, b));
+    pen.setStyle(Qt::SolidLine);
+    return pen;
+}
 
 void DataObjItem::setContourPalette(const ito::ItomPalette &palette)
 {
     m_pContourPalette = palette;
+    QPen pen(defaultContourPen());
+    pen.setStyle(Qt::NoPen);
+    setDefaultContourPen(pen);
+    
 }
 
 /*!

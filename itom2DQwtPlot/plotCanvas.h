@@ -103,7 +103,8 @@ class PlotCanvas : public ItomQwtPlot
         QSharedPointer<ito::DataObject> getOverlayObject(void);
         QSharedPointer<ito::DataObject> getDisplayedOverlayObject(void);
 
-        void setContourLevels(const QSharedPointer<ito::DataObject> contourLevels);
+        void setContourLevels(QSharedPointer<ito::DataObject> contourLevels);
+        QSharedPointer<ito::DataObject> getContourLevels() const;
         bool setContourColorMap(const QString & name = "__next__");
         inline QString getContourColorMap() const { return m_colorContourMapName; }
 
@@ -175,6 +176,8 @@ class PlotCanvas : public ItomQwtPlot
 
         DataObjItem *m_dObjItem;
         DataObjItem *m_dOverlayItem;
+
+        QSharedPointer<ito::DataObject> m_pContourObj;
 
         DataObjRasterData *m_rasterData;
         DataObjRasterData *m_rasterOverlayData;

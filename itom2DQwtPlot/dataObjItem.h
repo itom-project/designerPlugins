@@ -36,7 +36,7 @@ public:
 
     explicit DataObjItem( const QString &title = QString::null );
     virtual ~DataObjItem();
-    //virtual QPen contourPen(double level) const;
+    virtual QPen contourPen(double level) const;
     void setContourPalette(const ito::ItomPalette &palette);
 
 

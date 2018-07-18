@@ -376,6 +376,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 
     QSize centerMarkerSize = QSize(25, 25);
     QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);
+    QPen contourPen = QPen(Qt::black, 1.0, Qt::SolidLine);
     int buttonSet = buttonStyle();
 
     if(ito::ITOM_API_FUNCS_GRAPH)
@@ -413,7 +414,8 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
         selectionPen.setColor(inverseColor0());
         //trackerPen.setColor(inverseColor0());
         centerMarkerPen.setColor(inverseColor0());
-        zStackMarkerPen.setColor(inverseColor1());
+        zStackMarkerPen.setColor(inverseColor0());
+        contourPen.setColor(inverseColor0());
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -431,6 +433,18 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
     m_pStackCutMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross, QBrush(inverseColor0()), zStackMarkerPen, zStackMarkerSize));
 
     m_pCenterMarker->setSymbol(new QwtSymbol(QwtSymbol::Cross,QBrush(/*m_inverseColor0*/), centerMarkerPen,  centerMarkerSize));
+    if (m_dObjItem)
+    {
+        if (m_curContourColorMapIndex == -1)
+        {
+            m_dObjItem->setDefaultContourPen(contourPen);
+        }
+        else
+        {
+            contourPen.setStyle(Qt::NoPen);
+            m_dObjItem->setDefaultContourPen(contourPen);
+        }
+    }
 	if (!m_pPaletteIsChanging && overwriteDesignableProperties)
 	{
 		title().setFont(titleFont);
@@ -2189,7 +2203,7 @@ QSharedPointer<ito::DataObject> PlotCanvas::getDisplayedOverlayObject()
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> PlotCanvas::getOverlayObject()
 {
-    if (!m_rasterData)
+    if (!m_rasterOverlayData)
     {
         return QSharedPointer<ito::DataObject>(); 
     }
@@ -2239,7 +2253,7 @@ template<typename _Tp> void parseContourLevels(const QSharedPointer<ito::DataObj
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::setContourLevels(const QSharedPointer<ito::DataObject> contourLevels)
+void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
 {
     ito::RetVal retval(ito::retOk);
     m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
@@ -2276,13 +2290,25 @@ void PlotCanvas::setContourLevels(const QSharedPointer<ito::DataObject> contourL
         parseContourLevels<ito::int8>(contourLevels, &list);
         m_dObjItem->setConrecFlag(QwtRasterData::IgnoreAllVerticesOnLevel, true);
         m_dObjItem->setContourLevels(list);
+        m_pContourObj = contourLevels;
         m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
         if (m_curContourColorMapIndex == -1)
         {
-            m_dObjItem->setDefaultContourPen(Qt::black, 1.0);
+            QPen pen(inverseColor1());
+            pen.setWidth(1.0);
+            m_dObjItem->setDefaultContourPen(pen);
         }
         replot();
     }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QSharedPointer<ito::DataObject> PlotCanvas::getContourLevels() const
+{
+    if (!m_pContourObj)
+    {
+        return QSharedPointer<ito::DataObject>();
+    }
+    return QSharedPointer<ito::DataObject>(m_pContourObj);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
@@ -2290,6 +2316,7 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
     ito::ItomPalette newPalette;
     ito::RetVal retval(ito::retOk);
     int numPalettes = 1;
+    ito::int32 idx = -1;
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -2319,6 +2346,9 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
     else
     {
         retval += apiPaletteGetColorBarName(name, newPalette);
+        
+        retval += apiPaletteGetColorBarIdxFromName(name, idx);
+        
     }
 
     if (retval.containsError() && retval.errorMessage() != NULL)
@@ -2331,9 +2361,8 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
         emit statusBarMessage("error when loading color map", 4000);
         return false;
     }
-
+    m_curContourColorMapIndex = idx;
     int totalStops = newPalette.colorStops.size();
-
     if (totalStops < 2)
     {
         emit statusBarMessage(tr("Selected color map has less than two points."), 4000);
@@ -2341,6 +2370,7 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
     }
 
     m_colorContourMapName = newPalette.name;
+    //m_curContourColorMapIndex = newPalette.index;
 
 
 

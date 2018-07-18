@@ -184,10 +184,7 @@ public:
     QString getOverlayColorMap() const;
     void setOverlayColorMap(const QString &name);
 
-    QSharedPointer< ito::DataObject > getContourLevels() const {
-        return QSharedPointer< ito::DataObject >
-            ();
-    };
+    QSharedPointer< ito::DataObject > getContourLevels() const;
     void setContourLevels(QSharedPointer< ito::DataObject > newContourLevels);
     void resetContourLevels(void) {};
 
