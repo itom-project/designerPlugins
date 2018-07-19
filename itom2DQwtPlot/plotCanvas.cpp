@@ -2257,46 +2257,59 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
 {
     ito::RetVal retval(ito::retOk);
     m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
-    int dims = contourLevels->getDims();
     int trueDims = 0;
     bool isInPlane = true;
-    if (contourLevels->getType() == ito::tRGBA32 || contourLevels->getType() == ito::tComplex128 || contourLevels->getType() == ito::tComplex64)
+    if (!contourLevels.isNull())
     {
-        retval += ito::RetVal(ito::retError, 0, "Can not use dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines");
-    }
-    if (!retval.containsError())
-    {
-        for (int i = 0; i < dims; ++i)
+        int dims = contourLevels->getDims();
+        if (dims == 0)
         {
-            if (contourLevels->getSize(i) != 1)
+            m_dObjItem->setContourLevels(QList<double>());
+            m_pContourObj = NULL;
+        }
+        else
+        {
+            if (contourLevels->getType() == ito::tRGBA32 || contourLevels->getType() == ito::tComplex128 || contourLevels->getType() == ito::tComplex64)
             {
-                ++trueDims;
-                if (dims - i > 2)
+                retval += ito::RetVal(ito::retError, 0, "Can not use dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines");
+            }
+            if (!retval.containsError())
+            {
+                for (int i = 0; i < dims; ++i)
                 {
-                    isInPlane = false;
+                    if (contourLevels->getSize(i) != 1)
+                    {
+                        ++trueDims;
+                        if (dims - i > 2)
+                        {
+                            isInPlane = false;
+                        }
+                    }
+                }
+                if (trueDims != 1 && isInPlane)
+                {
+                    retval += ito::RetVal(ito::retError, 0, QString("expected a 2d DataObject of shape (1xn) or (nx1), but a %1d object was given").arg(trueDims).toLatin1().data());
+                }
 
+                if (!retval.containsError())
+                {
+                    QList<double> list;
+                    parseContourLevels<ito::int8>(contourLevels, &list);
+                    if (m_dObjItem)
+                    {
+                        m_dObjItem->setConrecFlag(QwtRasterData::IgnoreAllVerticesOnLevel, true);
+                        m_dObjItem->setContourLevels(list);
+                        m_pContourObj = contourLevels;
+                        m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+                        if (m_curContourColorMapIndex == -1)
+                        {
+                            QPen pen(inverseColor1());
+                            pen.setWidth(1.0);
+                            m_dObjItem->setDefaultContourPen(pen);
+                        }
+                    }
                 }
             }
-
-        }
-        if (trueDims != 1 && isInPlane)
-        {
-            retval += ito::RetVal(ito::retError, 0, QString("expected a 2d DataObject of shape (1xn) or (nx1), but a %1d object was given").arg(trueDims).toLatin1().data());
-        }
-    }
-    if (!retval.containsError())
-    {
-        QList<double> list;
-        parseContourLevels<ito::int8>(contourLevels, &list);
-        m_dObjItem->setConrecFlag(QwtRasterData::IgnoreAllVerticesOnLevel, true);
-        m_dObjItem->setContourLevels(list);
-        m_pContourObj = contourLevels;
-        m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
-        if (m_curContourColorMapIndex == -1)
-        {
-            QPen pen(inverseColor1());
-            pen.setWidth(1.0);
-            m_dObjItem->setDefaultContourPen(pen);
         }
         replot();
     }

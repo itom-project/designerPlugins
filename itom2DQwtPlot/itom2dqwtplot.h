@@ -186,7 +186,7 @@ public:
 
     QSharedPointer< ito::DataObject > getContourLevels() const;
     void setContourLevels(QSharedPointer< ito::DataObject > newContourLevels);
-    void resetContourLevels(void) {};
+    void resetContourLevels(void);
 
     void setContourColorMap(const QString &name);
     QString getContourColorMap() const;
