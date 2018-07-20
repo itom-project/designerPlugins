@@ -2344,8 +2344,22 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
         emit statusBarMessage(tr("No color maps defined."), 4000);
         return false;
     }
+    if (name == "")
+    {
+        m_curContourColorMapIndex = -1;
+        if (m_dObjItem)
+        {
+            QPen pen(m_dObjItem->defaultContourPen());
+            pen.setColor(inverseColor0());
+            pen.setStyle(Qt::SolidLine);
+            m_dObjItem->setDefaultContourPen(pen);
+            m_colorContourMapName = "";
+            replot();
+            return true;
+        }
 
-    if (name == "__next__")
+    }
+    else if (name == "__next__")
     {
         m_curContourColorMapIndex++;
         m_curContourColorMapIndex %= numPalettes; //map index to [0,numPalettes)
@@ -2385,76 +2399,11 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
     m_colorContourMapName = newPalette.name;
     //m_curContourColorMapIndex = newPalette.index;
 
-
-
-    if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
-    {
-        //QwtLinearColorMap colorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
-        //if (totalStops > 2)
-        //{
-        //    for (int i = 1; i < totalStops - 2; i++)
-        //    {
-        //        colorMap.addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
-        //    }
-        //    colorMap.addColorStop(newPalette.colorStops[totalStops - 1].first, newPalette.colorStops[totalStops - 1].second);
-        //}
         if (m_dObjItem)
         {
             m_dObjItem->setContourPalette(newPalette);
         }
-
-    }
-    else
-    {
-        //QwtLinearColorMap colorMap(QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed));
-        //if (totalStops > 2)
-        //{
-        //    for (int i = 1; i < totalStops - 1; i++)
-        //    {
-        //        colorMap.addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
-        //    }
-        //}
-        if (m_dObjItem)
-        {
-            m_dObjItem->setContourPalette(newPalette);
-        }
-    }
-
-
-
-    //if (newPalette.colorStops[totalStops - 1].first == newPalette.colorStops[totalStops - 2].first)  // BuxFix - For Gray-Marked
-    //{
-    //    colorMap = new QwtLinearColorMap(newPalette.colorStops[0].second, newPalette.colorStops[totalStops - 2].second, QwtColorMap::Indexed);
-    //    if (totalStops > 2)
-    //    {
-    //        for (int i = 1; i < totalStops - 2; i++)
-    //        {
-    //            colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
-    //        }
-    //        colorMap->addColorStop(newPalette.colorStops[totalStops - 1].first, newPalette.colorStops[totalStops - 1].second);
-    //    }
-    //}
-    //else
-    //{
-    //    colorMap = new QwtLinearColorMap(newPalette.colorStops.first().second, newPalette.colorStops.last().second, QwtColorMap::Indexed);
-    //    if (totalStops > 2)
-    //    {
-    //        for (int i = 1; i < totalStops - 1; i++)
-    //        {
-    //           colorMap->addColorStop(newPalette.colorStops[i].first, newPalette.colorStops[i].second);
-    //        }
-    //    }
-    //}
-
-    //if (colorMap)
-    //{
-    //    this->m_dOverlayItem->setColorMap(colorMap);
-    //}
-    //else
-    //{
-    //    delete colorMap;
-    //}
-
+    
     replot();
     return true;
 }
