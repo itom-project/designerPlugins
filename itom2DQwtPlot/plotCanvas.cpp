@@ -2294,7 +2294,34 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
                 if (!retval.containsError())
                 {
                     QList<double> list;
-                    parseContourLevels<ito::int8>(contourLevels, &list);
+                    switch (contourLevels->getType())
+                    {
+                    case ito::tUInt8:
+                        parseContourLevels<ito::uint8>(contourLevels, &list);
+                        break;
+                    case ito::tUInt16:
+                        parseContourLevels<ito::uint16>(contourLevels, &list);
+                        break;
+                    case ito::tUInt32:
+                        parseContourLevels<ito::uint32>(contourLevels, &list);
+                        break;
+                    case ito::tFloat32:
+                        parseContourLevels<ito::float32>(contourLevels, &list);
+                        break;
+                    case ito::tFloat64:
+                        parseContourLevels<ito::float64>(contourLevels, &list);
+                        break;
+                    case ito::tInt8:
+                        parseContourLevels<ito::int8>(contourLevels, &list);
+                        break;
+                    case ito::tInt16:
+                        parseContourLevels<ito::int16>(contourLevels, &list);
+                        break;
+                    case ito::tInt32:
+                        parseContourLevels<ito::int32>(contourLevels, &list);
+                        break;
+
+                    }
                     if (m_dObjItem)
                     {
                         m_dObjItem->setConrecFlag(QwtRasterData::IgnoreAllVerticesOnLevel, true);
