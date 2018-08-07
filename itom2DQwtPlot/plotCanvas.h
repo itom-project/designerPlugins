@@ -107,6 +107,8 @@ class PlotCanvas : public ItomQwtPlot
         QSharedPointer<ito::DataObject> getContourLevels() const;
         bool setContourColorMap(const QString & name = "__next__");
         inline QString getContourColorMap() const { return m_colorContourMapName; }
+        float getContourLineWidth() const;
+        void setContourLineWidth(const float &width);
 
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
 		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);

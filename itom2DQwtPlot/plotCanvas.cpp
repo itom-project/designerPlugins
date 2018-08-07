@@ -415,7 +415,11 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
         //trackerPen.setColor(inverseColor0());
         centerMarkerPen.setColor(inverseColor0());
         zStackMarkerPen.setColor(inverseColor0());
-        contourPen.setColor(inverseColor0());
+        if (m_dObjItem)
+        {
+            contourPen = m_dObjItem->defaultContourPen();//hold setting from default pen
+        }
+        contourPen.setColor(inverseColor1());
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -2242,12 +2246,15 @@ template<typename _Tp> void parseContourLevels(const QSharedPointer<ito::DataObj
         const _Tp* rowPtr = NULL;
         cv::Mat_<_Tp> *mat = NULL;
         int m, n;
-        mat = (cv::Mat_<_Tp>*)obj->get_mdata()[obj->seekMat(0)];
-        for (m = 0; m < mat->rows; ++m)
+        for (int layer = 0; layer < obj->getNumPlanes(); ++layer)
         {
-            rowPtr = (_Tp*)mat->ptr(m);
-            for (n = 0; n < mat->cols; ++n)
-                list->append(rowPtr[n]);
+            mat = (cv::Mat_<_Tp>*)obj->get_mdata()[obj->seekMat(layer)];
+            for (m = 0; m < mat->rows; ++m)
+            {
+                rowPtr = (_Tp*)mat->ptr(m);
+                for (n = 0; n < mat->cols; ++n)
+                    list->append(rowPtr[n]);
+            }
         }
     }
 }
@@ -2264,6 +2271,7 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
         int dims = contourLevels->getDims();
         if (dims == 0)
         {
+            m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, false);
             m_dObjItem->setContourLevels(QList<double>());
             m_pContourObj = NULL;
         }
@@ -2271,26 +2279,11 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
         {
             if (contourLevels->getType() == ito::tRGBA32 || contourLevels->getType() == ito::tComplex128 || contourLevels->getType() == ito::tComplex64)
             {
-                retval += ito::RetVal(ito::retError, 0, "Can not use dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines");
+                retval += ito::RetVal(ito::retError, 0, "Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines");
+                emit statusBarMessage(tr("Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines"), 4000);
             }
             if (!retval.containsError())
             {
-                for (int i = 0; i < dims; ++i)
-                {
-                    if (contourLevels->getSize(i) != 1)
-                    {
-                        ++trueDims;
-                        if (dims - i > 2)
-                        {
-                            isInPlane = false;
-                        }
-                    }
-                }
-                if (trueDims != 1 && isInPlane)
-                {
-                    retval += ito::RetVal(ito::retError, 0, QString("expected a 2d DataObject of shape (1xn) or (nx1), but a %1d object was given").arg(trueDims).toLatin1().data());
-                }
-
                 if (!retval.containsError())
                 {
                     QList<double> list;
@@ -2377,7 +2370,7 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
         if (m_dObjItem)
         {
             QPen pen(m_dObjItem->defaultContourPen());
-            pen.setColor(inverseColor0());
+            pen.setColor(inverseColor1());
             pen.setStyle(Qt::SolidLine);
             m_dObjItem->setDefaultContourPen(pen);
             m_colorContourMapName = "";
@@ -2433,6 +2426,19 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
     
     replot();
     return true;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setContourLineWidth(const float& width)
+{
+    QPen pen(m_dObjItem->defaultContourPen());
+    pen.setWidthF(width);
+    m_dObjItem->setDefaultContourPen(pen);
+    replot();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+float PlotCanvas::getContourLineWidth() const
+{
+    return m_dObjItem->defaultContourPen().widthF();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::alphaChanged()

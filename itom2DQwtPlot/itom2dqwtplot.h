@@ -66,11 +66,12 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > overlayImage READ getOverlayImage WRITE setOverlayImage RESET resetOverlayImage DESIGNABLE false)
     Q_PROPERTY(int overlayAlpha READ getOverlayAlpha WRITE setOverlayAlpha RESET resetOverlayAlpha USER true)
-    Q_PROPERTY(ito::AutoInterval overlayInterval READ getOverlayInterval WRITE setOverlayInterval DESIGNABLE true USER true)
-    Q_PROPERTY(QString overlayColorMap READ getOverlayColorMap WRITE setOverlayColorMap DESIGNABLE true USER true)
+    Q_PROPERTY(ito::AutoInterval overlayInterval READ getOverlayInterval WRITE setOverlayInterval DESIGNABLE false USER true)
+    Q_PROPERTY(QString overlayColorMap READ getOverlayColorMap WRITE setOverlayColorMap DESIGNABLE false USER true)
 
     Q_PROPERTY(QSharedPointer <ito::DataObject> contourLevels READ getContourLevels WRITE setContourLevels RESET resetContourLevels DESIGNABLE false)
     Q_PROPERTY(QString contourColorMap READ getContourColorMap WRITE setContourColorMap DESIGNABLE true USER true)
+    Q_PROPERTY(float contourLineWidth READ getContourLineWidth WRITE setContourLineWidth DESIGNABLE true USER true);
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
     
@@ -190,6 +191,9 @@ public:
 
     void setContourColorMap(const QString &name);
     QString getContourColorMap() const;
+
+    void setContourLineWidth(const float& width);
+    float getContourLineWidth() const;
 
     int getPlaneIndex() const;
     void setPlaneIndex(const int &index);
