@@ -403,7 +403,6 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 
         
     }
-
     if (inverseColor1().isValid())
     {
         rubberBandPen.setColor(inverseColor1());
@@ -417,9 +416,12 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
         zStackMarkerPen.setColor(inverseColor0());
         if (m_dObjItem)
         {
-            contourPen = m_dObjItem->defaultContourPen();//hold setting from default pen
+           contourPen = m_dObjItem->defaultContourPen();//hold setting from default pen
         }
-        contourPen.setColor(inverseColor1());
+        if (m_curContourColorMapIndex == -1)
+        {
+            contourPen.setColor(inverseColor1());
+        }
     }
 
     m_pValuePicker->setTrackerFont(trackerFont);
@@ -2323,8 +2325,8 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
                         m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
                         if (m_curContourColorMapIndex == -1)
                         {
-                            QPen pen(inverseColor1());
-                            pen.setWidth(1.0);
+                            QPen pen(m_dObjItem->defaultContourPen());
+                            pen.setColor(inverseColor1());
                             m_dObjItem->setDefaultContourPen(pen);
                         }
                     }
@@ -2423,7 +2425,6 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
         {
             m_dObjItem->setContourPalette(newPalette);
         }
-    
     replot();
     return true;
 }
