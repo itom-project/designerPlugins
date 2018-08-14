@@ -98,14 +98,14 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
     Q_CLASSINFO("prop://showCenterMarker", "Shows or hides a marker for the center of a data object.")
 
+    Q_CLASSINFO("prop://contourLevels", "Defines which contour levels should be plotted. Each value inside the given dataObject results in one contour level. Possible types are uint8, int8, uint16, int16, int32, float32 and float64.")
+    Q_CLASSINFO("prop://contourLineWidth", "Defines the line width of the contour lines")
+    Q_CLASSINFO("prop://contourColorMap", "Defines which color map should be used for the contour lines [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
+
     Q_CLASSINFO("prop://overlayImage", "Set an overlay dataObject which is shown above the main dataObject and whose opacity (see 'overlayAlpha') can be controlled by a slider in the toolbar. Assign None to remove the overlay object.")
     Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
-
     Q_CLASSINFO("prop://overlayColorMap", "Defines which color map should be used for the overlay channel [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
-
-    Q_CLASSINFO("prop://contourLevel","Defines the levels of the contoour lines.")
-    Q_CLASSINFO("prop://contourColorMap", "Defines which color map should be used for the contour lines [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
 
     Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
 
