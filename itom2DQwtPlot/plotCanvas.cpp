@@ -948,6 +948,10 @@ void PlotCanvas::adjustColorDataTypeRepresentation()
         m_pActColorPalette->setVisible(false);
         m_pActToggleColorBar->setVisible(false);
         m_pActDataChannel->setVisible(true);
+        if (m_dObjItem)
+        {
+            m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, false);
+        }
     }
     else
     {
@@ -955,6 +959,10 @@ void PlotCanvas::adjustColorDataTypeRepresentation()
         m_pActToggleColorBar->setVisible(true);
         setColorBarVisible(m_pActToggleColorBar->isChecked());
         m_pActDataChannel->setVisible(m_dObjPtr->getType() == ito::tRGBA32);
+        if (m_dObjItem)
+        {
+            m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+        }
     }
 
     if (m_pMnuDataChannel->defaultAction()->data().toInt() != m_pData->m_dataChannel)
@@ -968,7 +976,7 @@ void PlotCanvas::adjustColorDataTypeRepresentation()
                 break;
             }
         }
-    }   
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -2265,7 +2273,10 @@ template<typename _Tp> void parseContourLevels(const QSharedPointer<ito::DataObj
 void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
 {
     ito::RetVal retval(ito::retOk);
-    m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+    if ((m_dObjPtr->getType() == ito::tRGBA32) && (m_pData->m_dataChannel & 0x0100))
+    {
+        m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+    }
     int trueDims = 0;
     bool isInPlane = true;
     if (!contourLevels.isNull())
@@ -2286,6 +2297,18 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
             }
             if (!retval.containsError())
             {
+                for (int i = 0; i < contourLevels->getDims()-1; ++i)
+                {
+                    if (contourLevels->getSize(i) != 1)
+                    {
+                        ++trueDims;
+                    }
+                }
+                if (trueDims != 0)
+                {
+                    retval += ito::RetVal(ito::retError, 0, "Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines");
+                    emit statusBarMessage(tr("Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines"), 4000);
+                }
                 if (!retval.containsError())
                 {
                     QList<double> list;
@@ -2322,7 +2345,7 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
                         m_dObjItem->setConrecFlag(QwtRasterData::IgnoreAllVerticesOnLevel, true);
                         m_dObjItem->setContourLevels(list);
                         m_pContourObj = contourLevels;
-                        m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+                        //m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
                         if (m_curContourColorMapIndex == -1)
                         {
                             QPen pen(m_dObjItem->defaultContourPen());

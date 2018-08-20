@@ -468,7 +468,36 @@ double DataObjRasterData::value(double x, double y) const
                     }
                 case ito::tRGBA32:
                     {
-                        return m_plane->at<ito::Rgba32>(m,n).gray();
+
+                    if(m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAuto) //channelAuto
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).gray();
+                    }
+                    else if(m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRGBA)//rgba
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).gray();
+                    }
+                    else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGray)//gray
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).gray();
+                    }
+                    else if(m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRed)//red
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).red();
+                    }
+                    else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGreen)//green
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).green();
+                    }
+                    else if(m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelBlue)//blue
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).blue();
+                    }
+                    else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAlpha)//alpha
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).alpha();
+                    }
+                        
                     }
                 default:
                     return quietNaN;
