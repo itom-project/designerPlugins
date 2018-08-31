@@ -81,6 +81,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 		m_zstackCutUID(0),
 		m_lineCutUID(0),
 		m_pLineCutLine(NULL),
+        m_pVolumeCutLine(NULL),
 		m_isRefreshingPlot(false),
 		m_unitLabelChanged(false),
 		m_pPaletteIsChanging(false),
@@ -90,6 +91,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pActToggleColorBar(NULL),
         m_pActValuePicker(NULL),
         m_pActLineCut(NULL),
+        m_pActVolumeCut(NULL),
         m_showCenterMarker(false),
         m_pMnuLineCutMode(NULL),
         m_pActStackCut(NULL),
@@ -166,6 +168,21 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_pCenterMarker->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
     m_pCenterMarker->setSpacing(0);
 
+    //picker for volume cut
+    m_pVolumeCutPicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, canvas());
+    m_pVolumeCutPicker->setEnabled(false);
+    m_pVolumeCutPicker->setStateMachine(new QwtPickerDragPointMachine);
+    m_pVolumeCutPicker->setRubberBandPen(QPen(Qt::green));
+    m_pVolumeCutPicker->setTrackerPen(QPen(Qt::green));
+    //disable key movements for the picker (the marker will be moved by the key-event of this widget)
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyUp, 0);
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyDown, 0);
+    connect(m_pVolumeCutPicker, SIGNAL(moved(const QPoint&)), SLOT(volumeCutMovedPx(const QPoint&)));
+    connect(m_pVolumeCutPicker, SIGNAL(appended(const QPoint&)), SLOT(volumeCutAppendedPx(const QPoint&)));
+
+
     //picker for line picking
     m_pLineCutPicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, canvas());
     m_pLineCutPicker->setEnabled(false);
@@ -184,6 +201,11 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_pLineCutLine = new QwtPlotCurve();
     m_pLineCutLine->attach(this);
     m_pLineCutLine->setVisible(false);
+
+    //line for volume picking
+    m_pVolumeCutLine = new QwtPlotCurve();
+    m_pVolumeCutLine->attach(this);
+    m_pVolumeCutLine->setVisible(false);
 
     //right axis (color bar)
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
@@ -229,6 +251,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActValuePicker);
     mainTb->addAction(m_pActCntrMarker);
     mainTb->addAction(m_pActLineCut);
+    mainTb->addAction(m_pActVolumeCut);
     mainTb->addAction(m_pActStackCut);
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
@@ -267,6 +290,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     menuTools->addAction(m_pActValuePicker);
     menuTools->addAction(m_pActCntrMarker);
     menuTools->addAction(m_pActLineCut);
+    menuTools->addAction(m_pActVolumeCut);
     menuTools->addAction(m_pActStackCut);
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
@@ -568,6 +592,13 @@ void PlotCanvas::createActions()
     a->setToolTip(tr("Show a 1D line cut (in-plane)"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuLineCut(bool)));
 
+    //m_actVolumeCut
+    m_pActVolumeCut = a = new QAction(tr("Volumecut"), p);
+    a->setCheckable(true);
+    a->setObjectName("actVolumeCut");
+    a->setToolTip(tr("Show a 2D volume cut"));
+    connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuVolumeCut(bool)));
+
     //m_pActLineCutMode
     m_pMnuLineCutMode = new QMenu(tr("Linecut Mode"), p);
     m_pActLineCut->setMenu(m_pMnuLineCutMode);
@@ -661,6 +692,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActCntrMarker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"));
         m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"));
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+        m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
 
@@ -699,6 +731,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActCntrMarker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerCntr_lt.png"));
         m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/zStack_lt.png"));
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
+        m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
         m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rgba_lt.png"));
@@ -1828,8 +1861,10 @@ void PlotCanvas::stateChanged(int state)
 
     if (m_pValuePicker) m_pValuePicker->setEnabled(state == stateValuePicker);
     if (m_pLineCutPicker) m_pLineCutPicker->setEnabled(state == stateLineCut);
+    if (m_pVolumeCutPicker) m_pVolumeCutPicker->setEnabled(state == stateVolumeCut);
     if (m_pStackPicker) m_pStackPicker->setEnabled(state == stateStackCut);
     m_pActLineCut->setChecked(state == stateLineCut);
+    m_pActVolumeCut->setChecked(state == stateVolumeCut);
     m_pActValuePicker->setChecked(state == stateValuePicker);
     m_pActStackCut->setChecked(state == stateStackCut);
 
@@ -1954,6 +1989,12 @@ void PlotCanvas::lineCutMovedPx(const QPoint &pt)
     lineCutMovedPhys(phys);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutMovedPx(const QPoint & pt)
+{
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    volumeCutMovedPhys(phys);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::lineCutMovedPhys(const QPointF &pt)
 {
@@ -2166,7 +2207,216 @@ void PlotCanvas::lineCutAppendedPhys(const QPointF &pt)
         replot();
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutAppendedPx(const QPoint &pt)
+{
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    volumeCutAppendedPhys(phys);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
+{
+    if (state() == stateVolumeCut)
+    {
+        QVector<QPointF> pts;
+        pts.resize(2);
 
+        QwtInterval xInterval = m_rasterData->interval(Qt::XAxis);
+        QwtInterval yInterval = m_rasterData->interval(Qt::YAxis);
+
+        if (m_pVolumeCutLine->dataSize() > 0)
+        {
+            pts[0] = m_pVolumeCutLine->sample(0);
+        }
+        else
+        {
+            return;
+        }
+
+        if (m_volumeCutValidStart)
+        {
+            pts[1] = pt;
+
+            if (!xInterval.contains(pts[1].x()) || !yInterval.contains(pts[1].y()))
+            {
+                QPointF intersection;
+                QPointF rt(xInterval.maxValue(), yInterval.maxValue());
+                QPointF lt(xInterval.minValue(), yInterval.maxValue());
+                QPointF rb(xInterval.maxValue(), yInterval.minValue());
+                QPointF lb(xInterval.minValue(), yInterval.minValue());
+
+                if ((pts[1].x() < pts[0].x()) && lineIntersection(pts[1], pts[0], lt, lb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with left border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].x() > pts[0].x()) && lineIntersection(pts[1], pts[0], rt, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with right border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].y() > pts[0].y()) && lineIntersection(pts[1], pts[0], lt, rt, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with top border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].y() < pts[0].y()) && lineIntersection(pts[1], pts[0], lb, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with bottom border
+                    pts[1] = intersection;
+                }
+            }
+
+            if (m_activeModifiers.testFlag(Qt::ControlModifier))
+            {
+                //Ctrl pressed: line should be horizontally or vertically aligned. This has to be checked with respect to screen coordinates,
+                //if it is done on scale coordinates, problems can occur if one dimension has a scaling that varies strongly from the other scaling.
+                int dx = transform(QwtPlot::xBottom, pts[0].x()) - transform(QwtPlot::xBottom, pts[1].x());
+                int dy = transform(QwtPlot::yLeft, pts[0].y()) - transform(QwtPlot::yLeft, pts[1].y());
+
+                if (abs(dx) > abs(dy))
+                {
+                    pts[1].setY(pts[0].y());
+                }
+                else
+                {
+                    pts[1].setX(pts[0].x());
+                }
+            }
+
+            m_pVolumeCutLine->setSamples(pts);
+
+            setCoordinates(pts, true);
+
+            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+            }
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+            }
+            replot();
+        }
+        else //first point is still not valid, try to find a valid first point
+        {
+            QPointF pts0 = pts[0];
+
+            pts[0] = pt;
+
+            if (m_rasterData->pointValid(pts[0]))
+            {
+                //the mouse cursor is now in a valid area. Due to discretization limits, it might be that this point is not exactly at the border
+                //towards the direction where the mouse has been pressed for the first time. Therefore get the intersection to the initial mouse press
+                //position.
+                QPointF intersection;
+                QPointF rt(xInterval.maxValue(), yInterval.maxValue());
+                QPointF lt(xInterval.minValue(), yInterval.maxValue());
+                QPointF rb(xInterval.maxValue(), yInterval.minValue());
+                QPointF lb(xInterval.minValue(), yInterval.minValue());
+
+                if (lineIntersection(pts[0], pts0, lt, lb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with left border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, rt, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with right border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, lt, rt, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with top border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, lb, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with bottom border
+                    pts[0] = intersection;
+                }
+
+                m_volumeCutValidStart = true;
+            }
+            else
+            {
+                //first point not valid
+                m_volumeCutValidStart = false;
+            }
+
+            pts[1] = pts[0];
+
+            m_pVolumeCutLine->setVisible(true);
+            m_pVolumeCutLine->setSamples(pts);
+
+            setCoordinates(pts, true);
+
+            // check for m_dObjPtr first otherwise crash
+            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+            }
+
+            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+            }
+            replot();
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
+{
+    if (state() == stateVolumeCut && m_dObjPtr)
+    {
+        QVector<QPointF> pts;
+        pts.resize(2);
+        pts[0] = pt;
+
+        if (m_rasterData->pointValid(pts[0]))
+        {
+            m_volumeCutValidStart = true;
+        }
+        else
+        {
+            //first point not valid
+            m_volumeCutValidStart = false;
+        }
+
+        pts[1] = pts[0];
+
+        m_pVolumeCutLine->setVisible(true);
+        m_pVolumeCutLine->setSamples(pts);
+
+        //setCoordinates(pts, true);
+
+        // check for m_dObjPtr first otherwise crash
+        if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+        {
+            pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+        }
+
+        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+        if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+        {
+            QVector4D vec;
+            if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+            else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+            (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+        }
+
+        replot();
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::childFigureDestroyed(QObject* /*obj*/, ito::uint32 UID)
 {
@@ -2563,7 +2813,21 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
 
     return ito::retOk;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::setVolumeCut(const double x0, const double y0, const double x1, const double y1)
+{
+    if (m_pActVolumeCut->isCheckable() && m_pActVolumeCut->isEnabled())
+    {
+        m_pActVolumeCut->setChecked(true);
+        mnuVolumeCut(true);
+    }
+    else
+    {
+        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
+    }
+    volumeCutAppendedPhys(QPointF(x0, y0));
 
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
 {
@@ -2690,7 +2954,18 @@ void PlotCanvas::mnuLineCut(bool checked)
         setState(stateIdle);
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mnuVolumeCut(bool checked)
+{
+    if (checked)
+    {
+        setState(stateVolumeCut);
+    }
+    else if (state() == stateVolumeCut)
+    {
+        setState(stateIdle);
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuLineCutMode(QAction *action)
 {

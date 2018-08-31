@@ -70,6 +70,7 @@ public:
         stateStackCut = 5,
         stateDrawShape = 6,
         stateMarkerPicker = 7,
+        stateVolumeCut = 8,
         stateUser = 100
     };
 

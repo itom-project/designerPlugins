@@ -111,6 +111,7 @@ class PlotCanvas : public ItomQwtPlot
         void setContourLineWidth(const float &width);
 
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
+        ito::RetVal setVolumeCut(const double x0, const double y0, const double x1, const double y1);
 		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
 		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
@@ -148,6 +149,10 @@ class PlotCanvas : public ItomQwtPlot
         void lineCutMovedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
         void lineCutAppendedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
 
+        void volumeCutAppendedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
+        void volumeCutMovedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
+
+
     private:
         void createActions();
 
@@ -159,6 +164,8 @@ class PlotCanvas : public ItomQwtPlot
 
         QwtPlotPicker *m_pLineCutPicker;
         QwtPlotCurve *m_pLineCutLine;
+        QwtPlotPicker *m_pVolumeCutPicker;
+        QwtPlotCurve *m_pVolumeCutLine;
         ValuePicker2D *m_pValuePicker;
         ItomPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
@@ -187,6 +194,7 @@ class PlotCanvas : public ItomQwtPlot
         ito::uint32 m_zstackCutUID;
         ito::uint32 m_lineCutUID;
         bool m_lineCutValidStart; //true if the first point of the line cut is a valid point inside of the data object
+        bool m_volumeCutValidStart; ////true if the first point of the volume cut is a valid point inside of the data object
 
         InternalData *m_pData;
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
@@ -205,6 +213,7 @@ class PlotCanvas : public ItomQwtPlot
         QAction *m_pActToggleColorBar;
         QAction *m_pActValuePicker;
         QAction *m_pActLineCut;
+        QAction *m_pActVolumeCut;
         QMenu *m_pMnuLineCutMode;
         QAction *m_pActStackCut; //
         QWidgetAction *m_pActPlaneSelector; //
@@ -227,6 +236,8 @@ class PlotCanvas : public ItomQwtPlot
         void zStackCutTrackerAppended(const QPoint &pt);
         void lineCutMovedPx(const QPoint &pt); //pt is in canvas coordinates (pixel)
         void lineCutAppendedPx(const QPoint &pt); //pt is in canvas coordinates (pixel)
+        void volumeCutMovedPx(const  QPoint &pt); //pt is in canvas coordinates (pixel)
+        void volumeCutAppendedPx(const QPoint &pt); //pt is in canvas coordinates (pixel)
 
         void mnuScaleSettings();
         void mnuCmplxSwitch(QAction*);
@@ -237,6 +248,7 @@ class PlotCanvas : public ItomQwtPlot
         void mnuValuePicker(bool checked);
         void mnuLineCut(bool checked);
         void mnuLineCutMode(QAction *action);
+        void mnuVolumeCut(bool checked);
         void mnuStackCut(bool checked);
         void mnuPlaneSelector(int plane);
         void mnuOverlaySliderChanged(int value);
