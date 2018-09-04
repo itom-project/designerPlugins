@@ -2286,7 +2286,7 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
         {
             m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, false);
             m_dObjItem->setContourLevels(QList<double>());
-            m_pContourObj = NULL;
+            m_pContourObj = QSharedPointer<ito::DataObject>();
         }
         else
         {
