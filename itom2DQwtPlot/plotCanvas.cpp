@@ -2292,7 +2292,7 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
             }
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+            ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_lineCutUID);
             if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
             {
                 QVector4D vec;
@@ -2361,7 +2361,7 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
             }
 
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+            ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_lineCutUID);
             if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
             {
                 QVector4D vec;
@@ -2405,7 +2405,7 @@ void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
             pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
         }
 
-        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
+        ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_lineCutUID);
         if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
         {
             QVector4D vec;

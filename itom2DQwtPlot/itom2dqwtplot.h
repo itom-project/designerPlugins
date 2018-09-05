@@ -146,6 +146,7 @@ public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
 
+    ito::RetVal displayVolumeCut(QVector<QPointF> bounds, ito::uint32 &uniqueID);
     ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack = false);
 
     ito::RetVal applyUpdate();  //!> does the real update work
