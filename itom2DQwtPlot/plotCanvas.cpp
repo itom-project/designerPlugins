@@ -767,7 +767,7 @@ void PlotCanvas::setButtonStyle(int style)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
+void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
     if (m_isRefreshingPlot || !m_pData)
     {
@@ -787,7 +787,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
 
-        updateState = m_rasterData->updateDataObject(dObj, plane);
+        updateState = m_rasterData->updateDataObject(dObj, plane , bounds);
 
         if ((updateState & changeData) || m_unitLabelChanged)
         {

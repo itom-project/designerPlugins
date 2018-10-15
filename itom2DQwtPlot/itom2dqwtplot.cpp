@@ -70,6 +70,8 @@ void Itom2dQwtPlot::constructor()
     // Basic settings
     m_pContent = NULL;
     
+    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for volume plots from 3d objects").toLatin1().data()));
+
     //bounds and zCutPoint are two different output connections, since it is possible to have a line cut and a z-stack cut visible at the same time.
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
     m_pOutput.insert("zCutPoint", new ito::Param("zCutPoint", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for z-stack cut in 3d objects").toLatin1().data()));
@@ -171,7 +173,8 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
         m_pOutput["bounds"]->setVal<double*>(bounds, 6);
     }
     */
-    m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>());
+    QVector<QPointF> bounds = getBounds();
+    m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(),-1,bounds);
 
     return ito::retOk;
 }
@@ -864,7 +867,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
     //setOutpBounds(bounds);
     //setLinePlotCoordinates(bounds);
 
-    retval += apiGetFigure("DObjStaticLine", "", newUniqueID, &volumeCutObj, this);
+    retval += apiGetFigure("DObjStaticImage", "", newUniqueID, &volumeCutObj, this);
 
     QWidget *w = this;
     while (w)
@@ -1617,6 +1620,35 @@ void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
 
         m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setBounds(QVector<QPointF> bounds)
+{
+    double *pointArr = new double[2 * bounds.size()];
+    for (int np = 0; np < bounds.size(); np++)
+    {
+        pointArr[np * 2] = bounds[np].x();
+        pointArr[np * 2 + 1] = bounds[np].y();
+    }
+    m_pInput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    delete[] pointArr;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QVector<QPointF> Itom2dQwtPlot::getBounds(void) const
+{
+    int numPts = m_pInput["bounds"]->getLen();
+    QVector<QPointF> boundsVec;
+
+    if (numPts > 0)
+    {
+        double *ptsDblVec = m_pInput["bounds"]->getVal<double*>();
+        boundsVec.reserve(numPts / 2);
+        for (int n = 0; n < numPts / 2; n++)
+        {
+            boundsVec.append(QPointF(ptsDblVec[n * 2], ptsDblVec[n * 2 + 1]));
+        }
+    }
+    return boundsVec;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType Itom2dQwtPlot::getComplexStyle() const

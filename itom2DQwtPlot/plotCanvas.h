@@ -78,7 +78,7 @@ class PlotCanvas : public ItomQwtPlot
         ~PlotCanvas();
 
         ito::RetVal init(bool overwriteDesignableProperties);
-        void refreshPlot(const ito::DataObject *dObj, int plane = -1);
+        void refreshPlot(const ito::DataObject *dObj, int plane = -1, const QVector<QPointF> bounds = QVector<QPointF>());
 
         void changePlane(int plane);
         int getCurrentPlane();

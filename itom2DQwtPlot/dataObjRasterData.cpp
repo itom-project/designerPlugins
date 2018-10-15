@@ -125,7 +125,7 @@ void DataObjRasterData::deleteCache()
 /*
 returns 0 if nothing changed, 1 if only the appearance changed and 3 if data and appearance changed
 */
-ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int planeIdx /*= -1*/)
+ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int planeIdx /*= -1*/, QVector<QPointF> bounds /*QVector<QPointF>()*/)
 {
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
     // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is 
@@ -310,6 +310,82 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                 setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_valueMin, m_pInternalData->m_valueMax));
             }
         }
+
+        if(bounds.size()==3)
+
+        {
+            if (bounds.size() == 3)
+            {
+                QVector<QPointF> tmpBounds;
+                m_D.m_planeIdx = bounds[0].x();
+                m_D.m_planeIdx = d > 2 ? qMin<int>(m_D.m_planeIdx, dataObj->getSize(d - 3)) : 0;
+                tmpBounds.resize(2);
+                tmpBounds[0] = bounds[1];
+                tmpBounds[1] = bounds[2];
+
+                int pxX1, pxX2, pxY1, pxY2;
+                float right;
+                bool _unused;
+                cv::Mat *mat;
+                pxX1 = qRound(dataObj->getPhysToPix(d - 1, bounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPhysToPix(d - 2, bounds[0].y(), _unused));
+                pxX2 = qRound(dataObj->getPhysToPix(d - 1, bounds[1].x(), _unused));
+                pxY2 = qRound(dataObj->getPhysToPix(d - 2, bounds[1].y(), _unused));
+
+                saturation(pxX1, 0, dataObj->getSize(d - 1) - 1);
+                saturation(pxX2, 0, dataObj->getSize(d - 1) - 1);
+                saturation(pxY1, 0, dataObj->getSize(d - 2) - 1);
+                saturation(pxY2, 0, dataObj->getSize(d - 2) - 1);
+
+                if (true) //Todo: set to pure y
+                {
+                    m_D.m_dir = dirX;
+                    if (pxY2 >= pxY1)
+                    {
+                        m_D.m_lineLength = 1 + pxY2 - pxY1;
+                    }
+                    else
+                    {
+                        m_D.m_lineLength = 1 + pxY1 - pxY2;
+                    }
+                    m_D.m_startPhys = dataObj->getPixToPhys(d - 2, pxY1, _unused);
+                    right = dataObj->getPixToPhys(d - 2, pxY2, _unused);
+                    m_D.m_stepSizePhys = m_D.m_lineLength > 1 ? (right - m_D.m_startPhys) / (float)(m_D.m_lineLength - 1) : 0.0;
+
+                    m_D.m_startPx.setX(pxX1);
+                    m_D.m_startPx.setY(pxY1);
+                    m_D.m_stepSizePx.setWidth(0);
+                    m_D.m_stepSizePx.setWidth(1);
+                    m_D.m_matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1;
+                    if (pxY2 >= pxY1)
+                    {
+                        m_D.m_matStepSize = (int)mat->step[0]; //step in y-direction (in bytes)
+                    }
+                    else
+                    {
+                        m_D.m_matStepSize = -(int)mat->step[0]; //step in y-direction (in bytes)
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     else
     {

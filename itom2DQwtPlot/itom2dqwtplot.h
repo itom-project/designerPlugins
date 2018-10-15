@@ -74,6 +74,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(float contourLineWidth READ getContourLineWidth WRITE setContourLineWidth DESIGNABLE true USER true);
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
+    Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
     
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
     Q_PROPERTY(ItomQwtPlotEnums::DataChannel dataChannel READ getDataChannel WRITE setDataChannel  RESET resetDataChannel DESIGNABLE true USER true);
@@ -259,6 +260,12 @@ public:
 
     //!> return the current line cut id for zSlices
     void setZSlicePlotItem(const ito::ItomPlotHandle idx);
+
+    //!> set the bounds for volume cut
+    void setBounds(QVector<QPointF> bounds);
+
+    //!> get the bounds for volume cut
+    QVector<QPointF> getBounds() const; 
 
 	ItomQwtPlotEnums::ComplexType getComplexStyle() const;
 	void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type);
