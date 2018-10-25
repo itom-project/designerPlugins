@@ -86,6 +86,8 @@ void DataObjRasterData::calcHash(const ito::DataObject *dObj, QByteArray &dataHa
         ba2.append( m_pInternalData->m_cmplxType );
         ba2.append( m_pInternalData->m_yaxisFlipped );
         ba2.append( (char)m_D.m_planeIdx );
+        
+
 
         if( dims > 0 )
         {
@@ -406,8 +408,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                     {
                         newHash |= PlotCanvas::changeData;
                     }
-
-                    if (m_appearanceHash != appearanceHash || m_dataHash != dataHash)
+                    //todo remove true
+                    if (true || m_appearanceHash != appearanceHash || m_dataHash != dataHash)
                     {
                         m_dataHash = dataHash;
                         m_appearanceHash = appearanceHash;
@@ -722,9 +724,10 @@ double DataObjRasterData::value(double x, double y) const
                             }
                         }
                 }
+                //Todo: complete section
                 else
                 {
-                    int n = qRound(m_dataObj.getPhysToPix(d - 1, x, inside1));
+                    int n = qRound(m_dataObj.getPhysToPix(d - 2, x, inside1));
                     int m = qRound(m_dataObj.getPhysToPix(d - 3, y, inside2));
                     if (inside1 && inside2)
                     {
@@ -924,142 +927,143 @@ double DataObjRasterData::value2_yinv(int m, int n) const
     if(m_validData)
     {
         m = m_rasteredLines - m - 1; //invert y-coordinate
-
-        switch(m_dataObj.getType())
-        {
-        case ito::tInt8:
+            switch (m_dataObj.getType())
+            {
+            case ito::tInt8:
             {
                 ito::int8 *line = (ito::int8*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tUInt8:
+            case ito::tUInt8:
             {
                 ito::uint8 *line = (ito::uint8*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tInt16:
+            case ito::tInt16:
             {
                 ito::int16 *line = (ito::int16*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tUInt16:
+            case ito::tUInt16:
             {
                 ito::uint16 *line = (ito::uint16*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tInt32:
+            case ito::tInt32:
             {
                 ito::int32 *line = (ito::int32*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tUInt32:
+            case ito::tUInt32:
             {
                 ito::uint32 *line = (ito::uint32*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tFloat32:
+            case ito::tFloat32:
             {
                 ito::float32 *line = (ito::float32*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tFloat64:
+            case ito::tFloat64:
             {
                 ito::float64 *line = (ito::float64*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                return line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                return line[m_xIndizes[n]];
             }
-        case ito::tComplex64:
+            case ito::tComplex64:
             {
                 ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                ito::complex64 i = line[ m_xIndizes[n] ];
+                if (!line) return quietNaN;
+                ito::complex64 i = line[m_xIndizes[n]];
 
                 if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                 {
-                    return line[ m_xIndizes[n] ].real();
+                    return line[m_xIndizes[n]].real();
                 }
                 if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                 {
-                    return line[ m_xIndizes[n] ].imag();
+                    return line[m_xIndizes[n]].imag();
                 }
                 if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                 {
-                    return std::arg( line[ m_xIndizes[n] ] );
+                    return std::arg(line[m_xIndizes[n]]);
                 }
                 else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                 {
-                    return std::abs( line[ m_xIndizes[n] ] );
+                    return std::abs(line[m_xIndizes[n]]);
                 }
             }
-        case ito::tComplex128:
+            case ito::tComplex128:
             {
                 ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
-                ito::complex128 i = line[ m_xIndizes[n] ];
-                
+                if (!line) return quietNaN;
+                ito::complex128 i = line[m_xIndizes[n]];
+
                 if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                 {
-                    return line[ m_xIndizes[n] ].real();
+                    return line[m_xIndizes[n]].real();
                 }
                 if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                 {
-                    return line[ m_xIndizes[n] ].imag();
+                    return line[m_xIndizes[n]].imag();
                 }
                 if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                 {
-                    return std::arg( line[ m_xIndizes[n] ] );
+                    return std::arg(line[m_xIndizes[n]]);
                 }
                 else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                 {
-                    return std::abs( line[ m_xIndizes[n] ] );
+                    return std::abs(line[m_xIndizes[n]]);
                 }
             }
-        case ito::tRGBA32:
+            case ito::tRGBA32:
             {
                 ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
-                if(!line) return quietNaN;
+                if (!line) return quietNaN;
 
                 switch (m_pInternalData->m_dataChannel)
                 {
                 case ItomQwtPlotEnums::ChannelAuto:
                 case ItomQwtPlotEnums::ChannelRGBA:
                 case ItomQwtPlotEnums::ChannelGray:
-                    {
-                        return line[ m_xIndizes[n] ].gray();
-                    }
-                    break;
+                {
+                    return line[m_xIndizes[n]].gray();
+                }
+                break;
                 case ItomQwtPlotEnums::ChannelRed:
-                    {
-                        return line[ m_xIndizes[n] ].r;
-                    }
-                    break;
+                {
+                    return line[m_xIndizes[n]].r;
+                }
+                break;
                 case ItomQwtPlotEnums::ChannelGreen:
-                    {
-                        return line[ m_xIndizes[n] ].g;
-                    }
-                    break;
+                {
+                    return line[m_xIndizes[n]].g;
+                }
+                break;
                 case ItomQwtPlotEnums::ChannelBlue:
-                    {
-                        return line[ m_xIndizes[n] ].b;
-                    }
-                    break;
+                {
+                    return line[m_xIndizes[n]].b;
+                }
+                break;
                 case ItomQwtPlotEnums::ChannelAlpha:
-                    {
-                        return line[ m_xIndizes[n] ].a;
-                    }
-                    break;
+                {
+                    return line[m_xIndizes[n]].a;
+                }
+                break;
                 }
             }
-        default:
-            return quietNaN;
-        }
+            default:
+                return quietNaN;
+            }
+
+        
     }
     else
     {
@@ -1248,39 +1252,84 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
 
         if(m_dataObj.getDims() > 1)
         {
-            //m_plane = (cv::Mat*)m_dataObj->get_mdata()[ m_dataObj->seekMat( m_D.m_planeIdx ) ];
-            m_rasteredLines = raster.height();
-            int nrOfCols = raster.width();
-        
-            m_rasteredLinePtr = new uchar*[m_rasteredLines];
-            for(int i = 0 ; i < m_rasteredLines ; i++)
+            if (m_D.m_dir == inPlane)
             {
-                j = qRound( top + ySteps * i );
+                //m_plane = (cv::Mat*)m_dataObj->get_mdata()[ m_dataObj->seekMat( m_D.m_planeIdx ) ];
+                m_rasteredLines = raster.height();
+                int nrOfCols = raster.width();
 
-                if(j >= 0 && j < m_D.m_ySize)
-                {
-                    m_rasteredLinePtr[i] = m_plane->ptr(j);
-                }
-                else
-                {
-                    m_rasteredLinePtr[i] = NULL;
-                }
-            }
+                m_rasteredLinePtr = new uchar*[m_rasteredLines];
 
-            m_xIndizes = new int[raster.width()];
-            for(int i = 0 ; i < nrOfCols ; i++)
-            {
-                j = qRound( left + xSteps * i );
+                    for (int i = 0; i < m_rasteredLines; i++)
+                    {
+                        j = qRound(top + ySteps * i);
 
-                if(j >= 0 && j < m_D.m_xSize)
-                {
-                    m_xIndizes[i] = j;
+                        if (j >= 0 && j < m_D.m_ySize)
+                        {
+                            m_rasteredLinePtr[i] = m_plane->ptr(j);
+                        }
+                        else
+                        {
+                            m_rasteredLinePtr[i] = NULL;
+                        }
+                    }
+
+                    m_xIndizes = new int[raster.width()];
+                    for (int i = 0; i < nrOfCols; i++)
+                    {
+                        j = qRound(left + xSteps * i);
+
+                        if (j >= 0 && j < m_D.m_xSize)
+                        {
+                            m_xIndizes[i] = j;
+                        }
+                        else
+                        {
+                            m_xIndizes[i] = -1;
+                        }
+                    }
                 }
-                else
+                else if (m_D.m_dir == dirY)
                 {
-                    m_xIndizes[i] = -1;
+                    //obtain start coordinate of volume cut
+                    int startY = m_D.m_startPx.y();
+                    int startX = m_D.m_startPx.x();
+                    m_rasteredLines = raster.height();
+                    int nrOfCols = raster.width();
+                    m_rasteredLinePtr = new uchar*[m_rasteredLines];
+                    int i;
+                    
+                    int lineOffset = (m_dataObj.elemSize()*startX);
+                    for (i=0; i < m_rasteredLines; i++)
+                    {
+                        j = qRound(top + ySteps * i); //px
+                        if (j >= 0 && j < m_D.m_ySize)
+                        {
+                            m_rasteredLinePtr[i] = m_dataObj.rowPtr(j, startY + left)+lineOffset;
+                        }
+                        else
+                        {
+                            m_rasteredLinePtr[i] = NULL;
+                        }
+                    }
+
+                    m_xIndizes = new int[raster.width()];
+                    int rowStep = m_dataObj.getCvPlaneMat(0)->step1(0); //row step in type of obj
+                    for (i = 0; i < nrOfCols; i++)
+                    {
+                        j = qRound(left + xSteps*i);
+                        if (j >= 0 && j < m_D.m_ySize)
+                        {
+                            //m_dataObj.getCvPlaneMat(0)->step*j
+                            m_xIndizes[i] = j*rowStep;
+                        }
+                        else
+                        {
+                            m_xIndizes[i] = NULL;
+                        }
+                    }
+
                 }
-            }
         }
         else
         {
