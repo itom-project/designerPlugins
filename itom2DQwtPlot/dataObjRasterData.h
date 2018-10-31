@@ -111,8 +111,7 @@ class DataObjRasterData : public QwtRasterData
 
         struct DataParam {
             DataParam() : m_dataPtr(NULL), m_planeIdx(0), m_yScaling(1), m_xScaling(1),
-                m_yOffset(0), m_xOffset(0), m_ySize(0), m_xSize(0), m_yaxisFlipped(0),
-                m_startPhys(-1), m_stepSizePhys(0.0), m_matOffset(0) {}
+                m_yOffset(0), m_xOffset(0), m_ySize(0), m_xSize(0), m_yaxisFlipped(0) {}
 
             int** m_dataPtr; //only for comparison
             size_t m_planeIdx;
@@ -123,13 +122,6 @@ class DataObjRasterData : public QwtRasterData
             int m_ySize;
             int m_xSize;
             bool m_yaxisFlipped;
-            int m_startPhys;
-            float m_stepSizePhys;
-            QPoint m_startPx;
-            QSize m_stepSizePx;
-            int m_matOffset;
-            int m_matStepSize;
-
         };
 
         DataParam m_D;
