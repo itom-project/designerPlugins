@@ -106,7 +106,9 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pOverlaySlider(NULL),
         m_pActOverlaySlider(NULL),
         m_currentDataType(-1),
-        m_valueScale(ItomQwtPlotEnums::Linear)
+        m_valueScale(ItomQwtPlotEnums::Linear),
+        m_dObjVolumeCut(),
+        m_dir(inPlane)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -765,7 +767,179 @@ void PlotCanvas::setButtonStyle(int style)
         }
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds)
+{
+    if (bounds.size() < 2)
+    {
+        m_dir = inPlane;
+    }
+    if (bounds.size() > 2)
+    {
+        int d = dataObj->getDims();
+        QVector<QPointF> tmpBounds;
+        QPoint startPx;
+        int planeIdx = bounds[0].x();
+        planeIdx = d > 2 ? qMin<int>(planeIdx, dataObj->getSize(d - 3)) : 0;
+        tmpBounds.resize(2);
+        tmpBounds[0] = bounds[1];
+        tmpBounds[1] = bounds[2];
 
+        int pxX1, pxX2, pxY1, pxY2, xSize, ySize;
+        double yScaling, xScaling, yOffset, xOffset;
+        float right;
+        bool _unused;
+        cv::Mat *mat;
+        pxX1 = qRound(dataObj->getPhysToPix(d - 1, tmpBounds[0].x(), _unused));
+        pxY1 = qRound(dataObj->getPhysToPix(d - 2, tmpBounds[0].y(), _unused));
+        pxX2 = qRound(dataObj->getPhysToPix(d - 1, tmpBounds[1].x(), _unused));
+        pxY2 = qRound(dataObj->getPhysToPix(d - 2, tmpBounds[1].y(), _unused));
+
+        saturation(pxX1, 0, dataObj->getSize(d - 1) - 1);
+        saturation(pxX2, 0, dataObj->getSize(d - 1) - 1);
+        saturation(pxY1, 0, dataObj->getSize(d - 2) - 1);
+        saturation(pxY2, 0, dataObj->getSize(d - 2) - 1);
+
+        mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(planeIdx)]; //first plane in ROI
+
+        if (false) //Todo: set to pure y
+        {
+            pxX2 = pxX1;
+            m_dir = dirY;
+
+
+            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
+            xScaling = d > 2 ? dataObj->getAxisScale(d - 2) : 1.0; // scaling along y of the host object
+            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
+            xOffset = d > 2 ? dataObj->getAxisOffset(d - 2) : 0.0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+
+
+
+
+            if (pxY2 >= pxY1)
+            {
+                xSize = 1 + pxY2 - pxY1;
+            }
+            else
+            {
+                xSize = 1 + pxY1 - pxY2;
+            }
+
+            startPx.setX(pxX1); //in host coordinates
+            startPx.setY(pxY1);
+            /* m_D.m_stepSizePx.setWidth(0);
+             m_D.m_stepSizePx.setHeight(1);
+             m_D.m_matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1;
+             if (pxY2 >= pxY1)
+             {
+                 m_D.m_matStepSize = (int)mat->step[0]; //step in y-direction (in bytes)
+             }
+             else
+             {
+                 m_D.m_matStepSize = -(int)mat->step[0]; //step in y-direction (in bytes)
+             }*/
+
+             // todo: check if this DataObject is deleted when the plot is closed
+
+            m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+
+
+
+
+            if (pxX2 == pxX1)
+            {
+                cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0); // this is continous
+                int row;
+                const cv::Mat** srcCvMatVec = dataObj->get_mdata();
+                int srcRowStep;
+                if (pxY1 < pxY2)
+                {
+                    srcRowStep = srcCvMatVec[0]->step1(0);
+                }
+                else// go in negative direction
+                {
+                    srcRowStep = -srcCvMatVec[0]->step1(0);
+                }
+                switch (dataObj->getType())
+                {
+                case ito::tUInt8:
+                    const ito::uint8* val;
+                    int srcOffset = startPx.x() + startPx.y()*qAbs(srcRowStep);
+                    ito::uint8* dstPtr = (ito::uint8*)dstMat->data;
+                    for (int layer = 0; layer < dstMat->rows; ++layer)
+                    {
+                        val = ((ito::uint8*)srcCvMatVec[planeIdx + layer]->data) + srcOffset; //first element of host volume cut
+
+                        for (row = 0; row < dstMat->cols; row++)
+                        {
+                            *dstPtr++ = val[row*srcRowStep];
+
+                        }
+                    }
+
+                }
+            }
+        }
+        else if (true) // pure x
+        {
+            pxY2 = pxY1;
+            m_dir = dirX;
+
+            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
+            xScaling = d > 2 ? dataObj->getAxisScale(d - 1) : 1.0; // scaling along y of the host object
+            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
+            xOffset = d > 2 ? dataObj->getAxisOffset(d - 1) : 0.0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            if (pxX2 >= pxX1)
+            {
+                xSize = 1 + pxX2 - pxX1;
+            }
+            else
+            {
+                xSize = 1 + pxX1 - pxX2;
+            }
+            startPx.setX(pxX1); //in host coordinates
+            startPx.setY(pxY1);
+            // todo: check if this DataObject is deleted when the plot is closed
+
+            m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+            if (pxY2 == pxY1)
+            {
+                cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0); // this is continous
+                int col;
+                const cv::Mat** srcCvMatVec = dataObj->get_mdata();
+                int srcRowStep = srcCvMatVec[0]->step1(0);
+                int srcStep;
+                if (pxX1 < pxX2)
+                {
+                    srcStep = 1;
+                }
+                else// go in negative direction
+                {
+                    srcStep = -1;
+                }
+                switch (dataObj->getType())
+                {
+                case ito::tUInt8:
+                    const ito::uint8* val;
+                    int srcOffset = startPx.x() + startPx.y()*srcRowStep;
+                    ito::uint8* dstPtr = (ito::uint8*)dstMat->data;
+                    for (int layer = 0; layer < dstMat->rows; ++layer)
+                    {
+                        val = ((ito::uint8*)srcCvMatVec[planeIdx + layer]->data) + srcOffset; //first element of host volume cut
+
+                        for (col = 0; col < dstMat->cols; col++)
+                        {
+                            *dstPtr++ = val[col*srcStep];
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
@@ -777,17 +951,23 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
     m_isRefreshingPlot = true;
 
     ito::uint8 updateState = 0; //changeNo (0): nothing changed, changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...), changeData (2): data changed (dimensions, sizes, other data object...)
-
+    
     m_dObjPtr = dObj;
 
     //QString valueLabel, axisLabel, title;
     if (dObj)
     {
+        cutVolume(dObj, bounds);
+        if (m_dir != inPlane)
+        {
+            dObj = &m_dObjVolumeCut;
+            m_dObjPtr = &m_dObjVolumeCut;
+        }
         int dims = dObj->getDims();
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
 
-        updateState = m_rasterData->updateDataObject(dObj, plane , bounds);
+        updateState = m_rasterData->updateDataObject(dObj, plane);
 
         if ((updateState & changeData) || m_unitLabelChanged)
         {

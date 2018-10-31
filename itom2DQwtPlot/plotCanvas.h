@@ -154,11 +154,14 @@ class PlotCanvas : public ItomQwtPlot
 
 
     private:
+        enum Direction { dirX = 0, dirY = 1, dirZ = 2, dirXY = 3, inPlane = 4 };
         void createActions();
 
         // a1 is line1 start, a2 is line1 end, b1 is line2 start, b2 is line2 end
         bool lineIntersection(const QPointF &a1, const QPointF &a2, const QPointF &b1, const QPointF &b2, QPointF &intersection);
         void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
+        void cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds);
+        inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
 
         ito::DataObject randImg;
 
@@ -191,6 +194,7 @@ class PlotCanvas : public ItomQwtPlot
         DataObjRasterData *m_rasterData;
         DataObjRasterData *m_rasterOverlayData;
         
+        Direction m_dir;
         ito::uint32 m_zstackCutUID;
         ito::uint32 m_lineCutUID;
         bool m_lineCutValidStart; //true if the first point of the line cut is a valid point inside of the data object
@@ -198,6 +202,7 @@ class PlotCanvas : public ItomQwtPlot
 
         InternalData *m_pData;
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
+        ito::DataObject m_dObjVolumeCut; //data object holding the object used for volume cut
 
         int m_currentDataType;
 

@@ -64,7 +64,7 @@ class DataObjRasterData : public QwtRasterData
 
         void calcHash(const ito::DataObject *dObj, QByteArray &dataHash, QByteArray &appearanceHash);
 
-        ito::uint8 updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1, QVector<QPointF> bounds = QVector<QPointF>());
+        ito::uint8 updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
 
         bool pointValid(const QPointF &point) const;
        
@@ -86,7 +86,7 @@ class DataObjRasterData : public QwtRasterData
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
         inline double pxToScaleCoords(double px, double offset, double scaling) { return ((double)px - offset) * scaling; }
         inline double scaleToPxCoords(double coord, double offset, double scaling) { return (coord / scaling) + offset; }
-        inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
+        
 
     private:
         static double quietNaN;
@@ -112,7 +112,7 @@ class DataObjRasterData : public QwtRasterData
         struct DataParam {
             DataParam() : m_dataPtr(NULL), m_planeIdx(0), m_yScaling(1), m_xScaling(1),
                 m_yOffset(0), m_xOffset(0), m_ySize(0), m_xSize(0), m_yaxisFlipped(0),
-                m_dir(DataObjRasterData::inPlane), m_startPhys(-1), m_stepSizePhys(0.0), m_matOffset(0) {}
+                m_startPhys(-1), m_stepSizePhys(0.0), m_matOffset(0) {}
 
             int** m_dataPtr; //only for comparison
             size_t m_planeIdx;
@@ -123,7 +123,6 @@ class DataObjRasterData : public QwtRasterData
             int m_ySize;
             int m_xSize;
             bool m_yaxisFlipped;
-            Direction m_dir;
             int m_startPhys;
             float m_stepSizePhys;
             QPoint m_startPx;
