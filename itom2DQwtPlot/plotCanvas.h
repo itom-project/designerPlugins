@@ -161,6 +161,7 @@ class PlotCanvas : public ItomQwtPlot
         bool lineIntersection(const QPointF &a1, const QPointF &a2, const QPointF &b1, const QPointF &b2, QPointF &intersection);
         void setCoordinates(const QVector<QPointF> &pts, bool visible = true);
         void cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds);
+        template <typename _Tp> void parseVolumeCutObj( const ito::DataObject* srcObj, const QVector<int>& start, const QSize& step, const QVector<int>& stepSizes=QVector<int>());
         inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
 
         ito::DataObject randImg;
