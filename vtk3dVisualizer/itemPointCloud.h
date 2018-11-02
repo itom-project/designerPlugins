@@ -49,7 +49,7 @@ class ItemPointCloud : public Item
     Q_PROPERTY(QColor Color READ color WRITE setColor DESIGNABLE true USER true);
 #ifdef PCL_HASLUT
     Q_PROPERTY(ColorMap ColorMap READ colorMap WRITE setColorMap DESIGNABLE true USER true);
-    Q_PROPERTY(ito::AutoInterval ColorValueRange READ colorValueRange WRITE colorValueRange DESIGNABLE true USER true);
+    Q_PROPERTY(ito::AutoInterval ColorValueRange READ colorValueRange WRITE setColorValueRange DESIGNABLE true USER true);
 #endif
 
 public:
@@ -89,7 +89,7 @@ public:
     void setColorMap(ColorMap colorMap);
 
     ito::AutoInterval colorValueRange() const { return m_colorValueRange; }
-    void colorValueRange(const ito::AutoInterval& range);
+    void setColorValueRange(const ito::AutoInterval& range);
 #endif
 protected:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;

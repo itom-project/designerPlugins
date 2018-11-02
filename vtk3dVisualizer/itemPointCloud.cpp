@@ -242,7 +242,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmpl(typenam
         m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
 #ifdef PCL_HASLUT
         setColorMap(m_colorMap);
-        colorValueRange(m_colorValueRange);
+        setColorValueRange(m_colorValueRange);
 #endif
     }
 
@@ -446,7 +446,7 @@ template <typename PointT> ito::RetVal ItemPointCloud::addPointCloudTmplRgba(typ
         m_visualizer->setPointCloudRenderingProperties( pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_pointSize, m_name.toStdString() );
 #ifdef PCL_HASLUT
         setColorMap(m_colorMap);
-        colorValueRange(m_colorValueRange);
+        setColorValueRange(m_colorValueRange);
 #endif
     }
 
@@ -623,7 +623,7 @@ void ItemPointCloud::setColorMap(ColorMap colorMap)
 
 
 //-------------------------------------------------------------------------------------------
-void ItemPointCloud::colorValueRange(const ito::AutoInterval& range)
+void ItemPointCloud::setColorValueRange(const ito::AutoInterval& range)
 {
     m_colorValueRange = range;
     if (range.isAuto())
@@ -634,6 +634,7 @@ void ItemPointCloud::colorValueRange(const ito::AutoInterval& range)
     {
         m_visualizer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LUT_RANGE, range.minimum(), range.maximum(), m_name.toStdString());
     }
+    emit updateCanvasRequest();
 }
 #endif
 

@@ -62,7 +62,7 @@ class ItemPolygonMesh : public Item
     Q_PROPERTY(ColorMode ColorMode READ colorMode WRITE setColorMode DESIGNABLE true USER true);
     Q_PROPERTY(QColor FaceColor READ faceColor WRITE setFaceColor DESIGNABLE true USER true);
     Q_PROPERTY(ColorMap ColorMap READ colorMap WRITE setColorMap DESIGNABLE true USER true);
-    Q_PROPERTY(ito::AutoInterval ColorValueRange READ colorValueRange WRITE colorValueRange DESIGNABLE true USER true);
+    Q_PROPERTY(ito::AutoInterval ColorValueRange READ colorValueRange WRITE setColorValueRange DESIGNABLE true USER true);
 
 public:
     ItemPolygonMesh(boost::shared_ptr<pcl::visualization::PCLVisualizer> visualizer, const QString &name, QTreeWidgetItem *treeItem);
@@ -120,7 +120,7 @@ public:
     void setColorMap(const ColorMap& map);
 
     ito::AutoInterval colorValueRange() const { return m_colorValueRange;}
-    void colorValueRange(const ito::AutoInterval& range);
+    void setColorValueRange(const ito::AutoInterval& range);
 
 protected:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
