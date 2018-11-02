@@ -727,7 +727,7 @@ void ItemPolygonMesh::setColorMap(const ColorMap& map)
 }
 
 //-------------------------------------------------------------------------------------------
-void ItemPolygonMesh::colorValueRange(const ito::AutoInterval& range)
+void ItemPolygonMesh::setColorValueRange(const ito::AutoInterval& range)
 {
     m_colorValueRange = range;
     setColorMode(m_colorMode); //in order to redraw
