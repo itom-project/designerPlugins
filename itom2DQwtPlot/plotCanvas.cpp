@@ -768,42 +768,42 @@ void PlotCanvas::setButtonStyle(int style)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObject* srcObj, const QVector<int>& start, const QSize& step, const QVector<int>& stepSizes/*QVector<int>*/)
+template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObject* srcObj, const unsigned int& offsetByte,const unsigned int& startLayer ,const QVector<int>& stepByte)
 {
     if(m_dir == dirX || m_dir == dirY)
     {
-        _Tp* val=NULL;
+        unsigned char* val=NULL;
         int i;
         const cv::Mat** srcCvMatVec= srcObj->get_mdata();
-        int srcOffset = start[0] + start[1]*srcCvMatVec[0]->step1(0); //convention start x,y,z
         cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0);
         _Tp* dstPtr = (_Tp*)(dstMat->data);
         for (int layer = 0; layer < dstMat->rows; ++layer)
         {
-            val = ((_Tp*)srcCvMatVec[start[2] + step.height()*layer]->data) + srcOffset; //first element of host volume cut
+            val= srcCvMatVec[startLayer+layer]->data+offsetByte; //first element of host volume cut
+           // val = ((_Tp*)srcCvMatVec[start[2] + step.height()*layer]->data) + srcOffset; //first element of host volume cut
 
             for (i = 0; i < dstMat->cols; i++)
             {
-                *dstPtr++ = val[i*step.width()];
+                *dstPtr++ =*reinterpret_cast<_Tp*>(val+i*stepByte[0]);
 
             }
         }
     }
     else if(m_dir == dirXY)
     {
+        uchar* val=NULL;
         int i;
-        const unsigned char* initialPtr;
-        const cv::Mat* srcMat;
-        cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0);
-        _Tp* dstPtr= (_Tp*)dstMat->data;
         const cv::Mat** srcCvMatVec= srcObj->get_mdata();
-        int matOffset = (int)srcCvMatVec[0]->step[0] * start[1] + (int)srcCvMatVec[0]->step[1] * start[0]; //byte
-        for(int layer=0; layer< dstMat->rows; ++layer)
+        cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0);
+        _Tp* dstPtr = (_Tp*)(dstMat->data);
+        for (int layer = 0; layer < dstMat->rows; ++layer)
         {
-            initialPtr=srcCvMatVec[layer+start[2]]->data+matOffset;
-            for(i=0; i<dstMat->cols;i++)
+            val= srcCvMatVec[startLayer+layer]->data+offsetByte; //first element of host volume cut
+           // val = ((_Tp*)srcCvMatVec[start[2] + step.height()*layer]->data) + srcOffset; //first element of host volume cut
+            for (i = 0; i < dstMat->cols; i++)
             {
-                *dstPtr++=(_Tp)*(initialPtr+stepSizes[i]);
+                *dstPtr++ = *reinterpret_cast<_Tp*>(val+stepByte[i]);
+
             }
         }
     }
@@ -811,7 +811,7 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds)
 {
-    //todo for one pixel area
+    //todo for one pixel area and if lowest plane is selected
     if (bounds.size() < 2)
     {
         m_dir = inPlane;
@@ -820,9 +820,10 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
     {
         int d = dataObj->getDims();
         QVector<QPointF> tmpBounds;
-        QVector<int> startPx(3); //convention x,y,z
-        QSize step;
-        int planeIdx = bounds[0].x();
+        unsigned int offsetByte;
+        //QVector<int> startPx(3); //convention x,y,z
+        QVector<int> stepByte; //step to be done to next elem
+        unsigned int planeIdx = bounds[0].x();
         planeIdx = d > 2 ? qMin<int>(planeIdx, dataObj->getSize(d - 3)) : 0;
         tmpBounds.resize(2);
         tmpBounds[0] = bounds[1];
@@ -844,17 +845,17 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
 
         mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(planeIdx)]; //first plane in ROI
 
-        if (pxX2 == pxX1) //Todo: set to pure y
+        if (pxX2 == pxX1)
         {
 
             m_dir = dirY;
-
+            stepByte.resize(1);
 
             yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
             xScaling = d > 2 ? dataObj->getAxisScale(d - 2) : 1.0; // scaling along y of the host object
             yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
             xOffset = d > 2 ? dataObj->getAxisOffset(d - 2) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            ySize = d > 2 ? dataObj->getSize(d - 3)-planeIdx : 0;
             if (pxY2 >= pxY1)
             {
                 xSize = 1 + pxY2 - pxY1;
@@ -863,18 +864,14 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             {
                 xSize = 1 + pxY1 - pxY2;
             }
-
-            startPx[0]=pxX1; //in host coordinates
-            startPx[1]=pxY1;
-            startPx[2]=planeIdx;
-            step.setHeight(1);
+            offsetByte = pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
             if (pxY1 < pxY2)
             {
-                step.setWidth(dataObj->get_mdata()[0]->step1(0));
+                stepByte[0]=(dataObj->get_mdata()[0]->step[0]);
             }
             else// go in negative direction
             {
-                step.setWidth(-dataObj->get_mdata()[0]->step1(0));
+                stepByte[0]=(-dataObj->get_mdata()[0]->step[0]);
             }
 
              // todo: check if this DataObject is deleted when the plot is closed
@@ -883,33 +880,41 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
-                parseVolumeCutObj<ito::uint8>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
             case(ito::tUInt16):
-                parseVolumeCutObj<ito::uint16>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
             case(ito::tInt8):
-                parseVolumeCutObj<ito::int8>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
             case(ito::tInt16):
-                parseVolumeCutObj<ito::int16>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
             case(ito::tInt32):
-                parseVolumeCutObj<ito::int32>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
-                //todo complex and color
+            case(ito::tComplex64):
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
+                break;
+            case(ito::tComplex128):
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,planeIdx,stepByte);
+                break;
+            case(ito::tRGBA32):
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
+
             }
         }
         else if (pxY2 == pxY1) // pure x
         {
 
             m_dir = dirX;
-
+            stepByte.resize(1);
             yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
             xScaling = d > 2 ? dataObj->getAxisScale(d - 1) : 1.0; // scaling along y of the host object
             yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
             xOffset = d > 2 ? dataObj->getAxisOffset(d - 1) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            ySize = d > 2 ? dataObj->getSize(d - 3)-planeIdx : 0;
             if (pxX2 >= pxX1)
             {
                 xSize = 1 + pxX2 - pxX1;
@@ -918,18 +923,14 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             {
                 xSize = 1 + pxX1 - pxX2;
             }
-
-            startPx[0]=pxX1; //in host coordinates
-            startPx[1]=pxY1;
-            startPx[2]=planeIdx;
-            step.setHeight(1);
+            offsetByte=pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
             if (pxX1 < pxX2)
             {
-                step.setWidth(1);
+                stepByte[0]=dataObj->get_mdata()[0]->step[1];
             }
             else// go in negative direction
             {
-                step.setWidth(-1);
+                stepByte[0]=-dataObj->get_mdata()[0]->step[1];
             }
             // todo: check if this DataObject is deleted when the plot is closed
 
@@ -937,21 +938,28 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
-                parseVolumeCutObj<ito::uint8>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
             case(ito::tUInt16):
-                parseVolumeCutObj<ito::uint16>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,planeIdx, stepByte);;
                 break;
             case(ito::tInt8):
-                parseVolumeCutObj<ito::int8>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
             case(ito::tInt16):
-                parseVolumeCutObj<ito::int16>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
             case(ito::tInt32):
-                parseVolumeCutObj<ito::int32>(dataObj,startPx,step);
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
-                //todo complex and color
+            case(ito::tComplex64):
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
+                break;
+            case(ito::tComplex128):
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,planeIdx,stepByte);
+                break;
+            case(ito::tRGBA32):
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
             }
         }
         else
@@ -967,7 +975,7 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             //m_d.startPhys= 0.0;  //there is no physical starting point for diagonal lines.
             yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0;
             yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            ySize = d > 2 ? dataObj->getSize(d - 3)-planeIdx : 0;
             if (xSize > 0)
             {
                 double dxPhys = dataObj->getPixToPhys(d-1, pxX2, _unused) - dataObj->getPixToPhys(d-1, pxX1, _unused);
@@ -978,13 +986,9 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             {
                 xScaling = 0.0;
             }
+            offsetByte = pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
 
-            startPx[0]=pxX1;
-            startPx[1]=pxY1;
-            //m_d.stepSizePx.setWidth(incx);
-            //m_d.stepSizePx.setHeight(incy);
-            step.setHeight(1);
-
+            stepByte.resize(xSize);
             int pdx, pdy, ddx, ddy, es, el;
             if (dx>dy)
             {
@@ -1008,13 +1012,14 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             int err = el / 2; //0; /* error value e_xy */
             int x = 0; //pxX1;
             int y = 0; //pxY1;
-            QVector<int>matSteps(xSize);
+
+
 
 
             for (unsigned int n = 0; n < (unsigned int)xSize; n++)
             {  /* loop */
                 //setPixel(x,y)
-                matSteps[n] = (int)mat->step[0] * y + (int)mat->step[1] * x;
+                stepByte[n] = (int)mat->step[0] * y + (int)mat->step[1] * x;
 
                 err -= es;
                 if (err < 0)
@@ -1033,24 +1038,32 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
-                parseVolumeCutObj<ito::uint8>(dataObj,startPx,step,matSteps);
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
             case(ito::tUInt16):
-                parseVolumeCutObj<ito::uint16>(dataObj,startPx,step,matSteps);
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
             case(ito::tInt8):
-                parseVolumeCutObj<ito::int8>(dataObj,startPx,step,matSteps);
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
             case(ito::tInt16):
-                parseVolumeCutObj<ito::int16>(dataObj,startPx,step,matSteps);
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
             case(ito::tInt32):
-                parseVolumeCutObj<ito::int32>(dataObj,startPx,step,matSteps);
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
-                //todo complex and color
+            case(ito::tComplex64):
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
+                break;
+            case(ito::tComplex128):
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,planeIdx,stepByte);
+                break;
+            case(ito::tRGBA32):
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
             }
         }
-    }
+  }
+
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 
