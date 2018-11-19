@@ -40,6 +40,7 @@
 #include "DataObject/dataobj.h"
 
 #include "dataObjectSeriesData.h"
+#include "dataObjectSeriesDataXY.h"
 #include <qwt_painter.h>
 #include <qwt_clipper.h>
 #include <qpainter.h>
@@ -174,6 +175,11 @@ void QwtPlotCurveDataObject::drawSeries( QPainter *painter, const QwtScaleMap &x
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+/*
+this method can reduce the number of points in a polyline, if the plot area in pixels is much smaller than the number of points.
+If the reduction should be applied (doAlign must be true), only every n.th point is selected.
+Therefore, the reduction cannot be applied for X/Y-data, only for equidistant data!
+*/
 QPolygonF QwtPlotCurveDataObject::reducePoints(const QPolygonF &polyline, const QwtScaleMap &xMap, bool doAlign) const
 {
     int canvas_pixel_size = qRound(xMap.pDist());
@@ -274,7 +280,8 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
 
     const bool doAlign = QwtPainter::roundingAlignment( painter );
 
-    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
+    const DataObjectSeriesData *d_objseries = dynamic_cast<const DataObjectSeriesData*>( data() );
+    const DataObjectSeriesDataXY *d_objseriesXY = dynamic_cast<const DataObjectSeriesDataXY*>(d_objseries);
 
     if (d_objseries && d_objseries->floatingPointValues())
     {
@@ -291,7 +298,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
             if ( doAlign )
             {
                 x = qRound( x );
-                if(qIsFinite(y))
+                if(qIsFinite(y) || d_objseriesXY)
                 {
                     y = qRound( y );
                     sample.rx() = x;
@@ -307,7 +314,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
             }
             else
             {
-                if(qIsFinite(y))
+                if(qIsFinite(y) || d_objseriesXY)
                 {
                     sample.rx() = x;
                     sample.ry() = y;
@@ -324,7 +331,10 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
 
         if(polyline.size() > 0)
         {
-            polyline = reducePoints(polyline, xMap, doAlign);
+            if (!d_objseriesXY)
+            {
+                polyline = reducePoints(polyline, xMap, doAlign);
+            }
             drawPolyline(painter,polyline,xMap,yMap,canvasRect);
             polyline.clear();
         }
@@ -350,7 +360,10 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
             points[i - from].ry() = y;
         }
 
-        polyline = reducePoints(polyline, xMap, doAlign);
+        if (!d_objseriesXY)
+        {
+            polyline = reducePoints(polyline, xMap, doAlign);
+        }
         drawPolyline(painter, polyline, xMap, yMap, canvasRect);
     }
 }
@@ -386,7 +399,8 @@ void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &sy
 
     const int chunkSize = 500;
 
-    const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
+    const DataObjectSeriesData *d_objseries = dynamic_cast<const DataObjectSeriesData*>( data() );
+    const DataObjectSeriesDataXY *d_objseriesXY = dynamic_cast<const DataObjectSeriesDataXY*>(d_objseries);
 
     if(d_objseries->floatingPointValues())
     {
@@ -424,7 +438,10 @@ void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &sy
 
         if(polyline.size() > 0)
         {
-            polyline = reducePoints(polyline, xMap, doAlign);
+            if (!d_objseriesXY)
+            {
+                polyline = reducePoints(polyline, xMap, doAlign);
+            }
             symbol.drawSymbols( painter, polyline );
             polyline.clear();
         }
@@ -450,7 +467,11 @@ void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &sy
             points[i - from].ry() = y;
         }
 
-        polyline = reducePoints(polyline, xMap, doAlign);
+        if (!d_objseriesXY)
+        {
+            polyline = reducePoints(polyline, xMap, doAlign);
+        }
+
         symbol.drawSymbols( painter, polyline );
     }
 }
