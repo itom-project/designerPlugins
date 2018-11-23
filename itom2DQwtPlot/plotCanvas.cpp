@@ -708,6 +708,7 @@ void PlotCanvas::setButtonStyle(int style)
         dataChannels[6]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAlpha.png"));
         m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
 
+
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
         {
@@ -780,8 +781,6 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
         for (int layer = 0; layer < dstMat->rows; ++layer)
         {
             val= srcCvMatVec[startLayer+layer]->data+offsetByte; //first element of host volume cut
-           // val = ((_Tp*)srcCvMatVec[start[2] + step.height()*layer]->data) + srcOffset; //first element of host volume cut
-
             for (i = 0; i < dstMat->cols; i++)
             {
                 *dstPtr++ =*reinterpret_cast<_Tp*>(val+i*stepByte[0]);
@@ -799,7 +798,6 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
         for (int layer = 0; layer < dstMat->rows; ++layer)
         {
             val= srcCvMatVec[startLayer+layer]->data+offsetByte; //first element of host volume cut
-           // val = ((_Tp*)srcCvMatVec[start[2] + step.height()*layer]->data) + srcOffset; //first element of host volume cut
             for (i = 0; i < dstMat->cols; i++)
             {
                 *dstPtr++ = *reinterpret_cast<_Tp*>(val+stepByte[i]);

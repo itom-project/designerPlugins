@@ -511,20 +511,7 @@ double DataObjRasterData::value(double x, double y) const
                             }
                         }
                 }
-                //Todo: complete section
-                else
-                {
-                    int n = qRound(m_dataObj.getPhysToPix(d - 2, x, inside1));
-                    int m = qRound(m_dataObj.getPhysToPix(d - 3, y, inside2));
-                    if (inside1 && inside2)
-                    {
-                        switch (m_dataObj.getType())
-                        {
-                        case ito::tUInt8:
-                            return 1;
-                        }
-                    }
-                }
+               
         }
     }
     return quietNaN;
