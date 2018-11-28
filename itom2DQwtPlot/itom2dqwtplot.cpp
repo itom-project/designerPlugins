@@ -72,10 +72,12 @@ void Itom2dQwtPlot::constructor()
     
     m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for volume plots from 3d objects").toLatin1().data()));
 
-    //bounds and zCutPoint are two different output connections, since it is possible to have a line cut and a z-stack cut visible at the same time.
+    //bounds, volumeCutBounds and zCutPoint are three different output connections, since it is possible to have a line cut, volume cut and a z-stack cut visible at the same time.
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
     m_pOutput.insert("zCutPoint", new ito::Param("zCutPoint", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for z-stack cut in 3d objects").toLatin1().data()));
+    m_pOutput.insert("volumeCutBounds", new ito::Param("volumeCutBounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for volume cut in 3d objects").toLatin1().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
+
 
     d->m_pData = new InternalData();
     
@@ -860,7 +862,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
         m_volumeCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
         m_volumeCutType |= ito::AbstractFigure::tExternChild;
     }
-    m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    m_pOutput["volumeCutBounds"]->setVal(pointArr, 2 * bounds.size());
     
 
     delete[] pointArr;
@@ -950,9 +952,9 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
                     ((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
                 }
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["volumeCutBounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                paramNames << "bounds" << "sourceout";
+                paramNames << "volumeCutBounds" << "sourceout";
             }
             else
             {
@@ -962,9 +964,9 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
                     ((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
                 }
                 // otherwise simply pass on the displayed plane
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["volumeCutBounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                paramNames << "bounds" << "displayed";
+                paramNames << "volumeCutBounds" << "displayed";
             }
 
             retval += updateChannels(paramNames);
@@ -990,11 +992,11 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
         {
             if (bounds.size() == 3) // its a 3D-Object
             {
-                paramNames << "bounds" << "sourceout";
+                paramNames << "volumeCutBounds" << "sourceout";
             }
             else
             {
-                paramNames << "bounds" << "displayed";
+                paramNames << "volumeCutBounds" << "displayed";
             }
             retval += updateChannels(paramNames);
         }
