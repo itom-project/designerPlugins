@@ -816,6 +816,7 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
     }
     if (bounds.size() > 2)
     {
+        std::string description, unit;
         int d = dataObj->getDims();
         QVector<QPointF> tmpBounds;
         unsigned int offsetByte;
@@ -902,6 +903,27 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
 
             }
+            description = dataObj->getAxisDescription(d - 2, _unused);
+            unit = dataObj->getAxisUnit(d - 2, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("y-axis").toLatin1().data();
+            }
+
+            m_dObjVolumeCut.setAxisDescription(1, description);
+            m_dObjVolumeCut.setAxisUnit(1, unit);
+
+            description = dataObj->getAxisDescription(d - 3, _unused);
+            unit = dataObj->getAxisUnit(d - 3, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("z-axis").toLatin1().data();
+            }
+            m_dObjVolumeCut.setAxisDescription(0, description);
+            m_dObjVolumeCut.setAxisUnit(0, unit);
+            m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
+            m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
+
         }
         else if (pxY2 == pxY1) // pure x
         {
@@ -959,6 +981,27 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             case(ito::tRGBA32):
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
             }
+            description = dataObj->getAxisDescription(d - 1, _unused);
+            unit = dataObj->getAxisUnit(d - 1, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("x-axis").toLatin1().data();
+            }
+
+            m_dObjVolumeCut.setAxisDescription(1, description);
+            m_dObjVolumeCut.setAxisUnit(1, unit);
+
+            description = dataObj->getAxisDescription(d - 3, _unused);
+            unit = dataObj->getAxisUnit(d - 3, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("z-axis").toLatin1().data();
+            }
+            m_dObjVolumeCut.setAxisDescription(0, description);
+            m_dObjVolumeCut.setAxisUnit(0, unit);
+            m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
+            m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
+
         }
         else
         {
@@ -1059,6 +1102,39 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             case(ito::tRGBA32):
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
             }
+            description = dataObj->getAxisDescription(d - 2, _unused);
+            unit = dataObj->getAxisUnit(d - 2, _unused);
+            if (unit == "") unit = "px";
+
+            std::string descr2 = dataObj->getAxisDescription(d - 1, _unused);
+            std::string unit2 = dataObj->getAxisUnit(d - 1, _unused);
+            if (unit2 == "") unit2 = "px";
+
+            if (description == "" && descr2 == "")
+            {
+              
+                
+                    m_dObjVolumeCut.setAxisDescription(1,"x/y-axis");
+                    m_dObjVolumeCut.setAxisUnit(1,QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
+                
+            }
+            else
+            {
+                m_dObjVolumeCut.setAxisDescription(1,QString("%1/%2").arg(QString::fromLatin1(description.data()), QString::fromLatin1(descr2.data())).toLatin1().data());
+                m_dObjVolumeCut.setAxisUnit(1, QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
+            }
+
+
+            description = dataObj->getAxisDescription(d - 3, _unused);
+            unit = dataObj->getAxisUnit(d - 3, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("z-axis").toLatin1().data();
+            }
+            m_dObjVolumeCut.setAxisDescription(0, description);
+            m_dObjVolumeCut.setAxisUnit(0, unit);
+            m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
+            m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
         }
   }
 

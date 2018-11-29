@@ -958,15 +958,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
             }
             else
             {
-                ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
-                if (figure->inherits("ItomQwtDObjFigure"))
-                {
-                    ((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
-                }
-                // otherwise simply pass on the displayed plane
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["volumeCutBounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                paramNames << "volumeCutBounds" << "displayed";
+                return ito::RetVal(ito::retError, 0, tr("exspected a bound vector with 3 values").toLatin1().data());
             }
 
             retval += updateChannels(paramNames);
@@ -982,10 +974,8 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
             }
             else// we do not have a plot so we have to show it and its child of this plot
             {
-
                     m_volumeCutType = ito::AbstractFigure::tOwnChild;
-                    figure->show();
-                
+                    figure->show(); 
             }
         }
         else
