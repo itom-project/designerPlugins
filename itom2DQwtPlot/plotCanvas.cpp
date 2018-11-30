@@ -924,6 +924,22 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
 
+
+
+
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3) - planeIdx*dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+
+            double startPhys = dataObj->getPixToPhys(d - 2, pxY1, _unused);
+            double right = dataObj->getPixToPhys(d - 2, pxY2, _unused);
+            double scale = xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0;
+            
+            m_dObjVolumeCut.setAxisScale(1, scale);
+            m_dObjVolumeCut.setAxisOffset(1, -startPhys/scale);
+
+
+
+
         }
         else if (pxY2 == pxY1) // pure x
         {
@@ -935,6 +951,7 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
             xOffset = d > 2 ? dataObj->getAxisOffset(d - 1) : 0.0;
             ySize = d > 2 ? dataObj->getSize(d - 3)-planeIdx : 0;
+
             if (pxX2 >= pxX1)
             {
                 xSize = 1 + pxX2 - pxX1;
@@ -1002,6 +1019,15 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
 
+
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3) - planeIdx*dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+
+            double startPhys = dataObj->getPixToPhys(d - 1, pxX1, _unused);
+            double right = dataObj->getPixToPhys(d - 1, pxX2, _unused);
+            double scale = xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0;
+            m_dObjVolumeCut.setAxisScale(1, xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0);
+            m_dObjVolumeCut.setAxisOffset(1, startPhys/scale);
         }
         else
         {
@@ -1135,6 +1161,10 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             m_dObjVolumeCut.setAxisUnit(0, unit);
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
+            m_dObjVolumeCut.setAxisScale(1, xScaling);
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3)-planeIdx*dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+
         }
   }
 
