@@ -1027,7 +1027,7 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             double right = dataObj->getPixToPhys(d - 1, pxX2, _unused);
             double scale = xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0;
             m_dObjVolumeCut.setAxisScale(1, xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0);
-            m_dObjVolumeCut.setAxisOffset(1, startPhys/scale);
+            m_dObjVolumeCut.setAxisOffset(1, -startPhys/scale);
         }
         else
         {
