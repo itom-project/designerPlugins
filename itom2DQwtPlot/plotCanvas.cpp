@@ -807,8 +807,9 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds)
+ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds)
 {
+    ito::RetVal retval;
     //todo for one pixel area and if lowest plane is selected
     if (bounds.size() < 2)
     {
@@ -893,6 +894,12 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             case(ito::tInt32):
                 parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
+            case(ito::tFloat32):
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, planeIdx, stepByte);
+                break;
+            case(ito::tFloat64):
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, planeIdx, stepByte);
+                break;
             case(ito::tComplex64):
                 parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
@@ -901,6 +908,9 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
                 break;
             case(ito::tRGBA32):
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
+                break;
+            default:
+                retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
 
             }
             description = dataObj->getAxisDescription(d - 2, _unused);
@@ -989,6 +999,12 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             case(ito::tInt32):
                 parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
+            case(ito::tFloat32):
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, planeIdx, stepByte);
+                break;
+            case(ito::tFloat64):
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, planeIdx, stepByte);
+                break;
             case(ito::tComplex64):
                 parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
@@ -997,6 +1013,8 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
                 break;
             case(ito::tRGBA32):
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
+            default:
+                retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
             description = dataObj->getAxisDescription(d - 1, _unused);
             unit = dataObj->getAxisUnit(d - 1, _unused);
@@ -1119,6 +1137,12 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
             case(ito::tInt32):
                 parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx, stepByte);
                 break;
+            case(ito::tFloat32):
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, planeIdx, stepByte);
+                break;
+            case(ito::tFloat64):
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, planeIdx, stepByte);
+                break;
             case(ito::tComplex64):
                 parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
                 break;
@@ -1127,6 +1151,8 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
                 break;
             case(ito::tRGBA32):
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
+            default:
+                retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
             description = dataObj->getAxisDescription(d - 2, _unused);
             unit = dataObj->getAxisUnit(d - 2, _unused);
@@ -1167,12 +1193,13 @@ void PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF
 
         }
   }
-
+  return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
+    ito::RetVal retval;
     if (m_isRefreshingPlot || !m_pData)
     {
         return;
@@ -1187,11 +1214,18 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
     //QString valueLabel, axisLabel, title;
     if (dObj)
     {
-        cutVolume(dObj, bounds);
-        if (m_dir != inPlane)
+        retval+=cutVolume(dObj, bounds);
+        if (!retval.containsError())
         {
-            dObj = &m_dObjVolumeCut;
-            m_dObjPtr = &m_dObjVolumeCut;
+            if (m_dir != inPlane)
+            {
+                dObj = &m_dObjVolumeCut;
+                m_dObjPtr = &m_dObjVolumeCut;
+            }
+        }
+        else
+        {
+            emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
         }
         int dims = dObj->getDims();
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
