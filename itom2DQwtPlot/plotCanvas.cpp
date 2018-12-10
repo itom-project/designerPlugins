@@ -694,7 +694,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActCntrMarker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"));
         m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"));
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
-        m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+        m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/volumeCut.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
 
@@ -1899,6 +1899,91 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
 				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
 				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
 			}
+
+            replot();
+        }
+    }
+    else if (state() == stateVolumeCut)
+    {
+        QVector<QPointF> pts;
+
+        event->accept();
+
+        if (event->key() == Qt::Key_H) //draw horizontal line in the middle of the plotted dataObject
+        {
+            QwtInterval hInterval = m_rasterData->interval(Qt::XAxis);
+            QwtInterval vInterval = m_rasterData->interval(Qt::YAxis);
+
+            pts.append(QPointF(hInterval.minValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
+            pts.append(QPointF(hInterval.maxValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
+
+            setCoordinates(pts, true);
+        }
+        else if (event->key() == Qt::Key_V) // draw vertical line in the middle of the plotted dataObject
+        {
+            QwtInterval hInterval = m_rasterData->interval(Qt::XAxis);
+            QwtInterval vInterval = m_rasterData->interval(Qt::YAxis);
+
+            pts.append(QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.minValue()));
+            pts.append(QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.maxValue()));
+
+            setCoordinates(pts, true);
+        }
+        else if (m_pVolumeCutLine->dataSize() >= 2)
+        {
+            pts.append(m_pVolumeCutLine->sample(0));
+            pts.append(m_pVolumeCutLine->sample(1));
+
+            switch (event->key())
+            {
+            case Qt::Key_Left:
+                pts[0].rx() -= incr.rx();
+                pts[1].rx() -= incr.rx();
+                break;
+            case Qt::Key_Right:
+                pts[0].rx() += incr.rx();
+                pts[1].rx() += incr.rx();
+                break;
+            case Qt::Key_Up:
+                pts[0].ry() -= incr.ry();
+                pts[1].ry() -= incr.ry();
+                break;
+            case Qt::Key_Down:
+                pts[0].ry() += incr.ry();
+                pts[1].ry() += incr.ry();
+                break;
+            default:
+                event->ignore();
+                break;
+            }
+
+            if (event->isAccepted())
+            {
+                setCoordinates(pts, true);
+            }
+        }
+        else
+        {
+            event->ignore();
+        }
+
+        if (event->isAccepted() && m_rasterData->pointValid(pts[0]) && m_rasterData->pointValid(pts[1]))
+        {
+            m_pVolumeCutLine->setSamples(pts);
+            m_pVolumeCutLine->setVisible(true);
+
+            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+            }
+            p->displayVolumeCut(pts, m_volumeCutUID);
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+            }
 
             replot();
         }
@@ -3275,6 +3360,7 @@ ito::RetVal PlotCanvas::setVolumeCut(const double x0, const double y0, const dou
         return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
     }
     volumeCutAppendedPhys(QPointF(x0, y0));
+    return ito::retOk;
 
 }
 //----------------------------------------------------------------------------------------------------------------------------------

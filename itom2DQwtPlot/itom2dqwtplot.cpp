@@ -156,7 +156,7 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
     //displayed and sourceout is set by dataObjRasterData, since the data is analyzed there
     /*
-    if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
+    if (subplotStates()["lineCut"] & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
     {
         ito::DataObject* tmp = m_pInput["source"]->getVal<ito::DataObject*>();
         int dims = tmp->getDims();
@@ -856,11 +856,11 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
-    if (m_volumeCutType & ito::AbstractFigure::tUninitilizedExtern)
+    if (subplotStates()["volumeCut"] & ito::AbstractFigure::tUninitilizedExtern)
     {
         needChannelUpdate = true;
-        m_volumeCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
-        m_volumeCutType |= ito::AbstractFigure::tExternChild;
+        subplotStates()["volumeCut"] &= ~ito::AbstractFigure::tUninitilizedExtern;
+        subplotStates()["volumeCut"] |= ito::AbstractFigure::tExternChild;
     }
     m_pOutput["volumeCutBounds"]->setVal(pointArr, 2 * bounds.size());
     
@@ -965,16 +965,16 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
 
             if (needChannelUpdate) // we have an updated plot and want to show it
             {
-                if (m_volumeCutType & ito::AbstractFigure::tVisibleOnInit)
+                if (subplotStates()["volumeCut"] & ito::AbstractFigure::tVisibleOnInit)
                 {
-                    m_volumeCutType &= ~ito::AbstractFigure::tVisibleOnInit;
+                    subplotStates()["volumeCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
                 // Something to do?
             }
             else// we do not have a plot so we have to show it and its child of this plot
             {
-                    m_volumeCutType = ito::AbstractFigure::tOwnChild;
+                    subplotStates()["volumeCut"] = ito::AbstractFigure::tOwnChild;
                     figure->show(); 
             }
         }
@@ -1023,20 +1023,20 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     {	
 		infoType = ito::Shape::Point;
         m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
-        if (m_zSliceType & ito::AbstractFigure::tUninitilizedExtern)
+        if (subplotStates()["zSlice"] & ito::AbstractFigure::tUninitilizedExtern)
         {
             needChannelUpdate = true;
-            m_zSliceType &= ~ito::AbstractFigure::tUninitilizedExtern;
-            m_zSliceType |= ito::AbstractFigure::tExternChild;
+            subplotStates()["zSlice"] &= ~ito::AbstractFigure::tUninitilizedExtern;
+            subplotStates()["zSlice"] |= ito::AbstractFigure::tExternChild;
         }
     }
     else
     {	
-		if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
+		if (subplotStates()["lineCut"] & ito::AbstractFigure::tUninitilizedExtern)
         {
             needChannelUpdate = true;
-            m_lineCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
-            m_lineCutType |= ito::AbstractFigure::tExternChild;
+            subplotStates()["lineCut"] &= ~ito::AbstractFigure::tUninitilizedExtern;
+            subplotStates()["lineCut"] |= ito::AbstractFigure::tExternChild;
         }
         m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
     }
@@ -1163,14 +1163,14 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             if (needChannelUpdate) // we have an updated plot and want to show it
             {
-                if (zStack && (m_zSliceType & ito::AbstractFigure::tVisibleOnInit))
+                if (zStack && (subplotStates()["zSlice"] & ito::AbstractFigure::tVisibleOnInit))
                 {
-                    m_zSliceType &= ~ito::AbstractFigure::tVisibleOnInit;
+                    subplotStates()["zSlice"] &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
-                else if (!zStack && (m_lineCutType & ito::AbstractFigure::tVisibleOnInit))
+                else if (!zStack && (subplotStates()["lineCut"] & ito::AbstractFigure::tVisibleOnInit))
                 {
-                    m_lineCutType &= ~ito::AbstractFigure::tVisibleOnInit;
+                    subplotStates()["lineCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
                 // Something to do?
@@ -1179,12 +1179,12 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             {
                 if (zStack)
                 {
-                    m_zSliceType = ito::AbstractFigure::tOwnChild;
+                    subplotStates()["zSlice"] = ito::AbstractFigure::tOwnChild;
                     figure->show();
                 }
                 else
                 {
-                    m_lineCutType = ito::AbstractFigure::tOwnChild;
+                    subplotStates()["lineCut"] = ito::AbstractFigure::tOwnChild;
                     figure->show();
                 }
             }
@@ -1550,7 +1550,7 @@ void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle idx)
             }
         }
 
-        m_lineCutType = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
+        subplotStates()["lineCut"] = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 }
 
@@ -1610,7 +1610,7 @@ void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
             }
         }
 
-        m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
+        subplotStates()["zSlice"] = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
