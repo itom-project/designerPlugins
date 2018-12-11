@@ -16,28 +16,28 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.1 r15371"
-   sodipodi:docname="volumeCut.svg"
-   inkscape:export-filename="D:\itom_qt5.9.0\sources\designerplugins\icons\volumeCut.png"
+   sodipodi:docname="volumeCut_lt.svg"
+   inkscape:export-filename="D:\itom_qt5.9.0\sources\designerplugins\icons\volumeCut_lt.png"
    inkscape:export-xdpi="32.339363"
    inkscape:export-ydpi="32.339363">
   <defs
      id="defs2">
     <linearGradient
        inkscape:collect="always"
-       id="linearGradient4499">
+       id="linearGradient6004">
       <stop
-         style="stop-color:#000096;stop-opacity:0.60392159"
+         style="stop-color:#000096;stop-opacity:0.604"
          offset="0"
-         id="stop4495" />
+         id="stop6000" />
       <stop
-         style="stop-color:#000096;stop-opacity:0;"
+         style="stop-color:#000000;stop-opacity:0;"
          offset="1"
-         id="stop4497" />
+         id="stop6002" />
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient4499"
-       id="linearGradient4501"
+       xlink:href="#linearGradient6004"
+       id="linearGradient6006"
        x1="24.475917"
        y1="29.998459"
        x2="49.607417"
@@ -51,9 +51,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="-124.83431"
-     inkscape:cy="94.050446"
+     inkscape:zoom="3.959798"
+     inkscape:cx="94.327796"
+     inkscape:cy="75.169372"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -90,7 +90,7 @@
      id="layer1"
      transform="translate(-18.388541,-4.5031249)">
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#ffffe8;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 18.520833,16.541666 11.90625,-11.9062494 37.041667,1e-7 V 41.677083"
        id="path4501"
        inkscape:connector-curvature="0"
@@ -98,21 +98,21 @@
        inkscape:export-xdpi="33.032257"
        inkscape:export-ydpi="33.032257" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#ffffe8;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="M 55.562499,16.541666 67.468749,4.6354166"
        id="path4503"
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="33.032257"
        inkscape:export-ydpi="33.032257" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#ffffe8;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 55.562499,53.583334 11.90625,-11.90625"
        id="path4505"
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="33.032257"
        inkscape:export-ydpi="33.032257" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#ffffe8;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="M 30.427083,4.6354166 V 41.677083 H 67.46875"
        id="path4507"
        inkscape:connector-curvature="0"
@@ -120,14 +120,14 @@
        inkscape:export-xdpi="33.032257"
        inkscape:export-ydpi="33.032257" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#ffffe8;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 18.520833,53.583334 11.90625,-11.90625"
        id="path4509"
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="33.032257"
        inkscape:export-ydpi="33.032257" />
     <path
-       style="fill:url(#linearGradient4501);stroke:#e90000;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       style="fill:url(#linearGradient6006);stroke:#e90300;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
        d="M 25.135417,52.260417 V 15.21875 l 23.8125,-6.6145833 V 45.645833"
        id="path4513"
        inkscape:connector-curvature="0"
@@ -174,7 +174,7 @@
        inkscape:export-xdpi="33.032257"
        inkscape:export-ydpi="33.032257" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#ffffe8;stroke-width:1.319;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        d="m 18.520833,16.541667 v 37.041668 l 37.041667,-10e-7 V 16.541668 Z"
        id="path4499"
        inkscape:connector-curvature="0"
