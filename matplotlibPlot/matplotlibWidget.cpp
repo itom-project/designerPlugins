@@ -162,7 +162,10 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     
     QSize s = size();
 
-    if ((m_pixmap.width() == s.width()) && (m_pixmap.height() == s.height()))
+	//it seems that screens with scaling factor cannot render pixmaps with all sizes,
+	//therefore it can occur that the real image size is not returned, which will lead to
+	//an inifinte regression. To terminate this, we allow a size difference of up to 1px.
+    if (qAbs(m_pixmap.width() - s.width()) < 2 && qAbs(m_pixmap.height() - s.height()) < 2)
     {
         setTransform( QTransform(1,0,0,1,0,0), false );
         centerOn( m_pixmapItem->boundingRect().center() );
