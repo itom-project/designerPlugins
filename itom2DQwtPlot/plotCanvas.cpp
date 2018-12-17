@@ -597,6 +597,7 @@ void PlotCanvas::createActions()
     //m_actVolumeCut
     m_pActVolumeCut = a = new QAction(tr("Volumecut"), p);
     a->setCheckable(true);
+    a->setVisible(false);
     a->setObjectName("actVolumeCut");
     a->setToolTip(tr("Show a 2D volume cut"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuVolumeCut(bool)));

@@ -829,6 +829,7 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
         }
         m_pContent->m_pActPlaneSelector->setVisible((max - min) > 0);
         m_pContent->m_pActStackCut->setVisible((max - min) > 0);
+        m_pContent->m_pActVolumeCut->setVisible((max - min) > 0);
     }
 }
 
