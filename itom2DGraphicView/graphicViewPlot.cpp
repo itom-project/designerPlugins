@@ -26,6 +26,7 @@
 #include <qfiledialog.h>
 #include <qimagewriter.h>
 #include <qpainter.h>
+#include<qstatusbar.h>
 
 //#include <GV_plot_renderer.h>
 
@@ -157,13 +158,23 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_pContent->setObjectName("canvasWidget");
     setCentralWidget(m_pContent);
 
+
+
+
+
+    QStatusBar *statusbar = this->statusBar();
+    statusbar->setStyleSheet("color: red");
+    connect((QObject*)m_pContent, SIGNAL(statusBarMessage(QString, int)), (QObject*)statusbar, SLOT(showMessage(QString, int)));
+
+    emit m_pContent->statusBarMessage(tr("deprecation warning: starting with itom version 3.3 this plot will be removed."), 10000);
     //connect(m_pContent, SIGNAL(statusBarClear()), statusBar(), SLOT(clearMessage()));
-    //connect(m_pContent, SIGNAL(statusBarMessage(QString,int)), statusBar(), SLOT(showMessage(QString,int)));
+    
 
     //m_pContent->setFocus();
     //resize(600,400);
     
     setPropertyObservedObject(this);
+    
 }
 
 //----------------------------------------------------------------------------------------------------------
