@@ -17,7 +17,7 @@ endif (WIN32)
 
 OPTION(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
 OPTION(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
-OPTION(PLUGIN_itom2DGraphicView "Build with this solution." ON)
+OPTION(PLUGIN_itom2DGraphicView "Build with this solution." OFF)
 OPTION(PLUGIN_itomIsoGLFigurePlugin "Build with this solution." ON)
 OPTION(PLUGIN_matplotlibPlot "Build with this solution." ON)
 OPTION(PLUGIN_motorController "Build with this solution." ON)
