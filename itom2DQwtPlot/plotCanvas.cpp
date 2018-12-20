@@ -942,7 +942,7 @@ void PlotCanvas::adjustColorDataTypeRepresentation()
 
     if (m_dObjPtr && \
         (m_dObjPtr->getType() == ito::tRGBA32) && \
-        ((m_pData->m_dataChannel & 0x0100) == 0x0000))
+        ((m_pData->m_dataChannel & ItomQwtPlotEnums::ChannelGray) == 0))
     {
         setColorBarVisible(false);
         m_pActColorPalette->setVisible(false);
@@ -961,7 +961,8 @@ void PlotCanvas::adjustColorDataTypeRepresentation()
         m_pActDataChannel->setVisible(m_dObjPtr->getType() == ito::tRGBA32);
         if (m_dObjItem)
         {
-            m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+            //only enable contour mode, if contour levels available
+            m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, m_dObjItem->contourLevels().size() > 0);
         }
     }
 
@@ -2263,7 +2264,9 @@ template<typename _Tp> void parseContourLevels(const QSharedPointer<ito::DataObj
             {
                 rowPtr = (_Tp*)mat->ptr(m);
                 for (n = 0; n < mat->cols; ++n)
+                {
                     list->append(rowPtr[n]);
+                }
             }
         }
     }
@@ -2273,15 +2276,14 @@ template<typename _Tp> void parseContourLevels(const QSharedPointer<ito::DataObj
 void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
 {
     ito::RetVal retval(ito::retOk);
-    if ((m_dObjPtr->getType() == ito::tRGBA32) && (m_pData->m_dataChannel & 0x0100))
-    {
-        m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
-    }
+    
     int trueDims = 0;
     bool isInPlane = true;
+
     if (!contourLevels.isNull())
     {
         int dims = contourLevels->getDims();
+
         if (dims == 0)
         {
             m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, false);
@@ -2295,6 +2297,7 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
                 retval += ito::RetVal(ito::retError, 0, "Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines");
                 emit statusBarMessage(tr("Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines"), 4000);
             }
+
             if (!retval.containsError())
             {
                 for (int i = 0; i < contourLevels->getDims()-1; ++i)
@@ -2304,11 +2307,13 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
                         ++trueDims;
                     }
                 }
+
                 if (trueDims != 0)
                 {
                     retval += ito::RetVal(ito::retError, 0, "Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines");
                     emit statusBarMessage(tr("Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines"), 4000);
                 }
+
                 if (!retval.containsError())
                 {
                     QList<double> list;
@@ -2340,18 +2345,32 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
                         break;
 
                     }
+
                     if (m_dObjItem)
                     {
                         m_dObjItem->setConrecFlag(QwtRasterData::IgnoreAllVerticesOnLevel, true);
                         m_dObjItem->setContourLevels(list);
                         m_pContourObj = contourLevels;
-                        //m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode);
+
                         if (m_curContourColorMapIndex == -1)
                         {
                             QPen pen(m_dObjItem->defaultContourPen());
                             pen.setColor(inverseColor1());
                             m_dObjItem->setDefaultContourPen(pen);
                         }
+
+                        if ((m_dObjPtr->getType() == ito::tRGBA32))
+                        {
+                            m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, (m_pData->m_dataChannel & ItomQwtPlotEnums::ChannelGray) > 0);
+                        }
+                        else
+                        {
+                            m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, true);
+                        }
+                    }
+                    else
+                    {
+                        m_dObjItem->setDisplayMode(QwtPlotSpectrogram::ContourMode, false);
                     }
                 }
             }
