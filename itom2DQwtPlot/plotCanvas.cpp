@@ -457,6 +457,9 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
     m_pLineCutPicker->setRubberBandPen(rubberBandPen);
     m_pLineCutPicker->setTrackerPen(trackerPen);
     m_pLineCutLine->setPen(selectionPen);
+    m_pVolumeCutLine->setPen(selectionPen);
+    m_pVolumeCutPicker->setRubberBandPen(rubberBandPen);
+    m_pVolumeCutPicker->setTrackerPen(trackerPen);
 
     m_pStackPicker->setTrackerFont(trackerFont);
     m_pStackPicker->setTrackerPen(trackerPen);
