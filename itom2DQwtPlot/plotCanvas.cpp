@@ -773,7 +773,7 @@ void PlotCanvas::setButtonStyle(int style)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObject* srcObj, const unsigned int& offsetByte,const unsigned int& startLayer ,const QVector<int>& stepByte)
+template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObject* srcObj, const unsigned int& offsetByte, const QVector<int>& stepByte)
 {
     if(m_dir == dirX || m_dir == dirY)
     {
@@ -784,7 +784,7 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
         _Tp* dstPtr = (_Tp*)(dstMat->data);
         for (int layer = 0; layer < dstMat->rows; ++layer)
         {
-            val= srcCvMatVec[startLayer+layer]->data+offsetByte; //first element of host volume cut
+            val= srcCvMatVec[layer]->data+offsetByte; //first element of host volume cut
             for (i = 0; i < dstMat->cols; i++)
             {
                 *dstPtr++ =*reinterpret_cast<_Tp*>(val+i*stepByte[0]);
@@ -801,7 +801,7 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
         _Tp* dstPtr = (_Tp*)(dstMat->data);
         for (int layer = 0; layer < dstMat->rows; ++layer)
         {
-            val= srcCvMatVec[startLayer+layer]->data+offsetByte; //first element of host volume cut
+            val= srcCvMatVec[layer]->data+offsetByte; //first element of host volume cut
             for (i = 0; i < dstMat->cols; i++)
             {
                 *dstPtr++ = *reinterpret_cast<_Tp*>(val+stepByte[i]);
@@ -827,8 +827,6 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
         unsigned int offsetByte;
         //QVector<int> startPx(3); //convention x,y,z
         QVector<int> stepByte; //step to be done to next elem
-        unsigned int planeIdx = bounds[0].x();
-        planeIdx = d > 2 ? qMin<int>(planeIdx, dataObj->getSize(d - 3)) : 0;
         tmpBounds.resize(2);
         tmpBounds[0] = bounds[1];
         tmpBounds[1] = bounds[2];
@@ -847,7 +845,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
         saturation(pxY1, 0, dataObj->getSize(d - 2) - 1);
         saturation(pxY2, 0, dataObj->getSize(d - 2) - 1);
 
-        mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(planeIdx)]; //first plane in ROI
+        mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(0)]; //first plane in ROI
 
         if (pxX2 == pxX1)
         {
@@ -859,7 +857,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             xScaling = d > 2 ? dataObj->getAxisScale(d - 2) : 1.0; // scaling along y of the host object
             yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
             xOffset = d > 2 ? dataObj->getAxisOffset(d - 2) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3)-planeIdx : 0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
             if (pxY2 >= pxY1)
             {
                 xSize = 1 + pxY2 - pxY1;
@@ -884,34 +882,34 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
-                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,stepByte);
                 break;
             case(ito::tUInt16):
-                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,stepByte);
                 break;
             case(ito::tInt8):
-                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,stepByte);
                 break;
             case(ito::tInt16):
-                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,stepByte);
                 break;
             case(ito::tInt32):
-                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,stepByte);
                 break;
             case(ito::tFloat32):
-                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, planeIdx, stepByte);
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, stepByte);
                 break;
             case(ito::tFloat64):
-                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, planeIdx, stepByte);
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, stepByte);
                 break;
             case(ito::tComplex64):
-                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,stepByte);
                 break;
             case(ito::tComplex128):
-                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,stepByte);
                 break;
             case(ito::tRGBA32):
-                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,stepByte);
                 break;
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
@@ -941,7 +939,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
 
 
 
-            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3) - planeIdx*dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
             m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
 
             double startPhys = dataObj->getPixToPhys(d - 2, pxY1, _unused);
@@ -964,7 +962,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             xScaling = d > 2 ? dataObj->getAxisScale(d - 1) : 1.0; // scaling along y of the host object
             yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
             xOffset = d > 2 ? dataObj->getAxisOffset(d - 1) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3)-planeIdx : 0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
 
             if (pxX2 >= pxX1)
             {
@@ -989,34 +987,34 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
-                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tUInt16):
-                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,planeIdx, stepByte);;
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte, stepByte);;
                 break;
             case(ito::tInt8):
-                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tInt16):
-                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tInt32):
-                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tFloat32):
-                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, planeIdx, stepByte);
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, stepByte);
                 break;
             case(ito::tFloat64):
-                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, planeIdx, stepByte);
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, stepByte);
                 break;
             case(ito::tComplex64):
-                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tComplex128):
-                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tRGBA32):
-                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte, stepByte);
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
@@ -1042,7 +1040,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
 
 
-            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3) - planeIdx*dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
             m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
 
             double startPhys = dataObj->getPixToPhys(d - 1, pxX1, _unused);
@@ -1064,7 +1062,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             //m_d.startPhys= 0.0;  //there is no physical starting point for diagonal lines.
             yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0;
             yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3)-planeIdx : 0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
             if (xSize > 0)
             {
                 double dxPhys = dataObj->getPixToPhys(d-1, pxX2, _unused) - dataObj->getPixToPhys(d-1, pxX1, _unused);
@@ -1127,34 +1125,34 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
-                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tUInt16):
-                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tInt8):
-                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tInt16):
-                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tInt32):
-                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,planeIdx, stepByte);
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tFloat32):
-                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, planeIdx, stepByte);
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, stepByte);
                 break;
             case(ito::tFloat64):
-                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, planeIdx, stepByte);
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, stepByte);
                 break;
             case(ito::tComplex64):
-                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tComplex128):
-                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte, stepByte);
                 break;
             case(ito::tRGBA32):
-                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,planeIdx,stepByte);
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte, stepByte);
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
@@ -1192,7 +1190,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
             m_dObjVolumeCut.setAxisScale(1, xScaling);
-            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3)-planeIdx*dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
             m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
 
         }
