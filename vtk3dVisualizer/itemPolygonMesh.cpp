@@ -696,7 +696,11 @@ void ItemPolygonMesh::setFaceColor(const QColor& color)
             int nrOfPoints = m_mesh.polygonMesh()->cloud.height * m_mesh.polygonMesh()->cloud.width;
             for (int i = 0; i < nrOfPoints; i++)
             {
-                colors->InsertNextTupleValue(ucharColor);
+                #if VTK_MAJOR_VERSION < 7 //VTK version < 7 the name is changed in newer versions of VTK. https://github.com/PointCloudLibrary/pcl/issues/2060
+                    colors->InsertNextTupleValue(ucharColor);
+                #else
+                    colors->InsertNextTypedTuple(ucharColor);
+                #endif
             }
 
             colors->SetName ("SolidColor");
@@ -723,7 +727,7 @@ void ItemPolygonMesh::setColorMap(const ColorMap& map)
 }
 
 //-------------------------------------------------------------------------------------------
-void ItemPolygonMesh::colorValueRange(const ito::AutoInterval& range)
+void ItemPolygonMesh::setColorValueRange(const ito::AutoInterval& range)
 {
     m_colorValueRange = range;
     setColorMode(m_colorMode); //in order to redraw

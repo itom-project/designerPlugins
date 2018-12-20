@@ -151,7 +151,7 @@ private slots:
 public slots:
     void showSubplotConfig(float left, float top, float right, float bottom, float wSpace, float hSpace);
     void modifySubplotSliders(float left, float top, float right, float bottom, float wSpace, float hSpace);
-    void setLabelText(QString text) { m_lblCoordinates->setText(text); }
+	void setLabelText(QString text);
     void replot();
 
     ito::RetVal copyToClipBoard();

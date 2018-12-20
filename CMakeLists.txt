@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 
 OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
-OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." OFF)
+OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." ON)
 SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 
 load_cache(${ITOM_SDK_DIR}/../[EXCLUDE ${VTK_DIR}])
@@ -17,7 +17,7 @@ endif (WIN32)
 
 OPTION(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
 OPTION(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
-OPTION(PLUGIN_itom2DGraphicView "Build with this solution." ON)
+OPTION(PLUGIN_itom2DGraphicView "Build with this solution." OFF)
 OPTION(PLUGIN_itomIsoGLFigurePlugin "Build with this solution." ON)
 OPTION(PLUGIN_matplotlibPlot "Build with this solution." ON)
 OPTION(PLUGIN_motorController "Build with this solution." ON)

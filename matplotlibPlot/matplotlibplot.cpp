@@ -355,6 +355,33 @@ void MatplotlibPlot::replot()
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void MatplotlibPlot::setLabelText(QString text)
+{
+	QStringList splits = text.split("\\u"); //begin of unicode sign
+	if (splits.size() < 2)
+	{
+		m_lblCoordinates->setText(text);
+	}
+	else
+	{
+		QString temp;
+		int hexCode;
+
+		for (int i = 1; i < splits.size(); ++i)
+		{
+			temp = splits[i];
+			if (temp.size() >= 4)
+			{
+				hexCode = temp.left(4).toInt(nullptr, 16);
+				temp = QChar(hexCode) + temp.mid(4);
+				splits[i] = temp;
+			}
+		}
+
+		m_lblCoordinates->setText(splits.join(""));
+	}
+}
 
 
 

@@ -1242,7 +1242,7 @@ void Itom2dQwtPlot::resetContourLevels()
 {
     if(m_pContent)
     {
-        m_pContent->setContourLevels(NULL);
+        m_pContent->setContourLevels(QSharedPointer<ito::DataObject>());
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
