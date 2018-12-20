@@ -44,12 +44,6 @@ DataObjItem::DataObjItem( const QString &title ):
     m_pContourPalette()
 {
     m_counter = 0;
-    /*QList<double> levels;
-    levels << 30 << 60 << 90 << 120 << 150 << 180 << 210 << 240;
-    this->setContourLevels( levels );
-    setDisplayMode(ContourMode, true);
-    setDisplayMode(ImageMode, false);
-    setDefaultContourPen( QPen(Qt::NoPen) );*/
 }
 
 //! Destructor
