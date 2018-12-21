@@ -815,30 +815,26 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
 {
     ito::RetVal retval;
     //todo for one pixel area and if lowest plane is selected
-    if (bounds.size() < 2)
+    if (bounds.size() == 0)
     {
         m_dir = inPlane;
     }
-    if (bounds.size() > 2)
+    if (bounds.size() == 2)
     {
         std::string description, unit;
         int d = dataObj->getDims();
-        QVector<QPointF> tmpBounds;
         unsigned int offsetByte;
         //QVector<int> startPx(3); //convention x,y,z
         QVector<int> stepByte; //step to be done to next elem
-        tmpBounds.resize(2);
-        tmpBounds[0] = bounds[1];
-        tmpBounds[1] = bounds[2];
 
         int pxX1, pxX2, pxY1, pxY2, xSize, ySize;
         double yScaling, xScaling, yOffset, xOffset;
         bool _unused;
         cv::Mat *mat;
-        pxX1 = qRound(dataObj->getPhysToPix(d - 1, tmpBounds[0].x(), _unused));
-        pxY1 = qRound(dataObj->getPhysToPix(d - 2, tmpBounds[0].y(), _unused));
-        pxX2 = qRound(dataObj->getPhysToPix(d - 1, tmpBounds[1].x(), _unused));
-        pxY2 = qRound(dataObj->getPhysToPix(d - 2, tmpBounds[1].y(), _unused));
+        pxX1 = qRound(dataObj->getPhysToPix(d - 1, bounds[0].x(), _unused));
+        pxY1 = qRound(dataObj->getPhysToPix(d - 2, bounds[0].y(), _unused));
+        pxX2 = qRound(dataObj->getPhysToPix(d - 1, bounds[1].x(), _unused));
+        pxY2 = qRound(dataObj->getPhysToPix(d - 2, bounds[1].y(), _unused));
 
         saturation(pxX1, 0, dataObj->getSize(d - 1) - 1);
         saturation(pxX2, 0, dataObj->getSize(d - 1) - 1);
@@ -2820,10 +2816,10 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
 
             setCoordinates(pts, true);
 
-            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
-            {
-                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
-            }
+            //if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+            //{
+            //    pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+            //}
             ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
             if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
             {
@@ -2928,14 +2924,6 @@ void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
 
         m_pVolumeCutLine->setVisible(true);
         m_pVolumeCutLine->setSamples(pts);
-
-        //setCoordinates(pts, true);
-
-        // check for m_dObjPtr first otherwise crash
-        if (m_dObjPtr && m_dObjPtr->getDims() > 2)
-        {
-            pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
-        }
 
         ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
         if (((Itom2dQwtPlot*)this->parent())->pickerWidget())

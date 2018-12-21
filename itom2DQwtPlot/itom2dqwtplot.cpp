@@ -945,7 +945,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
                     }
                 }
             }
-            if (bounds.size() == 3) // its a 3D-Object
+            if (bounds.size() == 2)
             {
                 ((QMainWindow*)figure)->setWindowTitle(tr("Volumecut"));
                 if (figure->inherits("ItomQwtDObjFigure"))
@@ -959,7 +959,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
             }
             else
             {
-                return ito::RetVal(ito::retError, 0, tr("exspected a bound vector with 3 values").toLatin1().data());
+                return ito::RetVal(ito::retError, 0, tr("exspected a bound vector with 2 values").toLatin1().data());
             }
 
             retval += updateChannels(paramNames);
@@ -981,7 +981,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
         }
         else
         {
-            if (bounds.size() == 3) // its a 3D-Object
+            if (bounds.size() == 2)
             {
                 paramNames << "volumeCutBounds" << "sourceout";
             }
