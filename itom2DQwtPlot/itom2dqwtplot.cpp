@@ -1427,6 +1427,8 @@ QString Itom2dQwtPlot::getContourColorMap() const
     {
         return m_pContent->getContourColorMap();
     }
+
+    return "";
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setContourLineWidth(const float& width)
@@ -1444,6 +1446,7 @@ float Itom2dQwtPlot::getContourLineWidth() const
         return m_pContent->getContourLineWidth();
     }
 
+    return 1;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlayObj)
