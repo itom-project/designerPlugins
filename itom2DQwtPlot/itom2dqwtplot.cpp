@@ -70,10 +70,14 @@ void Itom2dQwtPlot::constructor()
     // Basic settings
     m_pContent = NULL;
     
-    //bounds and zCutPoint are two different output connections, since it is possible to have a line cut and a z-stack cut visible at the same time.
+    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for volume plots from 3d objects").toLatin1().data()));
+
+    //bounds, volumeCutBounds and zCutPoint are three different output connections, since it is possible to have a line cut, volume cut and a z-stack cut visible at the same time.
     m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
     m_pOutput.insert("zCutPoint", new ito::Param("zCutPoint", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for z-stack cut in 3d objects").toLatin1().data()));
+    m_pOutput.insert("volumeCutBounds", new ito::Param("volumeCutBounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for volume cut in 3d objects").toLatin1().data()));
     m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
+
 
     d->m_pData = new InternalData();
     
@@ -152,7 +156,7 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
     //displayed and sourceout is set by dataObjRasterData, since the data is analyzed there
     /*
-    if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
+    if (subplotStates()["lineCut"] & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
     {
         ito::DataObject* tmp = m_pInput["source"]->getVal<ito::DataObject*>();
         int dims = tmp->getDims();
@@ -171,7 +175,8 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
         m_pOutput["bounds"]->setVal<double*>(bounds, 6);
     }
     */
-    m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>());
+    QVector<QPointF> bounds = getBounds();
+    m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(),-1,bounds);
 
     return ito::retOk;
 }
@@ -824,10 +829,172 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
         }
         m_pContent->m_pActPlaneSelector->setVisible((max - min) > 0);
         m_pContent->m_pActStackCut->setVisible((max - min) > 0);
+        m_pContent->m_pActVolumeCut->setVisible((max - min) > 0);
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint32 &uniqueID)
+{
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Could not spawn volumeCut due to missing API-handle").toLatin1().data());
+    }
 
+    int infoType = ito::Shape::Line;
+
+    ito::RetVal retval = ito::retOk;
+    QList<QString> paramNames;
+    ito::uint32 newUniqueID = uniqueID;
+    QWidget *volumeCutObj = NULL;
+
+    bool needChannelUpdate = false;
+
+    double *pointArr = new double[2 * bounds.size()];
+    for (int np = 0; np < bounds.size(); np++)
+    {
+        pointArr[np * 2] = bounds[np].x();
+        pointArr[np * 2 + 1] = bounds[np].y();
+    }
+
+    if (subplotStates()["volumeCut"] & ito::AbstractFigure::tUninitilizedExtern)
+    {
+        needChannelUpdate = true;
+        subplotStates()["volumeCut"] &= ~ito::AbstractFigure::tUninitilizedExtern;
+        subplotStates()["volumeCut"] |= ito::AbstractFigure::tExternChild;
+    }
+    m_pOutput["volumeCutBounds"]->setVal(pointArr, 2 * bounds.size());
+    
+
+    delete[] pointArr;
+    //setOutpBounds(bounds);
+    //setLinePlotCoordinates(bounds);
+
+    retval += apiGetFigure("DObjStaticImage", "", newUniqueID, &volumeCutObj, this);
+
+    QWidget *w = this;
+    while (w)
+    {
+        //qDebug() << w->geometry() << w->frameGeometry();
+        w = qobject_cast<QWidget*>(w->parent());
+    }
+
+    if (!retval.containsError())
+    {
+        if (uniqueID != newUniqueID || needChannelUpdate)
+        {
+            uniqueID = newUniqueID;
+            ito::AbstractDObjFigure* figure = NULL;
+            if (volumeCutObj->inherits("ito::AbstractDObjFigure"))
+            {
+                //get global position of this window
+                QWidget *w = this;
+                QRect geom(0, 0, 0, 0);
+                QRect temp = geometry();
+                geom.setHeight(temp.height());
+                geom.setWidth(temp.width());
+                while (w)
+                {
+                    temp = w->geometry();
+                    geom = QRect(temp.x() + geom.x(), temp.y() + geom.y(), geom.width(), geom.height());
+                    w = qobject_cast<QWidget*>(w->parent());
+                }
+
+                figure = (ito::AbstractDObjFigure*)volumeCutObj;
+                if (!needChannelUpdate)
+                {
+                    d->m_childFigures[volumeCutObj] = newUniqueID;
+                    connect(volumeCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
+                }
+
+                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+                //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
+                QTimer::singleShot(0, this, SLOT(activatePlot()));
+
+                //move the new figure close to the right, bottom position of this figure
+                geom.setX(geom.x() + 2 * geom.width() / 3);
+                geom.setY(geom.y() + 2 * geom.height() / 3);
+                geom.setWidth(width());
+                geom.setHeight(height());
+
+                //check if the desired geometry is within the available desktop
+                QDesktopWidget *dw = QApplication::desktop();
+                QRect screenGeom = dw->screenGeometry(this);
+                if (!screenGeom.contains(geom.bottomRight()))
+                {
+                    QPoint t(screenGeom.bottomRight() - geom.bottomRight());
+                    t.rx() = qMin(0, t.x());
+                    t.ry() = qMin(0, t.y());
+                    geom.translate(t);
+                }
+                figure->move(geom.x(), geom.y());
+            }
+            else
+            {
+                return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
+            }
+
+            if (needChannelUpdate)
+            {
+                ito::Channel *tempChannel;
+                foreach(tempChannel, m_pChannels)
+                {
+                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)figure)
+                    {
+                        removeChannel(tempChannel);
+                    }
+                }
+            }
+            if (bounds.size() == 2)
+            {
+                ((QMainWindow*)figure)->setWindowTitle(tr("Volumecut"));
+                if (figure->inherits("ItomQwtDObjFigure"))
+                {
+                    ((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+                }
+                // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["volumeCutBounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                paramNames << "volumeCutBounds" << "sourceout";
+            }
+            else
+            {
+                return ito::RetVal(ito::retError, 0, tr("exspected a bound vector with 2 values").toLatin1().data());
+            }
+
+            retval += updateChannels(paramNames);
+
+            if (needChannelUpdate) // we have an updated plot and want to show it
+            {
+                if (subplotStates()["volumeCut"] & ito::AbstractFigure::tVisibleOnInit)
+                {
+                    subplotStates()["volumeCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
+                    figure->setVisible(true);
+                }
+                // Something to do?
+            }
+            else// we do not have a plot so we have to show it and its child of this plot
+            {
+                    subplotStates()["volumeCut"] = ito::AbstractFigure::tOwnChild;
+                    figure->show(); 
+            }
+        }
+        else
+        {
+            if (bounds.size() == 2)
+            {
+                paramNames << "volumeCutBounds" << "sourceout";
+            }
+            else
+            {
+                paramNames << "volumeCutBounds" << "displayed";
+            }
+            retval += updateChannels(paramNames);
+        }
+    }
+
+    return retval;
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack /*= false*/)
@@ -857,20 +1024,20 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     {	
 		infoType = ito::Shape::Point;
         m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
-        if (m_zSliceType & ito::AbstractFigure::tUninitilizedExtern)
+        if (subplotStates()["zSlice"] & ito::AbstractFigure::tUninitilizedExtern)
         {
             needChannelUpdate = true;
-            m_zSliceType &= ~ito::AbstractFigure::tUninitilizedExtern;
-            m_zSliceType |= ito::AbstractFigure::tExternChild;
+            subplotStates()["zSlice"] &= ~ito::AbstractFigure::tUninitilizedExtern;
+            subplotStates()["zSlice"] |= ito::AbstractFigure::tExternChild;
         }
     }
     else
     {	
-		if (m_lineCutType & ito::AbstractFigure::tUninitilizedExtern)
+		if (subplotStates()["lineCut"] & ito::AbstractFigure::tUninitilizedExtern)
         {
             needChannelUpdate = true;
-            m_lineCutType &= ~ito::AbstractFigure::tUninitilizedExtern;
-            m_lineCutType |= ito::AbstractFigure::tExternChild;
+            subplotStates()["lineCut"] &= ~ito::AbstractFigure::tUninitilizedExtern;
+            subplotStates()["lineCut"] |= ito::AbstractFigure::tExternChild;
         }
         m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
     }
@@ -997,14 +1164,14 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             if (needChannelUpdate) // we have an updated plot and want to show it
             {
-                if (zStack && (m_zSliceType & ito::AbstractFigure::tVisibleOnInit))
+                if (zStack && (subplotStates()["zSlice"] & ito::AbstractFigure::tVisibleOnInit))
                 {
-                    m_zSliceType &= ~ito::AbstractFigure::tVisibleOnInit;
+                    subplotStates()["zSlice"] &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
-                else if (!zStack && (m_lineCutType & ito::AbstractFigure::tVisibleOnInit))
+                else if (!zStack && (subplotStates()["lineCut"] & ito::AbstractFigure::tVisibleOnInit))
                 {
-                    m_lineCutType &= ~ito::AbstractFigure::tVisibleOnInit;
+                    subplotStates()["lineCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
                     figure->setVisible(true);
                 }
                 // Something to do?
@@ -1013,12 +1180,12 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             {
                 if (zStack)
                 {
-                    m_zSliceType = ito::AbstractFigure::tOwnChild;
+                    subplotStates()["zSlice"] = ito::AbstractFigure::tOwnChild;
                     figure->show();
                 }
                 else
                 {
-                    m_lineCutType = ito::AbstractFigure::tOwnChild;
+                    subplotStates()["lineCut"] = ito::AbstractFigure::tOwnChild;
                     figure->show();
                 }
             }
@@ -1384,7 +1551,7 @@ void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle idx)
             }
         }
 
-        m_lineCutType = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
+        subplotStates()["lineCut"] = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 }
 
@@ -1444,8 +1611,37 @@ void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
             }
         }
 
-        m_zSliceType = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
+        subplotStates()["zSlice"] = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setBounds(QVector<QPointF> bounds)
+{
+    double *pointArr = new double[2 * bounds.size()];
+    for (int np = 0; np < bounds.size(); np++)
+    {
+        pointArr[np * 2] = bounds[np].x();
+        pointArr[np * 2 + 1] = bounds[np].y();
+    }
+    m_pInput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    delete[] pointArr;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+QVector<QPointF> Itom2dQwtPlot::getBounds(void) const
+{
+    int numPts = m_pInput["bounds"]->getLen();
+    QVector<QPointF> boundsVec;
+
+    if (numPts > 0)
+    {
+        double *ptsDblVec = m_pInput["bounds"]->getVal<double*>();
+        boundsVec.reserve(numPts / 2);
+        for (int n = 0; n < numPts / 2; n++)
+        {
+            boundsVec.append(QPointF(ptsDblVec[n * 2], ptsDblVec[n * 2 + 1]));
+        }
+    }
+    return boundsVec;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType Itom2dQwtPlot::getComplexStyle() const

@@ -45,6 +45,7 @@ class DataObjRasterData : public QwtRasterData
             tFloatOrComplex = 0x01,  // Object is floating point or complex value
             tRGB            = 0x02   // Object is true color type
         };
+        enum Direction { dirX = 0, dirY = 1, dirZ = 2, dirXY = 3, inPlane = 4};
 
         explicit DataObjRasterData(const InternalData *m_internalData, const bool isOverlayData = false);
         explicit DataObjRasterData(QSharedPointer<ito::DataObject> dataObj, QList<unsigned int>startPoint, unsigned int wDimIndex, unsigned int width, unsigned int hDimIndex, unsigned int height, bool replotPending, const bool overlay = true);
@@ -85,6 +86,7 @@ class DataObjRasterData : public QwtRasterData
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
         inline double pxToScaleCoords(double px, double offset, double scaling) { return ((double)px - offset) * scaling; }
         inline double scaleToPxCoords(double coord, double offset, double scaling) { return (coord / scaling) + offset; }
+        
 
     private:
         static double quietNaN;

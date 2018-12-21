@@ -81,6 +81,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 		m_zstackCutUID(0),
 		m_lineCutUID(0),
 		m_pLineCutLine(NULL),
+        m_pVolumeCutLine(NULL),
 		m_isRefreshingPlot(false),
 		m_unitLabelChanged(false),
 		m_pPaletteIsChanging(false),
@@ -90,6 +91,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pActToggleColorBar(NULL),
         m_pActValuePicker(NULL),
         m_pActLineCut(NULL),
+        m_pActVolumeCut(NULL),
         m_showCenterMarker(false),
         m_pMnuLineCutMode(NULL),
         m_pActStackCut(NULL),
@@ -104,7 +106,9 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
         m_pOverlaySlider(NULL),
         m_pActOverlaySlider(NULL),
         m_currentDataType(-1),
-        m_valueScale(ItomQwtPlotEnums::Linear)
+        m_valueScale(ItomQwtPlotEnums::Linear),
+        m_dObjVolumeCut(),
+        m_dir(inPlane)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -166,6 +170,21 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_pCenterMarker->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
     m_pCenterMarker->setSpacing(0);
 
+    //picker for volume cut
+    m_pVolumeCutPicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, canvas());
+    m_pVolumeCutPicker->setEnabled(false);
+    m_pVolumeCutPicker->setStateMachine(new QwtPickerDragPointMachine);
+    m_pVolumeCutPicker->setRubberBandPen(QPen(Qt::green));
+    m_pVolumeCutPicker->setTrackerPen(QPen(Qt::green));
+    //disable key movements for the picker (the marker will be moved by the key-event of this widget)
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyUp, 0);
+    m_pVolumeCutPicker->setKeyPattern(QwtEventPattern::KeyDown, 0);
+    connect(m_pVolumeCutPicker, SIGNAL(moved(const QPoint&)), SLOT(volumeCutMovedPx(const QPoint&)));
+    connect(m_pVolumeCutPicker, SIGNAL(appended(const QPoint&)), SLOT(volumeCutAppendedPx(const QPoint&)));
+
+
     //picker for line picking
     m_pLineCutPicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, canvas());
     m_pLineCutPicker->setEnabled(false);
@@ -184,6 +203,11 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     m_pLineCutLine = new QwtPlotCurve();
     m_pLineCutLine->attach(this);
     m_pLineCutLine->setVisible(false);
+
+    //line for volume picking
+    m_pVolumeCutLine = new QwtPlotCurve();
+    m_pVolumeCutLine->attach(this);
+    m_pVolumeCutLine->setVisible(false);
 
     //right axis (color bar)
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
@@ -229,6 +253,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     mainTb->addAction(m_pActValuePicker);
     mainTb->addAction(m_pActCntrMarker);
     mainTb->addAction(m_pActLineCut);
+    mainTb->addAction(m_pActVolumeCut);
     mainTb->addAction(m_pActStackCut);
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
@@ -267,6 +292,7 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
     menuTools->addAction(m_pActValuePicker);
     menuTools->addAction(m_pActCntrMarker);
     menuTools->addAction(m_pActLineCut);
+    menuTools->addAction(m_pActVolumeCut);
     menuTools->addAction(m_pActStackCut);
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
@@ -431,6 +457,9 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
     m_pLineCutPicker->setRubberBandPen(rubberBandPen);
     m_pLineCutPicker->setTrackerPen(trackerPen);
     m_pLineCutLine->setPen(selectionPen);
+    m_pVolumeCutLine->setPen(selectionPen);
+    m_pVolumeCutPicker->setRubberBandPen(rubberBandPen);
+    m_pVolumeCutPicker->setTrackerPen(trackerPen);
 
     m_pStackPicker->setTrackerFont(trackerFont);
     m_pStackPicker->setTrackerPen(trackerPen);
@@ -568,6 +597,14 @@ void PlotCanvas::createActions()
     a->setToolTip(tr("Show a 1D line cut (in-plane)"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuLineCut(bool)));
 
+    //m_actVolumeCut
+    m_pActVolumeCut = a = new QAction(tr("Volumecut"), p);
+    a->setCheckable(true);
+    a->setVisible(false);
+    a->setObjectName("actVolumeCut");
+    a->setToolTip(tr("Show a 2D volume cut"));
+    connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuVolumeCut(bool)));
+
     //m_pActLineCutMode
     m_pMnuLineCutMode = new QMenu(tr("Linecut Mode"), p);
     m_pActLineCut->setMenu(m_pMnuLineCutMode);
@@ -661,6 +698,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActCntrMarker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerCntr.png"));
         m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/zStack.png"));
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/pntline.png"));
+        m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/volumeCut.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
 
@@ -673,6 +711,7 @@ void PlotCanvas::setButtonStyle(int style)
         dataChannels[5]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelBlue.png"));
         dataChannels[6]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAlpha.png"));
         m_pActDataChannel->setIcon(m_pMnuDataChannel->defaultAction()->icon());
+
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
@@ -699,6 +738,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActCntrMarker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerCntr_lt.png"));
         m_pActStackCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/zStack_lt.png"));
         m_pActLineCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
+        m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/volumeCut_lt.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
         m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rgba_lt.png"));
@@ -732,10 +772,432 @@ void PlotCanvas::setButtonStyle(int style)
         }
     }
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
+template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObject* srcObj, const unsigned int& offsetByte, const QVector<int>& stepByte)
 {
+    if(m_dir == dirX || m_dir == dirY)
+    {
+        unsigned char* val=NULL;
+        int i;
+        const cv::Mat** srcCvMatVec= srcObj->get_mdata();
+        cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0);
+        _Tp* dstPtr = (_Tp*)(dstMat->data);
+        for (int layer = 0; layer < dstMat->rows; ++layer)
+        {
+            val= srcCvMatVec[layer]->data+offsetByte; //first element of host volume cut
+            for (i = 0; i < dstMat->cols; i++)
+            {
+                *dstPtr++ =*reinterpret_cast<_Tp*>(val+i*stepByte[0]);
+
+            }
+        }
+    }
+    else if(m_dir == dirXY)
+    {
+        uchar* val=NULL;
+        int i;
+        const cv::Mat** srcCvMatVec= srcObj->get_mdata();
+        cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0);
+        _Tp* dstPtr = (_Tp*)(dstMat->data);
+        for (int layer = 0; layer < dstMat->rows; ++layer)
+        {
+            val= srcCvMatVec[layer]->data+offsetByte; //first element of host volume cut
+            for (i = 0; i < dstMat->cols; i++)
+            {
+                *dstPtr++ = *reinterpret_cast<_Tp*>(val+stepByte[i]);
+
+            }
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds)
+{
+    ito::RetVal retval;
+    //todo for one pixel area and if lowest plane is selected
+    if (bounds.size() == 0)
+    {
+        m_dir = inPlane;
+    }
+    if (bounds.size() == 2)
+    {
+        std::string description, unit;
+        int d = dataObj->getDims();
+        unsigned int offsetByte;
+        //QVector<int> startPx(3); //convention x,y,z
+        QVector<int> stepByte; //step to be done to next elem
+
+        int pxX1, pxX2, pxY1, pxY2, xSize, ySize;
+        double yScaling, xScaling, yOffset, xOffset;
+        bool _unused;
+        cv::Mat *mat;
+        pxX1 = qRound(dataObj->getPhysToPix(d - 1, bounds[0].x(), _unused));
+        pxY1 = qRound(dataObj->getPhysToPix(d - 2, bounds[0].y(), _unused));
+        pxX2 = qRound(dataObj->getPhysToPix(d - 1, bounds[1].x(), _unused));
+        pxY2 = qRound(dataObj->getPhysToPix(d - 2, bounds[1].y(), _unused));
+
+        saturation(pxX1, 0, dataObj->getSize(d - 1) - 1);
+        saturation(pxX2, 0, dataObj->getSize(d - 1) - 1);
+        saturation(pxY1, 0, dataObj->getSize(d - 2) - 1);
+        saturation(pxY2, 0, dataObj->getSize(d - 2) - 1);
+
+        mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(0)]; //first plane in ROI
+
+        if (pxX2 == pxX1)
+        {
+
+            m_dir = dirY;
+            stepByte.resize(1);
+
+            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
+            xScaling = d > 2 ? dataObj->getAxisScale(d - 2) : 1.0; // scaling along y of the host object
+            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
+            xOffset = d > 2 ? dataObj->getAxisOffset(d - 2) : 0.0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            if (pxY2 >= pxY1)
+            {
+                xSize = 1 + pxY2 - pxY1;
+            }
+            else
+            {
+                xSize = 1 + pxY1 - pxY2;
+            }
+            offsetByte = pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
+            if (pxY1 < pxY2)
+            {
+                stepByte[0]=(dataObj->get_mdata()[0]->step[0]);
+            }
+            else// go in negative direction
+            {
+                stepByte[0]=(-dataObj->get_mdata()[0]->step[0]);
+            }
+
+             // todo: check if this DataObject is deleted when the plot is closed
+
+            m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+            switch(dataObj->getType())
+            {
+            case(ito::tUInt8):
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte,stepByte);
+                break;
+            case(ito::tUInt16):
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte,stepByte);
+                break;
+            case(ito::tInt8):
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte,stepByte);
+                break;
+            case(ito::tInt16):
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte,stepByte);
+                break;
+            case(ito::tInt32):
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte,stepByte);
+                break;
+            case(ito::tFloat32):
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, stepByte);
+                break;
+            case(ito::tFloat64):
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, stepByte);
+                break;
+            case(ito::tComplex64):
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte,stepByte);
+                break;
+            case(ito::tComplex128):
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte,stepByte);
+                break;
+            case(ito::tRGBA32):
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte,stepByte);
+                break;
+            default:
+                retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
+
+            }
+            description = dataObj->getAxisDescription(d - 2, _unused);
+            unit = dataObj->getAxisUnit(d - 2, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("y-axis").toLatin1().data();
+            }
+
+            m_dObjVolumeCut.setAxisDescription(1, description);
+            m_dObjVolumeCut.setAxisUnit(1, unit);
+
+            description = dataObj->getAxisDescription(d - 3, _unused);
+            unit = dataObj->getAxisUnit(d - 3, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("z-axis").toLatin1().data();
+            }
+            m_dObjVolumeCut.setAxisDescription(0, description);
+            m_dObjVolumeCut.setAxisUnit(0, unit);
+            m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
+            m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
+
+
+
+
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+
+            double startPhys = dataObj->getPixToPhys(d - 2, pxY1, _unused);
+            double right = dataObj->getPixToPhys(d - 2, pxY2, _unused);
+            double scale = xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0;
+            
+            m_dObjVolumeCut.setAxisScale(1, scale);
+            m_dObjVolumeCut.setAxisOffset(1, -startPhys/scale);
+
+
+
+
+        }
+        else if (pxY2 == pxY1) // pure x
+        {
+
+            m_dir = dirX;
+            stepByte.resize(1);
+            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
+            xScaling = d > 2 ? dataObj->getAxisScale(d - 1) : 1.0; // scaling along y of the host object
+            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
+            xOffset = d > 2 ? dataObj->getAxisOffset(d - 1) : 0.0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+
+            if (pxX2 >= pxX1)
+            {
+                xSize = 1 + pxX2 - pxX1;
+            }
+            else
+            {
+                xSize = 1 + pxX1 - pxX2;
+            }
+            offsetByte=pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
+            if (pxX1 < pxX2)
+            {
+                stepByte[0]=dataObj->get_mdata()[0]->step[1];
+            }
+            else// go in negative direction
+            {
+                stepByte[0]=-dataObj->get_mdata()[0]->step[1];
+            }
+            // todo: check if this DataObject is deleted when the plot is closed
+
+            m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+            switch(dataObj->getType())
+            {
+            case(ito::tUInt8):
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tUInt16):
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte, stepByte);;
+                break;
+            case(ito::tInt8):
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tInt16):
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tInt32):
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tFloat32):
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, stepByte);
+                break;
+            case(ito::tFloat64):
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, stepByte);
+                break;
+            case(ito::tComplex64):
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tComplex128):
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tRGBA32):
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte, stepByte);
+            default:
+                retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
+            }
+            description = dataObj->getAxisDescription(d - 1, _unused);
+            unit = dataObj->getAxisUnit(d - 1, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("x-axis").toLatin1().data();
+            }
+
+            m_dObjVolumeCut.setAxisDescription(1, description);
+            m_dObjVolumeCut.setAxisUnit(1, unit);
+
+            description = dataObj->getAxisDescription(d - 3, _unused);
+            unit = dataObj->getAxisUnit(d - 3, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("z-axis").toLatin1().data();
+            }
+            m_dObjVolumeCut.setAxisDescription(0, description);
+            m_dObjVolumeCut.setAxisUnit(0, unit);
+            m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
+            m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
+
+
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+
+            double startPhys = dataObj->getPixToPhys(d - 1, pxX1, _unused);
+            double right = dataObj->getPixToPhys(d - 1, pxX2, _unused);
+            double scale = xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0;
+            m_dObjVolumeCut.setAxisScale(1, xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0);
+            m_dObjVolumeCut.setAxisOffset(1, -startPhys/scale);
+        }
+        else
+        {
+            m_dir=dirXY;
+            int dx = abs( pxX2 - pxX1 );
+            int incx = pxX1 <= pxX2 ? 1 : -1;
+            int dy = abs( pxY2 - pxY1 );
+            int incy = pxY1 <= pxY2 ? 1 : -1;
+
+            xSize = 1 + std::max(dx,dy);
+
+            //m_d.startPhys= 0.0;  //there is no physical starting point for diagonal lines.
+            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0;
+            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
+            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            if (xSize > 0)
+            {
+                double dxPhys = dataObj->getPixToPhys(d-1, pxX2, _unused) - dataObj->getPixToPhys(d-1, pxX1, _unused);
+                double dyPhys = dataObj->getPixToPhys(d-2, pxY2, _unused) - dataObj->getPixToPhys(d-2, pxY1, _unused);
+                xScaling = sqrt((dxPhys * dxPhys) + (dyPhys * dyPhys)) / (xSize - 1);
+            }
+            else
+            {
+                xScaling = 0.0;
+            }
+            offsetByte = pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
+
+            stepByte.resize(xSize);
+            int pdx, pdy, ddx, ddy, es, el;
+            if (dx>dy)
+            {
+                pdx = incx;
+                pdy = 0;
+                ddx = incx;
+                ddy = incy;
+                es = dy;
+                el = dx;
+            }
+            else
+            {
+                pdx = 0;
+                pdy = incy;
+                ddx = incx;
+                ddy = incy;
+                es = dx;
+                el = dy;
+            }
+
+            int err = el / 2; //0; /* error value e_xy */
+            int x = 0; //pxX1;
+            int y = 0; //pxY1;
+
+
+
+
+            for (unsigned int n = 0; n < (unsigned int)xSize; n++)
+            {  /* loop */
+                //setPixel(x,y)
+                stepByte[n] = (int)mat->step[0] * y + (int)mat->step[1] * x;
+
+                err -= es;
+                if (err < 0)
+                {
+                    err += el;
+                    x += ddx;
+                    y += ddy;
+                }
+                else
+                {
+                    x += pdx;
+                    y += pdy;
+                }
+            }
+            m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+            switch(dataObj->getType())
+            {
+            case(ito::tUInt8):
+                parseVolumeCutObj<ito::uint8>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tUInt16):
+                parseVolumeCutObj<ito::uint16>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tInt8):
+                parseVolumeCutObj<ito::int8>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tInt16):
+                parseVolumeCutObj<ito::int16>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tInt32):
+                parseVolumeCutObj<ito::int32>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tFloat32):
+                parseVolumeCutObj<ito::float32>(dataObj, offsetByte, stepByte);
+                break;
+            case(ito::tFloat64):
+                parseVolumeCutObj<ito::float64>(dataObj, offsetByte, stepByte);
+                break;
+            case(ito::tComplex64):
+                parseVolumeCutObj<ito::complex64>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tComplex128):
+                parseVolumeCutObj<ito::complex128>(dataObj,offsetByte, stepByte);
+                break;
+            case(ito::tRGBA32):
+                parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte, stepByte);
+            default:
+                retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
+            }
+            description = dataObj->getAxisDescription(d - 2, _unused);
+            unit = dataObj->getAxisUnit(d - 2, _unused);
+            if (unit == "") unit = "px";
+
+            std::string descr2 = dataObj->getAxisDescription(d - 1, _unused);
+            std::string unit2 = dataObj->getAxisUnit(d - 1, _unused);
+            if (unit2 == "") unit2 = "px";
+
+            if (description == "" && descr2 == "")
+            {
+              
+                
+                    m_dObjVolumeCut.setAxisDescription(1,"x/y-axis");
+                    m_dObjVolumeCut.setAxisUnit(1,QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
+                
+            }
+            else
+            {
+                m_dObjVolumeCut.setAxisDescription(1,QString("%1/%2").arg(QString::fromLatin1(description.data()), QString::fromLatin1(descr2.data())).toLatin1().data());
+                m_dObjVolumeCut.setAxisUnit(1, QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
+            }
+
+
+            description = dataObj->getAxisDescription(d - 3, _unused);
+            unit = dataObj->getAxisUnit(d - 3, _unused);
+            if (description == "")
+            {
+                description = QObject::tr("z-axis").toLatin1().data();
+            }
+            m_dObjVolumeCut.setAxisDescription(0, description);
+            m_dObjVolumeCut.setAxisUnit(0, unit);
+            m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
+            m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
+            m_dObjVolumeCut.setAxisScale(1, xScaling);
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+
+        }
+  }
+  return retval;
+}
+//---------------------------------------------------------------------------------------------------------------------------------
+
+void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
+{
+    ito::RetVal retval;
     if (m_isRefreshingPlot || !m_pData)
     {
         return;
@@ -744,12 +1206,25 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/)
     m_isRefreshingPlot = true;
 
     ito::uint8 updateState = 0; //changeNo (0): nothing changed, changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...), changeData (2): data changed (dimensions, sizes, other data object...)
-
+    
     m_dObjPtr = dObj;
 
     //QString valueLabel, axisLabel, title;
     if (dObj)
     {
+        retval+=cutVolume(dObj, bounds);
+        if (!retval.containsError())
+        {
+            if (m_dir != inPlane)
+            {
+                dObj = &m_dObjVolumeCut;
+                m_dObjPtr = &m_dObjVolumeCut;
+            }
+        }
+        else
+        {
+            emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
+        }
         int dims = dObj->getDims();
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
@@ -1427,6 +1902,91 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             replot();
         }
     }
+    else if (state() == stateVolumeCut)
+    {
+        QVector<QPointF> pts;
+
+        event->accept();
+
+        if (event->key() == Qt::Key_H) //draw horizontal line in the middle of the plotted dataObject
+        {
+            QwtInterval hInterval = m_rasterData->interval(Qt::XAxis);
+            QwtInterval vInterval = m_rasterData->interval(Qt::YAxis);
+
+            pts.append(QPointF(hInterval.minValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
+            pts.append(QPointF(hInterval.maxValue(), (vInterval.minValue() + vInterval.maxValue())*0.5));
+
+            setCoordinates(pts, true);
+        }
+        else if (event->key() == Qt::Key_V) // draw vertical line in the middle of the plotted dataObject
+        {
+            QwtInterval hInterval = m_rasterData->interval(Qt::XAxis);
+            QwtInterval vInterval = m_rasterData->interval(Qt::YAxis);
+
+            pts.append(QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.minValue()));
+            pts.append(QPointF((hInterval.minValue() + hInterval.maxValue())*0.5, vInterval.maxValue()));
+
+            setCoordinates(pts, true);
+        }
+        else if (m_pVolumeCutLine->dataSize() >= 2)
+        {
+            pts.append(m_pVolumeCutLine->sample(0));
+            pts.append(m_pVolumeCutLine->sample(1));
+
+            switch (event->key())
+            {
+            case Qt::Key_Left:
+                pts[0].rx() -= incr.rx();
+                pts[1].rx() -= incr.rx();
+                break;
+            case Qt::Key_Right:
+                pts[0].rx() += incr.rx();
+                pts[1].rx() += incr.rx();
+                break;
+            case Qt::Key_Up:
+                pts[0].ry() -= incr.ry();
+                pts[1].ry() -= incr.ry();
+                break;
+            case Qt::Key_Down:
+                pts[0].ry() += incr.ry();
+                pts[1].ry() += incr.ry();
+                break;
+            default:
+                event->ignore();
+                break;
+            }
+
+            if (event->isAccepted())
+            {
+                setCoordinates(pts, true);
+            }
+        }
+        else
+        {
+            event->ignore();
+        }
+
+        if (event->isAccepted() && m_rasterData->pointValid(pts[0]) && m_rasterData->pointValid(pts[1]))
+        {
+            m_pVolumeCutLine->setSamples(pts);
+            m_pVolumeCutLine->setVisible(true);
+
+            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+            }
+            p->displayVolumeCut(pts, m_volumeCutUID);
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+            }
+
+            replot();
+        }
+    }
     
     if (!event->isAccepted())
     {
@@ -1829,12 +2389,14 @@ void PlotCanvas::stateChanged(int state)
 
     if (m_pValuePicker) m_pValuePicker->setEnabled(state == stateValuePicker);
     if (m_pLineCutPicker) m_pLineCutPicker->setEnabled(state == stateLineCut);
+    if (m_pVolumeCutPicker) m_pVolumeCutPicker->setEnabled(state == stateVolumeCut);
     if (m_pStackPicker) m_pStackPicker->setEnabled(state == stateStackCut);
     m_pActLineCut->setChecked(state == stateLineCut);
+    m_pActVolumeCut->setChecked(state == stateVolumeCut);
     m_pActValuePicker->setChecked(state == stateValuePicker);
     m_pActStackCut->setChecked(state == stateStackCut);
 
-    if (state != stateLineCut && state != stateStackCut)
+    if (state != stateLineCut && state != stateStackCut && state!= stateVolumeCut)
     {
         setCoordinates(QVector<QPointF>(), false);
     }
@@ -1955,6 +2517,12 @@ void PlotCanvas::lineCutMovedPx(const QPoint &pt)
     lineCutMovedPhys(phys);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutMovedPx(const QPoint & pt)
+{
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    volumeCutMovedPhys(phys);
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::lineCutMovedPhys(const QPointF &pt)
 {
@@ -2167,7 +2735,208 @@ void PlotCanvas::lineCutAppendedPhys(const QPointF &pt)
         replot();
     }
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutAppendedPx(const QPoint &pt)
+{
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    volumeCutAppendedPhys(phys);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
+{
+    if (state() == stateVolumeCut)
+    {
+        QVector<QPointF> pts;
+        pts.resize(2);
 
+        QwtInterval xInterval = m_rasterData->interval(Qt::XAxis);
+        QwtInterval yInterval = m_rasterData->interval(Qt::YAxis);
+
+        if (m_pVolumeCutLine->dataSize() > 0)
+        {
+            pts[0] = m_pVolumeCutLine->sample(0);
+        }
+        else
+        {
+            return;
+        }
+
+        if (m_volumeCutValidStart)
+        {
+            pts[1] = pt;
+
+            if (!xInterval.contains(pts[1].x()) || !yInterval.contains(pts[1].y()))
+            {
+                QPointF intersection;
+                QPointF rt(xInterval.maxValue(), yInterval.maxValue());
+                QPointF lt(xInterval.minValue(), yInterval.maxValue());
+                QPointF rb(xInterval.maxValue(), yInterval.minValue());
+                QPointF lb(xInterval.minValue(), yInterval.minValue());
+
+                if ((pts[1].x() < pts[0].x()) && lineIntersection(pts[1], pts[0], lt, lb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with left border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].x() > pts[0].x()) && lineIntersection(pts[1], pts[0], rt, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with right border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].y() > pts[0].y()) && lineIntersection(pts[1], pts[0], lt, rt, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with top border
+                    pts[1] = intersection;
+                }
+                else if ((pts[1].y() < pts[0].y()) && lineIntersection(pts[1], pts[0], lb, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with bottom border
+                    pts[1] = intersection;
+                }
+            }
+
+            if (m_activeModifiers.testFlag(Qt::ControlModifier))
+            {
+                //Ctrl pressed: line should be horizontally or vertically aligned. This has to be checked with respect to screen coordinates,
+                //if it is done on scale coordinates, problems can occur if one dimension has a scaling that varies strongly from the other scaling.
+                int dx = transform(QwtPlot::xBottom, pts[0].x()) - transform(QwtPlot::xBottom, pts[1].x());
+                int dy = transform(QwtPlot::yLeft, pts[0].y()) - transform(QwtPlot::yLeft, pts[1].y());
+
+                if (abs(dx) > abs(dy))
+                {
+                    pts[1].setY(pts[0].y());
+                }
+                else
+                {
+                    pts[1].setX(pts[0].x());
+                }
+            }
+
+            m_pVolumeCutLine->setSamples(pts);
+
+            setCoordinates(pts, true);
+
+            //if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+            //{
+            //    pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+            //}
+            ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+            }
+            replot();
+        }
+        else //first point is still not valid, try to find a valid first point
+        {
+            QPointF pts0 = pts[0];
+
+            pts[0] = pt;
+
+            if (m_rasterData->pointValid(pts[0]))
+            {
+                //the mouse cursor is now in a valid area. Due to discretization limits, it might be that this point is not exactly at the border
+                //towards the direction where the mouse has been pressed for the first time. Therefore get the intersection to the initial mouse press
+                //position.
+                QPointF intersection;
+                QPointF rt(xInterval.maxValue(), yInterval.maxValue());
+                QPointF lt(xInterval.minValue(), yInterval.maxValue());
+                QPointF rb(xInterval.maxValue(), yInterval.minValue());
+                QPointF lb(xInterval.minValue(), yInterval.minValue());
+
+                if (lineIntersection(pts[0], pts0, lt, lb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with left border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, rt, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with right border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, lt, rt, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with top border
+                    pts[0] = intersection;
+                }
+                else if (lineIntersection(pts[0], pts0, lb, rb, intersection))
+                {
+                    //try if pts[1] - pts[0] intersects with bottom border
+                    pts[0] = intersection;
+                }
+
+                m_volumeCutValidStart = true;
+            }
+            else
+            {
+                //first point not valid
+                m_volumeCutValidStart = false;
+            }
+
+            pts[1] = pts[0];
+
+            m_pVolumeCutLine->setVisible(true);
+            m_pVolumeCutLine->setSamples(pts);
+
+            setCoordinates(pts, true);
+
+            // check for m_dObjPtr first otherwise crash
+            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+            {
+                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+            }
+
+            ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
+            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            {
+                QVector4D vec;
+                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+            }
+            replot();
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
+{
+    if (state() == stateVolumeCut && m_dObjPtr)
+    {
+        QVector<QPointF> pts;
+        pts.resize(2);
+        pts[0] = pt;
+
+        if (m_rasterData->pointValid(pts[0]))
+        {
+            m_volumeCutValidStart = true;
+        }
+        else
+        {
+            //first point not valid
+            m_volumeCutValidStart = false;
+        }
+
+        pts[1] = pts[0];
+
+        m_pVolumeCutLine->setVisible(true);
+        m_pVolumeCutLine->setSamples(pts);
+
+        ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
+        if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+        {
+            QVector4D vec;
+            if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+            else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+            (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+        }
+
+        replot();
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::childFigureDestroyed(QObject* /*obj*/, ito::uint32 UID)
 {
@@ -2180,6 +2949,11 @@ void PlotCanvas::childFigureDestroyed(QObject* /*obj*/, ito::uint32 UID)
         else if (UID == m_lineCutUID)
         {
             m_pLineCutLine->setVisible(false);
+            setCoordinates(QVector<QPointF>(), false);
+        }
+        else if (UID == m_volumeCutUID)
+        {
+            m_pVolumeCutLine->setVisible(false);
             setCoordinates(QVector<QPointF>(), false);
         }
     }
@@ -2582,7 +3356,22 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
 
     return ito::retOk;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::setVolumeCut(const double x0, const double y0, const double x1, const double y1)
+{
+    if (m_pActVolumeCut->isCheckable() && m_pActVolumeCut->isEnabled())
+    {
+        m_pActVolumeCut->setChecked(true);
+        mnuVolumeCut(true);
+    }
+    else
+    {
+        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
+    }
+    volumeCutAppendedPhys(QPointF(x0, y0));
+    return ito::retOk;
 
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
 {
@@ -2709,7 +3498,18 @@ void PlotCanvas::mnuLineCut(bool checked)
         setState(stateIdle);
     }
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mnuVolumeCut(bool checked)
+{
+    if (checked)
+    {
+        setState(stateVolumeCut);
+    }
+    else if (state() == stateVolumeCut)
+    {
+        setState(stateIdle);
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuLineCutMode(QAction *action)
 {
