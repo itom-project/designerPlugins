@@ -40,7 +40,6 @@
         <file>icons/zStack.png</file>
         <file>icons/pntline.png</file>
         <file>icons/volumeCut.png</file>
-        <file>icons/volumeCut_lt.png</file>
         <file>icons/autoscal.png</file>
         <file>icons/colorbar.png</file>
         <file>icons/colorPalette.png</file>
@@ -75,6 +74,7 @@
         <file>icons/markerPos_lt.png</file>
         <file>icons/zStack_lt.png</file>
         <file>icons/pntline_lt.png</file>
+        <file>icons/volumeCut_lt.png</file>
         <file>icons/autoscal_lt.png</file>
         <file>icons/colorbar_lt.png</file>
         <file>icons/colorPalette_lt.png</file>
