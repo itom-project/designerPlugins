@@ -871,9 +871,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {
                 stepByte[0]=(-dataObj->get_mdata()[0]->step[0]);
             }
-
-             // todo: check if this DataObject is deleted when the plot is closed
-
+            int test = dataObj->getType();
             m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
             switch(dataObj->getType())
             {
@@ -1011,6 +1009,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                 break;
             case(ito::tRGBA32):
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte, stepByte);
+                break;
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
@@ -1149,6 +1148,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                 break;
             case(ito::tRGBA32):
                 parseVolumeCutObj<ito::Rgba32>(dataObj,offsetByte, stepByte);
+                break;
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
