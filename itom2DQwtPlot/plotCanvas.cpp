@@ -1971,18 +1971,7 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             m_pVolumeCutLine->setSamples(pts);
             m_pVolumeCutLine->setVisible(true);
 
-            if (m_dObjPtr && m_dObjPtr->getDims() > 2)
-            {
-                pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
-            }
             p->displayVolumeCut(pts, m_volumeCutUID);
-            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
-            {
-                QVector4D vec;
-                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
-            }
 
             replot();
         }
