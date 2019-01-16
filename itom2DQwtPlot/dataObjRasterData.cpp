@@ -400,116 +400,113 @@ double DataObjRasterData::value(double x, double y) const
                     {
                         switch (m_dataObj.getType())
                         {
-                        case inPlane:
-                            switch (m_dataObj.getType())
+                        case ito::tInt8:
+                        {
+                            return m_plane->at<ito::int8>(m, n);
+                        }
+                        case ito::tUInt8:
+                        {
+                            return m_plane->at<ito::uint8>(m, n);
+                        }
+                        case ito::tInt16:
+                        {
+                            return m_plane->at<ito::int16>(m, n);
+                        }
+                        case ito::tUInt16:
+                        {
+                            return m_plane->at<ito::uint16>(m, n);
+                        }
+                        case ito::tInt32:
+                        {
+                            return m_plane->at<ito::int32>(m, n);
+                        }
+                        case ito::tUInt32:
+                        {
+                            return m_plane->at<ito::uint32>(m, n);
+                        }
+                        case ito::tFloat32:
+                        {
+                            return m_plane->at<ito::float32>(m, n);
+                        }
+                        case ito::tFloat64:
+                        {
+                            return m_plane->at<ito::float64>(m, n);
+                        }
+                        case ito::tComplex64:
+                        {
+                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                             {
-                            case ito::tInt8:
-                            {
-                                return m_plane->at<ito::int8>(m, n);
+                                return m_plane->at<ito::complex64>(m, n).real();
                             }
-                            case ito::tUInt8:
+                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
                             {
-                                return m_plane->at<ito::uint8>(m, n);
+                                return m_plane->at<ito::complex64>(m, n).imag();
                             }
-                            case ito::tInt16:
+                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
                             {
-                                return m_plane->at<ito::int16>(m, n);
+                                return std::arg(m_plane->at<ito::complex64>(m, n));
                             }
-                            case ito::tUInt16:
+                            else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
                             {
-                                return m_plane->at<ito::uint16>(m, n);
-                            }
-                            case ito::tInt32:
-                            {
-                                return m_plane->at<ito::int32>(m, n);
-                            }
-                            case ito::tUInt32:
-                            {
-                                return m_plane->at<ito::uint32>(m, n);
-                            }
-                            case ito::tFloat32:
-                            {
-                                return m_plane->at<ito::float32>(m, n);
-                            }
-                            case ito::tFloat64:
-                            {
-                                return m_plane->at<ito::float64>(m, n);
-                            }
-                            case ito::tComplex64:
-                            {
-                                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
-                                {
-                                    return m_plane->at<ito::complex64>(m, n).real();
-                                }
-                                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
-                                {
-                                    return m_plane->at<ito::complex64>(m, n).imag();
-                                }
-                                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
-                                {
-                                    return std::arg(m_plane->at<ito::complex64>(m, n));
-                                }
-                                else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
-                                {
-                                    return std::abs(m_plane->at<ito::complex64>(m, n));
-                                }
-                            }
-                            case ito::tComplex128:
-                            {
-                                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
-                                {
-                                    return m_plane->at<ito::complex128>(m, n).real();
-                                }
-                                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
-                                {
-                                    return m_plane->at<ito::complex128>(m, n).imag();
-                                }
-                                if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
-                                {
-                                    return std::arg(m_plane->at<ito::complex128>(m, n));
-                                }
-                                else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
-                                {
-                                    return std::abs(m_plane->at<ito::complex128>(m, n));
-                                }
-                            }
-                            case ito::tRGBA32:
-                            {
-
-                                if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAuto) //channelAuto
-                                {
-                                    return m_plane->at<ito::Rgba32>(m, n).gray();
-                                }
-                                else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRGBA)//rgba
-                                {
-                                    return m_plane->at<ito::Rgba32>(m, n).gray();
-                                }
-                                else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGray)//gray
-                                {
-                                    return m_plane->at<ito::Rgba32>(m, n).gray();
-                                }
-                                else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRed)//red
-                                {
-                                    return m_plane->at<ito::Rgba32>(m, n).red();
-                                }
-                                else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGreen)//green
-                                {
-                                    return m_plane->at<ito::Rgba32>(m, n).green();
-                                }
-                                else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelBlue)//blue
-                                {
-                                    return m_plane->at<ito::Rgba32>(m, n).blue();
-                                }
-                                else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAlpha)//alpha
-                                {
-                                    return m_plane->at<ito::Rgba32>(m, n).alpha();
-                                }
-
-                            }
-                            default:
-                                return quietNaN;
+                                return std::abs(m_plane->at<ito::complex64>(m, n));
                             }
                         }
+                        case ito::tComplex128:
+                        {
+                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
+                            {
+                                return m_plane->at<ito::complex128>(m, n).real();
+                            }
+                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
+                            {
+                                return m_plane->at<ito::complex128>(m, n).imag();
+                            }
+                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
+                            {
+                                return std::arg(m_plane->at<ito::complex128>(m, n));
+                            }
+                            else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
+                            {
+                                return std::abs(m_plane->at<ito::complex128>(m, n));
+                            }
+                        }
+                        case ito::tRGBA32:
+                        {
+
+                            if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAuto) //channelAuto
+                            {
+                                return m_plane->at<ito::Rgba32>(m, n).gray();
+                            }
+                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRGBA)//rgba
+                            {
+                                return m_plane->at<ito::Rgba32>(m, n).gray();
+                            }
+                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGray)//gray
+                            {
+                                return m_plane->at<ito::Rgba32>(m, n).gray();
+                            }
+                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRed)//red
+                            {
+                                return m_plane->at<ito::Rgba32>(m, n).red();
+                            }
+                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGreen)//green
+                            {
+                                return m_plane->at<ito::Rgba32>(m, n).green();
+                            }
+                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelBlue)//blue
+                            {
+                                return m_plane->at<ito::Rgba32>(m, n).blue();
+                            }
+                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAlpha)//alpha
+                            {
+                                return m_plane->at<ito::Rgba32>(m, n).alpha();
+                            }
+
+                        }
+                        default:
+                            return quietNaN;
+                        }
+                        
                 }
                
         }
