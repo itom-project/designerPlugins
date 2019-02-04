@@ -114,6 +114,7 @@ private:
     QRect m_pixmapRect;
     bool m_keepSizeFixed;
     bool m_updatePlot;
+    bool m_mouseTrackingState;
 
     QTimer m_timer;
     bool m_internalResize; //resize has been done, but resizeEvent should not request a python-side refresh of the image (if true)

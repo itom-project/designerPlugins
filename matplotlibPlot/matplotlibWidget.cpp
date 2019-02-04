@@ -42,7 +42,8 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
 #ifdef _DEBUG
     m_debugOutput(false), //set this to true in order to get qDebug() outputs in _DEBUG mode
 #endif
-    m_contextMenu(contextMenu)
+    m_contextMenu(contextMenu),
+    m_mouseTrackingState(false)
 {
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
@@ -51,6 +52,7 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     this->setMouseTracking(false); //only react on mouse-move events between a mouse-click and a subsequent release
+    m_mouseTrackingState = hasMouseTracking();
 
     //create empty pixmap
     m_pixmap = QPixmap(20,20);
@@ -371,7 +373,7 @@ void MatplotlibWidget::paintTimeout()
             m_pendingEvent.clear();
             break;
         case PendingEvent::typeMouseMove:
-            m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
+            m_timer.start(100); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
             emit eventMouse(2, m_pendingEvent.m_x,m_pendingEvent.m_y, m_pendingEvent.m_button);
             m_pendingEvent.clear();
             break;
@@ -527,6 +529,7 @@ void MatplotlibWidget::mousePressEvent ( QMouseEvent * event )
     if (!hasFocus())
         return;
 
+    m_mouseTrackingState = hasMouseTracking();
     setMouseTracking(true);
     m_pendingEvent.clear(); //clear possible move events which are still in queue
     handleMouseEvent(0, event);
@@ -538,10 +541,8 @@ void MatplotlibWidget::mouseReleaseEvent ( QMouseEvent * event )
 {
     if (!hasFocus())
         return;
-    if(m_trackerActive == false)
-    {
-        setMouseTracking(false);
-    }
+
+    setMouseTracking(m_mouseTrackingState);
     m_pendingEvent.clear(); //clear possible move events which are still in queue
     handleMouseEvent(3, event);
     event->accept();
