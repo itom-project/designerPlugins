@@ -133,25 +133,25 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     QAction *lblAction = m_toolbar->addWidget(m_lblCoordinates);
     lblAction->setVisible(true);
 
-    QMenu *contextMenu = new QMenu(tr("Matplotlib"), this);
-    contextMenu->addAction(m_actSave);
-    contextMenu->addAction(m_actCopyClipboard);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_actHome);
-    contextMenu->addAction(m_actBack);
-    contextMenu->addAction(m_actForward);
-    contextMenu->addAction(m_actPan);
-    contextMenu->addAction(m_actZoomToRect);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_actMarker);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_actSubplotConfig);
-    m_pContextMenuBeforeAct = contextMenu->addSeparator();
-    contextMenu->addAction(m_toolbar->toggleViewAction());
-    contextMenu->addAction(m_actProperties);
-    addMenu(contextMenu);
+    m_contextMenu = new QMenu(tr("Matplotlib"), this);
+    m_contextMenu->addAction(m_actSave);
+    m_contextMenu->addAction(m_actCopyClipboard);
+    m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_actHome);
+    m_contextMenu->addAction(m_actBack);
+    m_contextMenu->addAction(m_actForward);
+    m_contextMenu->addAction(m_actPan);
+    m_contextMenu->addAction(m_actZoomToRect);
+    m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_actMarker);
+    m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_actSubplotConfig);
+    m_pContextMenuBeforeAct = m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_toolbar->toggleViewAction());
+    m_contextMenu->addAction(m_actProperties);
+    addMenu(m_contextMenu);
 
-    m_pContent = new MatplotlibWidget(contextMenu, this);
+    m_pContent = new MatplotlibWidget(m_contextMenu, this);
     setContentsMargins(0, 0, 0, 0);
     m_pContent->setObjectName("canvasWidget");
 
