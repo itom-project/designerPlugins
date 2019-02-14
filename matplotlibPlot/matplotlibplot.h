@@ -168,6 +168,7 @@ public slots:
     void replot();
     void addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, const QString &tooltip, const QString &groupName);
     void removeUserDefinedAction(const QString &name);
+    QWidget* createDialogEditProperties(bool showApplyButton, const QString &title = "");
 
     ito::RetVal copyToClipBoard();
 

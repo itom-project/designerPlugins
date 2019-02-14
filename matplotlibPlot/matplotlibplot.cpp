@@ -23,6 +23,7 @@
 #include "matplotlibplot.h"
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
+#include "editProperties/dialogEditProperties.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------
 MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= 0*/)
@@ -477,6 +478,16 @@ void MatplotlibPlot::removeUserDefinedAction(const QString &name)
             ++groupIt;
         }
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QWidget* MatplotlibPlot::createDialogEditProperties(bool showApplyButton, const QString &title /*= ""*/)
+{
+    DialogEditProperties *dialog = new DialogEditProperties(showApplyButton, title, this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose, true);
+
+    return dialog;
+
 }
 
 
