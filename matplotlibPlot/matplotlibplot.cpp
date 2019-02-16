@@ -484,7 +484,6 @@ void MatplotlibPlot::removeUserDefinedAction(const QString &name)
 QWidget* MatplotlibPlot::createDialogEditProperties(bool showApplyButton, const QString &title /*= ""*/)
 {
     DialogEditProperties *dialog = new DialogEditProperties(showApplyButton, title, this);
-    dialog->setAttribute(Qt::WA_DeleteOnClose, true);
 
     return dialog;
 

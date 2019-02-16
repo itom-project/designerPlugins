@@ -36,7 +36,7 @@ class DialogEditProperties : public QDialog
 public:
     DialogEditProperties(bool showApplyButton, const QString &title = "", QWidget *parent = 0);
 
-    ~DialogEditProperties() {};
+    ~DialogEditProperties();
 
     
 private:
@@ -47,8 +47,8 @@ private:
 
 public Q_SLOTS:
     QWidget* addFormWidget(const QString &title, const QString &comment = "", bool withMargin = false);
-    QWidget* addFormTabWidget(const QString &comment = "");
-    QWidget* addFormComboWidget(const QString &comment = "");
+    QWidget* addFormTabWidget(const QString &title, const QString &comment = "");
+    QWidget* addFormComboWidget(const QString &title, const QString &comment = "");
 
 Q_SIGNALS:
     void applied();

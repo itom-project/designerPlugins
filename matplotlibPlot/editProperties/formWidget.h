@@ -112,6 +112,7 @@ public Q_SLOTS:
     QWidget* addReal(const QString &label, double value)
     {
         QDoubleSpinBox *valueWidget = new QDoubleSpinBox(this);
+        valueWidget->setRange(-1.e9, 1.e9);
         valueWidget->setValue(value);
         m_pFormLayout->insertRow(m_rows++, label, valueWidget);
         return valueWidget;

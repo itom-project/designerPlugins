@@ -41,21 +41,6 @@ DialogEditProperties::DialogEditProperties(bool showApplyButton, const QString &
 {
     m_pLayout = new QVBoxLayout(this);
 
-    // Form
-    /*if isinstance(data[0][0], (list, tuple)) :
-        self.formwidget = FormTabWidget(data, comment = comment,
-            parent = self)
-        elif len(data[0]) == 3 :
-        self.formwidget = FormComboWidget(data, comment = comment,
-            parent = self)
-    else:
-        self.formwidget = FormWidget(data, comment = comment,
-    parent = self)
-    layout.addWidget(self.formwidget)
-
-    self.float_fields = []
-    self.formwidget.setup()*/
-
     // Button box
     m_pBBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 
@@ -76,6 +61,12 @@ DialogEditProperties::DialogEditProperties(bool showApplyButton, const QString &
 }
 
 //-------------------------------------------------------------------------------------
+DialogEditProperties::~DialogEditProperties()
+{
+    //int i = 1;
+}
+
+//-------------------------------------------------------------------------------------
 QWidget* DialogEditProperties::addFormWidget(const QString &title, const QString &comment /*= ""*/, bool withMargin /*= false*/)
 {
     if (m_pContent)
@@ -90,7 +81,7 @@ QWidget* DialogEditProperties::addFormWidget(const QString &title, const QString
 }
 
 //-------------------------------------------------------------------------------------
-QWidget* DialogEditProperties::addFormTabWidget(const QString &comment /*= ""*/)
+QWidget* DialogEditProperties::addFormTabWidget(const QString &title, const QString &comment /*= ""*/)
 {
     if (m_pContent)
     {
@@ -104,7 +95,7 @@ QWidget* DialogEditProperties::addFormTabWidget(const QString &comment /*= ""*/)
 }
 
 //-------------------------------------------------------------------------------------
-QWidget* DialogEditProperties::addFormComboWidget(const QString &comment /*= ""*/)
+QWidget* DialogEditProperties::addFormComboWidget(const QString &title, const QString &comment /*= ""*/)
 {
     if (m_pContent)
     {
