@@ -97,6 +97,8 @@ Color-specialized QLineEdit layout
 class ColorWidget : public QWidget
 {
     Q_OBJECT
+
+    Q_PROPERTY(QString text READ text)
 public:
     ColorWidget(const QColor &color, QWidget *parent = 0) :
         QWidget(parent),
@@ -105,7 +107,7 @@ public:
     {
         QHBoxLayout *layout = new QHBoxLayout(this);
 
-        m_pLineEdit = new QLineEdit(color.name(QColor::HexArgb), parent);
+        m_pLineEdit = new QLineEdit(colorToRgbaText(color), parent);
         connect(m_pLineEdit, SIGNAL(editingFinished()), this, SLOT(updateColor()));
         layout->addWidget(m_pLineEdit);
         m_pColorBtn = new ColorButton(parent);
@@ -120,16 +122,47 @@ private:
     QLineEdit *m_pLineEdit;
     ColorButton *m_pColorBtn;
 
+    QString colorToRgbaText(const QColor &color) const
+    {
+        int r = color.red();
+        int g = color.green();
+        int b = color.blue();
+        int a = color.alpha();
+        QString txt = QString("#%1%2%3%4").arg(r, 2, 16, QChar('0')). \
+            arg(g, 2, 16, QChar('0')). \
+            arg(b, 2, 16, QChar('0')). \
+            arg(a, 2, 16, QChar('0'));
+        return txt;
+    }
+
 public Q_SLOTS:
     void updateColor()
     {
-        QColor color = QColor(text());
+        QColor color("black");
+        if (text().startsWith("#"))
+        {
+            bool ok;
+            unsigned int rgba = text().mid(1).toUInt(&ok, 16);
+            if (ok)
+            {
+                int a = rgba & 0xff;
+                int r = (rgba & 0xff000000) >> 24;
+                int g = (rgba & 0x00ff0000) >> 16;
+                int b = (rgba & 0x0000ff00) >> 8;
+                color = QColor(r, g, b, a);
+            }
+        }
+        else
+        {
+            color = QColor(text());
+        }
+
         m_pColorBtn->setColor(color); // defaults to black if not qcolor.isValid()
     }
 
     void updateText(const QColor &color)
     {
-        m_pLineEdit->setText(color.name(QColor::HexArgb));
+        m_pLineEdit->setText(colorToRgbaText(color));
     }
 
     QString text()
