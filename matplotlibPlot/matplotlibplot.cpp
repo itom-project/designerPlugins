@@ -128,7 +128,6 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_toolbar->addAction(m_actZoomToRect);
     m_pToolbarBeforeAct = m_toolbar->addSeparator();
     m_toolbar->addAction(m_actSubplotConfig);
-    m_toolbar->addSeparator();
     m_toolbar->addAction(m_actMarker);
     
     QAction *lblAction = m_toolbar->addWidget(m_lblCoordinates);
