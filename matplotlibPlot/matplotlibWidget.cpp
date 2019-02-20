@@ -150,6 +150,10 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
 
         if(x>=0 && y>=0 && imgHeight >= (y+h) && imgWidth >= (x+w))
         {
+            //in case of blit, y is the distance from the bottom border, convert it into the
+            //distance from top:
+            y = imgHeight - h - y;
+
             QPainter painter(&m_pixmap);
             QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
             painter.drawImage(QPoint(x,y),image);
@@ -221,6 +225,9 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
 
         if(x>=0 && y>=0 && imgHeight >= (y+h) && imgWidth >= (x+w))
         {
+            //in case of blit, y is the distance from the bottom border, convert it into the
+            //distance from top:
+            y = imgHeight - h - y;
             QPainter painter(&m_pixmap);
             QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
             painter.drawImage(QPoint(x,y),image);
@@ -412,7 +419,7 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
             button = 2;
         }
 
-        if(button == 0) //no mouse button pressed, then handle mouse move event with lowest priority
+        if(0 && button == 0) //no mouse button pressed, then handle mouse move event with lowest priority
         {
             if(!m_timer.isActive())
             {
