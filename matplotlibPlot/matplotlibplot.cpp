@@ -126,7 +126,7 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_toolbar->addAction(m_actForward);
     m_toolbar->addAction(m_actPan);
     m_toolbar->addAction(m_actZoomToRect);
-    m_pToolbarBeforeAct = m_toolbar->addSeparator();
+    m_pToolbarBeforeAct = m_actSubplotConfig;
     m_toolbar->addAction(m_actSubplotConfig);
     m_toolbar->addAction(m_actMarker);
     
@@ -415,7 +415,7 @@ QAction* MatplotlibPlot::getActionFromGroupByName(const QString &name) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, const QString &tooltip, const QString &groupName)
+void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, const QString &tooltip, const QString &groupName, int position /*= -1*/)
 {
     if (getActionFromGroupByName(name))
     {
@@ -439,11 +439,34 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
 #endif
 
     QAction *action = new QAction(QIcon(pm), text, this);
+    QAction *beforeToolbar = m_pToolbarBeforeAct;
+    QAction *beforeContextMenu = m_pContextMenuBeforeAct;
+
     action->setToolTip(tooltip);
     action->setObjectName(name);
-    actGroup.m_pActions.append(action);
 
-    m_toolbar->insertAction(m_pToolbarBeforeAct, action);
+    if (position <= 0)
+    {
+        if (actGroup.m_pActions.size() > 0)
+        {
+            beforeToolbar = beforeContextMenu = actGroup.m_pActions[0];
+        }
+        actGroup.m_pActions.insert(position, action);
+    }
+    else if (position >= actGroup.m_pActions.size())
+    {
+        actGroup.m_pActions.append(action);
+    }
+    else
+    {
+        if (actGroup.m_pActions.size() > 0)
+        {
+            beforeToolbar = beforeContextMenu = actGroup.m_pActions[position];
+        }
+        actGroup.m_pActions.insert(position, action);
+    }
+
+    m_toolbar->insertAction(beforeToolbar, action);
     m_contextMenu->insertAction(m_pContextMenuBeforeAct, action);
 }
 
