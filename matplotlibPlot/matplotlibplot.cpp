@@ -103,7 +103,6 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_actCopyClipboard = new QAction(tr("Copy To Clipboard"), this);
     m_actCopyClipboard->setObjectName("actionCopyClipboard");
     m_actCopyClipboard->setShortcut(QKeySequence::Copy);
-    m_actCopyClipboard->setObjectName("actionCopyClipboard");
     m_actCopyClipboard->setToolTip(tr("Copies the current view to the clipboard"));
     connect(m_actCopyClipboard, SIGNAL(triggered()), this, SLOT(mnuCopyToClipboard()));
     m_actCopyClipboard->setVisible(false);
@@ -120,7 +119,6 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     addToolBar(m_toolbar, "mainToolBar");
     m_toolbar->setObjectName("toolbar");
     m_toolbar->addAction(m_actSave);
-    m_toolbar->addSeparator();
     m_toolbar->addAction(m_actHome);
     m_toolbar->addAction(m_actBack);
     m_toolbar->addAction(m_actForward);
@@ -415,7 +413,8 @@ QAction* MatplotlibPlot::getActionFromGroupByName(const QString &name) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, const QString &tooltip, const QString &groupName, int position /*= -1*/)
+void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, 
+    const QString &tooltip, const QString &groupName, int position /*= -1*/)
 {
     if (getActionFromGroupByName(name))
     {
@@ -433,17 +432,32 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
 
     ActionGroup &actGroup = m_actionGroups[groupName];
 
-    QPixmap pm(iconFilename);
+    QAction *action = NULL;
+
+    if (text == "")
+    {
+        action = new QAction(this);
+        action->setSeparator(true);
+    }
+    else
+    {
+        QPixmap pm(iconFilename);
 #if QT_VERSION >= 0x050000
-    pm.setDevicePixelRatio(this->devicePixelRatio());
+        pm.setDevicePixelRatio(this->devicePixelRatio());
 #endif
 
-    QAction *action = new QAction(QIcon(pm), text, this);
+        action = new QAction(QIcon(pm), text, this);
+    }
+
     QAction *beforeToolbar = m_pToolbarBeforeAct;
     QAction *beforeContextMenu = m_pContextMenuBeforeAct;
 
     action->setToolTip(tooltip);
-    action->setObjectName(name);
+
+    if (name != "")
+    {
+        action->setObjectName(name);
+    }
 
     if (position <= 0)
     {
@@ -467,7 +481,7 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
     }
 
     m_toolbar->insertAction(beforeToolbar, action);
-    m_contextMenu->insertAction(m_pContextMenuBeforeAct, action);
+    m_contextMenu->insertAction(beforeContextMenu, action);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

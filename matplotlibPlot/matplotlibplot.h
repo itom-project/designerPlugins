@@ -166,7 +166,8 @@ public slots:
     void modifySubplotSliders(float left, float top, float right, float bottom, float wSpace, float hSpace);
 	void setLabelText(QString text);
     void replot();
-    void addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, const QString &tooltip, const QString &groupName, int position = -1);
+    void addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, 
+        const QString &tooltip, const QString &groupName, int position = -1);
     void removeUserDefinedAction(const QString &name);
     QWidget* createDialogEditProperties(bool showApplyButton, const QString &title = "");
 

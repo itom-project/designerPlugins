@@ -268,7 +268,8 @@ void MatplotlibWidget::copyToClipboardResult(QSharedPointer<char> imageString, i
     }
 #endif
 
-    QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during livetime of image (therefore, copy below)
+    QImage image  = QImage((uchar*)imageString.data(), w, h, QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during livetime of image (therefore, copy below)
+
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard)
     {
@@ -472,7 +473,7 @@ void MatplotlibWidget::keyReleaseEvent ( QKeyEvent * event )
 }
 
 //-------------------------------------------------------------------------------------
-void MatplotlibWidget::leaveEvent ( QEvent * /*event*/ )
+void MatplotlibWidget::leaveEvent ( QEvent * event )
 {
     if (!hasFocus())
         return;
@@ -480,7 +481,7 @@ void MatplotlibWidget::leaveEvent ( QEvent * /*event*/ )
 }
 
 //-------------------------------------------------------------------------------------
-void MatplotlibWidget::enterEvent ( QEvent * /*event*/ )
+void MatplotlibWidget::enterEvent ( QEvent * event )
 {
     if (!hasFocus())
         return;
