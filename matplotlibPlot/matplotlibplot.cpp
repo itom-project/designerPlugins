@@ -23,6 +23,7 @@
 #include "matplotlibplot.h"
 #include "matplotlibWidget.h"
 #include "matplotlibSubfigConfig.h"
+#include "editProperties/dialogEditProperties.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------
 MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= 0*/)
@@ -53,26 +54,31 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_actHome->setObjectName("actionHome");
     m_actHome->setShortcut(Qt::CTRL + Qt::Key_0);
     m_actHome->setToolTip(tr("Reset original view"));
+    m_actHome->setVisible(false);
 
     m_actForward = new QAction(QIcon(":/itomDesignerPlugins/general/icons/forward.png"), tr("Forward"), this);
     m_actForward->setObjectName("actionForward");
     m_actForward->setToolTip(tr("Forward to next view"));
+    m_actForward->setVisible(false);
 
     m_actBack = new QAction(QIcon(":/itomDesignerPlugins/general/icons/back.png"), tr("Back"), this);
     m_actBack->setObjectName("actionBack");
     m_actBack->setToolTip(tr("Back to previous view"));
+    m_actBack->setVisible(false);
 
     m_actPan = new QAction(QIcon(":/itomDesignerPlugins/general/icons/move.png"), tr("Move"), this);
     m_actPan->setObjectName("actionPan");
     m_actPan->setCheckable(true);
     m_actPan->setChecked(false);
     m_actPan->setToolTip(tr("Pan axes with left mouse, zoom with right"));
+    m_actPan->setVisible(false);
 
     m_actZoomToRect = new QAction(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"), tr("Zoom to Rectangle"), this);
     m_actZoomToRect->setObjectName("actionZoomToRect");
     m_actZoomToRect->setCheckable(true);
     m_actZoomToRect->setChecked(false);
     m_actZoomToRect->setToolTip(tr("Zoom to rectangle"));
+    m_actZoomToRect->setVisible(false);
 
     m_actMarker = new QAction(QIcon(":/itomDesignerPlugins/general/icons/marker.png"), tr("Marker"), this);
     m_actMarker->setObjectName("actionMarker");
@@ -80,22 +86,26 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_actMarker->setChecked(false);
     m_actMarker->setToolTip(tr("Show coordinates under mouse cursor"));
     m_actMarker->connect(m_actMarker, SIGNAL(toggled(bool)), this, SLOT(mnuMarkerClick(bool)));
+    m_actMarker->setVisible(false);
 
     m_actSubplotConfig = new QAction(QIcon(":/itomDesignerPlugins/general/icons/subplots.png"), tr("Subplot Configuration..."), this);
     m_actSubplotConfig->setObjectName("actionSubplotConfig");
     m_actSubplotConfig->setToolTip(tr("Configure subplots..."));
+    m_actSubplotConfig->setVisible(false);
 
     m_actSave = new QAction(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"), tr("Save..."), this);
     m_actSave->setShortcut(QKeySequence::Save);
     m_actSave->setObjectName("actionSave");
     m_actSave->setToolTip(tr("Save the figure..."));
+    m_actSave->setVisible(false);
 
     //m_actCopyClipboard
     m_actCopyClipboard = new QAction(tr("Copy To Clipboard"), this);
-    m_actCopyClipboard->setShortcut(QKeySequence::Copy);
     m_actCopyClipboard->setObjectName("actionCopyClipboard");
+    m_actCopyClipboard->setShortcut(QKeySequence::Copy);
     m_actCopyClipboard->setToolTip(tr("Copies the current view to the clipboard"));
     connect(m_actCopyClipboard, SIGNAL(triggered()), this, SLOT(mnuCopyToClipboard()));
+    m_actCopyClipboard->setVisible(false);
 
     m_actProperties = this->getPropertyDockWidget()->toggleViewAction();
     connect(m_actProperties, SIGNAL(triggered(bool)), this, SLOT(mnuShowProperties(bool)));
@@ -109,39 +119,37 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     addToolBar(m_toolbar, "mainToolBar");
     m_toolbar->setObjectName("toolbar");
     m_toolbar->addAction(m_actSave);
-    m_toolbar->addSeparator();
     m_toolbar->addAction(m_actHome);
     m_toolbar->addAction(m_actBack);
     m_toolbar->addAction(m_actForward);
     m_toolbar->addAction(m_actPan);
     m_toolbar->addAction(m_actZoomToRect);
-    m_toolbar->addSeparator();
+    m_pToolbarBeforeAct = m_actSubplotConfig;
     m_toolbar->addAction(m_actSubplotConfig);
-    m_toolbar->addSeparator();
     m_toolbar->addAction(m_actMarker);
     
     QAction *lblAction = m_toolbar->addWidget(m_lblCoordinates);
     lblAction->setVisible(true);
 
-    QMenu *contextMenu = new QMenu(tr("Matplotlib"),this);
-    contextMenu->addAction(m_actSave);
-    contextMenu->addAction(m_actCopyClipboard);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_actHome);
-    contextMenu->addAction(m_actBack);
-    contextMenu->addAction(m_actForward);
-    contextMenu->addAction(m_actPan);
-    contextMenu->addAction(m_actZoomToRect);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_actMarker);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_actSubplotConfig);
-    contextMenu->addSeparator();
-    contextMenu->addAction(m_toolbar->toggleViewAction());
-    contextMenu->addAction(m_actProperties);
-    addMenu(contextMenu);
+    m_contextMenu = new QMenu(tr("Matplotlib"), this);
+    m_contextMenu->addAction(m_actSave);
+    m_contextMenu->addAction(m_actCopyClipboard);
+    m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_actHome);
+    m_contextMenu->addAction(m_actBack);
+    m_contextMenu->addAction(m_actForward);
+    m_contextMenu->addAction(m_actPan);
+    m_contextMenu->addAction(m_actZoomToRect);
+    m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_actMarker);
+    m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_actSubplotConfig);
+    m_pContextMenuBeforeAct = m_contextMenu->addSeparator();
+    m_contextMenu->addAction(m_toolbar->toggleViewAction());
+    m_contextMenu->addAction(m_actProperties);
+    addMenu(m_contextMenu);
 
-    m_pContent = new MatplotlibWidget(contextMenu, this);
+    m_pContent = new MatplotlibWidget(m_contextMenu, this);
     setContentsMargins(0, 0, 0, 0);
     m_pContent->setObjectName("canvasWidget");
 
@@ -381,6 +389,140 @@ void MatplotlibPlot::setLabelText(QString text)
 
 		m_lblCoordinates->setText(splits.join(""));
 	}
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QAction* MatplotlibPlot::getActionFromGroupByName(const QString &name) const
+{
+    QMap<QString, ActionGroup>::const_iterator groupIt = m_actionGroups.constBegin();
+
+    while (groupIt != m_actionGroups.constEnd())
+    {
+        foreach(QAction *a, groupIt->m_pActions)
+        {
+            if (a && a->objectName() == name)
+            {
+                return a;
+            }
+        }
+        
+        ++groupIt;
+    }
+
+    return NULL;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, 
+    const QString &tooltip, const QString &groupName, int position /*= -1*/)
+{
+    if (getActionFromGroupByName(name))
+    {
+        qDebug() << "action with name '" << name << "' already exists in action group";
+        return;
+    }
+
+    if (!m_actionGroups.contains(groupName))
+    {
+        ActionGroup ag;
+        ag.m_pSeparatorToolbar = m_toolbar->insertSeparator(m_pToolbarBeforeAct);
+        ag.m_pSeparatorContextMenu = m_contextMenu->insertSeparator(m_pContextMenuBeforeAct);
+        m_actionGroups[groupName] = ag;
+    }
+
+    ActionGroup &actGroup = m_actionGroups[groupName];
+
+    QAction *action = NULL;
+
+    if (text == "")
+    {
+        action = new QAction(this);
+        action->setSeparator(true);
+    }
+    else
+    {
+        QPixmap pm(iconFilename);
+#if QT_VERSION >= 0x050000
+        pm.setDevicePixelRatio(this->devicePixelRatio());
+#endif
+
+        action = new QAction(QIcon(pm), text, this);
+    }
+
+    QAction *beforeToolbar = m_pToolbarBeforeAct;
+    QAction *beforeContextMenu = m_pContextMenuBeforeAct;
+
+    action->setToolTip(tooltip);
+
+    if (name != "")
+    {
+        action->setObjectName(name);
+    }
+
+    if (position <= 0)
+    {
+        if (actGroup.m_pActions.size() > 0)
+        {
+            beforeToolbar = beforeContextMenu = actGroup.m_pActions[0];
+        }
+        actGroup.m_pActions.insert(position, action);
+    }
+    else if (position >= actGroup.m_pActions.size())
+    {
+        actGroup.m_pActions.append(action);
+    }
+    else
+    {
+        if (actGroup.m_pActions.size() > 0)
+        {
+            beforeToolbar = beforeContextMenu = actGroup.m_pActions[position];
+        }
+        actGroup.m_pActions.insert(position, action);
+    }
+
+    m_toolbar->insertAction(beforeToolbar, action);
+    m_contextMenu->insertAction(beforeContextMenu, action);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void MatplotlibPlot::removeUserDefinedAction(const QString &name)
+{
+    QAction *a = NULL;
+    QMap<QString, ActionGroup>::iterator groupIt = m_actionGroups.begin();
+
+    while (groupIt != m_actionGroups.end())
+    {
+        for (int idx = groupIt->m_pActions.size() - 1; idx >= 0; --idx)
+        {
+            a = groupIt->m_pActions[idx];
+            if (a && a->objectName() == name)
+            {
+                a->deleteLater();
+                groupIt.value().m_pActions.removeAt(idx);
+            }
+        }
+
+        if (groupIt->m_pActions.size() == 0)
+        {
+            //delete the entire group
+            groupIt->m_pSeparatorToolbar->deleteLater();
+            groupIt->m_pSeparatorContextMenu->deleteLater();
+            m_actionGroups.erase(groupIt);
+        }
+        else
+        {
+            ++groupIt;
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QWidget* MatplotlibPlot::createDialogEditProperties(bool showApplyButton, const QString &title /*= ""*/)
+{
+    DialogEditProperties *dialog = new DialogEditProperties(showApplyButton, title, this);
+
+    return dialog;
+
 }
 
 

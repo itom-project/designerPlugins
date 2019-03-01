@@ -72,6 +72,12 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibSubfigConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/dialogEditProperties.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/colorWidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/fontWidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/formWidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/formTabWidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/formComboWidget.h
 )
 
 set(plugin_HEADERS_COPY
@@ -90,7 +96,10 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplotfactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibWidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/dialogEditProperties.cpp
 )
+
+ADD_SOURCE_GROUP(editProperties)
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
 if(MSVC)

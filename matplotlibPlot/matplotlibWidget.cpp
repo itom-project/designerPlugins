@@ -42,7 +42,8 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
 #ifdef _DEBUG
     m_debugOutput(false), //set this to true in order to get qDebug() outputs in _DEBUG mode
 #endif
-    m_contextMenu(contextMenu)
+    m_contextMenu(contextMenu),
+    m_mouseTrackingState(false)
 {
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
@@ -51,6 +52,7 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     this->setMouseTracking(false); //only react on mouse-move events between a mouse-click and a subsequent release
+    m_mouseTrackingState = hasMouseTracking();
 
     //create empty pixmap
     m_pixmap = QPixmap(20,20);
@@ -148,6 +150,10 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
 
         if(x>=0 && y>=0 && imgHeight >= (y+h) && imgWidth >= (x+w))
         {
+            //in case of blit, y is the distance from the bottom border, convert it into the
+            //distance from top:
+            y = imgHeight - h - y;
+
             QPainter painter(&m_pixmap);
             QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
             painter.drawImage(QPoint(x,y),image);
@@ -219,6 +225,9 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
 
         if(x>=0 && y>=0 && imgHeight >= (y+h) && imgWidth >= (x+w))
         {
+            //in case of blit, y is the distance from the bottom border, convert it into the
+            //distance from top:
+            y = imgHeight - h - y;
             QPainter painter(&m_pixmap);
             QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
             painter.drawImage(QPoint(x,y),image);
@@ -259,7 +268,8 @@ void MatplotlibWidget::copyToClipboardResult(QSharedPointer<char> imageString, i
     }
 #endif
 
-    QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during livetime of image (therefore, copy below)
+    QImage image  = QImage((uchar*)imageString.data(), w, h, QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during livetime of image (therefore, copy below)
+
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard)
     {
@@ -371,7 +381,7 @@ void MatplotlibWidget::paintTimeout()
             m_pendingEvent.clear();
             break;
         case PendingEvent::typeMouseMove:
-            m_timer.start(2000); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
+            m_timer.start(100); //if further update is required, it will be requested if the recent update has been transmitted or the timer runs into its timeout
             emit eventMouse(2, m_pendingEvent.m_x,m_pendingEvent.m_y, m_pendingEvent.m_button);
             m_pendingEvent.clear();
             break;
@@ -410,7 +420,7 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
             button = 2;
         }
 
-        if(button == 0) //no mouse button pressed, then handle mouse move event with lowest priority
+        if(0 && button == 0) //no mouse button pressed, then handle mouse move event with lowest priority
         {
             if(!m_timer.isActive())
             {
@@ -463,7 +473,7 @@ void MatplotlibWidget::keyReleaseEvent ( QKeyEvent * event )
 }
 
 //-------------------------------------------------------------------------------------
-void MatplotlibWidget::leaveEvent ( QEvent * /*event*/ )
+void MatplotlibWidget::leaveEvent ( QEvent * event )
 {
     if (!hasFocus())
         return;
@@ -471,7 +481,7 @@ void MatplotlibWidget::leaveEvent ( QEvent * /*event*/ )
 }
 
 //-------------------------------------------------------------------------------------
-void MatplotlibWidget::enterEvent ( QEvent * /*event*/ )
+void MatplotlibWidget::enterEvent ( QEvent * event )
 {
     if (!hasFocus())
         return;
@@ -527,6 +537,7 @@ void MatplotlibWidget::mousePressEvent ( QMouseEvent * event )
     if (!hasFocus())
         return;
 
+    m_mouseTrackingState = hasMouseTracking();
     setMouseTracking(true);
     m_pendingEvent.clear(); //clear possible move events which are still in queue
     handleMouseEvent(0, event);
@@ -538,10 +549,8 @@ void MatplotlibWidget::mouseReleaseEvent ( QMouseEvent * event )
 {
     if (!hasFocus())
         return;
-    if(m_trackerActive == false)
-    {
-        setMouseTracking(false);
-    }
+
+    setMouseTracking(m_mouseTrackingState);
     m_pendingEvent.clear(); //clear possible move events which are still in queue
     handleMouseEvent(3, event);
     event->accept();

@@ -128,6 +128,19 @@ private:
     bool m_forceWindowResize;
     bool m_keepSizeFixed;
     QTimer *m_pResetFixedSizeTimer;
+    QAction *m_pContextMenuBeforeAct; //action, before which all user-defined actions are added to the context menu
+    QAction *m_pToolbarBeforeAct; //action, before which all user-defined actions are added to the toolbar
+
+    struct ActionGroup
+    {
+        QAction *m_pSeparatorToolbar; //leading separator
+        QAction *m_pSeparatorContextMenu; //leading separator
+        QList<QAction*> m_pActions;
+    };
+
+    QMap<QString, ActionGroup> m_actionGroups;
+
+    QAction *getActionFromGroupByName(const QString &name) const;
 
 signals:
     void subplotConfigSliderChanged(int type, int value);
@@ -153,6 +166,10 @@ public slots:
     void modifySubplotSliders(float left, float top, float right, float bottom, float wSpace, float hSpace);
 	void setLabelText(QString text);
     void replot();
+    void addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, 
+        const QString &tooltip, const QString &groupName, int position = -1);
+    void removeUserDefinedAction(const QString &name);
+    QWidget* createDialogEditProperties(bool showApplyButton, const QString &title = "");
 
     ito::RetVal copyToClipBoard();
 
