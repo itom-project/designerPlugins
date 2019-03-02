@@ -407,10 +407,10 @@ void ItomQwtPlot::loadStyles(bool overwriteDesignableProperties)
 
     foreach(DrawItem *item, m_pShapes)
     {
-        if (item && item->getAutoColor())
-        {
+        /*if (item && item->getAutoColor())
+        {*/
             item->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
-        }
+        //}
     }
 }
 

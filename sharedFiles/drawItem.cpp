@@ -48,7 +48,7 @@ class DrawItemPrivate
         QVector<QwtPlotMarker*> m_marker;
         char m_type;    
 
-        bool m_autoColor;
+        bool m_autoColor; //!< if true, the given shape brings it own valid color, which is used as line color. Else, the line color depends on the invalid color of the current color palette
         bool m_labelVisible;
 
         QColor m_markerColor;
@@ -91,6 +91,12 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     d->m_labelFont = QFont("Verdana", 10);
     //this pen is only used to set the style and the width of the elemets. The color is set to the inverse color of the curren palette
     d->m_elementPen = QPen(QBrush(Qt::red), 1, Qt::SolidLine);
+
+    if (shape.color().isValid())
+    {
+        d->m_lineColor = shape.color();
+        d->m_autoColor = false; //use the line color from the given shape, not from any inverse colors...
+    }
 
     d->m_labelTextColor = QColor(Qt::red);
 
@@ -894,16 +900,25 @@ void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor, cons
     if (d->m_markerColor != markerColor || d->m_lineColor != lineColor)
     {
         d->m_markerColor = markerColor;
-        d->m_lineColor = lineColor;
+
+        if (d->m_autoColor)
+        {
+            d->m_lineColor = lineColor;
+        }
+
         if (markerColor2 != QColor())
+        {
             d->m_markerColor2 = markerColor2;
+        }
         else
+        {
             d->m_markerColor2 = markerColor;
+        }
 
         if (d->m_fillBrush.style() != Qt::NoBrush)
         {
             int alpha = d->m_fillBrush.color().alpha();
-            QColor fillColor = lineColor;
+            QColor fillColor = d->m_lineColor;
             fillColor.setAlpha(alpha);
             d->m_fillBrush.setColor(fillColor);
         }
@@ -911,7 +926,7 @@ void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor, cons
         if (d->m_fillBrushSelected.style() != Qt::NoBrush)
         {
             int alpha = d->m_fillBrushSelected.color().alpha();
-            QColor fillColor = lineColor;
+            QColor fillColor = d->m_lineColor;
             fillColor.setAlpha(alpha);
             d->m_fillBrushSelected.setColor(fillColor);
         }   
@@ -1058,6 +1073,13 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
         d->m_shape = shape;
         QwtPlotShapeItem::setShape(path);
         QwtPlotShapeItem::setTitle(d->m_shape.name());
+
+        d->m_autoColor = true;
+        if (shape.color().isValid())
+        {
+            d->m_autoColor = false;
+            d->m_lineColor = shape.color();
+        }
 
         setSelected(d->m_selected, d->m_currentMarker); //to possibly adjust the position of markers
     }
