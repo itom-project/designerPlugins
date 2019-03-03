@@ -720,7 +720,7 @@ void MotorController::actuatorStatusChanged(QVector<int> status, QVector<double>
             style = "background-color: yellow";
 //            running = true;
         }
-        else if (status[i] & ito::actuatorInterrupted)
+        else if ((status[i] & ito::actuatorInterrupted) || (status[i] & ito::actuatorError))
         {
             style = "background-color: red";
         }
