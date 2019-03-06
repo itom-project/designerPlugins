@@ -134,7 +134,7 @@ public:
         for (vtkIdType cp = 0; cp < nr_points; ++cp)
         {
             // Copy the value at the specified field
-            if (!pcl_isfinite (cloud_->points[cp].x) || !pcl_isfinite (cloud_->points[cp].y) || !pcl_isfinite (cloud_->points[cp].z))
+            if (!std::isfinite(cloud_->points[cp].x) || !std::isfinite(cloud_->points[cp].y) || !std::isfinite(cloud_->points[cp].z))
             continue;
 
             const uint8_t* pt_data = reinterpret_cast<const uint8_t*> (&cloud_->points[cp]);
@@ -162,7 +162,7 @@ public:
                 fields_sum += field_data * field_data;
             }
 
-            if (!pcl_isfinite (field_data))
+            if (!std::isfinite(field_data))
                 continue;
 
             colors[j] =sqrtf(fields_sum);
