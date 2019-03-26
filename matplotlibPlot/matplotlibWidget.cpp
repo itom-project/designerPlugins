@@ -298,6 +298,17 @@ void MatplotlibWidget::paintRect(bool drawRect, int x /*= 0*/, int y /*= 0*/, in
     }
     else
     {
+        if (w < 0)
+        {
+            x += w;
+            w *= -1;
+        }
+
+        if (h < 0)
+        {
+            y += h;
+            h *= -1;
+        }
         
         m_rectItem->setRect(x, y, w, h);
         m_rectItem->setVisible(true);
