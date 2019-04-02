@@ -721,8 +721,15 @@ void Plot1DWidget::setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngin
 
         bool recalculateBoundaries = false;
 
-        if (m_pData->m_valueScaleAuto == true || m_pData->m_axisScaleAuto == true)
+        if (m_pData->m_valueScaleAuto == true)
         {
+            m_pData->m_valueMin = qQNaN();
+            recalculateBoundaries = true;
+        }
+
+        if (m_pData->m_axisScaleAuto == true)
+        {
+            m_pData->m_axisMin = qQNaN();
             recalculateBoundaries = true;
         }
 
@@ -752,8 +759,15 @@ void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine
 
         bool recalculateBoundaries = false;
 
-        if (m_pData->m_valueScaleAuto == true || m_pData->m_axisScaleAuto == true)
+        if (m_pData->m_valueScaleAuto == true)
         {
+            m_pData->m_valueMin = qQNaN();
+            recalculateBoundaries = true;
+        }
+
+        if (m_pData->m_axisScaleAuto == true)
+        {
+            m_pData->m_axisMin = qQNaN();
             recalculateBoundaries = true;
         }
 
@@ -2637,7 +2651,11 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
         case Qt::YAxis:
             if (autoCalcLimits) 
             {
-                m_pData->m_valueScaleAuto = true;
+                if (!m_pData->m_valueScaleAuto)
+                {
+                    m_pData->m_valueMin = qQNaN();
+                    m_pData->m_valueScaleAuto = true;
+                }
                 recalculateBoundaries = true;
             }
             else
@@ -2650,7 +2668,11 @@ ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLi
         case Qt::XAxis:
             if (autoCalcLimits) 
             {
-                m_pData->m_axisScaleAuto = true;
+                if (!m_pData->m_axisScaleAuto)
+                {
+                    m_pData->m_axisMin = qQNaN();
+                    m_pData->m_axisScaleAuto = true;
+                }
                 recalculateBoundaries = true;
             }
             else
@@ -2767,11 +2789,11 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
     QStack<QRectF> prevStack = zoomer()->zoomStack();
     QRectF initialRect = zoomer()->zoomRect();
     int initialIdx = zoomer()->zoomRectIndex();
-    if (m_pData->m_valueScaleAuto || m_pData->m_axisScaleAuto)
+    if ((m_pData->m_valueScaleAuto && qIsNaN(m_pData->m_valueMin)) || 
+        (m_pData->m_axisScaleAuto && qIsNaN(m_pData->m_axisMin)))
     {
         QRectF rect;
         
-
         foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
             QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
@@ -2785,13 +2807,13 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             }
         }
 
-        if (m_pData->m_valueScaleAuto)
+        if (m_pData->m_valueScaleAuto && qIsNaN(m_pData->m_valueMin))
         {
             m_pData->m_valueMin = rect.top();
             m_pData->m_valueMax = rect.bottom();
         }
 
-        if (m_pData->m_axisScaleAuto)
+        if (m_pData->m_axisScaleAuto && qIsNaN(m_pData->m_axisMin))
         {
             m_pData->m_axisMin = rect.left();
             m_pData->m_axisMax = rect.right();
@@ -2799,7 +2821,6 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
 
         if (initialIdx == 0)// if the plot wasn't zoomed we need to adjust the window to the current bounds
         {
-
             zoomer()->zoom(QRectF(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin)));
             zoomer()->rescale(false);
 
@@ -2835,7 +2856,10 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             updateGeometry(); //if the interval changes, the tick positions... change as well. Therefore, the sizeHint() might change, too, possibly allowing a smaller plot window
 
             QStack<QRectF> stack = zoomer()->zoomStack();
-            stack[0] = zoom;
+            if ((initialIdx >= 0) && (initialIdx < stack.size()))
+            {
+                stack[initialIdx] = zoom;
+            }
             zoomer()->setZoomStack(stack, initialIdx);
 
             zoomer()->rescale(false);
@@ -3774,10 +3798,25 @@ void Plot1DWidget::mnuScaleSettings()
     //update m_data to current values
     synchronizeCurrentScaleValues();
 
+    //if the following two values are not set to false but to the current value of the auto scale values,
+    //a re-calc of the the auto limits is only executed, if a switch from manual to automatic boundaries happens.
+    bool m_oldAxisScaleAuto = false; //m_pData->m_axisScaleAuto;
+    bool m_oldValueScaleAuto = false; //m_pData->m_valueScaleAuto;
+
     Dialog1DScale *dlg = new Dialog1DScale(*m_pData, qobject_cast<QWidget*>(parent()));
     if (dlg->exec() == QDialog::Accepted)
     {
         dlg->getData((*m_pData));
+
+        if (!m_oldAxisScaleAuto && m_pData->m_axisScaleAuto)
+        {
+            m_pData->m_axisMin = qQNaN(); //reforce to re-calc the axis min / max boundaries
+        }
+
+        if (!m_oldValueScaleAuto && m_pData->m_valueScaleAuto)
+        {
+            m_pData->m_valueMin = qQNaN(); //reforce to re-calc the value min / max boundaries
+        }
         updateScaleValues();
     }
 

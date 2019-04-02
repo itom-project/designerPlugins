@@ -796,11 +796,21 @@ ito::AutoInterval Itom1DQwtPlot::getYAxisInterval(void) const
 //----------------------------------------------------------------------------------------------------------------------------------        
 void Itom1DQwtPlot::setYAxisInterval(ito::AutoInterval interval) 
 { 
-    d->m_pData->m_valueMin = interval.minimum();
-    d->m_pData->m_valueMax = interval.maximum();
-    d->m_pData->m_valueScaleAuto = interval.isAuto();
-    m_pContent->updateScaleValues( interval.isAuto() ); 
-    updatePropertyDock();
+    if ((interval.minimum() != d->m_pData->m_valueMin) ||
+        (interval.maximum() != d->m_pData->m_valueMax) ||
+        (interval.isAuto() != d->m_pData->m_valueScaleAuto))
+    {
+        d->m_pData->m_valueMin = interval.minimum();
+        d->m_pData->m_valueMax = interval.maximum();
+        if (d->m_pData->m_valueScaleAuto == false && interval.isAuto())
+        {
+            //reforce re-calc of intervals by settings m_valueMin to qNaN
+            d->m_pData->m_valueMin = qQNaN();
+        }
+        d->m_pData->m_valueScaleAuto = interval.isAuto();
+        m_pContent->updateScaleValues(interval.isAuto());
+        updatePropertyDock();
+    }
 }   
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -814,11 +824,21 @@ ito::AutoInterval Itom1DQwtPlot::getXAxisInterval(void) const
 //----------------------------------------------------------------------------------------------------------------------------------        
 void Itom1DQwtPlot::setXAxisInterval(ito::AutoInterval interval) 
 { 
-    d->m_pData->m_axisMin = interval.minimum();
-    d->m_pData->m_axisMax = interval.maximum();
-    d->m_pData->m_axisScaleAuto = interval.isAuto();
-    m_pContent->updateScaleValues( interval.isAuto() );
-    updatePropertyDock();
+    if ((interval.minimum() != d->m_pData->m_axisMin) ||
+        (interval.maximum() != d->m_pData->m_axisMax) ||
+        (interval.isAuto() != d->m_pData->m_axisScaleAuto))
+    {
+        d->m_pData->m_axisMin = interval.minimum();
+        d->m_pData->m_axisMax = interval.maximum();
+        if (d->m_pData->m_axisScaleAuto == false && interval.isAuto())
+        {
+            //reforce re-calc of intervals by settings m_valueMin to qNaN
+            d->m_pData->m_axisMin = qQNaN();
+        }
+        d->m_pData->m_axisScaleAuto = interval.isAuto();
+        m_pContent->updateScaleValues(interval.isAuto());
+        updatePropertyDock();
+    }
 }  
 
 //----------------------------------------------------------------------------------------------------------------------------------
