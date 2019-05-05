@@ -76,7 +76,8 @@ Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
         ui.radioManualY->setChecked(true);
     }
 
-    getDataTypeRange(data.m_dataType, m_minY, m_maxY);
+    //it is not necessary to restrict the value range, since it might be desired to set a higher axis interval than the datatype of the displayed dataObject.
+    //getDataTypeRange(data.m_dataType, m_minY, m_maxY);
     
     ui.txtMinY->setText(m_locale.toString(data.m_valueMin, 'g') );
     ui.txtMaxY->setText(m_locale.toString(data.m_valueMax, 'g') );
@@ -131,6 +132,7 @@ void Dialog1DScale::getDataTypeRange(ito::tDataType type, double &min, double &m
         max = std::numeric_limits<ito::int8>::max();
         break;
     case ito::tUInt8:
+    case ito::tRGBA32:
         min = std::numeric_limits<ito::uint8>::min();
         max = std::numeric_limits<ito::uint8>::max();
         break;

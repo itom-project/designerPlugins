@@ -94,7 +94,8 @@ Dialog2DScale::Dialog2DScale(const InternalData &data, QWidget *parent) :
         ui.radioManualValue->setChecked(true);
     }
 
-    getDataTypeRange(data.m_dataType, m_minValue, m_maxValue);
+    //it is not necessary to restrict the value range, since it might be desired to set a higher axis interval than the datatype of the displayed dataObject.
+    //getDataTypeRange(data.m_dataType, m_minValue, m_maxValue);
 
     ui.groupValue->setEnabled(data.m_dataType != ito::tRGBA32); //rgba32 data objects have no color map and can therefore not be cropped.
 
