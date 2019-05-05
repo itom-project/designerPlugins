@@ -242,7 +242,7 @@ void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
         m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
-        m_pContent->setInterval(Qt::YAxis, d->m_pData->m_valueScaleAuto, d->m_pData->m_valueMin, d->m_pData->m_valueMax); //replot is done here 
+        m_pContent->updateInterval(Qt::YAxis, *(d->m_pData)); //replot is done here 
     }
     updatePropertyDock();
 }

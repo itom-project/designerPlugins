@@ -804,50 +804,7 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
         connect(m_pLegend, SIGNAL(checked(QVariant,bool,int)), this, SLOT(legendItemChecked(QVariant,bool)));
         insertLegend(m_pLegend, position);
 
-        if (m_pLegend)
-        {
-            QwtLegendLabel *legendLabel = NULL;
-            QSize maxLegendIconSize(m_pLegendLabelWidth,0);
-            foreach (QwtPlotCurve *item, m_plotCurveItems)
-            {
-                item->setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
-                item->setLegendAttribute(QwtPlotCurve::LegendShowSymbol, true);
-                maxLegendIconSize.rheight() = std::max(maxLegendIconSize.height(), item->legendIconSize().height());
-                //maxLegendIconSize.rwidth() = std::max(maxLegendIconSize.width(), item->legendIconSize().width());
-                legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
-
-                if (legendLabel)
-                {
-                    //set font
-                    QwtText text(legendLabel->data().title());
-                    text.setFont(m_legendFont);
-                    legendLabel->setText(text);
-
-
-                    //TODO: the following connection is lost once the single legend entry becomes invisible. If it is displayed again, the signal is not re-established. Changing the legend-position
-                    //re-connects it again!
-                    connect(legendLabel, SIGNAL(checked(bool)), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
-                    if (legendLabel)
-                    {
-                        //the check status is again set in QwtPlotCurveProperty::setLegendVisible
-                        legendLabel->setChecked(item->isVisible());
-                    }
-                }
-            }
-
-			//maxLegendIconSize.rwidth() = m_pLengendLineLength;
-            //max icon size: 30w, 18h
-            //maxLegendIconSize.rwidth() = std::min(maxLegendIconSize.width(), 30);
-            maxLegendIconSize.rheight() = std::min(maxLegendIconSize.height(), 18);
-
-
-
-            //adjust legend icon size
-            foreach (QwtPlotCurve *item, m_plotCurveItems)
-            {
-                item->setLegendIconSize(maxLegendIconSize);
-            }
-        }
+        updateLegendItems();
 
         foreach(QAction *a, m_pMnuLegendSwitch->actions())
         {
@@ -882,6 +839,58 @@ void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
     m_legendVisible = visible;
     m_legendPosition = position;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::updateLegendItems()
+{
+    if (m_pLegend)
+    {
+        QwtLegendLabel *legendLabel = NULL;
+        QSize maxLegendIconSize(m_pLegendLabelWidth, 0);
+        WidgetCurveProperties* widgetCurveProperties = (WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties();
+
+        foreach(QwtPlotCurve *item, m_plotCurveItems)
+        {
+            item->setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
+            item->setLegendAttribute(QwtPlotCurve::LegendShowSymbol, true);
+            maxLegendIconSize.rheight() = std::max(maxLegendIconSize.height(), item->legendIconSize().height());
+            legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
+
+            if (legendLabel)
+            {
+                //set font
+                QwtText text(legendLabel->data().title());
+                text.setFont(m_legendFont);
+                legendLabel->setText(text);
+
+                //at first try to disconnect the signal before connecting it again...
+                disconnect(legendLabel, SIGNAL(checked(bool)), widgetCurveProperties, SLOT(on_listWidget_itemSelectionChanged()));
+
+                //TODO: the following connection is lost once the single legend entry becomes invisible. If it is displayed again, the signal is not re-established. Changing the legend-position
+                //re-connects it again!
+                connect(legendLabel, SIGNAL(checked(bool)), widgetCurveProperties, SLOT(on_listWidget_itemSelectionChanged()));
+
+                if (legendLabel)
+                {
+                    //the check status is again set in QwtPlotCurveProperty::setLegendVisible
+                    legendLabel->setChecked(item->isVisible());
+                }
+            }
+        }
+
+        //maxLegendIconSize.rwidth() = m_pLengendLineLength;
+        //max icon size: 30w, 18h
+        //maxLegendIconSize.rwidth() = std::min(maxLegendIconSize.width(), 30);
+        maxLegendIconSize.rheight() = std::min(maxLegendIconSize.height(), 18);
+
+        //adjust legend icon size
+        foreach(QwtPlotCurve *item, m_plotCurveItems)
+        {
+            item->setLegendIconSize(maxLegendIconSize);
+        }
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendLabelWidth(const int &width)
 {
@@ -899,6 +908,7 @@ void Plot1DWidget::setLegendLabelWidth(const int &width)
 		//max icon height: 18
 		maxLegendIconSize.rheight() = std::min(maxLegendIconSize.height(), 18);
 		m_pLegendLabelWidth = maxLegendIconSize.rwidth();
+
 		//adjust legend icon size
 		foreach(QwtPlotCurve *item, m_plotCurveItems)
 		{
@@ -1185,14 +1195,15 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         int height = dims > 1 ? dataObj->getSize(dims - 2) : (width == 0) ? 0 : 1;
 		m_pData->m_dataType = (ito::tDataType)dataObj->getType();
 
-        if (dataObj->getType() == ito::tComplex128 || dataObj->getType() == ito::tComplex64)
+        if (m_pData->m_dataType == ito::tComplex128 || 
+            m_pData->m_dataType == ito::tComplex64)
         {
             enableObjectGUIElements(2 /*complex*/ | (dims > 1 ? 0x10 : 0x00) /*multi-layer: yes : no*/);
             m_cmplxState = true;
             m_colorState = false;
             m_pRescaleParent->setVisible(bounds.size() != 1 && m_hasParentForRescale); //a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
         }
-        else if (dataObj->getType() == ito::tRGBA32)
+        else if (m_pData->m_dataType == ito::tRGBA32)
         {
             enableObjectGUIElements(1 /*rgba, no multi-layer*/);
             m_colorState = true;
@@ -1214,7 +1225,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
         else
         {
-            for (int i = bounds.size() == 3 ? 1 : 0; i < bounds.size(); ++i) //if a 3d object is displayed, the first bounds is the plane, however the plane is no reason for deleting old markers
+            //if a 3d object is displayed, the first bounds is the plane, however the plane is no reason for deleting old markers
+            for (int i = bounds.size() == 3 ? 1 : 0; i < bounds.size(); ++i) 
             {
                 if (bounds[i] != m_currentBounds[i])
                 {
@@ -1223,16 +1235,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
             }
         }
+
         if (m_currentBounds != bounds)
         {
             boundsChanged = true;
+            m_currentBounds = bounds;
         }
-        m_currentBounds = bounds;
         
-
         ItomQwtPlotEnums::MultiLineMode multiLineMode = m_pData->m_multiLine;
 
-        if (dataObj->getType() == ito::tRGBA32)
+        if (m_pData->m_dataType == ito::tRGBA32)
         {
             m_layerState = false;
             if (bounds.size() == 0) m_pData->m_multiLine = width == 1 ? ItomQwtPlotEnums::FirstCol : ItomQwtPlotEnums::FirstRow;
@@ -1346,31 +1358,36 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         //check if current number of curves does not correspond to height. If so, adjust the number of curves to the required number
 		bool refreshWidgetCurveProperties = 0;
+        QwtPlotCurveProperty *curveProp = NULL;
+
+        //remove and delete all 'old' curves, whose index is bigger than 'numCurves'
         while (m_plotCurveItems.size() > numCurves)
         {
             curve = m_plotCurveItems.takeLast();
-            m_plotCurvePropertyItems.takeLast();
+            curveProp = m_plotCurvePropertyItems.takeLast();
+            DELETE_AND_SET_NULL(curveProp);
+
             curve->detach();
-            delete curve;
+            DELETE_AND_SET_NULL(curve);
+
 			refreshWidgetCurveProperties = 1;
-		
         }
 
+        //add new curves to the canvas until a number of 'numCurves' exists.
         bool valid;
         ito::DataObjectTagType tag;
-        QList<QString> curveNames;
+        QList<QString> curveNames = m_legendTitles.mid(0, m_plotCurveItems.size());
 
         while (m_plotCurveItems.size() < numCurves)
         {
             index = m_plotCurveItems.size();
-            if (m_legendTitles.size() == 0)
+            if (m_legendTitles.size() <= index)
             {
 #if QT_VERSION >= 0x050400
                 tag = dataObj->getTag(QString("legendTitle%1").arg(index).toLatin1().toStdString(), valid);
 #else
                 tag = dataObj->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
 #endif
-                
                 
 				if(valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
 				{
@@ -1383,16 +1400,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     curveNames.append(tr("curve %1").arg(index));
 				}	
             }
-            else if (m_legendTitles.size() > index)
+            else // if (m_legendTitles.size() > index)
             {
                 dObjCurve = new QwtPlotCurveDataObject(m_legendTitles[index]);
                 curveNames.append(m_legendTitles[index]);
-            }
-            else
-            {
-                dObjCurve = new QwtPlotCurveDataObject("");
-                curveNames.append("");
-            }            
+            }           
 
             dObjCurve->setData(NULL);
             dObjCurve->setRenderHint(QwtPlotItem::RenderAntialiased, m_antiAliased);
@@ -1420,62 +1432,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 dObjCurve->setSymbol(new QwtSymbol(m_pData->m_lineSymbole, QBrush(Qt::white), QPen(m_colorList[colorIndex]),  QSize(m_pData->m_lineSymboleSize,m_pData->m_lineSymboleSize)));
             }
 
-            switch(m_qwtCurveStyle)
-            {
-                case ItomQwtPlotEnums::NoCurve:
-                    dObjCurve->setStyle(QwtPlotCurve::NoCurve);
-                    break;
-                default:
-                case ItomQwtPlotEnums::Lines:
-                    dObjCurve->setOrientation(Qt::Vertical);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::Lines);
-                    break;
-                case ItomQwtPlotEnums::FittedLines:
-                    dObjCurve->setOrientation(Qt::Vertical);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, true);
-                    dObjCurve->setStyle(QwtPlotCurve::Lines);
-                    break;
-                case ItomQwtPlotEnums::StepsLeft:
-                    dObjCurve->setOrientation(Qt::Vertical);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::Steps);
-                    break;
-                case ItomQwtPlotEnums::StepsRight:
-                    dObjCurve->setOrientation(Qt::Vertical);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, true);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::Steps);
-                    break;
-                case ItomQwtPlotEnums::Steps:
-                    dObjCurve->setOrientation(Qt::Vertical);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::UserCurve);
-                    break;
-                case ItomQwtPlotEnums::SticksHorizontal:
-                    dObjCurve->setOrientation(Qt::Horizontal);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::Sticks);
-                    break;
-                case ItomQwtPlotEnums::Sticks:
-                case ItomQwtPlotEnums::SticksVertical:
-                    dObjCurve->setOrientation(Qt::Vertical);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::Sticks);
-                    break;
-                case ItomQwtPlotEnums::Dots:
-                    dObjCurve->setOrientation(Qt::Vertical);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-                    dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-                    dObjCurve->setStyle(QwtPlotCurve::Dots);
-                    break;
-            }
+            setQwtLineStyle(dObjCurve, m_qwtCurveStyle);
 
             dObjCurve->setBaseline(m_baseLine);
             dObjCurve->setCurveFilled(m_curveFilled);
@@ -1514,9 +1471,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 		if (refreshWidgetCurveProperties == 1) // if true a curve was added or deleted and the widget has to be updated
 		{	
 			((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties())->updateProperties();
+            updateLegendItems();
 
 		}
-        if (bounds.size() == 0)
+        if (bounds.size() == 0) //default plot
         {
             QVector<QPointF> pts(2);
             QVector<QPointF> ptsX(2);
@@ -1794,9 +1752,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 if (m_colorState)
                 {
-                    if (m_pData->m_colorLine == ItomQwtPlotEnums::Gray) seriesData->setColorState(DataObjectSeriesData::grayColor);
-                    else if (m_pData->m_colorLine == ItomQwtPlotEnums::RGB || m_pData->m_colorLine == ItomQwtPlotEnums::RGBA) seriesData->setColorState(n);
-                    else if (m_pData->m_colorLine == ItomQwtPlotEnums::RGBGray) seriesData->setColorState(n == 3 ? 4 : n);
+                    if (m_pData->m_colorLine == ItomQwtPlotEnums::Gray)
+                    {
+                        seriesData->setColorState(DataObjectSeriesData::grayColor);
+                    }
+                    else if (m_pData->m_colorLine == ItomQwtPlotEnums::RGB || m_pData->m_colorLine == ItomQwtPlotEnums::RGBA)
+                    {
+                        seriesData->setColorState(n);
+                    }
+                    else if (m_pData->m_colorLine == ItomQwtPlotEnums::RGBGray)
+                    {
+                        seriesData->setColorState(n == 3 ? 4 : n);
+                    }
                 }
             }
 
@@ -1849,11 +1816,21 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     {
         QByteArray hash = seriesData->getHash();
         QByteArray hashX(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject ? seriesData->getHash() : "");
-        if (hash != m_hash || hashX != m_hashX|| m_pData->m_valueScaleAuto)
+        if (hash != m_hash || hashX != m_hashX || m_pData->m_valueScaleAuto)
         {
             updatePickerPosition(true);
 
-            QRectF rect = seriesData->boundingRect();
+            //get the bounding rectangle of all bounding rectangles of all curves
+            QRectF rect;
+            foreach(QwtPlotCurve *curve, m_plotCurveItems)
+            {
+#if QT_VERSION >= 0x050000
+                rect |= curve->boundingRect();
+#else
+                rect = rect.unite(curve->boundingRect());
+#endif
+            }
+
             if (rect.width() < 0 || rect.height() <0)
             {
                 axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Inverted);
@@ -1862,6 +1839,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             {
                 axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Inverted, false);
             }
+
             if (m_pData->m_valueScaleAuto)
             {
                 if (qIsFinite(rect.height()))
@@ -1897,7 +1875,18 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
             updatePickerPosition(true);
 
-            QRectF rect = seriesData->boundingRect();
+            
+            //get the bounding rectangle of all bounding rectangles of all curves
+            QRectF rect;
+            foreach(QwtPlotCurve *curve, m_plotCurveItems)
+            {
+#if QT_VERSION >= 0x050000
+                rect |= curve->boundingRect();
+#else
+                rect = rect.unite(curve->boundingRect());
+#endif
+            }
+
             if (m_pData->m_valueScaleAuto)
             {
                 m_pData->m_valueMin = rect.top();
@@ -2643,43 +2632,37 @@ void Plot1DWidget::stickPickerToSampleIdx(Picker *m, int idx, int dir)
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Plot1DWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
+ito::RetVal Plot1DWidget::updateInterval(const Qt::Axis axis, const InternalData &data)
 {
     bool recalculateBoundaries = false;
     switch(axis)
     {
         case Qt::YAxis:
-            if (autoCalcLimits) 
+            if (data.m_valueScaleAuto)
             {
-                if (!m_pData->m_valueScaleAuto)
-                {
-                    m_pData->m_valueMin = qQNaN();
-                    m_pData->m_valueScaleAuto = true;
-                }
+                m_pData->m_valueScaleAuto = true;
+                m_pData->m_valueMin = qQNaN();
                 recalculateBoundaries = true;
             }
             else
             {
                 m_pData->m_valueScaleAuto = false;
-                m_pData->m_valueMin = minValue;
-                m_pData->m_valueMax = maxValue;
+                m_pData->m_valueMin = data.m_valueMin;
+                m_pData->m_valueMax = data.m_valueMax;
             }
         break;
         case Qt::XAxis:
-            if (autoCalcLimits) 
+            if (data.m_axisScaleAuto) 
             {
-                if (!m_pData->m_axisScaleAuto)
-                {
-                    m_pData->m_axisMin = qQNaN();
-                    m_pData->m_axisScaleAuto = true;
-                }
+                m_pData->m_axisScaleAuto = true;
+                m_pData->m_axisMin = qQNaN();
                 recalculateBoundaries = true;
             }
             else
             {
                 m_pData->m_axisScaleAuto = false;
-                m_pData->m_axisMin = minValue;
-                m_pData->m_axisMax = maxValue;                        
+                m_pData->m_axisMin = data.m_axisMin;
+                m_pData->m_axisMax = data.m_axisMax;                        
             }
         break;
     }
@@ -2800,9 +2783,9 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             if (qIsFinite(tmpRect.height()))
             {
     #if QT_VERSION >= 0x050000
-                rect = rect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
+                rect = rect.united(tmpRect);
     #else
-                rect = rect.unite(((DataObjectSeriesData *)curve->data())->boundingRect());
+                rect = rect.unite(tmpRect);
     #endif
             }
         }
@@ -3011,7 +2994,11 @@ void Plot1DWidget::home()
     QRectF boundingRect;
     foreach(QwtPlotCurve *curve, m_plotCurveItems)
     {
+#if QT_VERSION >= 0x050000
         boundingRect = boundingRect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
+#else
+        boundingRect = boundingRect.unite(((DataObjectSeriesData *)curve->data())->boundingRect());
+#endif
     }
 
     if (currentZoomStack.empty())
@@ -3287,69 +3274,78 @@ void Plot1DWidget::updatePickerStyle(void)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setQwtLineStyle(const ItomQwtPlotEnums::CurveStyle &style)
 {
-    m_qwtCurveStyle = style;
-
-    foreach(QwtPlotCurve *dObjCurve, m_plotCurveItems)
+    if (style != m_qwtCurveStyle)
     {
-        switch(m_qwtCurveStyle)
+        m_qwtCurveStyle = style;
+
+        foreach(QwtPlotCurve *dObjCurve, m_plotCurveItems)
         {
-        case ItomQwtPlotEnums::NoCurve:
-            dObjCurve->setStyle(QwtPlotCurve::NoCurve);
-            break;
-        default:
-        case ItomQwtPlotEnums::Lines:
-            dObjCurve->setOrientation(Qt::Vertical);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-            dObjCurve->setStyle(QwtPlotCurve::Lines);
-            break;
-        case ItomQwtPlotEnums::FittedLines:
-            dObjCurve->setOrientation(Qt::Vertical);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, true);
-            dObjCurve->setStyle(QwtPlotCurve::Lines);
-            break;
-        case ItomQwtPlotEnums::StepsLeft:
-            dObjCurve->setOrientation(Qt::Vertical);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-            dObjCurve->setStyle(QwtPlotCurve::Steps);
-            break;
-        case ItomQwtPlotEnums::StepsRight:
-            dObjCurve->setOrientation(Qt::Vertical);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, true);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-            dObjCurve->setStyle(QwtPlotCurve::Steps);
-            break;
-        case ItomQwtPlotEnums::Steps:
-            dObjCurve->setOrientation(Qt::Vertical);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-            dObjCurve->setStyle(QwtPlotCurve::UserCurve);
-            break;
-        case ItomQwtPlotEnums::SticksHorizontal:
-            dObjCurve->setOrientation(Qt::Horizontal);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-            dObjCurve->setStyle(QwtPlotCurve::Sticks);
-            break;
-        case ItomQwtPlotEnums::Sticks:
-        case ItomQwtPlotEnums::SticksVertical:
-            dObjCurve->setOrientation(Qt::Vertical);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-            dObjCurve->setStyle(QwtPlotCurve::Sticks);
-            break;
-        case ItomQwtPlotEnums::Dots:
-            dObjCurve->setOrientation(Qt::Vertical);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
-            dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-            dObjCurve->setStyle(QwtPlotCurve::Dots);
-            break;
+            setQwtLineStyle(dObjCurve, style);
         }
+        applyLegendFont();
+        replot();
     }
-    applyLegendFont();
-    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setQwtLineStyle(QwtPlotCurve *dObjCurve, const ItomQwtPlotEnums::CurveStyle &style)
+{
+    switch (style)
+    {
+    case ItomQwtPlotEnums::NoCurve:
+        dObjCurve->setStyle(QwtPlotCurve::NoCurve);
+        break;
+    default:
+    case ItomQwtPlotEnums::Lines:
+        dObjCurve->setOrientation(Qt::Vertical);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+        dObjCurve->setStyle(QwtPlotCurve::Lines);
+        break;
+    case ItomQwtPlotEnums::FittedLines:
+        dObjCurve->setOrientation(Qt::Vertical);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, true);
+        dObjCurve->setStyle(QwtPlotCurve::Lines);
+        break;
+    case ItomQwtPlotEnums::StepsLeft:
+        dObjCurve->setOrientation(Qt::Vertical);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+        dObjCurve->setStyle(QwtPlotCurve::Steps);
+        break;
+    case ItomQwtPlotEnums::StepsRight:
+        dObjCurve->setOrientation(Qt::Vertical);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, true);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+        dObjCurve->setStyle(QwtPlotCurve::Steps);
+        break;
+    case ItomQwtPlotEnums::Steps:
+        dObjCurve->setOrientation(Qt::Vertical);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+        dObjCurve->setStyle(QwtPlotCurve::UserCurve);
+        break;
+    case ItomQwtPlotEnums::SticksHorizontal:
+        dObjCurve->setOrientation(Qt::Horizontal);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+        dObjCurve->setStyle(QwtPlotCurve::Sticks);
+        break;
+    case ItomQwtPlotEnums::Sticks:
+    case ItomQwtPlotEnums::SticksVertical:
+        dObjCurve->setOrientation(Qt::Vertical);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+        dObjCurve->setStyle(QwtPlotCurve::Sticks);
+        break;
+    case ItomQwtPlotEnums::Dots:
+        dObjCurve->setOrientation(Qt::Vertical);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Inverted, false);
+        dObjCurve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+        dObjCurve->setStyle(QwtPlotCurve::Dots);
+        break;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3676,7 +3672,7 @@ void Plot1DWidget::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx)
         refreshPlot(p->getInputParam("source")->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
-        setInterval(Qt::YAxis, m_pData->m_valueScaleAuto, m_pData->m_valueMin, m_pData->m_valueMax); //replot is done here 
+        updateInterval(Qt::YAxis, *m_pData); //replot is done here 
         p->updatePropertyDock();
     }
 }
@@ -3703,7 +3699,7 @@ void Plot1DWidget::setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx)
         refreshPlot(p->getInputParam("source")->getVal<ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
-        setInterval(Qt::YAxis, m_pData->m_valueScaleAuto, m_pData->m_valueMin, m_pData->m_valueMax); //replot is done here 
+        updateInterval(Qt::YAxis, *m_pData); //replot is done here 
         p->updatePropertyDock();
     }
 }
@@ -3736,8 +3732,9 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
         }
     }
 	m_pComplexStyle = (ItomQwtPlotEnums::ComplexType)idx;
+
     //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
-    setInterval(Qt::YAxis, m_pData->m_valueScaleAuto, m_pData->m_valueMin, m_pData->m_valueMax); //replot is done here 
+    updateInterval(Qt::YAxis, *m_pData); //replot is done here 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

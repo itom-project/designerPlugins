@@ -92,7 +92,9 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         QPointF sample(size_t n) const;
 
+        //returns the bounding box in axis coordinates for this line
         QRectF boundingRect() const;
+
         RetVal getMinMaxLoc(double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const;
         RetVal getMinMaxLocCropped(const QwtInterval &xInterval, const QwtInterval &yInterval, double &min, double &max, int &minSampleIdx, int &maxSampleIdx) const; //!< returns retWarning if no valid points are within xInterval and yInterval
 
@@ -107,8 +109,6 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         inline void setCmplxState(ItomQwtPlotEnums::ComplexType state) { m_cmplxState = state; }
         inline ItomQwtPlotEnums::ComplexType getCmplxState() const { return m_cmplxState; }
-
-        ito::DataObject getResampledDataObject();
 
         virtual int getPosToPix(const double physx, const double physy = -1) const;
         

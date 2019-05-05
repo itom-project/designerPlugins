@@ -67,7 +67,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>(), const ito::DataObject* xVec = NULL);
 
-        ito::RetVal setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue);
+        ito::RetVal updateInterval(const Qt::Axis axis, const InternalData &data);
 
         void setZoomerEnable(const bool checked);
         void setPickerEnable(const bool checked);
@@ -81,6 +81,7 @@ class Plot1DWidget : public ItomQwtPlot
         ito::RetVal clearPicker(int id = -1, bool doReplot = true);
 
         void setLegendPosition(LegendPosition position, bool visible);
+        
 		void setLegendLabelWidth(const int &width);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
 		void toggleLegendLabel(QwtPlotCurve* curve, const bool state);
@@ -139,12 +140,14 @@ class Plot1DWidget : public ItomQwtPlot
         void setLineWidth(const qreal &width);
         void setLineStyle(const Qt::PenStyle &style);
         void setQwtLineStyle(const ItomQwtPlotEnums::CurveStyle &style);
+        void setQwtLineStyle(QwtPlotCurve *dObjCurve, const ItomQwtPlotEnums::CurveStyle &style);
         void setBaseLine(const qreal &line);
         void setCurveFilled();
         //void setStickOrientation(const qreal &line);
         void setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
         void setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
+        void updateLegendItems();
 
         void home();
 
@@ -168,6 +171,8 @@ class Plot1DWidget : public ItomQwtPlot
         ito::RetVal validateXData(const ito::DataObject* dataObj, const ito::DataObject* xVec, const QVector<QPointF> &bounds);
         inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
 
+
+
         QList<QwtPlotCurve*> m_plotCurveItems;
         QList<QwtPlotCurveProperty*> m_plotCurvePropertyItems; //sychrone with m_plotCurveItems. Every item is derived from QObject and therefore propagate a Q_PROPERTY based set of properties for each curve!
         QwtPlotGrid *m_pPlotGrid;
@@ -182,7 +187,7 @@ class Plot1DWidget : public ItomQwtPlot
         bool m_yDirect;
         bool m_cmplxState;
         bool m_colorState;
-        bool m_layerState;
+        bool m_layerState; //true: lines from different planes of the input data object are shown, false: lines from one plane only are displayed (default)
         Itom1DQwtPlot::GridStyle m_gridStyle;
 
         //unsigned char m_autoLineColIndex;
@@ -258,9 +263,6 @@ class Plot1DWidget : public ItomQwtPlot
         QRectF base;
 
     signals:
-
-        
-
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
 		void curveChanged();
@@ -304,7 +306,7 @@ struct InternalData
         m_axisScaleAuto(1),
         m_axisMin(0),
         m_axisMax(0),
-        m_forceValueParsing(1),
+        m_forceValueParsing(true),
         m_lineSymboleSize(8),
         m_multiLine(ItomQwtPlotEnums::AutoRowCol),
         m_colorLine(ItomQwtPlotEnums::AutoColor),

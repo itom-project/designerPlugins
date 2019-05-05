@@ -1597,223 +1597,11 @@ void DataObjectSeriesData::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, 
     }
 }
 
-//------------------------------------------------------------------------------------------------------------
-ito::DataObject DataObjectSeriesData::getResampledDataObject()
-{
-    //if (m_plotPts.size() > 1)
-    //{
-    //    //setRasterObj();
-
-    //    ito::DataObject temp(1, m_plotPts.size(), ito::tFloat64);
-    //    ito::float64* ptrTemp = ((ito::float64*)((cv::Mat*)temp.get_mdata()[0])->ptr(0));
-
-    //    QPointF val = sample(0);
-    //    
-    //    double offset = val.x();
-    //    double scale = val.x();
-    //    *(ptrTemp++) = val.y();
-
-    //    val = sample(1);
-    //    scale -= val.x();
-    //    offset = offset/scale;
-
-    //    *(ptrTemp++) = val.y();
-
-    //    temp.setAxisScale(1, scale);
-    //    temp.setAxisOffset(1, offset);
-
-    //    for (int i = 2; i < m_plotPts.size(); i++)
-    //    {
-    //        *(ptrTemp++) = sample(i).y();
-    //    }
-
-    //    //releaseRasterObj();
-    //    return temp;
-    //}
-    
-
-    return ito::DataObject();
-}
-
-////----------------------------------------------------------------------------------------------------------------------------------
-//QRectF DataObjectSeriesData::boundingRect() const
-//{
-//    QRectF res;
-//
-//    if (m_pDataObj)
-//    {
-//        double max = -1.0e308;
-//        double min = 1.0e308;
-//
-//        switch(m_dir)
-//        {
-//        case dirZ:
-//
-//            res.setX( m_pointsZ.xLeft );
-//            res.setY( m_pointsZ.xLeft + m_pointsZ.xStepSize * (m_numPts -1) );
-//
-//            switch(m_pDataObj->getType())
-//            {
-//                case ito::tInt8:
-//                    findMinMaxInZ<int8>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tUInt8:
-//                    findMinMaxInZ<uint8>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tInt16:
-//                    findMinMaxInZ<int16>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tUInt16:
-//                    findMinMaxInZ<uint16>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tInt32:
-//                    findMinMaxInZ<int32>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tUInt32:
-//                    findMinMaxInZ<uint32>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tFloat32:
-//                    findMinMaxInZ<float32>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tFloat64:
-//                    findMinMaxInZ<float64>(m_pDataObj, m_startPhysOrg, min, max);
-//                break;
-//                case ito::tComplex64:
-//                    findMinMaxInZ<complex64>(m_pDataObj, m_startPhysOrg, min, max, m_cmplxState);
-//                break;
-//                case ito::tComplex128:
-//                    findMinMaxInZ<complex128>(m_pDataObj, m_startPhysOrg, min, max, m_cmplxState);
-//                break;
-//            }
-//            break;
-//
-//        case dirX:
-//
-//            res.setX( m_pointsX.xLeft );
-//            res.setY( m_pointsX.xLeft + m_pointsX.xStepSize * (m_numPts -1) );
-//
-//            break;
-//
-//        case dirY:
-//
-//            res.setX( m_pointsY.yTop );
-//            res.setY( m_pointsY.yTop + m_pointsY.yStepSize * (m_numPts -1) );
-//
-//            break;
-//        case dirXY:
-//
-//            break;
-//        }
-//            /*}
-//            else
-//            {
-//                switch(m_pDataObj->getType())
-//                {
-//                    case ito::tInt8:
-//                        findMinMax<int8>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tUInt8:
-//                        findMinMax<uint8>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tInt16:
-//                        findMinMax<int16>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tUInt16:
-//                        findMinMax<uint16>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tInt32:
-//                        findMinMax<int32>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tUInt32:
-//                        findMinMax<uint32>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tFloat32:
-//                        findMinMax<float32>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tFloat64:
-//                        findMinMax<float64>(mat, m_plotPts, m_fast, min, max);
-//                    break;
-//                    case ito::tComplex64:
-//                        findMinMax<complex64>(mat, m_plotPts, m_fast, min, max, m_cmplxState);
-//                    break;
-//                    case ito::tComplex128:
-//                        findMinMax<complex128>(mat, m_plotPts, m_fast, min, max, m_cmplxState);
-//                    break;
-//                }            
-//            }
-//
-//        }
-//        else
-//        {
-//            min = m_minY;
-//            max = m_maxY;
-//        }
-//        
-//        if (m_autoScaleX)
-//        {
-//            if (m_Scaling > 0) return QRectF(m_startPos, min, m_physLength, max - min);
-//            else return QRectF(m_startPos + m_physLength, min, abs(m_physLength), max - min);
-//        }
-//        else
-//        {
-//
-//            return QRectF(m_minX, min, m_maxX-m_minX, max - min);
-//        }*/
-//    }
-//    
-//    return res;
-//}
-
-////------------------------------------------------------------------------------------------------------------
-//QRectF DataObjectSeriesData::boundingRectMax() const
-//{
-////    double minX = -1.0;
-////    double maxX = 2.0;
-//
-//    double minY = -std::numeric_limits<ito::float64>::max();
-//    double maxY = std::numeric_limits<ito::float64>::max();
-//    
-//    if (m_pDataObj != NULL)
-//    {
-//        switch(m_pDataObj->getType())
-//        {
-//            case ito::tInt8:
-//                minY = std::numeric_limits<ito::int8>::min();
-//                maxY = std::numeric_limits<ito::int8>::max();
-//            break;
-//            case ito::tUInt8:
-//                minY = std::numeric_limits<ito::int8>::min();
-//                maxY = std::numeric_limits<ito::int8>::max();
-//            break;
-//            case ito::tInt16:
-//                minY = std::numeric_limits<ito::int16>::min();
-//                maxY = std::numeric_limits<ito::int16>::max();
-//            break;
-//            case ito::tUInt16:
-//                minY = std::numeric_limits<ito::uint16>::min();
-//                maxY = std::numeric_limits<ito::uint16>::max();
-//            break;
-//            case ito::tInt32:
-//                minY = std::numeric_limits<ito::int32>::min();
-//                maxY = std::numeric_limits<ito::int32>::max();
-//            break;
-//            case ito::tUInt32:
-//                minY = std::numeric_limits<ito::uint32>::min();
-//                maxY = std::numeric_limits<ito::uint32>::max();
-//            break;
-//            case ito::tFloat32:
-//            case ito::tComplex64:
-//                minY = -std::numeric_limits<ito::float32>::max();
-//                maxY = std::numeric_limits<ito::float32>::max();
-//            break;
-//        }
-//    }
-//
-//    if (m_Scaling > 0) return QRectF(m_startPos, minY, m_physLength, maxY - minY);
-//    else return QRectF(m_startPos + m_physLength, minY, abs(m_physLength), maxY - minY);
-//}
-
 //----------------------------------------------------------------------------------------------------------------------------------
+/*
+This helper method returns the min/max values for an fixed-point typed dataObject and the line, which is represented 
+by this dataObjectSeriesData.
+*/
 template<typename _Tp> void findMinMaxNonWeightedInteger(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx)
 {
     const cv::Mat *mat;
@@ -1865,6 +1653,10 @@ template<typename _Tp> void findMinMaxNonWeightedInteger(const ito::DataObject *
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+/*
+This helper method returns the min/max values for an floating-point typed dataObject and the line, which is represented
+by this dataObjectSeriesData.
+*/
 template<typename _Tp> void findMinMaxNonWeightedFloat(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx)
 {
     const cv::Mat *mat;
@@ -1931,6 +1723,12 @@ template<typename _Tp> void findMinMaxNonWeightedFloat(const ito::DataObject *ob
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+/*
+This helper method returns the min/max values for a complex typed dataObject and the line, which is represented
+by this dataObjectSeriesData.
+
+The complex selector can be defined separately
+*/
 template<typename _Tp, typename _Tp2> void findMinMaxNonWeightedComplex(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, ItomQwtPlotEnums::ComplexType cmplxState = ItomQwtPlotEnums::CmplxAbs)
 {
     const cv::Mat *mat;
@@ -2312,7 +2110,7 @@ template<typename _Tp, typename _Tp2> bool findMinMaxNonWeightedComplexCropped(c
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void findMinMaxNonWeighteRGBA(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ColorType type)
+void findMinMaxNonWeightedRGBA(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx, DataObjectSeriesData::ColorType type)
 {
     const cv::Mat *mat;
     uchar *ptr;
@@ -2522,13 +2320,11 @@ void findMinMaxNonWeighteRGBA(const ito::DataObject *obj, const DataObjectSeries
     }
 }
 
+//-----------------------------------------------------------------------------------
+
 QRectF DataObjectSeriesData::boundingRect() const
 {
     QRectF res;
-
-    //cv::Mat *mat;
-    //const uchar* ptr[4];
-    //float weights[4];
 
     if (m_pDataObj && m_d.valid)
     {
@@ -2567,7 +2363,7 @@ QRectF DataObjectSeriesData::boundingRect() const
                 findMinMaxNonWeightedComplex<ito::float64, ito::complex128>(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_cmplxState);
             break;
             case ito::tRGBA32:
-                findMinMaxNonWeighteRGBA(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_colorState);
+                findMinMaxNonWeightedRGBA(m_pDataObj, m_d, min, max, minIdx, maxIdx, m_colorState);
             break;
         }
 
