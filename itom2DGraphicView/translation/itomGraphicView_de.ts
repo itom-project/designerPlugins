@@ -61,7 +61,7 @@
 <context>
     <name>GraphicViewPlot</name>
     <message>
-        <location filename="../graphicViewPlot.cpp" line="+62"/>
+        <location filename="../graphicViewPlot.cpp" line="+63"/>
         <source>Points for line plots from 2D objects</source>
         <translation type="unfinished">Punkte für Linienplot von 2D-Objekten</translation>
     </message>
@@ -91,7 +91,12 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+25"/>
+        <source>deprecation warning: starting with itom version 3.3 this plot will be removed.</source>
+        <translation type="unfinished">Vorwarnung: Dieser Plot steht ab der itom Version 3.3 nicht mehr zur Verfügung.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
         <source>home</source>
         <translation type="unfinished">Ansicht zurücksetzen</translation>
     </message>

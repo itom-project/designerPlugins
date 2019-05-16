@@ -66,7 +66,7 @@
         <translation type="vanished">Hinweis: Um die Anzahl der Dezimalstellen in den Spinboxen zu ändern Strg+ und Strg- verwenden</translation>
     </message>
     <message>
-        <location filename="../dialog2DScale.cpp" line="+205"/>
+        <location filename="../dialog2DScale.cpp" line="+206"/>
         <source>invalid number</source>
         <translation type="unfinished">Ungültige Zahl</translation>
     </message>
@@ -215,7 +215,7 @@
 <context>
     <name>Itom2dQwtPlot</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="+973"/>
+        <location filename="../itom2dqwtplot.cpp" line="+1140"/>
         <location line="+12"/>
         <source>Linecut</source>
         <translation>Linienschnitt</translation>
@@ -226,12 +226,33 @@
         <translation>Linienschnitt konnte nicht erzeugt werden, API-Handle wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="-931"/>
+        <source>Points for volume plots from 3d objects</source>
+        <translation type="unfinished">Punkte für Volumen-Plots von 3D-Objekten</translation>
+    </message>
+    <message>
+        <location line="+768"/>
+        <source>Could not spawn volumeCut due to missing API-handle</source>
+        <translation type="unfinished">Volumenschnitt konnte nicht erzeugt werden, API-Handle wurde nicht gefunden</translation>
+    </message>
+    <message>
+        <location line="+93"/>
+        <location line="+176"/>
         <source>the opened figure is not inherited from ito::AbstractDObjFigure</source>
         <translation>Die geöffnete Abbildung wurde nicht von ito::AbstractDObjFigure vererbt</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="-160"/>
+        <source>Volumecut</source>
+        <translation>Volumenschnitt</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Expected a bound vector with 2 values</source>
+        <translation type="unfinished">Es wird ein Grenzvektor mit 2 Werten erwartet</translation>
+    </message>
+    <message>
+        <location line="+165"/>
         <source>Z-Stack</source>
         <translation>Z-Stapel</translation>
     </message>
@@ -774,7 +795,7 @@
         <translation type="unfinished">Die Stil-Bezeichnung entspricht nicht dem erforderlichen Format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+87"/>
         <source>No marker with id &apos;%1&apos; found.</source>
         <translation type="unfinished">Der Marker mit der ID &apos;%1&apos; wurde nicht gefunden.</translation>
     </message>
@@ -782,23 +803,25 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+1126"/>
+        <location filename="../plotCanvas.cpp" line="+1633"/>
+        <location line="+1530"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="-133"/>
+        <location line="-1663"/>
         <location line="+141"/>
+        <location line="+1530"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
-        <location line="-926"/>
+        <location line="-2937"/>
         <source>plotting tools</source>
         <translation type="unfinished">Symbolleiste Plot</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+32"/>
         <source>File</source>
         <translation type="unfinished">Datei</translation>
     </message>
@@ -813,7 +836,7 @@
         <translation type="unfinished">Werkzeuge</translation>
     </message>
     <message>
-        <location line="+209"/>
+        <location line="+233"/>
         <source>Scale Settings...</source>
         <translation type="unfinished">Skaleneinstellungen...</translation>
     </message>
@@ -940,6 +963,16 @@
     </message>
     <message>
         <location line="+4"/>
+        <source>Volumecut</source>
+        <translation type="unfinished">Volumenschnitt</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Show a 2D volume cut</source>
+        <translation type="unfinished">Zeigt einen21D-Volumenschnitt</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Linecut Mode</source>
         <translation type="unfinished">Linienschnittmodus</translation>
     </message>
@@ -1033,13 +1066,50 @@
         <translation type="unfinished">Bildebene auswählen</translation>
     </message>
     <message>
-        <location line="+416"/>
+        <location line="+228"/>
+        <location line="+105"/>
+        <location line="+139"/>
+        <source>type not implemented yet</source>
+        <translation type="unfinished">Diser Variablentyp wurde noch nicht implementiert</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>x/y-axis</source>
+        <translation>x/y-Achse</translation>
+    </message>
+    <message>
+        <location line="+160"/>
+        <source>2D Object Plot</source>
+        <translation type="unfinished">2D Objekt Plod</translation>
+    </message>
+    <message>
+        <location line="+218"/>
         <location line="+131"/>
+        <location line="+1546"/>
         <source>Selected color map has less than two points.</source>
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="+1184"/>
+        <location line="-1554"/>
+        <location line="+1547"/>
+        <source>error when loading color map</source>
+        <translation type="unfinished">Fehler beim Laden der Farbpalette</translation>
+    </message>
+    <message>
+        <location line="-155"/>
+        <location line="+1"/>
+        <source>Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines</source>
+        <translation type="unfinished">Ein DataObject vom Typ RGBA32, Complex128 oder Complex64 kann nicht als Höhenlinie gesetzt werden</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <location line="+1"/>
+        <source>Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines</source>
+        <translation type="unfinished">Ein DataObject mit dieser Dimension kann nicht als Höhenlinie gesetzt werden</translation>
+    </message>
+    <message>
+        <location line="+263"/>
+        <location line="+18"/>
         <source>Set lineCut coordinates failed. Could not activate lineCut.</source>
         <translation type="unfinished">Das Setzten der Linienschnittkoordinaten schlug fehl. Der Linienschnitt konnte nicht aktiviert werden.</translation>
     </message>
@@ -1047,7 +1117,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-1115"/>
+        <location filename="../itom2dqwtplot.cpp" line="-1280"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
     </message>
@@ -1058,13 +1128,35 @@
     </message>
     <message>
         <location line="+1"/>
+        <source>Points for volume cut in 3d objects</source>
+        <translation type="unfinished">Punkte für Volumenschnitt in 3D-Objekten</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>shallow copy of input source object</source>
         <translation>Referenz auf Eingangsobjekt</translation>
     </message>
     <message>
-        <location filename="../plotCanvas.cpp" line="-2079"/>
+        <location filename="../plotCanvas.cpp" line="-3056"/>
         <source>plot2D</source>
         <translation type="unfinished">2D-Plot</translation>
+    </message>
+    <message>
+        <location line="+614"/>
+        <source>y-axis</source>
+        <translation>Y-Achse</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+104"/>
+        <location line="+152"/>
+        <source>z-axis</source>
+        <translation>z-Achse</translation>
+    </message>
+    <message>
+        <location line="-162"/>
+        <source>x-axis</source>
+        <translation>x-Achse</translation>
     </message>
     <message>
         <location filename="../itom2dqwtplotplugin.cpp" line="+38"/>
@@ -1086,7 +1178,7 @@
         <translation type="obsolete">Das Rotieren der geometischen Formen wird derzeit nicht unterstützt.</translation>
     </message>
     <message>
-        <location filename="../../sharedFiles/drawItem.cpp" line="+1052"/>
+        <location filename="../../sharedFiles/drawItem.cpp" line="+1067"/>
         <source>invalid geometric shape type</source>
         <translation type="unfinished">Ungültige Typ der geometischen Formen</translation>
     </message>

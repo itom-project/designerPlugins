@@ -55,7 +55,7 @@
         <translation>Y-Ansicht</translation>
     </message>
     <message>
-        <location filename="../dialog1DScale.cpp" line="+173"/>
+        <location filename="../dialog1DScale.cpp" line="+175"/>
         <source>invalid number</source>
         <translation type="unfinished">Ungültige Zahl</translation>
     </message>
@@ -219,7 +219,7 @@
         <translation>Kurveneigenschaften</translation>
     </message>
     <message>
-        <location line="+760"/>
+        <location line="+780"/>
         <location line="+10"/>
         <source>Set picker failed, since canvas not initilized</source>
         <translation>Der Picker konnte nicht gesetzt werden, da &apos;Canvas&apos; nicht inizialisiert wurde</translation>
@@ -774,7 +774,7 @@
         <translation type="unfinished">Die Stil-Bezeichnung entspricht nicht dem erforderlichen Format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+87"/>
         <source>No marker with id &apos;%1&apos; found.</source>
         <translation type="unfinished">Es wurde kein Marker mit der ID %1 gefunden.</translation>
     </message>
@@ -786,7 +786,7 @@
         <translation type="obsolete">Symbolleiste</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="+215"/>
+        <location filename="../plot1DWidget.cpp" line="+216"/>
         <source>File</source>
         <translation type="unfinished">Datei</translation>
     </message>
@@ -947,7 +947,75 @@
         <translation type="unfinished">Erste Zeile</translation>
     </message>
     <message>
-        <location line="+2514"/>
+        <location line="+62"/>
+        <source>No Grid</source>
+        <translation type="unfinished">Kein Gitter</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Major XY</source>
+        <translation type="unfinished">XY grob</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Major X</source>
+        <translation type="unfinished">X grob</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Major Y</source>
+        <translation type="unfinished">Y grob</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Minor XY</source>
+        <translation type="unfinished">XY fein</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Minor X</source>
+        <translation type="unfinished">X fein</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Minor Y</source>
+        <translation type="unfinished">Y fein</translation>
+    </message>
+    <message>
+        <location line="+1320"/>
+        <source>1D Object Slice</source>
+        <translation type="unfinished">1D-Objektschnitt</translation>
+    </message>
+    <message>
+        <location line="+62"/>
+        <source>xData requires a 2d dataObject or the first (n-2) dimension must have a shape of 1</source>
+        <translation>xData benötigt ein 2D-DataObject oder die ersten (n-2) Dimensionen müssen die Größe 1 haben</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location line="+16"/>
+        <source>wrong xData shape. Expect a shape of (1 x %2) or (%1 x %2)</source>
+        <translation type="unfinished">Falsche xData-Dimensionen. Erwartet wird ein (1 x %2) oder (%1 x %2) Objekt</translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <location line="+16"/>
+        <source>wrong xData shape. Expect a shape of (%1 x 1) or (%1 x %2)</source>
+        <translation type="unfinished">Falsche xData-Dimensionen. Erwartet wird ein (%1 x 1) oder (%1 x %2) Objekt</translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <location line="+16"/>
+        <source>unexpected axis state</source>
+        <translation type="unfinished">Unerwarteter Status der Achse</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>xData contains more values than the source dataObject. Unused values will be ignored.</source>
+        <translation type="unfinished">xData enthält mehr Werte als das Quell-DataObject. Ungenutzte Werte werden ignoriert.</translation>
+    </message>
+    <message>
+        <location line="+1033"/>
         <source>CurveIndex out of bounds [0,%i]</source>
         <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
@@ -967,7 +1035,7 @@
         <translation type="unfinished">Die ID liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
     <message>
-        <location line="+693"/>
+        <location line="+749"/>
         <source>Select a visible curve</source>
         <translation type="unfinished">Eine sichbare Kurve auswählen</translation>
     </message>
@@ -1007,7 +1075,7 @@
         <translation type="obsolete">Alle Schichten</translation>
     </message>
     <message>
-        <location line="-3332"/>
+        <location line="-3414"/>
         <location line="+1"/>
         <source>Color Representation</source>
         <translation type="unfinished">Farbdarstellung</translation>
@@ -1047,16 +1115,17 @@
     </message>
     <message>
         <location line="+2"/>
+        <location line="+7"/>
         <source>Grid</source>
         <translation type="unfinished">Gitter</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-3"/>
         <source>Shows/hides a grid</source>
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+659"/>
+        <location line="+684"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -1104,22 +1173,22 @@
         <translation type="obsolete">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="+2635"/>
+        <location line="+2692"/>
         <source>itom API not available.</source>
         <translation type="unfinished">Die itom-API ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-2937"/>
+        <location line="-2968"/>
         <location line="+1"/>
         <location line="+11"/>
         <location line="+1"/>
-        <location line="+410"/>
+        <location line="+389"/>
         <location line="+1"/>
         <source>curve %1</source>
         <translation>Kurve %1</translation>
     </message>
     <message>
-        <location line="-1192"/>
+        <location line="-1222"/>
         <source>Plotting Tools</source>
         <translation type="unfinished">Symbolleiste</translation>
     </message>
@@ -1178,7 +1247,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation type="unfinished">Grauwert</translation>
     </message>
     <message>
-        <location line="+685"/>
+        <location line="+710"/>
         <location line="+12"/>
         <source>gray</source>
         <translation type="unfinished">grau</translation>
@@ -1196,7 +1265,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation type="obsolete">Das Rotieren der geometischen Formen wird derzeit nicht unterstützt.</translation>
     </message>
     <message>
-        <location filename="../../sharedFiles/drawItem.cpp" line="+1052"/>
+        <location filename="../../sharedFiles/drawItem.cpp" line="+1067"/>
         <source>invalid geometric shape type</source>
         <translation type="unfinished">Ungültige Typ der geometischen Formen</translation>
     </message>
@@ -1225,12 +1294,12 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation type="unfinished">cv::Mat im Datenobjekt scheint defekt</translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+61"/>
         <source>y-axis</source>
         <translation>y-Achse</translation>
     </message>
     <message>
-        <location line="+68"/>
+        <location line="+85"/>
         <source>x-axis</source>
         <translation>x-Achse</translation>
     </message>
@@ -1246,12 +1315,12 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation>z-Achse</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-988"/>
+        <location filename="../plot1DWidget.cpp" line="-1013"/>
         <source>Plot1D</source>
         <translation>Plot1D</translation>
     </message>
     <message>
-        <location line="+1753"/>
+        <location line="+1771"/>
         <source>wrong xData data type. Complex64 and Rgba32 are not supported.</source>
         <translation type="unfinished">Falscher xData-Datentyp. Complex64 und RGBA32 werden nicht unterstützt.</translation>
     </message>
