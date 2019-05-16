@@ -959,7 +959,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
             }
             else
             {
-                return ito::RetVal(ito::retError, 0, tr("exspected a bound vector with 2 values").toLatin1().data());
+                return ito::RetVal(ito::retError, 0, tr("Expected a bound vector with 2 values").toLatin1().data());
             }
 
             retval += updateChannels(paramNames);

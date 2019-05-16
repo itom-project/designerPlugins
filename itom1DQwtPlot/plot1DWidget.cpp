@@ -1918,7 +1918,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 		{
 			PlotInfoDObject* infoWidget = (((Itom1DQwtPlot*)(this->parent()))->dObjectWidget());
 			infoWidget->updateInfoHeader(
-				QString("1D Object Slice"),
+				tr("1D Object Slice"),
 				dataObj->getType(),
 				dataObj->getDims(),
 				dataObj->getSize());
@@ -1980,7 +1980,7 @@ ito::RetVal Plot1DWidget::validateXData(const ito::DataObject* dataObj, const it
             }
             else if ((dimsX - prependOneDimsX) != 2)//check if xVec is 2d
             {
-                retval += RetVal(retError, 0, "xData requires a 2d dataObject or the first (n-2) dimension must have a shape of 1");
+                retval += RetVal(retError, 0, tr("xData requires a 2d dataObject or the first (n-2) dimension must have a shape of 1").toLatin1().data());
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
             }
 
@@ -1989,15 +1989,15 @@ ito::RetVal Plot1DWidget::validateXData(const ito::DataObject* dataObj, const it
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                 if(m_pData->m_axisState & ItomQwtPlotEnums::rowState)
                 {
-                    retval += RetVal(retError, 0, QString("wrong xData shape. Expect a shape of (1 x %2) or (%1 x %2)").arg(curveAxisShapeDObj).arg(dataAxisShapeDObj).toLatin1().data());
+                    retval += RetVal(retError, 0, tr("wrong xData shape. Expect a shape of (1 x %2) or (%1 x %2)").arg(curveAxisShapeDObj).arg(dataAxisShapeDObj).toLatin1().data());
                 }
                 else if(m_pData->m_axisState & ItomQwtPlotEnums::colState)
                 {
-                    retval += RetVal(retError, 0, QString("wrong xData shape. Expect a shape of (%1 x 1) or (%1 x %2)").arg(dataAxisShapeDObj).arg(curveAxisShapeDObj).toLatin1().data());
+                    retval += RetVal(retError, 0, tr("wrong xData shape. Expect a shape of (%1 x 1) or (%1 x %2)").arg(dataAxisShapeDObj).arg(curveAxisShapeDObj).toLatin1().data());
                 }
                 else
                 {
-                    retval += RetVal(retError, 0, "unexpected axis state");
+                    retval += RetVal(retError, 0, tr("unexpected axis state").toLatin1().data());
                 }
             }
             else if (curveAxisShapeDObj > curveAxisShapeX && curveAxisShapeX != 1) //todo for other dimension and check if correct
@@ -2005,15 +2005,15 @@ ito::RetVal Plot1DWidget::validateXData(const ito::DataObject* dataObj, const it
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;
                 if(m_pData->m_axisState & ItomQwtPlotEnums::rowState)
                 {
-                    retval += RetVal(retError, 0, QString("wrong xData shape. Expect a shape of (1 x %2) or (%1 x %2)").arg(curveAxisShapeDObj).arg(dataAxisShapeDObj).toLatin1().data());
+                    retval += RetVal(retError, 0, tr("wrong xData shape. Expect a shape of (1 x %2) or (%1 x %2)").arg(curveAxisShapeDObj).arg(dataAxisShapeDObj).toLatin1().data());
                 }
                 else if(m_pData->m_axisState & ItomQwtPlotEnums::colState)
                 {
-                    retval += RetVal(retError, 0, QString("wrong xData shape. Expect a shape of (%1 x 1) or (%1 x %2)").arg(dataAxisShapeDObj).arg(curveAxisShapeDObj).toLatin1().data());
+                    retval += RetVal(retError, 0, tr("wrong xData shape. Expect a shape of (%1 x 1) or (%1 x %2)").arg(dataAxisShapeDObj).arg(curveAxisShapeDObj).toLatin1().data());
                 }
                 else
                 {
-                    retval += RetVal(retError, 0, "unexpected axis state");
+                    retval += RetVal(retError, 0, tr("unexpected axis state").toLatin1().data());
                 }
 
             }
@@ -2024,7 +2024,7 @@ ito::RetVal Plot1DWidget::validateXData(const ito::DataObject* dataObj, const it
             }
             if (curveAxisShapeDObj < curveAxisShapeX || dataAxisShapeDObj < dataAxisShapeX)
             {
-                retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. Unused values will be ignored.");
+                retval += RetVal(retWarning, 0, tr("xData contains more values than the source dataObject. Unused values will be ignored.").toLatin1().data());
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::noPerfectFit;
             }
         }

@@ -1164,7 +1164,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {
               
                 
-                    m_dObjVolumeCut.setAxisDescription(1,"x/y-axis");
+                    m_dObjVolumeCut.setAxisDescription(1, tr("x/y-axis").toLatin1().data());
                     m_dObjVolumeCut.setAxisUnit(1,QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
                 
             }
@@ -1324,7 +1324,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
 	{
 		PlotInfoDObject* infoWidget = (((Itom2dQwtPlot*)(this->parent()))->dObjectWidget());
 		infoWidget->updateInfoHeader(
-			QString("2D Object Plot"),
+			tr("2D Object Plot"),
 			m_dObjPtr->getType(),
 			m_dObjPtr->getDims(),
 			m_dObjPtr->getSize());
@@ -1665,7 +1665,7 @@ bool PlotCanvas::setOverlayColorMap(const QString &colormap /*= "__next__"*/)
     }
     else if (retval.containsError())
     {
-        emit statusBarMessage("error when loading color map", 4000);
+        emit statusBarMessage(tr("error when loading color map"), 4000);
         return false;
     }
 
@@ -3057,7 +3057,7 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
         {
             if (contourLevels->getType() == ito::tRGBA32 || contourLevels->getType() == ito::tComplex128 || contourLevels->getType() == ito::tComplex64)
             {
-                retval += ito::RetVal(ito::retError, 0, "Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines");
+                retval += ito::RetVal(ito::retError, 0, tr("Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines").toLatin1().data());
                 emit statusBarMessage(tr("Can not set dataObjects of type RGBA32, Complex128 or Complex64 for contour Lines"), 4000);
             }
 
@@ -3073,7 +3073,7 @@ void PlotCanvas::setContourLevels(QSharedPointer<ito::DataObject> contourLevels)
 
                 if (trueDims != 0)
                 {
-                    retval += ito::RetVal(ito::retError, 0, "Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines");
+                    retval += ito::RetVal(ito::retError, 0, tr("Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines").toLatin1().data());
                     emit statusBarMessage(tr("Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines"), 4000);
                 }
 
@@ -3212,7 +3212,7 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
     }
     else if (retval.containsError())
     {
-        emit statusBarMessage("error when loading color map", 4000);
+        emit statusBarMessage(tr("error when loading color map"), 4000);
         return false;
     }
     m_curContourColorMapIndex = idx;
