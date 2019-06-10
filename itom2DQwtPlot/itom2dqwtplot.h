@@ -276,6 +276,8 @@ public:
 protected:
     ito::RetVal init(); //called when api-pointers are transmitted, directly after construction
 
+    ito::RetVal moveChildPlotCloseToThis(QWidget *child); //tries to place a line cut, volume cut ... a little bit to the right / bottom of this plot, however still in the same screen
+
 private:
     void constructor();
 

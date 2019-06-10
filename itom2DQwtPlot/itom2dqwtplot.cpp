@@ -884,23 +884,10 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
         if (uniqueID != newUniqueID || needChannelUpdate)
         {
             uniqueID = newUniqueID;
-            ito::AbstractDObjFigure* figure = NULL;
+            ito::AbstractDObjFigure* childFigure = NULL;
             if (volumeCutObj->inherits("ito::AbstractDObjFigure"))
             {
-                //get global position of this window
-                QWidget *w = this;
-                QRect geom(0, 0, 0, 0);
-                QRect temp = geometry();
-                geom.setHeight(temp.height());
-                geom.setWidth(temp.width());
-                while (w)
-                {
-                    temp = w->geometry();
-                    geom = QRect(temp.x() + geom.x(), temp.y() + geom.y(), geom.width(), geom.height());
-                    w = qobject_cast<QWidget*>(w->parent());
-                }
-
-                figure = (ito::AbstractDObjFigure*)volumeCutObj;
+                childFigure = (ito::AbstractDObjFigure*)volumeCutObj;
                 if (!needChannelUpdate)
                 {
                     d->m_childFigures[volumeCutObj] = newUniqueID;
@@ -911,23 +898,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
                 //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
                 QTimer::singleShot(0, this, SLOT(activatePlot()));
 
-                //move the new figure close to the right, bottom position of this figure
-                geom.setX(geom.x() + 2 * geom.width() / 3);
-                geom.setY(geom.y() + 2 * geom.height() / 3);
-                geom.setWidth(width());
-                geom.setHeight(height());
-
-                //check if the desired geometry is within the available desktop
-                QDesktopWidget *dw = QApplication::desktop();
-                QRect screenGeom = dw->screenGeometry(this);
-                if (!screenGeom.contains(geom.bottomRight()))
-                {
-                    QPoint t(screenGeom.bottomRight() - geom.bottomRight());
-                    t.rx() = qMin(0, t.x());
-                    t.ry() = qMin(0, t.y());
-                    geom.translate(t);
-                }
-                figure->move(geom.x(), geom.y());
+                retval += moveChildPlotCloseToThis(volumeCutObj);
             }
             else
             {
@@ -939,7 +910,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
                 ito::Channel *tempChannel;
                 foreach(tempChannel, m_pChannels)
                 {
-                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)figure)
+                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
                     {
                         removeChannel(tempChannel);
                     }
@@ -947,14 +918,14 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
             }
             if (bounds.size() == 2)
             {
-                ((QMainWindow*)figure)->setWindowTitle(tr("Volumecut"));
-                if (figure->inherits("ItomQwtDObjFigure"))
+                ((QMainWindow*)childFigure)->setWindowTitle(tr("Volumecut"));
+                if (childFigure->inherits("ItomQwtDObjFigure"))
                 {
-                    ((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+                    ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
                 }
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["volumeCutBounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["volumeCutBounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "volumeCutBounds" << "sourceout";
             }
             else
@@ -969,14 +940,14 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
                 if (subplotStates()["volumeCut"] & ito::AbstractFigure::tVisibleOnInit)
                 {
                     subplotStates()["volumeCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
-                    figure->setVisible(true);
+                    childFigure->setVisible(true);
                 }
                 // Something to do?
             }
             else// we do not have a plot so we have to show it and its child of this plot
             {
                     subplotStates()["volumeCut"] = ito::AbstractFigure::tOwnChild;
-                    figure->show(); 
+                    childFigure->show();
             }
         }
         else
@@ -1042,41 +1013,19 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
     }
 
-    delete[] pointArr;
-    //setOutpBounds(bounds);
-    //setLinePlotCoordinates(bounds);
+    DELETE_AND_SET_NULL_ARRAY(pointArr);
 
     retval += apiGetFigure("DObjStaticLine","", newUniqueID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
-
-    QWidget *w = this;
-    while (w)
-    {
-        //qDebug() << w->geometry() << w->frameGeometry();
-        w = qobject_cast<QWidget*>(w->parent());
-    }
 
     if (!retval.containsError())
     {
         if (uniqueID != newUniqueID || needChannelUpdate)
         {
             uniqueID = newUniqueID;
-            ito::AbstractDObjFigure* figure = NULL;
+            ito::AbstractDObjFigure* childFigure = NULL;
             if (lineCutObj->inherits("ito::AbstractDObjFigure"))
             {
-                //get global position of this window
-                QWidget *w = this;
-                QRect geom(0,0,0,0);
-                QRect temp = geometry();
-                geom.setHeight(temp.height());
-                geom.setWidth(temp.width());
-                while (w)
-                {
-                    temp = w->geometry();
-                    geom = QRect(temp.x() + geom.x(), temp.y() + geom.y(), geom.width(), geom.height());
-                    w = qobject_cast<QWidget*>(w->parent());
-                }
-
-                figure = (ito::AbstractDObjFigure*)lineCutObj;
+                childFigure = (ito::AbstractDObjFigure*)lineCutObj;
                 if (!needChannelUpdate)
                 {
                     d->m_childFigures[lineCutObj] = newUniqueID;
@@ -1087,23 +1036,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
                 QTimer::singleShot(0, this, SLOT(activatePlot()));
 
-                //move the new figure close to the right, bottom position of this figure
-                geom.setX(geom.x() + 2 * geom.width() / 3);
-                geom.setY(geom.y() + 2 * geom.height() / 3);
-                geom.setWidth(width());
-                geom.setHeight(height());
-
-                //check if the desired geometry is within the available desktop
-                QDesktopWidget *dw = QApplication::desktop();
-                QRect screenGeom = dw->screenGeometry(this);
-                if (!screenGeom.contains(geom.bottomRight()))
-                {
-                    QPoint t(screenGeom.bottomRight() - geom.bottomRight());
-                    t.rx() = qMin(0, t.x());
-                    t.ry() = qMin(0, t.y());
-                    geom.translate(t);
-                }
-                figure->move(geom.x(), geom.y());
+                retval += moveChildPlotCloseToThis(childFigure);
             }
             else
             {
@@ -1115,7 +1048,7 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 ito::Channel *tempChannel;
                 foreach(tempChannel, m_pChannels)
                 {
-                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)figure)
+                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
                     {
                         removeChannel(tempChannel);
                     }
@@ -1124,39 +1057,39 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
 
             if (zStack)
             {
-                ((QMainWindow*)figure)->setWindowTitle(tr("Z-Stack"));
-				if (figure->inherits("ItomQwtDObjFigure"))
+                ((QMainWindow*)childFigure)->setWindowTitle(tr("Z-Stack"));
+				if (childFigure->inherits("ItomQwtDObjFigure"))
 				{
-					((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+					((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
 				}
                 // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
                 // with one plane and cannot display the points in z-direction
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["zCutPoint"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)figure,  m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["zCutPoint"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure,  m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "zCutPoint"  << "sourceout";
             }
             else if (bounds.size() == 3) // its a 3D-Object
             {
-                ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
-				if (figure->inherits("ItomQwtDObjFigure"))
+                ((QMainWindow*)childFigure)->setWindowTitle(tr("Linecut"));
+				if (childFigure->inherits("ItomQwtDObjFigure"))
 				{
-					((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+					((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
 				}
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["sourceout"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["bounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "bounds"  << "sourceout";
             }
             else
             {
-                ((QMainWindow*)figure)->setWindowTitle(tr("Linecut"));
-				if (figure->inherits("ItomQwtDObjFigure"))
+                ((QMainWindow*)childFigure)->setWindowTitle(tr("Linecut"));
+				if (childFigure->inherits("ItomQwtDObjFigure"))
 				{
-					((ItomQwtDObjFigure*)figure)->setComplexStyle(d->m_pData->m_cmplxType);
+					((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
 				}
                 // otherwise simply pass on the displayed plane
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["bounds"], figure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)figure, m_pOutput["displayed"], figure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["bounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["displayed"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
                 paramNames << "bounds"  << "displayed";
             }
 
@@ -1167,12 +1100,12 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 if (zStack && (subplotStates()["zSlice"] & ito::AbstractFigure::tVisibleOnInit))
                 {
                     subplotStates()["zSlice"] &= ~ito::AbstractFigure::tVisibleOnInit;
-                    figure->setVisible(true);
+                    childFigure->setVisible(true);
                 }
                 else if (!zStack && (subplotStates()["lineCut"] & ito::AbstractFigure::tVisibleOnInit))
                 {
                     subplotStates()["lineCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
-                    figure->setVisible(true);
+                    childFigure->setVisible(true);
                 }
                 // Something to do?
             }
@@ -1181,12 +1114,12 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
                 if (zStack)
                 {
                     subplotStates()["zSlice"] = ito::AbstractFigure::tOwnChild;
-                    figure->show();
+                    childFigure->show();
                 }
                 else
                 {
                     subplotStates()["lineCut"] = ito::AbstractFigure::tOwnChild;
-                    figure->show();
+                    childFigure->show();
                 }
             }
         }
@@ -1209,6 +1142,64 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
     }
 
     return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+//tries to place a line cut, volume cut ... a little bit to the right / bottom of this plot, however still in the same screen
+ito::RetVal Itom2dQwtPlot::moveChildPlotCloseToThis(QWidget *child)
+{
+    //get global position of this window
+    QWidget *w = this;
+    
+    QRect temp = geometry();
+
+    QRect geom(0, 0, 0, 0); //final geometry of the child
+    geom.setSize(size());
+
+    while (w)
+    {
+        temp = w->geometry();
+        geom = QRect(temp.x() + geom.x(), temp.y() + geom.y(), geom.width(), geom.height());
+        w = qobject_cast<QWidget*>(w->parent());
+    }
+
+    //check if the desired geometry is within the available desktop
+    QDesktopWidget *dw = QApplication::desktop();
+    QRect screenGeom = dw->screenGeometry(this);
+
+    //move the new figure close to the right, bottom position of this figure
+    geom.setX(geom.x() + 2 * width() / 3);
+    geom.setY(geom.y() + 2 * height() / 3);
+    geom.setWidth(qMin(width(), screenGeom.width()));
+    geom.setHeight(qMin(height(), screenGeom.height()));
+
+    if (!screenGeom.contains(geom))
+    {
+        //new geometry is outside of this screen. Try to fit it into this screen...
+        if (geom.right() > screenGeom.right())
+        {
+            geom.translate(screenGeom.right() - geom.right(), 0);
+        }
+
+        if (geom.left() < screenGeom.left())
+        {
+            geom.translate(screenGeom.left() - geom.left(), 0);
+        }
+
+        if (geom.top() < screenGeom.top())
+        {
+            geom.translate(0, screenGeom.top() - geom.top());
+        }
+
+        if (geom.bottom() > screenGeom.bottom())
+        {
+            geom.translate(0, screenGeom.bottom() - geom.bottom());
+        }
+    }
+
+    child->move(geom.x(), geom.y());
+
+    return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
