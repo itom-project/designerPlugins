@@ -40,7 +40,7 @@
 #include <qwt_plot_curve.h>
 #include <qpolygon.h>
 
-#include "../sharedFiles/itomQwtPlotEnums.h"
+#include "itomQwtPlotEnums.h"
 class QPainter;
 
 class QwtPlotCurveDataObject : public QwtPlotCurve

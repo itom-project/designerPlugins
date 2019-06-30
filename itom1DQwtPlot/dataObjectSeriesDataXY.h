@@ -26,7 +26,7 @@
 #include "common/sharedStructures.h"
 #include "plot/AbstractFigure.h"
 #include "DataObject/dataobj.h"
-#include "../sharedFiles/itomQwtPlotEnums.h"
+#include "itomQwtPlotEnums.h"
 #include "dataObjectSeriesData.h"
 
 #include <qwt_series_data.h>

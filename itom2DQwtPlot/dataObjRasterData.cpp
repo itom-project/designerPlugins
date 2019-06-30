@@ -24,7 +24,7 @@
 #include "common/typeDefs.h"
 
 #include "DataObject/dataObjectFuncs.h"
-#include "../sharedFiles/itomQwtPlotEnums.h"
+#include "itomQwtPlotEnums.h"
 #include <qdebug.h>
 
 double DataObjRasterData::quietNaN = std::numeric_limits<double>::quiet_NaN();

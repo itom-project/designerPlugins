@@ -44,7 +44,7 @@
 
 #include "valuepicker1d.h"
 
-#include "../sharedFiles/itomQwtPlot.h"
+#include "itomQwtPlot.h"
 #include "itom1DQwtPlot.h"
 #include "itomPlotMarker.h"
 

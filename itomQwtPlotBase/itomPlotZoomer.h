@@ -23,12 +23,14 @@
 #ifndef ITOMPLOTZOOMER_H
 #define ITOMPLOTZOOMER_H
 
+#include "itomQwtPlotBase.h"
+
 #include <qwt_plot_zoomer.h>
 #include <qpoint.h>
 
 class QEvent;
 
-class ItomPlotZoomer : public QwtPlotZoomer
+class ITOMQWTPLOTBASE_EXPORT ItomPlotZoomer : public QwtPlotZoomer
 {
     Q_OBJECT
 

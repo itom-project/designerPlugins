@@ -29,6 +29,7 @@ OPTION(PLUGIN_slider2D "Build with this solution." ON)
 
 if (PLUGIN_itom1DQwtPlot OR PLUGIN_itom2DQwtPlot)
     ADD_SUBDIRECTORY(qwt)
+    ADD_SUBDIRECTORY(itomQwtPlotBase)
 endif ()
 
 if (PLUGIN_slider2D)

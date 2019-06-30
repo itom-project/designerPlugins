@@ -23,11 +23,13 @@
 #ifndef ITOMCOLORMAP_H
 #define ITOMCOLORMAP_H
 
+#include "itomQwtPlotBase.h"
+
 #include <qwt_color_map.h>
 
 #include "itomQwtPlotEnums.h"
 
-class ItomColorMap : public QwtColorMap
+class ITOMQWTPLOTBASE_EXPORT ItomColorMap : public QwtColorMap
 {
 public:
 	/*!

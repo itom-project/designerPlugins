@@ -23,11 +23,7 @@
 #ifndef ITOMQWTDOBJFIGURE_H
 #define ITOMQWTDOBJFIGURE_H
 
-#if defined(ITOMSHAREDDESIGNER)
-    #define ITOMQWTDOBJFIGURE_EXPORT Q_DECL_EXPORT
-#else
-    #define ITOMQWTDOBJFIGURE_EXPORT Q_DECL_IMPORT
-#endif
+#include "itomQwtPlotBase.h"
 
 #include "plot/AbstractDObjFigure.h"
 #include "common/retVal.h"
@@ -61,7 +57,7 @@ class ItomQwtPlot;
 class ItomQwtDObjFigurePrivate;
 
 
-class ITOMQWTDOBJFIGURE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
+class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 

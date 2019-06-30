@@ -23,9 +23,11 @@
 #ifndef ITOMQWTPLOTENUMS_H
 #define ITOMQWTPLOTENUMS_H
 
+#include "itomQwtPlotBase.h"
+
 #include <qobject.h>
 
-class ItomQwtPlotEnums : public QObject
+class ITOMQWTPLOTBASE_EXPORT ItomQwtPlotEnums : public QObject
 {
     Q_OBJECT
 

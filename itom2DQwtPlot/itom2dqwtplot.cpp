@@ -23,10 +23,10 @@
 #include "plotCanvas.h"
 #include "itom2dqwtplot.h"
 
-#include "../sharedFiles/userInteractionPlotPicker.h"
-#include "../sharedFiles/multiPointPickerMachine.h"
+#include "userInteractionPlotPicker.h"
+#include "multiPointPickerMachine.h"
 
-#include "../sharedFiles/dialogExportProperties.h"
+#include "dialogExportProperties.h"
 
 #include "plotLegends/infoWidgetPickers.h"
 

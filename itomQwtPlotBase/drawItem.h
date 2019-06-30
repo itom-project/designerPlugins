@@ -23,6 +23,8 @@
 #ifndef DRAWITEM_H
 #define DRAWITEM_H
 
+#include "itomQwtPlotBase.h"
+
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_shapeitem.h>
 #include <qwt_plot_marker.h>
@@ -37,7 +39,7 @@
 
 class DrawItemPrivate; //forward declaration
 
-class DrawItem : public QwtPlotShapeItem
+class ITOMQWTPLOTBASE_EXPORT DrawItem : public QwtPlotShapeItem
 {
     public:
         enum HitType

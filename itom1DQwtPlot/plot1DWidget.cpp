@@ -38,7 +38,7 @@
 
 #include "itomLogLogScaleEngine.h"
 
-#include "../sharedFiles/itomPlotZoomer.h"
+#include "itomPlotZoomer.h"
 #include <qwt_color_map.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_renderer.h>
@@ -309,6 +309,19 @@ Plot1DWidget::~Plot1DWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Plot1DWidget::init(bool overwriteDesignableProperties)
 {
+    //since itom2dqwtplot is based on itomqwtplotbase, which also uses the concept of ITOM_API_FUNCS and ITOM_API_FUNCS_GRAPH,
+    //itom only writes the global ITOM_API_FUNCS(_GRAPH) pointer in the base library 'itomqwtplotbase'. Therefore the following
+    //lines are used to get the pointer from the base library and set it to the global variable of the same name, defined in this library.
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        ito::ITOM_API_FUNCS_GRAPH = getItomApiFuncsPtrGraph();
+    }
+
+    if (!ito::ITOM_API_FUNCS)
+    {
+        ito::ITOM_API_FUNCS = getItomApiFuncsPtr();
+    }
+
     //overwriteDesignableProperties: if the plot widget is configured for the first time
     //(e.g. in the constructor), all styles and properties should be set to their default
     //value, hence overwriteDesignableProperties is set to true. If the plot is
