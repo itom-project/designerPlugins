@@ -23,6 +23,8 @@
 #ifndef ITOMLOGLOGSCALEENGINE
 #define ITOMLOGLOGSCALEENGINE
 
+#include "itomQwtPlotBase.h"
+
 #include <qwt_scale_engine.h>
 //#include "qwt_global.h"
 #include <qwt_transform.h>
@@ -38,7 +40,7 @@
   \warning the step size as well as the margins are measured in *decades*.
 */
 
-class ItomLogLogScaleEngine: public QwtScaleEngine
+class ITOMQWTPLOTBASE_EXPORT ItomLogLogScaleEngine: public QwtScaleEngine
 {
 public:
     ItomLogLogScaleEngine( uint base = 10 );
@@ -75,7 +77,7 @@ protected:
          has no effect on the mapping. So QwtLogTransform can be used 
          for log2(), log10() or any other logarithmic scale.
  */
-class ItomLogLogTransform: public QwtTransform
+class ITOMQWTPLOTBASE_EXPORT ItomLogLogTransform: public QwtTransform
 {   
 public:
     ItomLogLogTransform();

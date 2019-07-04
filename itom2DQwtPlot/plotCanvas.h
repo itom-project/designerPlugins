@@ -31,10 +31,10 @@
 
 #include "dataObjItem.h"
 
-#include "../sharedFiles/itomQwtPlot.h"
-#include "../sharedFiles/userInteractionPlotPicker.h"
-#include "../sharedFiles/drawItem.h"
-#include "../sharedFiles/itomPlotPicker.h"
+#include "itomQwtPlot.h"
+#include "userInteractionPlotPicker.h"
+#include "drawItem.h"
+#include "itomPlotPicker.h"
 
 
 #include <qwidget.h>

@@ -23,6 +23,8 @@
 #ifndef ITOMPLOTMAGNIFIER_H
 #define ITOMPLOTMAGNIFIER_H
 
+#include "itomQwtPlotBase.h"
+
 #include <qwt_plot_magnifier.h>
 #include <qpoint.h>
 #include <qpointer.h>
@@ -31,7 +33,7 @@
 class QMouseEvent;
 class ItomPlotZoomer;
 
-class ItomPlotMagnifier : public QwtPlotMagnifier
+class ITOMQWTPLOTBASE_EXPORT ItomPlotMagnifier : public QwtPlotMagnifier
 {
 public:
     explicit ItomPlotMagnifier(QWidget* parent, ItomPlotZoomer *zoomer = NULL);

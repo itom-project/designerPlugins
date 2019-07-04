@@ -23,6 +23,8 @@
 #ifndef ITOMQWTPLOT_H
 #define ITOMQWTPLOT_H
 
+#include "itomQwtPlotBase.h"
+
 #include <qwt_plot.h>
 
 #include "plot/AbstractFigure.h"
@@ -55,7 +57,7 @@ class QToolBar;
 class UserInteractionPlotPicker;
 class ItomQwtDObjFigure;
 
-class ItomQwtPlot : public QwtPlot
+class ITOMQWTPLOTBASE_EXPORT ItomQwtPlot : public QwtPlot
 {
     Q_OBJECT
 
@@ -154,6 +156,9 @@ public:
     ito::RetVal deleteMarkers(const QString &id);
 
 protected:
+
+    void** getItomApiFuncsPtr() const; 
+    void** getItomApiFuncsPtrGraph() const;
     
     void loadStyles(bool overwriteDesignableProperties);
     ItomPlotZoomer *zoomer() const;

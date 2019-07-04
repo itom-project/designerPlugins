@@ -3580,3 +3580,5 @@ ito::RetVal ItomQwtPlot::changeVisibleMarkers(int currentPlane)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void** ItomQwtPlot::getItomApiFuncsPtr() const { return ito::ITOM_API_FUNCS; }
+void** ItomQwtPlot::getItomApiFuncsPtrGraph() const { return ito::ITOM_API_FUNCS_GRAPH; }

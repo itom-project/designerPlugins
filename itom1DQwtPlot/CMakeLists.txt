@@ -39,6 +39,7 @@ IF (BUILD_UNICODE)
     ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
 ENDIF (BUILD_UNICODE)
 ADD_DEFINITIONS(-DCMAKE -DITOMSHAREDDESIGNER)
+ADD_DEFINITIONS(-DQWT_DLL)
 
 IF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
     ADD_DEFINITIONS(-DVISUAL_LEAK_DETECTOR_CMAKE)
@@ -64,7 +65,8 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
     ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/../itomQwtPlotBase
+	${CMAKE_CURRENT_BINARY_DIR}/../itomQwtPlotBase
 )
 
 LINK_DIRECTORIES(
@@ -84,29 +86,16 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomLogLogScaleEngine.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
 )
 
 set(plugin_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itom1DQwtPlotEnums.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlotEnums.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.h
 )
 
 set(plugin_UI
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.ui
     ${CMAKE_CURRENT_SOURCE_DIR}/widgetCurveProperties.ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.ui
 )
 
 set(plugin_RCC
@@ -126,15 +115,6 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveProperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/dialogExportProperties.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/multiPointPickerMachine.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/userInteractionPlotPicker.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/drawItem.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotMagnifier.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomPlotZoomer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomLogLogScaleEngine.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtPlot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sharedFiles/itomQwtDObjFigure.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
@@ -156,7 +136,7 @@ file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
 
 ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${plugin_SOURCES} ${plugin_HEADERS} ${plugin_HEADERS_MOC} ${plugin_ui_MOC} ${plugin_rcc_MOC} ${EXISTING_TRANSLATION_FILES})
 
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES} qwtsrc)
+TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES} itomQwtPlotBase)
 IF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
     qt5_use_modules(${target_name} ${QT_COMPONENTS})
 ENDIF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)

@@ -23,12 +23,14 @@
 #ifndef USERINTERACTIONPLOTPICKER_H
 #define USERINTERACTIONPLOTPICKER_H
 
+#include "itomQwtPlotBase.h"
+
 
 #include <qwt_plot_picker.h>
 #include <qpainter.h>
 #include <qbrush.h>
 
-class UserInteractionPlotPicker: public QwtPlotPicker
+class ITOMQWTPLOTBASE_EXPORT UserInteractionPlotPicker: public QwtPlotPicker
 {
     Q_OBJECT
 

@@ -23,10 +23,12 @@
 #ifndef MULTIPOINTPICKERMACHINE_H
 #define MULTIPOINTPICKERMACHINE_H
 
+#include "itomQwtPlotBase.h"
+
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
 
-class MultiPointPickerMachine: public QwtPickerPolygonMachine
+class ITOMQWTPLOTBASE_EXPORT MultiPointPickerMachine: public QwtPickerPolygonMachine
 {
 public:
     MultiPointPickerMachine();

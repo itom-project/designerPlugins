@@ -20,38 +20,51 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef ITOMPLOTPICKER_H
-#define ITOMPLOTPICKER_H
+#ifndef DIALOGEXPORT
+#define DIALOGEXPORT
 
-#include <qwt_plot_picker.h>
+#include "itomQwtPlotBase.h"
 
-#include <qpoint.h>
-#include <qpainter.h>
+#include <QtGui>
+#include <qdialog.h>
 
-class ItomPlotPicker : public QwtPlotPicker
+#include "ui_dialogExportProperties.h"
+
+class ITOMQWTPLOTBASE_EXPORT DialogExportProperties : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ItomPlotPicker( QWidget *parent );
-    explicit ItomPlotPicker( int xAxis, int yAxis, QWidget *parent );
-    explicit ItomPlotPicker( int xAxis, int yAxis, RubberBand rubberBand, DisplayMode trackerMode, QWidget *parent );
+    
 
-    virtual ~ItomPlotPicker();
+    DialogExportProperties(const QSizeF &currentSizePx, QWidget *parent = NULL);
+    ~DialogExportProperties() {};
 
-    void drawTracker( QPainter *painter ) const;
-    void setBackgroundFillBrush( const QBrush &brush );
+    void getData(QSizeF &exportSizePx, QSizeF &exportSizeMm, int &resolution);
 
 protected:
+    void updateOutput(void);
+
+    double pxToMm(const int &px);
+    int mmToPx(const double &mm);
 
 private:
-    QBrush m_rectFillBrush;
+    Ui::DialogExport2File ui;
 
-signals:
+    double m_aspect; /*!< canvas width / canvas height */
 
-public slots:
+    bool m_inEditing;
+    bool m_keepAspectRatio;
 
 private slots:
+    void on_dSB_destHeight_valueChanged(double mm);
+    void on_dSB_destWidth_valueChanged(double mm);
+
+    void on_sB_destHeight_valueChanged(int pixel);
+    void on_sB_destWidth_valueChanged(int pixel);
+
+    void on_cB_ExpType_currentIndexChanged(int index);
+    void on_sB_destResolution_valueChanged(int value);
 
 };
 
