@@ -795,9 +795,10 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
         const cv::Mat** srcCvMatVec= srcObj->get_mdata();
         cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0);
         _Tp* dstPtr = (_Tp*)(dstMat->data);
+        int firstMatOff = srcObj->seekMat(0);
         for (int layer = 0; layer < dstMat->rows; ++layer)
         {
-            val= srcCvMatVec[layer]->data+offsetByte; //first element of host volume cut
+            val= srcCvMatVec[firstMatOff +layer]->data+offsetByte; //first element of host volume cut
             for (i = 0; i < dstMat->cols; i++)
             {
                 *dstPtr++ =*reinterpret_cast<_Tp*>(val+i*stepByte[0]);
@@ -809,12 +810,13 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
     {
         uchar* val=NULL;
         int i;
+        int firstMatOff = srcObj->seekMat(0);
         const cv::Mat** srcCvMatVec= srcObj->get_mdata();
         cv::Mat* dstMat = m_dObjVolumeCut.getCvPlaneMat(0);
         _Tp* dstPtr = (_Tp*)(dstMat->data);
         for (int layer = 0; layer < dstMat->rows; ++layer)
         {
-            val= srcCvMatVec[layer]->data+offsetByte; //first element of host volume cut
+            val= srcCvMatVec[firstMatOff+layer]->data+offsetByte; //first element of host volume cut
             for (i = 0; i < dstMat->cols; i++)
             {
                 *dstPtr++ = *reinterpret_cast<_Tp*>(val+stepByte[i]);
@@ -827,7 +829,6 @@ template <typename _Tp> void PlotCanvas::parseVolumeCutObj( const ito::DataObjec
 ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<QPointF> bounds)
 {
     ito::RetVal retval;
-    //todo for one pixel area and if lowest plane is selected
     if (bounds.size() == 0)
     {
         m_dir = inPlane;
@@ -884,7 +885,6 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {
                 stepByte[0]=(-dataObj->get_mdata()[0]->step[0]);
             }
-            int test = dataObj->getType();
             m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
             switch(dataObj->getType())
             {
