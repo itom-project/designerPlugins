@@ -60,7 +60,7 @@ message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/version
+    ${CMAKE_CURRENT_SOURCE_DIR}/version
     ${QT_QTCORE_INCLUDE_DIR}
     ${ITOM_SDK_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
@@ -72,7 +72,7 @@ LINK_DIRECTORIES(
 )
 
 set(plugin_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/version/pluginVersion.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/version/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogExportProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.h
@@ -84,13 +84,14 @@ set(plugin_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtDObjFigure.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotEnums.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomColorMap.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotPicker.h 
+    ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotPicker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotPanner.h   
 )
 
 set(plugin_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotEnums.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtDObjFigure.h
-	${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotBase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotBase.h
 )
 
 set(plugin_UI
@@ -114,6 +115,7 @@ set(plugin_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtDObjFigure.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itomColorMap.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotPicker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotPanner.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
