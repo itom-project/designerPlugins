@@ -29,12 +29,12 @@ class ItomQwtPlotPanner : public QwtPlotPanner
 {
 public:
     explicit ItomQwtPlotPanner(QWidget *parent);
-    inline void setLeftKlickPanner(bool val) { m_pLeftKlickEnabled = val; }
-    inline bool leftKlickPanner() { return m_pLeftKlickEnabled; }
+    inline void setLeftClickPanner(bool val) { m_pLeftClickEnabled = val; }
+    inline bool leftClickPanner() { return m_pLeftClickEnabled; }
 protected:
     virtual void widgetMousePressEvent(QMouseEvent* mouseEvent);
 private:
-    bool m_pLeftKlickEnabled;
+    bool m_pLeftClickEnabled;
 };
 
 #endif

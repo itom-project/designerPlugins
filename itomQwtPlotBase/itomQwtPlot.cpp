@@ -790,7 +790,7 @@ void ItomQwtPlot::setVisible(bool visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::contextMenuEvent(QContextMenuEvent * event)
 {
-    if (m_showContextMenu && m_pPanner->leftKlickPanner() == false)
+    if (m_showContextMenu && m_pPanner->leftClickPanner() == false)
     {
         event->accept();
         m_pContextMenu->exec(event->globalPos());
@@ -823,7 +823,7 @@ void ItomQwtPlot::setState(int state)
         m_pActZoom->setChecked(state == stateZoom);
         m_pZoomer->setEnabled(state == stateZoom);
         m_pActPan->setChecked(state == statePan);
-        m_pPanner->setLeftKlickPanner(state == statePan);
+        m_pPanner->setLeftClickPanner(state == statePan);
         m_pActShapeType->setChecked(state == stateDrawShape);
         m_pMenuShapeType->setEnabled(m_plottingEnabled && (m_allowedShapeTypes ^ ItomQwtPlotEnums::MultiPointPick) != 0);
         m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes());
