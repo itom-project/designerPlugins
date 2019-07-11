@@ -297,24 +297,26 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
             double y = yMap.transform( sample.y() );
             if ( doAlign )
             {
-                x = qRound( x );
-                if(qIsFinite(y) || d_objseriesXY)
+                if(qIsFinite(y))
                 {
-                    y = qRound( y );
-                    sample.rx() = x;
-                    sample.ry() = y;
+                    //qRound(NaN) will return 0! Be careful about this (probably undefined) behaviour!
+                    sample.rx() = qRound(x);
+                    sample.ry() = qRound(y);
                     polyline << sample;
                 }
                 else
                 {
-                    polyline = reducePoints(polyline, xMap, doAlign);
+                    if (!d_objseriesXY)
+                    {
+                        polyline = reducePoints(polyline, xMap, doAlign);
+                    }
                     drawPolyline(painter,polyline,xMap,yMap,canvasRect);
                     polyline.clear();
                 }
             }
             else
             {
-                if(qIsFinite(y) || d_objseriesXY)
+                if(qIsFinite(y))
                 {
                     sample.rx() = x;
                     sample.ry() = y;
@@ -322,7 +324,10 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
                 }
                 else
                 {
-                    polyline = reducePoints(polyline, xMap, doAlign);
+                    if (!d_objseriesXY)
+                    {
+                        polyline = reducePoints(polyline, xMap, doAlign);
+                    }
                     drawPolyline(painter,polyline,xMap,yMap,canvasRect);
                     polyline.clear();
                 }
