@@ -24,13 +24,13 @@ along with itom. If not, see <http://www.gnu.org/licenses/>.
 #include <QMouseEvent>
 
 ItomQwtPlotPanner::ItomQwtPlotPanner(QWidget* parent) : QwtPlotPanner(parent),
-m_pLeftClickEnabled(false)
+m_leftClickEnabled(false)
 {
 }
 //---------------------------------------------------------------------------
 void ItomQwtPlotPanner::widgetMousePressEvent(QMouseEvent* mouseEvent)
 {
-    if (m_pLeftClickEnabled && mouseEvent->buttons() == Qt::LeftButton)
+    if (m_leftClickEnabled && mouseEvent->buttons() == Qt::LeftButton)
     {
         QMouseEvent newEvent(mouseEvent->type(), mouseEvent->localPos(), mouseEvent->windowPos(), mouseEvent->screenPos(), Qt::MiddleButton, Qt::MiddleButton, mouseEvent->modifiers(), mouseEvent->source());
         QwtPlotPanner::widgetMousePressEvent(&newEvent);
