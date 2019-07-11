@@ -48,6 +48,7 @@
 #include "userInteractionPlotPicker.h"
 #include "multiPointPickerMachine.h"
 #include "dialogExportProperties.h"
+#include "itomQwtPlotPanner.h"
 
 #include "plotLegends/infoWidgetShapes.h"
 #include "plotLegends/infoWidgetMarkers.h"
@@ -136,10 +137,11 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     //all others settings for zoomer are set in init (since they need access to the settings via api)
 
     //panner tool
-    m_pPanner = new QwtPlotPanner(canvas());
+    m_pPanner = new ItomQwtPlotPanner(canvas());
     m_pPanner->setAxisEnabled(QwtPlot::yRight, false);
     m_pPanner->setCursor(Qt::SizeAllCursor);
-    m_pPanner->setEnabled(false);
+    m_pPanner->setEnabled(true);
+    m_pPanner->setMouseButton(Qt::MiddleButton);
     connect(m_pPanner, SIGNAL(panned(int, int)), m_pZoomer, SLOT(canvasPanned(int, int))); //if panner is moved, the new rect is added to the zoom stack for a synchronization of both tools
 
     //magnifier tool
@@ -613,7 +615,7 @@ ItomPlotZoomer *ItomQwtPlot::zoomer() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QwtPlotPanner *ItomQwtPlot::panner() const
+ItomQwtPlotPanner *ItomQwtPlot::panner() const
 {
     return m_pPanner;
 }
@@ -788,7 +790,7 @@ void ItomQwtPlot::setVisible(bool visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::contextMenuEvent(QContextMenuEvent * event)
 {
-    if (m_showContextMenu && m_pPanner->isEnabled() == false)
+    if (m_showContextMenu && m_pPanner->leftClickPanner() == false)
     {
         event->accept();
         m_pContextMenu->exec(event->globalPos());
@@ -821,7 +823,7 @@ void ItomQwtPlot::setState(int state)
         m_pActZoom->setChecked(state == stateZoom);
         m_pZoomer->setEnabled(state == stateZoom);
         m_pActPan->setChecked(state == statePan);
-        m_pPanner->setEnabled(state == statePan);
+        m_pPanner->setLeftClickPanner(state == statePan);
         m_pActShapeType->setChecked(state == stateDrawShape);
         m_pMenuShapeType->setEnabled(m_plottingEnabled && (m_allowedShapeTypes ^ ItomQwtPlotEnums::MultiPointPick) != 0);
         m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes());
@@ -1312,7 +1314,6 @@ void ItomQwtPlot::mouseReleaseEvent(QMouseEvent * event)
         QwtPlot::mouseReleaseEvent(event);
     }
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::closePolygon(bool aborted)
 {

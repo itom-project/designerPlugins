@@ -44,7 +44,7 @@
 class QMenu;
 class ItomPlotZoomer;
 class ItomPlotMagnifier;
-class QwtPlotPanner;
+class ItomQwtPlotPanner;
 class QwtPlotMarker;
 class QContextMenuEvent;
 class QResizeEvent;
@@ -162,7 +162,7 @@ protected:
     
     void loadStyles(bool overwriteDesignableProperties);
     ItomPlotZoomer *zoomer() const;
-    QwtPlotPanner *panner() const;
+    ItomQwtPlotPanner *panner() const;
     void configRescaler();
 
     ito::RetVal changeVisibleMarkers(int currentPlane);
@@ -225,7 +225,7 @@ private:
 
     ItomPlotZoomer *m_pZoomer;
     ItomPlotMagnifier *m_pMagnifier;
-    QwtPlotPanner *m_pPanner;
+    ItomQwtPlotPanner *m_pPanner;
     UserInteractionPlotPicker *m_pMultiPointPicker;
 
     //geometric shapes
