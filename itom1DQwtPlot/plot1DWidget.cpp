@@ -3682,7 +3682,7 @@ void Plot1DWidget::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx)
     if (p)
     {
         QVector<QPointF> bounds = p->getBounds();
-        refreshPlot(p->getInputParam("source")->getVal<ito::DataObject*>(), bounds);
+        refreshPlot(p->getInputParam("source")->getVal<ito::DataObject*>(), bounds, p->getInputParam("xData")->getVal<ito::DataObject*>());
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         updateInterval(Qt::YAxis, *m_pData); //replot is done here 
