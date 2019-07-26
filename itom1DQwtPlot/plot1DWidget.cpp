@@ -65,66 +65,67 @@
 //}
 //----------------------------------------------------------------------------------------------------------------------------------
 Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
-        ItomQwtPlot(parent),
-        m_pPlotGrid(NULL),
-//        m_startScaledX(false),
-//        m_startScaledY(false),
-        m_xDirect(false),
-        m_yDirect(false),
-        //m_autoLineColIndex(0),
-        m_lineCol(0),
-        m_lineWidth(1.0),
-        m_lineStyle(Qt::SolidLine),
-        m_hasParentForRescale(false),
-//        m_actPickerIdx(-1),
-        m_cmplxState(false),
-        m_colorState(false),
-        m_layerState(false),
-        m_pData(data),
-        m_gridStyle(Itom1DQwtPlot::GridNo),
-        m_legendPosition(BottomLegend),
-        m_legendVisible(false),
-		m_pLegendLabelWidth(15),
-        m_qwtCurveStyle(ItomQwtPlotEnums::Lines),
-        m_baseLine(0.0),
-        m_fillCurveAlpa(128),
-        m_filledColor(QColor::Invalid),
-        m_curveFilled(ItomQwtPlotEnums::NoCurveFill),
-        m_pLegend(NULL),
-        m_guiModeCache(-1),
-        m_valueScale(ItomQwtPlotEnums::Linear),
-        m_axisScale(ItomQwtPlotEnums::Linear),
-        m_pActScaleSettings(NULL),
-        m_pRescaleParent(NULL),
-        m_pActForward(NULL),
-        m_pActBack(NULL),
-        m_pActPicker(NULL),
-        m_pMnuSetPicker(NULL),
-        m_pActSetPicker(NULL),
-        m_pMnuCmplxSwitch(NULL),
-        m_pMnuRGBSwitch(NULL),
-		m_pMnuGrid(NULL),
-		m_pLblMarkerOffsets(NULL),
-        m_pLblMarkerCoords(NULL),
-        m_pMnuMultiRowSwitch(NULL),
-        m_pActXVAuto(NULL),
-        m_pActXVFR(NULL),
-        m_pActXVFC(NULL),
-        m_pActXVMR(NULL),
-        m_pActXVMC(NULL),
-        m_pActXVML(NULL),
-        m_pActRGBA(NULL),
-        m_pActGray(NULL),
-        m_pActRGBL(NULL),
-        m_pActRGBAL(NULL),
-        m_pActRGBG(NULL),
-        m_pActMultiRowSwitch(NULL),
-        m_pActRGBSwitch(NULL),
-        m_pActCmplxSwitch(NULL),
-        m_pActLegendSwitch(NULL),
-        m_pMnuLegendSwitch(NULL),
-        m_antiAliased(false),
-		m_pComplexStyle(ItomQwtPlotEnums::CmplxAbs)
+    ItomQwtPlot(parent),
+    m_pPlotGrid(NULL),
+    //        m_startScaledX(false),
+    //        m_startScaledY(false),
+    m_xDirect(false),
+    m_yDirect(false),
+    //m_autoLineColIndex(0),
+    m_lineCol(0),
+    m_lineWidth(1.0),
+    m_lineStyle(Qt::SolidLine),
+    m_hasParentForRescale(false),
+    //        m_actPickerIdx(-1),
+    m_cmplxState(false),
+    m_colorState(false),
+    m_layerState(false),
+    m_pData(data),
+    m_gridStyle(Itom1DQwtPlot::GridNo),
+    m_legendPosition(BottomLegend),
+    m_legendVisible(false),
+    m_pLegendLabelWidth(15),
+    m_qwtCurveStyle(ItomQwtPlotEnums::Lines),
+    m_baseLine(0.0),
+    m_fillCurveAlpa(128),
+    m_filledColor(QColor::Invalid),
+    m_curveFilled(ItomQwtPlotEnums::NoCurveFill),
+    m_pLegend(NULL),
+    m_guiModeCache(-1),
+    m_valueScale(ItomQwtPlotEnums::Linear),
+    m_axisScale(ItomQwtPlotEnums::Linear),
+    m_pActScaleSettings(NULL),
+    m_pRescaleParent(NULL),
+    m_pActForward(NULL),
+    m_pActBack(NULL),
+    m_pActPicker(NULL),
+    m_pMnuSetPicker(NULL),
+    m_pActSetPicker(NULL),
+    m_pMnuCmplxSwitch(NULL),
+    m_pMnuRGBSwitch(NULL),
+    m_pMnuGrid(NULL),
+    m_pLblMarkerOffsets(NULL),
+    m_pLblMarkerCoords(NULL),
+    m_pMnuMultiRowSwitch(NULL),
+    m_pActXVAuto(NULL),
+    m_pActXVFR(NULL),
+    m_pActXVFC(NULL),
+    m_pActXVMR(NULL),
+    m_pActXVMC(NULL),
+    m_pActXVML(NULL),
+    m_pActRGBA(NULL),
+    m_pActGray(NULL),
+    m_pActRGBL(NULL),
+    m_pActRGBAL(NULL),
+    m_pActRGBG(NULL),
+    m_pActMultiRowSwitch(NULL),
+    m_pActRGBSwitch(NULL),
+    m_pActCmplxSwitch(NULL),
+    m_pActLegendSwitch(NULL),
+    m_pMnuLegendSwitch(NULL),
+    m_antiAliased(false),
+    m_pComplexStyle(ItomQwtPlotEnums::CmplxAbs),
+    m_legendOffset(0)
 {
     createActions();
     setButtonStyle(buttonStyle());
@@ -1389,17 +1390,37 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         //add new curves to the canvas until a number of 'numCurves' exists.
         bool valid;
         ito::DataObjectTagType tag;
+        int *roiLims = new int[2 * dataObj->getDims()];
+        dataObj->locateROI(roiLims);
         QList<QString> curveNames = m_legendTitles.mid(0, m_plotCurveItems.size());
+        int legendOffset;
+        switch (m_pData->m_multiLine)
+        {
+        case ItomQwtPlotEnums::AutoRowCol:
+        case ItomQwtPlotEnums::MultiLayerAuto:
+        case ItomQwtPlotEnums::MultiLayerRows:
+        case ItomQwtPlotEnums::FirstRow:
+        case ItomQwtPlotEnums::MultiRows:
+            legendOffset = roiLims[2*dataObj->getDims() - 4];
+            break;
+        case ItomQwtPlotEnums::MultiLayerCols:
+        case ItomQwtPlotEnums::FirstCol:
+        case ItomQwtPlotEnums::MultiCols:
+            legendOffset = roiLims[2 * dataObj->getDims() - 2];
+            break;
+        default:
+            legendOffset = 0;
+        }
 
-        while (m_plotCurveItems.size() < numCurves)
+        while (m_plotCurveItems.size() < numCurves) // do until all curves are present
         {
             index = m_plotCurveItems.size();
-            if (m_legendTitles.size() <= index)
+            if (m_legendTitles.size() <= index) //true if there are fewer or equal legend entries such as curves
             {
 #if QT_VERSION >= 0x050400
-                tag = dataObj->getTag(QString("legendTitle%1").arg(index).toLatin1().toStdString(), valid);
+                tag = dataObj->getTag(QString("legendTitle%1").arg(index + legendOffset).toLatin1().toStdString(), valid);
 #else
-                tag = dataObj->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
+                tag = dataObj->getTag(QString("legendTitle%1").arg(index+legendOffset).toStdString(), valid);
 #endif
                 
 				if(valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
@@ -1409,8 +1430,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 				}
 				else // plots with empty tags: curce 0, curve 1, ...
 				{
-					dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index));
-                    curveNames.append(tr("curve %1").arg(index));
+					dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index+legendOffset));
+                    curveNames.append(tr("curve %1").arg(index + legendOffset));
 				}	
             }
             else // if (m_legendTitles.size() > index)
@@ -1471,14 +1492,42 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 			connect(m_plotCurvePropertyItems.last(), SIGNAL(curveChanged()), ((WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties()), SLOT(on_listWidget_itemSelectionChanged()));
 			refreshWidgetCurveProperties = 1;
         }
+ 
 
 		//re-use old legend titles entries, if no new curves have been appended (e.g. important if 'the' same shape of object is only updated via resetting its source property
 		for (int i = curveNames.size(); i < std::min(numCurves, m_legendTitles.size()); ++i)
 		{
 			curveNames.append(m_legendTitles[i]);
 		}
+        // update legend since offset has changed
+        if (m_legendOffset != legendOffset) 
+        {
+            for (int i = 0; i < curveNames.size(); ++i)
+            {
+#if QT_VERSION >= 0x050400
+                tag = dataObj->getTag(QString("legendTitle%1").arg(i + legendOffset).toLatin1().toStdString(), valid);
+#else
+                tag = dataObj->getTag(QString("legendTitle%1").arg(i + legendOffset).toStdString(), valid);
+#endif
+
+                if (valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
+                {
+                    m_plotCurveItems[i]->setTitle(QString::fromLatin1(tag.getVal_ToString().data()));
+                    curveNames[i]=QString(tag.getVal_ToString().data());
+                }
+                else // plots with empty tags: curce 0, curve 1, ...
+                {
+                    m_plotCurveItems[i]->setTitle(tr("curve %1").arg(index + legendOffset));
+                    curveNames[i] = QString(tr("curve %1").arg(index + legendOffset));
+                }
+            }
+
+        }
 
         m_legendTitles = curveNames;
+        m_legendOffset = legendOffset;
+        delete[] roiLims;
+        roiLims = NULL;
 
 
 		if (refreshWidgetCurveProperties == 1) // if true a curve was added or deleted and the widget has to be updated

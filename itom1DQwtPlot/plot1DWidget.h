@@ -208,6 +208,7 @@ class Plot1DWidget : public ItomQwtPlot
         LegendPosition m_legendPosition;
         bool m_legendVisible;
 		int m_pLegendLabelWidth;
+        int m_legendOffset;
 
         ItomQwtPlotEnums::CurveStyle m_qwtCurveStyle;
 
