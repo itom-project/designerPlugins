@@ -1397,6 +1397,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         switch (m_pData->m_multiLine)
         {
         case ItomQwtPlotEnums::AutoRowCol:
+            if (multiLineMode == ItomQwtPlotEnums::MultiCols)
+            {
+                legendOffset = roiLims[2 * dataObj->getDims() - 4];
+                break;
+            }
+            else
+            {
+                legendOffset = roiLims[2 * dataObj->getDims() - 2];
+                break;
+            }
         case ItomQwtPlotEnums::MultiLayerAuto:
         case ItomQwtPlotEnums::MultiLayerRows:
         case ItomQwtPlotEnums::FirstRow:
