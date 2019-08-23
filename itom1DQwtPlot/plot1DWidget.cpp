@@ -2502,7 +2502,7 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
         xScaleStart = m->item->xValue();
     }
 
-    int thisIdx = data->getPosToPix(xScaleStart, yScaleStart); //yScaleStart is ignored in case of DatsaObjectSeriesData
+    int thisIdx = data->getPosToPix(xScaleStart, yScaleStart); //yScaleStart is ignored in case of DataObjectSeriesData
     int s = (int)data->size();
     QPointF p;
     bool found = false;
@@ -2568,10 +2568,15 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
                 p = data->sample(thisIdx);
                 if (qIsFinite(p.ry()))
                 {
-                    m->item->setXValue(p.rx());
-                    m->item->setYValue(p.ry());
-                    m->dObjDataIdx = thisIdx;
-                    found = true;
+                    if (std::abs(p.rx() - xScaleStart) > std::numeric_limits<double>::epsilon() ||
+                        std::abs(p.ry() - yScaleStart) > std::numeric_limits<double>::epsilon())
+                    {
+                        //the next point is at another position --> take it, else continue in the loop
+                        m->item->setXValue(p.rx());
+                        m->item->setYValue(p.ry());
+                        m->dObjDataIdx = thisIdx;
+                        found = true;
+                    }
                 }
             }
             else
@@ -2594,15 +2599,20 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
         while (!found)
         {
             thisIdx += 1;
-            if (thisIdx >= 0 && thisIdx < s)
+            if (thisIdx < s)
             {
                 p = data->sample(thisIdx);
                 if (qIsFinite(p.ry()))
                 {
-                    m->item->setXValue(p.rx());
-                    m->item->setYValue(p.ry());
-                    m->dObjDataIdx = thisIdx;
-                    found = true;
+                    if (std::abs(p.rx() - xScaleStart) > std::numeric_limits<double>::epsilon() ||
+                        std::abs(p.ry() - yScaleStart) > std::numeric_limits<double>::epsilon())
+                    {
+                        //the next point is at another position --> take it, else continue in the loop
+                        m->item->setXValue(p.rx());
+                        m->item->setYValue(p.ry());
+                        m->dObjDataIdx = thisIdx;
+                        found = true;
+                    }
                 }
             }
             else
