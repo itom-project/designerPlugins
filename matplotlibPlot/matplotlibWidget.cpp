@@ -488,7 +488,9 @@ void MatplotlibWidget::leaveEvent ( QEvent * event )
 {
     if (!hasFocus())
         return;
-    emit eventLeaveEnter(0);
+
+    emit eventLeave();
+    emit eventLeaveEnter(false); //deprecated
 }
 
 //-------------------------------------------------------------------------------------
@@ -496,7 +498,22 @@ void MatplotlibWidget::enterEvent ( QEvent * event )
 {
     if (!hasFocus())
         return;
-    emit eventLeaveEnter(1);
+
+#if QT_VERSION >= 0x050000
+    QEnterEvent *e = static_cast<QEnterEvent*>(event);
+    if (e)
+    {
+        emit eventEnter(e->pos().x(), e->pos().y());
+    }
+    else
+    {
+        emit eventEnter(0, 0);
+    }
+#else
+    emit eventEnter(0, 0);
+#endif
+
+    emit eventLeaveEnter(true); //deprecated
 }
 
 //-------------------------------------------------------------------------------------

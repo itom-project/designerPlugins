@@ -131,7 +131,9 @@ private:
 #endif
 
 signals:
-    void eventLeaveEnter(bool enter);
+    void eventLeaveEnter(bool enter); /*deprecated*/
+    void eventEnter(int x, int y);
+    void eventLeave();
     void eventMouse(int type, int x, int y, int button);
     void eventWheel(int x, int y, int delta, int orientation);
     void eventKey(int type, int key, int modifiers, bool autoRepeat);
