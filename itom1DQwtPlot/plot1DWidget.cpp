@@ -805,53 +805,56 @@ void Plot1DWidget::toggleLegendLabel(QwtPlotCurve* curve, const bool state)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
 {
-    if (m_pLegend)
-    {
-        m_pLegend->deleteLater();
-        m_pLegend = NULL;		
-    }
+	if (position != m_legendPosition || visible != m_legendVisible)
+	{
+		if (m_pLegend)
+		{
+			m_pLegend->deleteLater();
+			m_pLegend = NULL;
+		}
 
-    if (visible)
-    {
-        m_pLegend = new QwtLegend(this);
-        m_pLegend->setDefaultItemMode(QwtLegendData::Checkable);
-        connect(m_pLegend, SIGNAL(checked(QVariant,bool,int)), this, SLOT(legendItemChecked(QVariant,bool)));
-        insertLegend(m_pLegend, position);
+		if (visible)
+		{
+			m_pLegend = new QwtLegend(this);
+			m_pLegend->setDefaultItemMode(QwtLegendData::Checkable);
+			connect(m_pLegend, SIGNAL(checked(QVariant, bool, int)), this, SLOT(legendItemChecked(QVariant, bool)));
+			insertLegend(m_pLegend, position);
 
-        updateLegendItems();
+			updateLegendItems();
 
-        foreach(QAction *a, m_pMnuLegendSwitch->actions())
-        {
-            if (a->data().toInt() == position)
-            {
-                m_pMnuLegendSwitch->setDefaultAction(a);
-                a->setChecked(true);
-            }
-            else
-            {
-                a->setChecked(false);
-            }
-        }
-    }
-    else
-    {
-        foreach(QAction *a, m_pMnuLegendSwitch->actions())
-        {
-            if (a->data().toInt() == -1)
-            {
-                m_pMnuLegendSwitch->setDefaultAction(a);
-                a->setChecked(true);
-            }
-            else
-            {
-                a->setChecked(false);
-            }
-        }
-        insertLegend(NULL);
-    }
+			foreach(QAction *a, m_pMnuLegendSwitch->actions())
+			{
+				if (a->data().toInt() == position)
+				{
+					m_pMnuLegendSwitch->setDefaultAction(a);
+					a->setChecked(true);
+				}
+				else
+				{
+					a->setChecked(false);
+				}
+			}
+		}
+		else
+		{
+			foreach(QAction *a, m_pMnuLegendSwitch->actions())
+			{
+				if (a->data().toInt() == -1)
+				{
+					m_pMnuLegendSwitch->setDefaultAction(a);
+					a->setChecked(true);
+				}
+				else
+				{
+					a->setChecked(false);
+				}
+			}
+			insertLegend(NULL);
+		}
 
-    m_legendVisible = visible;
-    m_legendPosition = position;
+		m_legendVisible = visible;
+		m_legendPosition = position;
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -862,9 +865,14 @@ void Plot1DWidget::updateLegendItems()
         QwtLegendLabel *legendLabel = NULL;
         QSize maxLegendIconSize(m_pLegendLabelWidth, 0);
         WidgetCurveProperties* widgetCurveProperties = (WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties();
+		QwtText text;
 
         foreach(QwtPlotCurve *item, m_plotCurveItems)
         {
+			text = item->title();
+			text.setFont(m_legendFont);
+			item->setTitle(text);
+
             item->setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
             item->setLegendAttribute(QwtPlotCurve::LegendShowSymbol, true);
             maxLegendIconSize.rheight() = std::max(maxLegendIconSize.height(), item->legendIconSize().height());
@@ -873,7 +881,7 @@ void Plot1DWidget::updateLegendItems()
             if (legendLabel)
             {
                 //set font
-                QwtText text(legendLabel->data().title());
+                text = legendLabel->data().title();
                 text.setFont(m_legendFont);
                 legendLabel->setText(text);
 
@@ -936,13 +944,27 @@ void Plot1DWidget::setLegendFont(const QFont &font)
     m_legendFont = font;
     if (m_pLegend)
     {
+		QwtText text;
         QwtLegendLabel* legendLabel;
         foreach(QwtPlotCurve *item, m_plotCurveItems)
         {
+			QList<QwtLegendData> &data = item->legendData();
+			for (int i = 0; i < data.size(); ++i)
+			{
+				if (data[i].hasRole(QwtLegendData::TitleRole))
+				{
+					text = data[i].title();
+					text.setFont(m_legendFont);
+					QVariant titleValue;
+					qVariantSetValue(titleValue, text);
+					data[i].setValue(QwtLegendData::TitleRole, titleValue);
+				}
+			}
+
             legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
             if (legendLabel)
             {
-                QwtText text(legendLabel->data().title());
+                text = legendLabel->data().title();
                 text.setFont(m_legendFont);
                 legendLabel->setText(text);
             }
@@ -1462,6 +1484,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     legendLabel->setChecked(true);
                 }
             }
+
+			QwtText text = dObjCurve->title();
+			text.setFont(m_legendFont);
+			dObjCurve->setTitle(text);
 
             QPen plotPen;
             colorIndex = m_plotCurveItems.size() % m_colorList.size();
