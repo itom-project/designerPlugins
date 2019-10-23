@@ -34,7 +34,7 @@ DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
     m_dX.nrPoints = 0;
     m_dX.points.clear();
     m_dX.valid = false;
-    hasXObj = true;
+    m_hasXObj = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -156,6 +156,7 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
     }
 }
 
+//---------------------------------------------------------------------------------------------------
 RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/, const QVector<QPointF>& boundsX /*= QVector<QPointF>()*/)
 {
     DataObjectSeriesData::updateDataObject(dataObj, bounds);
@@ -176,6 +177,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         m_dX.matSteps.clear();
         m_dX.valid = false;
     }
+
     if(xVec != NULL)
     {
         int dimsX = xVec->getDims();
@@ -196,106 +198,128 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         m_dX.plane = 0;
         
         if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[m_dX.plane])->data)
+        {
             return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the xData seems corrupted").toLatin1().data());
+        }
 
-            if (!retval.containsError())
+        if (!retval.containsError())
+        {
+            m_dX.valid = true;
+
+
+            pxX1x = qRound(xVec->getPhysToPix(dimsX - 1, boundsX[0].x(), _unused));
+            pxY1x = qRound(xVec->getPhysToPix(dimsX - 2, boundsX[0].y(), _unused));
+            pxX2x = qRound(xVec->getPhysToPix(dimsX - 1, boundsX[1].x(), _unused));
+            pxY2x = qRound(xVec->getPhysToPix(dimsX - 2, boundsX[1].y(), _unused));
+
+            saturation(pxX1x, 0, xVec->getSize(dimsX - 1) - 1);
+            saturation(pxX2x, 0, xVec->getSize(dimsX - 1) - 1);
+            saturation(pxY1x, 0, xVec->getSize(dimsX - 2) - 1);
+            saturation(pxY2x, 0, xVec->getSize(dimsX - 2) - 1);
+
+
+
+            mat = (cv::Mat*)xVec->get_mdata()[xVec->seekMat(m_dX.plane)];
+            if (pxY1x == pxY2x) //pure line in x direction of x vector
             {
-                m_dX.valid = true;
-
-
-                pxX1x = qRound(xVec->getPhysToPix(dimsX - 1, boundsX[0].x(), _unused));
-                pxY1x = qRound(xVec->getPhysToPix(dimsX - 2, boundsX[0].y(), _unused));
-                pxX2x = qRound(xVec->getPhysToPix(dimsX - 1, boundsX[1].x(), _unused));
-                pxY2x = qRound(xVec->getPhysToPix(dimsX - 2, boundsX[1].y(), _unused));
-
-                saturation(pxX1x, 0, xVec->getSize(dimsX - 1) - 1);
-                saturation(pxX2x, 0, xVec->getSize(dimsX - 1) - 1);
-                saturation(pxY1x, 0, xVec->getSize(dimsX - 2) - 1);
-                saturation(pxY2x, 0, xVec->getSize(dimsX - 2) - 1);
-
-
-
-                mat = (cv::Mat*)xVec->get_mdata()[xVec->seekMat(m_dX.plane)];
-                if (pxY1x == pxY2x) //pure line in x direction of x vector
+                m_dX.dir = dirX;
+                if (pxX2x > pxX1x)
                 {
-                    m_dX.dir = dirX;
-                    if (pxX2x > pxX1x)
+                    m_dX.nrPoints = 1 + pxX2x - pxX1x;
+                    if (m_dX.nrPoints != size())
                     {
-                        m_dX.nrPoints = 1 + pxX2x - pxX1x;
-                        if (m_dX.nrPoints != size())
+                        if (m_dX.nrPoints > size())
                         {
-                            if (m_dX.nrPoints > size())
-                            {
-                                retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
-                            }
-                            else
-                            {
-                                m_dX.valid = false;
-                                retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
-                            }
+                            retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
                         }
-                        m_dX.startPx.setX(pxX1x);
-                        m_dX.startPx.setY(pxY1x);
-                        m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
-                        m_dX.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
-                        m_dX.stepSizePx.setWidth(1);
-                        m_dX.stepSizePx.setHeight(0);
-                    }
-                }
-                else if(pxX1x == pxX2x)
-                    {
-                        m_dX.dir = dirY;
-                        if (pxY2x > pxY1x)
+                        else
                         {
-                            m_dX.nrPoints = 1 + pxY2x -pxY1x;
-                            if (m_dX.nrPoints != size())
-                            {
-                                if (m_dX.nrPoints > size())
-                                {
-                                    retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
-                                }
-                                else
-                                {
-                                    m_dX.valid = false;
-                                    retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
-                                }
-                            }
+                            m_dX.valid = false;
+                            retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
                         }
-                        m_dX.startPx.setX(pxX1x);
-                        m_dX.startPx.setY(pxY1x);
-                        m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
-                        m_dX.stepSizePx.setWidth(0);
-                        m_dX.stepSizePx.setHeight(1);
-                        m_dX.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
-
                     }
-                
-                    else
-                    {
-                        retval += RetVal(retError, 0, "recieved invalid bounds.");
-                    }
-                }
-                if (!retval.containsError())
-                {
-                    description = xVec->getValueDescription();
-                    unit = xVec->getValueUnit();
-                    if (unit != "" || description != "") //xVec value description dominates over source axis- and unit decription
-                    {
-                        if (description == "")
-                        {
-                            description = "x-Axis";
-                        }
-                        m_dObjAxisDescription = fromStdLatin1String(description);
-                        m_dObjAxisUnit = fromStdLatin1String(unit);
-
-                    }
-                    m_pXVec = xVec;
-                    calcHash();
+                    m_dX.startPx.setX(pxX1x);
+                    m_dX.startPx.setY(pxY1x);
+                    m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
+                    m_dX.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
+                    m_dX.stepSizePx.setWidth(1);
+                    m_dX.stepSizePx.setHeight(0);
                 }
             }
+            else if(pxX1x == pxX2x)
+            {
+                m_dX.dir = dirY;
+                if (pxY2x > pxY1x)
+                {
+                    m_dX.nrPoints = 1 + pxY2x -pxY1x;
+                    if (m_dX.nrPoints != size())
+                    {
+                        if (m_dX.nrPoints > size())
+                        {
+                            retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
+                        }
+                        else
+                        {
+                            m_dX.valid = false;
+                            retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
+                        }
+                    }
+                }
+                m_dX.startPx.setX(pxX1x);
+                m_dX.startPx.setY(pxY1x);
+                m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
+                m_dX.stepSizePx.setWidth(0);
+                m_dX.stepSizePx.setHeight(1);
+                m_dX.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
+
+            } 
+            else
+            {
+                retval += RetVal(retError, 0, "recieved invalid bounds.");
+            }
+        }
+
+        if (!retval.containsError())
+        {
+            description = xVec->getValueDescription();
+            unit = xVec->getValueUnit();
+
+            if (unit != "" || description != "") //xVec value description dominates over source axis- and unit decription
+            {
+                if (description == "")
+                {
+                    description = "x-Axis";
+                }
+                m_dObjAxisDescription = fromStdLatin1String(description);
+                m_dObjAxisUnit = fromStdLatin1String(unit);
+
+            }
+
+            switch (xVec->getType())
+            {
+            case ito::tUInt8:
+            case ito::tInt8:
+            case ito::tUInt16:
+            case ito::tInt16:
+            case ito::tUInt32:
+            case ito::tInt32:
+                m_xCoordsWholeNumber = true;
+                break;
+            default:
+                m_xCoordsWholeNumber = false;
+                break;
+            }
+
+            m_pXVec = xVec;
+
+            calcHash();
+        }
+    }
     
     return retval;
 }
+
+//----------------------------------------------------------------
 void DataObjectSeriesDataXY::calcHash()
 {
     if (m_pXVec == NULL)

@@ -164,13 +164,14 @@ class Plot1DWidget : public ItomQwtPlot
             int dObjDataIdx;
         };
         void setSendCurrentViewState(bool state);
-        void stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart = std::numeric_limits<double>::quiet_NaN());
+        void stickPickerToXPx(Picker *picker, double xScaleStart, int dir, const double& yScaleStart = std::numeric_limits<double>::quiet_NaN());
         void stickPickerToSampleIdx(Picker *m, int idx, int dir);
         void updatePickerPosition(bool updatePositions, bool clear = false);
         void createActions();
         ito::RetVal validateXData(const ito::DataObject* dataObj, const ito::DataObject* xVec, const QVector<QPointF> &bounds);
         inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
 
+        QString distanceWithUnit(qreal d, const QString &unit, bool isIntegerType) const;
 
 
         QList<QwtPlotCurve*> m_plotCurveItems;
@@ -262,6 +263,9 @@ class Plot1DWidget : public ItomQwtPlot
         int idx1;
         QRectF rect1;
         QRectF base;
+
+        static QStringList siLengthUnits;
+        static QStringList siTimeUnits;
 
     signals:
         void spawnNewChild(QVector<QPointF>);

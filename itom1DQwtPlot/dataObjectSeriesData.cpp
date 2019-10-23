@@ -39,8 +39,9 @@ DataObjectSeriesData::DataObjectSeriesData(const int fastmode) :
     m_cmplxState(ItomQwtPlotEnums::CmplxAbs),
     m_pDataObj(NULL),
     inSamplingMode(false),
-    hasXObj(false),
-    m_colorState(grayColor)
+    m_hasXObj(false),
+    m_colorState(grayColor),
+    m_xCoordsWholeNumber(false)
 {
     m_d.nrPoints = 0;
     m_d.points.clear();
@@ -383,7 +384,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
                         m_d.nrPoints = 1 + std::max(dx,dy);
 
-                        m_d.startPhys= 0.0;  //there is no physical starting point for diagonal lines.
+                        m_d.startPhys = 0.0;  //there is no physical starting point for diagonal lines.
 
                         if (m_d.nrPoints > 0)
                         {
@@ -669,6 +670,24 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
         }    
     }
     m_pDataObj = dataObj;
+
+    if (m_d.valid)
+    {
+        double dStart = std::abs(m_d.startPhys - (int)m_d.startPhys);
+        double dStep = std::abs(m_d.stepSizePhys - (int)m_d.stepSizePhys);
+        if (dStart < 1e-10 && dStep < 1e-10)
+        {
+            m_xCoordsWholeNumber = true;
+        }
+        else
+        {
+            m_xCoordsWholeNumber = false;
+        }
+    }
+    else
+    {
+        m_xCoordsWholeNumber = false;
+    }
 
     calcHash();
 
@@ -2603,6 +2622,8 @@ QString DataObjectSeriesData::getDObjAxisLabel(const AbstractFigure::UnitLabelSt
     }
     return m_dObjAxisDescription;
 }
+
+//-------------------------------------------------------------------------
 template <typename _Tp> _Tp DataObjectSeriesData::sampleComplex(const size_t& n) const
 {
     const cv::Mat *mat;
@@ -2641,6 +2662,7 @@ template <typename _Tp> _Tp DataObjectSeriesData::sampleComplex(const size_t& n)
 }
 template ito::complex64  DataObjectSeriesData::sampleComplex(const size_t& n) const;
 template ito::complex128  DataObjectSeriesData::sampleComplex(const size_t& n) const;
+
 //----------------------------------------------------------------------------------------------
 void DataObjectSeriesData::getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const
 {

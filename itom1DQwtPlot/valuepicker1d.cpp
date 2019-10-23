@@ -35,7 +35,7 @@ ValuePicker1D::~ValuePicker1D()
 
 QwtText ValuePicker1D::trackerTextF( const QPointF &pos ) const
 {
-    QString text = QString("[%1, %2]").arg(pos.x(), 0, 'g', 3).arg(pos.y(), 0, 'g', 3);
+    QString text = QString("x: %1, y: %2").arg(pos.x(), 0, 'g', 3).arg(pos.y(), 0, 'g', 3);
     return text;
 }
 
