@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2019, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -87,7 +87,7 @@ class PlotCanvas : public ItomQwtPlot
 
         virtual void setButtonStyle(int style);
 
-        void childFigureDestroyed(QObject* obj, ito::uint32 UID);
+        void removeChildPlotIndicators(bool lineChildPlot, bool zStackChildPlot, bool volumeChildPlot, bool resetState = false);
 
         ito::AutoInterval getInterval(Qt::Axis axis) const;
         void setInterval(Qt::Axis axis, const ito::AutoInterval &interval);
@@ -111,7 +111,7 @@ class PlotCanvas : public ItomQwtPlot
         void setContourLineWidth(const float &width);
 
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
-        ito::RetVal setVolumeCut(const double x0, const double y0, const double x1, const double y1);
+        
 		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
 		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
@@ -196,9 +196,6 @@ class PlotCanvas : public ItomQwtPlot
         DataObjRasterData *m_rasterOverlayData;
         
         Direction m_dir;
-        ito::uint32 m_zstackCutUID;
-        ito::uint32 m_lineCutUID;
-        ito::uint32 m_volumeCutUID;
         bool m_lineCutValidStart; //true if the first point of the line cut is a valid point inside of the data object
         bool m_volumeCutValidStart; ////true if the first point of the volume cut is a valid point inside of the data object
 

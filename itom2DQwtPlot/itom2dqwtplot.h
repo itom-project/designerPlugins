@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2019, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -82,7 +82,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     
     Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false)
     Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false)
-
+    Q_PROPERTY(ito::ItomPlotHandle volumeCutPlotItem READ getVolumeCutPlotItem WRITE setVolumeCutPlotItem DESIGNABLE false)
 
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
@@ -115,6 +115,7 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 
     Q_CLASSINFO("prop://lineCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for lateral slicing. The 'uiItem' can be savely cast to 'plotItem'.")
     Q_CLASSINFO("prop://zSlicePlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for z slicing. The 'uiItem' can be savely cast to 'plotItem'.")
+    Q_CLASSINFO("prop://volumeCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for the volume cut. The 'uiItem' can be savely cast to 'plotItem'.")
     Q_CLASSINFO("slot://getDisplayed", "returns the currently displayed dataObject.")
     Q_CLASSINFO("slot://getDisplayedLineCut", "returns the currently displayed line cut dataObject")
 
@@ -147,8 +148,9 @@ public:
     Itom2dQwtPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     ~Itom2dQwtPlot();
 
-    ito::RetVal displayVolumeCut(QVector<QPointF> bounds, ito::uint32 &uniqueID);
-    ito::RetVal displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack = false);
+    ito::RetVal displayVolumeCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);
+    ito::RetVal displayZStackCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);
+    ito::RetVal displayLineCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);
 
     ito::RetVal applyUpdate();  //!> does the real update work
 
@@ -253,13 +255,19 @@ public:
     ito::ItomPlotHandle getLineCutPlotItem() const;
 
     //!> return the current line cut id for lateral slices
-    void setLineCutPlotItem(const ito::ItomPlotHandle idx);
+    void setLineCutPlotItem(const ito::ItomPlotHandle &plotHandle);
 
     //!> set a line cut id for zSlices
     ito::ItomPlotHandle getZSlicePlotItem() const;
 
     //!> return the current line cut id for zSlices
-    void setZSlicePlotItem(const ito::ItomPlotHandle idx);
+    void setZSlicePlotItem(const ito::ItomPlotHandle &plotHandle);
+    
+    //!> set a line cut id for volume cut
+    ito::ItomPlotHandle getVolumeCutPlotItem() const;
+
+    //!> return the current line cut id for volume cut
+    void setVolumeCutPlotItem(const ito::ItomPlotHandle &plotHandle);
 
     //!> set the bounds for volume cut
     void setBounds(QVector<QPointF> bounds);

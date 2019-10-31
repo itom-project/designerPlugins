@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2019, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -36,6 +36,7 @@
 #include <qmessagebox.h>
 #include <qshortcut.h>
 #include <qdesktopwidget.h>
+#include <qpointer.h>
 
 #include <qwt_plot_renderer.h>
 #include <qmenu.h>
@@ -50,16 +51,60 @@
 
 #include "DataObject/dataObjectFuncs.h"
 
+//! this class contains information about a child plot
+class ChildPlotItem
+{
+public:
+    enum ChildPlotState
+    {
+        StateChannelsConnected = 0x10, /*if this flag is set, the 'channels' are connected from this plot to this child plot. */
+        StateShowPending = 0x20 /*if this flag is set, the child plot should be shown at first plot command (then reset this flag) */
+    };
+
+    Q_DECLARE_FLAGS(ChildPlotStates, ChildPlotState)
+
+    ChildPlotItem() :
+        m_UID(0),
+        m_states(0)
+    {};
+
+    ChildPlotItem(ito::uint32 UID, QWidget *childFigure, ChildPlotStates states = 0) :
+        m_UID(UID),
+        m_childFigure(childFigure),
+        m_states(states)
+    {}
+
+    //default copy constructor and assignment operator can be used
+
+    bool isValid() const { return !m_childFigure.isNull(); }
+    ito::uint32 UID() const { return isValid() ? m_UID : 0; }
+    QWidget *childFigure() const { return m_childFigure.data(); }
+    ChildPlotStates states() const { return m_states; }
+    ChildPlotStates& rStates() { return m_states; }
+
+private:
+    QPointer<QWidget> m_childFigure;
+    ito::uint32 m_UID;
+    ChildPlotStates m_states;
+};
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(ChildPlotItem::ChildPlotStates)
+
 //------------------------------------------------------------------------------------------------------------------------
 class Itom2dQwtPlotPrivate 
 {
 public:
+
     Itom2dQwtPlotPrivate() : 
         m_pData(NULL)
     {}
     
     InternalData *m_pData;
-    QHash<QObject*,ito::uint32> m_childFigures;
+
+    //QHash<QObject*,ito::uint32> m_childFigures;
+    ChildPlotItem m_volumeCutChildPlot; /*Line cut plot in the 2D plane, spanned by the last two dimensions and displayed as 1D plot*/
+    ChildPlotItem m_lineCutChildPlot;   /*Line cut plot along the first dimension (in case of >= 3 dimensions), displayed as 1D plot */
+    ChildPlotItem m_zStackChildPlot;    /*Plane cut along the x/z, y/z or x-y/z direction, displayed as 2D plot*/
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -834,88 +879,88 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint32 &uniqueID)
+ito::RetVal Itom2dQwtPlot::displayVolumeCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID /*= NULL*/)
 {
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
-        return ito::RetVal(ito::retError, 0, tr("Could not spawn volumeCut due to missing API-handle").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not spawn lineCut due to missing API-handle").toLatin1().data());
     }
-
-    int infoType = ito::Shape::Line;
 
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
-    ito::uint32 newUniqueID = uniqueID;
-    QWidget *volumeCutObj = NULL;
-
-    bool needChannelUpdate = false;
+    ito::uint32 UID = 0;
+    QWidget *childPlot = NULL;
+    ito::AbstractDObjFigure* childFigure = NULL;
 
     double *pointArr = new double[2 * bounds.size()];
-    for (int np = 0; np < bounds.size(); np++)
+    for (int np = 0; np < bounds.size(); ++np)
     {
         pointArr[np * 2] = bounds[np].x();
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
-    if (subplotStates()["volumeCut"] & ito::AbstractFigure::tUninitilizedExtern)
-    {
-        needChannelUpdate = true;
-        subplotStates()["volumeCut"] &= ~ito::AbstractFigure::tUninitilizedExtern;
-        subplotStates()["volumeCut"] |= ito::AbstractFigure::tExternChild;
-    }
     m_pOutput["volumeCutBounds"]->setVal(pointArr, 2 * bounds.size());
-    
 
-    delete[] pointArr;
-    //setOutpBounds(bounds);
-    //setLinePlotCoordinates(bounds);
+    DELETE_AND_SET_NULL_ARRAY(pointArr);
 
-    retval += apiGetFigure("DObjStaticImage", "", newUniqueID, &volumeCutObj, this);
-
-    QWidget *w = this;
-    while (w)
+    if (d->m_volumeCutChildPlot.isValid())
     {
-        //qDebug() << w->geometry() << w->frameGeometry();
-        w = qobject_cast<QWidget*>(w->parent());
+        //there should exist a plot
+        childPlot = d->m_volumeCutChildPlot.childFigure();
+        UID = d->m_volumeCutChildPlot.UID();
     }
 
-    if (!retval.containsError())
+    if (UID == 0 || childPlot == NULL)
     {
-        if (uniqueID != newUniqueID || needChannelUpdate)
+        //try to create a new plot
+        d->m_volumeCutChildPlot.rStates() = ChildPlotItem::StateShowPending;
+        UID = 0;
+        retval += apiGetFigure("DObjStaticImage", "", UID, &childPlot, this);
+
+        if (!retval.containsError())
         {
-            uniqueID = newUniqueID;
-            ito::AbstractDObjFigure* childFigure = NULL;
-            if (volumeCutObj->inherits("ito::AbstractDObjFigure"))
+            d->m_volumeCutChildPlot = ChildPlotItem(UID, childPlot, ChildPlotItem::StateShowPending);
+
+            if (childPlot->inherits("ito::AbstractDObjFigure"))
             {
-                childFigure = (ito::AbstractDObjFigure*)volumeCutObj;
-                if (!needChannelUpdate)
-                {
-                    d->m_childFigures[volumeCutObj] = newUniqueID;
-                    connect(volumeCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
-                }
+                childFigure = (ito::AbstractDObjFigure*)childPlot;
+                connect(childPlot, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
 
                 //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
                 //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
                 QTimer::singleShot(0, this, SLOT(activatePlot()));
 
-                retval += moveChildPlotCloseToThis(volumeCutObj);
+                retval += moveChildPlotCloseToThis(childFigure);
             }
             else
             {
-                return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
+                retval += ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
             }
+        }
+    }
 
-            if (needChannelUpdate)
+    if (!retval.containsError())
+    {
+        if (childFigureUID)
+        {
+            *childFigureUID = UID;
+        }
+
+        childFigure = (ito::AbstractDObjFigure*)childPlot;
+
+        if (!(d->m_volumeCutChildPlot.states() & ChildPlotItem::StateChannelsConnected))
+        {
+            d->m_volumeCutChildPlot.rStates() &= ~ChildPlotItem::StateChannelsConnected;
+
+            ito::Channel *tempChannel;
+            foreach(tempChannel, m_pChannels)
             {
-                ito::Channel *tempChannel;
-                foreach(tempChannel, m_pChannels)
+                if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
                 {
-                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
-                    {
-                        removeChannel(tempChannel);
-                    }
+                    removeChannel(tempChannel);
                 }
             }
+
             if (bounds.size() == 2)
             {
                 ((QMainWindow*)childFigure)->setWindowTitle(tr("Volumecut"));
@@ -923,6 +968,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
                 {
                     ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
                 }
+
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
                 retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["volumeCutBounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
@@ -930,24 +976,19 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
             }
             else
             {
-                return ito::RetVal(ito::retError, 0, tr("Expected a bound vector with 2 values").toLatin1().data());
+                return ito::RetVal(ito::retError, 0, tr("Expected a bounds vector with 2 values").toLatin1().data());
             }
 
             retval += updateChannels(paramNames);
 
-            if (needChannelUpdate) // we have an updated plot and want to show it
+            if (d->m_volumeCutChildPlot.states() & ChildPlotItem::StateShowPending)
             {
-                if (subplotStates()["volumeCut"] & ito::AbstractFigure::tVisibleOnInit)
-                {
-                    subplotStates()["volumeCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
-                    childFigure->setVisible(true);
-                }
-                // Something to do?
+                d->m_volumeCutChildPlot.rStates() &= ~ChildPlotItem::StateShowPending;
+                childFigure->setVisible(true);
             }
-            else// we do not have a plot so we have to show it and its child of this plot
+            else // we do not have a plot so we have to show it and its child of this plot
             {
-                    subplotStates()["volumeCut"] = ito::AbstractFigure::tOwnChild;
-                    childFigure->show();
+                childFigure->show();
             }
         }
         else
@@ -960,6 +1001,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
             {
                 paramNames << "volumeCutBounds" << "displayed";
             }
+
             retval += updateChannels(paramNames);
         }
     }
@@ -968,21 +1010,18 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(QVector <QPointF> bounds, ito::uint3
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniqueID, bool zStack /*= false*/)
+ito::RetVal Itom2dQwtPlot::displayLineCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID /*= NULL*/)
 {
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         return ito::RetVal(ito::retError, 0, tr("Could not spawn lineCut due to missing API-handle").toLatin1().data());
     }
 
-	int infoType = ito::Shape::Line;
-
     ito::RetVal retval = ito::retOk;
     QList<QString> paramNames;
-    ito::uint32 newUniqueID = uniqueID;
-    QWidget *lineCutObj = NULL;
-
-    bool needChannelUpdate = false;
+    ito::uint32 UID = 0;
+    QWidget *childPlot = NULL;
+    ito::AbstractDObjFigure* childFigure = NULL;
 
     double *pointArr = new double[2 * bounds.size()];
     for (int np = 0; np < bounds.size(); np++)
@@ -991,46 +1030,32 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
-    if (zStack)
-    {	
-		infoType = ito::Shape::Point;
-        m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
-        if (subplotStates()["zSlice"] & ito::AbstractFigure::tUninitilizedExtern)
-        {
-            needChannelUpdate = true;
-            subplotStates()["zSlice"] &= ~ito::AbstractFigure::tUninitilizedExtern;
-            subplotStates()["zSlice"] |= ito::AbstractFigure::tExternChild;
-        }
-    }
-    else
-    {	
-		if (subplotStates()["lineCut"] & ito::AbstractFigure::tUninitilizedExtern)
-        {
-            needChannelUpdate = true;
-            subplotStates()["lineCut"] &= ~ito::AbstractFigure::tUninitilizedExtern;
-            subplotStates()["lineCut"] |= ito::AbstractFigure::tExternChild;
-        }
-        m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
-    }
+    m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
 
     DELETE_AND_SET_NULL_ARRAY(pointArr);
 
-    retval += apiGetFigure("DObjStaticLine","", newUniqueID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
-
-    if (!retval.containsError())
+    if (d->m_lineCutChildPlot.isValid())
     {
-        if (uniqueID != newUniqueID || needChannelUpdate)
+        //there should exist a plot
+        childPlot = d->m_lineCutChildPlot.childFigure();
+        UID = d->m_lineCutChildPlot.UID();
+    }
+
+    if (UID == 0 || childPlot == NULL)
+    {
+        //try to create a new plot
+        d->m_lineCutChildPlot.rStates() = ChildPlotItem::StateShowPending;
+        UID = 0;
+        retval += apiGetFigure("DObjStaticLine", "", UID, &childPlot, this);
+
+        if (!retval.containsError())
         {
-            uniqueID = newUniqueID;
-            ito::AbstractDObjFigure* childFigure = NULL;
-            if (lineCutObj->inherits("ito::AbstractDObjFigure"))
+            d->m_lineCutChildPlot = ChildPlotItem(UID, childPlot, ChildPlotItem::StateShowPending);
+
+            if (childPlot->inherits("ito::AbstractDObjFigure"))
             {
-                childFigure = (ito::AbstractDObjFigure*)lineCutObj;
-                if (!needChannelUpdate)
-                {
-                    d->m_childFigures[lineCutObj] = newUniqueID;
-                    connect(lineCutObj, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
-                }
+                childFigure = (ito::AbstractDObjFigure*)childPlot;
+                connect(childPlot, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
 
                 //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
                 //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
@@ -1040,103 +1065,200 @@ ito::RetVal Itom2dQwtPlot::displayCut(QVector<QPointF> bounds, ito::uint32 &uniq
             }
             else
             {
-                return ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
+                retval += ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
             }
+        }
+    }
 
-            if (needChannelUpdate)
+    if (!retval.containsError())
+    {
+        if (childFigureUID)
+        {
+            *childFigureUID = UID;
+        }
+
+        childFigure = (ito::AbstractDObjFigure*)childPlot;
+
+        if (!(d->m_lineCutChildPlot.states() & ChildPlotItem::StateChannelsConnected))
+        {
+            d->m_lineCutChildPlot.rStates() &= ~ChildPlotItem::StateChannelsConnected;
+
+            ito::Channel *tempChannel;
+            foreach(tempChannel, m_pChannels)
             {
-                ito::Channel *tempChannel;
-                foreach(tempChannel, m_pChannels)
+                if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
                 {
-                    if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
-                    {
-                        removeChannel(tempChannel);
-                    }
+                    removeChannel(tempChannel);
                 }
             }
 
-            if (zStack)
-            {
-                ((QMainWindow*)childFigure)->setWindowTitle(tr("Z-Stack"));
-				if (childFigure->inherits("ItomQwtDObjFigure"))
-				{
-					((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
-				}
-                // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
-                // with one plane and cannot display the points in z-direction
-                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["zCutPoint"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)childFigure,  m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                paramNames << "zCutPoint"  << "sourceout";
-            }
-            else if (bounds.size() == 3) // its a 3D-Object
+            if (bounds.size() == 3) // its a 3D-Object
             {
                 ((QMainWindow*)childFigure)->setWindowTitle(tr("Linecut"));
-				if (childFigure->inherits("ItomQwtDObjFigure"))
-				{
-					((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
-				}
+                if (childFigure->inherits("ItomQwtDObjFigure"))
+                {
+                    ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
+                }
+
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
                 retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["bounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                paramNames << "bounds"  << "sourceout";
+                paramNames << "bounds" << "sourceout";
             }
             else
             {
                 ((QMainWindow*)childFigure)->setWindowTitle(tr("Linecut"));
-				if (childFigure->inherits("ItomQwtDObjFigure"))
-				{
-					((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
-				}
+                if (childFigure->inherits("ItomQwtDObjFigure"))
+                {
+                    ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
+                }
+
                 // otherwise simply pass on the displayed plane
                 retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["bounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
                 retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["displayed"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
-                paramNames << "bounds"  << "displayed";
+                paramNames << "bounds" << "displayed";
             }
 
             retval += updateChannels(paramNames);
 
-            if (needChannelUpdate) // we have an updated plot and want to show it
+            if (d->m_zStackChildPlot.states() & ChildPlotItem::StateShowPending)
             {
-                if (zStack && (subplotStates()["zSlice"] & ito::AbstractFigure::tVisibleOnInit))
-                {
-                    subplotStates()["zSlice"] &= ~ito::AbstractFigure::tVisibleOnInit;
-                    childFigure->setVisible(true);
-                }
-                else if (!zStack && (subplotStates()["lineCut"] & ito::AbstractFigure::tVisibleOnInit))
-                {
-                    subplotStates()["lineCut"] &= ~ito::AbstractFigure::tVisibleOnInit;
-                    childFigure->setVisible(true);
-                }
-                // Something to do?
+                d->m_zStackChildPlot.rStates() &= ~ChildPlotItem::StateShowPending;
+                childFigure->setVisible(true);
             }
-            else// we do not have a plot so we have to show it and its child of this plot
+            else // we do not have a plot so we have to show it and its child of this plot
             {
-                if (zStack)
-                {
-                    subplotStates()["zSlice"] = ito::AbstractFigure::tOwnChild;
-                    childFigure->show();
-                }
-                else
-                {
-                    subplotStates()["lineCut"] = ito::AbstractFigure::tOwnChild;
-                    childFigure->show();
-                }
+                childFigure->show();
             }
         }
         else
         {
-            if (zStack)
+            if (bounds.size() == 3) // its a 3D-Object
             {
-                paramNames << "zCutPoint"  << "sourceout";
-            }
-            else if (bounds.size() == 3) // its a 3D-Object
-            {
-                paramNames << "bounds"  << "sourceout";
+                paramNames << "bounds" << "sourceout";
             }
             else
             {
-                paramNames << "bounds"  << "displayed";
+                paramNames << "bounds" << "displayed";
             }
+
+            retval += updateChannels(paramNames);
+        }
+    }
+
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::displayZStackCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID /*= NULL*/)
+{
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return ito::RetVal(ito::retError, 0, tr("Could not spawn lineCut due to missing API-handle").toLatin1().data());
+    }
+
+    ito::RetVal retval = ito::retOk;
+    QList<QString> paramNames;
+    ito::uint32 UID = 0;
+    QWidget *childPlot = NULL;
+    ito::AbstractDObjFigure* childFigure = NULL;
+
+    double *pointArr = new double[2 * bounds.size()];
+    for (int np = 0; np < bounds.size(); np++)
+    {
+        pointArr[np * 2] = bounds[np].x();
+        pointArr[np * 2 + 1] = bounds[np].y();
+    }
+
+    m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
+
+    DELETE_AND_SET_NULL_ARRAY(pointArr);
+
+    if (d->m_zStackChildPlot.isValid())
+    {
+        //there should exist a plot
+        childPlot = d->m_zStackChildPlot.childFigure();
+        UID = d->m_zStackChildPlot.UID();
+    }
+
+    if (UID == 0 || childPlot == NULL)
+    {
+        //try to create a new plot
+        d->m_zStackChildPlot.rStates() = ChildPlotItem::StateShowPending;
+        UID = 0;
+        retval += apiGetFigure("DObjStaticLine", "", UID, &childPlot, this);
+
+        if (!retval.containsError())
+        {
+            d->m_zStackChildPlot = ChildPlotItem(UID, childPlot, ChildPlotItem::StateShowPending);
+
+            if (childPlot->inherits("ito::AbstractDObjFigure"))
+            {
+                childFigure = (ito::AbstractDObjFigure*)childPlot;
+                connect(childPlot, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
+
+                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+                //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
+                QTimer::singleShot(0, this, SLOT(activatePlot()));
+
+                retval += moveChildPlotCloseToThis(childFigure);
+            }
+            else
+            {
+                retval += ito::RetVal(ito::retError, 0, tr("the opened figure is not inherited from ito::AbstractDObjFigure").toLatin1().data());
+            }
+        }
+    }
+
+    if (!retval.containsError())
+    {
+        if (childFigureUID)
+        {
+            *childFigureUID = UID;
+        }
+
+        childFigure = (ito::AbstractDObjFigure*)childPlot;
+
+        if (!(d->m_zStackChildPlot.states() & ChildPlotItem::StateChannelsConnected))
+        {
+            d->m_zStackChildPlot.rStates() &= ~ChildPlotItem::StateChannelsConnected;
+
+            ito::Channel *tempChannel;
+            foreach(tempChannel, m_pChannels)
+            {
+                if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
+                {
+                    removeChannel(tempChannel);
+                }
+            }
+
+            ((QMainWindow*)childFigure)->setWindowTitle(tr("Z-Stack"));
+            if (childFigure->inherits("ItomQwtDObjFigure"))
+            {
+                ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
+            }
+
+            // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
+            // with one plane and cannot display the points in z-direction
+            retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["zCutPoint"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
+            retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+            paramNames << "zCutPoint" << "sourceout";
+
+            retval += updateChannels(paramNames);
+
+            if (d->m_zStackChildPlot.states() & ChildPlotItem::StateShowPending)
+            {
+                d->m_zStackChildPlot.rStates() &= ~ChildPlotItem::StateShowPending;
+                childFigure->setVisible(true);
+            }
+            else // we do not have a plot so we have to show it and its child of this plot
+            {
+                childFigure->show();
+            }
+        }
+        else
+        {
+            paramNames << "zCutPoint" << "sourceout";
             retval += updateChannels(paramNames);
         }
     }
@@ -1205,31 +1327,45 @@ ito::RetVal Itom2dQwtPlot::moveChildPlotCloseToThis(QWidget *child)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 {
+    bool lineChildPlot = (d->m_lineCutChildPlot.childFigure() == obj);
+    bool zStackChildPlot = (d->m_zStackChildPlot.childFigure() == obj);
+    bool volumeChildPlot = (d->m_volumeCutChildPlot.childFigure() == obj);
 
+    ito::uint32 childPlotUid = 0;
 
-    QHash<QObject*,ito::uint32>::iterator it = d->m_childFigures.find(obj);
-
-    if (it != d->m_childFigures.end())
+    if (lineChildPlot)
     {
-        m_pContent->childFigureDestroyed(obj, d->m_childFigures[obj]);
-
-		if (pickerWidget())
-		{
-			(pickerWidget())->removeChildPlot(d->m_childFigures[obj]);
-		}
-	
-    }
-	else
-	{
-		if (pickerWidget())
-		{
-			(pickerWidget())->removeChildPlots();
-		}
-	
-        m_pContent->childFigureDestroyed(obj, 0);
+        childPlotUid = d->m_lineCutChildPlot.UID();
+        d->m_lineCutChildPlot = ChildPlotItem(); //reset it
     }
 
-    d->m_childFigures.erase(it);
+    if (zStackChildPlot)
+    {
+        childPlotUid = d->m_zStackChildPlot.UID();
+        d->m_zStackChildPlot = ChildPlotItem(); //reset it
+    }
+
+    if (volumeChildPlot)
+    {
+        childPlotUid = d->m_volumeCutChildPlot.UID();
+        d->m_volumeCutChildPlot = ChildPlotItem(); //reset it
+    }
+
+    m_pContent->removeChildPlotIndicators(lineChildPlot, zStackChildPlot, volumeChildPlot);
+
+    PlotInfoPicker* pickerWid = pickerWidget();
+
+    if (pickerWid)
+    {
+        if (childPlotUid == 0)
+        {
+            pickerWid->removeChildPlots();
+        }
+        else
+        {
+            pickerWid->removeChildPlot(childPlotUid);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1320,19 +1456,16 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayedLineCut(void)
         return QSharedPointer<ito::DataObject>(); 
     }
 
-    ito::AbstractDObjFigure* figure = NULL;
-    QList<QObject*> keys = d->m_childFigures.keys();
+    QWidget* widget = d->m_lineCutChildPlot.childFigure();
 
-    for (int i = 0; i < keys.length(); i++)
+    if (widget && widget->inherits("ito::AbstractDObjFigure"))
     {
-        if (d->m_childFigures[keys[i]] == m_pContent->m_lineCutUID &&
-            keys[i]->inherits("ito::AbstractDObjFigure"))                        
-        {
-            return (qobject_cast<ito::AbstractDObjFigure*>(keys[i]))->getDisplayed();
-        }
+        return (qobject_cast<ito::AbstractDObjFigure*>(widget))->getDisplayed();
     }
-
-    return QSharedPointer<ito::DataObject>(); 
+    else
+    {
+        return QSharedPointer<ito::DataObject>();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1493,70 +1626,110 @@ void Itom2dQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::ItomPlotHandle Itom2dQwtPlot::getLineCutPlotItem() const
 {
-    ito::ItomPlotHandle handle(NULL, NULL, 0);
-    if (m_pContent && this->m_pContent->m_lineCutUID > 0)
+    if (m_pContent && d->m_lineCutChildPlot.isValid())
     {
-        if (apiGetItomPlotHandleByID(m_pContent->m_lineCutUID, handle) == ito::retOk)
+        ito::ItomPlotHandle handle;
+        if (apiGetItomPlotHandleByID(d->m_lineCutChildPlot.UID(), handle) == ito::retOk)
         {
             return handle;
         }
     }
+
     return ito::ItomPlotHandle(NULL, NULL, 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle idx)
+void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle &plotHandle)
 {
     ito::RetVal retval = ito::retOk;
+    QWidget *lineCutObj = NULL;
+
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         return;
     }
-    
-    if (m_pContent || idx.getObjectID() > -1)
+
+    if (m_pContent)
     {
-        ito::uint32 thisID = 0;
-        retval += apiGetFigureIDbyHandle(this, thisID);
-
-        if (idx.getObjectID() == thisID || retval.containsError())
+        if (plotHandle.getObjectID() == 0) //invalidate an existing line cut object
         {
-            return;
-        }
-        else
-        {
-            thisID = idx.getObjectID();
-        }
-
-        QWidget *lineCutObj = NULL;
-        
-
-        this->m_pContent->m_lineCutUID = thisID;
-        retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_lineCutUID, &lineCutObj, this);
-        if (lineCutObj == NULL || (!lineCutObj->inherits("ito::AbstractDObjFigure")))
-        {
-            m_pContent->m_lineCutUID = 0;
-        }
-        else
-        {
-            ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj);
-            if (af->getInputParam("bounds") == NULL || af->getInputParam("source") == NULL)
+            if (d->m_lineCutChildPlot.isValid())
             {
-                m_pContent->m_lineCutUID = 0;
+                lineCutObj = d->m_lineCutChildPlot.childFigure();
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj); //lineCutObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast... 
+
+                if (!retval.containsError() && lineCutObj && af)
+                {
+                    childFigureDestroyed(d->m_lineCutChildPlot.childFigure());
+                    m_pContent->removeChildPlotIndicators(true, false, false, true);
+
+                    ito::Channel *channel;
+                    foreach(channel, m_pChannels)
+                    {
+                        if (channel->getParent() == (ito::AbstractNode*)this &&  channel->getChild() == (ito::AbstractNode*)af) //...and here the cast to AbstractNode again. Else, there would be an error
+                        {
+                            removeChannel(channel);
+                        }
+                    }
+                }
+            }
+
+            d->m_lineCutChildPlot = ChildPlotItem();
+        }
+        else
+        {
+            ito::uint32 thisFigureUid = 0;
+            ito::uint32 destinationFigureUid = -1;
+            retval += apiGetFigureIDbyHandle(this, thisFigureUid);
+
+            if (plotHandle.getObjectID() == thisFigureUid || retval.containsError())
+            {
+                //line cut plot handle cannot be the same than this 2d plot instance
+                return;
+            }
+            else
+            {
+                destinationFigureUid = plotHandle.getObjectID();
+            }
+
+            if (destinationFigureUid > 0)
+            {
+                //plotHandle is valid
+                retval += apiGetFigure("DObjStaticLine", "", destinationFigureUid, &lineCutObj, this);
+            }
+            else
+            {
+                //plotHandle is 0 (None), invalidate the connection to an existing 1d plot widget for line cuts
+                lineCutObj = NULL;
+            }
+
+            if (lineCutObj == NULL || (!lineCutObj->inherits("ito::AbstractDObjFigure")))
+            {
+                d->m_lineCutChildPlot = ChildPlotItem(); //invalidate the line cut
+            }
+            else
+            {
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj);
+                if (af->getInputParam("bounds") == NULL || af->getInputParam("source") == NULL)
+                {
+                    d->m_lineCutChildPlot = ChildPlotItem(); //invalidate the line cut
+                }
+                else
+                {
+                    d->m_lineCutChildPlot = ChildPlotItem(destinationFigureUid, lineCutObj, ChildPlotItem::StateShowPending);
+                }
             }
         }
-
-        subplotStates()["lineCut"] = this->m_pContent->m_lineCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-
 ito::ItomPlotHandle Itom2dQwtPlot::getZSlicePlotItem() const
 {
-    ito::ItomPlotHandle handle(NULL, NULL, 0);
-    if (m_pContent && this->m_pContent->m_zstackCutUID > 0)
+    if (m_pContent && d->m_zStackChildPlot.isValid())
     {
-        if (apiGetItomPlotHandleByID(m_pContent->m_zstackCutUID, handle) == ito::retOk)
+        ito::ItomPlotHandle handle;
+        if (apiGetItomPlotHandleByID(d->m_zStackChildPlot.UID(), handle) == ito::retOk)
         {
             return handle;
         }
@@ -1566,48 +1739,190 @@ ito::ItomPlotHandle Itom2dQwtPlot::getZSlicePlotItem() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle idx)
+void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle &plotHandle)
 {
     ito::RetVal retval = ito::retOk;
+    QWidget *zStackObj = NULL;
+
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         return;
     }
-    
-    if (m_pContent || idx.getObjectID() > -1)
+
+    if (m_pContent)
     {
-        ito::uint32 thisID = 0;
-        retval += apiGetFigureIDbyHandle(this, thisID);
-
-        if (idx.getObjectID() == thisID || retval.containsError())
+        if (plotHandle.getObjectID() == 0) //invalidate an existing line cut object
         {
-            return;
-        }
-        else
-        {
-            thisID = idx.getObjectID();
-        }
-
-        QWidget *lineCutObj = NULL;
-        
-        this->m_pContent->m_zstackCutUID = thisID;
-        retval += apiGetFigure("DObjStaticLine","", this->m_pContent->m_zstackCutUID, &lineCutObj, this); //(newUniqueID, "itom1DQwtFigure", &lineCutObj);
-        if (lineCutObj == NULL || (!lineCutObj->inherits("ito::AbstractDObjFigure")))
-        {
-            m_pContent->m_zstackCutUID = 0;
-        }
-        else
-        {
-            ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj);
-            if (af->getInputParam("bounds") == NULL || af->getInputParam("source") == NULL)
+            if (d->m_zStackChildPlot.isValid())
             {
-                m_pContent->m_lineCutUID = 0;
+                zStackObj = d->m_zStackChildPlot.childFigure();
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(zStackObj); //lineCutObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast... 
+
+                if (!retval.containsError() && zStackObj && af)
+                {
+                    childFigureDestroyed(d->m_zStackChildPlot.childFigure());
+                    m_pContent->removeChildPlotIndicators(true, false, false, true);
+
+                    ito::Channel *channel;
+                    foreach(channel, m_pChannels)
+                    {
+                        if (channel->getParent() == (ito::AbstractNode*)this &&  channel->getChild() == (ito::AbstractNode*)af) //...and here the cast to AbstractNode again. Else, there would be an error
+                        {
+                            removeChannel(channel);
+                        }
+                    }
+                }
+            }
+
+            d->m_zStackChildPlot = ChildPlotItem();
+        }
+        else
+        {
+            ito::uint32 thisFigureUid = 0;
+            ito::uint32 destinationFigureUid = -1;
+            retval += apiGetFigureIDbyHandle(this, thisFigureUid);
+
+            if (plotHandle.getObjectID() == thisFigureUid || retval.containsError())
+            {
+                //line cut plot handle cannot be the same than this 2d plot instance
+                return;
+            }
+            else
+            {
+                destinationFigureUid = plotHandle.getObjectID();
+            }
+
+            if (destinationFigureUid > 0)
+            {
+                //plotHandle is valid
+                retval += apiGetFigure("DObjStaticLine", "", destinationFigureUid, &zStackObj, this);
+            }
+            else
+            {
+                //plotHandle is 0 (None), invalidate the connection to an existing 1d plot widget for line cuts
+                zStackObj = NULL;
+            }
+
+            if (zStackObj == NULL || (!zStackObj->inherits("ito::AbstractDObjFigure")))
+            {
+                d->m_zStackChildPlot = ChildPlotItem(); //invalidate the line cut
+            }
+            else
+            {
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(zStackObj);
+                if (af->getInputParam("bounds") == NULL || af->getInputParam("source") == NULL)
+                {
+                    d->m_zStackChildPlot = ChildPlotItem(); //invalidate the line cut
+                }
+                else
+                {
+                    d->m_zStackChildPlot = ChildPlotItem(destinationFigureUid, zStackObj, ChildPlotItem::StateShowPending);
+                }
             }
         }
-
-        subplotStates()["zSlice"] = this->m_pContent->m_zstackCutUID != 0 ? ito::AbstractFigure::tUninitilizedExtern | ito::AbstractFigure::tVisibleOnInit : ito::AbstractFigure::tNoChildPlot;
     }
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::ItomPlotHandle Itom2dQwtPlot::getVolumeCutPlotItem() const
+{
+    if (m_pContent && d->m_volumeCutChildPlot.isValid())
+    {
+        ito::ItomPlotHandle handle;
+        if (apiGetItomPlotHandleByID(d->m_volumeCutChildPlot.UID(), handle) == ito::retOk)
+        {
+            return handle;
+        }
+    }
+
+    return ito::ItomPlotHandle(NULL, NULL, 0);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setVolumeCutPlotItem(const ito::ItomPlotHandle &plotHandle)
+{
+    ito::RetVal retval = ito::retOk;
+    QWidget *volumeObj = NULL;
+
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return;
+    }
+
+    if (m_pContent)
+    {
+        if (plotHandle.getObjectID() == 0) //invalidate an existing line cut object
+        {
+            if (d->m_volumeCutChildPlot.isValid())
+            {
+                volumeObj = d->m_volumeCutChildPlot.childFigure();
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(volumeObj); //volumeObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast... 
+
+                if (!retval.containsError() && volumeObj && af)
+                {
+                    childFigureDestroyed(d->m_volumeCutChildPlot.childFigure());
+                    m_pContent->removeChildPlotIndicators(true, false, false, true);
+
+                    ito::Channel *channel;
+                    foreach(channel, m_pChannels)
+                    {
+                        if (channel->getParent() == (ito::AbstractNode*)this &&  channel->getChild() == (ito::AbstractNode*)af) //...and here the cast to AbstractNode again. Else, there would be an error
+                        {
+                            removeChannel(channel);
+                        }
+                    }
+                }
+            }
+
+            d->m_volumeCutChildPlot = ChildPlotItem();
+        }
+        else
+        {
+            ito::uint32 thisFigureUid = 0;
+            ito::uint32 destinationFigureUid = -1;
+            retval += apiGetFigureIDbyHandle(this, thisFigureUid);
+
+            if (plotHandle.getObjectID() == thisFigureUid || retval.containsError())
+            {
+                //line cut plot handle cannot be the same than this 2d plot instance
+                return;
+            }
+            else
+            {
+                destinationFigureUid = plotHandle.getObjectID();
+            }
+
+            if (destinationFigureUid > 0)
+            {
+                //plotHandle is valid
+                retval += apiGetFigure("DObjStaticLine", "", destinationFigureUid, &volumeObj, this);
+            }
+            else
+            {
+                //plotHandle is 0 (None), invalidate the connection to an existing 1d plot widget for line cuts
+                volumeObj = NULL;
+            }
+
+            if (volumeObj == NULL || (!volumeObj->inherits("ito::AbstractDObjFigure")))
+            {
+                d->m_volumeCutChildPlot = ChildPlotItem(); //invalidate the line cut
+            }
+            else
+            {
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(volumeObj);
+                if (af->getInputParam("bounds") == NULL || af->getInputParam("source") == NULL)
+                {
+                    d->m_volumeCutChildPlot = ChildPlotItem(); //invalidate the line cut
+                }
+                else
+                {
+                    d->m_volumeCutChildPlot = ChildPlotItem(destinationFigureUid, volumeObj, ChildPlotItem::StateShowPending);
+                }
+            }
+        }
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setBounds(QVector<QPointF> bounds)
 {
