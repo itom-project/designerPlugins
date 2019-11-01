@@ -268,6 +268,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
 {
+    resetBounds();
     d->m_pData->m_forceValueParsing = true; //recalculate boundaries since content of data object may have changed
     AbstractDObjFigure::setSource(source);
     return ito::retOk;
@@ -281,7 +282,7 @@ void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds)
         pointArr[np * 2] = bounds[np].x();
         pointArr[np * 2 + 1] = bounds[np].y();
     }
-    m_pInput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    m_pInput["bounds"]->setVal<double*>(pointArr, 2 * bounds.size());
     delete[] pointArr;
 }
 
@@ -293,8 +294,9 @@ QVector<QPointF> Itom1DQwtPlot::getBounds(void) const
 
     if (numPts > 0)
     {
-        double *ptsDblVec = m_pInput["bounds"]->getVal<double*>();
+        const double *ptsDblVec = m_pInput["bounds"]->getVal<const double*>();
         boundsVec.reserve(numPts / 2);
+
         for (int n = 0; n < numPts / 2; n++)
         {
             boundsVec.append(QPointF(ptsDblVec[n * 2], ptsDblVec[n * 2 + 1]));
@@ -302,6 +304,16 @@ QVector<QPointF> Itom1DQwtPlot::getBounds(void) const
     }
     return boundsVec;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetBounds()
+{
+    if (m_pInput["bounds"]->getLen() > 0)
+    {
+        m_pInput["bounds"]->setVal<double*>(NULL, 0);
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QString Itom1DQwtPlot::getTitle() const
 {

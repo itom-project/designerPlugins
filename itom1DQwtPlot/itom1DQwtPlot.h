@@ -49,7 +49,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     //DESIGNABLE (default: true): property is visible in QtDesigner property editor
     //USER (default: false): property is visible in property editor of plot
 
-    Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
+    Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds RESET resetBounds DESIGNABLE false)
 
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel USER true)
@@ -255,6 +255,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         //properties
         QVector<QPointF> getBounds(void) const;
         void setBounds(QVector<QPointF> bounds);
+        void resetBounds();
 
         void enableObjectGUIElements(const int mode);
 
