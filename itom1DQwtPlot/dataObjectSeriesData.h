@@ -126,15 +126,18 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         void setColorState(int newVal) {m_colorState = (ColorType)newVal;}
 
         template <typename _Tp> _Tp sampleComplex(const size_t& n) const; //only supports ito::complex64 and ito::complex128
-        inline bool hasAxisObj() const { return hasXObj; } //!< returns true if there is a axisObject for the x-axis
-        
-
+        inline bool hasAxisObj() const { return m_hasXObj; } //!< returns true if there is a axisObject for the x-axis
+        inline bool getXCoordsWholeNumber() const { return m_xCoordsWholeNumber;  }
+        QString getAxisUnit() const { return m_dObjAxisUnit; }
+        QString getValueUnit() const { return m_dObjValueUnit; }
 
     protected:
 
         inline void saturation(int &value, int min, int max) { value = (value < min ? min : (value > max ? max : value)); }
         inline QString fromStdLatin1String(const std::string &str) { return QString::fromLatin1(str.data()); }
-        bool hasXObj;
+
+        bool m_hasXObj;
+        bool m_xCoordsWholeNumber; //true, if the x-position of every sample is a whole number (integer), else false. If not decidable, set it to false
         QString m_dObjAxisDescription;
         QString m_dObjAxisUnit;
 

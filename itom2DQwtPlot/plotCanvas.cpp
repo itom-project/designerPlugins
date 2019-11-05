@@ -78,8 +78,6 @@ PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NUL
 		m_pValuePicker(NULL),
 		m_dObjPtr(NULL),
 		m_pStackPicker(NULL),
-		m_zstackCutUID(0),
-		m_lineCutUID(0),
 		m_pLineCutLine(NULL),
         m_pVolumeCutLine(NULL),
 		m_isRefreshingPlot(false),
@@ -876,16 +874,20 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {
                 xSize = 1 + pxY1 - pxY2;
             }
-            offsetByte = pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
+
+            offsetByte = pxX1 * dataObj->get_mdata()[0]->step[1] + pxY1 * dataObj->get_mdata()[0]->step[0];
+
             if (pxY1 < pxY2)
             {
-                stepByte[0]=(dataObj->get_mdata()[0]->step[0]);
+                stepByte[0] = dataObj->get_mdata()[0]->step[0];
             }
             else// go in negative direction
             {
-                stepByte[0]=(-dataObj->get_mdata()[0]->step[0]);
+                stepByte[0] = -static_cast<int>(dataObj->get_mdata()[0]->step[0]);
             }
+
             m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
@@ -924,6 +926,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             }
             description = dataObj->getAxisDescription(d - 2, _unused);
             unit = dataObj->getAxisUnit(d - 2, _unused);
+
             if (description == "")
             {
                 description = QObject::tr("y-axis").toLatin1().data();
@@ -934,17 +937,16 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
 
             description = dataObj->getAxisDescription(d - 3, _unused);
             unit = dataObj->getAxisUnit(d - 3, _unused);
+
             if (description == "")
             {
                 description = QObject::tr("z-axis").toLatin1().data();
             }
+
             m_dObjVolumeCut.setAxisDescription(0, description);
             m_dObjVolumeCut.setAxisUnit(0, unit);
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
-
-
-
 
             m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
             m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
@@ -955,14 +957,9 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             
             m_dObjVolumeCut.setAxisScale(1, scale);
             m_dObjVolumeCut.setAxisOffset(1, -startPhys/scale);
-
-
-
-
         }
         else if (pxY2 == pxY1) // pure x
         {
-
             m_dir = dirX;
             stepByte.resize(1);
             yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
@@ -979,18 +976,21 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {
                 xSize = 1 + pxX1 - pxX2;
             }
-            offsetByte=pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
+
+            offsetByte=pxX1 * dataObj->get_mdata()[0]->step[1] + pxY1 * dataObj->get_mdata()[0]->step[0];
+
             if (pxX1 < pxX2)
             {
-                stepByte[0]=dataObj->get_mdata()[0]->step[1];
+                stepByte[0] = dataObj->get_mdata()[0]->step[1];
             }
             else// go in negative direction
             {
-                stepByte[0]=-dataObj->get_mdata()[0]->step[1];
+                stepByte[0] = -static_cast<int>(dataObj->get_mdata()[0]->step[1]);
             }
             // todo: check if this DataObject is deleted when the plot is closed
 
             m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
@@ -1026,8 +1026,10 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
+
             description = dataObj->getAxisDescription(d - 1, _unused);
             unit = dataObj->getAxisUnit(d - 1, _unused);
+
             if (description == "")
             {
                 description = QObject::tr("x-axis").toLatin1().data();
@@ -1038,15 +1040,16 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
 
             description = dataObj->getAxisDescription(d - 3, _unused);
             unit = dataObj->getAxisUnit(d - 3, _unused);
+
             if (description == "")
             {
                 description = QObject::tr("z-axis").toLatin1().data();
             }
+
             m_dObjVolumeCut.setAxisDescription(0, description);
             m_dObjVolumeCut.setAxisUnit(0, unit);
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
-
 
             m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
             m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
@@ -1081,10 +1084,12 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {
                 xScaling = 0.0;
             }
-            offsetByte = pxX1*dataObj->get_mdata()[0]->step[1]+pxY1*dataObj->get_mdata()[0]->step[0];
+
+            offsetByte = pxX1 * dataObj->get_mdata()[0]->step[1] + pxY1 * dataObj->get_mdata()[0]->step[0];
 
             stepByte.resize(xSize);
             int pdx, pdy, ddx, ddy, es, el;
+
             if (dx>dy)
             {
                 pdx = incx;
@@ -1108,9 +1113,6 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             int x = 0; //pxX1;
             int y = 0; //pxY1;
 
-
-
-
             for (unsigned int n = 0; n < (unsigned int)xSize; n++)
             {  /* loop */
                 //setPixel(x,y)
@@ -1129,7 +1131,9 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                     y += pdy;
                 }
             }
+
             m_dObjVolumeCut = ito::DataObject(ySize, xSize, dataObj->getType());
+
             switch(dataObj->getType())
             {
             case(ito::tUInt8):
@@ -1165,21 +1169,21 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
+
             description = dataObj->getAxisDescription(d - 2, _unused);
             unit = dataObj->getAxisUnit(d - 2, _unused);
+
             if (unit == "") unit = "px";
 
             std::string descr2 = dataObj->getAxisDescription(d - 1, _unused);
             std::string unit2 = dataObj->getAxisUnit(d - 1, _unused);
+
             if (unit2 == "") unit2 = "px";
 
             if (description == "" && descr2 == "")
             {
-              
-                
                     m_dObjVolumeCut.setAxisDescription(1, tr("x/y-axis").toLatin1().data());
                     m_dObjVolumeCut.setAxisUnit(1,QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
-                
             }
             else
             {
@@ -1187,13 +1191,14 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                 m_dObjVolumeCut.setAxisUnit(1, QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
             }
 
-
             description = dataObj->getAxisDescription(d - 3, _unused);
             unit = dataObj->getAxisUnit(d - 3, _unused);
+
             if (description == "")
             {
                 description = QObject::tr("z-axis").toLatin1().data();
             }
+
             m_dObjVolumeCut.setAxisDescription(0, description);
             m_dObjVolumeCut.setAxisUnit(0, unit);
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
@@ -1201,10 +1206,10 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setAxisScale(1, xScaling);
             m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
             m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
-
         }
-  }
-  return retval;
+    }
+
+    return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 
@@ -1819,10 +1824,13 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
 
             QVector<QPointF> pts;
             pts.append(markerPosScaleCoords);
-            p->displayCut(pts, m_zstackCutUID,true);
-			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+
+            ito::uint32 childFigureUID;
+            p->displayZStackCut(pts, &childFigureUID);
+
+			if (((Itom2dQwtPlot*)parent())->pickerWidget() && childFigureUID > 0)
 			{
-				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
+				(((Itom2dQwtPlot*)parent())->pickerWidget())->updateChildPlot(childFigureUID, ito::Shape::Point, QVector4D(pts[0]));
 			}
 
             setCoordinates(pts, true);
@@ -1903,13 +1911,25 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(),m_rasterData->getCurrentPlane()));
             }
-            p->displayCut(pts, m_lineCutUID, false);
-			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+
+            ito::uint32 childFigureUID;
+            Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+
+            p->displayLineCut(pts, &childFigureUID);
+
+			if (p->pickerWidget() && childFigureUID > 0)
 			{
 				QVector4D vec;
-				if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-				else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+                if (pts.size() == 3)
+                {
+                    vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                }
+                else
+                {
+                    vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                }
+
+				p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Line, vec);
 			}
 
             replot();
@@ -1984,7 +2004,7 @@ void PlotCanvas::keyPressEvent (QKeyEvent * event)
             m_pVolumeCutLine->setSamples(pts);
             m_pVolumeCutLine->setVisible(true);
 
-            p->displayVolumeCut(pts, m_volumeCutUID);
+            p->displayVolumeCut(pts);
 
             replot();
         }
@@ -2379,6 +2399,7 @@ void PlotCanvas::stateChanged(int state)
 {
     m_pCenterMarker->setVisible(m_showCenterMarker);
     m_pActCntrMarker->setChecked(m_showCenterMarker);
+
     if (m_showCenterMarker && m_dObjPtr)
     {
         if (m_dObjPtr->getDims() > 1)
@@ -2393,12 +2414,13 @@ void PlotCanvas::stateChanged(int state)
     if (m_pLineCutPicker) m_pLineCutPicker->setEnabled(state == stateLineCut);
     if (m_pVolumeCutPicker) m_pVolumeCutPicker->setEnabled(state == stateVolumeCut);
     if (m_pStackPicker) m_pStackPicker->setEnabled(state == stateStackCut);
+
     m_pActLineCut->setChecked(state == stateLineCut);
     m_pActVolumeCut->setChecked(state == stateVolumeCut);
     m_pActValuePicker->setChecked(state == stateValuePicker);
     m_pActStackCut->setChecked(state == stateStackCut);
 
-    if (state != stateLineCut && state != stateStackCut && state!= stateVolumeCut)
+    if (state != stateLineCut && state != stateStackCut && state != stateVolumeCut)
     {
         setCoordinates(QVector<QPointF>(), false);
     }
@@ -2460,11 +2482,15 @@ void PlotCanvas::zStackCutTrackerAppended(const QPoint &pt)
 
             pts.append(ptScale);
             setCoordinates(pts, true);
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
 
-			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            Itom2dQwtPlot *p = (Itom2dQwtPlot*)parent();
+
+            ito::uint32 childFigureUID;
+            p->displayZStackCut(pts, &childFigureUID);
+
+			if (p->pickerWidget() && childFigureUID > 0)
 			{
-				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pt));
+				p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Point, QVector4D(pt));
 			}
 
             replot();
@@ -2482,6 +2508,7 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
         QPointF ptScale;
         ptScale.setY(invTransform(QwtPlot::yLeft, pt.y()));
         ptScale.setX(invTransform(QwtPlot::xBottom, pt.x()));
+
         if (m_rasterData->pointValid(ptScale))
         {
             if (m_activeModifiers.testFlag(Qt::ControlModifier))
@@ -2502,11 +2529,16 @@ void PlotCanvas::zStackCutTrackerMoved(const QPoint &pt)
             pts.append(ptScale);
             setCoordinates(pts, true);
 
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_zstackCutUID,true);
-			if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+            ito::uint32 childFigureUID;
+
+            p->displayZStackCut(pts, &childFigureUID);
+
+			if (p->pickerWidget() && childFigureUID > 0)
 			{
-				(((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_zstackCutUID, ito::Shape::Point, QVector4D(pts[0]));
+				p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Point, QVector4D(pts[0]));
 			}
+
             replot();
         }    
     }
@@ -2600,18 +2632,31 @@ void PlotCanvas::lineCutMovedPhys(const QPointF &pt)
 
             setCoordinates(pts, true);
 
+            Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+
             if (m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
             }
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+
+            ito::uint32 childFigureUID;
+            p->displayLineCut(pts, &childFigureUID);
+
+            if (childFigureUID > 0 && p->pickerWidget())
             {
                 QVector4D vec;
-                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+                if (pts.size() == 3)
+                {
+                    vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                }
+                else
+                {
+                    vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                }
+
+                p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Line, vec);
             }
+
             replot();
         }
         else //first point is still not valid, try to find a valid first point
@@ -2667,19 +2712,31 @@ void PlotCanvas::lineCutMovedPhys(const QPointF &pt)
 
             setCoordinates(pts, true);
 
+            Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+
             // check for m_dObjPtr first otherwise crash
             if (m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
             }
 
-            ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            ito::uint32 childFigureUID;
+
+            p->displayLineCut(pts, &childFigureUID);
+
+            if (p->pickerWidget() && childFigureUID > 0)
             {
                 QVector4D vec;
-                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+                if (pts.size() == 3)
+                {
+                    vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                }
+                else
+                {
+                    vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                }
+
+                p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Line, vec);
             }
             replot();
         }
@@ -2719,19 +2776,31 @@ void PlotCanvas::lineCutAppendedPhys(const QPointF &pt)
 
         setCoordinates(pts, true);
 
+        Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+
         // check for m_dObjPtr first otherwise crash
         if (m_dObjPtr && m_dObjPtr->getDims() > 2)
         {
             pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
         }
 
-        ((Itom2dQwtPlot*)parent())->displayCut(pts, m_lineCutUID, false);
-        if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+        ito::uint32 childFigureUID;
+
+        p->displayLineCut(pts, &childFigureUID);
+
+        if (p->pickerWidget() && childFigureUID > 0)
         {
             QVector4D vec;
-            if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-            else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-            (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_lineCutUID, ito::Shape::Line, vec);
+            if (pts.size() == 3)
+            {
+                vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+            }
+            else
+            {
+                vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+            }
+            
+            p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Line, vec);
         }
 
         replot();
@@ -2818,18 +2887,26 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
 
             setCoordinates(pts, true);
 
-            //if (m_dObjPtr && m_dObjPtr->getDims() > 2)
-            //{
-            //    pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
-            //}
-            ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
-            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+            ito::uint32 childFigureUID;
+
+            p->displayVolumeCut(pts, &childFigureUID);
+
+            if (p->pickerWidget() && childFigureUID > 0)
             {
                 QVector4D vec;
-                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+                if (pts.size() == 3)
+                {
+                    vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                }
+                else
+                {
+                    vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                }
+
+                p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Line, vec);
             }
+
             replot();
         }
         else //first point is still not valid, try to find a valid first point
@@ -2885,19 +2962,31 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
 
             setCoordinates(pts, true);
 
+            Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+
             // check for m_dObjPtr first otherwise crash
             if (m_dObjPtr && m_dObjPtr->getDims() > 2)
             {
                 pts.insert(0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
             }
 
-            ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
-            if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+            ito::uint32 childFigureUID;
+
+            p->displayVolumeCut(pts, &childFigureUID);
+
+            if (p->pickerWidget() && childFigureUID > 0)
             {
                 QVector4D vec;
-                if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-                else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-                (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+                if (pts.size() == 3)
+                {
+                    vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+                }
+                else
+                {
+                    vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+                }
+
+                p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Line, vec);
             }
             replot();
         }
@@ -2927,43 +3016,63 @@ void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
         m_pVolumeCutLine->setVisible(true);
         m_pVolumeCutLine->setSamples(pts);
 
-        ((Itom2dQwtPlot*)parent())->displayVolumeCut(pts, m_volumeCutUID);
-        if (((Itom2dQwtPlot*)this->parent())->pickerWidget())
+        Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+        ito::uint32 childFigureUID;
+
+        p->displayVolumeCut(pts, &childFigureUID);
+
+        if (p->pickerWidget() && childFigureUID > 0)
         {
             QVector4D vec;
-            if (pts.size() == 3) vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
-            else vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
-            (((Itom2dQwtPlot*)this->parent())->pickerWidget())->updateChildPlot(m_volumeCutUID, ito::Shape::Line, vec);
+            if (pts.size() == 3)
+            {
+                vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+            }
+            else
+            {
+                vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+            }
+
+            p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Line, vec);
         }
 
         replot();
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::childFigureDestroyed(QObject* /*obj*/, ito::uint32 UID)
+void PlotCanvas::removeChildPlotIndicators(bool lineChildPlot, bool zStackChildPlot, bool volumeChildPlot, bool resetState /*= false*/)
 {
-    if (UID > 0)
+    if (zStackChildPlot)
     {
-        if (UID == m_zstackCutUID)
+        m_pStackCutMarker->setVisible(false);
+        
+        if (resetState && state() == stateStackCut)
         {
-            m_pStackCutMarker->setVisible(false);
-        }
-        else if (UID == m_lineCutUID)
-        {
-            m_pLineCutLine->setVisible(false);
-            setCoordinates(QVector<QPointF>(), false);
-        }
-        else if (UID == m_volumeCutUID)
-        {
-            m_pVolumeCutLine->setVisible(false);
-            setCoordinates(QVector<QPointF>(), false);
+            setState(stateIdle);
         }
     }
-    else
+
+    if (lineChildPlot)
     {
-        //hide all related markers (we have no further information)
-        m_pStackCutMarker->setVisible(false);
         m_pLineCutLine->setVisible(false);
+        setCoordinates(QVector<QPointF>(), false);
+
+        if (resetState && state() == stateLineCut)
+        {
+            setState(stateIdle);
+        }
+    }
+    
+    if (volumeChildPlot)
+    {
+        m_pVolumeCutLine->setVisible(false);
+        setCoordinates(QVector<QPointF>(), false);
+
+        if (resetState && state() == stateVolumeCut)
+        {
+            setState(stateIdle);
+        }
     }
 
     replot();
@@ -3163,6 +3272,7 @@ QSharedPointer<ito::DataObject> PlotCanvas::getContourLevels() const
     }
     return QSharedPointer<ito::DataObject>(m_pContourObj);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
 {
@@ -3228,8 +3338,10 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
         emit statusBarMessage(tr("error when loading color map"), 4000);
         return false;
     }
+
     m_curContourColorMapIndex = idx;
     int totalStops = newPalette.colorStops.size();
+
     if (totalStops < 2)
     {
         emit statusBarMessage(tr("Selected color map has less than two points."), 4000);
@@ -3246,6 +3358,7 @@ bool PlotCanvas::setContourColorMap(const QString& name /*=__next__*/)
     replot();
     return true;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setContourLineWidth(const float& width)
 {
@@ -3254,11 +3367,13 @@ void PlotCanvas::setContourLineWidth(const float& width)
     m_dObjItem->setDefaultContourPen(pen);
     replot();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 float PlotCanvas::getContourLineWidth() const
 {
     return m_dObjItem->defaultContourPen().widthF();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::alphaChanged()
 {
@@ -3312,8 +3427,6 @@ void PlotCanvas::getMinMaxPhysLoc(double &min, double *minPhysLoc, double &max, 
     maxPhysLoc[0] = maxLoc[0];
     maxPhysLoc[1] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-2, maxLoc[1], check); 
     maxPhysLoc[2] = m_dObjPtr->getPixToPhys(m_dObjPtr->getDims()-1, maxLoc[2], check); 
-
-    return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3350,7 +3463,7 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
     }
     else
     {
-        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Could not activate the line cut.").toLatin1().data());
     }
 
     lineCutAppendedPhys(QPointF(x0, y0));
@@ -3358,22 +3471,7 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
 
     return ito::retOk;
 }
-//----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal PlotCanvas::setVolumeCut(const double x0, const double y0, const double x1, const double y1)
-{
-    if (m_pActVolumeCut->isCheckable() && m_pActVolumeCut->isEnabled())
-    {
-        m_pActVolumeCut->setChecked(true);
-        mnuVolumeCut(true);
-    }
-    else
-    {
-        return ito::RetVal(ito::retError, 0, tr("Set lineCut coordinates failed. Could not activate lineCut.").toLatin1().data());
-    }
-    volumeCutAppendedPhys(QPointF(x0, y0));
-    return ito::retOk;
 
-}
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
 {

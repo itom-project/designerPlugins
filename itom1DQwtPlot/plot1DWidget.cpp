@@ -60,6 +60,9 @@
 #include <qnumeric.h>
 #include <qinputdialog.h>
 
+/*static*/ QStringList Plot1DWidget::siLengthUnits = QStringList() << "pm" << "nm" << (QLatin1String("\u00B5m")) << "mm" << "m" << "km";
+/*static*/ QStringList Plot1DWidget::siTimeUnits = QStringList() << "ps" << "ns" << (QLatin1String("\u00B5s")) << "ms" << "s";
+
 //namespace ito {
 //    extern void **ITOM_API_FUNCS_GRAPH;
 //}
@@ -805,53 +808,56 @@ void Plot1DWidget::toggleLegendLabel(QwtPlotCurve* curve, const bool state)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendPosition(LegendPosition position, bool visible)
 {
-    if (m_pLegend)
-    {
-        m_pLegend->deleteLater();
-        m_pLegend = NULL;		
-    }
+	if (position != m_legendPosition || visible != m_legendVisible)
+	{
+		if (m_pLegend)
+		{
+			m_pLegend->deleteLater();
+			m_pLegend = NULL;
+		}
 
-    if (visible)
-    {
-        m_pLegend = new QwtLegend(this);
-        m_pLegend->setDefaultItemMode(QwtLegendData::Checkable);
-        connect(m_pLegend, SIGNAL(checked(QVariant,bool,int)), this, SLOT(legendItemChecked(QVariant,bool)));
-        insertLegend(m_pLegend, position);
+		if (visible)
+		{
+			m_pLegend = new QwtLegend(this);
+			m_pLegend->setDefaultItemMode(QwtLegendData::Checkable);
+			connect(m_pLegend, SIGNAL(checked(QVariant, bool, int)), this, SLOT(legendItemChecked(QVariant, bool)));
+			insertLegend(m_pLegend, position);
 
-        updateLegendItems();
+			updateLegendItems();
 
-        foreach(QAction *a, m_pMnuLegendSwitch->actions())
-        {
-            if (a->data().toInt() == position)
-            {
-                m_pMnuLegendSwitch->setDefaultAction(a);
-                a->setChecked(true);
-            }
-            else
-            {
-                a->setChecked(false);
-            }
-        }
-    }
-    else
-    {
-        foreach(QAction *a, m_pMnuLegendSwitch->actions())
-        {
-            if (a->data().toInt() == -1)
-            {
-                m_pMnuLegendSwitch->setDefaultAction(a);
-                a->setChecked(true);
-            }
-            else
-            {
-                a->setChecked(false);
-            }
-        }
-        insertLegend(NULL);
-    }
+			foreach(QAction *a, m_pMnuLegendSwitch->actions())
+			{
+				if (a->data().toInt() == position)
+				{
+					m_pMnuLegendSwitch->setDefaultAction(a);
+					a->setChecked(true);
+				}
+				else
+				{
+					a->setChecked(false);
+				}
+			}
+		}
+		else
+		{
+			foreach(QAction *a, m_pMnuLegendSwitch->actions())
+			{
+				if (a->data().toInt() == -1)
+				{
+					m_pMnuLegendSwitch->setDefaultAction(a);
+					a->setChecked(true);
+				}
+				else
+				{
+					a->setChecked(false);
+				}
+			}
+			insertLegend(NULL);
+		}
 
-    m_legendVisible = visible;
-    m_legendPosition = position;
+		m_legendVisible = visible;
+		m_legendPosition = position;
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -862,9 +868,14 @@ void Plot1DWidget::updateLegendItems()
         QwtLegendLabel *legendLabel = NULL;
         QSize maxLegendIconSize(m_pLegendLabelWidth, 0);
         WidgetCurveProperties* widgetCurveProperties = (WidgetCurveProperties*)((Itom1DQwtPlot*)(this->parent()))->getWidgetCurveProperties();
+		QwtText text;
 
         foreach(QwtPlotCurve *item, m_plotCurveItems)
         {
+			text = item->title();
+			text.setFont(m_legendFont);
+			item->setTitle(text);
+
             item->setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
             item->setLegendAttribute(QwtPlotCurve::LegendShowSymbol, true);
             maxLegendIconSize.rheight() = std::max(maxLegendIconSize.height(), item->legendIconSize().height());
@@ -873,7 +884,7 @@ void Plot1DWidget::updateLegendItems()
             if (legendLabel)
             {
                 //set font
-                QwtText text(legendLabel->data().title());
+                text = legendLabel->data().title();
                 text.setFont(m_legendFont);
                 legendLabel->setText(text);
 
@@ -936,13 +947,27 @@ void Plot1DWidget::setLegendFont(const QFont &font)
     m_legendFont = font;
     if (m_pLegend)
     {
+		QwtText text;
         QwtLegendLabel* legendLabel;
         foreach(QwtPlotCurve *item, m_plotCurveItems)
         {
+			QList<QwtLegendData> &data = item->legendData();
+			for (int i = 0; i < data.size(); ++i)
+			{
+				if (data[i].hasRole(QwtLegendData::TitleRole))
+				{
+					text = data[i].title();
+					text.setFont(m_legendFont);
+					QVariant titleValue;
+					qVariantSetValue(titleValue, text);
+					data[i].setValue(QwtLegendData::TitleRole, titleValue);
+				}
+			}
+
             legendLabel = qobject_cast<QwtLegendLabel*>(m_pLegend->legendWidget(itemToInfo(item)));
             if (legendLabel)
             {
-                QwtText text(legendLabel->data().title());
+                text = legendLabel->data().title();
                 text.setFont(m_legendFont);
                 legendLabel->setText(text);
             }
@@ -1205,6 +1230,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     if (dataObj)
     {
         int dims = dataObj->getDims();
+
+        if (dims == 0)
+        {
+            bounds.clear();
+        }
+
         int width = dims > 0 ? dataObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dataObj->getSize(dims - 2) : (width == 0) ? 0 : 1;
 		m_pData->m_dataType = (ito::tDataType)dataObj->getType();
@@ -1215,7 +1246,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             enableObjectGUIElements(2 /*complex*/ | (dims > 1 ? 0x10 : 0x00) /*multi-layer: yes : no*/);
             m_cmplxState = true;
             m_colorState = false;
-            m_pRescaleParent->setVisible(bounds.size() != 1 && m_hasParentForRescale); //a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
+            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale); //a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
         }
         else if (m_pData->m_dataType == ito::tRGBA32)
         {
@@ -1229,7 +1260,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             enableObjectGUIElements(0 /*gray*/ | (dims > 1 ? 0x10 : 0x00) /*multi-layer: yes : no*/);
             m_cmplxState = false;  
             m_colorState = false;
-            m_pRescaleParent->setVisible(bounds.size() != 1 && m_hasParentForRescale); //a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
+            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale); //a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
         }
 
         //if this 1d plot is based on bounds (hence, a line cut or similar of a 2d cut, all pickers should be deleted if the boundaries changed)
@@ -1462,6 +1493,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     legendLabel->setChecked(true);
                 }
             }
+
+			QwtText text = dObjCurve->title();
+			text.setFont(m_legendFont);
+			dObjCurve->setTitle(text);
 
             QPen plotPen;
             colorIndex = m_plotCurveItems.size() % m_colorList.size();
@@ -2489,17 +2524,18 @@ void Plot1DWidget::setMainPickersToIndex(int idx1, int idx2, int curveIdx)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, const double& yScaleStart) //dir: 0: this point, -1: next valid to the left or this if not possible, 1: next valid to the right or this if not possible
+void Plot1DWidget::stickPickerToXPx(Picker* picker, double xScaleStart, int dir, const double& yScaleStart) //dir: 0: this point, -1: next valid to the left or this if not possible, 1: next valid to the right or this if not possible
 {
-    if (m_plotCurveItems.size() <= m->curveIdx) 
+    if (m_plotCurveItems.size() <= picker->curveIdx)
     {
         return;
     }
-    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
+
+    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[picker->curveIdx]->data());
 
     if (!qIsFinite(xScaleStart))
     {
-        xScaleStart = m->item->xValue();
+        xScaleStart = picker->item->xValue();
     }
 
     int thisIdx = data->getPosToPix(xScaleStart, yScaleStart); //yScaleStart is ignored in case of DataObjectSeriesData
@@ -2526,9 +2562,9 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
                 p = data->sample(thisIdx);
                 if (qIsFinite(p.ry()))
                 {
-                    m->item->setXValue(p.rx());
-                    m->item->setYValue(p.ry());
-                    m->dObjDataIdx = thisIdx;
+                    picker->item->setXValue(p.rx());
+                    picker->item->setYValue(p.ry());
+                    picker->dObjDataIdx = thisIdx;
                     found = true;
                 }
             }
@@ -2572,9 +2608,9 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
                         std::abs(p.ry() - yScaleStart) > std::numeric_limits<double>::epsilon())
                     {
                         //the next point is at another position --> take it, else continue in the loop
-                        m->item->setXValue(p.rx());
-                        m->item->setYValue(p.ry());
-                        m->dObjDataIdx = thisIdx;
+                        picker->item->setXValue(p.rx());
+                        picker->item->setYValue(p.ry());
+                        picker->dObjDataIdx = thisIdx;
                         found = true;
                     }
                 }
@@ -2608,9 +2644,9 @@ void Plot1DWidget::stickPickerToXPx(Picker *m, double xScaleStart, int dir, cons
                         std::abs(p.ry() - yScaleStart) > std::numeric_limits<double>::epsilon())
                     {
                         //the next point is at another position --> take it, else continue in the loop
-                        m->item->setXValue(p.rx());
-                        m->item->setYValue(p.ry());
-                        m->dObjDataIdx = thisIdx;
+                        picker->item->setXValue(p.rx());
+                        picker->item->setYValue(p.ry());
+                        picker->dObjDataIdx = thisIdx;
                         found = true;
                     }
                 }
@@ -2957,6 +2993,113 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+/* if the unit is a SI length unit and if the distance d is below or above a certain range,
+try to adapt d and the unit to a more readable representation. Returns the distance and unit as string.*/
+QString Plot1DWidget::distanceWithUnit(qreal d, const QString &unit, bool isIntegerType) const
+{
+    if (unit == "")
+    {
+        if (isIntegerType)
+        {
+            return QString::number((int)d);
+        }
+        else
+        {
+            return QString("%1").arg(d, 0, 'f', 3);
+        }
+    }
+    else if (siLengthUnits.contains(unit))
+    {
+        int index = siLengthUnits.indexOf(unit);
+        qreal dTemp = std::abs(d);
+        int sign = (d >= 0) ? 1 : -1;
+        int maxIdx = siLengthUnits.size() - 1;
+
+        while (true)
+        {
+            if (dTemp < 1e-12)
+            {
+                break;
+            }
+            else if (dTemp > 10000 && index < maxIdx)
+            {
+                dTemp /= 1000.0;
+                index++;
+                isIntegerType = false;
+            }
+            else if (dTemp < 0.1 && index > 0)
+            {
+                dTemp *= 1000.0;
+                index--;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (isIntegerType)
+        {
+            return QString("%1 %2").arg((int)(dTemp * sign)).arg(siLengthUnits[index]);
+        }
+        else
+        {
+            return QString("%1 %2").arg(dTemp * sign, 0, 'f', 2).arg(siLengthUnits[index]);
+        }
+    }
+    else if (siTimeUnits.contains(unit))
+    {
+        int index = siTimeUnits.indexOf(unit);
+        qreal dTemp = std::abs(d);
+        int sign = (d >= 0) ? 1 : -1;
+        int maxIdx = siTimeUnits.size() - 1;
+
+        while (true)
+        {
+            if (dTemp < 1e-12)
+            {
+                break;
+            }
+            else if (dTemp >= 10000 && index < maxIdx)
+            {
+                dTemp /= 1000.0;
+                index++;
+                isIntegerType = false;
+            }
+            else if (dTemp < 0.1 && index > 0)
+            {
+                dTemp *= 1000.0;
+                index--;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (isIntegerType)
+        {
+            return QString("%1 %2").arg((int)(dTemp * sign)).arg(siTimeUnits[index]);
+        }
+        else
+        {
+            return QString("%1 %2").arg(dTemp * sign, 0, 'f', 2).arg(siTimeUnits[index]);
+        }
+    }
+    else
+    {
+        if (isIntegerType)
+        {
+            return QString("%1 %2").arg((int)d).arg(unit);
+        }
+        else
+        {
+            return QString("%1 %2").arg(d, 0, 'f', 3).arg(unit);
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = false*/)
 {
     if (clear)
@@ -2966,7 +3109,9 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             m.item->detach();
             delete m.item;
         }
+
         m_pickers.clear();
+
 		if (((Itom1DQwtPlot*)(this->parent()))->pickerWidget())
 		{
 			(((Itom1DQwtPlot*)(this->parent()))->pickerWidget())->removePickers();
@@ -2977,6 +3122,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     int cur = 0;
     Picker *m;
     QVector<QPointF> points;
+    QVector<const DataObjectSeriesData*> seriesData;
 
 	QVector< int > idcs;
     int actIdx = -1;
@@ -2986,8 +3132,10 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
         m = &(m_pickers[i]);
         if (updatePositions)
         {
-            stickPickerToXPx(m, std::numeric_limits<double>::quiet_NaN() ,0);
+            stickPickerToXPx(m, std::numeric_limits<double>::quiet_NaN(), 0);
         }
+
+        seriesData << (DataObjectSeriesData*)(m_plotCurveItems[m->curveIdx]->data());
 
         if (m->active)
         {
@@ -3000,30 +3148,108 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
         }
 
         if (cur < 2) cur++;
-        points << QPointF(m_pickers[i].item->xValue(), m_pickers[i].item->yValue());   
+        points << QPointF(m->item->xValue(), m->item->yValue());   
 		idcs << i;
     }
 
-    QString coords, offsets;
-    if (points.size() > 1)
+    Itom1DQwtPlot *plot1d = (Itom1DQwtPlot*)(this->parent());
+    
+    if (points.size() >= 1)
     {
-        coords = QString("[%1; %2]\n[%3; %4]").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4).arg(points[1].rx(),0,'g',4).arg(points[1].ry(),0,'g',4);
-        offsets = QString(" width: %1\n height: %2").arg(points[1].rx() - points[0].rx(),0,'f',2).arg(points[1].ry() - points[0].ry(), 0, 'f', 2);
-		if (((Itom1DQwtPlot*)(this->parent()))->pickerWidget())
-		{
-			(((Itom1DQwtPlot*)(this->parent()))->pickerWidget())->updatePickers(idcs, points);
-		}
-	}
-    else if (points.size() == 1)
-    {
-        coords = QString("[%1; %2]\n      ").arg(points[0].rx(),0,'g',4).arg(points[0].ry(),0,'g',4);
-		if (((Itom1DQwtPlot*)(this->parent()))->pickerWidget())
-		{
-			(((Itom1DQwtPlot*)(this->parent()))->pickerWidget())->updatePickers(idcs, points);
-		}
+        QString coords, offsets;
+
+        if (plot1d->pickerWidget())
+        {
+            (plot1d->pickerWidget())->updatePickers(idcs, points);
+        }
+
+        QStringList coordTexts;
+        bool yIntegerType, xIntegerType;
+        QString yCoord, xCoord;
+        QString yUnit, xUnit;
+
+        for (int i = 0; i < std::min(points.size(), 2); ++i) 
+        {
+            const DataObjectSeriesData* d = seriesData[i];
+            yIntegerType = false;
+            xIntegerType = d->getXCoordsWholeNumber();
+            const ito::DataObject *yObj = d->getDataObject();
+
+            if (i == 0)
+            {
+                xUnit = d->getAxisUnit();
+            }
+            else if (xUnit != d->getAxisUnit())
+            {
+                xUnit = "";
+            }
+
+            if (i == 0)
+            {
+                yUnit = d->getValueUnit();
+            }
+            else if (yUnit != d->getValueUnit())
+            {
+                yUnit = "";
+            }
+
+            if (yObj)
+            {
+                switch (yObj->getType())
+                {
+                case ito::tUInt8:
+                case ito::tInt8:
+                case ito::tUInt16:
+                case ito::tInt16:
+                case ito::tUInt32:
+                case ito::tInt32:
+                case ito::tRGBA32:
+                    yIntegerType = true;
+                    break;
+                }
+            }
+
+            if (yIntegerType)
+            {
+                yCoord = QString("%1").arg(points[i].ry(), 0, 'f', 0);
+            }
+            else
+            {
+                yCoord = QString("%1").arg(points[i].ry(), 0, 'g', 3);
+            }
+
+            if (xIntegerType)
+            {
+                xCoord = QString("%1").arg(points[i].rx(), 0, 'f', 0);
+            }
+            else
+            {
+                xCoord = QString("%1").arg(points[i].rx(), 0, 'g', 3);
+            }
+
+            coordTexts << QString("[%1; %2]").arg(xCoord, yCoord);
+        }
+
+        if (points.size() > 1)
+        {
+            coords = coordTexts.join("\n");
+
+            qreal dx = points[1].rx() - points[0].rx();
+            qreal dy = points[1].ry() - points[0].ry();           
+
+            offsets = QString(" width: %1\n height: %2"). \
+                arg(distanceWithUnit(dx, xUnit, xIntegerType)). \
+                arg(distanceWithUnit(dy, yUnit, yIntegerType));
+        }
+        else // == 1
+        {
+            coords = QString("%1\n      ").arg(coordTexts[0]);
+        }
+
+        setPickerText(coords, offsets);
     }
 
-    setPickerText(coords,offsets);
+    
 
     if (actIdx >= 0)
     {
@@ -3805,12 +4031,15 @@ void Plot1DWidget::mnuCmplxSwitch(QAction *action)
 
 
             //if pickers are visible, stick them to the new line form
-            foreach(Picker m, m_pickers)
+            if (m_pickers.size())
             {
-                stickPickerToSampleIdx(&m, m.dObjDataIdx, 0);
-                //stickPickerToXPx(&m, m.item->xValue(), 0);
-            }
+                foreach(Picker m, m_pickers)
+                {
+                    stickPickerToSampleIdx(&m, m.dObjDataIdx, 0);
+                }
 
+                updatePickerPosition(false);
+            }
         }
     }
 	m_pComplexStyle = (ItomQwtPlotEnums::ComplexType)idx;
