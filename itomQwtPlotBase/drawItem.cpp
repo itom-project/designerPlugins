@@ -138,6 +138,8 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     {
         idxVec.append(shape.index());
     }
+
+	setZ(25.0); //display over lines / images (20.0), grid (10.0), but below markers (30.0) and labels (150.0)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
