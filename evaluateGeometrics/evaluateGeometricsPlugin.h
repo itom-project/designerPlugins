@@ -39,7 +39,7 @@
 class EvaluateGeometricsPlugin : public ito::AbstractItomDesignerPlugin
 {
 #if QT_VERSION >=  QT_VERSION_CHECK(5,0,0)
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" )
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface"  FILE "pluginMetaData.json")
 #endif
     Q_OBJECT
 
