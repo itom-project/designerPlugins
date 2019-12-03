@@ -381,7 +381,7 @@ void MatplotlibPlot::setLabelText(QString text)
 			temp = splits[i];
 			if (temp.size() >= 4)
 			{
-				hexCode = temp.left(4).toInt(nullptr, 16);
+				hexCode = temp.left(4).toInt(NULL, 16);
 				temp = QChar(hexCode) + temp.mid(4);
 				splits[i] = temp;
 			}

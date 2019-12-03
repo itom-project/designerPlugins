@@ -951,16 +951,15 @@ void Plot1DWidget::setLegendFont(const QFont &font)
         QwtLegendLabel* legendLabel;
         foreach(QwtPlotCurve *item, m_plotCurveItems)
         {
-			QList<QwtLegendData> &data = item->legendData();
-			for (int i = 0; i < data.size(); ++i)
+            for (int i = 0; i < item->legendData().size(); ++i)
 			{
-				if (data[i].hasRole(QwtLegendData::TitleRole))
+                if (item->legendData()[i].hasRole(QwtLegendData::TitleRole))
 				{
-					text = data[i].title();
+                    text = item->legendData()[i].title();
 					text.setFont(m_legendFont);
 					QVariant titleValue;
 					qVariantSetValue(titleValue, text);
-					data[i].setValue(QwtLegendData::TitleRole, titleValue);
+                    item->legendData()[i].setValue(QwtLegendData::TitleRole, titleValue);
 				}
 			}
 
