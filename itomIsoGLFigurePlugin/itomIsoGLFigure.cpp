@@ -62,7 +62,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
     m_toggleInfoText(NULL),
     m_lblCoordinates(NULL)
 {
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
+    addOutputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
@@ -404,15 +404,15 @@ ito::RetVal ItomIsoGLWidget::applyUpdate()
 {
     if (m_inpType == ito::ParamBase::DObjPtr)
     {
-        ((plotGLWidget*)m_pContent)->refreshPlot(m_pInput["dataObject"]);
+        ((plotGLWidget*)m_pContent)->refreshPlot(getInputParam("dataObject"));
     }
     else if (m_inpType = ito::ParamBase::PointCloudPtr)
     {
-        ((plotGLWidget*)m_pContent)->refreshPlot(m_pInput["pointCloud"]);
+        ((plotGLWidget*)m_pContent)->refreshPlot(getInputParam("pointCloud"));
     }
     else if (m_inpType = ito::ParamBase::PolygonMeshPtr)
     {
-        ((plotGLWidget*)m_pContent)->refreshPlot(m_pInput["polygonMesh"]);
+        ((plotGLWidget*)m_pContent)->refreshPlot(getInputParam("polygonMesh"));
     }
     else
         return ito::retError;
@@ -425,13 +425,13 @@ ito::RetVal ItomIsoGLWidget::applyUpdate()
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> ItomIsoGLWidget::getDisplayed(void)
 {
-    return QSharedPointer<ito::DataObject>(m_pOutput["displayed"]->getVal<ito::DataObject*>());
+    return QSharedPointer<ito::DataObject>(new ito::DataObject(*getOutputParam("displayed")->getVal<const ito::DataObject*>()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> ItomIsoGLWidget::getSource(void) const
 {
-    return QSharedPointer<ito::DataObject>(m_pInput["source"]->getVal<ito::DataObject*>());
+    return QSharedPointer<ito::DataObject>(new ito::DataObject(*getInputParam("source")->getVal<const ito::DataObject*>()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

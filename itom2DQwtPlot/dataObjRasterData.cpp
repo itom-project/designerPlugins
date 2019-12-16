@@ -218,8 +218,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
 
                 if (!m_isOverlayData)
                 {
-                    m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>((void*)&m_dataObj);
-                    m_pInternalData->m_pConstOutput->operator[]("displayed")->setVal<void*>((void*)m_dataObjPlane);
+                    m_pInternalData->m_selectedOutputParameters["sourceout"]->setVal<void*>((void*)&m_dataObj);
+                    m_pInternalData->m_selectedOutputParameters["displayed"]->setVal<void*>((void*)m_dataObjPlane);
                 }
 
                 //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
@@ -326,8 +326,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
         m_dataObj = ito::DataObject();
         if(!m_isOverlayData)
         {
-            m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>(NULL);
-            m_pInternalData->m_pConstOutput->operator[]("output")->setVal<void*>(NULL);
+            m_pInternalData->m_selectedOutputParameters["sourceout"]->setVal<void*>(NULL);
+            m_pInternalData->m_selectedOutputParameters["output"]->setVal<void*>(NULL);
         }
         m_plane = NULL;
 

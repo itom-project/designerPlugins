@@ -4173,10 +4173,13 @@ void Plot1DWidget::mnuParentScaleSetting()
         const QwtScaleDiv scale = axisScaleDiv(QwtPlot::yLeft);
         ito::AutoInterval bounds(scale.lowerBound(), scale.upperBound());
         const Itom1DQwtPlot *p = (const Itom1DQwtPlot*)(this->parent());
-        ito::Channel* dataChannel = p->getInputChannel("source");
-        if (dataChannel && dataChannel->getParent())
+
+        foreach(QSharedPointer<ito::Channel> dataChannel, p->getConnectedInputChannels("source"))
         {
-            ((ito::AbstractDObjFigure*)(dataChannel->getParent()))->setZAxisInterval(bounds);
+            if (dataChannel && dataChannel->getSender())
+            {
+                ((ito::AbstractDObjFigure*)(dataChannel->getSender()))->setZAxisInterval(bounds);
+            }
         }
     }
 }

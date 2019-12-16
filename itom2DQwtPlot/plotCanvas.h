@@ -291,7 +291,6 @@ struct InternalData
         m_colorBarVisible(false),
         m_cmplxType(ItomQwtPlotEnums::CmplxReal),
         m_dataChannel(ItomQwtPlotEnums::ChannelAuto),
-        m_pConstOutput(NULL),
         m_alpha(0),
         m_overlayScaleAuto(true),
         m_overlayMin(0),
@@ -344,7 +343,7 @@ struct InternalData
     ItomQwtPlotEnums::ComplexType m_cmplxType;
     ItomQwtPlotEnums::DataChannel m_dataChannel;
 
-    const QHash<QString, ito::Param*> *m_pConstOutput;
+    QHash<QString, ito::Param*> m_selectedOutputParameters;
 };
 
 

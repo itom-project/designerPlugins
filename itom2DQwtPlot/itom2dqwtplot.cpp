@@ -115,13 +115,13 @@ void Itom2dQwtPlot::constructor()
     // Basic settings
     m_pContent = NULL;
     
-    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for volume plots from 3d objects").toLatin1().data()));
+    addInputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for volume plots from 3d objects").toLatin1().data()));
 
     //bounds, volumeCutBounds and zCutPoint are three different output connections, since it is possible to have a line cut, volume cut and a z-stack cut visible at the same time.
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
-    m_pOutput.insert("zCutPoint", new ito::Param("zCutPoint", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for z-stack cut in 3d objects").toLatin1().data()));
-    m_pOutput.insert("volumeCutBounds", new ito::Param("volumeCutBounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for volume cut in 3d objects").toLatin1().data()));
-    m_pOutput.insert("sourceout", new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
+    addOutputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for line plots from 2d objects").toLatin1().data()));
+    addOutputParam(new ito::Param("zCutPoint", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for z-stack cut in 3d objects").toLatin1().data()));
+    addOutputParam(new ito::Param("volumeCutBounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for volume cut in 3d objects").toLatin1().data()));
+    addOutputParam(new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
 
 
     d->m_pData = new InternalData();
@@ -142,7 +142,12 @@ void Itom2dQwtPlot::constructor()
     d->m_pData->m_colorBarVisible = false;
     d->m_pData->m_cmplxType = ItomQwtPlotEnums::CmplxAbs;
     d->m_pData->m_yaxisFlipped = false;
-    d->m_pData->m_pConstOutput = &m_pOutput;
+
+    QHash<QString, ito::Param*> selectedOutputParameters;
+    selectedOutputParameters["sourceout"] = getOutputParam("sourceout");
+    selectedOutputParameters["displayed"] = getOutputParam("displayed");
+    selectedOutputParameters["output"] = getOutputParam("output");
+    d->m_pData->m_selectedOutputParameters = selectedOutputParameters;
 
     //initialize canvas
     m_pContent = new PlotCanvas(d->m_pData, this);
@@ -193,7 +198,7 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
 ito::RetVal Itom2dQwtPlot::init() 
 { 
     //called when api-pointers are transmitted, directly after construction
-    return m_pContent->init(m_windowMode != ito::AbstractFigure::ModeStandaloneInUi); 
+    return m_pContent->init(getWindowMode() != ito::AbstractFigure::ModeStandaloneInUi);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -221,7 +226,7 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
     }
     */
     QVector<QPointF> bounds = getBounds();
-    m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(),-1,bounds);
+    m_pContent->refreshPlot(getInputParam("source")->getVal<const ito::DataObject*>(),-1,bounds);
 
     return ito::retOk;
 }
@@ -785,10 +790,10 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
     
     QStringList paramNames;
     
-    if (m_pOutput["bounds"]->getLen() == 6)
+    if (getOutputParam("bounds")->getLen() == 6)
     {
         paramNames << "bounds"  << "sourceout";
-        double * bounds = m_pOutput["bounds"]->getVal<double*>();
+        const double* bounds = getOutputParam("bounds")->getVal<const double*>();
 
         double newBounds[6];
 
@@ -798,7 +803,7 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
         }
         newBounds[0] = m_pContent->getCurrentPlane();
         newBounds[1] = m_pContent->getCurrentPlane();
-        m_pOutput["bounds"]->setVal<double*>(newBounds, 6);
+        getOutputParam("bounds")->setVal<double*>(newBounds, 6);
     }
     else
     {
@@ -899,7 +904,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(const QVector<QPointF> &bounds, ito:
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
-    m_pOutput["volumeCutBounds"]->setVal(pointArr, 2 * bounds.size());
+    getOutputParam("volumeCutBounds")->setVal(pointArr, 2 * bounds.size());
 
     DELETE_AND_SET_NULL_ARRAY(pointArr);
 
@@ -952,15 +957,6 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(const QVector<QPointF> &bounds, ito:
         {
             d->m_volumeCutChildPlot.rStates() &= ~ChildPlotItem::StateChannelsConnected;
 
-            ito::Channel *tempChannel;
-            foreach(tempChannel, m_pChannels)
-            {
-                if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
-                {
-                    removeChannel(tempChannel);
-                }
-            }
-
             if (bounds.size() == 2)
             {
                 ((QMainWindow*)childFigure)->setWindowTitle(tr("Volumecut"));
@@ -969,9 +965,14 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(const QVector<QPointF> &bounds, ito:
                     ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
                 }
 
+                QList<ito::AbstractNode::ParamNamePair> excludes;
+                excludes << ParamNamePair("volumeCutBounds", "bounds");
+                excludes << ParamNamePair("sourceout", "source");
+                removeAllChannelsToReceiver((ito::AbstractNode*)childFigure, excludes);
+
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
-                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["volumeCutBounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                retval += createChannel("volumeCutBounds", childFigure, "bounds", false);
+                retval += createChannel("sourceout", childFigure, "source", false);
                 paramNames << "volumeCutBounds" << "sourceout";
             }
             else
@@ -1030,7 +1031,7 @@ ito::RetVal Itom2dQwtPlot::displayLineCut(const QVector<QPointF> &bounds, ito::u
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
-    m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    getOutputParam("bounds")->setVal(pointArr, 2 * bounds.size());
 
     DELETE_AND_SET_NULL_ARRAY(pointArr);
 
@@ -1083,15 +1084,6 @@ ito::RetVal Itom2dQwtPlot::displayLineCut(const QVector<QPointF> &bounds, ito::u
         {
             d->m_lineCutChildPlot.rStates() &= ~ChildPlotItem::StateChannelsConnected;
 
-            ito::Channel *tempChannel;
-            foreach(tempChannel, m_pChannels)
-            {
-                if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
-                {
-                    removeChannel(tempChannel);
-                }
-            }
-
             if (bounds.size() == 3) // its a 3D-Object
             {
                 ((QMainWindow*)childFigure)->setWindowTitle(tr("Linecut"));
@@ -1100,9 +1092,14 @@ ito::RetVal Itom2dQwtPlot::displayLineCut(const QVector<QPointF> &bounds, ito::u
                     ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
                 }
 
+                QList<ito::AbstractNode::ParamNamePair> excludes;
+                excludes << ParamNamePair("bounds", "bounds");
+                excludes << ParamNamePair("sourceout", "source");
+                removeAllChannelsToReceiver((ito::AbstractNode*)childFigure, excludes);
+
                 // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
-                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["bounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                retval += createChannel("bounds", childFigure, "bounds", false);
+                retval += createChannel("sourceout", childFigure, "source", false);
                 paramNames << "bounds" << "sourceout";
             }
             else
@@ -1113,9 +1110,14 @@ ito::RetVal Itom2dQwtPlot::displayLineCut(const QVector<QPointF> &bounds, ito::u
                     ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
                 }
 
+                QList<ito::AbstractNode::ParamNamePair> excludes;
+                excludes << ParamNamePair("bounds", "bounds");
+                excludes << ParamNamePair("displayed", "source");
+                removeAllChannelsToReceiver((ito::AbstractNode*)childFigure, excludes);
+
                 // otherwise simply pass on the displayed plane
-                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["bounds"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-                retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["displayed"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+                retval += createChannel("bounds", childFigure, "bounds", false);
+                retval += createChannel("displayed", childFigure, "source", false);
                 paramNames << "bounds" << "displayed";
             }
 
@@ -1170,7 +1172,7 @@ ito::RetVal Itom2dQwtPlot::displayZStackCut(const QVector<QPointF> &bounds, ito:
         pointArr[np * 2 + 1] = bounds[np].y();
     }
 
-    m_pOutput["zCutPoint"]->setVal(pointArr, 2 * bounds.size());
+    getOutputParam("zCutPoint")->setVal(pointArr, 2 * bounds.size());
 
     DELETE_AND_SET_NULL_ARRAY(pointArr);
 
@@ -1223,25 +1225,21 @@ ito::RetVal Itom2dQwtPlot::displayZStackCut(const QVector<QPointF> &bounds, ito:
         {
             d->m_zStackChildPlot.rStates() &= ~ChildPlotItem::StateChannelsConnected;
 
-            ito::Channel *tempChannel;
-            foreach(tempChannel, m_pChannels)
-            {
-                if (tempChannel->getParent() == (ito::AbstractNode*)this &&  tempChannel->getChild() == (ito::AbstractNode*)childFigure)
-                {
-                    removeChannel(tempChannel);
-                }
-            }
-
             ((QMainWindow*)childFigure)->setWindowTitle(tr("Z-Stack"));
             if (childFigure->inherits("ItomQwtDObjFigure"))
             {
                 ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
             }
 
+            QList<ito::AbstractNode::ParamNamePair> excludes;
+            excludes << ParamNamePair("zCutPoint", "bounds");
+            excludes << ParamNamePair("sourceout", "source");
+            removeAllChannelsToReceiver((ito::AbstractNode*)childFigure, excludes);
+
             // for a linecut in z-direction we have to pass the input object to the linecut, otherwise the 1D-widget "sees" only a 2D object
             // with one plane and cannot display the points in z-direction
-            retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["zCutPoint"], childFigure->getInputParam("bounds"), ito::Channel::parentToChild, 0, 1);
-            retval += addChannel((ito::AbstractNode*)childFigure, m_pOutput["sourceout"], childFigure->getInputParam("source"), ito::Channel::parentToChild, 0, 1);
+            retval += createChannel("zCutPoint", childFigure, "bounds", false);
+            retval += createChannel("sourceout", childFigure, "source", false);
             paramNames << "zCutPoint" << "sourceout";
 
             retval += updateChannels(paramNames);
@@ -1617,7 +1615,7 @@ void Itom2dQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
     {
         m_pContent->setUnitLabelStyle(style);
         m_pContent->m_unitLabelChanged = true;
-        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>());
+        m_pContent->refreshPlot(getInputParam("source")->getVal<const ito::DataObject*>());
     }
 
     updatePropertyDock();
@@ -1663,14 +1661,7 @@ void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle &plotHandle)
                     childFigureDestroyed(d->m_lineCutChildPlot.childFigure());
                     m_pContent->removeChildPlotIndicators(true, false, false, true);
 
-                    ito::Channel *channel;
-                    foreach(channel, m_pChannels)
-                    {
-                        if (channel->getParent() == (ito::AbstractNode*)this &&  channel->getChild() == (ito::AbstractNode*)af) //...and here the cast to AbstractNode again. Else, there would be an error
-                        {
-                            removeChannel(channel);
-                        }
-                    }
+                    removeAllChannelsToReceiver((ito::AbstractNode*)af); //...and here the cast to AbstractNode again. Else, there would be an error
                 }
             }
 
@@ -1763,14 +1754,7 @@ void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle &plotHandle)
                     childFigureDestroyed(d->m_zStackChildPlot.childFigure());
                     m_pContent->removeChildPlotIndicators(true, false, false, true);
 
-                    ito::Channel *channel;
-                    foreach(channel, m_pChannels)
-                    {
-                        if (channel->getParent() == (ito::AbstractNode*)this &&  channel->getChild() == (ito::AbstractNode*)af) //...and here the cast to AbstractNode again. Else, there would be an error
-                        {
-                            removeChannel(channel);
-                        }
-                    }
+                    removeAllChannelsToReceiver((ito::AbstractNode*)af); //...and here the cast to AbstractNode again. Else, there would be an error
                 }
             }
 
@@ -1863,14 +1847,7 @@ void Itom2dQwtPlot::setVolumeCutPlotItem(const ito::ItomPlotHandle &plotHandle)
                     childFigureDestroyed(d->m_volumeCutChildPlot.childFigure());
                     m_pContent->removeChildPlotIndicators(true, false, false, true);
 
-                    ito::Channel *channel;
-                    foreach(channel, m_pChannels)
-                    {
-                        if (channel->getParent() == (ito::AbstractNode*)this &&  channel->getChild() == (ito::AbstractNode*)af) //...and here the cast to AbstractNode again. Else, there would be an error
-                        {
-                            removeChannel(channel);
-                        }
-                    }
+                    removeAllChannelsToReceiver((ito::AbstractNode*)af); //...and here the cast to AbstractNode again. Else, there would be an error
                 }
             }
 
@@ -1932,18 +1909,18 @@ void Itom2dQwtPlot::setBounds(QVector<QPointF> bounds)
         pointArr[np * 2] = bounds[np].x();
         pointArr[np * 2 + 1] = bounds[np].y();
     }
-    m_pInput["bounds"]->setVal(pointArr, 2 * bounds.size());
+    getInputParam("bounds")->setVal(pointArr, 2 * bounds.size());
     delete[] pointArr;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QVector<QPointF> Itom2dQwtPlot::getBounds(void) const
 {
-    int numPts = m_pInput["bounds"]->getLen();
+    int numPts = getInputParam("bounds")->getLen();
     QVector<QPointF> boundsVec;
 
     if (numPts > 0)
     {
-        double *ptsDblVec = m_pInput["bounds"]->getVal<double*>();
+        const double *ptsDblVec = getInputParam("bounds")->getVal<const double*>();
         boundsVec.reserve(numPts / 2);
         for (int n = 0; n < numPts / 2; n++)
         {

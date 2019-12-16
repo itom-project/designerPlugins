@@ -59,8 +59,8 @@ void Itom1DQwtPlot::constructor()
 {
     d = new Itom1DQwtPlotPrivate();
 
-    m_pInput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
-    m_pInput.insert("xData", new ito::Param("xData", ito::ParamBase::DObjPtr, NULL, tr("represents the xData of the given source object").toLatin1().data()));
+    addInputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
+    addInputParam(new ito::Param("xData", ito::ParamBase::DObjPtr, NULL, tr("represents the xData of the given source object").toLatin1().data()));
 
     d->m_pData = new InternalData();
     d->m_pData->m_autoAxisLabel = true;
@@ -136,7 +136,7 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::init()
 { 
-    return m_pContent->init(m_windowMode != ito::AbstractFigure::ModeStandaloneInUi); 
+    return m_pContent->init(getWindowMode() != ito::AbstractFigure::ModeStandaloneInUi);
 } //called when api-pointers are transmitted, directly after construction
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -239,7 +239,7 @@ void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
     {
         m_pContent->setUnitLabelStyle(style);
         QVector<QPointF> bounds = getBounds();
-        m_pContent->refreshPlot(m_pInput["source"]->getVal<ito::DataObject*>(), bounds);
+        m_pContent->refreshPlot(getInputParam("source")->getVal<const ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         m_pContent->updateInterval(Qt::YAxis, *(d->m_pData)); //replot is done here 
@@ -252,15 +252,23 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
 
-    if (m_pInput["source"]->getVal<const ito::DataObject*>())
+    ito::Param *sourceParam = getInputParam("source");
+
+    if (sourceParam->getVal<const ito::DataObject*>())
     {
-        m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
+        getOutputParam("displayed")->copyValueFrom(sourceParam);
         // why "source" is used here and not "displayed" .... ck 05/15/2013
         
-        ito::Channel* dataChannel = getInputChannel("source");
-        m_pContent->m_hasParentForRescale = (dataChannel && dataChannel->getParent());
+        QList<QSharedPointer<Channel> > dataChannels = getConnectedInputChannels("source");
 
-        m_pContent->refreshPlot(m_pInput["source"]->getVal<const ito::DataObject*>(), bounds, m_pInput["xData"]->getVal<const ito::DataObject*>());
+        m_pContent->m_hasParentForRescale = false;
+
+        foreach(QSharedPointer<Channel> dataChannel, dataChannels)
+        {
+            m_pContent->m_hasParentForRescale |= (dataChannel && dataChannel->getSender());
+        }
+
+        m_pContent->refreshPlot(sourceParam->getVal<const ito::DataObject*>(), bounds, getInputParam("xData")->getVal<const ito::DataObject*>());
     }
 
     return ito::retOk;
@@ -282,19 +290,19 @@ void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds)
         pointArr[np * 2] = bounds[np].x();
         pointArr[np * 2 + 1] = bounds[np].y();
     }
-    m_pInput["bounds"]->setVal<double*>(pointArr, 2 * bounds.size());
+    getInputParam("bounds")->setVal<double*>(pointArr, 2 * bounds.size());
     delete[] pointArr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QVector<QPointF> Itom1DQwtPlot::getBounds(void) const
 { 
-    int numPts = m_pInput["bounds"]->getLen();
+    int numPts = getInputParam("bounds")->getLen();
     QVector<QPointF> boundsVec;
 
     if (numPts > 0)
     {
-        const double *ptsDblVec = m_pInput["bounds"]->getVal<const double*>();
+        const double *ptsDblVec = getInputParam("bounds")->getVal<const double*>();
         boundsVec.reserve(numPts / 2);
 
         for (int n = 0; n < numPts / 2; n++)
@@ -308,9 +316,9 @@ QVector<QPointF> Itom1DQwtPlot::getBounds(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::resetBounds()
 {
-    if (m_pInput["bounds"]->getLen() > 0)
+    if (getInputParam("bounds")->getLen() > 0)
     {
-        m_pInput["bounds"]->setVal<double*>(NULL, 0);
+        getInputParam("bounds")->setVal<double*>(NULL, 0);
     }
 }
 
@@ -790,7 +798,7 @@ void Itom1DQwtPlot::setLegendTitles(const QStringList &legends)
 {
     if (m_pContent)
     {
-        m_pContent->setLegendTitles(legends, m_pInput["source"]->getVal<ito::DataObject*>());
+        m_pContent->setLegendTitles(legends, getInputParam("source")->getVal<const ito::DataObject*>());
     }
 
     updatePropertyDock();

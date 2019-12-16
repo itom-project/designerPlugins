@@ -112,7 +112,7 @@ class ITOMGVPLOT_EXPORT GraphicViewPlot : public ito::AbstractDObjFigure
                 pointArr[np * 2] = bounds[np].x();
                 pointArr[np * 2 + 1] = bounds[np].y();
             }
-            m_pOutput["bounds"]->setVal(pointArr, 2 * bounds.size());
+            getOutputParam("bounds")->setVal(pointArr, 2 * bounds.size());
             delete[] pointArr;
         }
 
