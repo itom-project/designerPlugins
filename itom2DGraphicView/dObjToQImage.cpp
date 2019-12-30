@@ -179,10 +179,6 @@ bool RasterToQImageObj::updateDataObject(const ito::DataObject *dataObj, int pla
             {
                 m_dataObjPlane = &m_dataObj;
             }
-
-            //m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>((void*)&m_dataObj);
-            //m_pInternalData->m_pConstOutput->operator[]("displayed")->setVal<void*>((void*)m_dataObjPlane);
-
         }
 
         if(m_pInternalData->m_valueScaleAuto)
@@ -204,8 +200,6 @@ bool RasterToQImageObj::updateDataObject(const ito::DataObject *dataObj, int pla
 
         m_dataObjPlane = NULL;
         m_dataObj = ito::DataObject();
-        //m_pInternalData->m_pConstOutput->operator[]("sourceout")->setVal<void*>(NULL);
-        //m_pInternalData->m_pConstOutput->operator[]("output")->setVal<void*>(NULL);
 
         m_plane = NULL;
 
