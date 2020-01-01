@@ -128,7 +128,3 @@ QString Vtk3DVisualizerFactory::includeFile() const
 {
     return "win3dVisualizer.h";
 }
-
-#if QT_VERSION <= 0x050000
-    Q_EXPORT_PLUGIN2(vtk3dVisualizer, Vtk3DVisualizerFactory)
-#endif

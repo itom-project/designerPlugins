@@ -98,7 +98,3 @@ QString Slider2DFactory::includeFile() const
 {
     return "slider2D.h";
 }
-
-#if QT_VERSION <= 0x050000
-    Q_EXPORT_PLUGIN2(Slider2D, Slider2DFactory)
-#endif

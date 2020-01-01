@@ -70,10 +70,6 @@
 
 Q_DECLARE_METATYPE ( SharedItemPtr )
 
-#if QT_VERSION < 0x050000
-#define QStringLiteral QString::fromUtf8
-#endif
-
 //------------------------------------------------------------------------------------------------------------------------
 class Vtk3dVisualizerPrivate 
 {

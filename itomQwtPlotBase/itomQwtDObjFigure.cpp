@@ -196,17 +196,9 @@ ito::RetVal ItomQwtDObjFigure::savePlot(const QString &filename, float xsize /*=
     suffixes << "pdf";
 #endif
 
-#if QT_VERSION < 0x050000
-#ifndef QT_NO_PRINTER
-    suffixes << "ps";
-#endif
-#endif
-
 #ifndef QWT_NO_SVG
 #ifdef QT_SVG_LIB
-#if QT_VERSION >= 0x040500
-        suffixes << "svg";
-#endif
+    suffixes << "svg";
 #endif
 #endif
 

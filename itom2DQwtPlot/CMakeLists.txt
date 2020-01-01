@@ -61,13 +61,12 @@ message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${QT_QTCORE_INCLUDE_DIR}
     ${ITOM_SDK_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
     ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
     ${VISUALLEAKDETECTOR_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomQwtPlotBase
-	${CMAKE_CURRENT_BINARY_DIR}/../itomQwtPlotBase
+    ${CMAKE_CURRENT_BINARY_DIR}/../itomQwtPlotBase
 )
 
 LINK_DIRECTORIES(
@@ -119,9 +118,7 @@ if (QT5_FOUND)
     QT5_WRAP_UI(plugin_ui_MOC ${plugin_UI})
     QT5_ADD_RESOURCES(plugin_rcc_MOC ${plugin_RCC})
 else (QT5_FOUND)
-    QT4_WRAP_CPP_ITOM(plugin_HEADERS_MOC ${plugin_HEADERS})
-    QT4_WRAP_UI_ITOM(plugin_ui_MOC ${plugin_UI})
-    QT4_ADD_RESOURCES(plugin_rcc_MOC ${plugin_RCC})
+    MESSAGE(SEND_ERROR "Currently only Qt5 is supported")
 endif (QT5_FOUND)
 
 file (GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")

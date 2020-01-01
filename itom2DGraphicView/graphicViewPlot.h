@@ -40,9 +40,7 @@
 #include <qaction.h>
 #include <qwidget.h>
 #include <qwidgetaction.h>
-#if QT_VERSION >= 0x050000
 #include <QtWidgets/qlabel.h>
-#endif
 
 #ifndef DECLAREMETADATAOBJECT
     Q_DECLARE_METATYPE(QSharedPointer<ito::DataObject>)

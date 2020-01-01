@@ -60,11 +60,7 @@ PlotWidget::PlotWidget(InternalData* pData, QMenu *contextMenu, QWidget * parent
 
     //m_pItem->setTransform(QTransform::fromScale(m_pData->m_xaxisFlipped ? -1 : 1, m_pData->m_yaxisFlipped ? 1 : -1));
 
-#if QT_VERSION < 0x050000
-    m_pLineCut = new QGraphicsLineItem(NULL, m_pContent);
-#else
     m_pLineCut = new QGraphicsLineItem(m_pContent->items().at(0));
-#endif
     m_pLineCut->setVisible(false);
     m_pLineCut->setZValue(1.0);
     m_lineIsSampling = false;

@@ -28,9 +28,7 @@
 class Itom1DQwtPlotPlugin : public ito::AbstractItomDesignerPlugin
 {
     Q_OBJECT
-#if QT_VERSION >=  QT_VERSION_CHECK(5,0,0)
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface"  FILE "pluginMetaData.json")
-#endif
 
 public:
     Itom1DQwtPlotPlugin(QObject *parent = 0);

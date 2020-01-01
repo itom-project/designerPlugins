@@ -2931,12 +2931,8 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
             (hMyParent->dObjectWidget() && hMyParent->dObjectWidget()->isVisible()) ||
             (hMyParent->shapesWidget()  && hMyParent->shapesWidget()->isVisible()))
         {
-#if QT_VERSION >= 0x050000
             plotInfoVisible = true;
             emit statusBarMessage(tr("Copy current view to clipboard including meta information widgets ..."));
-#else
-            emit statusBarMessage(tr("Copy current view to clipboard without meta information widgets (requires Qt5) ..."));
-#endif
         }
         else
         {
@@ -2952,7 +2948,6 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         img.setDotsPerMeterX(img.dotsPerMeterX() * resFactor); //setDotsPerMeterXY must be set after rendering
         img.setDotsPerMeterY(img.dotsPerMeterY() * resFactor);
 
-#if QT_VERSION >= 0x050000
         if (plotInfoVisible)
         {
             QList<QWidget*> widgets;
@@ -2981,16 +2976,17 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
             QPainter painter2(&imgTotal);
             painter2.drawImage(0, 0, img);
             int y0 = 0;
+
             foreach(QPixmap pixmap, pixmaps)
             {
                 painter2.drawPixmap(x0, y0, pixmap);
                 y0 += pixmap.height();
             }
+
             painter2.end();
 
             img = imgTotal;
         }
-#endif
 
         clipboard->setImage(img);
 
