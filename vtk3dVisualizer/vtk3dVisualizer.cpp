@@ -298,7 +298,7 @@ ito::RetVal Vtk3dVisualizer::applyUpdate()
     {
     case ito::ParamBase::PointCloudPtr:
         {
-            const ito::PCLPointCloud *cloud = m_pInput["pointCloud"]->getVal<const ito::PCLPointCloud*>();
+            const ito::PCLPointCloud *cloud = getInputParam("pointCloud")->getVal<const ito::PCLPointCloud*>();
             if (cloud)
             {
                 if (cloud->hasNormal())
@@ -314,7 +314,7 @@ ito::RetVal Vtk3dVisualizer::applyUpdate()
         break;
     case ito::ParamBase::PolygonMeshPtr:
         {
-            const ito::PCLPolygonMesh *mesh = m_pInput["polygonMesh"]->getVal<const ito::PCLPolygonMesh*>();
+            const ito::PCLPolygonMesh *mesh = getInputParam("polygonMesh")->getVal<const ito::PCLPolygonMesh*>();
             if (mesh)
             {
                 retval += this->addMesh(*mesh, "source_mesh");

@@ -24,6 +24,7 @@
 #ifndef WIN32
     #include <unistd.h>
 #endif
+
 #include "itomIsoGLFigure.h"
 #include "plotIsoGLWidget.h"
 #include "common/sharedStructuresGraphics.h"
@@ -115,7 +116,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_pParent(parent),
     m_paletteNum(0),
     m_lineplotUID(0),
-    m_cBarTexture(NULL),
+    m_cBarTexture(0),
     m_drawTitle(false),
     m_backgnd(true),
     m_drawLightDir(false),

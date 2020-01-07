@@ -60,7 +60,7 @@ GraphicViewPlot::GraphicViewPlot(const QString &itomSettingsFile, AbstractFigure
     m_lblCoordinates(NULL),
     m_pActProperties(NULL)
 {
-    m_pOutput.insert("bounds", new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toLatin1().data()));
+    addOutputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2D objects").toLatin1().data()));
 
     int id = qRegisterMetaType<QSharedPointer<ito::DataObject> >("QSharedPointer<ito::DataObject>");
 
@@ -417,13 +417,13 @@ GraphicViewPlot::~GraphicViewPlot()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal GraphicViewPlot::applyUpdate()
 {
-    m_pOutput["displayed"]->copyValueFrom(m_pInput["source"]);
+    getOutputParam("displayed")->copyValueFrom(getInputParam("source"));
 
     if (!m_pContent)
         return ito::retError;
 
-    if (m_pOutput["displayed"]->getType() & ito::ParamBase::DObjPtr)
-        ((PlotWidget*)m_pContent)->refreshPlot(m_pOutput["displayed"]->getVal<ito::DataObject*>()); //push the displayed DataObj into the actual plot widget for displaying
+    if (getOutputParam("displayed")->getType() & ito::ParamBase::DObjPtr)
+        ((PlotWidget*)m_pContent)->refreshPlot(getOutputParam("displayed")->getVal<ito::DataObject*>()); //push the displayed DataObj into the actual plot widget for displaying
     else
         ((PlotWidget*)m_pContent)->refreshPlot(NULL); //push the displayed DataObj into the actual plot widget for displaying
 
@@ -433,13 +433,13 @@ ito::RetVal GraphicViewPlot::applyUpdate()
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> GraphicViewPlot::getDisplayed()
 {
-    return QSharedPointer<ito::DataObject>(m_pOutput["displayed"]->getVal<ito::DataObject*>());
+    return QSharedPointer<ito::DataObject>(new ito::DataObject(*getOutputParam("displayed")->getVal<const ito::DataObject*>()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> GraphicViewPlot::getSource(void) const
 {
-    return QSharedPointer<ito::DataObject>(m_pInput["source"]->getVal<ito::DataObject*>());
+    return QSharedPointer<ito::DataObject>(new ito::DataObject(*getInputParam("source")->getVal<const ito::DataObject*>()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -491,8 +491,9 @@ ito::RetVal GraphicViewPlot::displayLineCut(QVector<QPointF> bounds, ito::uint32
         {
             return ito::retError;
         }
-        retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["bounds"], lineCut->getInputParam("bounds"), Channel::parentToChild, 0, 1);
-        retval += addChannel((ito::AbstractNode*)lineCut, m_pOutput["displayed"], lineCut->getInputParam("source"), Channel::parentToChild, 0, 1);
+
+        retval += createChannel("bounds", (ito::AbstractNode*)lineCut, "bounds", false);
+        retval += createChannel("displayed", (ito::AbstractNode*)lineCut, "source", false);
         paramNames << "bounds"  << "displayed";
         retval += updateChannels(paramNames);
 
