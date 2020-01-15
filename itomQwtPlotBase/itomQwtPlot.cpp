@@ -50,9 +50,6 @@
 #include "dialogExportProperties.h"
 #include "itomQwtPlotPanner.h"
 
-#include "plotLegends/infoWidgetShapes.h"
-#include "plotLegends/infoWidgetMarkers.h"
-
 #include "../DataObject/dataObjectFuncs.h"
 
 #include "common/apiFunctionsGraphInc.h"

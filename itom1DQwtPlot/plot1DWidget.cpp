@@ -33,9 +33,6 @@
 #include "dialog1DScale.h"
 #include "widgetCurveProperties.h"
 
-#include "plotLegends/infoWidgetPickers.h"
-#include "plotLegends/infoWidgetDObject.h"
-
 #include "itomLogLogScaleEngine.h"
 
 #include "itomPlotZoomer.h"
