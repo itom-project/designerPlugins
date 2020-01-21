@@ -433,13 +433,31 @@ ito::RetVal GraphicViewPlot::applyUpdate()
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> GraphicViewPlot::getDisplayed()
 {
-    return QSharedPointer<ito::DataObject>(new ito::DataObject(*getOutputParam("displayed")->getVal<const ito::DataObject*>()));
+    const ito::DataObject *displayedObj = getOutputParam("displayed")->getVal<const ito::DataObject*>();
+
+    if (displayedObj)
+    {
+        return QSharedPointer<ito::DataObject>(new ito::DataObject(*displayedObj));
+    }
+    else
+    {
+    return QSharedPointer<ito::DataObject>();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer<ito::DataObject> GraphicViewPlot::getSource(void) const
 {
-    return QSharedPointer<ito::DataObject>(new ito::DataObject(*getInputParam("source")->getVal<const ito::DataObject*>()));
+    const ito::DataObject *sourceObj = getInputParam("source")->getVal<const ito::DataObject*>();
+
+    if (sourceObj)
+    {
+        return QSharedPointer<ito::DataObject>(new ito::DataObject(*sourceObj));
+    }
+    else
+    {
+        return QSharedPointer<ito::DataObject>();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
