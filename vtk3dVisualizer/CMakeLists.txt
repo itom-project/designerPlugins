@@ -46,7 +46,7 @@ if(ITOM_SDK_PCL_SUPPORT)
         if(BUILD_UNICODE)
             add_definitions(-DUNICODE -D_UNICODE)
         endif(BUILD_UNICODE)
-        add_definitions(-DCMAKE -DITOMSHAREDDESIGNER)
+        add_definitions(-DITOMSHAREDDESIGNER)
 
         if(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
             add_definitions(-DVISUAL_LEAK_DETECTOR_CMAKE)

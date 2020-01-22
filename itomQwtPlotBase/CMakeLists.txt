@@ -35,7 +35,7 @@ find_package(VisualLeakDetector QUIET)
 if(BUILD_UNICODE)
     add_definitions(-DUNICODE -D_UNICODE)
 endif(BUILD_UNICODE)
-add_definitions(-DCMAKE -DITOMQWTPLOTBASE_DLL)
+add_definitions(-DITOMQWTPLOTBASE_DLL)
 add_definitions(-DQWT_DLL) #use the shared library version of qwt
 
 if(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
