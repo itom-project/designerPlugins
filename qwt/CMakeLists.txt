@@ -1,55 +1,34 @@
 set(target_name qwt)
- 
+
 project(${target_name})
- 
-cmake_minimum_required(VERSION 3.0.2)
 
-message(STATUS "\n--------------- BASE LIBRARY ${target_name} ---------------")
+message(STATUS "\n<--- BASE LIBRARY ${target_name} --->")
+message(STATUS "-- Build directory: ${CMAKE_CURRENT_BINARY_DIR}")
 
-option(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
-option(BUILD_SHARED_LIBS "Build shared library." ON)
 option(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." ON)
 set(ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
-set(LIBRARY_TYPE SHARED)
 
-include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-INIT_ITOM_LIBRARY() #apply general project settings, CMake configurations, policies... for itom and its libraries
-
-#if qwt is static, add -fPIC as compiler flag for linux
-if(UNIX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-endif(UNIX)
-
-  # As moc files are generated in the binary dir, tell CMake
-  # to always look for includes there:
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR}/cmake)
+# As moc files are generated in the binary dir, tell CMake
+# to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(ITOM_SDK COMPONENTS itomCommonLib REQUIRED)
-FIND_PACKAGE_QT(ON Core Widgets PrintSupport Xml Designer Widgets Svg OpenGL Concurrent)
+include("ItomBuildMacros")
+itom_init_cmake_policy()
 
+
+find_package(ITOM_SDK COMPONENTS itomCommonLib REQUIRED)
+itom_find_package_qt(ON Core Widgets PrintSupport Xml Designer Widgets Svg OpenGL Concurrent)
 find_package(VisualLeakDetector QUIET)
 
-if(BUILD_UNICODE)
-    add_definitions(-DUNICODE -D_UNICODE)
-endif(BUILD_UNICODE)
-add_definitions(-DCMAKE)
+add_definitions(-DUNICODE -D_UNICODE)
 add_definitions(-DQWT_DLL)
 add_definitions(-DQWT_MAKEDLL)
 
 if(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
     add_definitions(-DVISUAL_LEAK_DETECTOR_CMAKE)
 endif(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
-
-# default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
-if(DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-else()
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-endif()
-
-message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -164,12 +143,6 @@ set(qwt_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.h
 )
 
-set(qwt_UI
-)
-
-set(qwt_RCC
-)
-
 set(qwt_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_legend.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale.cpp
@@ -268,23 +241,23 @@ set(qwt_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.cpp
 )
 
-if(QT5_FOUND)
-    #if automoc if OFF, you also need to call QT5_WRAP_CPP here
-    QT5_WRAP_UI(qwt_ui_MOC ${qwt_UI})
-    QT5_ADD_RESOURCES(qwt_rcc_MOC ${qwt_RCC})
-else()
-    message(SEND_ERROR "Currently only Qt5 is supported")
-endif()
+add_library(${target_name} SHARED ${qwt_SOURCES} ${qwt_HEADERS})
 
-add_library(${target_name} ${LIBRARY_TYPE} ${qwt_SOURCES} ${qwt_HEADERS} ${qwt_HEADERS_MOC} ${qwt_ui_MOC} ${qwt_rcc_MOC})
-target_link_libraries(${target_name} ${QT_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+target_link_libraries(${target_name} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
 
+# Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
+set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
+# manually parse the ui files to obtain the output files for the translation below
+itom_qt_wrap_ui(DESIGNER_UIC ${target_name} ${DESIGNER_UI})
+
+# translations
+file(GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
+set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UIC})
+itom_library_translation(QM_FILES ${target_name} ${UPDATE_TRANSLATIONS} "${EXISTING_TRANSLATION_FILES}" ITOM_LANGUAGES "${FILES_TO_TRANSLATE}")
 
 # COPY SECTION
 set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")
-ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
-#ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
-#ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
-POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+itom_add_designerlibrary_to_copy_list(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+itom_post_build_copy_files(${target_name} COPY_SOURCES COPY_DESTINATIONS)

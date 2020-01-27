@@ -1,27 +1,28 @@
-project(itom_designerPlugin)       
-
+project(itom_designerPlugin)
+ 
 cmake_minimum_required(VERSION 3.0.2)
 
-option(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
-option(BUILD_SHARED_LIBS "Build shared library." ON)
 option(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." ON)
 
+#include(CMakeBackwardCompatibilityC)
+
 #this is to automatically detect the SDK subfolder of the itom build directory.
-find_path(ITOM_SDK_DIR "itom_sdk.cmake"
+find_path(ITOM_SDK_CMAKE_DIR "itom_sdk.cmake"
     HINTS "C:/itom/build/itom/SDK"
           "${CMAKE_CURRENT_BINARY_DIR}/../itom/SDK"
+    PATH_SUFFIXES "cmake"
     DOC "path of SDK subfolder of itom root (build) directory")
+get_filename_component(ITOM_SDK_DIR ${ITOM_SDK_CMAKE_DIR} DIRECTORY)
 
 if("${ITOM_SDK_DIR}" STREQUAL "ITOM_SDK_DIR-NOTFOUND")
     message(FATAL_ERROR "ITOM_SDK_DIR is invalid. Provide itom SDK directory path first")
 endif()
 
-load_cache(${ITOM_SDK_DIR}/../[EXCLUDE ${VTK_DIR}])
+#load_cache(${ITOM_SDK_DIR}/../[EXCLUDE ${VTK_DIR}])
 
 if(WIN32)
     # add /LTCG flag to remove MSVC linker warning in release build
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
-    set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG")
 endif(WIN32)
 
 option(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
