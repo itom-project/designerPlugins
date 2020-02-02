@@ -1,17 +1,26 @@
 set(target_name vtk3dVisualizer)
-project(${target_name})
 
-option(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." ON)
-option(UPDATE_TRANSLATIONS "Update source translation translation/*.ts files (WARNING: make clean will delete the source .ts files! Danger!)")
-set(ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
-set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
-set(ITOM_LANGUAGES "de" CACHE STRING "semicolon separated list of languages that should be created (en must not be given since it is the default)")
+cmake_minimum_required(VERSION 3.1...3.15)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR}/cmake)
+set(ITOM_SDK_DIR "" CACHE PATH "path of SDK subfolder of itom root (build) directory")
+
+#this is to automatically detect the SDK subfolder of the itom build directory.
+find_path(ITOM_SDK_DIR "cmake/itom_sdk.cmake"
+    HINTS "C:/itom/build/itom/SDK"
+          "${CMAKE_CURRENT_BINARY_DIR}/../../itom/SDK"
+    DOC "path of SDK subfolder of itom root (build) directory")
+
+if(NOT ITOM_SDK_DIR)
+    message(SEND_ERROR "ITOM_SDK_DIR is invalid. Provide itom SDK directory path first")
+endif()
+
+# ...which contains useful scripts for completing this file
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ITOM_SDK_DIR}/cmake)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include("ItomBuildMacros")
-itom_init_cmake_policy()
+# ... for example this one, found in the CMAKE_MODULE_PATH
+include(ItomBuildMacros)
+itom_init_cmake_policy(3.12)
 itom_init_designerplugin_library(${target_name})
 
 #this is required to get the state of ITOM_SDK_PCL_SUPPORT
@@ -29,16 +38,11 @@ if(ITOM_SDK_PCL_SUPPORT)
     if(EXISTS ${VTK_DIR})
     
         find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
-        find_package(VisualLeakDetector QUIET)
-        
+                
 
         add_definitions(-DITOMSHAREDDESIGNER)
 
-        if(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
-            add_definitions(-DVISUAL_LEAK_DETECTOR_CMAKE)
-        endif(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
-
-        # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
+                                # default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
         if(DEFINED CMAKE_BUILD_TYPE)
             set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
         else()
@@ -63,8 +67,7 @@ if(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}
             ${PCL_INCLUDE_DIRS}
             ${ITOM_SDK_INCLUDE_DIRS}
-            ${VISUALLEAKDETECTOR_INCLUDE_DIR}
-            ${CMAKE_CURRENT_SOURCE_DIR}/icons
+                    ${CMAKE_CURRENT_SOURCE_DIR}/icons
         )
 
         link_directories(
@@ -90,7 +93,7 @@ if(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/treeWidgetKeyEater.h
         )
 
-        set(plugin_HEADERS_COPY
+        set(DESIGNER_HEADERS_COPY
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.h
         )
 
@@ -149,9 +152,8 @@ set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON
         endif()
 
         # translations
-        file(GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
-        set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UIC})
-        itom_library_translation(QM_FILES ${target_name} ${UPDATE_TRANSLATIONS} "${EXISTING_TRANSLATION_FILES}" ITOM_LANGUAGES "${FILES_TO_TRANSLATE}")
+                set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})
+        itom_library_translation(QM_FILES TARGET ${target_name} FILES_TO_TRANSLATE ${FILES_TO_TRANSLATE})
         
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/doxygen/doxygen.dox.in ${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen/doxygen.dox )
 
@@ -160,7 +162,7 @@ set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON
         set(COPY_DESTINATIONS "")
         itom_add_designerlibrary_to_copy_list(${target_name} COPY_SOURCES COPY_DESTINATIONS)
         itom_add_designer_qm_files_to_copy_list(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
-        itom_add_designerplugin_headers_to_copy_list(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
+        itom_add_designerplugin_headers_to_copy_list(${target_name} DESIGNER_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
         itom_post_build_copy_files(${target_name} COPY_SOURCES COPY_DESTINATIONS)
         
     else(EXISTS ${VTK_DIR})

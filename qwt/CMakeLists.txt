@@ -1,6 +1,7 @@
 set(target_name qwt)
 
-project(${target_name})
+cmake_minimum_required(VERSION 3.1...3.15)
+
 
 message(STATUS "\n<--- BASE LIBRARY ${target_name} --->")
 message(STATUS "-- Build directory: ${CMAKE_CURRENT_BINARY_DIR}")
@@ -15,27 +16,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR}
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include("ItomBuildMacros")
-itom_init_cmake_policy()
-
+itom_init_designerplugin_library(${target_name})
 
 find_package(ITOM_SDK COMPONENTS itomCommonLib REQUIRED)
 itom_find_package_qt(ON Core Widgets PrintSupport Xml Designer Widgets Svg OpenGL Concurrent)
-find_package(VisualLeakDetector QUIET)
 
-add_definitions(-DUNICODE -D_UNICODE)
 add_definitions(-DQWT_DLL)
 add_definitions(-DQWT_MAKEDLL)
-
-if(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
-    add_definitions(-DVISUAL_LEAK_DETECTOR_CMAKE)
-endif(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${ITOM_SDK_INCLUDE_DIRS}
     ${Qt5OpenGL_INCLUDE_DIRS}
-    ${VISUALLEAKDETECTOR_INCLUDE_DIR}
 )
 
 link_directories(
@@ -247,14 +240,6 @@ target_link_libraries(${target_name} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRA
 
 # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
 set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
-
-# manually parse the ui files to obtain the output files for the translation below
-itom_qt_wrap_ui(DESIGNER_UIC ${target_name} ${DESIGNER_UI})
-
-# translations
-file(GLOB EXISTING_TRANSLATION_FILES "translation/*.ts")
-set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UIC})
-itom_library_translation(QM_FILES ${target_name} ${UPDATE_TRANSLATIONS} "${EXISTING_TRANSLATION_FILES}" ITOM_LANGUAGES "${FILES_TO_TRANSLATE}")
 
 # COPY SECTION
 set(COPY_SOURCES "")
