@@ -241,6 +241,14 @@ target_link_libraries(${target_name} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRA
 # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
 set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
+#targets that link to this target have to add the following include directories (automatically done if
+#this target is among the target_link_libraries).
+set_target_properties(
+    ${target_name}
+    PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+
 # COPY SECTION
 set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")

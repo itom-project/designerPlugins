@@ -39,7 +39,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/version
     ${ITOM_SDK_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
+    #${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
 )
 
 link_directories(
@@ -105,6 +105,22 @@ target_link_libraries(${target_name} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VI
 # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
 set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
+itom_qt_wrap_ui(uic_files ${target_name} ${DESIGNER_UI})
+
+set(additional_include_folders "${CMAKE_CURRENT_SOURCE_DIR}")
+
+foreach(uic_file ${uic_files})
+    get_filename_component(dir ${uic_file} DIRECTORY)
+    set(additional_include_folders "${additional_include_folders}" "${dir}")
+endforeach()
+
+#targets that link to this target have to add the following include directories (automatically done if
+#this target is among the target_link_libraries).
+set_target_properties(
+    ${target_name}
+    PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${additional_include_folders}"
+)
 
 # translations
 set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})

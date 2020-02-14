@@ -33,9 +33,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${ITOM_SDK_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/icons
-    ${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../itomQwtPlotBase
-    ${CMAKE_CURRENT_BINARY_DIR}/../itomQwtPlotBase
+    #${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
 )
 
 link_directories(
