@@ -30,11 +30,6 @@
 #include <limits>
 #include "qwt_interval.h"
 
-
-#if QT_VERSION < 0x040601
-#define qExp(x) ::exp(x)
-#endif
-
 #if QT_VERSION >= 0x050400
 
 //! Smallest allowed value for logarithmic scalQwtPowerTransformes: 1.0e-150

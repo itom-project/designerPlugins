@@ -33,9 +33,6 @@
 #include "dialog1DScale.h"
 #include "widgetCurveProperties.h"
 
-#include "plotLegends/infoWidgetPickers.h"
-#include "plotLegends/infoWidgetDObject.h"
-
 #include "itomLogLogScaleEngine.h"
 
 #include "itomPlotZoomer.h"
@@ -1930,11 +1927,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             QRectF rect;
             foreach(QwtPlotCurve *curve, m_plotCurveItems)
             {
-#if QT_VERSION >= 0x050000
                 rect |= curve->boundingRect();
-#else
-                rect = rect.unite(curve->boundingRect());
-#endif
             }
 
             if (rect.width() < 0 || rect.height() <0)
@@ -1984,13 +1977,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             
             //get the bounding rectangle of all bounding rectangles of all curves
             QRectF rect;
+
             foreach(QwtPlotCurve *curve, m_plotCurveItems)
             {
-#if QT_VERSION >= 0x050000
                 rect |= curve->boundingRect();
-#else
-                rect = rect.unite(curve->boundingRect());
-#endif
             }
 
             if (m_pData->m_valueScaleAuto)
@@ -2899,11 +2889,7 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
             if (qIsFinite(tmpRect.height()))
             {
-    #if QT_VERSION >= 0x050000
                 rect = rect.united(tmpRect);
-    #else
-                rect = rect.unite(tmpRect);
-    #endif
             }
         }
 
@@ -3301,11 +3287,7 @@ void Plot1DWidget::home()
     QRectF boundingRect;
     foreach(QwtPlotCurve *curve, m_plotCurveItems)
     {
-#if QT_VERSION >= 0x050000
         boundingRect = boundingRect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
-#else
-        boundingRect = boundingRect.unite(((DataObjectSeriesData *)curve->data())->boundingRect());
-#endif
     }
 
     if (currentZoomStack.empty())

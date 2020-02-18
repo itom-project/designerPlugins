@@ -36,9 +36,6 @@
 #include "itomLogLogScaleEngine.h"
 #include "itomColorMap.h"
 
-#include "plotLegends/infoWidgetDObject.h"
-#include "plotLegends/infoWidgetPickers.h"
-
 #include <qwt_plot_layout.h>
 #include <qwt_matrix_raster_data.h>
 #include <qwt_scale_widget.h>

@@ -442,9 +442,7 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
     else
     {
         QPixmap pm(iconFilename);
-#if QT_VERSION >= 0x050000
         pm.setDevicePixelRatio(this->devicePixelRatio());
-#endif
 
         action = new QAction(QIcon(pm), text, this);
     }

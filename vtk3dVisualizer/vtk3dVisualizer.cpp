@@ -70,10 +70,6 @@
 
 Q_DECLARE_METATYPE ( SharedItemPtr )
 
-#if QT_VERSION < 0x050000
-#define QStringLiteral QString::fromUtf8
-#endif
-
 //------------------------------------------------------------------------------------------------------------------------
 class Vtk3dVisualizerPrivate 
 {
@@ -238,7 +234,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
 #if VTK_MAJOR_VERSION >= 7 && VTK_MINOR_VERSION > 0
     d->cubeAxesActor->SetGridLineLocation(vtkCubeAxesActor::VTK_GRID_LINES_FURTHEST);
-#else VTK_MAJOR_VERSION > 5
+#elif VTK_MAJOR_VERSION > 5
     d->cubeAxesActor->SetGridLineLocation(VTK_GRID_LINES_FURTHEST);
 #endif	
 

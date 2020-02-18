@@ -28,8 +28,6 @@
 
 #include "dialogExportProperties.h"
 
-#include "plotLegends/infoWidgetPickers.h"
-
 #include <qfiledialog.h>
 #include <qimagewriter.h>
 #include <qinputdialog.h>
