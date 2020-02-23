@@ -19,7 +19,6 @@ endif()
 
 option(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
 option(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
-option(PLUGIN_itom2DGraphicView "Build with this solution." OFF)
 option(PLUGIN_itomIsoGLFigurePlugin "Build with this solution." ON)
 option(PLUGIN_matplotlibPlot "Build with this solution." ON)
 option(PLUGIN_motorController "Build with this solution." ON)
@@ -44,10 +43,6 @@ endif()
 
 if(PLUGIN_itom2DQwtPlot)
     add_subdirectory(itom2DQwtPlot)
-endif()
-
-if(PLUGIN_itom2DGraphicView)
-    add_subdirectory(itom2DGraphicView)
 endif()
 
 if(PLUGIN_itomIsoGLFigurePlugin)
