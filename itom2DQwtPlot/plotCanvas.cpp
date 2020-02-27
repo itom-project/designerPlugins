@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -35,9 +35,6 @@
 #include "dialog2DScale.h"
 #include "itomLogLogScaleEngine.h"
 #include "itomColorMap.h"
-
-#include "plotLegends/infoWidgetDObject.h"
-#include "plotLegends/infoWidgetPickers.h"
 
 #include <qwt_plot_layout.h>
 #include <qwt_matrix_raster_data.h>

@@ -1,68 +1,37 @@
-SET (target_name qwt)
- 
-project(${target_name})
- 
-cmake_minimum_required(VERSION 2.8)
+set(target_name qwt)
 
-#CMAKE Policies
-if (POLICY CMP0028)
-    cmake_policy(SET CMP0028 NEW) #raise an CMake error if an imported target, containing ::, could not be found
-ENDIF (POLICY CMP0028)
+cmake_minimum_required(VERSION 3.1...3.15)
 
-message(STATUS "\n--------------- BASE LIBRARY ${target_name} ---------------")
 
-OPTION(BUILD_UNICODE "Build with unicode charset if set to ON, else multibyte charset." ON)
-OPTION(BUILD_SHARED_LIBS "Build shared library." ON)
-OPTION(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." ON)
-SET (ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
-SET (CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${ITOM_SDK_DIR})
-SET (LIBRARY_TYPE SHARED)
+message(STATUS "\n<--- BASE LIBRARY ${target_name} --->")
+message(STATUS "-- Build directory: ${CMAKE_CURRENT_BINARY_DIR}")
 
-#if qwt is static, add -fPIC as compiler flag for linux
-IF(UNIX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-ENDIF(UNIX)
+option(BUILD_TARGET64 "Build for 64 bit target if set to ON or 32 bit if set to OFF." ON)
+set(ITOM_SDK_DIR "" CACHE PATH "base path to itom_sdk")
+set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
 
-  # As moc files are generated in the binary dir, tell CMake
-  # to always look for includes there:
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${ITOM_SDK_DIR}/cmake)
+# As moc files are generated in the binary dir, tell CMake
+# to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+include("ItomBuildMacros")
+itom_init_designerplugin_library(${target_name})
+
 find_package(ITOM_SDK COMPONENTS itomCommonLib REQUIRED)
-include("${ITOM_SDK_DIR}/ItomBuildMacros.cmake")
-FIND_PACKAGE_QT(ON Core Widgets PrintSupport Xml Designer Widgets Svg OpenGL Concurrent)
+itom_find_package_qt(ON Core Widgets PrintSupport Xml Designer Widgets Svg OpenGL Concurrent)
 
-find_package(VisualLeakDetector QUIET)
+add_definitions(-DQWT_DLL)
+add_definitions(-DQWT_MAKEDLL)
 
-IF (BUILD_UNICODE)
-    ADD_DEFINITIONS(-DUNICODE -D_UNICODE)
-ENDIF (BUILD_UNICODE)
-ADD_DEFINITIONS(-DCMAKE)
-ADD_DEFINITIONS(-DQWT_DLL)
-ADD_DEFINITIONS(-DQWT_MAKEDLL)
-
-IF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
-    ADD_DEFINITIONS(-DVISUAL_LEAK_DETECTOR_CMAKE)
-ENDIF(VISUALLEAKDETECTOR_FOUND AND VISUALLEAKDETECTOR_ENABLED)
-
-# default build types are None, Debug, Release, RelWithDebInfo and MinRelSize
-IF (DEFINED CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-ELSE(CMAKE_BUILD_TYPE)
-    SET (CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-ENDIF (DEFINED CMAKE_BUILD_TYPE)
-
-message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
-
-INCLUDE_DIRECTORIES(
+include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${ITOM_SDK_INCLUDE_DIRS}
     ${Qt5OpenGL_INCLUDE_DIRS}
-    ${VISUALLEAKDETECTOR_INCLUDE_DIR}
 )
 
-LINK_DIRECTORIES(
+link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
@@ -167,12 +136,6 @@ set(qwt_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.h
 )
 
-set(qwt_UI
-)
-
-set(qwt_RCC
-)
-
 set(qwt_SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_legend.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_abstract_scale.cpp
@@ -271,27 +234,23 @@ set(qwt_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_widget_overlay.cpp
 )
 
-if (QT5_FOUND)
-    #if automoc if OFF, you also need to call QT5_WRAP_CPP here
-    QT5_WRAP_UI(qwt_ui_MOC ${qwt_UI})
-    QT5_ADD_RESOURCES(qwt_rcc_MOC ${qwt_RCC})
-else (QT5_FOUND)
-    QT4_WRAP_CPP_ITOM(qwt_HEADERS_MOC ${qwt_HEADERS})
-    QT4_WRAP_UI_ITOM(qwt_ui_MOC ${qwt_UI})
-    QT4_ADD_RESOURCES(qwt_rcc_MOC ${qwt_RCC})
-endif (QT5_FOUND)
+add_library(${target_name} SHARED ${qwt_SOURCES} ${qwt_HEADERS})
 
-ADD_LIBRARY(${target_name} ${LIBRARY_TYPE} ${qwt_SOURCES} ${qwt_HEADERS} ${qwt_HEADERS_MOC} ${qwt_ui_MOC} ${qwt_rcc_MOC})
-TARGET_LINK_LIBRARIES(${target_name} ${QT_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
-IF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
-    qt5_use_modules(${target_name} ${QT_COMPONENTS})
-ENDIF (QT5_FOUND AND CMAKE_VERSION VERSION_LESS 3.0.2)
+target_link_libraries(${target_name} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
 
+# Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
+set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
+
+#targets that link to this target have to add the following include directories (automatically done if
+#this target is among the target_link_libraries).
+set_target_properties(
+    ${target_name}
+    PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
 
 # COPY SECTION
 set(COPY_SOURCES "")
 set(COPY_DESTINATIONS "")
-ADD_DESIGNERLIBRARY_TO_COPY_LIST(${target_name} COPY_SOURCES COPY_DESTINATIONS)
-#ADD_DESIGNER_QM_FILES_TO_COPY_LIST(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
-#ADD_DESIGNERHEADER_TO_COPY_LIST(${target_name} plugin_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
-POST_BUILD_COPY_FILES(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+itom_add_designerlibrary_to_copy_list(${target_name} COPY_SOURCES COPY_DESTINATIONS)
+itom_post_build_copy_files(${target_name} COPY_SOURCES COPY_DESTINATIONS)

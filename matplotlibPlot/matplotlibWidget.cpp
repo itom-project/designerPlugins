@@ -499,7 +499,6 @@ void MatplotlibWidget::enterEvent ( QEvent * event )
     if (!hasFocus())
         return;
 
-#if QT_VERSION >= 0x050000
     QEnterEvent *e = static_cast<QEnterEvent*>(event);
     if (e)
     {
@@ -509,9 +508,6 @@ void MatplotlibWidget::enterEvent ( QEvent * event )
     {
         emit eventEnter(0, 0);
     }
-#else
-    emit eventEnter(0, 0);
-#endif
 
     emit eventLeaveEnter(true); //deprecated
 }

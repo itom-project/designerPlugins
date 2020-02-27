@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2020, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -442,9 +442,7 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
     else
     {
         QPixmap pm(iconFilename);
-#if QT_VERSION >= 0x050000
         pm.setDevicePixelRatio(this->devicePixelRatio());
-#endif
 
         action = new QAction(QIcon(pm), text, this);
     }

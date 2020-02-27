@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2020, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -118,6 +118,3 @@ QString ItomIsoGLWidgetPlugin::includeFile() const
     return "ItomIsoGLWidget.h";
 }
 
-#if QT_VERSION <  QT_VERSION_CHECK(5,0,0)
-    Q_EXPORT_PLUGIN2(ItomIsoGLWidgetPlugin, ItomIsoGLWidgetPlugin)
-#endif

@@ -26,15 +26,9 @@
 #include <qwt_color_map.h>
 #include <qwt_raster_data.h>
 
-#if QT_VERSION >= 0x040400
 #include <qthread.h>
 #include <qfuture.h>
-#if (QT_VERSION >= 0x050000)
-    #include <QtConcurrent/qtconcurrentrun.h>
-#else
-    #include <qtconcurrentrun.h>
-#endif
-#endif
+#include <QtConcurrent/qtconcurrentrun.h>
 
 #include "dataObjRasterData.h"
 
@@ -142,7 +136,7 @@ QImage DataObjItem::renderImage(
     int* t =const_cast<int*>(&m_counter); //)++;
     (*t) ++;
 
-#if QT_VERSION >= 0x040400 && !defined(QT_NO_QFUTURE)
+#if !defined(QT_NO_QFUTURE)
     uint numThreads = renderThreadCount();
 
     if ( numThreads <= 0 )

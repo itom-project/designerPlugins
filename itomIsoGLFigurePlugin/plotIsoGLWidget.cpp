@@ -126,11 +126,7 @@ plotGLWidget::plotGLWidget(QMenu *contextMenu, QGLFormat &fmt, QWidget *parent, 
     m_gamma (1),
     m_TransX(0.0),
     m_TransY(0.0),
-#if QT_VERSION < 0x050000
-    m_TransZ(-3.0),
-#else
     m_TransZ(-2.0),
-#endif
     m_colorBarMode(COLORBAR_NO),
     m_currentColor(1),
     m_fontsize(10),
@@ -2847,12 +2843,8 @@ void plotGLWidget::OGLMakeFont(int size)
         glDeleteLists(m_myCharBitmapBuffer, 256);
     m_myCharBitmapBuffer = glGenLists(256);            // Storage For 256 Characters
 #ifdef WIN32
-    #if QT_VERSION >= 0x050000
-        HWND hwnd = (HWND)winId();
-        wglUseFontBitmaps(GetDC(hwnd), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
-    #else
-        wglUseFontBitmaps(getDC(), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
-    #endif
+    HWND hwnd = (HWND)winId();
+    wglUseFontBitmaps(GetDC(hwnd), 0, 255, m_myCharBitmapBuffer);            // Builds 96 Characters Starting At Character 32
 #endif
 
     this->setFont(oldFont);
