@@ -311,25 +311,29 @@ void plotGLWidget::initializeGL()
 
     if(ITOM_API_FUNCS_GRAPH != NULL && *ITOM_API_FUNCS_GRAPH != NULL)
     {
-        int numColBars = 0;
+        int numColorMaps = 0;
         ito::ItomPalette newPalette;
 
-        apiPaletteGetNumberOfColorBars(numColBars);
-        apiPaletteGetColorBarIdx((m_currentColor + 1) % numColBars, newPalette);
+        apiPaletteGetNumberOfColorBars(numColorMaps);
 
-        m_currentPalette = newPalette.colorVector256;
+        if (numColorMaps > 0)
+        {
+            apiPaletteGetColorBarIdx((m_currentColor + 1) % numColorMaps, newPalette);
+            m_currentPalette = newPalette.colorVector256;
+        }
+        else
+        {
+            //should never happen, since there should always be more than 0 colorbars
+            m_currentPalette = QVector<ito::uint32>(256);
+
+            for (int i = 0; i < 256; i++)
+            {
+                m_currentPalette[i] = i + (i << 8) + (i << 16);
+            }
+        }
     }
     else
     {
-        // Only false Colors
-        /*
-        ito::ItomPalette newPalette("falseColorIR", ito::ItomPalette::FCPalette | ito::ItomPalette::LinearPalette, QColor::fromRgb(165, 30, 165), Qt::white);
-        newPalette.insertColorStop(0.15, Qt::blue);
-        newPalette.insertColorStop(0.35, Qt::cyan);
-        newPalette.insertColorStop(0.55, Qt::green);
-        newPalette.insertColorStop(0.75, Qt::yellow);
-        newPalette.insertColorStop(0.97, Qt::red);
-        */
         m_currentPalette = QVector<ito::uint32>(256);
 
         for(int i = 0; i < 256; i++)

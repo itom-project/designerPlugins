@@ -80,7 +80,7 @@ public:
     /** \brief Get the name of the field used. */
     virtual std::string getFieldName () const 
     { 
-        if (field_names_.size() == 0)
+        if (field_names_.empty())
         {
             return "";
         }

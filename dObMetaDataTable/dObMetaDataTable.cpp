@@ -192,8 +192,14 @@ void dObMetaDataTable::setData(QSharedPointer<ito::DataObject> dataObj)
 
                 cv::Mat tarMat(64, 130, CV_8U);
 
-                if(m_data.getType() == ito::tComplex64) convertComplexMat<ito::complex64>(tempMat, tarMat);
-                else convertComplexMat<ito::complex128>(tempMat, tarMat);
+                if (m_data.getType() == ito::tComplex64)
+                {
+                    convertComplexMat<ito::complex64>(tempMat, tarMat);
+                }
+                else
+                {
+                    convertComplexMat<ito::complex128>(tempMat, tarMat);
+                }
 
                 QImage retImage(tarMat.ptr<ito::uint8>(0), 130,64, 130, QImage::Format_Indexed8);
                 retImage.setColorTable(m_colorTable);

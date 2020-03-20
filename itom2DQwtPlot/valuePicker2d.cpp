@@ -52,7 +52,9 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
         double sx, sy, ox, oy;
         m_valueData->getPlaneScaleAndOffset(sy, sx, oy, ox);
 
-        if (sx == 0.0 || sy == 0.0 || (ito::areEqual<double>(oy, 0.0) && ito::areEqual<double>(ox, 0.0) && \
+        if (ito::areEqual<double>(sx, 0.0) || \
+            ito::areEqual<double>(sy, 0.0) || \
+            (ito::areEqual<double>(oy, 0.0) && ito::areEqual<double>(ox, 0.0) && \
             ito::areEqual<double>(sy, 1.0) && ito::areEqual<double>(sx, 1.0)))
         {
             coordinates = QString("[x: %1, y: %2]").arg(qRound(pos.x())).arg(qRound(pos.y()));

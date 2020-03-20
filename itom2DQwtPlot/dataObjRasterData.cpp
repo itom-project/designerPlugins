@@ -1186,10 +1186,12 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
     yi1 = yi1 > height -1 ? height -1 : yi1;
 
     ito::Range* curRange = new ito::Range[dims];
+
     for(int i = 0; i < dims - 2; i++)
     {
         curRange[i] = ito::Range(0, 0);
     }
+
     //if(dims > 2) curRange[dims - 3] = ito::Range(getCurrentPlane(), getCurrentPlane());
     curRange[dims - 2] = ito::Range(yi0, yi1 + 1);
     curRange[dims - 1] = ito::Range(xi0, xi1 + 1);
@@ -1202,35 +1204,29 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
     }
     else if(type == ito::tComplex64 || type == ito::tComplex128)
     {
-        ito::DataObject *temp;
+        ito::DataObject temp;
+
         switch (cmplxState)
         {
         default:
         case ItomQwtPlotEnums::CmplxAbs:
-            m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
-            temp = new ito::DataObject(ito::abs(*(m_dataObjPlane)));
-            temp->at(curRange).copyTo(dataObjectOut);
+            temp = ito::abs(*(m_dataObjPlane));
             break;
         case ItomQwtPlotEnums::CmplxReal:
-            m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
-            temp = new ito::DataObject(ito::real(*(m_dataObjPlane)));
-            temp->at(curRange).copyTo(dataObjectOut);
+            temp = ito::real(*(m_dataObjPlane));
             break;
         case ItomQwtPlotEnums::CmplxImag:
-            m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
-            temp = new ito::DataObject(ito::imag(*(m_dataObjPlane)));
-            temp->at(curRange).copyTo(dataObjectOut);
+            temp = ito::imag(*(m_dataObjPlane));
             break;
         case ItomQwtPlotEnums::CmplxArg:
-            m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
-            temp = new ito::DataObject(ito::arg(*(m_dataObjPlane)));
-            temp->at(curRange).copyTo(dataObjectOut);
+            temp = ito::arg(*(m_dataObjPlane));
             break;
         }
-                
+
+        temp.at(curRange).copyTo(dataObjectOut);       
     }
             
-    delete curRange;
+    DELETE_AND_SET_NULL_ARRAY(curRange)
     return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
 }
 //----------------------------------------------------------------------------------------------------------------------------------
