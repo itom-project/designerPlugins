@@ -51,7 +51,6 @@
 class Itom1DQwtPlot;
 class ItomQwtDObjFigure;
 class QwtLegend;
-struct InternalData;
 class QwtPlotCurveProperty;
 
 
@@ -59,15 +58,15 @@ class Plot1DWidget : public ItomQwtPlot
 {
     Q_OBJECT
     public:
-
-        Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent = 0);
+        struct InternalData;
+        Plot1DWidget(Plot1DWidget::InternalData *data, ItomQwtDObjFigure *parent = 0);
         ~Plot1DWidget();
 
         ito::RetVal init(bool overwriteDesignableProperties);
 
         void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>(), const ito::DataObject* xVec = NULL);
 
-        ito::RetVal updateInterval(const Qt::Axis axis, const InternalData &data);
+        ito::RetVal updateInterval(const Qt::Axis axis, const Plot1DWidget::InternalData &data);
 
         void setZoomerEnable(const bool checked);
         void setPickerEnable(const bool checked);
@@ -182,7 +181,7 @@ class Plot1DWidget : public ItomQwtPlot
         QByteArray m_hash; //hash of recently loaded dataObject
         QByteArray m_hashX; //hash of recently loaded axisObject
 
-        InternalData *m_pData;
+        Plot1DWidget::InternalData *m_pData;
 
         bool m_xDirect;
         bool m_yDirect;
@@ -293,7 +292,7 @@ class Plot1DWidget : public ItomQwtPlot
 
 };
 
-struct InternalData
+struct Plot1DWidget::InternalData
 {
     InternalData() :
         m_title(""),

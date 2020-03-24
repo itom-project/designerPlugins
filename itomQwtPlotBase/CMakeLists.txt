@@ -27,8 +27,24 @@ include(ItomBuildMacros)
 itom_init_cmake_policy(3.12)
 itom_init_designerplugin_library(${target_name})
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib itomWidgets itomShapeLib REQUIRED)
-itom_find_package_qt(ON Core Widgets Xml Designer PrintSupport Svg Concurrent OpenGL LinguistTools)
+find_package(ITOM_SDK COMPONENTS
+    dataobject
+    itomCommonLib
+    itomCommonQtLib
+    itomCommonPlotLib
+    itomWidgets
+    itomShapeLib
+    REQUIRED)
+itom_find_package_qt(ON
+    Core
+    Widgets
+    Xml
+    Designer
+    PrintSupport
+    Svg
+    Concurrent
+    OpenGL
+    LinguistTools)
 
 add_definitions(-DITOMQWTPLOTBASE_DLL)
 add_definitions(-DQWT_DLL) #use the shared library version of qwt
@@ -98,12 +114,23 @@ if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()
 
-add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
+add_library(${target_name} SHARED
+    ${DESIGNER_SOURCES}
+    ${DESIGNER_HEADERS}
+    ${DESIGNER_UI}
+    ${DESIGNER_RCC})
 
-target_link_libraries(${target_name} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES} qwt)
+target_link_libraries(${target_name}
+    ${ITOM_SDK_LIBRARIES}
+    ${QT5_LIBRARIES}
+    ${VISUALLEAKDETECTOR_LIBRARIES}
+    qwt)
 
 # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
-set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
+set_target_properties(${target_name} PROPERTIES
+    AUTOMOC ON
+    AUTORCC ON
+    AUTOUIC ON)
 
 itom_qt_wrap_ui(uic_files ${target_name} ${DESIGNER_UI})
 

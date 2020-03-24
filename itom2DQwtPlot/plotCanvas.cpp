@@ -60,7 +60,7 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-PlotCanvas::PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent /*= NULL*/) :
+PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * parent /*= NULL*/) :
 		ItomQwtPlot(parent),
 		m_pLineCutPicker(NULL),
 		m_pCenterMarker(NULL),

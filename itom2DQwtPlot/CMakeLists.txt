@@ -5,10 +5,12 @@ cmake_minimum_required(VERSION 3.1...3.15)
 set(ITOM_SDK_DIR NOTFOUND CACHE PATH "path of SDK subfolder of itom root (build) directory")
 
 #this is to automatically detect the SDK subfolder of the itom build directory.
-find_path(ITOM_SDK_DIR "cmake/itom_sdk.cmake"
-    HINTS "C:/itom/build/itom/SDK"
-          "${CMAKE_CURRENT_BINARY_DIR}/../../itom/SDK"
-    DOC "path of SDK subfolder of itom root (build) directory")
+if(NOT ITOM_SDK_DIR)
+    find_path(ITOM_SDK_DIR "cmake/itom_sdk.cmake"
+        HINTS "C:/itom/build/itom/SDK"
+              "${CMAKE_CURRENT_BINARY_DIR}/../../itom/SDK"
+        DOC "path of SDK subfolder of itom root (build) directory")
+endif()
 
 if(NOT ITOM_SDK_DIR)
     message(SEND_ERROR "ITOM_SDK_DIR is invalid. Provide itom SDK directory path first")
@@ -24,8 +26,25 @@ itom_init_cmake_policy(3.12)
 itom_init_designerplugin_library(${target_name})
 
 
-find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib itomWidgets itomShapeLib REQUIRED)
-itom_find_package_qt(ON Core Widgets Xml Svg Designer PrintSupport Concurrent OpenGL LinguistTools)
+find_package(ITOM_SDK
+    COMPONENTS
+    dataobject
+    itomCommonLib
+    itomCommonQtLib
+    itomCommonPlotLib
+    itomWidgets
+    itomShapeLib
+    REQUIRED)
+itom_find_package_qt(ON
+    Core
+    Widgets
+    Xml
+    Svg
+    Designer
+    PrintSupport
+    Concurrent
+    OpenGL
+    LinguistTools)
 
 add_definitions(-DITOMSHAREDDESIGNER)
 add_definitions(-DQWT_DLL)
@@ -40,7 +59,7 @@ include_directories(
 
 link_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/../../DataObject
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    # ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 set(DESIGNER_HEADERS
@@ -82,9 +101,22 @@ if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()
 
-add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
+add_library(${target_name} SHARED
+    ${DESIGNER_SOURCES}
+    ${DESIGNER_HEADERS}
+    ${DESIGNER_UI}
+    ${DESIGNER_RCC}
+    )
+MESSAGE(ERROR ${ITOM_SDK_LIBRARIES})
+MESSAGE(ERROR ${QT5_LIBRARIES})
+MESSAGE(ERROR ${VISUALLEAKDETECTOR_LIBRARIES})
 
-target_link_libraries(${target_name} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES} itomQwtPlotBase)
+target_link_libraries(${target_name}
+    ${ITOM_SDK_LIBRARIES}
+    ${QT5_LIBRARIES}
+    ${VISUALLEAKDETECTOR_LIBRARIES}
+    itomQwtPlotBase
+    )
 
 # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
 set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
