@@ -72,6 +72,7 @@ class PlotCanvas : public ItomQwtPlot
             changeAppearance = 1,
             changeData = 2
         };
+        //moved forward declaration here. Can be accessed using class' namespace
         struct InternalData;
         PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * parent = NULL);
         ~PlotCanvas();

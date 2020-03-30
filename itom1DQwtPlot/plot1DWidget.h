@@ -58,6 +58,7 @@ class Plot1DWidget : public ItomQwtPlot
 {
     Q_OBJECT
     public:
+        //moved forward declaration here. Can be accessed using class' namespace
         struct InternalData;
         Plot1DWidget(Plot1DWidget::InternalData *data, ItomQwtDObjFigure *parent = 0);
         ~Plot1DWidget();
