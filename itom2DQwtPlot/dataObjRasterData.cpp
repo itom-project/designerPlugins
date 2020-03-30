@@ -31,7 +31,8 @@ double DataObjRasterData::quietNaN = std::numeric_limits<double>::quiet_NaN();
 QRgb DataObjRasterData::transparentColor = 0x00ffffff;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DataObjRasterData::DataObjRasterData(const InternalData *m_internalData, const bool isOverlayData /*= false*/) :
+DataObjRasterData::DataObjRasterData(const PlotCanvas::InternalData *m_internalData,
+                                     const bool isOverlayData /*= false*/) :
     QwtRasterData(),
     m_validData(false),
     m_rasteredLinePtr(NULL),

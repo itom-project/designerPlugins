@@ -55,7 +55,6 @@
 
 class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
-struct InternalData;
 class DataObjRasterData;
 class QWidgetAction;
 class QMenu;
@@ -73,8 +72,9 @@ class PlotCanvas : public ItomQwtPlot
             changeAppearance = 1,
             changeData = 2
         };
-
-        PlotCanvas(InternalData *m_pData, ItomQwtDObjFigure * parent = NULL);
+        //moved forward declaration here. Can be accessed using class' namespace
+        struct InternalData;
+        PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * parent = NULL);
         ~PlotCanvas();
 
         ito::RetVal init(bool overwriteDesignableProperties);
@@ -231,6 +231,8 @@ class PlotCanvas : public ItomQwtPlot
         QSlider* m_pOverlaySlider;
         QWidgetAction *m_pActOverlaySlider;
 
+
+
     signals:
         void spawnNewChild(QVector<QPointF>);
         void updateChildren(QVector<QPointF>);
@@ -260,7 +262,8 @@ class PlotCanvas : public ItomQwtPlot
 
 };
 
-struct InternalData
+
+struct PlotCanvas::InternalData
 {
     InternalData() :
         m_dataType(ito::tFloat64),
@@ -297,9 +300,8 @@ struct InternalData
         m_overlayMax(0)
     {
     }
-    ~InternalData()
-    {
-    }
+    ~InternalData(){}
+
 
     ito::tDataType m_dataType;
 
@@ -345,6 +347,5 @@ struct InternalData
 
     QHash<QString, ito::Param*> m_selectedOutputParameters;
 };
-
 
 #endif

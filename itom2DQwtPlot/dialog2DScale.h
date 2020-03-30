@@ -36,10 +36,10 @@ class Dialog2DScale : public QDialog
 	Q_OBJECT
 
 public:
-    Dialog2DScale(const InternalData &data, QWidget *parent = NULL);
+    Dialog2DScale(const PlotCanvas::InternalData &data, QWidget *parent = NULL);
     ~Dialog2DScale() {};
 
-    void getData(InternalData &data);
+    void getData(PlotCanvas::InternalData &data);
 
 private:
     void getDataTypeRange(ito::tDataType type, double &min, double &max);

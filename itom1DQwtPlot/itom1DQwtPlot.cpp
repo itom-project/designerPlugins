@@ -49,7 +49,7 @@ public:
 		m_pLinePropertyWidget(NULL)
     {}
     
-    InternalData *m_pData;
+    Plot1DWidget::InternalData *m_pData;
     QDockWidget *m_pLinePropertiesDock;
 	WidgetCurveProperties *m_pLinePropertyWidget;
 };
@@ -62,7 +62,7 @@ void Itom1DQwtPlot::constructor()
     addInputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
     addInputParam(new ito::Param("xData", ito::ParamBase::DObjPtr, NULL, tr("represents the xData of the given source object").toLatin1().data()));
 
-    d->m_pData = new InternalData();
+    d->m_pData = new Plot1DWidget::InternalData();
     d->m_pData->m_autoAxisLabel = true;
     d->m_pData->m_autoValueLabel = true;
     d->m_pData->m_valueScaleAuto = true;

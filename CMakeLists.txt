@@ -17,6 +17,7 @@ if(NOT ITOM_SDK_DIR)
     message(SEND_ERROR "ITOM_SDK_DIR is invalid. Provide itom SDK directory path first")
 endif()
 
+set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Adds a postfix for debug-built libraries.")
 option(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
 option(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
 option(PLUGIN_itomIsoGLFigurePlugin "Build with this solution." ON)

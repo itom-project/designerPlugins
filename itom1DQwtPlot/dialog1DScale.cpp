@@ -27,7 +27,7 @@
 #include <qregexp.h>
 
 //-----------------------------------------------------------------------------------------------
-Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
+Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData &data, QWidget *parent) :
     QDialog(parent),
 	m_minX(-std::numeric_limits<double>::max()),
 	m_maxX(std::numeric_limits<double>::max()),
@@ -89,7 +89,7 @@ Dialog1DScale::Dialog1DScale(const InternalData &data, QWidget *parent) :
 }
 
 //-----------------------------------------------------------------------------------------------
-void Dialog1DScale::getData(InternalData &data)
+void Dialog1DScale::getData(Plot1DWidget::InternalData &data)
 {
     data.m_valueScaleAuto = ui.radioAutoCalcY->isChecked();
 	data.m_axisScaleAuto = ui.radioAutoCalcX->isChecked();
