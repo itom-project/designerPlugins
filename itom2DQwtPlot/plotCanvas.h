@@ -32,6 +32,7 @@
 #include "dataObjItem.h"
 
 #include "itomQwtPlot.h"
+#include "itom2dQwtPlot.h"
 #include "userInteractionPlotPicker.h"
 #include "drawItem.h"
 #include "itomPlotPicker.h"
@@ -51,9 +52,9 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_shapeitem.h>
+#include <qwt_plot_grid.h>
 #include <qcolor.h>
 
-class Itom2dQwtPlot; //forward declaration
 class ValuePicker2D;
 class DataObjRasterData;
 class QWidgetAction;
@@ -94,6 +95,9 @@ class PlotCanvas : public ItomQwtPlot
 
         bool showCenterMarker() const { return m_showCenterMarker; }
         void setShowCenterMarker(bool show);
+
+        Itom2dQwtPlot::GridStyle gridStyle() const { return m_gridStyle; }
+        void setGridStyle(Itom2dQwtPlot::GridStyle gridStyle);
 
         ito::AutoInterval getOverlayInterval(Qt::Axis axis) const;
         void setOverlayInterval(Qt::Axis axis, const ito::AutoInterval &interval);
@@ -174,6 +178,7 @@ class PlotCanvas : public ItomQwtPlot
         ItomPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
         QwtPlotMarker *m_pCenterMarker;
+        QwtPlotGrid *m_pPlotGrid;
 
         QString m_colorContourMapName;
         QString m_colorOverlayMapName;
@@ -203,6 +208,8 @@ class PlotCanvas : public ItomQwtPlot
         const ito::DataObject *m_dObjPtr; //pointer to the current source (original) data object
         ito::DataObject m_dObjVolumeCut; //data object holding the object used for volume cut
 
+        Itom2dQwtPlot::GridStyle m_gridStyle;
+
         int m_currentDataType;
 
         Qt::KeyboardModifiers m_activeModifiers;
@@ -225,6 +232,8 @@ class PlotCanvas : public ItomQwtPlot
         QWidgetAction *m_pActCoordinates; //
         QAction *m_pActCmplxSwitch; //
         QMenu *m_pMnuCmplxSwitch; //
+        QAction *m_pActGrid;
+        QMenu *m_pMnuGrid;
         QAction *m_pActDataChannel;
         QMenu *m_pMnuDataChannel;
         QAction* m_pActCntrMarker; //
@@ -259,6 +268,7 @@ class PlotCanvas : public ItomQwtPlot
         void mnuPlaneSelector(int plane);
         void mnuOverlaySliderChanged(int value);
         void mnuCenterMarker(bool checked);
+        void mnuSetGrid(QAction *action);
 
 };
 
