@@ -675,6 +675,27 @@ void Itom2dQwtPlot::setOverlayColorMap(const QString &name)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+Itom2dQwtPlot::GridStyle Itom2dQwtPlot::getGrid(void) const
+{
+    if (m_pContent)
+    {
+        return m_pContent->gridStyle();
+    }
+    return GridNo;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom2dQwtPlot::setGrid(const Itom2dQwtPlot::GridStyle &gridStyle)
+{
+    if (m_pContent)
+    {
+        m_pContent->setGridStyle(gridStyle);
+    }
+
+    updatePropertyDock();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 QFont Itom2dQwtPlot::getTitleFont(void) const
 {
     if (m_pContent)

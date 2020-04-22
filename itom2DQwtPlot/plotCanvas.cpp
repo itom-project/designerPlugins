@@ -28,7 +28,6 @@
 #include "DataObject/dataObjectFuncs.h"
 
 #include "dataObjRasterData.h"
-#include "itom2dqwtplot.h"
 #include "valuePicker2d.h"
 #include "multiPointPickerMachine.h"
 #include "itomPlotZoomer.h"
@@ -61,57 +60,66 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * parent /*= NULL*/) :
-		ItomQwtPlot(parent),
-		m_pLineCutPicker(NULL),
-		m_pCenterMarker(NULL),
-		//        m_pStackCut(NULL),
-		m_dObjItem(NULL),
-		m_rasterData(NULL),
-		m_dOverlayItem(NULL),
-		m_pData(m_pData),
-		m_curOverlayColorMapIndex(0),
-		m_curColorMapIndex(0),
-        m_curContourColorMapIndex(-1),
-		m_pValuePicker(NULL),
-		m_dObjPtr(NULL),
-		m_pStackPicker(NULL),
-		m_pLineCutLine(NULL),
-        m_pVolumeCutLine(NULL),
-		m_isRefreshingPlot(false),
-		m_unitLabelChanged(false),
-		m_pPaletteIsChanging(false),
-		m_pActScaleSettings(NULL),
-		m_pActColorPalette(NULL),
-		m_pMenuColorPalette(NULL),
-        m_pActToggleColorBar(NULL),
-        m_pActValuePicker(NULL),
-        m_pActLineCut(NULL),
-        m_pActVolumeCut(NULL),
-        m_showCenterMarker(false),
-        m_pMnuLineCutMode(NULL),
-        m_pActStackCut(NULL),
-        m_pActPlaneSelector(NULL),
-        m_pCoordinates(NULL),
-        m_pActCoordinates(NULL),
-        m_pActCmplxSwitch(NULL),
-        m_pMnuCmplxSwitch(NULL),
-        m_pActDataChannel(NULL),
-        m_pMnuDataChannel(NULL),
-        m_pActCntrMarker(NULL),
-        m_pOverlaySlider(NULL),
-        m_pActOverlaySlider(NULL),
-        m_currentDataType(-1),
-        m_valueScale(ItomQwtPlotEnums::Linear),
-        m_dObjVolumeCut(),
-        m_dir(inPlane)
+	ItomQwtPlot(parent),
+	m_pLineCutPicker(NULL),
+	m_pCenterMarker(NULL),
+	m_dObjItem(NULL),
+	m_rasterData(NULL),
+	m_dOverlayItem(NULL),
+	m_pData(m_pData),
+	m_curOverlayColorMapIndex(0),
+	m_curColorMapIndex(0),
+    m_curContourColorMapIndex(-1),
+	m_pValuePicker(NULL),
+	m_dObjPtr(NULL),
+	m_pStackPicker(NULL),
+	m_pLineCutLine(NULL),
+    m_pVolumeCutLine(NULL),
+	m_isRefreshingPlot(false),
+	m_unitLabelChanged(false),
+	m_pPaletteIsChanging(false),
+	m_pActScaleSettings(NULL),
+	m_pActColorPalette(NULL),
+	m_pMenuColorPalette(NULL),
+    m_pActToggleColorBar(NULL),
+    m_pActValuePicker(NULL),
+    m_pActLineCut(NULL),
+    m_pActVolumeCut(NULL),
+    m_showCenterMarker(false),
+    m_pMnuLineCutMode(NULL),
+    m_pActStackCut(NULL),
+    m_pActPlaneSelector(NULL),
+    m_pCoordinates(NULL),
+    m_pActCoordinates(NULL),
+    m_pActCmplxSwitch(NULL),
+    m_pMnuCmplxSwitch(NULL),
+    m_pActDataChannel(NULL),
+    m_pMnuDataChannel(NULL),
+    m_pActCntrMarker(NULL),
+    m_pOverlaySlider(NULL),
+    m_pActOverlaySlider(NULL),
+    m_currentDataType(-1),
+    m_valueScale(ItomQwtPlotEnums::Linear),
+    m_dObjVolumeCut(),
+    m_dir(inPlane),
+    m_gridStyle(Itom2dQwtPlot::GridNo),
+    m_pPlotGrid(NULL)
 {
     createActions();
     setButtonStyle(buttonStyle());
 
     canvas()->setCursor(Qt::ArrowCursor);
 
+    m_pPlotGrid = new QwtPlotGrid();
+    m_pPlotGrid->setZ(10.0);
+    m_pPlotGrid->attach(this);
+    setGridStyle(m_gridStyle);
+    m_pPlotGrid->setMajorPen(Qt::gray, 1);
+    m_pPlotGrid->setMinorPen(Qt::gray, 1, Qt::DashLine);
+
     //main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
+    m_dObjItem->setZ(11.0);
     m_dObjItem->setRenderThreadCount(0); //uses ideal thread count
     //m_dObjItem->setColorMap(new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     m_rasterData = new DataObjRasterData(m_pData);
@@ -121,6 +129,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
 
     //overlayobject item on canvas -> the data object
     m_dOverlayItem = new DataObjItem("Overlay Object");
+    m_dOverlayItem->setZ(12.0);
     m_dOverlayItem->setRenderThreadCount(0);
     m_rasterOverlayData = new DataObjRasterData(m_pData, true);
     m_dOverlayItem->setData(m_rasterOverlayData);
@@ -279,6 +288,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     menuView->addAction(m_pActScaleSettings);
     menuView->addSeparator();
     menuView->addAction(m_pActCmplxSwitch);
+    menuView->addAction(m_pActGrid);
     menuView->addSeparator();
     menuView->addAction(m_pActProperties);
     m_menus.append(menuView);
@@ -560,6 +570,43 @@ void PlotCanvas::createActions()
     a->setData(ItomQwtPlotEnums::CmplxArg);
     m_pActCmplxSwitch->setVisible(false);
     connect(m_pMnuCmplxSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuCmplxSwitch(QAction*)));
+
+    //m_pActGrid
+    m_pActGrid = a = new QAction(tr("Grid"), p);
+    a->setObjectName("actGrid");
+    a->setCheckable(true);
+    a->setChecked(false);
+    a->setToolTip(tr("Shows/hides a grid"));
+
+    m_pMnuGrid = new QMenu(tr("Grid"), p);
+    m_pActGrid->setMenu(m_pMnuGrid);
+
+    m_pMnuGrid = new QMenu(tr("Grid"), p);
+    m_pActGrid->setMenu(m_pMnuGrid);
+
+    a = m_pMnuGrid->addAction(tr("No Grid"));
+    a->setData(Itom2dQwtPlot::GridNo);
+    m_pMnuGrid->setDefaultAction(a);
+
+    a = m_pMnuGrid->addAction(tr("Major XY"));
+    a->setData(Itom2dQwtPlot::GridMajorXY);
+
+    a = m_pMnuGrid->addAction(tr("Major X"));
+    a->setData(Itom2dQwtPlot::GridMajorX);
+
+    a = m_pMnuGrid->addAction(tr("Major Y"));
+    a->setData(Itom2dQwtPlot::GridMajorY);
+
+    a = m_pMnuGrid->addAction(tr("Minor XY"));
+    a->setData(Itom2dQwtPlot::GridMinorXY);
+
+    a = m_pMnuGrid->addAction(tr("Minor X"));
+    a->setData(Itom2dQwtPlot::GridMinorX);
+
+    a = m_pMnuGrid->addAction(tr("Minor Y"));
+    a->setData(Itom2dQwtPlot::GridMinorY);
+
+    connect(m_pMnuGrid, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetGrid(QAction*)));
 
     //m_actToggleColorBar
     m_pActToggleColorBar = a = new QAction(tr("Show Colorbar"), p);
@@ -1763,6 +1810,18 @@ void PlotCanvas::setShowCenterMarker(bool show)
 {
     m_showCenterMarker = show;
     setState(state());
+    replot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::setGridStyle(Itom2dQwtPlot::GridStyle gridStyle)
+{
+    m_gridStyle = gridStyle;
+    m_pPlotGrid->enableX(gridStyle == Itom2dQwtPlot::GridMajorX || gridStyle == Itom2dQwtPlot::GridMajorXY || gridStyle == Itom2dQwtPlot::GridMinorX || gridStyle == Itom2dQwtPlot::GridMinorXY);
+    m_pPlotGrid->enableY(gridStyle == Itom2dQwtPlot::GridMajorY || gridStyle == Itom2dQwtPlot::GridMajorXY || gridStyle == Itom2dQwtPlot::GridMinorY || gridStyle == Itom2dQwtPlot::GridMinorXY);
+    m_pPlotGrid->enableXMin(gridStyle == Itom2dQwtPlot::GridMinorX || gridStyle == Itom2dQwtPlot::GridMinorXY);
+    m_pPlotGrid->enableYMin(gridStyle == Itom2dQwtPlot::GridMinorY || gridStyle == Itom2dQwtPlot::GridMinorXY);
+    m_pActGrid->setChecked(gridStyle != Itom2dQwtPlot::GridNo);
     replot();
 }
 
@@ -3812,3 +3871,28 @@ void PlotCanvas::mnuCenterMarker(bool checked)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mnuSetGrid(QAction *action)
+{
+    Itom2dQwtPlot::GridStyle style = Itom2dQwtPlot::GridNo;
+
+    if (action)
+    {
+        style = (Itom2dQwtPlot::GridStyle)action->data().toInt();
+        if (style != action->data().toInt())
+        {
+            style = Itom2dQwtPlot::GridNo;
+        }
+    }
+
+    bool ok;
+    foreach(QAction *a, m_pMnuGrid->actions())
+    {
+        if (a->data().toInt(&ok) == style && ok)
+        {
+            //m_pMnuGrid->setIcon(a->icon());
+            m_pMnuGrid->setDefaultAction(a);
+        }
+    }
+
+    setGridStyle(style);
+}
