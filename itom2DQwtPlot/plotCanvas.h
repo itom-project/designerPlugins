@@ -32,7 +32,7 @@
 #include "dataObjItem.h"
 
 #include "itomQwtPlot.h"
-#include "itom2dQwtPlot.h"
+#include "itom2dqwtplot.h"
 #include "userInteractionPlotPicker.h"
 #include "drawItem.h"
 #include "itomPlotPicker.h"
