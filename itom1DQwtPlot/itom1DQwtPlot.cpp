@@ -72,6 +72,12 @@ void Itom1DQwtPlot::constructor()
     d->m_pData->m_axisScaleAuto = true;
     d->m_pData->m_forceValueParsing = false;
 
+    //create dock widget for the curve properties (the dock widget must be created before Plot1DWidget)
+    d->m_pLinePropertiesDock = new QDockWidget(this);
+    d->m_pLinePropertiesDock->setObjectName(QLatin1String("curveProperties"));
+    d->m_pLinePropertiesDock->setWindowTitle(tr("Curve Properties"));
+    d->m_pLinePropertiesDock->setVisible(false);
+
     m_pContent = new Plot1DWidget(d->m_pData, this);
     m_pBaseContent = m_pContent;
     m_pContent->setObjectName("canvasWidget");
@@ -80,13 +86,7 @@ void Itom1DQwtPlot::constructor()
     setCentralWidget(m_pContent);
     m_pContent->setFocus();
 
-    addToolbarsAndMenus();
-
-    //create dock widget for the line properties
-    d->m_pLinePropertiesDock = new QDockWidget(this);
-    d->m_pLinePropertiesDock->setObjectName(QLatin1String("curveProperties"));
-    d->m_pLinePropertiesDock->setWindowTitle(tr("Curve Properties"));
-    d->m_pLinePropertiesDock->setVisible(false);
+    // now fill the curve properties dock widget with content
 	d->m_pLinePropertyWidget = new WidgetCurveProperties(m_pContent);
 	d->m_pLinePropertiesDock->setWidget(d->m_pLinePropertyWidget);
 	connect(d->m_pLinePropertiesDock, SIGNAL(visibilityChanged(bool)), d->m_pLinePropertyWidget, SLOT(visibilityChanged(bool)));
@@ -95,6 +95,7 @@ void Itom1DQwtPlot::constructor()
     connect(d->m_pLinePropertyWidget, SIGNAL(titleChanged(const QStringList)), this, SLOT(setLegendTitles(const QStringList)));
     addToolbox(d->m_pLinePropertiesDock, "curveProperties", Qt::BottomDockWidgetArea);
 
+    addToolbarsAndMenus();
     registerShortcutActions();
 
     setPropertyObservedObject(this);
@@ -144,6 +145,13 @@ QWidget* Itom1DQwtPlot::getWidgetCurveProperties()
 {
 	return (QWidget*)(d->m_pLinePropertyWidget);
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QAction* Itom1DQwtPlot::getCurvePropertiesToggleViewAction()
+{
+    return d->m_pLinePropertiesDock->toggleViewAction();
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::MultiLineMode Itom1DQwtPlot::getRowPresentation(void) const
 {

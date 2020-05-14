@@ -236,9 +236,8 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuView->addMenu(m_pMnuCmplxSwitch);
     menuView->addSeparator();
     menuView->addAction(m_pActProperties);
-	QAction *actCurveProperties = new QAction(tr("Curve Properties"), menuView);// this instance is created here because it is only needed for the 1DQWT Plot
+    QAction *actCurveProperties = ((Itom1DQwtPlot*)(this->parent()))->getCurvePropertiesToggleViewAction();
 	menuView->addAction(actCurveProperties);
-	connect(actCurveProperties, SIGNAL(triggered()), (Itom1DQwtPlot*)(this->parent()), SLOT(showCurveProperties()));
 	m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
@@ -262,6 +261,11 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pContextMenu->addAction(m_pActZoom);
     m_pContextMenu->addAction(m_pActPicker);
     m_pContextMenu->addSeparator();
+    m_pContextMenu->addAction(m_pActGrid);
+    m_pContextMenu->addAction(m_pActLegendSwitch);
+    m_pContextMenu->addSeparator();
+    m_pContextMenu->addAction(m_pActProperties);
+    m_pContextMenu->addAction(actCurveProperties);
     m_pContextMenu->addAction(mainTb->toggleViewAction());
 }
 
@@ -1000,18 +1004,24 @@ void Plot1DWidget::applyLegendFont()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataObject *object)
 {
+    // idea: m_legendTitles must always have a size >= number of currently displayed curves
+    /*
+    1. take the given legends
+    2. if there are more curve items, than current legends,
+       fill additional values up...
+    */
     int index = 0;
     m_legendTitles = legends;
 
     bool valid = false;
     ito::DataObjectTagType tag;
     QwtPlotCurve *item = NULL;
-    QList<QString> curveNames; 
 
     for (index = 0; index < m_plotCurveItems.size(); ++index)
     {
         item = m_plotCurveItems[index];
-        if (m_legendTitles.size() == 0)
+
+        if (m_legendTitles.size() <= index)
         {
             if (object)
             {
@@ -1024,30 +1034,18 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
 
             if (valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
             {
-                item->setTitle(QString::fromLatin1(tag.getVal_ToString().data()));
-                curveNames.append(QString(tag.getVal_ToString().data()));
+                m_legendTitles.append(QString(tag.getVal_ToString().data()));
             }
             else // plots with empty tags: curce 0, curve 1, ...
             {
-                item->setTitle(tr("curve %1").arg(index));
-                curveNames.append(tr("curve %1").arg(index));
+                m_legendTitles.append(tr("curve %1").arg(index));
             }
             
         }
-        else if (m_legendTitles.size() > index)
-        {
-            item->setTitle(m_legendTitles[index]);
-            curveNames.append(m_legendTitles[index]);
-        }
-        else
-        {
-            item->setTitle(tr("curve %1").arg(index));
-            curveNames.append(tr("curve %1").arg(index));
-        }
+
+        item->setTitle(m_legendTitles[index]);
     }
 
-    
-    m_legendTitles = curveNames;
     replot();
     applyLegendFont();
 	emit legendModified();
@@ -1420,33 +1418,43 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         int *roiLims = new int[2 * dataObj->getDims()];
         dataObj->locateROI(roiLims);
         QList<QString> curveNames = m_legendTitles.mid(0, m_plotCurveItems.size());
-        int legendOffset;
-        switch (m_pData->m_multiLine)
+        int legendOffset = 0;
+
         {
-        case ItomQwtPlotEnums::AutoRowCol:
-            if (multiLineMode == ItomQwtPlotEnums::MultiCols)
+            int legendOffsetRoiIdx = -1;
+
+            switch (m_pData->m_multiLine)
             {
-                legendOffset = roiLims[2 * dataObj->getDims() - 4];
+            case ItomQwtPlotEnums::AutoRowCol:
+                if (multiLineMode == ItomQwtPlotEnums::MultiCols)
+                {
+                    legendOffsetRoiIdx = 2 * dataObj->getDims() - 4;
+                    break;
+                }
+                else
+                {
+                    legendOffsetRoiIdx = 2 * dataObj->getDims() - 2;
+                    break;
+                }
+            case ItomQwtPlotEnums::MultiLayerAuto:
+            case ItomQwtPlotEnums::MultiLayerRows:
+            case ItomQwtPlotEnums::FirstRow:
+            case ItomQwtPlotEnums::MultiRows:
+                legendOffsetRoiIdx = 2 * dataObj->getDims() - 4;
                 break;
+            case ItomQwtPlotEnums::MultiLayerCols:
+            case ItomQwtPlotEnums::FirstCol:
+            case ItomQwtPlotEnums::MultiCols:
+                legendOffsetRoiIdx = 2 * dataObj->getDims() - 2;
+                break;
+            default:
+                legendOffset = 0;
             }
-            else
+
+            if (legendOffsetRoiIdx >= 0)
             {
-                legendOffset = roiLims[2 * dataObj->getDims() - 2];
-                break;
+                legendOffset = roiLims[legendOffsetRoiIdx];
             }
-        case ItomQwtPlotEnums::MultiLayerAuto:
-        case ItomQwtPlotEnums::MultiLayerRows:
-        case ItomQwtPlotEnums::FirstRow:
-        case ItomQwtPlotEnums::MultiRows:
-            legendOffset = roiLims[2*dataObj->getDims() - 4];
-            break;
-        case ItomQwtPlotEnums::MultiLayerCols:
-        case ItomQwtPlotEnums::FirstCol:
-        case ItomQwtPlotEnums::MultiCols:
-            legendOffset = roiLims[2 * dataObj->getDims() - 2];
-            break;
-        default:
-            legendOffset = 0;
         }
 
         while (m_plotCurveItems.size() < numCurves) // do until all curves are present
@@ -1558,8 +1566,8 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 else // plots with empty tags: curce 0, curve 1, ...
                 {
-                    m_plotCurveItems[i]->setTitle(tr("curve %1").arg(index + legendOffset));
-                    curveNames[i] = QString(tr("curve %1").arg(index + legendOffset));
+                    m_plotCurveItems[i]->setTitle(tr("curve %1").arg(i + legendOffset));
+                    curveNames[i] = QString(tr("curve %1").arg(i + legendOffset));
                 }
             }
 

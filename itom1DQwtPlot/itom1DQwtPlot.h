@@ -377,12 +377,15 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
 
 		QWidget* getWidgetCurveProperties();
+        QAction* getCurvePropertiesToggleViewAction();
 
 		int getLegendLabelWidth() const;
 		void setLegendLabelWidth(const int& length);
 
         ito::RetVal setXData(QSharedPointer<ito::DataObject> data);
         QSharedPointer<ito::DataObject> getXData() const;
+
+
 		
         friend Plot1DWidget;
 
