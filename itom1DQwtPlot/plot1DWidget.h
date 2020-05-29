@@ -173,6 +173,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         QString distanceWithUnit(qreal d, const QString &unit, bool isIntegerType) const;
 
+        void setPickerToMinMax(bool global); //! global = True: min / max in entire dataObject, False: only in visible ROI
 
         QList<QwtPlotCurve*> m_plotCurveItems;
         QList<QwtPlotCurveProperty*> m_plotCurvePropertyItems; //sychrone with m_plotCurveItems. Every item is derived from QObject and therefore propagate a Q_PROPERTY based set of properties for each curve!
@@ -229,24 +230,27 @@ class Plot1DWidget : public ItomQwtPlot
 
         QAction* m_pActScaleSettings;
         QAction* m_pRescaleParent;
-        QAction  *m_pActPicker;
-        QMenu    *m_pMnuSetPicker;
-        QAction  *m_pActSetPicker;
-        QAction *m_pActForward;
-        QAction *m_pActBack;
-        QAction *m_pActCmplxSwitch;
-        QMenu *m_pMnuCmplxSwitch;
-        QAction *m_pActRGBSwitch;
-        QMenu *m_pMnuRGBSwitch;
-        QLabel *m_pLblMarkerOffsets;
-        QLabel *m_pLblMarkerCoords;
-        QAction *m_pActGrid;
-		QMenu *m_pMnuGrid;
-        QAction *m_pActGridSettings;
-        QAction *m_pActMultiRowSwitch;
-        QMenu *m_pMnuMultiRowSwitch;
-        QAction *m_pActLegendSwitch;
-        QMenu *m_pMnuLegendSwitch;
+        QAction* m_pActPicker;
+        QMenu* m_pMnuSetPicker;
+        QAction* m_pActSetPickerMinMaxGlobal;
+        QAction* m_pActSetPickerMinMaxLocal;
+        QAction* m_pActSetPicker;
+        QAction* m_pActDeletePickers;
+        QAction* m_pActForward;
+        QAction* m_pActBack;
+        QAction* m_pActCmplxSwitch;
+        QMenu* m_pMnuCmplxSwitch;
+        QAction* m_pActRGBSwitch;
+        QMenu* m_pMnuRGBSwitch;
+        QLabel* m_pLblMarkerOffsets;
+        QLabel* m_pLblMarkerCoords;
+        QAction* m_pActGrid;
+		QMenu* m_pMnuGrid;
+        QAction* m_pActGridSettings;
+        QAction* m_pActMultiRowSwitch;
+        QMenu* m_pMnuMultiRowSwitch;
+        QAction* m_pActLegendSwitch;
+        QMenu* m_pMnuLegendSwitch;
 
         QAction* m_pActXVAuto;
         QAction* m_pActXVFR;
@@ -283,12 +287,14 @@ class Plot1DWidget : public ItomQwtPlot
         void mnuLegendSwitch(QAction*);
         void mnuMultiRowSwitch(QAction*);
         void mnuRGBSwitch(QAction*);
-        void mnuSetPicker(QAction *action);
         void mnuParentScaleSetting();
         void mnuGridEnabled(bool checked);
 		void mnuSetGrid(QAction *action);
         void mnuScaleSettings();
         void mnuPickerClick(bool checked);
+        void mnuDeletePicker();
+        void mnuSetPickerGlobalMinMax();
+        void mnuSetPickerRoiMinMax();
         
 
 };

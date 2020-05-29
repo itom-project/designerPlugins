@@ -99,8 +99,11 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pActForward(NULL),
     m_pActBack(NULL),
     m_pActPicker(NULL),
-    m_pMnuSetPicker(NULL),
+    m_pActSetPickerMinMaxGlobal(NULL),
+    m_pActSetPickerMinMaxLocal(NULL),
     m_pActSetPicker(NULL),
+    m_pActDeletePickers(NULL),
+    m_pMnuSetPicker(NULL),
     m_pMnuCmplxSwitch(NULL),
     m_pMnuRGBSwitch(NULL),
     m_pMnuGrid(NULL),
@@ -196,7 +199,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     // first block is zoom, scale settings, home
     mainTb->addSeparator();
     mainTb->addAction(m_pActPicker);
-    mainTb->addAction(m_pActSetPicker);
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
     mainTb->addAction(m_pActClearShapes);
@@ -242,7 +244,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
     menuTools->addAction(m_pActPicker);
-    menuTools->addAction(m_pActSetPicker);
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
     menuTools->addAction(m_pActClearShapes);
@@ -460,29 +461,35 @@ void Plot1DWidget::createActions()
 
     //m_actMarker
     m_pActPicker = a = new QAction(tr("Picker"), p);
+    a->setObjectName("actionPickerMenu");
+    a->setCheckable(true);
+    a->setChecked(false);
+    connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuPickerClick(bool)));
+
+    m_pMnuSetPicker = new QMenu("Picker Menu");
+    m_pActPicker->setMenu(m_pMnuSetPicker);
+
+    m_pActSetPicker = a = m_pMnuSetPicker->addAction(tr("Manual Picker Selection"));
     a->setObjectName("actionPicker");
     a->setCheckable(true);
     a->setChecked(false);
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuPickerClick(bool)));
 
-    //m_actSetMarker
-    m_pActSetPicker = new QAction(tr("Set Pickers..."), p);
-    m_pMnuSetPicker = new QMenu("Picker Switch");
-    m_pActSetPicker->setMenu(m_pMnuSetPicker);
-
-    a = m_pMnuSetPicker->addAction(tr("To Global Min-Max"));
+    m_pActSetPickerMinMaxGlobal = a = m_pMnuSetPicker->addAction(tr("To Global Min-Max"));
     a->setToolTip(tr("set two pickers to the absolute minimum and maximum of the curve. \nIf multiple curves are visible, the user can select the appropriate one."));
-    a->setData(0);
+    connect(a, &QAction::triggered, this, &Plot1DWidget::mnuSetPickerGlobalMinMax);
 
-    a = m_pMnuSetPicker->addAction(tr("To Min-Max In Current View"));
+    m_pActSetPickerMinMaxLocal = a = m_pMnuSetPicker->addAction(tr("To Min-Max In Current View"));
     a->setToolTip(tr("set two pickers to the absolute minimum and maximum of the curve (within the current view). \nIf multiple curves are visible, the user can select the appropriate one."));
-    a->setData(1);
+    connect(a, &QAction::triggered, this, &Plot1DWidget::mnuSetPickerRoiMinMax);
 
-    a = m_pMnuSetPicker->addAction(tr("Delete Pickers"));
+    m_pActDeletePickers = a = m_pMnuSetPicker->addAction(tr("Delete All Pickers"));
     a->setToolTip(tr("delete all pickers"));
-    a->setData(2);
-    
-    connect(m_pMnuSetPicker, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetPicker(QAction*)));
+    connect(a, &QAction::triggered, this, &Plot1DWidget::mnuDeletePicker);
+
+    m_pMnuSetPicker->addSeparator();
+
+    m_pMnuSetPicker->addAction(p->pickerDockWidget()->toggleViewAction());
 
     //m_actCmplxSwitch
     m_pActCmplxSwitch = new QAction(tr("Complex Switch"), p);
@@ -634,9 +641,10 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general/icons/forward.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general/icons/back.png"));
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker.png"));
-        m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/markerPos.png"));
-        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
-        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_cropped.png"));
+        m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker.png"));
+        m_pActSetPickerMinMaxGlobal->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
+        m_pActSetPickerMinMaxLocal->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_cropped.png"));
+        m_pActDeletePickers->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
         m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
@@ -678,9 +686,10 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActForward->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/forward_lt.png"));
         m_pActBack->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/back_lt.png"));
         m_pActPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_lt.png"));
-        m_pMnuSetPicker->actions()[0]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_lt.png"));
-        m_pMnuSetPicker->actions()[1]->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_cropped_lt.png"));
-        m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/markerPos_lt.png"));
+        m_pActSetPicker->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_lt.png"));
+        m_pActSetPickerMinMaxGlobal->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_lt.png"));
+        m_pActSetPickerMinMaxLocal->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_cropped_lt.png"));
+        m_pActDeletePickers->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete_lt.png"));
         m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
         m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
         m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yv_plot_lt.png"));
@@ -3241,6 +3250,10 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
 
         setPickerText(coords, offsets);
     }
+    else
+    {
+        setPickerText("", "");
+    }
 
     
 
@@ -4086,6 +4099,16 @@ void Plot1DWidget::mnuPickerClick(bool checked)
         setState(stateIdle);
     }
 
+    // two actions have the same meaning, therefore share the checked state.
+    m_pActPicker->blockSignals(true);
+    m_pActSetPicker->blockSignals(true);
+
+    m_pActPicker->setChecked(checked);
+    m_pActSetPicker->setChecked(checked);
+
+    m_pActPicker->blockSignals(false);
+    m_pActSetPicker->blockSignals(false);
+
 }
 
 
@@ -4174,72 +4197,85 @@ void Plot1DWidget::mnuParentScaleSetting()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mnuSetPicker(QAction *action)
+void Plot1DWidget::mnuDeletePicker()
 {
-    if (action->data().toInt() == 0 || action->data().toInt() == 1)
+    // remove all pickers
+    clearPicker(-1, true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::mnuSetPickerGlobalMinMax()
+{
+    setPickerToMinMax(true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::mnuSetPickerRoiMinMax()
+{
+    setPickerToMinMax(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::setPickerToMinMax(bool global)
+{
+    //absolute min/max within entire object or within current view
+    QList<int> visibleIndices;
+    QStringList visibleTitles;
+    int index = -1;
+
+    for (int i = 0; i < m_plotCurveItems.size(); ++i)
     {
-        //absolute min/max within entire object or within current view
-        QList<int> visibleIndices;
-        QStringList visibleTitles;
-        int index = -1;
-
-        for (int i = 0; i < m_plotCurveItems.size(); ++i)
+        if (m_plotCurveItems[i]->isVisible())
         {
-            if (m_plotCurveItems[i]->isVisible())
-            {
-                visibleIndices << i;
-                visibleTitles << m_plotCurveItems[i]->title().text();
-            }
+            visibleIndices << i;
+            visibleTitles << m_plotCurveItems[i]->title().text();
+        }
+    }
+
+    if (visibleIndices.size() == 1)
+    {
+        index = visibleIndices[0];
+    }
+    else if (visibleIndices.size() > 1)
+    {
+        bool ok;
+        QString selectedTitle = QInputDialog::getItem(this, tr("Select a visible curve"), tr("Select the curve the picker values should be referred to"), visibleTitles, 0, false, &ok);
+        if (!ok)
+        {
+            return;
         }
 
-        if (visibleIndices.size() == 1)
+        index = visibleIndices[visibleTitles.indexOf(selectedTitle)];
+    }
+
+    if (index >= 0)
+    {
+        DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[index]->data());
+
+        ito::float64 minVal, maxVal;
+        int minLoc, maxLoc;
+        ito::RetVal retval;
+
+        if (global) //global search
         {
-            index = visibleIndices[0];
+            retval = seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc);
         }
-        else if (visibleIndices.size() > 1)
+        else
         {
-            bool ok;
-            QString selectedTitle = QInputDialog::getItem(this, tr("Select a visible curve"), tr("Select the curve the picker values should be referred to"), visibleTitles, 0, false, &ok);
-            if (!ok)
-            {
-                return;
-            }
-
-            index = visibleIndices[visibleTitles.indexOf(selectedTitle)];
+            retval = seriesData->getMinMaxLocCropped(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft), minVal, maxVal, minLoc, maxLoc);
         }
 
-        if (index >= 0)
+        if (retval == ito::retOk)
         {
-            DataObjectSeriesData* seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[index]->data());
-
-            ito::float64 minVal, maxVal;
-            int minLoc, maxLoc;
-            ito::RetVal retval;
-            if (action->data().toInt() == 0) //global search
+            if (minLoc < maxLoc)
             {
-                retval = seriesData->getMinMaxLoc(minVal, maxVal, minLoc, maxLoc);
+                setMainPickersToIndex(minLoc, maxLoc, index);
             }
             else
             {
-                retval = seriesData->getMinMaxLocCropped(axisInterval(QwtPlot::xBottom), axisInterval(QwtPlot::yLeft), minVal, maxVal, minLoc, maxLoc);
-            }
-
-            if (retval == ito::retOk)
-            {
-                if (minLoc < maxLoc)
-                {
-                    setMainPickersToIndex(minLoc, maxLoc, index);
-                }
-                else
-                {
-                    setMainPickersToIndex(maxLoc, minLoc, index);
-                }
+                setMainPickersToIndex(maxLoc, minLoc, index);
             }
         }
-    }
-    else if (action->data().toInt() == 2) //delete all
-    {
-        clearPicker(-1, true);
     }
 }
 

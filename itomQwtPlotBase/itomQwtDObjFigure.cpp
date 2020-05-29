@@ -136,26 +136,16 @@ void ItomQwtDObjFigure::construct()
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::~ItomQwtDObjFigure()
 {
-	
-	//removeToolbox("shapes info");
-	//m_pShapesDock->deleteLater();
 	d->m_pShapesDock = NULL;
 	m_pShapesInfo = NULL;
 	
-	//removeToolbox("picker info");
-	//m_pPickerDock->deleteLater();
 	d->m_pPickerDock = NULL;
 	m_pPickerInfo = NULL;
 
-	//removeToolbox("object info");
-	//m_pObjectInfoDock->deleteLater();
 	d->m_pObjectInfoDock = NULL;
 	m_pObjectInfo = NULL;
 
-	//removeToolbox("marker info");
-	//m_pMarkerDock->deleteLater();
 	d->m_pMarkerDock = NULL;
-	
 	m_pMarkerInfo = NULL;
 
     delete d;
@@ -186,6 +176,31 @@ ito::RetVal ItomQwtDObjFigure::copyToClipBoard()
         return m_pBaseContent->exportCanvas(true, "");
     return ito::RetVal(ito::retError, 0, tr("no content widget available.").toLatin1().data());
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QDockWidget* ItomQwtDObjFigure::markerDockWidget() const
+{
+    return d->m_pMarkerDock;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QDockWidget* ItomQwtDObjFigure::pickerDockWidget() const
+{
+    return d->m_pPickerDock;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QDockWidget* ItomQwtDObjFigure::shapesDockWidget() const
+{
+    return d->m_pShapesDock;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QDockWidget* ItomQwtDObjFigure::dObjectDockWidget() const
+{
+    return d->m_pObjectInfoDock;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtDObjFigure::savePlot(const QString &filename, float xsize /*= 0*/, float ysize /*= 0*/, const int resolution /*= 300*/)
