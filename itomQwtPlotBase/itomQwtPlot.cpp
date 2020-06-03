@@ -307,38 +307,34 @@ void ItomQwtPlot::createBaseActions()
 
     a = m_pMenuShapeType->addAction(tr("Point"));
     a->setData(ito::Shape::Point);
-    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Line"));
     a->setData(ito::Shape::Line);
-    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Rectangle"));
     a->setData(ito::Shape::Rectangle);
-    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Square"));
     a->setData(ito::Shape::Square);
-    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Ellipse"));
     a->setData(ito::Shape::Ellipse);
-    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Circle"));
     a->setData(ito::Shape::Circle);
-    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
 
     a = m_pMenuShapeType->addAction(tr("Polygon"));
     a->setData(ito::Shape::Polygon);
-    //m_pMenuShapeType->addAction(a);
     a->setCheckable(true);
+
+    m_pMenuShapeType->addSeparator();
+    m_pMenuShapeType->addAction(p->shapesDockWidget()->toggleViewAction());
 
     m_pActShapeType->setData(ito::Shape::Rectangle);
     m_pActShapeType->setVisible(true);
@@ -681,16 +677,24 @@ void ItomQwtPlot::setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &
     m_allowedShapeTypes = allowedTypes;
     ito::Shape::ShapeType potentialCurrentShape = ito::Shape::Invalid;
 
+    bool ok; // only modify actions of m_pMenuShapeType, that have an 
+             // integer data(). Do not touch the separator or dock widget toggle action
+
     foreach(QAction *a, m_pMenuShapeType->actions())
     {
-        if (m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)(a->data().toInt())))
+        a->data().toInt(&ok);
+
+        if (ok)
         {
-            a->setEnabled(true);
-            potentialCurrentShape = (ito::Shape::ShapeType)(a->data().toInt());
-        }
-        else
-        {
-            a->setEnabled(false);
+            if (m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)(a->data().toInt())))
+            {
+                a->setEnabled(true);
+                potentialCurrentShape = (ito::Shape::ShapeType)(a->data().toInt());
+            }
+            else
+            {
+                a->setEnabled(false);
+            }
         }
     }
 
@@ -715,41 +719,47 @@ void ItomQwtPlot::setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::mnuGroupShapeTypes(QAction *action)
 {
-    switch (action->data().toInt())
-    {
-    case ito::Shape::Point:
-        m_currentShapeType = ito::Shape::Point;
-        break;
-    case ito::Shape::Line:
-        m_currentShapeType = ito::Shape::Line;
-        break;
-    case ito::Shape::Rectangle:
-        m_currentShapeType = ito::Shape::Rectangle;
-        break;
-    case ito::Shape::Ellipse:
-        m_currentShapeType = ito::Shape::Ellipse;
-        break;
-    case ito::Shape::Circle:
-        m_currentShapeType = ito::Shape::Circle;
-        break;
-    case ito::Shape::Square:
-        m_currentShapeType = ito::Shape::Square;
-        break;
-    case ito::Shape::Polygon:
-        m_currentShapeType = ito::Shape::Polygon;
-        break;
-    default:
-        m_currentShapeType = ito::Shape::Invalid;
-        break;
-    }
+    bool ok; // false if action has no integer data --> no shape type clicked but any other action
+    int shapeType = action->data().toInt(&ok);
 
-    if (m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)m_currentShapeType))
+    if (ok)
     {
-        if (m_state == stateDrawShape) //if an interaction is already running and the user desires another one, goto idle first.
+        switch (shapeType)
         {
-            setState(stateIdle);
+        case ito::Shape::Point:
+            m_currentShapeType = ito::Shape::Point;
+            break;
+        case ito::Shape::Line:
+            m_currentShapeType = ito::Shape::Line;
+            break;
+        case ito::Shape::Rectangle:
+            m_currentShapeType = ito::Shape::Rectangle;
+            break;
+        case ito::Shape::Ellipse:
+            m_currentShapeType = ito::Shape::Ellipse;
+            break;
+        case ito::Shape::Circle:
+            m_currentShapeType = ito::Shape::Circle;
+            break;
+        case ito::Shape::Square:
+            m_currentShapeType = ito::Shape::Square;
+            break;
+        case ito::Shape::Polygon:
+            m_currentShapeType = ito::Shape::Polygon;
+            break;
+        default:
+            m_currentShapeType = ito::Shape::Invalid;
+            break;
         }
-        setState(stateDrawShape);
+
+        if (m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)m_currentShapeType))
+        {
+            if (m_state == stateDrawShape) //if an interaction is already running and the user desires another one, goto idle first.
+            {
+                setState(stateIdle);
+            }
+            setState(stateDrawShape);
+        }
     }
 }
 
@@ -902,9 +912,16 @@ void ItomQwtPlot::setState(int state)
                 }
             }
 
+            bool ok; // only modify actions of m_pMenuShapeType, that have an 
+                     // integer data(). Do not touch the separator or dock widget toggle action
             foreach(QAction *act, m_pMenuShapeType->actions())
             {
-                act->setChecked(act->data() == m_currentShapeType);
+                act->data().toInt(&ok);
+
+                if (ok)
+                {
+                    act->setChecked(act->data() == m_currentShapeType);
+                }
             }
 
             canvas()->setCursor(Qt::CrossCursor);

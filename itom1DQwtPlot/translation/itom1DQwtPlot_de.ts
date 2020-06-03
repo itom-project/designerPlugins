@@ -861,12 +861,12 @@
     </message>
     <message>
         <source>set two pickers to absolute minimum and maximum of (first) curve</source>
-        <translation type="obsolete">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der (ersten) Kurve</translation>
+        <translation type="obsolete">Setzt zwei Picker auf das absolute &apos;Minimum und Maximim der (ersten) Kurve</translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Delete Pickers</source>
-        <translation>Picker löschen</translation>
+        <source>Delete All Pickers</source>
+        <translation>Alle Picker löschen</translation>
     </message>
     <message>
         <location line="+1"/>

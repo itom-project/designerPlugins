@@ -399,6 +399,11 @@ public:
 	virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
 	virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
 
+    QDockWidget *markerDockWidget() const;
+    QDockWidget *pickerDockWidget() const;
+    QDockWidget *shapesDockWidget() const;
+    QDockWidget *dObjectDockWidget() const;
+
     friend ItomQwtPlot;
 
     
