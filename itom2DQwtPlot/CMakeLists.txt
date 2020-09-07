@@ -107,9 +107,6 @@ add_library(${target_name} SHARED
     ${DESIGNER_UI}
     ${DESIGNER_RCC}
     )
-MESSAGE(ERROR ${ITOM_SDK_LIBRARIES})
-MESSAGE(ERROR ${QT5_LIBRARIES})
-MESSAGE(ERROR ${VISUALLEAKDETECTOR_LIBRARIES})
 
 target_link_libraries(${target_name}
     ${ITOM_SDK_LIBRARIES}
