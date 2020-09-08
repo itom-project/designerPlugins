@@ -27,7 +27,7 @@
 #include "pcl/point_cloud.h"
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
-
+#include <pcl/common/eigen.h>
 #include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/filters/filter.h>
 #include "pcl/search/kdtree.h"
