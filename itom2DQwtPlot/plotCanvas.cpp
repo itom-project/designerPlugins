@@ -243,6 +243,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
     mainTb->addAction(m_pActProperties);
+    mainTb->addAction(m_pActCamParameters);
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
@@ -291,6 +292,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     menuView->addAction(m_pActGrid);
     menuView->addSeparator();
     menuView->addAction(m_pActProperties);
+    menuView->addAction(m_pActCamParameters);
     m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);

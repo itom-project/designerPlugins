@@ -98,6 +98,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pMenuShapeType(NULL),
     m_pActClearShapes(NULL),
     m_pActProperties(NULL),
+    m_pActCamParameters(NULL),
     m_pActShapeType(NULL),
     m_currentPlane(0),
     m_axisColor(Qt::black),
@@ -207,6 +208,9 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     {
         m_pActProperties = parent->getPropertyDockWidget()->toggleViewAction();
         connect(m_pActProperties, SIGNAL(triggered(bool)), parent, SLOT(mnuShowProperties(bool)));
+
+        m_pActCamParameters = parent->cameraParamEditorDockWidget()->toggleViewAction();
+        m_pActCamParameters->setVisible(false);
     }
 }
 
@@ -522,7 +526,17 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general/icons/move.png"));
         m_pActClearShapes->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
-        m_pActProperties->setIcon(QIcon(":/itomDesignerPlugins/general/icons/settings.png"));
+        
+        if (m_pActProperties)
+        {
+            m_pActProperties->setIcon(QIcon(":/itomDesignerPlugins/general/icons/settings.png"));
+        }
+
+        if (m_pActCamParameters)
+        {
+            m_pActCamParameters->setIcon(QIcon(":/itomDesignerPlugins/general/icons/camParams.png"));
+        }
+        
         m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"));
         m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython.png"));
 
