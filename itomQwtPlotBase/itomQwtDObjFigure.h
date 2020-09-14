@@ -95,6 +95,8 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
 	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
+
+    // DESIGNABLE true: property can be edited in QtDesigner and by Python/C++, USER false: property cannot be changed in property editor of plot.
     Q_PROPERTY(bool allowCameraParameterEditor READ allowCameraParameterEditor WRITE setAllowCameraParameterEditor DESIGNABLE true USER false);
     
     Q_CLASSINFO("prop://enableBoxFrame", "If true, a 1px solid border is drawn as a boxed rectangle around the canvas, else no margin is visible on the upper and right side.")
