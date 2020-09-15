@@ -33,6 +33,7 @@
 #include <qapplication.h>
 #include <qtoolbar.h>
 #include <qfileinfo.h>
+#include <qmetaobject.h>
 
 #include "DataObject/dataobj.h"
 #include "itomQwtPlot.h"
@@ -129,6 +130,20 @@ void ItomQwtDObjFigure::construct()
     d->m_pCameraParamEditorWidget->setRootIsDecorated(false);
     d->m_pCameraParamEditorWidget->setShowDescriptions(true);
     d->m_pCameraParamEditorWidget->setSplitterPosition(120);
+
+#if ITOM_ADDININTERFACE_VERSION <= CREATEVERSION(4,0,2)
+    int idx = d->m_pCameraParamEditorWidget->metaObject()->indexOfProperty("popupSlider");
+
+    if (idx >= 0)
+    {
+        d->m_pCameraParamEditorWidget->metaObject()->property(idx).write(
+            d->m_pCameraParamEditorWidget,
+            true);
+    }
+#else
+    d->m_pCameraParamEditorWidget->setPopupSlider(true);
+#endif
+    
     d->m_pCameraParamEditorDock->setWidget(d->m_pCameraParamEditorWidget);
     connect(d->m_pCameraParamEditorDock, &QDockWidget::visibilityChanged, this, &ItomQwtDObjFigure::cameraParamEditorVisibilityChanged);
 
