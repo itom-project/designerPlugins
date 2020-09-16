@@ -33,7 +33,6 @@
 #include <qapplication.h>
 #include <qtoolbar.h>
 #include <qfileinfo.h>
-#include <qmetaobject.h>
 
 #include "DataObject/dataobj.h"
 #include "itomQwtPlot.h"
@@ -71,7 +70,8 @@ public:
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
+ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : 
+        ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
     m_pBaseContent(NULL),
     m_pMarkerInfo(NULL),
     m_pPickerInfo(NULL),
@@ -82,7 +82,8 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ito::Abstract
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) : ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
+ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) : 
+        ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
 	m_pBaseContent(NULL),
     m_pMarkerInfo(NULL),
     m_pPickerInfo(NULL),
@@ -131,16 +132,7 @@ void ItomQwtDObjFigure::construct()
     d->m_pCameraParamEditorWidget->setShowDescriptions(true);
     d->m_pCameraParamEditorWidget->setSplitterPosition(120);
 
-#if ITOM_ADDININTERFACE_VERSION <= CREATEVERSION(4,0,2)
-    int idx = d->m_pCameraParamEditorWidget->metaObject()->indexOfProperty("popupSlider");
-
-    if (idx >= 0)
-    {
-        d->m_pCameraParamEditorWidget->metaObject()->property(idx).write(
-            d->m_pCameraParamEditorWidget,
-            true);
-    }
-#else
+#if ITOM_ADDININTERFACE_VERSION >= CREATEVERSION(4,1,0)
     d->m_pCameraParamEditorWidget->setPopupSlider(true);
 #endif
     
@@ -257,7 +249,8 @@ ito::RetVal ItomQwtDObjFigure::savePlot(const QString &filename, float xsize /*=
         {
             s << b;
         }
-        return ito::RetVal::format(ito::retError, 0, tr("%s is an unsupported file suffix. Supported values are: %s").toLatin1().data(), 
+        return ito::RetVal::format(ito::retError, 0, 
+            tr("%s is an unsupported file suffix. Supported values are: %s").toLatin1().data(), 
             fileInfo.suffix().toLatin1().data(), s.join("; ").toLatin1().data());
     }
 
