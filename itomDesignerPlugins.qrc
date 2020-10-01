@@ -112,6 +112,7 @@
         <file>icons/zoom_to_rect.png</file>
         <file>icons/upDate.png</file>
         <file>icons/settings.png</file>
+        <file>icons/camParams.png</file>
         <file>icons/editDelete.png</file>
         <file>icons/copyImg.png</file>
         <file>icons/decimals.png</file>
@@ -130,6 +131,7 @@
         <file>icons/zoom_to_rect_lt.png</file>
         <file>icons/upDate_lt.png</file>
         <file>icons/settings_lt.png</file>
+        <file>icons/camParams_lt.png</file>
         <file>icons/editDelete_lt.png</file>
         <file>icons/copyImg_lt.png</file>
         <file>icons/decimals_lt.png</file>

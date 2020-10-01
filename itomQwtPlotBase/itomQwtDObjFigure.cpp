@@ -44,6 +44,7 @@
 #include "itomWidgets/plotInfoMarker.h"
 #include "itomWidgets/plotInfoPicker.h"
 #include "itomWidgets/plotInfoDObject.h"
+#include "itomWidgets/paramEditorWidget.h"
 
 //------------------------------------------------------------------------------------------------------------------------
 class ItomQwtDObjFigurePrivate 
@@ -53,17 +54,24 @@ public:
         m_pMarkerDock(NULL),
         m_pPickerDock(NULL),
         m_pShapesDock(NULL),
-        m_pObjectInfoDock(NULL)
+        m_pObjectInfoDock(NULL),
+        m_pCameraParamEditorDock(NULL),
+        m_pCameraParamEditorWidget(NULL),
+        m_allowCameraParamEditor(true)
     {}
     
     QDockWidget *m_pMarkerDock;
 	QDockWidget *m_pPickerDock;
 	QDockWidget *m_pShapesDock;
 	QDockWidget *m_pObjectInfoDock;
+    QDockWidget *m_pCameraParamEditorDock;
+    ParamEditorWidget *m_pCameraParamEditorWidget;
+    bool m_allowCameraParamEditor;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
+ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : 
+        ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
     m_pBaseContent(NULL),
     m_pMarkerInfo(NULL),
     m_pPickerInfo(NULL),
@@ -74,7 +82,8 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : ito::Abstract
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) : ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
+ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) : 
+        ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
 	m_pBaseContent(NULL),
     m_pMarkerInfo(NULL),
     m_pPickerInfo(NULL),
@@ -93,35 +102,51 @@ void ItomQwtDObjFigure::construct()
 	d->m_pMarkerDock = new QDockWidget(tr("Marker Info"), this);
 	d->m_pMarkerDock->setVisible(false);
 	d->m_pMarkerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
-
 	m_pMarkerInfo = new PlotInfoMarker(d->m_pMarkerDock);
 	d->m_pMarkerDock->setWidget(m_pMarkerInfo);
 
 	d->m_pPickerDock = new QDockWidget(tr("Picker Info"), this);
 	d->m_pPickerDock->setVisible(false);
 	d->m_pPickerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
-
 	m_pPickerInfo = new PlotInfoPicker(d->m_pPickerDock);
 	d->m_pPickerDock->setWidget(m_pPickerInfo);
 
 	d->m_pShapesDock = new QDockWidget(tr("Shapes Info"), this);
 	d->m_pShapesDock->setVisible(false);
 	d->m_pShapesDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
-
 	m_pShapesInfo = new PlotInfoShapes(d->m_pShapesDock);
 	d->m_pShapesDock->setWidget(m_pShapesInfo);
 
 	d->m_pObjectInfoDock = new QDockWidget(tr("Data Object Info"), this);
 	d->m_pObjectInfoDock->setVisible(false);
 	d->m_pObjectInfoDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    m_pObjectInfo = new PlotInfoDObject(d->m_pObjectInfoDock);
+    d->m_pObjectInfoDock->setWidget(m_pObjectInfo);
 
-	m_pObjectInfo = new PlotInfoDObject(d->m_pObjectInfoDock);
-	d->m_pObjectInfoDock->setWidget(m_pObjectInfo);
+    d->m_pCameraParamEditorDock = new QDockWidget(tr("Camera Parameters"), this);
+    d->m_pCameraParamEditorDock->setVisible(false);
+    d->m_pCameraParamEditorDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    d->m_pCameraParamEditorWidget = new ParamEditorWidget(d->m_pCameraParamEditorDock);
+    d->m_pCameraParamEditorWidget->setResizeMode(ParamEditorWidget::Interactive);
+    d->m_pCameraParamEditorWidget->setRootIsDecorated(false);
+    d->m_pCameraParamEditorWidget->setShowDescriptions(true);
+    d->m_pCameraParamEditorWidget->setSplitterPosition(120);
+
+#if ITOM_ADDININTERFACE_VERSION >= CREATEVERSION(4,1,0)
+    d->m_pCameraParamEditorWidget->setPopupSlider(true);
+#endif
+    
+    d->m_pCameraParamEditorDock->setWidget(d->m_pCameraParamEditorWidget);
+    connect(d->m_pCameraParamEditorDock, &QDockWidget::visibilityChanged, this, &ItomQwtDObjFigure::cameraParamEditorVisibilityChanged);
+
+
+	
 
 	addToolbox(d->m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
 	addToolbox(d->m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
 	addToolbox(d->m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
 	addToolbox(d->m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
+    addToolbox(d->m_pCameraParamEditorDock, "camera parameters", Qt::LeftDockWidgetArea);
 	
 	if (getPropertyDockWidget())
 	{
@@ -224,7 +249,8 @@ ito::RetVal ItomQwtDObjFigure::savePlot(const QString &filename, float xsize /*=
         {
             s << b;
         }
-        return ito::RetVal::format(ito::retError, 0, tr("%s is an unsupported file suffix. Supported values are: %s").toLatin1().data(), 
+        return ito::RetVal::format(ito::retError, 0, 
+            tr("%s is an unsupported file suffix. Supported values are: %s").toLatin1().data(), 
             fileInfo.suffix().toLatin1().data(), s.join("; ").toLatin1().data());
     }
 
@@ -740,6 +766,125 @@ void ItomQwtDObjFigure::setTextColor(const QColor newVal)
     }
 
     updatePropertyDock();
+}
+
+//-------------------------------------------------------------------------------------
+QDockWidget* ItomQwtDObjFigure::cameraParamEditorDockWidget() const
+{
+    return d->m_pCameraParamEditorDock;
+}
+
+//-------------------------------------------------------------------------------------
+ParamEditorWidget* ItomQwtDObjFigure::cameraParamEditorWidget() const
+{
+    return d->m_pCameraParamEditorWidget;
+}
+
+//-------------------------------------------------------------------------------------
+/*virtual*/ ito::RetVal ItomQwtDObjFigure::setCamera(QPointer<ito::AddInDataIO> camera)
+{
+    ito::RetVal retval = AbstractDObjFigure::setCamera(camera);
+    ParamEditorWidget *pew = cameraParamEditorWidget();
+    QDockWidget *dw = cameraParamEditorDockWidget();
+
+    if (pew)
+    {
+        if (camera.isNull())
+        {
+            pew->setPlugin(QPointer<ito::AddInBase>());
+            dw->hide();
+            dw->toggleViewAction()->setVisible(false);
+        }
+        else
+        {
+            ito::Param *liveSource = getInputParam("liveSource");
+
+            if (allowCameraParameterEditor() &&
+                liveSource &&
+                liveSource->getVal<ito::AddInDataIO*>() == camera.data())
+            {
+                if (dw->isVisible())
+                {
+                    QPointer<ito::AddInBase> plugin(camera.data());
+                    pew->setPlugin(plugin);
+                }
+                else
+                {
+                    pew->setPlugin(QPointer<ito::AddInBase>());
+                }
+
+                dw->toggleViewAction()->setVisible(true);
+            }
+            else
+            {
+                pew->setPlugin(QPointer<ito::AddInBase>());
+                dw->hide();
+                dw->toggleViewAction()->setVisible(false);
+            }
+        }
+    }
+
+    return retval;
+}
+
+//-------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::setAllowCameraParameterEditor(bool allowed)
+{
+    if (allowed != d->m_allowCameraParamEditor)
+    {
+        d->m_allowCameraParamEditor = allowed;
+
+        ParamEditorWidget *pew = cameraParamEditorWidget();
+        QDockWidget *dw = cameraParamEditorDockWidget();
+
+        if (pew && dw)
+        {
+            if (allowed)
+            {
+                if (!pew->plugin().isNull())
+                {
+                    dw->toggleViewAction()->setVisible(true);
+                }
+            }
+            else
+            {
+                pew->hide();
+                dw->toggleViewAction()->setVisible(false);
+            }
+        }
+        
+    }
+}
+
+//-------------------------------------------------------------------------------------
+bool ItomQwtDObjFigure::allowCameraParameterEditor() const
+{
+    return d->m_allowCameraParamEditor;
+}
+
+//-------------------------------------------------------------------------------------
+void ItomQwtDObjFigure::cameraParamEditorVisibilityChanged(bool visible)
+{
+    ParamEditorWidget *pew = cameraParamEditorWidget();
+    
+    if (pew)
+    {
+        if (!visible)
+        {
+            pew->setPlugin(QPointer<ito::AddInBase>());
+        }
+        else
+        {
+            ito::Param *liveSource = getInputParam("liveSource");
+
+            if (allowCameraParameterEditor() &&
+                liveSource)
+            {
+                QPointer<ito::AddInBase> plugin(liveSource->getVal<ito::AddInDataIO*>());
+                pew->setPlugin(plugin);
+            }
+        }
+    }
 }
 
 

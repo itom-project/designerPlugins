@@ -188,6 +188,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
     mainTb->addAction(m_pActProperties);
+    mainTb->addAction(m_pActCamParameters);
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActScaleSettings);
     mainTb->addAction(m_pRescaleParent);
@@ -240,6 +241,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     menuView->addAction(m_pActProperties);
     QAction *actCurveProperties = ((Itom1DQwtPlot*)(this->parent()))->getCurvePropertiesToggleViewAction();
 	menuView->addAction(actCurveProperties);
+    menuView->addAction(m_pActCamParameters);
 	m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
@@ -267,6 +269,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_pContextMenu->addSeparator();
     m_pContextMenu->addAction(m_pActProperties);
     m_pContextMenu->addAction(actCurveProperties);
+    m_pContextMenu->addAction(m_pActCamParameters);
     m_pContextMenu->addAction(mainTb->toggleViewAction());
 }
 

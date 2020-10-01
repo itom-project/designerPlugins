@@ -55,6 +55,7 @@
 
 class ItomQwtPlot;
 class ItomQwtDObjFigurePrivate;
+class ParamEditorWidget;
 
 
 class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
@@ -94,6 +95,9 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
 	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
+
+    // DESIGNABLE true: property can be edited in QtDesigner and by Python/C++, USER false: property cannot be changed in property editor of plot.
+    Q_PROPERTY(bool allowCameraParameterEditor READ allowCameraParameterEditor WRITE setAllowCameraParameterEditor DESIGNABLE true USER false);
     
     Q_CLASSINFO("prop://enableBoxFrame", "If true, a 1px solid border is drawn as a boxed rectangle around the canvas, else no margin is visible on the upper and right side.")
     Q_CLASSINFO("prop://buttonSet", "Get/set the button set used (normal or light color for dark themes).")
@@ -116,6 +120,8 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
 	Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
+    
+    Q_CLASSINFO("prop://allowCameraParameterEditor", "If a live camera is connected to this plot, a camera parameter editor can be displayed as toolbox of the plot. If this property is false, this toolbox is not available (default: true)")
 
     Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data (uses the default export resolution).")
 
@@ -398,6 +404,12 @@ public:
 
 	virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
 	virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
+    
+    //!< overwrite to configure the camera parameters toolbox
+    virtual ito::RetVal setCamera(QPointer<ito::AddInDataIO> camera);
+
+    void setAllowCameraParameterEditor(bool allowed);
+    bool allowCameraParameterEditor() const;
 
     QDockWidget *markerDockWidget() const;
     QDockWidget *pickerDockWidget() const;
@@ -426,13 +438,17 @@ public Q_SLOTS:
     ito::RetVal deleteMarkers(QString id = "");
 
     void replot();
-    
+ 
+private Q_SLOTS:
+    void cameraParamEditorVisibilityChanged(bool visible);
 
 protected:
     inline PlotInfoMarker* markerWidget(void) const { return m_pMarkerInfo; }
     inline PlotInfoPicker* pickerWidget(void) const { return m_pPickerInfo; }
     inline PlotInfoShapes* shapesWidget(void) const { return m_pShapesInfo; }
     inline PlotInfoDObject* dObjectWidget(void) const { return m_pObjectInfo; }
+    QDockWidget* cameraParamEditorDockWidget() const;
+    ParamEditorWidget* cameraParamEditorWidget() const;
 
     void addToolbarsAndMenus();
     

@@ -210,6 +210,7 @@ protected:
     QAction *m_pActClearShapes;
 
     QAction *m_pActProperties;
+    QAction *m_pActCamParameters;
 
     QList<QToolBar*> m_toolbars;
     QList<QMenu*> m_menus;
