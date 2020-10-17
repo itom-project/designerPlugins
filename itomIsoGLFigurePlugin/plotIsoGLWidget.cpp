@@ -1923,12 +1923,12 @@ ito::RetVal plotGLWidget::ResetColors()
     if(m_elementMode == PAINT_POINTS)
     {
         if (m_pColIndices == NULL || m_pPoints == NULL || m_pColTriangles==NULL)
-            return -ito::retError;
+            return ito::retError;
     }
     else
     {
         if (m_pColIndices == NULL || m_pTriangles == NULL || m_pColTriangles==NULL)
-            return -ito::retError;
+            return ito::retError;
     }
 
     if(m_elementMode == PAINT_POINTS)
