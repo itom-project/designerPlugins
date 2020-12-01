@@ -28,7 +28,7 @@
 #include <qpalette.h>
 #include <qstatusbar.h>
 #include <qimagewriter.h>
-
+#include <qdebug.h>
 #include <qsharedpointer.h>
 #include <qapplication.h>
 #include <qtoolbar.h>
@@ -360,7 +360,7 @@ void ItomQwtDObjFigure::userInteractionStart(int type, bool start, int maxNrOfPo
         switch (type)
         {
         default:
-            m_pBaseContent->userInteractionStart(0, false, 0);
+            qDebug() << "userInteractionStart. Invalid arguments.";
             break;
         case ito::Shape::MultiPointPick:
         case ito::Shape::Point:
@@ -369,6 +369,7 @@ void ItomQwtDObjFigure::userInteractionStart(int type, bool start, int maxNrOfPo
         case ito::Shape::Square:
         case ito::Shape::Ellipse:
         case ito::Shape::Circle:
+        case ito::Shape::Polygon:
             m_pBaseContent->userInteractionStart(type, start, maxNrOfPoints);
             break;
         }

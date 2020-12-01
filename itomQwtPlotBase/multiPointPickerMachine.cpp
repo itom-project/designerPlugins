@@ -32,6 +32,10 @@ MultiPointPickerMachine::MultiPointPickerMachine() :
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+/*
+if value == -1: pick an infinite number of points (Space or Esc will quit or abort the selection).
+for value > 0: pick the given number of points
+*/
 void MultiPointPickerMachine::setMaxNrItems(int value)
 {
     m_maxNrItems = value;

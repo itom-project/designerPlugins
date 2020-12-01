@@ -239,7 +239,7 @@ private:
     int m_mouseDragReplotCounter; /*!< a replot during mouse movement is time consuming, therefore only replot it every 2nd or 3rd movement */
 
     QVector<int> m_currentShapeIndices; /*!< indices of all shapes that have already been drawn in the current collection, e.g. if 4 rectangles are requested, the four indices are stored until the last rectangle has been given.*/
-    int m_elementsToPick; /*!< number of shapes that should be picked in the current session. */
+    int m_numShapesToPick; /*!< number of shapes that should be picked in the current session. */
     bool m_isUserInteraction;
     ito::Shape::ShapeType m_currentShapeType;
     ItomQwtPlotEnums::ShapeTypes m_allowedShapeTypes;
@@ -277,7 +277,19 @@ private:
 
     QPrinter *m_pPrinter;
     
+    void attachAndSelectNewShape(const ito::Shape &shape);
+    void linePickingFinished();
+    void squarePickingFinished();
+    void rectanglePickingFinished();
+    void circlePickingFinished();
+    void ellipsePickingFinished();
+    void pointPickingFinished();
+    void polygonSinglePointPickingFinished();
 
+    // during an interactive shape session, this method collect all current shapes and returns its vector. 
+    // additionally, the shape toolbox is updated and (if desired) the geometricShapeChanged signal
+    // is emitted for the last added shape in the m_currentShapeIndices vector.
+    QVector<ito::Shape> getAndUpdateAllCurrentShapes(bool emitUpdateForLastModifiedShape);
     
 public slots:
     void clearAllGeometricShapes();
