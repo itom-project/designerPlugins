@@ -21,6 +21,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # ... for example this one, found in the CMAKE_MODULE_PATH
 include(ItomBuildMacros)
 itom_init_cmake_policy(3.12)
+itom_init_designerplugin_library(${target_name})
 
 find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib itomWidgets itomShapeLib REQUIRED)
 itom_find_package_qt(ON Core Widgets Xml Designer PrintSupport Svg Concurrent OpenGL LinguistTools)
