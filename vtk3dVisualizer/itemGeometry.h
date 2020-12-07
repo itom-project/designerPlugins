@@ -37,11 +37,6 @@ class ItemGeometry : public Item
 {
     Q_OBJECT
 
-#if QT_VERSION < 0x050500
-    //for >= Qt 5.5.0 see Q_ENUM definition below
-    Q_ENUMS(Representation)
-    Q_ENUMS(Interpolation)
-#endif
 
     //Q_PROPERTY(bool selected READ selected WRITE setSelected DESIGNABLE true USER true);
     //Q_PROPERTY(int PointSize READ pointSize WRITE setPointSize DESIGNABLE true USER true);
@@ -63,12 +58,10 @@ public:
     enum Representation { Points , Wireframe, Surface }; //equals pcl::visualization::RenderingRepresentationProperties
     enum Interpolation { Flat, Gouraud, Phong };
 
-#if QT_VERSION >= 0x050500
     //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
     //values are always accessible.
     Q_ENUM(Representation)
     Q_ENUM(Interpolation)
-#endif
 
     ito::RetVal addText(const QString &text, const int x, const int y, const int fontsize, const QColor &color);
     ito::RetVal addCylinder(const pcl::ModelCoefficients &coefficients, const QColor &color);

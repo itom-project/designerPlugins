@@ -42,15 +42,6 @@ class ItemPolygonMesh : public Item
 {
     Q_OBJECT
 
-#if QT_VERSION < 0x050500
-    //for >= Qt 5.5.0 see Q_ENUM definition below
-    Q_ENUMS(Representation)
-    Q_ENUMS(Interpolation)
-    Q_ENUMS(Culling)
-    Q_ENUMS(ColorMode)
-    Q_ENUMS(ColorMap)
-#endif
-
     //Q_PROPERTY(bool selected READ selected WRITE setSelected DESIGNABLE true USER true);
     Q_PROPERTY(Representation Representation READ representation WRITE setRepresentation DESIGNABLE true USER true);
     Q_PROPERTY(Interpolation Interpolation READ interpolation WRITE setInterpolation DESIGNABLE true USER true);
@@ -76,7 +67,6 @@ public:
     enum ColorMode { RGB, SolidColor, NormalX, NormalY, NormalZ, NormalMagnitude, X, Y, Z, XY, YZ, XZ, XYZ, Curvature};
     enum ColorMap { gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis};
 
-#if QT_VERSION >= 0x050500
     //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
     //values are always accessible.
     Q_ENUM(Representation)
@@ -84,7 +74,6 @@ public:
     Q_ENUM(Culling)
     Q_ENUM(ColorMode)
     Q_ENUM(ColorMap)
-#endif
 
     //properties
     virtual void setVisible(bool value);

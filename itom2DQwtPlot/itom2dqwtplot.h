@@ -86,11 +86,6 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false)
     Q_PROPERTY(ito::ItomPlotHandle volumeCutPlotItem READ getVolumeCutPlotItem WRITE setVolumeCutPlotItem DESIGNABLE false)
 
-#if QT_VERSION < 0x050500
-    //for >= Qt 5.5.0 see Q_ENUM definition below
-    Q_ENUMS(GridStyle);
-#endif
-
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis or '<auto>' if the description from the data object should be used.")
     Q_CLASSINFO("prop://xAxisVisible", "Sets visibility of the x-axis.")
@@ -158,12 +153,9 @@ public:
 
     enum GridStyle { GridNo = 0, GridMajorXY = 1, GridMajorX = 2, GridMajorY = 3, GridMinorXY = 4, GridMinorX = 5, GridMinorY = 6 };
 
-
-#if QT_VERSION >= 0x050500
     //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
     //values are always accessible.
     Q_ENUM(GridStyle);
-#endif
 
     ito::RetVal displayVolumeCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);
     ito::RetVal displayZStackCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);

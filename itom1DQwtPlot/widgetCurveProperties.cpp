@@ -62,27 +62,14 @@ void WidgetCurveProperties::updateCurveList()
 	}
 }
 
-#if QT_VERSION < 0x050500
-//workaround for qt_getEnumMetaObject
-//see: https://forum.qt.io/topic/644/global-qmetaobject/2
-    struct StaticQtMetaObject : public QObject
-    {
-        static inline const QMetaObject& get() {return staticQtMetaObject;}
-    };
-#endif
-
 //-----------------------------------------------------------------------------------------------
 void WidgetCurveProperties::updateProperties()
 {
 	if (m_visible)
 	{
 		updateCurveList();
-#if QT_VERSION >= 0x050500
-		const QMetaObject *mo = qt_getEnumMetaObject(Qt::DashLine);//penStyle
-#else
-        const QMetaObject mo_ = StaticQtMetaObject::get();
-        const QMetaObject *mo = &mo_;
-#endif
+
+		const QMetaObject *mo = qt_getEnumMetaObject(Qt::DashLine); //penStyle
 		QMetaEnum me = mo->enumerator(mo->indexOfEnumerator("PenStyle"));
 
 		int i;

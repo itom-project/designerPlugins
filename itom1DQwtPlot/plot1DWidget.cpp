@@ -1037,11 +1037,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
         {
             if (object)
             {
-#if QT_VERSION >= 0x050400
-                tag = object->getTag(QString("legendTitle%1").arg(index).toLatin1().toStdString(), valid);
-#else
-                tag = object->getTag(QString("legendTitle%1").arg(index).toStdString(), valid);
-#endif                
+                tag = object->getTag(QString("legendTitle%1").arg(index).toLatin1().toStdString(), valid);              
             }
 
             if (valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
@@ -1565,11 +1561,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         {
             for (int i = 0; i < curveNames.size(); ++i)
             {
-#if QT_VERSION >= 0x050400
                 tag = dataObj->getTag(QString("legendTitle%1").arg(i + legendOffset).toLatin1().toStdString(), valid);
-#else
-                tag = dataObj->getTag(QString("legendTitle%1").arg(i + legendOffset).toStdString(), valid);
-#endif
 
                 if (valid) // plots with legend, defined by tags: legendTitle0, legendTitle1, ...
                 {

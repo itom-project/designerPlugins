@@ -94,15 +94,6 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     Q_PROPERTY(bool antiAliased READ getAntiAliased WRITE setAntiAliased DESIGNABLE true USER true);
 	Q_PROPERTY(int legendLabelWidth READ getLegendLabelWidth WRITE setLegendLabelWidth USER true);
-	
-
-
-#if QT_VERSION < 0x050500
-    //for >= Qt 5.5.0 see Q_ENUM definition below
-    Q_ENUMS(LegendPos);
-    Q_ENUMS(Symbol);
-    Q_ENUMS(GridStyle);
-#endif
     
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
@@ -241,14 +232,11 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray };
         enum GridStyle { GridNo = 0, GridMajorXY = 1, GridMajorX = 2, GridMajorY = 3, GridMinorXY = 4, GridMinorX = 5, GridMinorY = 6 };
 
-
-#if QT_VERSION >= 0x050500
         //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
         //values are always accessible.
         Q_ENUM(LegendPos);
         Q_ENUM(Symbol);
         Q_ENUM(GridStyle);
-#endif
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
         

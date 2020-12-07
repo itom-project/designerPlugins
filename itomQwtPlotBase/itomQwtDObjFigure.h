@@ -62,11 +62,6 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
 {
     Q_OBJECT
 
-#if QT_VERSION < 0x050500
-    //for >= Qt 5.5.0 see Q_ENUM definition below
-    Q_ENUMS(ButtonStyle)
-#endif
-
     //DESIGNABLE (default: true): property is visible in QtDesigner property editor
     //USER (default: false): property is visible in property editor of plot
 
@@ -315,11 +310,9 @@ public:
         StyleDark = 1
     };
 
-#if QT_VERSION >= 0x050500
     //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
     //values are always accessible.
     Q_ENUM(ButtonStyle)
-#endif
 
     explicit ItomQwtDObjFigure(QWidget *parent = NULL);
     explicit ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = NULL);

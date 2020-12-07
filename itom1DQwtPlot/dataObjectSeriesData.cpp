@@ -2666,53 +2666,13 @@ template ito::complex128  DataObjectSeriesData::sampleComplex(const size_t& n) c
 //----------------------------------------------------------------------------------------------
 void DataObjectSeriesData::getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const
 {
-#if QT_VERSION >= 0x050400
     description = m_dObjValueDescription.toLatin1().toStdString();
     unit = m_dObjValueUnit.toLatin1().toStdString();
-#else
-    //for Qt <= 5.3, toStdString assumes that QString is encoded in utf8, however itom encodes in latin1,
-    //therefore the following workaround...
-    QByteArray temp = m_dObjValueDescription.toLatin1();
-    description = std::string();
-    description.reserve(temp.size());
-    for (int i = 0; i < temp.size(); ++i)
-    {
-        description.push_back(temp.data()[i]);
-    }
-    
-    temp = m_dObjValueUnit.toLatin1();
-    unit = std::string();
-    unit.reserve(temp.size());
-    for (int i = 0; i < temp.size(); ++i)
-    {
-        unit.push_back(temp.data()[i]);
-    }
-#endif
 }
 
 //----------------------------------------------------------------------------------------------
 void DataObjectSeriesData::getDObjAxisDescriptionAndUnit(std::string &description, std::string &unit) const
 {
-#if QT_VERSION >= 0x050400
     description = m_dObjAxisDescription.toLatin1().toStdString();
     unit = m_dObjAxisUnit.toLatin1().toStdString();
-#else
-    //for Qt <= 5.3, toStdString assumes that QString is encoded in utf8, however itom encodes in latin1,
-    //therefore the following workaround...
-    QByteArray temp = m_dObjAxisDescription.toLatin1();
-    description = std::string();
-    description.reserve(temp.size());
-    for (int i = 0; i < temp.size(); ++i)
-    {
-        description.push_back(temp.data()[i]);
-    }
-    
-    temp = m_dObjAxisUnit.toLatin1();
-    unit = std::string();
-    unit.reserve(temp.size());
-    for (int i = 0; i < temp.size(); ++i)
-    {
-        unit.push_back(temp.data()[i]);
-    }
-#endif
 }

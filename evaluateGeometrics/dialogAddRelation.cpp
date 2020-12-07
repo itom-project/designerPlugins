@@ -152,13 +152,9 @@ void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
     QDialogButtonBox::ButtonRole role = ui.buttonBox->buttonRole(btn);
     if (role == QDialogButtonBox::AcceptRole)
     {
-#if QT_VERSION >= 0x050200
         QVariant idx1 = ui.comboBoxFirst->currentData();
         QVariant idx2 = ui.comboBoxSecond->currentData();
-#else
-        QVariant idx1 = ui.comboBoxFirst->itemData(ui.comboBoxFirst->currentIndex());
-        QVariant idx2 = ui.comboBoxSecond->itemData(ui.comboBoxFirst->currentIndex());
-#endif
+
         ito::DataObject rObj;
         ito::float64 *dPtr = NULL;
         if (idx1 == idx2)
@@ -172,12 +168,10 @@ void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
             dPtr = (ito::float64*)rObj.rowPtr(0, 0);
             dPtr[2] = idx2.toFloat();
         }
-        dPtr[0] = idx1.toFloat();
-#if QT_VERSION >= 0x050200        
+
+        dPtr[0] = idx1.toFloat();    
         dPtr[1] = ui.comboBoxType->currentData().toFloat();
-#else        
-        dPtr[1] = ui.comboBoxType->itemData(ui.comboBoxFirst->currentIndex()).toFloat();
-#endif
+
         if (m_evalGeoFig)
         {
             QSharedPointer<ito::DataObject> dObjPtr(new ito::DataObject(rObj));

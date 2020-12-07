@@ -57,13 +57,6 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
 {
     Q_OBJECT
 
-#if QT_VERSION < 0x050500
-    //for >= Qt 5.5.0 see Q_ENUM definition below
-    Q_ENUMS(FlyMode);
-    Q_ENUMS(TickLocation);
-    Q_ENUMS(Stereo);
-#endif
-
     Q_PROPERTY(bool propertiesSorted READ propertiesSorted WRITE setPropertiesSorted DESIGNABLE true USER true);
     Q_PROPERTY(bool enablePointPick READ enablePointPick WRITE setEnablePointPick DESIGNABLE true USER true);
     Q_PROPERTY(double pointPickSphereRadius READ pointPickSphereRadius WRITE setPointPickSphereRadius DESIGNABLE true USER true);
@@ -189,13 +182,11 @@ public:
     enum TickLocation { ticksInside = 0, ticksOutside = 1, ticksBoth = 2 };
     enum Stereo { No, CrystalEyes, RedBlue, Interlaced, Left, Right, Dresden, Anaglyph, Checkerboard };
 
-#if QT_VERSION >= 0x050500
     //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
     //values are always accessible.
     Q_ENUM(FlyMode);
     Q_ENUM(TickLocation);
     Q_ENUM(Stereo);
-#endif
 
     Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     virtual ~Vtk3dVisualizer();
