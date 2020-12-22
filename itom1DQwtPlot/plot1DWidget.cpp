@@ -2301,6 +2301,11 @@ void Plot1DWidget::keyPressEvent (QKeyEvent * event)
             replot();
         }
     }
+
+    if (!event->isAccepted())
+    {
+        ItomQwtPlot::keyPressEvent(event);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

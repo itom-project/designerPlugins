@@ -991,23 +991,50 @@ void ItomQwtPlot::keyPressEvent(QKeyEvent * event)
             }
         }
 
-        if (indices_to_delete.size() == 1 && m_pShapes[indices_to_delete[0]]->getShape().type() == ito::Shape::Polygon)
+        if (indices_to_delete.size() == 1 && 
+            m_pShapes[indices_to_delete[0]]->getShape().type() == ito::Shape::Polygon)
         {
             const ito::Shape &shape = m_pShapes[indices_to_delete[0]]->getShape();
 			QPolygonF newBasePoints = shape.basePoints();
 			int marker_index = m_pShapes[indices_to_delete[0]]->getSelectedMarker();
 
-			if (marker_index >= 0 && marker_index < newBasePoints.size())
+			if (marker_index >= 0 && 
+                marker_index < newBasePoints.size() &&
+                newBasePoints.size() > 1)
 			{
 				//delete single point
 				newBasePoints.remove(marker_index);
 				ito::Shape newShape(ito::Shape::Polygon, shape.flags(), newBasePoints, shape.index(), shape.transform());
+                newShape.setUnclosed(shape.unclosed() || newBasePoints.size() <= 2);
 				m_pShapes[indices_to_delete[0]]->setShape(newShape);
+                int new_marker_index = marker_index - 1;
+
+                if (new_marker_index < 0)
+                {
+                    new_marker_index = newBasePoints.size() - 1;
+                }
+
+                m_pShapes[indices_to_delete[0]]->setSelected(true, new_marker_index);
+
+                ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
+
+                if (p)
+                {
+                    emit p->geometricShapeCurrentChanged(newShape);
+
+                    if (p->shapesWidget())
+                    {
+                        QVector<ito::Shape> shapes;
+                        shapes << newShape;
+                        p->shapesWidget()->updateShapes(shapes);
+                    }
+                }
+
 				replot();
 			}
 			else
 			{
-				//delete entire polygon
+				//delete entire polygon, also because there is no point left any more
 				deleteGeometricShape(indices_to_delete[0]);
 			}
         }
