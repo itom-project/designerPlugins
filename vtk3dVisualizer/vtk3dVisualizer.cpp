@@ -32,6 +32,7 @@
 #include <pcl/filters/filter.h>
 #include "pcl/search/kdtree.h"
 #include "pcl/octree/octree.h"
+#include "pcl/visualization/pcl_visualizer.h"
 #include "vtkOutputWindow.h"
 #include "vtkFileOutputWindow.h"
 #include <qsharedpointer.h>
@@ -43,10 +44,11 @@
 #include <qmap.h>
 #include <qstring.h>
 
-#include "QVTKWidget.h"
-
+#include "QVTKOpenGLNativeWidget.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkCubeAxesActor.h"
+#include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkCamera.h"
 #include "vtkVersion.h"
 
@@ -59,8 +61,6 @@
 #include "item.h"
 #include "DataObject/dataObjectFuncs.h"
 #include "treeWidgetKeyEater.h"
-
-//#include "ui_vtk3dVisualizer.h"
 
 #include "common/apiFunctionsInc.h"
 
@@ -115,7 +115,7 @@ public:
     pcl::octree::OctreePointCloudSearch<pcl::PointNormal> pointPickSearchNormal;
     bool pointPickSearchHasNormals;
     
-    QVTKWidget *pclCanvas;
+    QVTKOpenGLNativeWidget *pclCanvas;
 
     QColor backgroundColor;
 
@@ -141,19 +141,22 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 
     //d->ui.setupUi(this);
 
-    d->PCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("PCLVisualizer", false) );
-
-    //this->statusBar()->setVisible(false);
-
+    auto renderer = vtkSmartPointer<vtkRenderer>::New();
+    vtkSmartPointer<vtkGenericOpenGLRenderWindow> _renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+    _renderWindow->AddRenderer(renderer);
+    d->PCLVis = boost::shared_ptr<pcl::visualization::PCLVisualizer>(
+        new pcl::visualization::PCLVisualizer(renderer, _renderWindow, "PCLVisualizer", false)
+        );
     vtkSmartPointer<vtkRenderWindow> win = d->PCLVis->getRenderWindow();
 
     win->SetStereoCapableWindow(1);
     win->StereoRenderOff();
 
-    d->pclCanvas = new QVTKWidget(this);
+    d->pclCanvas = new QVTKOpenGLNativeWidget(this);
     this->setCentralWidget(d->pclCanvas);
+
     d->pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
-    QVTKInteractor *interactor = d->pclCanvas->GetInteractor();
+    vtkRenderWindowInteractor *interactor = d->pclCanvas->GetInteractor();
 
     d->PCLVis->setShowFPS(true);
     
