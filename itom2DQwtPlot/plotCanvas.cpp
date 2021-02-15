@@ -416,9 +416,9 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
     QPen zStackMarkerPen = QPen(QBrush(inverseColor1()), 3);
     QSize zStackMarkerSize = QSize(7, 7);
 
-    QFont titleFont = QFont("Helvetica", 12);
-    QFont labelFont = QFont("Helvetica", 12);
-    QFont axisFont = QFont("Helvetica", 10);
+    QFont titleFont = QFont("Verdana", 12);
+    QFont labelFont = QFont("Verdana", 10);
+    QFont axisFont = QFont("Verdana", 10);
 
     QSize centerMarkerSize = QSize(25, 25);
     QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);

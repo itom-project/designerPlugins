@@ -345,17 +345,17 @@ ito::RetVal Plot1DWidget::init(bool overwriteDesignableProperties)
     ito::RetVal retVal;
     ItomQwtPlot::loadStyles(overwriteDesignableProperties);
 
-    QPen trackerPen = QPen(QBrush(Qt::red),2);
-    QFont trackerFont = QFont("Verdana",10);
+    QPen trackerPen = QPen(QBrush(Qt::red), 2);
+    QFont trackerFont = QFont("Verdana", 10);
     QBrush trackerBg = QBrush(Qt::white, Qt::SolidPattern);
 
-    QFont titleFont = QFont("Helvetica",12); //designable
-    QFont labelFont =  QFont("Helvetica",12); //designable
-    QFont axisFont = QFont("Helvetica",10); //designable
+    QFont titleFont = QFont("Verdana", 12); //designable
+    QFont labelFont =  QFont("Verdana", 10); //designable
+    QFont axisFont = QFont("Verdana", 10); //designable
 
     if (overwriteDesignableProperties)
     {
-        m_legendFont  = QFont("Helvetica", 8); //designable
+        m_legendFont  = QFont("Verdana", 8); //designable
         setUnitLabelStyle(ito::AbstractFigure::UnitLabelSlash); //designable
     }
 

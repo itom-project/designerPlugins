@@ -75,9 +75,9 @@ PlotTreeWidget::~PlotTreeWidget()
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotTreeWidget::init()
 {
-    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
-    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
-    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();
+    QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Verdana", 12), NULL).value<QFont>();
+    QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Verdana", 10), NULL).value<QFont>();
+    QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Verdana", 10), NULL).value<QFont>();
     
     return ito::retOk;
 }
