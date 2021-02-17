@@ -19,7 +19,7 @@
 <context>
     <name>DataObjectTable</name>
     <message>
-        <location filename="../dataObjectTable.cpp" line="+429"/>
+        <location filename="../dataObjectTable.cpp" line="+409"/>
         <source>number of decimals</source>
         <translation>Anzahl Dezimalstellen</translation>
     </message>

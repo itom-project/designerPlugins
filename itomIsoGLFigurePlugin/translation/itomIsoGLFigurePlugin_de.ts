@@ -169,62 +169,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>Source data for plot</source>
-        <translation type="vanished">Quelldaten der Abbildung</translation>
-    </message>
-    <message>
-        <source>Actual output data of plot</source>
-        <translation type="obsolete">Quelldaten der Abbildung</translation>
-    </message>
-    <message>
-        <source>duplicate Channel, in addChannel</source>
-        <translation type="obsolete">Doppelte Verbindung (in addChannel)</translation>
-    </message>
-    <message>
-        <source>parameters incompatible, while adding channel</source>
-        <translation type="obsolete">Nicht kompatible Parameter (in adding channel)</translation>
-    </message>
-    <message>
-        <source>undefined channel direction, while adding channel</source>
-        <translation type="obsolete">Undefinierte Verbindungsrichtung (in adding channel)</translation>
-    </message>
-    <message>
-        <source>invalid child pointer, in addChannel</source>
-        <translation type="obsolete">Ungültiger child pointer (in addChannel)</translation>
-    </message>
-    <message>
-        <source>channel does not exist</source>
-        <translation type="obsolete">Verbindung existiert nicht</translation>
-    </message>
-    <message>
-        <source>Parameter: does not exist in updateParam</source>
-        <translation type="obsolete">Parameter gibt es in updateParam nicht</translation>
-    </message>
-    <message>
-        <source>Running update on a locked input channel, i.e. updatePending flag is not set</source>
-        <translation type="obsolete">Fehler beim Versuch eine gelockte Verbindung zu aktualisieren. Vielleicht wurde das updatePending-Flag nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Channel is already updating</source>
-        <translation type="obsolete">Verbindung wurde bereits aktualisiert</translation>
-    </message>
-    <message>
-        <source>parameters in list could not be found in channels, in updateChannels</source>
-        <translation type="obsolete">Die Parameter der Liste wurden in &apos;channels&apos; nicht gefunden (in updateChannels)</translation>
-    </message>
-    <message>
-        <source>channel is not a sender in setUpdatePending</source>
-        <translation type="obsolete">Verbindung kann nicht als Quelle genutzt werden (in setUpdatePending)</translation>
-    </message>
-    <message>
-        <source>unknown channel in setUpdatePending</source>
-        <translation type="obsolete">Unbekannte Verbindung (in setUpdatePending)</translation>
-    </message>
-    <message>
-        <source>Live data source for plot</source>
-        <translation type="vanished">Live-Datenquelle für Abbildung</translation>
-    </message>
-    <message>
         <location filename="../itomIsoGLFigurePlugin.cpp" line="+39"/>
         <source>ITOM widget for isometric visualisation of 2D DataObjects.</source>
         <translation>itom-Widget für isometrische Visualisierung von 2D-Objekten.</translation>
@@ -236,27 +180,9 @@
     </message>
 </context>
 <context>
-    <name>ito::AbstractDObjFigure</name>
-    <message>
-        <source>Function &apos;spawnLinePlot&apos; not supported from this plot widget</source>
-        <translation type="obsolete">Die Funktion &apos;spawnLinePlot&apos; wird von diesem Widget nicht unterstützt</translation>
-    </message>
-    <message>
-        <source>Figure does not contain an input slot for live sources</source>
-        <translation type="obsolete">Die Abbildung hat keine Schnittstelle für Livebilder</translation>
-    </message>
-</context>
-<context>
-    <name>ito::AbstractFigure</name>
-    <message>
-        <source>Properties</source>
-        <translation type="obsolete">Eigenschaften</translation>
-    </message>
-</context>
-<context>
     <name>plotGLWidget</name>
     <message>
-        <location filename="../plotIsoGLWidget.cpp" line="+929"/>
+        <location filename="../plotIsoGLWidget.cpp" line="+930"/>
         <location line="+250"/>
         <location line="+15"/>
         <source>Error allocating memory</source>
