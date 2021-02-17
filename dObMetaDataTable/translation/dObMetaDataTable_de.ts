@@ -14,18 +14,18 @@
     <message>
         <location filename="../dObMetaDataTable.cpp" line="+118"/>
         <location line="+73"/>
-        <location line="+43"/>
+        <location line="+49"/>
         <source>no preview available</source>
         <translation>Keine Vorschau verfügbar</translation>
     </message>
     <message>
-        <location line="-115"/>
-        <location line="+120"/>
+        <location line="-121"/>
+        <location line="+126"/>
         <source>header</source>
         <translation>Metadaten</translation>
     </message>
     <message>
-        <location line="-119"/>
+        <location line="-125"/>
         <source>tag Space</source>
         <translation>Tags</translation>
     </message>
@@ -35,7 +35,7 @@
         <translation>Protokoll</translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="+112"/>
         <source>preview</source>
         <translation>Vorschau</translation>
     </message>

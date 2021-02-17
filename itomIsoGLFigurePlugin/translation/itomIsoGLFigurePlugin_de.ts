@@ -256,7 +256,7 @@
 <context>
     <name>plotGLWidget</name>
     <message>
-        <location filename="../plotIsoGLWidget.cpp" line="+929"/>
+        <location filename="../plotIsoGLWidget.cpp" line="+930"/>
         <location line="+250"/>
         <location line="+15"/>
         <source>Error allocating memory</source>
