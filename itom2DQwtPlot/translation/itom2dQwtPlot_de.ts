@@ -62,10 +62,6 @@
         <translation>Werte</translation>
     </message>
     <message>
-        <source>Hint: Control the number of decimals in the spin boxes by pressing Ctrl+ or Ctrl-</source>
-        <translation type="vanished">Hinweis: Um die Anzahl der Dezimalstellen in den Spinboxen zu ändern Strg+ und Strg- verwenden</translation>
-    </message>
-    <message>
         <location filename="../dialog2DScale.cpp" line="+206"/>
         <source>invalid number</source>
         <translation type="unfinished">Ungültige Zahl</translation>
@@ -84,84 +80,6 @@
         <location line="+0"/>
         <source>The &apos;%1&apos; number is out of range [%2,%3]</source>
         <translation type="unfinished">Die Zahl &apos;%1&apos; liegt außerhalb des Gültigkeitsbereichs [%2, %3]</translation>
-    </message>
-</context>
-<context>
-    <name>DialogExport2File</name>
-    <message>
-        <source>Export Properties</source>
-        <translation type="vanished">Export-Einstellungen</translation>
-    </message>
-    <message>
-        <source>plot canvas size</source>
-        <translation type="vanished">Plotgröße</translation>
-    </message>
-    <message>
-        <source>Width:</source>
-        <translation type="vanished">Breite:</translation>
-    </message>
-    <message>
-        <source>Height:</source>
-        <translation type="vanished">Höhe:</translation>
-    </message>
-    <message>
-        <source>export resolution and size</source>
-        <translation type="vanished">Exportauflöstung und -größe</translation>
-    </message>
-    <message>
-        <source>Resolution:</source>
-        <translation type="vanished">Auflösung:</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation type="vanished">Weiter</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="vanished">Abbrechen</translation>
-    </message>
-</context>
-<context>
-    <name>DialogExportProperties</name>
-    <message>
-        <source>user defined</source>
-        <translation type="vanished">Benutzerdefiniert</translation>
-    </message>
-    <message>
-        <source>user defined (keep aspect ratio)</source>
-        <translation type="vanished">Benutzerdefiniert (Seitenverhältnis beibehalten)</translation>
-    </message>
-    <message>
-        <source>A4 landscape</source>
-        <translation type="vanished">A4 Querformat</translation>
-    </message>
-    <message>
-        <source>A4 portrait</source>
-        <translation type="vanished">A4 Hochformat</translation>
-    </message>
-    <message>
-        <source>A4 landscape (fitting)</source>
-        <translation type="vanished">A4 Querformat (angepasst)</translation>
-    </message>
-    <message>
-        <source>A4 portrait (fitting)</source>
-        <translation type="vanished">A4 Hochformat (angepasst)</translation>
-    </message>
-    <message>
-        <source>A5 landscape</source>
-        <translation type="vanished">A5 Querformat</translation>
-    </message>
-    <message>
-        <source>A5 portrait</source>
-        <translation type="vanished">A5 Hochformat</translation>
-    </message>
-    <message>
-        <source>A5 landscape (fitting)</source>
-        <translation type="vanished">A5 Querformat (angepasst)</translation>
-    </message>
-    <message>
-        <source>A5 portrait (fitting)</source>
-        <translation type="vanished">A5 Hochformat (angepasst)</translation>
     </message>
 </context>
 <context>
@@ -190,10 +108,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not spawn volumeCut due to missing API-handle</source>
-        <translation type="obsolete">Volumenschnitt konnte nicht erzeugt werden, API-Handle wurde nicht gefunden</translation>
-    </message>
-    <message>
         <location line="-38"/>
         <location line="+127"/>
         <location line="+141"/>
@@ -206,10 +120,6 @@
         <translation>Volumenschnitt</translation>
     </message>
     <message>
-        <source>Expected a bound vector with 2 values</source>
-        <translation type="obsolete">Es wird ein Grenzvektor mit 2 Werten erwartet</translation>
-    </message>
-    <message>
         <location line="+266"/>
         <source>Z-Stack</source>
         <translation>Z-Stapel</translation>
@@ -218,416 +128,6 @@
         <location line="+250"/>
         <source>Set lineCut coordinates failed. Widget not ready.</source>
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Widget nicht bereit.</translation>
-    </message>
-</context>
-<context>
-    <name>ItomQwtDObjFigure</name>
-    <message>
-        <source>Marker Info</source>
-        <translation type="obsolete">Marker Info</translation>
-    </message>
-    <message>
-        <source>Picker Info</source>
-        <translation type="obsolete">Picker Info</translation>
-    </message>
-    <message>
-        <source>Shapes Info</source>
-        <translation type="obsolete">Info zu Geometische Formen</translation>
-    </message>
-    <message>
-        <source>Data Object Info</source>
-        <translation type="obsolete">DataObject Info</translation>
-    </message>
-    <message>
-        <source>no content widget available.</source>
-        <translation type="obsolete">Kein Widget für den Inhalt verfügbar.</translation>
-    </message>
-    <message>
-        <source>%s is an unsupported file suffix. Supported values are: %s</source>
-        <translation type="obsolete">&apos;%s&apos; ist eine nicht unterstützte Dateierweiterung. Unterstützte Werte sind: %s</translation>
-    </message>
-    <message>
-        <source>content widget not available</source>
-        <translation type="obsolete">Kein Widget für den Inhalt verfügbar</translation>
-    </message>
-    <message>
-        <source>content not available</source>
-        <translation type="obsolete">Der Inhalt ist nicht verfügbar</translation>
-    </message>
-</context>
-<context>
-    <name>ItomQwtPlot</name>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Ansicht zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Reset original view</source>
-        <translation type="vanished">Ursprüngliche Ansicht wiederherstellen</translation>
-    </message>
-    <message>
-        <source>Save...</source>
-        <translation type="vanished">Speichern...</translation>
-    </message>
-    <message>
-        <source>Export current view...</source>
-        <translation type="vanished">Aktuelle Abbildung exportieren...</translation>
-    </message>
-    <message>
-        <source>Print...</source>
-        <translation type="vanished">Drucken...</translation>
-    </message>
-    <message>
-        <source>Print preview...</source>
-        <translation type="vanished">Druckervorschau...</translation>
-    </message>
-    <message>
-        <source>Copy to clipboard</source>
-        <translation type="vanished">In die Zwischenablage kopieren</translation>
-    </message>
-    <message>
-        <source>Copies the current view to the clipboard</source>
-        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren</translation>
-    </message>
-    <message>
-        <source>Send current view to workspace...</source>
-        <translation type="obsolete">Aktueller Ausschnitt an Workspace senden...</translation>
-    </message>
-    <message>
-        <source>Move</source>
-        <translation type="obsolete">Verschieben</translation>
-    </message>
-    <message>
-        <source>Pan axes with left mouse, zoom with right</source>
-        <translation type="obsolete">Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
-    </message>
-    <message>
-        <source>Zoom to rectangle</source>
-        <translation type="obsolete">Zoom in Rechteck</translation>
-    </message>
-    <message>
-        <source>Clear geometric shapes</source>
-        <translation type="obsolete">Geometrische Formen löschen</translation>
-    </message>
-    <message>
-        <source>Clear all existing geometric shapes</source>
-        <translation type="obsolete">Alle geometrische Formen löschen</translation>
-    </message>
-    <message>
-        <source>Lock aspect ratio</source>
-        <translation type="obsolete">Seitenverhältnis beibehalten</translation>
-    </message>
-    <message>
-        <source>Toggle fixed / variable aspect ration between axis x and y</source>
-        <translation type="obsolete">Vollbild oder Seitenverhältnis beibehalten</translation>
-    </message>
-    <message>
-        <source>Draw geometric shape</source>
-        <translation type="obsolete">Geometrische Formen zeichnen</translation>
-    </message>
-    <message>
-        <source>Copy To Clipboard</source>
-        <translation type="obsolete">In die Zwischenablage kopieren</translation>
-    </message>
-    <message>
-        <source>Send Current View To Workspace...</source>
-        <translation type="obsolete">Aktueller Ausschnitt an Workspace senden...</translation>
-    </message>
-    <message>
-        <source>Zoom To Rectangle</source>
-        <translation type="obsolete">Zoom in Rechteck</translation>
-    </message>
-    <message>
-        <source>Clear Geometric Shapes</source>
-        <translation type="obsolete">Geometrische Formen löschen</translation>
-    </message>
-    <message>
-        <source>Clear All Existing Geometric Shapes</source>
-        <translation type="obsolete">Alle geometrische Formen löschen</translation>
-    </message>
-    <message>
-        <source>Lock Aspect Ratio</source>
-        <translation type="obsolete">Seitenverhältnis beibehalten</translation>
-    </message>
-    <message>
-        <source>Draw Geometric Shape</source>
-        <translation type="obsolete">Geometrische Formen zeichnen</translation>
-    </message>
-    <message>
-        <source>Point</source>
-        <translation type="vanished">Punkt</translation>
-    </message>
-    <message>
-        <source>Line</source>
-        <translation type="vanished">Linie</translation>
-    </message>
-    <message>
-        <source>Rectangle</source>
-        <translation type="vanished">Rechteck</translation>
-    </message>
-    <message>
-        <source>Square</source>
-        <translation type="vanished">Quadrat</translation>
-    </message>
-    <message>
-        <source>Ellipse</source>
-        <translation type="vanished">Ellipse</translation>
-    </message>
-    <message>
-        <source>Circle</source>
-        <translation type="vanished">Kreis</translation>
-    </message>
-    <message>
-        <source>Selection has been aborted.</source>
-        <translation type="obsolete">Auswahl wurde abgebrochen.</translation>
-    </message>
-    <message>
-        <source>%1 points have been selected.</source>
-        <translation type="obsolete">%1 Punkt(e) wurden ausgewählt.</translation>
-    </message>
-    <message>
-        <source>Please draw %1 points. Esc aborts the selection.</source>
-        <translation type="obsolete">%1 Punkte einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw one point. Esc aborts the selection.</source>
-        <translation type="obsolete">Ein Punkt einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw %1 lines. Esc aborts the selection.</source>
-        <translation type="obsolete">%1 Linien einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw one line. Esc aborts the selection.</source>
-        <translation type="obsolete">Eine Linie einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw %1 rectangles. Esc aborts the selection.</source>
-        <translation type="obsolete">%1 Rechtecke einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw one rectangle. Esc aborts the selection.</source>
-        <translation type="obsolete">Ein Rechteck einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw %1 ellipses. Esc aborts the selection.</source>
-        <translation type="obsolete">%1 Ellipsen einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw one ellipse. Esc aborts the selection.</source>
-        <translation type="obsolete">Eine Ellipse einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Add points to polygon. Esc aborts the selection.</source>
-        <translation type="obsolete">Punkte zum Polygon hinzufügen. &apos;ESC&apos; beendet das Hinzufügen.</translation>
-    </message>
-    <message>
-        <source>Invalid type for userInteractionStart</source>
-        <translation type="obsolete">Ungültiger Typ von &apos;userInteractionStart&apos;</translation>
-    </message>
-    <message>
-        <source>Invalid or unsupported shape type</source>
-        <translation type="obsolete">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
-    </message>
-    <message>
-        <source>Invalid marker type</source>
-        <translation type="obsolete">Ungültiger Marker-Typ</translation>
-    </message>
-    <message>
-        <source>The file &apos;%s&apos; cannot be created. Check the filename and the required permissions.</source>
-        <translation type="obsolete">Die Datei &apos;%s&apos; kann nicht erstellt werden. Bitte den Dateinamen und die Berechtigungen prüfen.</translation>
-    </message>
-    <message>
-        <source>Copy current view to clipboard including meta information widgets ...</source>
-        <translation type="obsolete">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
-    </message>
-    <message>
-        <source>Copy current view to clipboard without meta information widgets (requires Qt5) ...</source>
-        <translation type="obsolete">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
-    </message>
-    <message>
-        <source>Copy current view to clipboard ...</source>
-        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
-    </message>
-    <message>
-        <source>Copy current view to clipboard including infoWidgets. Done.</source>
-        <translation type="obsolete">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
-    </message>
-    <message>
-        <source>Copy current view to clipboard. Done.</source>
-        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren. Beendet.</translation>
-    </message>
-    <message>
-        <source>invalid type for userInteractionStart</source>
-        <translation type="obsolete">Ungültiger Typ von &apos;userInteractionStart&apos;</translation>
-    </message>
-    <message>
-        <source>Please select %1 points or press Space to quit earlier. Esc aborts the selection.</source>
-        <translation type="obsolete">%1 Punkt(e) auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please select points and press Space to end the selection. Esc aborts the selection.</source>
-        <translation type="obsolete">Punkte auswählen oder mit der Leertaste die Auswahl vorzeitig verlassen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw %1 squares. Esc aborts the selection.</source>
-        <translation type="obsolete">%1 Quadrate einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw one square. Esc aborts the selection.</source>
-        <translation type="obsolete">Ein Quadrat einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw %1 circles. Esc aborts the selection.</source>
-        <translation type="obsolete">%1 Kreise einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Please draw one circle. Esc aborts the selection.</source>
-        <translation type="obsolete">Ein Kreis einzeichnen. ESC bricht die Auswahl ab.</translation>
-    </message>
-    <message>
-        <source>Unknown type for userInteractionStart</source>
-        <translation type="obsolete">Ungültiger Typ für &apos;userInteractionStart&apos;</translation>
-    </message>
-    <message>
-        <source>Selection has been interrupted.</source>
-        <translation type="obsolete">Auswahl wurde abgebrochen.</translation>
-    </message>
-    <message>
-        <source>No geometric shape with index &apos;%d&apos; found.</source>
-        <translation type="obsolete">Es wurde keine geometrische Form mit dem Index %d gefunden.</translation>
-    </message>
-    <message>
-        <source>Could not set active element, index out of range.</source>
-        <translation type="obsolete">Der Index liegt außerhalb des erlauben Bereichs. Das aktive Element konnte nicht gesetzt werden.</translation>
-    </message>
-    <message>
-        <source>Could not set geometric shapes, api is missing</source>
-        <translation type="obsolete">API wurde nicht gefunden. Die geometrische Form konnte nicht gesetzt werden</translation>
-    </message>
-    <message>
-        <source>The shapes contain at least one shape type, that is not allowed for this plot, and is therefore ignored.</source>
-        <translation type="obsolete">Die zuletzt verwendete geometrische Form ist für diesen Plot nicht erlaubt und wird deshalb ignoriert.</translation>
-    </message>
-    <message>
-        <source>invalid or unsupported shape type</source>
-        <translation type="obsolete">Ungültiger oder nicht unterstützter Typ der geometrischen Form</translation>
-    </message>
-    <message>
-        <source>Could not add a geometric shape, api is missing</source>
-        <translation type="obsolete">Die geometrische Form kann nicht hinzugefügt werden, da die API nicht verfügbar ist</translation>
-    </message>
-    <message>
-        <source>Could not add the geometric shape since a shape with the same index already exists</source>
-        <translation type="obsolete">Die geometrische Form kann nicht hinzugefügt werden, da bereits eine Form mit diesem Index existiert</translation>
-    </message>
-    <message>
-        <source>The type of the shape is not allowed for this plot.</source>
-        <translation type="obsolete">Für diesen Plot ist dieser Typ der geometrischen Formen nicht erlaubt.</translation>
-    </message>
-    <message>
-        <source>Could not modify a geometric shape, api is missing</source>
-        <translation type="obsolete">Die geometrische Form kann nicht geändert  werden, da die API nicht verfügbar ist</translation>
-    </message>
-    <message>
-        <source>invalid marker type</source>
-        <translation type="obsolete">Ungültiger Marker-Typ</translation>
-    </message>
-    <message>
-        <source>Geometric shape not found</source>
-        <translation type="obsolete">Die geometrische Form wurde nicht gefunden</translation>
-    </message>
-    <message>
-        <source>The file &apos;%s&apos; already exists but cannot be overwritten.</source>
-        <translation type="obsolete">Die Datei &apos;%s&apos; existiert bereits, kann aber nicht überschrieben werden.</translation>
-    </message>
-    <message>
-        <source>The file &apos;%s&apos; already exists but cannot be overwritten (Maybe it is opened in another application).</source>
-        <translation type="obsolete">Die Datei &apos;%s&apos; existiert bereits, kann aber nicht überschrieben werden. Evtl. ist diese Datei durch ein anderes Programm geöffnet.</translation>
-    </message>
-    <message>
-        <source>copy current view to clipboard including meta information widgets ...</source>
-        <translation type="obsolete">Aktueller Ausschnitt inklusive Meta-Informations-Widget in die Zwischenablage kopieren...</translation>
-    </message>
-    <message>
-        <source>copy current view to clipboard without meta information widgets (requires Qt5) ...</source>
-        <translation type="obsolete">Aktueller Ausschnitt ohne Meta-Informations-Widget in die Zwischenablage kopieren (Qt5 erforderlich!)...</translation>
-    </message>
-    <message>
-        <source>copy current view to clipboard including infoWidgets ...</source>
-        <translation type="obsolete">Aktuelle Ansicht inklusive infoWidget in die Zwischenablage kopieren...</translation>
-    </message>
-    <message>
-        <source>copy current view to clipboard ...</source>
-        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren...</translation>
-    </message>
-    <message>
-        <source>copy current view to clipboard including infoWidgets. Done.</source>
-        <translation type="obsolete">Aktueller Ausschnitt inklusive infoWidget in die Zwischenablage kopieren. Beendet.</translation>
-    </message>
-    <message>
-        <source>copy current view to clipboard. Done.</source>
-        <translation type="obsolete">Aktueller Ausschnitt in die Zwischenablage kopieren. Beendet.</translation>
-    </message>
-    <message>
-        <source>PDF Documents (*.pdf)</source>
-        <translation type="obsolete">FDP-Dokumente (&apos;.pdf)</translation>
-    </message>
-    <message>
-        <source>SVG Documents (*.svg)</source>
-        <translation type="obsolete">SVG-Dokumente (*.svg)</translation>
-    </message>
-    <message>
-        <source>Postscript Documents (*.ps)</source>
-        <translation type="obsolete">Postscript-Dateien (*.ps)</translation>
-    </message>
-    <message>
-        <source>Images (</source>
-        <translation type="obsolete">Bilddateien (</translation>
-    </message>
-    <message>
-        <source>Export File Name</source>
-        <translation type="obsolete">Speichern unter</translation>
-    </message>
-    <message>
-        <source>Error while saving the plot</source>
-        <translation type="obsolete">Fehler beim Speichern des Plots</translation>
-    </message>
-    <message>
-        <source>Warning while saving the plot</source>
-        <translation type="obsolete">Beim Speichern des Plots ist eine Warnung aufgetreten</translation>
-    </message>
-    <message>
-        <source>Could not send object to workspace, api is missing.</source>
-        <translation type="obsolete">Das Objekt kann nicht in den Workspace gesendet werden. Die API wurde nicht gefunden.</translation>
-    </message>
-    <message>
-        <source>Current to workspace</source>
-        <translation type="obsolete">Aktueller Ausschnitt an den Workspace</translation>
-    </message>
-    <message>
-        <source>Indicate the python variable name for the currently visible object</source>
-        <translation type="obsolete">Variablenname für die Übernahme in den Workspace</translation>
-    </message>
-    <message>
-        <source>Error sending data object to workspace</source>
-        <translation type="obsolete">Fehler beim Senden des Datenobjekts an Workspace</translation>
-    </message>
-    <message>
-        <source>Warning sending data object to workspace</source>
-        <translation type="obsolete">Warnung beim Senden des Datenobjekts an Workspace</translation>
-    </message>
-    <message>
-        <source>Could not plot marker, api is missing</source>
-        <translation type="obsolete">Die Position kann nicht angezeigt werden, API wurde nicht gefunden</translation>
-    </message>
-    <message>
-        <source>The style tag does not correspond to the required format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</source>
-        <translation type="obsolete">Die Stil-Bezeichnung entspricht nicht dem erforderlichen Format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</translation>
-    </message>
-    <message>
-        <source>No marker with id &apos;%1&apos; found.</source>
-        <translation type="obsolete">Der Marker mit der ID &apos;%1&apos; wurde nicht gefunden.</translation>
     </message>
 </context>
 <context>
@@ -681,10 +181,6 @@
         <translation type="unfinished">Farbpalette wechseln</translation>
     </message>
     <message>
-        <source>Switch between color palettes</source>
-        <translation type="obsolete">Wechsel der Farbpaletten</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Click to switch to next color palette</source>
         <translation type="unfinished">Zur nächsten Farbpalette wechseln</translation>
@@ -725,47 +221,47 @@
         <location line="+6"/>
         <location line="+3"/>
         <source>Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Gitter</translation>
     </message>
     <message>
         <location line="-5"/>
         <source>Shows/hides a grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Gitter anzeigen/verstecken</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>No Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Gitter</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Major XY</source>
-        <translation type="unfinished"></translation>
+        <translation>XY-Hauptachsen</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Major X</source>
-        <translation type="unfinished"></translation>
+        <translation>X-Hauptachse</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Major Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Y-Hauptachse</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Minor XY</source>
-        <translation type="unfinished"></translation>
+        <translation>XY-Nebenachsen</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Minor X</source>
-        <translation type="unfinished"></translation>
+        <translation>X-Nebenachse</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Minor Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Y-Nebenachse</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -884,10 +380,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>min &amp; max</source>
-        <translation type="obsolete">Min &amp; Max</translation>
-    </message>
-    <message>
         <location line="-2855"/>
         <source>line cut through global minimum and maximum value</source>
         <translation type="unfinished">Globales Minimum und Maximum für Linienschnitt übernehmen</translation>
@@ -989,10 +481,6 @@
         <source>Can not set dataObject with a shape greater than one in the last but one dimensions for contour Lines</source>
         <translation type="unfinished">Ein DataObject mit dieser Dimension kann nicht als Höhenlinie gesetzt werden</translation>
     </message>
-    <message>
-        <source>Set lineCut coordinates failed. Could not activate lineCut.</source>
-        <translation type="obsolete">Das Setzten der Linienschnittkoordinaten schlug fehl. Der Linienschnitt konnte nicht aktiviert werden.</translation>
-    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1052,14 +540,6 @@
         <location line="+3"/>
         <source>LGPL, for Qwt see Qwt License</source>
         <translation>LGPL, für Qwt siehe Qwt-Lizenz</translation>
-    </message>
-    <message>
-        <source>rotated shapes are currently not supported.</source>
-        <translation type="obsolete">Das Rotieren der geometischen Formen wird derzeit nicht unterstützt.</translation>
-    </message>
-    <message>
-        <source>invalid geometric shape type</source>
-        <translation type="obsolete">Ungültige Typ der geometischen Formen</translation>
     </message>
 </context>
 </TS>
