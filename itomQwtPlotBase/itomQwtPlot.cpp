@@ -3184,36 +3184,40 @@ void ItomQwtPlot::mnuActSave()
         QImageWriter::supportedImageFormats();
 
     QStringList filter;
-    QString allSupportedFormats = tr("All supported Files (");
+    QString allSupportedFormats = tr("All Supported Files (");
 
     if (imageFormats.size() > 0)
     {
         QString imageFilter(tr("Images ("));
+
         for (int i = 0; i < imageFormats.size(); i++)
         {
             if (i > 0)
+            {
                 imageFilter += " ";
                 allSupportedFormats += " ";
+            }
+
             imageFilter += "*.";
-            allSupportedFormats += "*.";
             imageFilter += imageFormats[i];
+
+            allSupportedFormats += "*.";
             allSupportedFormats += imageFormats[i];
         }
-        imageFilter += ")";
 
-        filter += imageFilter;
-        
+        imageFilter += ")";
+        filter << imageFilter;
     }
 
-    filter += tr("PDF Documents (*.pdf)");
+    filter << tr("PDF Documents (*.pdf)");
     allSupportedFormats += " *.pdf";
 #ifndef QWT_NO_SVG
 #ifdef QT_SVG_LIB
-    filter += tr("SVG Documents (*.svg)");
+    filter << tr("SVG Documents (*.svg)");
     allSupportedFormats += " *.svg";
 #endif
 #endif
-    filter += tr("Postscript Documents (*.ps)");
+    filter << tr("Postscript Documents (*.ps)");
     allSupportedFormats += " *.ps)";
 
     filter.insert(0, allSupportedFormats);
