@@ -105,7 +105,7 @@
     <message>
         <location line="+883"/>
         <source>Expected a bounds vector with 2 values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Es wird ein Grenzvektor mit 2 Werten erwartet</translation>
     </message>
     <message>
         <location line="-38"/>
@@ -153,12 +153,12 @@
     <message>
         <location line="+33"/>
         <source>File</source>
-        <translation type="unfinished">Datei</translation>
+        <translation>Datei</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>View</source>
-        <translation type="unfinished">Ansicht</translation>
+        <translation>Ansicht</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -188,13 +188,13 @@
     <message>
         <location line="+3"/>
         <source>Color palettes</source>
-        <translation type="unfinished">Farbpalette</translation>
+        <translation>Farbpalette</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+1"/>
         <source>Complex Switch</source>
-        <translation type="unfinished">Komplexe Werte ein- und ausschalten</translation>
+        <translation>Komplexe Werte</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -287,27 +287,27 @@
     <message>
         <location line="+3"/>
         <source>Color</source>
-        <translation type="unfinished">Farbe</translation>
+        <translation>Farbe</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Gray</source>
-        <translation type="unfinished">Grau</translation>
+        <translation>Grau</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Red</source>
-        <translation type="unfinished">Rot</translation>
+        <translation>Rot</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Green</source>
-        <translation type="unfinished">Grün</translation>
+        <translation>Grün</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Blue</source>
-        <translation type="unfinished">Blau</translation>
+        <translation>Blau</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -352,32 +352,32 @@
     <message>
         <location line="+2"/>
         <source>min &amp;&amp; max</source>
-        <translation type="unfinished">Min &amp;&amp; Max</translation>
+        <translation>Min &amp;&amp; Max</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>- &amp;&amp; min</source>
-        <translation type="unfinished">- &amp;&amp; Min</translation>
+        <translation>- &amp;&amp; Min</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>- &amp;&amp; max</source>
-        <translation type="unfinished">- &amp;&amp; Max</translation>
+        <translation>- &amp;&amp; Max</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>| &amp;&amp; min</source>
-        <translation type="unfinished">| &amp;&amp; Min</translation>
+        <translation>| &amp;&amp; Min</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>| &amp;&amp; max</source>
-        <translation type="unfinished">| &amp;&amp; Max</translation>
+        <translation>| &amp;&amp; Max</translation>
     </message>
     <message>
         <location line="+2836"/>
         <source>Could not activate the line cut.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der Linienschnitt kann nicht aktiviert werden.</translation>
     </message>
     <message>
         <location line="-2855"/>

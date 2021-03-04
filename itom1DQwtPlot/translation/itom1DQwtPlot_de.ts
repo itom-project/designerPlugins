@@ -104,7 +104,7 @@
     <message>
         <location line="+5"/>
         <source>Forward</source>
-        <translation type="unfinished">Vorwärts</translation>
+        <translation>Vorwärts</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -352,7 +352,7 @@
         <location line="+2"/>
         <location line="+7"/>
         <source>Grid</source>
-        <translation type="unfinished">Gitter</translation>
+        <translation>Gitter</translation>
     </message>
     <message>
         <location line="-3"/>
@@ -365,7 +365,7 @@
         <location line="+4"/>
         <location line="+5"/>
         <source>blue</source>
-        <translation type="unfinished">blau</translation>
+        <translation>blau</translation>
     </message>
     <message>
         <location line="-13"/>
@@ -373,7 +373,7 @@
         <location line="+4"/>
         <location line="+5"/>
         <source>green</source>
-        <translation type="unfinished">grün</translation>
+        <translation>grün</translation>
     </message>
     <message>
         <location line="-13"/>
@@ -381,7 +381,7 @@
         <location line="+4"/>
         <location line="+5"/>
         <source>red</source>
-        <translation type="unfinished">rot</translation>
+        <translation>rot</translation>
     </message>
     <message>
         <location line="+2984"/>
@@ -405,7 +405,7 @@
     <message>
         <location line="+293"/>
         <source>Manual Picker Selection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Manuelle Pickerwahl</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -434,7 +434,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
     <message>
         <location line="+65"/>
         <source>First Column</source>
-        <translation type="unfinished">Erste Spalte</translation>
+        <translation>Erste Spalte</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -454,18 +454,18 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
     <message>
         <location line="+10"/>
         <source>Auto Value</source>
-        <translation type="unfinished">Autowert</translation>
+        <translation>Autowert</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Gray Value</source>
-        <translation type="unfinished">Grauwert</translation>
+        <translation>Grauwert</translation>
     </message>
     <message>
         <location line="+729"/>
         <location line="+12"/>
         <source>gray</source>
-        <translation type="unfinished">grau</translation>
+        <translation>grau</translation>
     </message>
     <message>
         <location line="-4"/>

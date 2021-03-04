@@ -588,27 +588,32 @@
         <translation type="unfinished">Die Datei &apos;%s&apos; existiert bereits, kann aber nicht überschrieben werden. Evtl. ist diese Datei durch ein anderes Programm geöffnet.</translation>
     </message>
     <message>
-        <location line="+213"/>
+        <location line="+207"/>
+        <source>All Supported Files (</source>
+        <translation type="unfinished">Alle unterstützten Dateien (</translation>
+    </message>
+    <message>
+        <location line="+25"/>
         <source>PDF Documents (*.pdf)</source>
         <translation>PDF-Dokumente (*.pdf)</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>SVG Documents (*.svg)</source>
         <translation>SVG-Dokumente (*.svg)</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Postscript Documents (*.ps)</source>
         <translation>Postscript-Dateien (*.ps)</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-29"/>
         <source>Images (</source>
         <translation>Bilddateien (</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+41"/>
         <source>Export File Name</source>
         <translation>Speichern unter</translation>
     </message>
