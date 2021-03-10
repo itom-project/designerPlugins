@@ -3174,12 +3174,6 @@ void ItomQwtPlot::mnuActSave()
 
     static QString saveDefaultPath;
 
-#ifndef QT_NO_PRINTER
-    QString fileName = "plot.pdf";
-#else
-    QString fileName = "plot.png";
-#endif
-
     if (saveDefaultPath == "")
     {
         saveDefaultPath = QDir::currentPath();
@@ -3190,28 +3184,48 @@ void ItomQwtPlot::mnuActSave()
         QImageWriter::supportedImageFormats();
 
     QStringList filter;
-    filter += tr("PDF Documents (*.pdf)");
-#ifndef QWT_NO_SVG
-#ifdef QT_SVG_LIB
-    filter += tr("SVG Documents (*.svg)");
-#endif
-#endif
-    filter += tr("Postscript Documents (*.ps)");
+    QString allSupportedFormats = tr("All Supported Files (");
 
     if (imageFormats.size() > 0)
     {
         QString imageFilter(tr("Images ("));
+
         for (int i = 0; i < imageFormats.size(); i++)
         {
             if (i > 0)
+            {
                 imageFilter += " ";
+                allSupportedFormats += " ";
+            }
+
             imageFilter += "*.";
             imageFilter += imageFormats[i];
-        }
-        imageFilter += ")";
 
-        filter += imageFilter;
+            allSupportedFormats += "*.";
+            allSupportedFormats += imageFormats[i];
+        }
+
+        imageFilter += ")";
+        filter << imageFilter;
     }
+
+    filter << tr("PDF Documents (*.pdf)");
+    allSupportedFormats += " *.pdf";
+#ifndef QWT_NO_SVG
+#ifdef QT_SVG_LIB
+    filter << tr("SVG Documents (*.svg)");
+    allSupportedFormats += " *.svg";
+#endif
+#endif
+    filter << tr("Postscript Documents (*.ps)");
+    allSupportedFormats += " *.ps)";
+
+    filter.insert(0, allSupportedFormats);
+
+    // default fileName is the first of the all supported files list
+    QString fileName = "plot.";
+    fileName += imageFormats[0];
+
 
     QDir file(saveDefaultPath);
     fileName = QFileDialog::getSaveFileName(

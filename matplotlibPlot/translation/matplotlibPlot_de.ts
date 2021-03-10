@@ -17,17 +17,9 @@
 <context>
     <name>MatplotlibPlot</name>
     <message>
-        <source>home</source>
-        <translation type="vanished">Ansicht zurücksetzen</translation>
-    </message>
-    <message>
         <location filename="../matplotlibplot.cpp" line="+56"/>
         <source>Reset original view</source>
         <translation>Ursprüngliche Ansicht wiederherstellen</translation>
-    </message>
-    <message>
-        <source>forward</source>
-        <translation type="vanished">Wiederholen</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -35,26 +27,14 @@
         <translation>Wiederholen</translation>
     </message>
     <message>
-        <source>back</source>
-        <translation type="vanished">Rückgängig</translation>
-    </message>
-    <message>
         <location line="+5"/>
         <source>Back to previous view</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <source>move</source>
-        <translation type="vanished">Verschieben</translation>
-    </message>
-    <message>
         <location line="+7"/>
         <source>Pan axes with left mouse, zoom with right</source>
         <translation>Achsen verschieben mit linker Maustaste, zoomen mit rechter Maustaste</translation>
-    </message>
-    <message>
-        <source>zoom to rectangle</source>
-        <translation type="vanished">Zoom in Rechteck</translation>
     </message>
     <message>
         <location line="-20"/>
@@ -112,21 +92,9 @@
         <translation type="unfinished">Es wurde nichts zum Kopieren gefunden.</translation>
     </message>
     <message>
-        <source>marker</source>
-        <translation type="vanished">Positionsanzeiger</translation>
-    </message>
-    <message>
-        <source>subplot configuration...</source>
-        <translation type="vanished">Einstellungen...</translation>
-    </message>
-    <message>
         <location line="-174"/>
         <source>Configure subplots...</source>
         <translation>Einstellungen...</translation>
-    </message>
-    <message>
-        <source>save...</source>
-        <translation type="vanished">Speichern...</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -147,14 +115,6 @@
         <location line="+12"/>
         <source>matplotlib toolbar</source>
         <translation>Symbolleiste Matplotlib</translation>
-    </message>
-    <message>
-        <source>save</source>
-        <translation type="obsolete">Speichern</translation>
-    </message>
-    <message>
-        <source>MatPlotLib toolbar</source>
-        <translation type="obsolete">Symbolleiste MatPlotLib</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -186,10 +146,6 @@
         <location line="+4"/>
         <source>LGPL</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Live data source for plot</source>
-        <translation type="obsolete">Live-Datenquelle für die Anzeige</translation>
     </message>
 </context>
 <context>
@@ -261,14 +217,6 @@
         <location line="+43"/>
         <source>Spacing</source>
         <translation>Abstand</translation>
-    </message>
-    <message>
-        <source>hspace</source>
-        <translation type="vanished">Horizontal</translation>
-    </message>
-    <message>
-        <source>wspace</source>
-        <translation type="vanished">Vertikal</translation>
     </message>
 </context>
 </TS>
