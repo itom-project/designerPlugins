@@ -223,20 +223,22 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
         case ito::Shape::Point:
         case ito::Shape::MultiPointPick:    
             {
+                // the color of point markers must be the line color,
+                // since this is the color that can be defined by shape.color (if desired).
                 if (selected && (moveable | resizeable))
                 {
                     foreach(QwtPlotMarker* marker, d->m_marker)
                     {
-                        marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Star1 : QwtSymbol::XCross, QBrush(d->m_markerColor),
-                            QPen(QBrush(d->m_markerColor), selected ? 2 : 1), selected ? QSize(15, 15) : QSize(11, 11)));
+                        marker->setSymbol(new QwtSymbol(selected ? QwtSymbol::Star1 : QwtSymbol::XCross, QBrush(d->m_lineColor),
+                            QPen(QBrush(d->m_lineColor), selected ? 2 : 1), selected ? QSize(15, 15) : QSize(11, 11)));
                     }
                 }
                 else
                 {
                     foreach(QwtPlotMarker* marker, d->m_marker)
                     {
-                        marker->setSymbol(new QwtSymbol(QwtSymbol::XCross, QBrush(d->m_markerColor),
-                            QPen(QBrush(d->m_markerColor), 1), QSize(11, 11)));
+                        marker->setSymbol(new QwtSymbol(QwtSymbol::XCross, QBrush(d->m_lineColor),
+                            QPen(QBrush(d->m_lineColor), 1), QSize(11, 11)));
                     }
                 }
             }
