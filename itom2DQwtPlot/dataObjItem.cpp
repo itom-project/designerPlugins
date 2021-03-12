@@ -48,7 +48,7 @@ DataObjItem::~DataObjItem()
 QPen DataObjItem::contourPen(double level) const
 {
     QList<double> list(contourLevels());
-    qSort(list.begin(), list.end());
+    std::sort(list.begin(), list.end());
     double min = list.first();
     double max = list.last();
     double range = max - min;

@@ -716,7 +716,12 @@ int QwtDate::utcOffset( const QDateTime &dateTime )
         }
         case Qt::OffsetFromUTC:
         {
+#if QT_VERSION >= 0x050200
+            seconds = dateTime.offsetFromUtc();
+#else
             seconds = dateTime.utcOffset();
+#endif
+
             break;
         }
         default:

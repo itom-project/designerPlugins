@@ -67,7 +67,7 @@ public:
         if (!sizelist.contains(size))
         {
             sizelist.append(size);
-            qSort(sizelist);
+            std::sort(sizelist.begin(), sizelist.end());
         }
 
         QStringList sizeliststr;
