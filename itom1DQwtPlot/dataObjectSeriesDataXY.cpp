@@ -552,6 +552,7 @@ template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const 
     }
     return idx;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 int DataObjectSeriesDataXY::getPosToPix(const double physx, const double physy) const
 {
@@ -585,4 +586,21 @@ int DataObjectSeriesDataXY::getPosToPix(const double physx, const double physy) 
         break;
     }
     return idx;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+bool DataObjectSeriesDataXY::floatingPointXValues() const
+{
+    if (m_pXVec)
+    {
+        switch (m_pXVec->getType())
+        {
+        case ito::tFloat32:
+        case ito::tFloat64:
+        case ito::tComplex64:
+        case ito::tComplex128:
+            return true;
+        }
+    }
+    return false;
 }

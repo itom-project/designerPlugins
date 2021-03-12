@@ -283,7 +283,9 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
     const DataObjectSeriesData *d_objseries = dynamic_cast<const DataObjectSeriesData*>( data() );
     const DataObjectSeriesDataXY *d_objseriesXY = dynamic_cast<const DataObjectSeriesDataXY*>(d_objseries);
 
-    if (d_objseries && d_objseries->floatingPointValues())
+    if (d_objseries && 
+        (d_objseries->floatingPointValues() ||
+        (d_objseriesXY && d_objseriesXY->floatingPointXValues())))
     {
         QPolygonF polyline;
         polyline.reserve(size);
@@ -402,12 +404,12 @@ void QwtPlotCurveDataObject::drawSymbols( QPainter *painter, const QwtSymbol &sy
 
     const bool doAlign = QwtPainter::roundingAlignment( painter );
 
-    const int chunkSize = 500;
-
     const DataObjectSeriesData *d_objseries = dynamic_cast<const DataObjectSeriesData*>( data() );
     const DataObjectSeriesDataXY *d_objseriesXY = dynamic_cast<const DataObjectSeriesDataXY*>(d_objseries);
 
-    if(d_objseries->floatingPointValues())
+    if (d_objseries &&
+        (d_objseries->floatingPointValues() ||
+        (d_objseriesXY && d_objseriesXY->floatingPointXValues())))
     {
         QPolygonF polyline;
         polyline.reserve(size);

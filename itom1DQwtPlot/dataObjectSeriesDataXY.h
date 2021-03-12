@@ -53,6 +53,8 @@ public:
         QPointF sample(size_t n) const;
         inline QByteArray getHash() const { return m_hash; }
 
+        bool floatingPointXValues() const;
+
 private:
 
     void calcHash();
