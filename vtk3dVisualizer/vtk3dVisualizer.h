@@ -366,6 +366,8 @@ public slots:
 
 private slots:
     void itemClicked(QTreeWidgetItem *item, int column);
+    void updateCanvas();
+    void updateCanvasImmediately();
 
 signals:
     void pointPicked(float x, float y, float z, int pointIndex);

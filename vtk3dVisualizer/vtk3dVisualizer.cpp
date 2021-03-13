@@ -64,6 +64,8 @@
 
 #include "common/apiFunctionsInc.h"
 
+#include <qtimer.h>
+
 #if PCL_VERSION_COMPARE(>=,1,7,0)
     #include <vtkRenderWindow.h>
 #endif
@@ -90,7 +92,8 @@ public:
         backgroundColor(Qt::black),
         coordinateSysScale(1.0),
         coordinateSysVisible(true),
-        coordinateSysPos(0,0,0)
+        coordinateSysPos(0,0,0),
+        canvasUpdateQueued(false)
     {}
     
     double pointPickSphereRadius;
@@ -127,6 +130,8 @@ public:
     QVector3D coordinateSysPos;
 
     QMap<QByteArray, QAction*> actions;
+
+    bool canvasUpdateQueued;
 };
 
 
@@ -200,7 +205,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     //create root for meshes
     d->meshItem = new QTreeWidgetItem();
     SharedItemPtr i1 = QSharedPointer<Item>( new Item("mesh", Item::rttiRoot, d->meshItem) );
-    connect(i1.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+    connect(i1.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
     d->meshItem->setData(0, Qt::DisplayRole, "mesh");
     d->meshItem->setData(0, Item::itemRole, QVariant::fromValue(i1) );
     d->treeWidget->addTopLevelItem( d->meshItem );
@@ -208,7 +213,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     //create root for point clouds
     d->cloudItem = new QTreeWidgetItem();
     SharedItemPtr i2 = QSharedPointer<Item>( new Item("clouds", Item::rttiRoot, d->cloudItem) );
-    connect(i2.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+    connect(i2.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
     d->cloudItem->setData(0, Qt::DisplayRole, "clouds");
     d->cloudItem->setData(0, Item::itemRole, QVariant::fromValue(i2) );
     d->treeWidget->addTopLevelItem( d->cloudItem );
@@ -216,7 +221,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     //create root for geometries
     d->geometryItem = new QTreeWidgetItem();
     SharedItemPtr i3 = QSharedPointer<Item>( new Item("geometries", Item::rttiRoot, d->geometryItem) );
-    connect(i3.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+    connect(i3.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
     d->geometryItem->setData(0, Qt::DisplayRole, "geometries");
     d->geometryItem->setData(0, Item::itemRole, QVariant::fromValue(i3) );
     d->treeWidget->addTopLevelItem( d->geometryItem );
@@ -514,7 +519,7 @@ ito::RetVal Vtk3dVisualizer::addPointCloud(ito::PCLPointCloud pc, const QString 
             retval += ((ItemPointCloud*)(i.data()))->addPointCloud(pc);
         }
 
-        connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+        connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
         item->setData(0, Item::itemRole, QVariant::fromValue(i));
 
     }
@@ -568,7 +573,7 @@ ito::RetVal Vtk3dVisualizer::addPointCloudNormal(ito::PCLPointCloud pcl, const Q
 
         if (!retval.containsError())
         {
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             item->setData(0, Item::itemRole, QVariant::fromValue(i));
         }
 
@@ -660,7 +665,7 @@ ito::RetVal Vtk3dVisualizer::addCylinder(QVector<double> point, QVector<double> 
         }        
         SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
         item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-        connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+        connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
         ((ItemGeometry*)(i.data()))->addCylinder(coefficients, color);
     }
 
@@ -705,7 +710,7 @@ ito::RetVal Vtk3dVisualizer::addPyramid(const ito::DataObject &points, const QSt
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             ((ItemGeometry*)(i.data()))->addPyramid(points2, color);
         }
 
@@ -753,7 +758,7 @@ ito::RetVal Vtk3dVisualizer::addCuboid(const ito::DataObject &points, const QStr
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             ((ItemGeometry*)(i.data()))->addCuboid(points2, color);
         }
 
@@ -840,7 +845,7 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             ((ItemGeometry*)(i.data()))->addCube(s, trafo, color);
         }
 
@@ -915,7 +920,7 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             ((ItemGeometry*)(i.data()))->addSphere(center, radius, color);
         }
 
@@ -971,7 +976,7 @@ ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QSt
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             ((ItemGeometry*)(i.data()))->addPolygon(cloud, color);
         }
 
@@ -1013,7 +1018,7 @@ ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int
         }        
         SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
         item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-        connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+        connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
         ((ItemGeometry*)(i.data()))->addText(text, x, y, fontsize, color);
     }
 
@@ -1088,7 +1093,7 @@ ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QStri
             }        
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             ((ItemGeometry*)(i.data()))->addLines(points2, color);
         }
 
@@ -1237,7 +1242,7 @@ ito::RetVal Vtk3dVisualizer::addMesh(ito::PCLPolygonMesh mesh, const QString &fu
             }
         
             SharedItemPtr i = SharedItemPtr(new ItemPolygonMesh(d->PCLVis, fullname, item));
-            connect(i.data(), SIGNAL(updateCanvasRequest()), d->pclCanvas, SLOT(update()));
+            connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             retval += ((ItemPolygonMesh*)(i.data()))->addPolygonMesh(mesh);
 
             item->setData(0, Item::itemRole, QVariant::fromValue(i));
@@ -2367,7 +2372,7 @@ void Vtk3dVisualizer::setParallelProjection(const bool& on)
     updatePropertyDock();
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------
 void Vtk3dVisualizer::createActions()
 {
     QAction *a = NULL;
@@ -2378,4 +2383,31 @@ void Vtk3dVisualizer::createActions()
     a->setIcon(QIcon(":/vtk3dVisualizer/icons/itemsSettings.png"));
     d->actions["itemsDock"] = a = d->dockItems->toggleViewAction();
     a->setIcon(QIcon(":/vtk3dVisualizer/icons/items.png"));
+}
+
+//-------------------------------------------------------------------------------------
+void Vtk3dVisualizer::updateCanvas()
+{
+    //old opengl
+    //d->pclCanvas->update();
+
+    //new opengl
+    if (!d->canvasUpdateQueued)
+    {
+        // the following delayed update should avoid updating to often if
+        // many things are changed at almost the same time.
+        d->canvasUpdateQueued = true;
+        QTimer::singleShot(10, this, &Vtk3dVisualizer::updateCanvasImmediately);
+    }
+}
+
+//-------------------------------------------------------------------------------------
+void Vtk3dVisualizer::updateCanvasImmediately()
+{
+    // old opengl
+    // d->pclCanvas->update();
+
+    //new opengl
+    d->canvasUpdateQueued = false;
+    d->pclCanvas->GetRenderWindow()->Render();
 }
