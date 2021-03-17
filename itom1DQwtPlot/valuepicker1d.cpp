@@ -35,7 +35,27 @@ ValuePicker1D::~ValuePicker1D()
 
 QwtText ValuePicker1D::trackerTextF( const QPointF &pos ) const
 {
-    QString text = QString("x: %1, y: %2").arg(pos.x(), 0, 'g', 3).arg(pos.y(), 0, 'g', 3);
+    QString x, y;
+
+    if (pos.x() < 100000)
+    {
+        x = QString::number(pos.x(), 'f', 3);
+    }
+    else
+    {
+        x = QString::number(pos.x(), 'g', 5);
+    }
+
+    if (pos.y() < 100000)
+    {
+        y = QString::number(pos.y(), 'f', 3);
+    }
+    else
+    {
+        y = QString::number(pos.y(), 'g', 5);
+    }
+
+    QString text = QString("x: %1, y: %2").arg(x, y);
     return text;
 }
 

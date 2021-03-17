@@ -3211,13 +3211,25 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
                 }
             }
 
+            auto floatformat = [](auto& value) 
+            { 
+                if (value < 100000)
+                {
+                    return QString::number(value, 'f', 3);
+                }
+                else
+                {
+                    return QString::number(value, 'g', 5);
+                }
+            };
+
             if (yIntegerType)
             {
                 yCoord = QString("%1").arg(points[i].ry(), 0, 'f', 0);
             }
             else
             {
-                yCoord = QString("%1").arg(points[i].ry(), 0, 'g', 3);
+                yCoord = floatformat(points[i].ry());
             }
 
             if (xIntegerType)
@@ -3226,7 +3238,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             }
             else
             {
-                xCoord = QString("%1").arg(points[i].rx(), 0, 'g', 3);
+                xCoord = floatformat(points[i].rx());
             }
 
             coordTexts << QString("[%1; %2]").arg(xCoord, yCoord);
