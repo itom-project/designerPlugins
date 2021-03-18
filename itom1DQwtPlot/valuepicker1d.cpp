@@ -37,7 +37,7 @@ QwtText ValuePicker1D::trackerTextF( const QPointF &pos ) const
 {
     QString x, y;
 
-    if (pos.x() < 100000)
+    if (std::abs(pos.x()) < 100000)
     {
         x = QString::number(pos.x(), 'f', 3);
     }
@@ -46,7 +46,7 @@ QwtText ValuePicker1D::trackerTextF( const QPointF &pos ) const
         x = QString::number(pos.x(), 'g', 5);
     }
 
-    if (pos.y() < 100000)
+    if (std::abs(pos.y()) < 100000)
     {
         y = QString::number(pos.y(), 'f', 3);
     }
