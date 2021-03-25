@@ -315,7 +315,7 @@ void DataObjectTable::copySelectionToClipboard()
     QStringList items;
     int currentRow = 0;
     QModelIndexList selected = selectedIndexes();
-    qSort(selected.begin(), selected.end(), sortByRowAndColumn);
+    std::sort(selected.begin(), selected.end(), sortByRowAndColumn);
 
     if (selected.size() > 0)
     {
