@@ -23,7 +23,6 @@ option(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
 option(PLUGIN_itomIsoGLFigurePlugin "Build with this solution." ON)
 option(PLUGIN_matplotlibPlot "Build with this solution." ON)
 option(PLUGIN_motorController "Build with this solution." ON)
-option(PLUGIN_dataObjectTable "Build with this solution." ON)
 option(PLUGIN_dObMetaDataTable "Build with this solution." ON)
 option(PLUGIN_evaluateGeometrics "Build with this solution." ON)
 option(PLUGIN_vtk3dVisualizer "Build with this solution." ON)
@@ -56,10 +55,6 @@ endif()
 
 if(PLUGIN_motorController)
     add_subdirectory(motorController)
-endif()
-
-if(PLUGIN_dataObjectTable)
-    add_subdirectory(dataObjectTable)
 endif()
 
 if(PLUGIN_dObMetaDataTable)
