@@ -3211,7 +3211,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
                 }
             }
 
-            auto floatformat = [](auto& value) 
+            auto floatformat = [](const auto& value) 
             { 
                 if (std::abs(value) < 100000)
                 {
@@ -3229,7 +3229,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             }
             else
             {
-                yCoord = floatformat(points[i].ry());
+                yCoord = floatformat(points[i].y());
             }
 
             if (xIntegerType)
@@ -3238,7 +3238,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             }
             else
             {
-                xCoord = floatformat(points[i].rx());
+                xCoord = floatformat(points[i].x());
             }
 
             coordTexts << QString("[%1; %2]").arg(xCoord, yCoord);
