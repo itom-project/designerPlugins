@@ -3211,7 +3211,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
                 }
             }
 
-            auto floatformat = [](const auto& value) 
+            QString floatformat = [](const qreal& value) 
             { 
                 if (std::abs(value) < 100000)
                 {
