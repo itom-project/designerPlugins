@@ -560,9 +560,9 @@ void QwtThermo::drawLiquid(
         QVector<double> values = qwtTickList( scaleDraw()->scaleDiv() );
 
         if ( scaleMap.isInverting() )
-            std::sort( values.begin(), values.end(), std::greater<double>() );
+            qSort( values.begin(), values.end(), qGreater<double>() );
         else
-            std::sort( values.begin(), values.end(), std::less<double>() );
+            qSort( values.begin(), values.end(), qLess<double>() );
 
         int from;
         if ( !values.isEmpty() )
