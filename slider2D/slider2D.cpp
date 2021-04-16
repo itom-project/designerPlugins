@@ -45,6 +45,7 @@
 #include <QLineF>
 #include <qmath.h>
 #include <cmath>
+#include <QtGui/qpainterpath.h>
 
 enum Mouse_Status
 {
