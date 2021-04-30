@@ -484,7 +484,7 @@ ito::RetVal Vtk3dVisualizer::addPointCloud(ito::PCLPointCloud pc, const QString 
     QTreeWidgetItem *parent;
 
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->geometryItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -545,7 +545,7 @@ ito::RetVal Vtk3dVisualizer::addPointCloudNormal(ito::PCLPointCloud pcl, const Q
     QTreeWidgetItem *parent;
 
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->geometryItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -641,7 +641,7 @@ ito::RetVal Vtk3dVisualizer::addCylinder(QVector<double> point, QVector<double> 
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -712,7 +712,7 @@ ito::RetVal Vtk3dVisualizer::addPyramid(const ito::DataObject &points, const QSt
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -769,7 +769,7 @@ ito::RetVal Vtk3dVisualizer::addCuboid(const ito::DataObject &points, const QStr
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -826,7 +826,7 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -938,7 +938,7 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -1004,7 +1004,7 @@ ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QSt
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -1069,7 +1069,7 @@ ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -1147,7 +1147,7 @@ ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QStri
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
@@ -1304,7 +1304,7 @@ ito::RetVal Vtk3dVisualizer::addMesh(ito::PCLPolygonMesh mesh, const QString &fu
 {
     QTreeWidgetItem *parent;
     bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
-    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->geometryItem, &parent) == ito::retOk);
+    nameAlreadyInUse |= (bool)(searchRecursiveTree(fullname, d->geometryItem, &parent) == ito::retOk);
 
     if (nameAlreadyInUse)
     {
