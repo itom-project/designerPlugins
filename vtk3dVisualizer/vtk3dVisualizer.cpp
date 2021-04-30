@@ -482,6 +482,15 @@ ito::RetVal Vtk3dVisualizer::addPointCloud(ito::PCLPointCloud pc, const QString 
 {
     ito::RetVal retval;
     QTreeWidgetItem *parent;
+
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->geometryItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     QString name = fullname;
     retval += createRecursiveTree(name, d->cloudItem, &parent);
 
@@ -534,6 +543,15 @@ ito::RetVal Vtk3dVisualizer::addPointCloudNormal(ito::PCLPointCloud pcl, const Q
 {
     ito::RetVal retval;
     QTreeWidgetItem *parent;
+
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->geometryItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     QString name = fullname;
     retval += createRecursiveTree(name, d->cloudItem, &parent);
 
@@ -621,12 +639,28 @@ ito::RetVal Vtk3dVisualizer::updatePointCloud(ito::PCLPointCloud pcl, const QStr
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addCylinder(QVector<double> point, QVector<double> orientation, double radius, const QString &fullname, const QColor &color /*= Qt::white*/)
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
     pcl::ModelCoefficients coefficients;
     coefficients.values.resize(7);
 
-    if(point.size() != 3) return ito::RetVal(ito::retError);
-    if(orientation.size() != 3) return ito::RetVal(ito::retError);
+    if (point.size() != 3)
+    {
+        return ito::RetVal(ito::retError, 0, "Point must have three components");
+    }
+
+    if (orientation.size() != 3)
+    {
+        return ito::RetVal(ito::retError, 0, "Orientation must have three components");
+    }
 
     coefficients.values[0] = point[0];
     coefficients.values[1] = point[1];
@@ -638,7 +672,6 @@ ito::RetVal Vtk3dVisualizer::addCylinder(QVector<double> point, QVector<double> 
 
     coefficients.values[6] = radius;
 
-    QTreeWidgetItem *parent;
     QString name = fullname;
 
     retval += createRecursiveTree(name, d->geometryItem, &parent);
@@ -677,6 +710,15 @@ ito::RetVal Vtk3dVisualizer::addCylinder(QVector<double> point, QVector<double> 
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addPyramid(const ito::DataObject &points, const QString &fullname, const QColor &color /*= Qt::white*/) //points must be a 3x5 float matrix
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
     int sizes[] = {3,3,5,5};
     ito::DataObject *points2 = apiCreateFromDataObject(&points, 2, ito::tFloat32, sizes, &retval);
@@ -725,6 +767,15 @@ ito::RetVal Vtk3dVisualizer::addPyramid(const ito::DataObject &points, const QSt
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addCuboid(const ito::DataObject &points, const QString &fullname, const QColor &color /*= Qt::white*/)  //points must be a 3x8 float matrix
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
     int sizes[] = {3,3,8,8};
     ito::DataObject *points2 = apiCreateFromDataObject(&points, 2, ito::tFloat32, sizes, &retval);
@@ -773,6 +824,15 @@ ito::RetVal Vtk3dVisualizer::addCuboid(const ito::DataObject &points, const QStr
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> translation, QVector<double> rotation, const QString &fullname, const QColor &color /*= Qt::white*/)
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
 
     float x,y,z;
@@ -876,6 +936,15 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, const QString &fullname, const QColor &color /*= Qt::red*/)
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
 
     pcl::PointXYZ center;
@@ -933,6 +1002,15 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QString &fullname, const QColor &color /*= Qt::red*/)
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
 
     ito::DataObject points2 = ito::dObjHelper::squeezeConvertCheck2DDataObject(&points, "points", ito::Range(1,std::numeric_limits<int>::max()), ito::Range(3,3), retval, ito::tFloat32, 0);
@@ -989,9 +1067,16 @@ ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QSt
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int y, const int fontsize, const QString &fullname, const QColor &color /*= Qt::white*/)
 {
-    ito::RetVal retval;
-
     QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
+    ito::RetVal retval;
     QString name = fullname;
 
     retval += createRecursiveTree(name, d->geometryItem, &parent);
@@ -1060,6 +1145,15 @@ ito::RetVal Vtk3dVisualizer::updateText(const QString &text, const int x, const 
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QString &fullname, const QColor &color /*= Qt::red*/)
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->meshItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
     int sizes[] = {1,10000000,6,6};
     ito::DataObject *points2 = apiCreateFromDataObject(&points, 2, ito::tFloat32, sizes, &retval);
@@ -1208,6 +1302,15 @@ void Vtk3dVisualizer::registerModel(ito::PCLPolygonMesh mesh, QString modelName)
 //-------------------------------------------------------------------------------------
 ito::RetVal Vtk3dVisualizer::addMesh(ito::PCLPolygonMesh mesh, const QString &fullname)
 {
+    QTreeWidgetItem *parent;
+    bool nameAlreadyInUse = searchRecursiveTree(fullname, d->cloudItem, &parent) == ito::retOk;
+    nameAlreadyInUse |= (searchRecursiveTree(fullname, d->geometryItem, &parent) == ito::retOk);
+
+    if (nameAlreadyInUse)
+    {
+        return ito::RetVal(ito::retError, 0, "The given name is already used in another item group.");
+    }
+
     ito::RetVal retval;
 
     if (mesh.valid() == false)
