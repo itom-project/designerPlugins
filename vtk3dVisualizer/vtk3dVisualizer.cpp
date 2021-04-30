@@ -127,6 +127,7 @@ public:
     QVector3D coordinateSysPos;
 
     QMap<QByteArray, QAction*> actions;
+    QString title;
 };
 
 
@@ -258,9 +259,9 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     //initialize actions
     QToolBar *mainTb = new QToolBar(tr("toolbars"), this);
     addToolBar(mainTb, "toolbars");
-    mainTb->addAction(d->actions["propertyDock"]);
-    mainTb->addAction(d->actions["settingsDock"]);
     mainTb->addAction(d->actions["itemsDock"]);
+    mainTb->addAction(d->actions["settingsDock"]);
+    mainTb->addAction(d->actions["propertyDock"]);
 
     //redirect any vtk warnings or errors to a log-file vtk_errors.txt in the current directory.
     //If desired, the vtkOutputWindow class can also be derived in order to redirect
@@ -2362,6 +2363,23 @@ void Vtk3dVisualizer::setParallelProjection(const bool& on)
     d->PCLVis->getRendererCollection()->GetFirstRenderer()->GetActiveCamera()->SetParallelProjection(on ? 1 : 0);
     d->pclCanvas->update();
     updatePropertyDock();
+}
+
+//-----------------------------------------------------------------------
+QString Vtk3dVisualizer::getTitle() const
+{
+    return d->title;
+}
+
+//-----------------------------------------------------------------------
+void Vtk3dVisualizer::setTitle(const QString& title)
+{
+    if (title != d->title)
+    {
+        this->setWindowTitleExtension(title);
+        d->title = title;
+    }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
