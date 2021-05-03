@@ -53,7 +53,14 @@ ItemPolygonMesh::~ItemPolygonMesh()
 //-------------------------------------------------------------------------------------------
 ito::RetVal ItemPolygonMesh::addPolygonMesh(const ito::PCLPolygonMesh &mesh)
 {
-    m_visualizer->addPolygonMesh( *(mesh.polygonMesh().get()), m_name.toStdString() );
+    const pcl::PolygonMesh &mesh_ = *(mesh.polygonMesh().get());
+
+    if (mesh_.polygons.size() == 0)
+    {
+        return ito::RetVal(ito::retError, 0, "The polygon mesh must contain at least one polygon.");
+    }
+
+    m_visualizer->addPolygonMesh(mesh_, m_name.toStdString() );
     m_mesh = mesh;
     return ito::retOk;
 }
