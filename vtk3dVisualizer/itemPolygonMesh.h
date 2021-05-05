@@ -47,7 +47,6 @@ class ItemPolygonMesh : public Item
     Q_PROPERTY(Interpolation Interpolation READ interpolation WRITE setInterpolation DESIGNABLE true USER true);
     Q_PROPERTY(Culling Culling READ culling WRITE setCulling DESIGNABLE true USER true);
     Q_PROPERTY(bool EdgeVisibility READ edgeVisibility WRITE setEdgeVisibility DESIGNABLE true USER true);
-    //Q_PROPERTY(int Fun READ fun WRITE setFun DESIGNABLE true USER true);
     Q_PROPERTY(int Opacity READ opacity WRITE setOpacity DESIGNABLE true USER true);
     Q_CLASSINFO("Opacity", "minimum=0;maximum=100;singleStep=1;");
     Q_PROPERTY(ColorMode ColorMode READ colorMode WRITE setColorMode DESIGNABLE true USER true);
