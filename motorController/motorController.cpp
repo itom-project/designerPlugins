@@ -575,7 +575,7 @@ void MotorController::triggerUpdatePosition(void)
         int axisNumbers = 0;
         ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
 
-        QSharedPointer<ito::Param> qsParam(new ito::Param("numaxis"));
+        QSharedPointer<ito::Param> qsParam(new ito::Param("numaxis", ito::ParamBase::Int));
         QMetaObject::invokeMethod(m_pActuator, "getParam", Q_ARG(QSharedPointer<ito::Param>, qsParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore()));
 
         while (!locker.getSemaphore()->wait(500))
