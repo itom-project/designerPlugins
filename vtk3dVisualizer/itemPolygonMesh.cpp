@@ -34,7 +34,7 @@ ItemPolygonMesh::ItemPolygonMesh(boost::shared_ptr<pcl::visualization::PCLVisual
     m_representation(Surface),
     m_interpolation(Flat),
     m_culling(ShowAll),
-    m_edgeVisibility(true),
+    m_edgeVisibility(false),
     m_opacity(100),
     m_colorMode(RGB),
     m_colorMap(gray),

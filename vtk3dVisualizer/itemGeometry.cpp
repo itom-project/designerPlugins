@@ -417,7 +417,7 @@ void ItemGeometry::setVisible(bool value)
 {
     m_visible = value;
 
-    double val = value ? 1.0 : 0.0;
+    double val = value ? ((double)m_opacity / 100.0) : 0.0;
 
     if (m_geometryType == tText)
     {
@@ -622,9 +622,12 @@ void ItemGeometry::setLineWidth(double value)
 }
 
 //-------------------------------------------------------------------------------------------
-void ItemGeometry::setOpacity(double value)
+void ItemGeometry::setOpacity(int value)
 {
-    value = qBound(0.0, value, 1.0);
+    value = qBound(0, value, 100);
+
+    double v_ = (double)value / 100.0;
+
     if (m_geometryType == tText)
     {
         vtkTextActor *ta;
@@ -633,7 +636,7 @@ void ItemGeometry::setOpacity(double value)
             ta = vtkTextActor::SafeDownCast(p);
             if (ta)
             {
-                ta->GetProperty()->SetOpacity(value);
+                ta->GetProperty()->SetOpacity(v_);
             }
         }
     }
@@ -641,7 +644,7 @@ void ItemGeometry::setOpacity(double value)
     {
         if (m_nrOfShapes == 1)
         {
-            m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, value, m_name.toStdString());
+            m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, v_, m_name.toStdString());
         }
         else
         {
@@ -649,7 +652,7 @@ void ItemGeometry::setOpacity(double value)
             for (int i = 0; i < m_nrOfShapes; ++i)
             {
                 name = QString("%1_%2").arg(m_name).arg(i);
-                m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, value, name.toStdString());
+                m_visualizer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, v_, name.toStdString());
             }
         }
     }
@@ -663,12 +666,14 @@ void ItemGeometry::setOpacity(double value)
 void ItemGeometry::setSpecular(double value)
 {
     value = qBound(0.0, value, 1.0);
+
     if (m_geometryType != tText && m_geometryType != tCuboid && m_geometryType != tLines)
     {
         vtkActor *a;
         foreach (vtkProp *p, getSafeActors())
         {
             a = vtkActor::SafeDownCast(p);
+
             if (a)
             {
                 a->GetProperty()->SetSpecular(value);
@@ -685,6 +690,7 @@ void ItemGeometry::setSpecular(double value)
 void ItemGeometry::setSpecularPower(double value)
 {
     value = qBound(0.0, value, 1.0);
+
     if (m_geometryType != tText && m_geometryType != tCuboid && m_geometryType != tLines)
     {
         vtkActor *a;

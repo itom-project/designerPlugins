@@ -41,13 +41,16 @@ class ItemGeometry : public Item
     //Q_PROPERTY(bool selected READ selected WRITE setSelected DESIGNABLE true USER true);
     //Q_PROPERTY(int PointSize READ pointSize WRITE setPointSize DESIGNABLE true USER true);
     Q_PROPERTY(double LineWidth READ lineWidth WRITE setLineWidth DESIGNABLE true USER true);
-    Q_PROPERTY(double Opacity READ opacity WRITE setOpacity DESIGNABLE true USER true);
+    Q_PROPERTY(int Opacity READ opacity WRITE setOpacity DESIGNABLE true USER true);
+    Q_CLASSINFO("Opacity", "minimum=0;maximum=100;singleStep=1;");
     Q_PROPERTY(bool Lighting READ lighting WRITE setLighting DESIGNABLE true USER true);
     Q_PROPERTY(Representation Representation READ representation WRITE setRepresentation DESIGNABLE true USER true);
     Q_PROPERTY(Interpolation Interpolation READ interpolation WRITE setInterpolation DESIGNABLE true USER true);
     Q_PROPERTY(QColor LineColor READ lineColor WRITE setLineColor DESIGNABLE true USER true);
     Q_PROPERTY(double Specular READ specular WRITE setSpecular DESIGNABLE true USER true);
+    Q_CLASSINFO("Specular", "minimum=0.0;maximum=1.0;singleStep=0.1;");
     Q_PROPERTY(double SpecularPower READ specularPower WRITE setSpecularPower DESIGNABLE true USER true);
+    Q_CLASSINFO("SpecularPower", "minimum=0.0;maximum=1.0;singleStep=0.1;");
     Q_PROPERTY(QColor SpecularColor READ specularColor WRITE setSpecularColor DESIGNABLE true USER true);
 
 public:
@@ -89,8 +92,8 @@ public:
     double lineWidth() const { return m_lineWidth; }
     void setLineWidth(double value);
 
-    double opacity() const { return m_opacity; }
-    void setOpacity(double value);
+    int opacity() const { return m_opacity; }
+    void setOpacity(int value);
 
     bool lighting() const { return m_lighting; }
     void setLighting(bool value);
@@ -116,7 +119,7 @@ protected:
     Representation m_representation;
     QColor m_lineColor;
     double m_lineWidth;
-    double m_opacity;
+    int m_opacity;
     Interpolation m_interpolation;
     QVector<vtkProp*> m_actors; //reference to actor(s), this is a guess since no access to the shapeactormap of m_visualizer is available. don't use this, always get the actor using getSafeActor.
     bool m_lighting;
