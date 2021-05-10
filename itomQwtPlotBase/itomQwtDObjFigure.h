@@ -56,6 +56,7 @@
 class ItomQwtPlot;
 class ItomQwtDObjFigurePrivate;
 class ParamEditorWidget;
+class QWidgetAction;
 
 
 class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
@@ -408,6 +409,7 @@ public:
     QDockWidget *pickerDockWidget() const;
     QDockWidget *shapesDockWidget() const;
     QDockWidget *dObjectDockWidget() const;
+    QWidgetAction *actCameraChannelSelector() const;
 
     friend ItomQwtPlot;
 
@@ -429,7 +431,6 @@ public Q_SLOTS:
 
     ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
-
     void replot();
  
 private Q_SLOTS:
@@ -442,6 +443,7 @@ protected:
     inline PlotInfoDObject* dObjectWidget(void) const { return m_pObjectInfo; }
     QDockWidget* cameraParamEditorDockWidget() const;
     ParamEditorWidget* cameraParamEditorWidget() const;
+
 
     void addToolbarsAndMenus();
     

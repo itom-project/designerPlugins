@@ -244,6 +244,10 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     mainTb->addSeparator();
     mainTb->addAction(m_pActProperties);
     mainTb->addAction(m_pActCamParameters);
+    if (parent)
+    {
+        mainTb->addAction(parent->actCameraChannelSelector());
+    }
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
@@ -267,6 +271,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
     mainTb->addAction(m_pActCoordinates);
+
 
     QMenu *menuFile = new QMenu(tr("File"), guiParent);
     menuFile->addAction(m_pActSave);
@@ -741,6 +746,8 @@ void PlotCanvas::createActions()
     m_pActPlaneSelector->setObjectName("planeSelector");
     m_pActPlaneSelector->setVisible(false);
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuPlaneSelector(int)));
+
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

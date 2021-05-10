@@ -40,6 +40,7 @@
 #include <qprintpreviewdialog.h>
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
+#include <qwidgetaction.h>
 
 #include "itomPlotZoomer.h"
 #include "itomPlotMagnifier.h"
@@ -212,6 +213,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
         m_pActCamParameters = parent->cameraParamEditorDockWidget()->toggleViewAction();
         m_pActCamParameters->setVisible(false);
     }
+    
 }
 
 //---------------------------------------------------------------------------
@@ -345,6 +347,8 @@ void ItomQwtPlot::createBaseActions()
     m_pActShapeType->setCheckable(true);
     connect(m_pMenuShapeType, SIGNAL(triggered(QAction*)), this, SLOT(mnuGroupShapeTypes(QAction*)));
     connect(m_pActShapeType, SIGNAL(triggered(bool)), this, SLOT(mnuShapeType(bool)));
+
+
 }
 
 //---------------------------------------------------------------------------

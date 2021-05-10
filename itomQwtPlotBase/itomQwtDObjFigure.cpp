@@ -33,9 +33,13 @@
 #include <qapplication.h>
 #include <qtoolbar.h>
 #include <qfileinfo.h>
+#include <qwidgetaction.h>
+#include <qcombobox.h>
+#include "common/addInGrabber.h"
 
 #include "DataObject/dataobj.h"
 #include "itomQwtPlot.h"
+#include "common/byteArray.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_renderer.h>
@@ -57,7 +61,8 @@ public:
         m_pObjectInfoDock(NULL),
         m_pCameraParamEditorDock(NULL),
         m_pCameraParamEditorWidget(NULL),
-        m_allowCameraParamEditor(true)
+        m_allowCameraParamEditor(true),
+        m_pActCameraChannelSelector(NULL)
     {}
     
     QDockWidget *m_pMarkerDock;
@@ -67,6 +72,7 @@ public:
     QDockWidget *m_pCameraParamEditorDock;
     ParamEditorWidget *m_pCameraParamEditorWidget;
     bool m_allowCameraParamEditor;
+    QWidgetAction *m_pActCameraChannelSelector;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -139,7 +145,12 @@ void ItomQwtDObjFigure::construct()
     d->m_pCameraParamEditorDock->setWidget(d->m_pCameraParamEditorWidget);
     connect(d->m_pCameraParamEditorDock, &QDockWidget::visibilityChanged, this, &ItomQwtDObjFigure::cameraParamEditorVisibilityChanged);
 
-
+    d->m_pActCameraChannelSelector = new QWidgetAction(this);
+    QComboBox* channelSelector = new QComboBox(this);
+    d->m_pActCameraChannelSelector->setDefaultWidget(channelSelector);
+    d->m_pActCameraChannelSelector->setObjectName("actChannelSelector");
+    d->m_pActCameraChannelSelector->setToolTip(tr("Select channel of connected grabber"));
+    d->m_pActCameraChannelSelector->setVisible(false);
 	
 
 	addToolbox(d->m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
@@ -780,13 +791,52 @@ ParamEditorWidget* ItomQwtDObjFigure::cameraParamEditorWidget() const
 {
     return d->m_pCameraParamEditorWidget;
 }
-
+//-------------------------------------------------------------------------------------
+QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
+{
+    return d->m_pActCameraChannelSelector;
+}
 //-------------------------------------------------------------------------------------
 /*virtual*/ ito::RetVal ItomQwtDObjFigure::setCamera(QPointer<ito::AddInDataIO> camera)
 {
     ito::RetVal retval = AbstractDObjFigure::setCamera(camera);
     ParamEditorWidget *pew = cameraParamEditorWidget();
     QDockWidget *dw = cameraParamEditorDockWidget();
+    
+    if (d->m_pActCameraChannelSelector)
+    {
+        if (camera.isNull())
+        {
+            d->m_pActCameraChannelSelector->setVisible(false);
+        }
+        else
+        {
+            ito::AddInMultiChannelGrabber* multichannelGrabber= qobject_cast<ito::AddInMultiChannelGrabber*>(camera);
+            if (multichannelGrabber)
+            {
+                d->m_pActCameraChannelSelector->setVisible(true);
+                QComboBox* channelCombo = qobject_cast<QComboBox*>(d->m_pActCameraChannelSelector->defaultWidget());
+                if (qobject_cast<QComboBox*>(channelCombo))
+                {
+                    channelCombo->clear();
+                    ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
+                    QSharedPointer<ito::Param> channelListParam(new ito::Param("channelList", ito::ParamBase::StringList));
+                    QMetaObject::invokeMethod(camera, "getParam",Q_ARG(QSharedPointer<ito::Param>, channelListParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore()));
+                    int len = 0;
+                    const ito::ByteArray* channelList = channelListParam->getVal<const ito::ByteArray*>(len);
+                    for (int i = 0; i < len; i++)
+                    {
+                        channelCombo->addItem(QString(channelList[i].data()));
+                    }
+
+                }
+            }
+            else
+            {
+                d->m_pActCameraChannelSelector->setVisible(false);
+            }
+        }
+    }
 
     if (pew)
     {
