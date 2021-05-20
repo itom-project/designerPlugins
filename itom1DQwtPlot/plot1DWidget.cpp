@@ -469,7 +469,7 @@ void Plot1DWidget::createActions()
     a->setChecked(false);
     connect(a, SIGNAL(toggled(bool)), this, SLOT(mnuPickerClick(bool)));
 
-    m_pMnuSetPicker = new QMenu("Picker Menu");
+    m_pMnuSetPicker = new QMenu("Picker Menu", p);
     m_pActPicker->setMenu(m_pMnuSetPicker);
 
     m_pActSetPicker = a = m_pMnuSetPicker->addAction(tr("Manual Picker Selection"));

@@ -169,7 +169,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
 
     //m_actAspectSwitch
     m_actTringModeSwitch = new QAction(tr("Triangles"), this);
-    m_mnuTringModeSwitch = new QMenu(tr("Mode Switch"));
+    m_mnuTringModeSwitch = new QMenu(tr("Mode Switch"), this);
     m_mnuTringModeSwitch->addAction(tr("M++Mode"));
     m_mnuTringModeSwitch->addAction(tr("JoeMode"));
     m_actTringModeSwitch->setMenu(m_mnuTringModeSwitch);
@@ -203,7 +203,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
     */
     //m_actCmplxSwitch
     m_actCmplxSwitch = new QAction(QIcon(":/itomDesignerPlugins/complex/icons/ImRe.png"), tr("Switch Imag, Real, Abs, Pha"), this);
-    m_mnuCmplxSwitch = new QMenu(tr("Complex Switch"));
+    m_mnuCmplxSwitch = new QMenu(tr("Complex Switch"), this);
     m_mnuCmplxSwitch->addAction(tr("Imag"));
     m_mnuCmplxSwitch->addAction(tr("Real"));
     m_mnuCmplxSwitch->addAction(tr("Abs"));
