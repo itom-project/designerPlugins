@@ -110,9 +110,9 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
         
 
     Q_CLASSINFO("prop://propertiesSorted", "sort the properties of one item in an alphabetical order or not")
-    Q_CLASSINFO("prop://enablePointPick", "if True, a click to any point of the canvas emits the signal pointPicked that emits the currently clicked 3d coordinate and the index of the closest point of the cloud / mesh that has been given as pickPointCloud or pickMesh.")
+    Q_CLASSINFO("prop://enablePointPick", "if True, a click to any point on the canvas and pressing the shift key emits the signal 'pointPicked' with the currently clicked 3d coordinate and the index of the closest point of the cloud / mesh that has been given by 'setPickPointCloud' or 'setPickPointMesh'.")
     Q_CLASSINFO("prop://pointPickSphereRadius", "If > 0, a sphere with the given radius is printed around the center point of the point pick event (if enabled)")
-    Q_CLASSINFO("prop://pointPickSphereColor", "Color of the possible sphere of the point pick event (see pointPickShereRadius and enablePointPick)")
+    Q_CLASSINFO("prop://pointPickSphereColor", "Color of the possible sphere of the point pick event (see pointPickSphereRadius and enablePointPick)")
 
     Q_CLASSINFO("prop://xAxisLabel", "Label of the x-axis.")
     Q_CLASSINFO("prop://yAxisLabel", "Label of the y-axis.")
@@ -178,6 +178,8 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_CLASSINFO("slot://setItemProperty", "set the property of an item (arguments: key, property-name, value)")
     Q_CLASSINFO("slot://setPickPointCloud", "set cloud for pick point event. Nearest point from the position of the cursor (x,y,z) position is searched (arguments: cloud)")
     Q_CLASSINFO("slot://setPickPointMesh", "set mesh for pick point event. The cloud of the mesh is used only (arguments: mesh)")
+
+    Q_CLASSINFO("signal://pointPicked", "This signal is emitted if the property ``enablePointPick`` is true and the user pressed somewhere on the canvas together with the Shift key.")
     
     DESIGNER_PLUGIN_ITOM_API
 
