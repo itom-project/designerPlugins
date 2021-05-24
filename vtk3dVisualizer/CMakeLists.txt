@@ -41,8 +41,13 @@ if(ITOM_SDK_PCL_SUPPORT)
     
         find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
         
-        if (${VTK_MAJOR_VERSION} LESS 8)
+        if(${VTK_MAJOR_VERSION} LESS 8)
             add_definitions(-DLEGACY_VTK)
+        elseif(${VTK_MAJOR_VERSION} GREATER_EQUAL 9)
+            # VTK9 does not support the legacy interface
+            if (VTK3DVISUALIZER_FORCE_LEGACY_VTK)
+                message(WARNING "For VTK9 or higher, the legacy VTK Qt widget is not supported.")
+            endif()
         elseif(VTK3DVISUALIZER_FORCE_LEGACY_VTK)
             add_definitions(-DLEGACY_VTK)
         elseif(Qt5_VERSION VERSION_LESS 5.10.0)
