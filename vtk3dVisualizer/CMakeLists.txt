@@ -17,6 +17,7 @@ endif()
 # ...which contains useful scripts for completing this file
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ITOM_SDK_DIR}/cmake)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+option(VTK3DVISUALIZER_FORCE_LEGACY_VTK "Usually with vtk >= 8, the new QVTKOpenGLNativeWidget is used, else the legacy QVTKWidget. If this option is set to ON, the legacy version is also used for VTK8." OFF)
 
 # ... for example this one, found in the CMAKE_MODULE_PATH
 include(ItomBuildMacros)
@@ -33,12 +34,25 @@ if(ITOM_SDK_PCL_SUPPORT)
 
     #set(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
     #set(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked
-
+    
+    # vtk 8.0 is required to support QOpenGLWidget, vtk 6.0 is required to support the deprecated QVTKWidget
     find_package(VTK)
     if(EXISTS ${VTK_DIR})
     
         find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
-                
+        
+        if(${VTK_MAJOR_VERSION} LESS 8)
+            add_definitions(-DLEGACY_VTK)
+        elseif(${VTK_MAJOR_VERSION} GREATER_EQUAL 9)
+            # VTK9 does not support the legacy interface
+            if (VTK3DVISUALIZER_FORCE_LEGACY_VTK)
+                message(WARNING "For VTK9 or higher, the legacy VTK Qt widget is not supported.")
+            endif()
+        elseif(VTK3DVISUALIZER_FORCE_LEGACY_VTK)
+            add_definitions(-DLEGACY_VTK)
+        elseif(Qt5_VERSION VERSION_LESS 5.10.0)
+            message(WARNING "For Qt < 5.10 it is recommended to enable VTK3DVISUALIZER_FORCE_LEGACY_VTK")
+        endif()
 
         add_definitions(-DITOMSHAREDDESIGNER)
 
@@ -98,7 +112,6 @@ if(ITOM_SDK_PCL_SUPPORT)
         )
 
         set(DESIGNER_UI
-            ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.ui
         )
 
         set(DESIGNER_RCC
