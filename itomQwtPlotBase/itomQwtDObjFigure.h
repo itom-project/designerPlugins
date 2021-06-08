@@ -90,7 +90,7 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
     
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
-	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
 
     // DESIGNABLE true: property can be edited in QtDesigner and by Python/C++, USER false: property cannot be changed in property editor of plot.
     Q_PROPERTY(bool allowCameraParameterEditor READ allowCameraParameterEditor WRITE setAllowCameraParameterEditor DESIGNABLE true USER false);
@@ -115,7 +115,7 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
-	Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
+    Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
     
     Q_CLASSINFO("prop://allowCameraParameterEditor", "If a live camera is connected to this plot, a camera parameter editor can be displayed as toolbox of the plot. If this property is false, this toolbox is not available (default: true)")
 
@@ -396,8 +396,8 @@ public:
     ItomQwtPlotEnums::ShapeTypes getAllowedGeometricShapes() const;
     void setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes);
 
-	virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
-	virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
+    virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
+    virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
     
     //!< overwrite to configure the camera parameters toolbox
     virtual ito::RetVal setCamera(QPointer<ito::AddInDataIO> camera);
@@ -431,6 +431,7 @@ public Q_SLOTS:
 
     ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
+    void setGrabberChannel(const QString& channel);
     void replot();
  
 private Q_SLOTS:
@@ -450,12 +451,12 @@ protected:
     ItomQwtPlot *m_pBaseContent;
 
 private:
-	void construct();
+    void construct();
 
     PlotInfoMarker  *m_pMarkerInfo;
-	PlotInfoPicker  *m_pPickerInfo;
-	PlotInfoShapes  *m_pShapesInfo;
-	PlotInfoDObject *m_pObjectInfo;
+    PlotInfoPicker  *m_pPickerInfo;
+    PlotInfoShapes  *m_pShapesInfo;
+    PlotInfoDObject *m_pObjectInfo;
     
     //avoid to add private members but put them in the ItomQwtDObjFigurePrivate container
     //since this file is part of the itom SDK and can be included in other plugin's source code.
@@ -472,6 +473,7 @@ signals :
     void geometricShapesDeleted();
     void geometricShapeFinished(QVector<ito::Shape> shapes, bool aborted);
     void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/
+    void grabberChannelChanged(const QString& channel, QObject* obj);
 };
 
 #endif //ITOMQWTDOBJFIGURE_H
