@@ -823,8 +823,6 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
                     QSharedPointer<ito::Param> channelListParam(new ito::Param("channelList", ito::ParamBase::StringList));
                     if (QMetaObject::invokeMethod(camera, "getParam", Q_ARG(QSharedPointer<ito::Param>, channelListParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore())))
                     {
-                        bool timeout = false;
-
                         while (!locker.getSemaphore()->wait(500))
                         {
                             retval += ito::RetVal(ito::retError, 0, tr("timeout while getting channelList parameter").toLatin1().data());
@@ -838,13 +836,34 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
                             {
                                 channelCombo->addItem(QString(channelList[i].data()));
                             }
+                            
                         }
-                        connect(channelCombo, &QComboBox::currentTextChanged, this, &ItomQwtDObjFigure::setGrabberChannel);
-                        connect(this, &ItomQwtDObjFigure::grabberChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListerners);
+                        connect(channelCombo, &QComboBox::currentTextChanged, this, &ItomQwtDObjFigure::setDisplayedCameraChannel);
+                        connect(this, &AbstractDObjFigure::cameraChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListerners);
                     }
                     else
                     {
                         retval += ito::RetVal(ito::retError, 0, QObject::tr("Member 'getParam' of plugin could not be invoked.").toLatin1().data());
+                    }
+                    QSharedPointer<ito::Param> defaultChannelParam(new ito::Param("defaultChannel", ito::ParamBase::String));
+                    ItomSharedSemaphoreLocker locker2(new ItomSharedSemaphore());
+                    if (QMetaObject::invokeMethod(camera, "getParam", Q_ARG(QSharedPointer<ito::Param>, defaultChannelParam), Q_ARG(ItomSharedSemaphore*, locker2.getSemaphore())))
+                    {
+                        while (!locker2.getSemaphore()->wait(500))
+                        {
+                            retval += ito::RetVal(ito::retError, 0, tr("timeout while getting defaultChannel parameter").toLatin1().data());
+                            break;
+                        }
+                        if (!retval.containsError())
+                        {
+                            const char* channel = defaultChannelParam->getVal<char*>();
+                            retval += ItomQwtDObjFigure::setDisplayedCameraChannel(channel);
+                        }
+
+                    }
+                    else
+                    {
+                        retval += ito::RetVal(ito::retError, 0, tr("could not read defaultChannel parameter").toLatin1().data());
                     }
 
                 }
@@ -896,13 +915,6 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
     return retval;
 }
 //-------------------------------------------------------------------------------------
-void ItomQwtDObjFigure::setGrabberChannel(const QString& channel)
-{
-    emit grabberChannelChanged(channel, this);
-
-}
-
-//-------------------------------------------------------------------------------------
 void ItomQwtDObjFigure::setAllowCameraParameterEditor(bool allowed)
 {
     if (allowed != d->m_allowCameraParamEditor)
@@ -930,7 +942,22 @@ void ItomQwtDObjFigure::setAllowCameraParameterEditor(bool allowed)
         
     }
 }
+//-------------------------------------------------------------------------------------
+ito::RetVal ItomQwtDObjFigure::setDisplayedCameraChannel(const QString& channel)
+{
+    ito::RetVal retValue(ito::retOk);
+    retValue += AbstractDObjFigure::setDisplayedCameraChannel(channel);
+    if (!retValue.containsError())
+    {
+        QComboBox* combo = qobject_cast<QComboBox*> (d->m_pActCameraChannelSelector->defaultWidget());
+        if (combo)
+        {
+            combo->setCurrentText(getDisplayedCameraChannel());
+        }
+    }
+    return retValue;
 
+}
 //-------------------------------------------------------------------------------------
 bool ItomQwtDObjFigure::allowCameraParameterEditor() const
 {

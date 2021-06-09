@@ -118,7 +118,7 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
     
     Q_CLASSINFO("prop://allowCameraParameterEditor", "If a live camera is connected to this plot, a camera parameter editor can be displayed as toolbox of the plot. If this property is false, this toolbox is not available (default: true)")
-
+        
     Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data (uses the default export resolution).")
 
     Q_CLASSINFO("slot://savePlot", "saves the plot as image, pdf or svg file (the supported file formats are listed in the save dialog of the plot)\n"
@@ -431,7 +431,7 @@ public Q_SLOTS:
 
     ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
-    void setGrabberChannel(const QString& channel);
+    ito::RetVal setDisplayedCameraChannel(const QString& channel);
     void replot();
  
 private Q_SLOTS:
@@ -473,7 +473,6 @@ signals :
     void geometricShapesDeleted();
     void geometricShapeFinished(QVector<ito::Shape> shapes, bool aborted);
     void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/
-    void grabberChannelChanged(const QString& channel, QObject* obj);
 };
 
 #endif //ITOMQWTDOBJFIGURE_H
