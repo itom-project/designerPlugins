@@ -35,7 +35,7 @@
 #include <qfileinfo.h>
 #include <qwidgetaction.h>
 #include <qcombobox.h>
-#include "common/addInGrabber.h"
+#include "common/addInMultiChannelGrabber.h"
 
 #include "DataObject/dataobj.h"
 #include "itomQwtPlot.h"
