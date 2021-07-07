@@ -787,6 +787,8 @@ void PlotCanvas::setButtonStyle(int style)
         {
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
         }
+
+        m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/grid.png"));
     }
     else
     {
@@ -827,6 +829,8 @@ void PlotCanvas::setButtonStyle(int style)
         {
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReAbs_lt.png"));
         }
+
+        m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/grid_lt.png"));
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1824,6 +1828,15 @@ void PlotCanvas::setGridStyle(Itom2dQwtPlot::GridStyle gridStyle)
     m_pPlotGrid->enableXMin(gridStyle == Itom2dQwtPlot::GridMinorX || gridStyle == Itom2dQwtPlot::GridMinorXY);
     m_pPlotGrid->enableYMin(gridStyle == Itom2dQwtPlot::GridMinorY || gridStyle == Itom2dQwtPlot::GridMinorXY);
     m_pActGrid->setChecked(gridStyle != Itom2dQwtPlot::GridNo);
+
+    foreach(QAction* a, m_pMnuGrid->actions())
+    {
+        if (a->data().toInt() == gridStyle)
+        {
+            m_pMnuGrid->setDefaultAction(a);
+        }
+    }
+
     replot();
 }
 

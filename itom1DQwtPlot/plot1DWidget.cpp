@@ -1069,6 +1069,15 @@ void Plot1DWidget::setGridStyle(const Itom1DQwtPlot::GridStyle gridStyle)
     m_pPlotGrid->enableXMin(gridStyle == Itom1DQwtPlot::GridMinorX || gridStyle == Itom1DQwtPlot::GridMinorXY);
     m_pPlotGrid->enableYMin(gridStyle == Itom1DQwtPlot::GridMinorY || gridStyle == Itom1DQwtPlot::GridMinorXY);
     m_pActGrid->setChecked(gridStyle != Itom1DQwtPlot::GridNo);
+
+    foreach(QAction* a, m_pMnuGrid->actions())
+    {
+        if (a->data().toInt() == gridStyle)
+        {
+            m_pMnuGrid->setDefaultAction(a);
+        }
+    }
+
     replot();
 }
 
