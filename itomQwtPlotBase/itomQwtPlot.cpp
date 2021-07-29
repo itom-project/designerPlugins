@@ -55,6 +55,7 @@
 
 #include "common/apiFunctionsGraphInc.h"
 #include "common/retVal.h"
+#include "plot/designerPluginInterfaceVersion.h"
 
 #include <qwt_plot_picker.h>
 #include <qwt_plot_panner.h>
@@ -212,6 +213,12 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
 
         m_pActCamParameters = parent->cameraParamEditorDockWidget()->toggleViewAction();
         m_pActCamParameters->setVisible(false);
+
+        PlotInfoMarker *pim = parent->markerWidget();
+        if (pim)
+        {
+            connect(pim, &PlotInfoMarker::itemChanged, this, &ItomQwtPlot::plotMarkersItemChanged);
+        }
     }
 }
 
@@ -3633,6 +3640,68 @@ ito::RetVal ItomQwtPlot::deleteMarkers(const QString &id)
     }
 
     return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtPlot::showHideMarkers(const QString &id, bool show)
+{
+    ito::RetVal retval;
+    bool found = false;
+    bool refresh = false;
+    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > it(m_plotMarkers);
+
+    while (it.hasNext())
+    {
+        it.next();
+
+        if (it.key() == id || id == "")
+        {
+            if (it.value().second->isVisible() != show)
+            {
+                it.value().second->setVisible(show);
+                refresh = true;
+            }
+
+            found = true;
+        }
+    }
+
+    PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
+    
+
+    if (!found && id != "")
+    {
+        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(id).toLatin1().data());
+    }
+    else if (refresh)
+    {
+        replot();
+
+#if ITOM_ADDININTERFACE_VERSION >= CREATEVERSION(5,0,0)
+        if (ITOM_ADDININTERFACE_VERSION <= 0x050000)
+        {
+            // TODO: can be replaced by a direct call if the AddInInterface version is > 5.0.0.
+            QMetaObject::invokeMethod(pim, "checkMarkers", Q_ARG(QString, id), Q_ARG(bool, show));
+        }
+        else
+        {
+            pim->checkMarkers(id, show);
+        }
+#endif
+    }
+
+    return retval;
+}
+
+//-------------------------------------------------------------------------------------
+void ItomQwtPlot::plotMarkersItemChanged(QTreeWidgetItem *item, int column)
+{
+    if (column == 0)
+    {
+        QString name = item->data(0, Qt::DisplayRole).toString();
+        showHideMarkers(name, item->checkState(column) == Qt::Checked);
+    }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -139,12 +139,12 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     "------------\n"
     "xsize : {int}\n"
     "    width of the pixmap\n"
-    "ysize : {int}\n"
-    "    height of the pixmap\n"
-    "resolution : {int}\n"
-    "    resolution of the pixmap in dpi")
+"ysize : {int}\n"
+"    height of the pixmap\n"
+"resolution : {int}\n"
+"    resolution of the pixmap in dpi")
 
-    Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let the user add a certain number of geometric shapes to the canvas.\n"
+Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let the user add a certain number of geometric shapes to the canvas.\n"
     "\n"
     "Parameters\n"
     "-----------\n"
@@ -158,81 +158,95 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     Q_CLASSINFO("slot://clearGeometricShapes", "removes all geometric shapes from the canvas.")
 
     Q_CLASSINFO("slot://deleteGeometricShape", "deletes the geometric shape with the given index.\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "idx : {int}\n"
-    "    idx is the index of the shape to be removed. This is the index of the shape instance itself and must not always correspond to the index-position of the shape within the tuple of all shapes")
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "idx : {int}\n"
+        "    idx is the index of the shape to be removed. This is the index of the shape instance itself and must not always correspond to the index-position of the shape within the tuple of all shapes")
 
     Q_CLASSINFO("slot://setGeometricShapes", "This slot is the same than assigning a sequence of shape to the property 'geometricShapes'. It replaces all existing shapes by the new set of shapes.\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "geometricShapes : {seq. of shapes}\n"
-    "    Sequence (e.g tuple or list) of shapes that replace all existing shapes by this new set.")
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "geometricShapes : {seq. of shapes}\n"
+        "    Sequence (e.g tuple or list) of shapes that replace all existing shapes by this new set.")
 
     Q_CLASSINFO("slot://addGeometricShape", "Add a new geometric shape to the canvas if no shape with the same index already exists. \n"
-    "\n"
-    "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
-    "stored in the optional 'newIndex' parameter).\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "geometricShape : {shape}\n"
-    "    new geometric shape\n"
-    "\n"
-    "Raises\n"
-    "------------\n"
-    "RuntimeError\n"
-    "    if the index of the shape is != -1 and does already exist")
+        "\n"
+        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+        "stored in the optional 'newIndex' parameter).\n"
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "geometricShape : {shape}\n"
+        "    new geometric shape\n"
+        "\n"
+        "Raises\n"
+        "------------\n"
+        "RuntimeError\n"
+        "    if the index of the shape is != -1 and does already exist")
 
     Q_CLASSINFO("slot://updateGeometricShape", "Updates an existing geometric shape by the new shape if the index of the shape already exists, else add the new shape to the canvas (similar to 'addGeometricShape'. \n"
-    "\n"
-    "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
-    "stored in the optional 'newIndex' parameter).\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "geometricShape : {shape}\n"
-    "    new geometric shape")
-    
+        "\n"
+        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+        "stored in the optional 'newIndex' parameter).\n"
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "geometricShape : {shape}\n"
+        "    new geometric shape")
+
     Q_CLASSINFO("slot://setGeometricShapeLabel", "Set the label of geometric shape with the index idx.\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "idx : {int}\n"
-    "    index of the shape\n"
-    "label : {str}\n"
-    "    new label of the shape")
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "idx : {int}\n"
+        "    index of the shape\n"
+        "label : {str}\n"
+        "    new label of the shape")
 
     Q_CLASSINFO("slot://setGeometricShapeLabelVisible", "Set the visibility of the label of a geometric shape with the given index.\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "idx : {int}\n"
-    "    index of the shape\n"
-    "visible : {bool}\n"
-    "    True if the label should be displayed close to the shape, else False")
-    
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "idx : {int}\n"
+        "    index of the shape\n"
+        "visible : {bool}\n"
+        "    True if the label should be displayed close to the shape, else False")
+
     Q_CLASSINFO("slot://plotMarkers", "Draws sub-pixel wise markers to the canvas of the plot\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "coordinates : {dataObject}\n"
-    "    2xN data object with the 2D coordinates of the markers (first row: X, second row: Y coordinates in axis coordinates of the plot)\n"
-    "style : {str}\n"
-    "    Style string for the set of markers (e.g. 'r+20' for red crosses with a size of 20px)\n"
-    "id : {str}\n"
-    "    Name of the set of added markers (optional, default='')\n"
-    "plane : {int}\n"
-    "    If the dataObject has more than 2 dimensions, it is possible to add the markers to a specific plane only (optional, default=-1 -> all planes)")
-    
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "coordinates : {dataObject}\n"
+        "    2xN data object with the 2D coordinates of the markers (first row: X, second row: Y coordinates in axis coordinates of the plot)\n"
+        "style : {str}\n"
+        "    Style string for the set of markers (e.g. 'r+20' for red crosses with a size of 20px)\n"
+        "id : {str}\n"
+        "    Name of the set of added markers (optional, default='')\n"
+        "plane : {int}\n"
+        "    If the dataObject has more than 2 dimensions, it is possible to add the markers to a specific plane only (optional, default=-1 -> all planes)")
+
     Q_CLASSINFO("slot://deleteMarkers", "Delete all sets of markers with the given id or all markers if no or an empty id is passed.\n"
-    "\n"
-    "Parameters\n"
-    "------------\n"
-    "id : {str} \n"
-    "    name of the marker set that should be removed (optional)")
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "id : {str} \n"
+        "    name of the marker set that should be removed (optional)")
+
+    Q_CLASSINFO("slot://showMarkers", "Shows all existing markers with the given name\n"
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "id : {str}\n"
+        "    Name of the set of markers, that should be shown.")
+
+    Q_CLASSINFO("slot://hideMarkers", "Hides all existing markers with the given name\n"
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "id : {str}\n"
+        "    Name of the set of markers, that should be hidden.")
     
     Q_CLASSINFO("slot://replot", "Force a replot which is for instance necessary if values of the displayed data object changed and you want to update the plot, too.")
 
@@ -429,6 +443,8 @@ public Q_SLOTS:
 
     ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString::Null(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
+    ito::RetVal showMarkers(QString id);
+    ito::RetVal hideMarkers(QString id);
 
     void replot();
  

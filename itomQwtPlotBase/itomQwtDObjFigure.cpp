@@ -659,6 +659,26 @@ ito::RetVal ItomQwtDObjFigure::deleteMarkers(QString id /*= ""*/)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtDObjFigure::showMarkers(QString id)
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->showHideMarkers(id, true);
+    }
+    return ito::RetVal(ito::retError, 0, tr("content not available").toLatin1().data());
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal ItomQwtDObjFigure::hideMarkers(QString id)
+{
+    if (m_pBaseContent)
+    {
+        return m_pBaseContent->showHideMarkers(id, false);
+    }
+    return ito::RetVal(ito::retError, 0, tr("content not available").toLatin1().data());
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::AbstractFigure::UnitLabelStyle ItomQwtDObjFigure::getUnitLabelStyle() const
 {
     if (m_pBaseContent)

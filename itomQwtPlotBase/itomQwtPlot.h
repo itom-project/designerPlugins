@@ -56,6 +56,7 @@ class QActionGroup;
 class QToolBar;
 class UserInteractionPlotPicker;
 class ItomQwtDObjFigure;
+class QTreeWidgetItem;
 
 class ITOMQWTPLOTBASE_EXPORT ItomQwtPlot : public QwtPlot
 {
@@ -154,6 +155,7 @@ public:
 
     ito::RetVal plotMarkers(const QSharedPointer<ito::DataObject> coordinates, const QString &style, const QString &id, int plane);
     ito::RetVal deleteMarkers(const QString &id);
+    ito::RetVal showHideMarkers(const QString &id, bool show);
 
 protected:
 
@@ -311,6 +313,8 @@ private slots:
     void updateColors(void);
 
     void printPreviewRequested(QPrinter* printer);
+
+    void plotMarkersItemChanged(QTreeWidgetItem *item, int column);
 
 signals:
     void statusBarClear();
