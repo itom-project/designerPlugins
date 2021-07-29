@@ -24,7 +24,7 @@
 
 #include <qvalidator.h>
 #include <qmessagebox.h>
-#include <qregexp.h>
+#include <qregularexpression.h>
 
 //-----------------------------------------------------------------------------------------------
 Dialog2DScale::Dialog2DScale(const PlotCanvas::InternalData &data, QWidget *parent) :
@@ -50,7 +50,8 @@ Dialog2DScale::Dialog2DScale(const PlotCanvas::InternalData &data, QWidget *pare
 	{
 		numberRegExp = "^[\\+-]?(?:0|[1-9]\\d*)(?:,\\d*)?(?:[eE][\\+-]?\\d+)?$";
 	}
-	QRegExpValidator *numberValidator = new QRegExpValidator(QRegExp(numberRegExp), this);
+
+	auto *numberValidator = new QRegularExpressionValidator(QRegularExpression(numberRegExp), this);
 
     //x
     if(data.m_xaxisScaleAuto)

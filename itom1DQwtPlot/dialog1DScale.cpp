@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -22,36 +22,33 @@
 
 #include "dialog1DScale.h"
 
-#include <qvalidator.h>
 #include <qmessagebox.h>
-#include <qregexp.h>
+#include <qregularexpression.h>
+#include <qvalidator.h>
 
 //-----------------------------------------------------------------------------------------------
-Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData &data, QWidget *parent) :
-    QDialog(parent),
-	m_minX(-std::numeric_limits<double>::max()),
-	m_maxX(std::numeric_limits<double>::max()),
-	m_minY(-std::numeric_limits<double>::max()),
-	m_maxY(std::numeric_limits<double>::max()),
-	m_locale(QLocale())
+Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData& data, QWidget* parent) :
+    QDialog(parent), m_minX(-std::numeric_limits<double>::max()),
+    m_maxX(std::numeric_limits<double>::max()), m_minY(-std::numeric_limits<double>::max()),
+    m_maxY(std::numeric_limits<double>::max()), m_locale(QLocale())
 {
     ui.setupUi(this);
 
-	m_locale.setNumberOptions(QLocale::OmitGroupSeparator);
+    m_locale.setNumberOptions(QLocale::OmitGroupSeparator);
 
-	QString numberRegExp;
-	if (m_locale.decimalPoint() == '.')
-	{
-		numberRegExp = "^[\\+-]?(?:0|[1-9]\\d*)(?:\\.\\d*)?(?:[eE][\\+-]?\\d+)?$";
-	}
-	else
-	{
-		numberRegExp = "^[\\+-]?(?:0|[1-9]\\d*)(?:,\\d*)?(?:[eE][\\+-]?\\d+)?$";
-	}
-	QRegExpValidator *numberValidator = new QRegExpValidator(QRegExp(numberRegExp), this);
+    QString numberRegExp;
+    if (m_locale.decimalPoint() == '.')
+    {
+        numberRegExp = "^[\\+-]?(?:0|[1-9]\\d*)(?:\\.\\d*)?(?:[eE][\\+-]?\\d+)?$";
+    }
+    else
+    {
+        numberRegExp = "^[\\+-]?(?:0|[1-9]\\d*)(?:,\\d*)?(?:[eE][\\+-]?\\d+)?$";
+    }
+    auto* numberValidator = new QRegularExpressionValidator(QRegularExpression(numberRegExp), this);
 
-    //x
-    if(data.m_axisScaleAuto)
+    // x
+    if (data.m_axisScaleAuto)
     {
         ui.radioAutoCalcX->setChecked(true);
     }
@@ -60,14 +57,14 @@ Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData &data, QWidget *pa
         ui.radioManualX->setChecked(true);
     }
 
-	ui.txtMinX->setValidator(numberValidator);
-	ui.txtMaxX->setValidator(numberValidator);
+    ui.txtMinX->setValidator(numberValidator);
+    ui.txtMaxX->setValidator(numberValidator);
 
-    ui.txtMinX->setText(m_locale.toString(data.m_axisMin, 'g') );
-    ui.txtMaxX->setText(m_locale.toString(data.m_axisMax, 'g') );
+    ui.txtMinX->setText(m_locale.toString(data.m_axisMin, 'g'));
+    ui.txtMaxX->setText(m_locale.toString(data.m_axisMax, 'g'));
 
-    //y
-    if(data.m_valueScaleAuto)
+    // y
+    if (data.m_valueScaleAuto)
     {
         ui.radioAutoCalcY->setChecked(true);
     }
@@ -76,56 +73,57 @@ Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData &data, QWidget *pa
         ui.radioManualY->setChecked(true);
     }
 
-    //it is not necessary to restrict the value range, since it might be desired to set a higher axis interval than the datatype of the displayed dataObject.
-    //getDataTypeRange(data.m_dataType, m_minY, m_maxY);
-    
-    ui.txtMinY->setText(m_locale.toString(data.m_valueMin, 'g') );
-    ui.txtMaxY->setText(m_locale.toString(data.m_valueMax, 'g') );
+    // it is not necessary to restrict the value range, since it might be desired to set a higher
+    // axis interval than the datatype of the displayed dataObject. getDataTypeRange(data.m_dataType,
+    // m_minY, m_maxY);
 
-	ui.txtMinY->setValidator(numberValidator);
-	ui.txtMaxY->setValidator(numberValidator);
+    ui.txtMinY->setText(m_locale.toString(data.m_valueMin, 'g'));
+    ui.txtMaxY->setText(m_locale.toString(data.m_valueMax, 'g'));
 
-    //ui.groupPlane->setVisible(false);
+    ui.txtMinY->setValidator(numberValidator);
+    ui.txtMaxY->setValidator(numberValidator);
+
+    // ui.groupPlane->setVisible(false);
 }
 
 //-----------------------------------------------------------------------------------------------
-void Dialog1DScale::getData(Plot1DWidget::InternalData &data)
+void Dialog1DScale::getData(Plot1DWidget::InternalData& data)
 {
     data.m_valueScaleAuto = ui.radioAutoCalcY->isChecked();
-	data.m_axisScaleAuto = ui.radioAutoCalcX->isChecked();
+    data.m_axisScaleAuto = ui.radioAutoCalcX->isChecked();
 
-	bool ok;
-	double number;
+    bool ok;
+    double number;
 
-	number = m_locale.toDouble(ui.txtMinY->text(), &ok);
-	if (ok)
-	{
-		data.m_valueMin = number;
-	}
+    number = m_locale.toDouble(ui.txtMinY->text(), &ok);
+    if (ok)
+    {
+        data.m_valueMin = number;
+    }
 
-	number = m_locale.toDouble(ui.txtMaxY->text(), &ok);
-	if (ok)
-	{
-		data.m_valueMax = number;
-	}
+    number = m_locale.toDouble(ui.txtMaxY->text(), &ok);
+    if (ok)
+    {
+        data.m_valueMax = number;
+    }
 
-	number = m_locale.toDouble(ui.txtMinX->text(), &ok);
-	if (ok)
-	{
-		data.m_axisMin = number;
-	}
+    number = m_locale.toDouble(ui.txtMinX->text(), &ok);
+    if (ok)
+    {
+        data.m_axisMin = number;
+    }
 
-	number = m_locale.toDouble(ui.txtMaxX->text(), &ok);
-	if (ok)
-	{
-		data.m_axisMax = number;
-	}
+    number = m_locale.toDouble(ui.txtMaxX->text(), &ok);
+    if (ok)
+    {
+        data.m_axisMax = number;
+    }
 }
 
 //-----------------------------------------------------------------------------------------------
-void Dialog1DScale::getDataTypeRange(ito::tDataType type, double &min, double &max)
+void Dialog1DScale::getDataTypeRange(ito::tDataType type, double& min, double& max)
 {
-    switch(type)
+    switch (type)
     {
     case ito::tInt8:
         min = std::numeric_limits<ito::int8>::min();
@@ -166,54 +164,64 @@ void Dialog1DScale::getDataTypeRange(ito::tDataType type, double &min, double &m
 }
 
 //-----------------------------------------------------------------------------------------------
-bool Dialog1DScale::checkValue(QLineEdit *lineEdit, const double &min, const double &max, const QString &name)
+bool Dialog1DScale::checkValue(
+    QLineEdit* lineEdit, const double& min, const double& max, const QString& name)
 {
-	bool ok;
-	double val = m_locale.toDouble(lineEdit->text(), &ok);
-	if (!ok)
-	{
-		QMessageBox::critical(this, tr("invalid number"), tr("The '%1' number is no valid decimal number.").arg(name));
-	}
-	else if ((val < min) || (val > max))
-	{
-		ok = false;
-		QMessageBox::critical(this, tr("out of range"), tr("The '%1' number is out of range [%2,%3]").arg(name).arg(m_locale.toString(min, 'g')).arg(m_locale.toString(max, 'g')));
-	}
+    bool ok;
+    double val = m_locale.toDouble(lineEdit->text(), &ok);
+    if (!ok)
+    {
+        QMessageBox::critical(
+            this,
+            tr("invalid number"),
+            tr("The '%1' number is no valid decimal number.").arg(name));
+    }
+    else if ((val < min) || (val > max))
+    {
+        ok = false;
+        QMessageBox::critical(
+            this,
+            tr("out of range"),
+            tr("The '%1' number is out of range [%2,%3]")
+                .arg(name)
+                .arg(m_locale.toString(min, 'g'))
+                .arg(m_locale.toString(max, 'g')));
+    }
 
-	if (!ok)
-	{
-		lineEdit->selectAll();
-	}
+    if (!ok)
+    {
+        lineEdit->selectAll();
+    }
 
-	return ok;
+    return ok;
 }
 
 
 //-----------------------------------------------------------------------------------------------
 void Dialog1DScale::on_buttonBox_accepted()
 {
-	bool ok = true;
+    bool ok = true;
 
-	if (!checkValue(ui.txtMinX, m_minX, m_maxX, "minimum X"))
-	{
-		return;
-	}
+    if (!checkValue(ui.txtMinX, m_minX, m_maxX, "minimum X"))
+    {
+        return;
+    }
 
-	if (!checkValue(ui.txtMaxX, m_minX, m_maxX, "maximum X"))
-	{
-		return;
-	}
+    if (!checkValue(ui.txtMaxX, m_minX, m_maxX, "maximum X"))
+    {
+        return;
+    }
 
-	if (!checkValue(ui.txtMinY, m_minY, m_maxY, "minimum Y"))
-	{
-		return;
-	}
+    if (!checkValue(ui.txtMinY, m_minY, m_maxY, "minimum Y"))
+    {
+        return;
+    }
 
-	if (!checkValue(ui.txtMaxY, m_minY, m_maxY, "maximum Y"))
-	{
-		return;
-	}
+    if (!checkValue(ui.txtMaxY, m_minY, m_maxY, "maximum Y"))
+    {
+        return;
+    }
 
 
-	emit accept();
+    emit accept();
 }

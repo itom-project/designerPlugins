@@ -40,6 +40,7 @@
 #include <qprintpreviewdialog.h>
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
+#include <qregularexpression.h>
 
 #include "itomPlotZoomer.h"
 #include "itomPlotMagnifier.h"
@@ -3445,10 +3446,13 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         QBrush symBrush(Qt::NoBrush);
         QPen symPen(Qt::red);
 
-        QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)(;(\\d*))?$");
-        if (rgexp.indexIn(style) != -1)
+        QRegularExpression rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)(;(\\d*))?$");
+
+        auto match = rgexp.match(style);
+
+        if (match.hasMatch())
         {
-            char s = rgexp.cap(1).toLatin1()[0];
+            char s = match.captured(1).toLatin1()[0];
 
             switch (s)
             {
@@ -3478,7 +3482,7 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
                 break;
             }
 
-            s = rgexp.cap(2).toLatin1()[0];
+            s = match.captured(2).toLatin1()[0];
             bool ok;
 
             switch (s)
@@ -3520,13 +3524,13 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
             }
 
             //s = rgexp.cap(3);
-            int size = rgexp.cap(3).toInt(&ok);
+            int size = match.captured(3).toInt(&ok);
             if (ok)
             {
                 symSize = QSize(size, size);
             }
 
-            size = rgexp.cap(5).toInt(&ok);
+            size = match.captured(5).toInt(&ok);
             if (ok)
             {
                 symPen.setWidth(size);
