@@ -50,6 +50,7 @@
 #include "multiPointPickerMachine.h"
 #include "dialogExportProperties.h"
 #include "itomQwtPlotPanner.h"
+#include "markerWidget.h"
 
 #include "../DataObject/dataObjectFuncs.h"
 
@@ -86,7 +87,6 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_buttonStyle(0),
     m_boxFrame(true),
     m_plottingEnabled(true),
-    m_markerLabelVisible(false),
     m_shapesLabelVisible(false),
     m_unitLabelStyle(ito::AbstractFigure::UnitLabelSlash),
     m_pActSave(NULL),
@@ -102,7 +102,6 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pActProperties(NULL),
     m_pActCamParameters(NULL),
     m_pActShapeType(NULL),
-    m_currentPlane(0),
     m_axisColor(Qt::black),
     m_textColor(Qt::black),
     m_backgroundColor(Qt::white),
@@ -112,7 +111,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_shapeModifiedByMouseMove(false),
     m_geometricShapeOpacity(0),
     m_geometricShapeOpacitySelected(0),
-	m_mouseCatchTolerancePx(8)
+	m_mouseCatchTolerancePx(8),
+    m_markerModel(new MarkerModel(false, this))
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -214,11 +214,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
         m_pActCamParameters = parent->cameraParamEditorDockWidget()->toggleViewAction();
         m_pActCamParameters->setVisible(false);
 
-        PlotInfoMarker *pim = parent->markerWidget();
-        if (pim)
-        {
-            connect(pim, &PlotInfoMarker::itemChanged, this, &ItomQwtPlot::plotMarkersItemChanged);
-        }
+        MarkerWidget* markerInfoWidget = parent->markerInfoWidget();
+        markerInfoWidget->setModel(m_markerModel.data());
     }
 }
 
@@ -1475,11 +1472,11 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     emit p->geometricShapeFinished(shapes, aborted);
 
-                    PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
+                    /*PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
                     if (pim)
                     {
                         pim->updateMarkers(shapes);
-                    }
+                    }*/
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -3041,7 +3038,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         QClipboard *clipboard = QApplication::clipboard();
 
 
-        if ((hMyParent->markerWidget()  && hMyParent->markerWidget()->isVisible()) ||
+        if ((hMyParent->markerInfoWidget()  && hMyParent->markerInfoWidget()->isVisible()) ||
             (hMyParent->pickerWidget()  && hMyParent->pickerWidget()->isVisible()) ||
             (hMyParent->dObjectWidget() && hMyParent->dObjectWidget()->isVisible()) ||
             (hMyParent->shapesWidget()  && hMyParent->shapesWidget()->isVisible()))
@@ -3067,7 +3064,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         {
             QList<QWidget*> widgets;
             widgets << hMyParent->dObjectWidget() << hMyParent->pickerWidget() << \
-                hMyParent->markerWidget()  << hMyParent->shapesWidget();
+                hMyParent->markerInfoWidget()  << hMyParent->shapesWidget();
             QList<QPixmap> pixmaps;
             int height = 0;
             int width = 0;
@@ -3426,17 +3423,13 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
     ito::RetVal retval;
     int limits[] = { 2, 2, 0, std::numeric_limits<int>::max() };
 
-    QString tmpID = id;
-    if (tmpID == "")
+    QString setname = id;
+
+    if (setname == "")
     {
-        tmpID = "undef";
-        int cnt = 0;
-        while (m_plotMarkers.contains(tmpID))
-        {
-            tmpID = QString("undef%1").arg(cnt);
-            cnt++;
-        }
+        setname = m_markerModel->getNextDefaultSetname();
     }
+
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         emit statusBarMessage(tr("Could not plot marker, api is missing"), 4000);
@@ -3545,21 +3538,23 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         }
         else
         {
-            retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,>,v,^,<,x,*,+,h)").toLatin1().data());
+            retval += ito::RetVal(
+                ito::retError, 
+                0, 
+                tr("The style tag does not correspond to the required format: "
+                    "ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; "
+                    "Style = o,s,d,>,v,^,<,x,*,+,h)").toLatin1().data());
         }
 
         QwtPlotMarker *marker = NULL;
         int nrOfMarkers = dObj.getSize(1);
 
         const cv::Mat *mat = dObj.getCvPlaneMat(0);
-
         const ito::float32 *xRow = mat->ptr<const ito::float32>(0);
         const ito::float32 *yRow = mat->ptr<const ito::float32>(1);
 
         QPolygonF markerPolygon;
-        markerPolygon.clear();
-
-		QwtText label(QString(" %1").arg(tmpID));
+        QList<MarkerItem> markers;
 
         for (int i = 0; i < nrOfMarkers; ++i)
         {
@@ -3573,31 +3568,11 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 				marker->setSymbol(new QwtSymbol(symStyle, symBrush, symPen, symSize));
 				marker->setValue(xRow[i], yRow[i]);
 				marker->attach(this);
-
-				if (m_markerLabelVisible)
-				{
-					marker->setLabel(label);
-				}
-
-				if (plane == -1 || plane == m_currentPlane)
-				{
-					marker->setVisible(true);
-				}
-				else
-				{
-					marker->setVisible(false);
-				}
-
-				m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
+                markers.append(MarkerItem(marker, plane, true));
 			}
         }
 
-        PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
-        if (pim)
-        {
-            ito::Shape shapes = ito::Shape::fromMultipoint(markerPolygon, m_plotMarkers.size(), tmpID);
-            pim->updateMarker(shapes);
-        }
+        m_markerModel->addMarkers(setname, markers);
 
         replot();
     }
@@ -3606,136 +3581,47 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::deleteMarkers(const QString &id)
+ito::RetVal ItomQwtPlot::deleteMarkers(const QString &setname)
 {
     ito::RetVal retval;
-    bool found = false;
-    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
-    
-    while (i.hasNext())
-    {
-        i.next();
-        if (i.key() == id || id == "")
-        {
-            i.value().second->detach();
-            delete i.value().second;
-            found = true;
-            i.remove();
-        }
-    }
 
-    PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
-    if (pim)
+    if (setname == "")
     {
-        pim->removeMarker(id);
-    }
-
-    if (!found && id != "")
-    {
-        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(id).toLatin1().data());
+        m_markerModel->removeAllMarkers();
+        replot();
     }
     else
     {
-        replot();
+        if (!m_markerModel->removeAllMarkersFromSet(setname))
+        {
+            retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(setname).toLatin1().data());
+        }
+        else
+        {
+            replot();
+        }
     }
 
     return retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::showHideMarkers(const QString &id, bool show)
+ito::RetVal ItomQwtPlot::showHideMarkers(const QString &setname, bool show)
 {
     ito::RetVal retval;
-    bool found = false;
-    bool refresh = false;
-    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > it(m_plotMarkers);
 
-    while (it.hasNext())
+    if (!m_markerModel->setVisibility(setname, show))
     {
-        it.next();
-
-        if (it.key() == id || id == "")
-        {
-            if (it.value().second->isVisible() != show)
-            {
-                it.value().second->setVisible(show);
-                refresh = true;
-            }
-
-            found = true;
-        }
-    }
-
-    PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
-    
-
-    if (!found && id != "")
-    {
-        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(id).toLatin1().data());
-    }
-    else if (refresh)
-    {
-        replot();
-
-#if ITOM_ADDININTERFACE_VERSION >= CREATEVERSION(5,0,0)
-        if (ITOM_ADDININTERFACE_VERSION <= 0x050000)
-        {
-            // TODO: can be replaced by a direct call if the AddInInterface version is > 5.0.0.
-            QMetaObject::invokeMethod(pim, "checkMarkers", Q_ARG(QString, id), Q_ARG(bool, show));
-        }
-        else
-        {
-            pim->checkMarkers(id, show);
-        }
-#endif
+        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(setname).toLatin1().data());
     }
 
     return retval;
-}
-
-//-------------------------------------------------------------------------------------
-void ItomQwtPlot::plotMarkersItemChanged(QTreeWidgetItem *item, int column)
-{
-    if (column == 0)
-    {
-        QString name = item->data(0, Qt::DisplayRole).toString();
-        showHideMarkers(name, item->checkState(column) == Qt::Checked);
-    }
-    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::setMarkerLabelVisible(bool visible)
 {
-    if (m_markerLabelVisible != visible)
-    {
-        if (visible)
-        {
-            QPair<int, QwtPlotMarker*> pair;
-            QList<QString> keys = m_plotMarkers.keys();
-            QString label;
-            foreach(label, keys)
-            {
-                foreach(pair, m_plotMarkers.values(label))
-                {
-                    if (pair.second) pair.second->setLabel(label);
-                }
-            }
-        }
-        else
-        {
-            QPair<int, QwtPlotMarker*> pair;
-
-            foreach(pair, m_plotMarkers)
-            {
-                if (pair.second) pair.second->setLabel(QwtText());
-            }
-        }
-    }
-
-    m_markerLabelVisible = visible;
-
-    replot();
+    m_markerModel->setMarkerLabelsVisible(visible);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3757,16 +3643,7 @@ void ItomQwtPlot::setShapesLabelVisible(bool visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtPlot::changeVisibleMarkers(int currentPlane)
 {
-    m_currentPlane = currentPlane;
-
-    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
-
-    while (i.hasNext())
-    {
-        i.next();
-        i.value().second->setVisible(i.value().first == -1 || i.value().first == currentPlane);
-    }
-
+    m_markerModel->changeCurrentPlane(currentPlane);
     return ito::retOk;
 }
 

@@ -76,7 +76,9 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotEnums.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomColorMap.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotPicker.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotPanner.h   
+    ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotPanner.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/markerModel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/markerWidget.h
 )
 
 set(DESIGNER_HEADERS_COPY
@@ -107,6 +109,8 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/itomColorMap.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotPicker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotPanner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/markerModel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/markerWidget.cpp
 )
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.

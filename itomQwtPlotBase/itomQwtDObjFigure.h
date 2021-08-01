@@ -33,7 +33,6 @@
 #include "common/shape.h"
 
 #include "itomWidgets/plotInfoShapes.h"
-#include "itomWidgets/plotInfoMarker.h"
 #include "itomWidgets/plotInfoPicker.h"
 #include "itomWidgets/plotInfoDObject.h"
 
@@ -56,7 +55,8 @@
 class ItomQwtPlot;
 class ItomQwtDObjFigurePrivate;
 class ParamEditorWidget;
-
+class MarkerWidget;
+class PlotInfoMarker;
 
 class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
 {
@@ -452,12 +452,17 @@ private Q_SLOTS:
     void cameraParamEditorVisibilityChanged(bool visible);
 
 protected:
-    inline PlotInfoMarker* markerWidget(void) const { return m_pMarkerInfo; }
+
+    //!< deprecated. Do not use this method any more. Use ``markerInfoWidget`` instead.
+    inline PlotInfoMarker* markerWidget(void) const { return nullptr; }
+
     inline PlotInfoPicker* pickerWidget(void) const { return m_pPickerInfo; }
     inline PlotInfoShapes* shapesWidget(void) const { return m_pShapesInfo; }
     inline PlotInfoDObject* dObjectWidget(void) const { return m_pObjectInfo; }
+
     QDockWidget* cameraParamEditorDockWidget() const;
     ParamEditorWidget* cameraParamEditorWidget() const;
+    MarkerWidget* markerInfoWidget() const;
 
     void addToolbarsAndMenus();
     
@@ -466,7 +471,9 @@ protected:
 private:
 	void construct();
 
+    //!< this is deprecated. This member will be deleted in a next major version change.
     PlotInfoMarker  *m_pMarkerInfo;
+
 	PlotInfoPicker  *m_pPickerInfo;
 	PlotInfoShapes  *m_pShapesInfo;
 	PlotInfoDObject *m_pObjectInfo;
