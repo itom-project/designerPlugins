@@ -97,6 +97,11 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pActAspectRatio(NULL),
     m_pActSendCurrentToWorkspace(NULL),
     m_pActCopyClipboard(NULL),
+    m_pActShapesToolbox(nullptr),
+    m_pActMarkerToolbox(nullptr),
+    m_pActDObjInfoToolbox(nullptr),
+    m_pActPickerToolbox(nullptr),
+    m_pMenuToolboxes(nullptr),
     m_pMenuShapeType(NULL),
     m_pActClearShapes(NULL),
     m_pActProperties(NULL),
@@ -297,7 +302,7 @@ void ItomQwtPlot::createBaseActions()
     a->setObjectName("actClearGeometrics");
     a->setCheckable(false);
     a->setChecked(false);
-    a->setToolTip(tr("Clear All Existing Geometric Shapes"));
+    a->setToolTip(tr("Clear all existing geometric shapes"));
     connect(a, SIGNAL(triggered()), this, SLOT(clearAllGeometricShapes()));
 
     //m_actApectRatio
@@ -308,6 +313,15 @@ void ItomQwtPlot::createBaseActions()
     a->setToolTip(tr("Toggle fixed / variable aspect ration between axis x and y"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
+    m_pActShapesToolbox = p->shapesDockWidget()->toggleViewAction();
+    m_pActMarkerToolbox = p->markerDockWidget()->toggleViewAction();
+    m_pActDObjInfoToolbox = p->dObjectDockWidget()->toggleViewAction();
+    m_pActPickerToolbox = p->pickerDockWidget()->toggleViewAction();
+    m_pMenuToolboxes = new QMenu(tr("Toolboxes"), p);
+    m_pMenuToolboxes->addAction(m_pActShapesToolbox);
+    m_pMenuToolboxes->addAction(m_pActMarkerToolbox);
+    m_pMenuToolboxes->addAction(m_pActPickerToolbox);
+    m_pMenuToolboxes->addAction(m_pActDObjInfoToolbox);
 
     //m_pActShapeType
     m_pActShapeType = new QAction(tr("Draw Geometric Shape"), p);
@@ -343,7 +357,7 @@ void ItomQwtPlot::createBaseActions()
     a->setCheckable(true);
 
     m_pMenuShapeType->addSeparator();
-    m_pMenuShapeType->addAction(p->shapesDockWidget()->toggleViewAction());
+    m_pMenuShapeType->addAction(m_pActShapesToolbox);
 
     m_pActShapeType->setData(ito::Shape::Rectangle);
     m_pActShapeType->setVisible(true);
@@ -522,6 +536,8 @@ void ItomQwtPlot::setCanvasColor(const QColor &color)
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::setButtonStyle(int style)
 {
+    m_pMenuToolboxes->setIcon(QIcon(":/application/icons/list.png"));
+
     if (style == 0)
     {
         m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"));

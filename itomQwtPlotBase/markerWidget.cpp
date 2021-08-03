@@ -28,10 +28,6 @@ MarkerWidget::MarkerWidget(QWidget* parent /*= nullptr*/) :
 {
     m_pView = new QTreeView(this);
     //m_pView->setSortingEnabled(true);
-    m_pView->setColumnWidth(0, 30);
-    m_pView->setColumnWidth(1, 40);
-    m_pView->setColumnWidth(2, 40);
-    m_pView->setColumnWidth(3, 40);
 
     setCentralWidget(m_pView);
 
@@ -56,6 +52,11 @@ void MarkerWidget::setModel(QAbstractItemModel* model)
     connect(m_pModel, &QAbstractItemModel::rowsInserted, this, &MarkerWidget::rowsInserted);
     rowsInserted(QModelIndex(), 0, 0);
     m_pView->expandToDepth(1);
+
+    m_pView->setColumnWidth(0, 90);
+    m_pView->setColumnWidth(1, 50);
+    m_pView->setColumnWidth(2, 50);
+    m_pView->setColumnWidth(3, 40);
 }
 
 //-------------------------------------------------------------------------------------

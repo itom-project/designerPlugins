@@ -214,6 +214,11 @@ protected:
 
     QAction *m_pActProperties;
     QAction *m_pActCamParameters;
+    QAction *m_pActShapesToolbox;
+    QAction *m_pActMarkerToolbox;
+    QAction *m_pActDObjInfoToolbox;
+    QAction *m_pActPickerToolbox;
+    QMenu *m_pMenuToolboxes;
 
     QList<QToolBar*> m_toolbars;
     QList<QMenu*> m_menus;
