@@ -23,6 +23,8 @@
 #include "markerModel.h"
 
 #include "qwt_plot.h"
+#include "qwt_text.h"
+#include "qwt_graphic.h"
 
 //-------------------------------------------------------------------------------------
 MarkerModel::MarkerModel(bool markerLabelsVisible, QObject* parent /*= nullptr*/) :

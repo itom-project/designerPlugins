@@ -26,6 +26,7 @@
 
 #include <qdebug.h>
 #include <qnumeric.h>
+#include <QtMath>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DataObjectSeriesData::DataObjectSeriesData(const int fastmode) :

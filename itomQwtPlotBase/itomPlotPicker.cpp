@@ -25,6 +25,7 @@
 #include <qpainter.h>
 #include <qbrush.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_text.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomPlotPicker::ItomPlotPicker( QWidget *parent ) : 

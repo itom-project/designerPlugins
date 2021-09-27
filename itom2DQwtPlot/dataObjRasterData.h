@@ -57,6 +57,9 @@ class DataObjRasterData : public QwtRasterData
         void initRaster( const QRectF& area, const QSize& raster );
         void discardRaster();
 
+        void setInterval(Qt::Axis, const QwtInterval&);
+        virtual QwtInterval interval(Qt::Axis axis) const QWT_OVERRIDE QWT_FINAL;
+
         inline QSize getSize() const { return QSize(m_D.m_xSize, m_D.m_ySize); }
 
         void calcHash(const ito::DataObject *dObj, QByteArray &dataHash, QByteArray &appearanceHash);
@@ -134,6 +137,7 @@ class DataObjRasterData : public QwtRasterData
         const PlotCanvas::InternalData *m_pInternalData;
 
         bool m_isOverlayData;
+        QwtInterval m_intervals[3];
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------

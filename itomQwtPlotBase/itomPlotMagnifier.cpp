@@ -26,6 +26,7 @@
 #include <qwt_plot.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_engine.h>
+#include <qwt_transform.h>
 #include <QtCore/qmath.h>
 #include "itomPlotZoomer.h"
 

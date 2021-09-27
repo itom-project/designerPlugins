@@ -383,9 +383,9 @@ void QwtPlotCurveDataObject::drawPolyline(QPainter *painter, QPolygonF &polyline
     if ( testPaintAttribute(ClipPolygons) ) //d_data->paintAttributes & ClipPolygons )
     {
         qreal pw = qMax( qreal( 1.0 ), painter->pen().widthF());
-        const QPolygonF clipped = QwtClipper::clipPolygonF(canvasRect.adjusted(-pw, -pw, pw, pw), polyline, false );
+        QwtClipper::clipPolygonF(canvasRect.adjusted(-pw, -pw, pw, pw), polyline, false );
 
-        QwtPainter::drawPolyline( painter, clipped );
+        QwtPainter::drawPolyline( painter, polyline );
     }
     else
     {
@@ -765,9 +765,9 @@ void QwtPlotCurveDataObject::drawSteps( QPainter *painter, const QwtScaleMap &xM
                 {
                     if ( this->testPaintAttribute(ClipPolygons) )
                     {
-                        const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+                        QwtClipper::clipPolygonF( canvasRect, polyline, false );
 
-                        QwtPainter::drawPolyline( painter, clipped );
+                        QwtPainter::drawPolyline( painter, polyline );
                     }
                     else
                     {
@@ -810,9 +810,9 @@ void QwtPlotCurveDataObject::drawSteps( QPainter *painter, const QwtScaleMap &xM
                 {
                     if ( this->testPaintAttribute(ClipPolygons) )
                     {
-                        const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+                        QwtClipper::clipPolygonF( canvasRect, polyline, false );
 
-                        QwtPainter::drawPolyline( painter, clipped );
+                        QwtPainter::drawPolyline( painter, polyline );
                     }
                     else
                     {
@@ -833,9 +833,9 @@ void QwtPlotCurveDataObject::drawSteps( QPainter *painter, const QwtScaleMap &xM
 
             if ( this->testPaintAttribute(ClipPolygons) )
             {
-                const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+                QwtClipper::clipPolygonF( canvasRect, polyline, false );
 
-                QwtPainter::drawPolyline( painter, clipped );
+                QwtPainter::drawPolyline( painter, polyline );
             }
             else
             {
@@ -889,8 +889,8 @@ void QwtPlotCurveDataObject::drawSteps( QPainter *painter, const QwtScaleMap &xM
 
         if ( this->testPaintAttribute(ClipPolygons) )
         {
-            const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
-            QwtPainter::drawPolyline( painter, clipped );
+            QwtClipper::clipPolygonF( canvasRect, polyline, false );
+            QwtPainter::drawPolyline( painter, polyline );
         }
         else
         {
@@ -969,9 +969,9 @@ void QwtPlotCurveDataObject::drawCenteredSteps( QPainter *painter, const QwtScal
                 {
                     if ( this->testPaintAttribute(ClipPolygons) )
                     {
-                        const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+                        QwtClipper::clipPolygonF( canvasRect, polyline, false );
 
-                        QwtPainter::drawPolyline( painter, clipped );
+                        QwtPainter::drawPolyline( painter, polyline );
                     }
                     else
                     {
@@ -1022,9 +1022,9 @@ void QwtPlotCurveDataObject::drawCenteredSteps( QPainter *painter, const QwtScal
                 {
                     if ( this->testPaintAttribute(ClipPolygons) )
                     {
-                        const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+                        QwtClipper::clipPolygonF( canvasRect, polyline, false );
 
-                        QwtPainter::drawPolyline( painter, clipped );
+                        QwtPainter::drawPolyline( painter, polyline );
                     }
                     else
                     {
@@ -1045,9 +1045,9 @@ void QwtPlotCurveDataObject::drawCenteredSteps( QPainter *painter, const QwtScal
 
             if ( this->testPaintAttribute(ClipPolygons) )
             {
-                const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
+                QwtClipper::clipPolygonF( canvasRect, polyline, false );
 
-                QwtPainter::drawPolyline( painter, clipped );
+                QwtPainter::drawPolyline( painter, polyline );
             }
             else
             {
@@ -1110,8 +1110,8 @@ void QwtPlotCurveDataObject::drawCenteredSteps( QPainter *painter, const QwtScal
 
         if ( this->testPaintAttribute(ClipPolygons) )
         {
-            const QPolygonF clipped = QwtClipper::clipPolygonF( canvasRect, polyline, false );
-            QwtPainter::drawPolyline( painter, clipped );
+            QwtClipper::clipPolygonF( canvasRect, polyline, false );
+            QwtPainter::drawPolyline( painter, polyline );
         }
         else
         {
@@ -1153,7 +1153,7 @@ void QwtPlotCurveDataObject::fillCurve( QPainter *painter,
         brush.setColor( pen().color() );
 
     if ( testPaintAttribute(ClipPolygons) )
-        polygon = QwtClipper::clipPolygonF( canvasRect, polygon, true );
+        QwtClipper::clipPolygonF( canvasRect, polygon, true );
 
     painter->save();
 

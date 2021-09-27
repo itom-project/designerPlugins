@@ -35,6 +35,7 @@
 #include <qapplication.h>
 #include <qtoolbar.h>
 #include <qfileinfo.h>
+#include <qpainter.h>
 
 #include "DataObject/dataobj.h"
 #include "itomQwtPlot.h"

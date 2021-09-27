@@ -65,6 +65,24 @@ DataObjRasterData::~DataObjRasterData()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void DataObjRasterData::setInterval(Qt::Axis axis, const QwtInterval& interval)
+{
+    if (axis >= 0 && axis <= 2)
+    {
+        m_intervals[axis] = interval;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QwtInterval DataObjRasterData::interval(Qt::Axis axis) const
+{
+    if (axis >= 0 && axis <= 2)
+        return m_intervals[axis];
+
+    return QwtInterval();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 /*
 dataHash only concerns fundamental items like the the number of dimensions or the pointer address to the real data
 apearanceHash contains things that might require a redraw of the data (however the current zoom... can be unchanged)

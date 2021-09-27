@@ -24,6 +24,7 @@
 
 #include <qpainter.h>
 #include <qbrush.h>
+#include <qwt_text.h>
 
 ValuePicker1D::ValuePicker1D(int xAxis, int yAxis, QWidget* parent) : QwtPlotPicker(xAxis, yAxis, parent)
 {

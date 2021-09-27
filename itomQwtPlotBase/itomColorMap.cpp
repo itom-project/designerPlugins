@@ -25,6 +25,7 @@
 #include "qwt_interval.h"
 #include <qnumeric.h>
 #include <qmath.h>
+#include <qvector.h>
 #include <limits>
 
 

@@ -129,7 +129,7 @@ QImage DataObjItem::renderImage(
 
     if ( format == QImage::Format_Indexed8 ) //colorMap()->format() == QwtColorMap::Indexed )
     {
-        image.setColorTable( colorMap()->colorTable( intensityRange ) );
+        image.setColorTable( colorMap()->colorTable256() );
     }
 
     dObjRasterData->initRaster( area, image.size() );
@@ -280,7 +280,7 @@ void DataObjItem::renderTile(
 
                     for ( int x = tile.left(); x <= tile.right(); x++ )
                     {
-                        *line++ = colorMap()->colorIndex( range,
+                        *line++ = colorMap()->colorIndex( 256, range,
                             dataObjRasterData->value2_yinv( y, x ) );
                     }
                 }
@@ -294,7 +294,7 @@ void DataObjItem::renderTile(
 
                     for ( int x = tile.left(); x <= tile.right(); x++ )
                     {
-                        *line++ = colorMap()->colorIndex( range,
+                        *line++ = colorMap()->colorIndex( 256, range,
                             dataObjRasterData->value2( y, x ) );
                     }
                 }

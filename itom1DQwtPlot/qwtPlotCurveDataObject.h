@@ -38,6 +38,7 @@
 #define QWTPLOTCURVEDATAOBJECT
 
 #include <qwt_plot_curve.h>
+#include <qbrush.h>
 #include <qpolygon.h>
 
 #include "itomQwtPlotEnums.h"

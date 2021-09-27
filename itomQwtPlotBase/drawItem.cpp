@@ -24,9 +24,12 @@
 #include "qwt_scale_map.h"
 #include <qwt_symbol.h>
 #include <qwt_plot.h>
+#include <qwt_text.h>
 #include "common/apiFunctionsGraphInc.h"
 #include <qrect.h>
 #include <qmath.h>
+#include <qvariant.h>
+#include <qpainter.h>
 
 
 QVector<int> DrawItem::idxVec;
