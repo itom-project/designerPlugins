@@ -22,6 +22,8 @@
 
 #include "userInteractionPlotPicker.h"
 
+#include <qpainterpath.h>
+
 #include <qwt_picker_machine.h>
 #include <qwt_painter.h>
 #include <qwt_text.h>
