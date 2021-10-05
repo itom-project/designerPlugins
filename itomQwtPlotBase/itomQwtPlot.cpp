@@ -3152,7 +3152,7 @@ ito::RetVal ItomQwtPlot::printCanvas()
     if (!m_pPrinter)
     {
         m_pPrinter = new QPrinter();
-        m_pPrinter->setPageMargins(15, 15, 15, 15, QPrinter::Millimeter);
+        m_pPrinter->setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Unit::Millimeter);
     }
 
     QPrintPreviewDialog printPreviewDialog(m_pPrinter, this, Qt::Window);

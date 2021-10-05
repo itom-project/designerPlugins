@@ -66,7 +66,7 @@ public:
         m_states(0)
     {};
 
-    ChildPlotItem(ito::uint32 UID, QWidget *childFigure, ChildPlotStates states = 0) :
+    ChildPlotItem(ito::uint32 UID, QWidget* childFigure, ChildPlotStates states = ChildPlotStates()) :
         m_UID(UID),
         m_childFigure(childFigure),
         m_states(states)

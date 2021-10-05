@@ -86,26 +86,26 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                     case DataObjRasterData::tRGB:
                     {
                         QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
-                        text.sprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:rgb %i,%i,%i alpha %i", qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                        text.asprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:rgb %i,%i,%i alpha %i", qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
                     }
                     break;
                     case DataObjRasterData::tFloatOrComplex:
                     {
                         double value2 = m_overlayData->value(pos.x(), pos.y());
-                        text.sprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:%.4f", qRed(value), qGreen(value), qBlue(value), qAlpha(value), value2);
+                        text.asprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:%.4f", qRed(value), qGreen(value), qBlue(value), qAlpha(value), value2);
                     }
                     break;
                     case DataObjRasterData::tInteger:
                     {
                         double value2 = m_overlayData->value(pos.x(), pos.y());
-                        text.sprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:%d", qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRound(value2));
+                        text.asprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:%d", qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRound(value2));
                     }
                     break;
                 }
             }
             else
             {
-                text.sprintf("\nrgb %i,%i,%i alpha %i", qRed(value), qGreen(value), qBlue(value), qAlpha(value));
+                text.asprintf("\nrgb %i,%i,%i alpha %i", qRed(value), qGreen(value), qBlue(value), qAlpha(value));
             }
         }
         else if (m_valueData->getTypeFlag() == DataObjRasterData::tFloatOrComplex)
@@ -118,7 +118,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                     case DataObjRasterData::tRGB:
                     {
                         QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
-                        text.sprintf("\nL1:%.4f\nL2:rgb %i,%i,%i alpha %i", value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                        text.asprintf("\nL1:%.4f\nL2:rgb %i,%i,%i alpha %i", value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
                     }
                     break;
                     case DataObjRasterData::tFloatOrComplex:
@@ -150,7 +150,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                 case DataObjRasterData::tRGB:
                 {
                     QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
-                    text.sprintf("\nL1:%d\nL2:rgb %i,%i,%i alpha %i", value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                    text.asprintf("\nL1:%d\nL2:rgb %i,%i,%i alpha %i", value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
                 }
                 break;
                 case DataObjRasterData::tFloatOrComplex:
@@ -169,7 +169,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
             }
             else
             {
-                text.sprintf("\n%d", value);
+                text.asprintf("\n%d", value);
             }
         }
     }

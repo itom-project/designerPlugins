@@ -973,7 +973,7 @@ void Plot1DWidget::setLegendFont(const QFont &font)
                     text = item->legendData()[i].title();
 					text.setFont(m_legendFont);
 					QVariant titleValue;
-					qVariantSetValue(titleValue, text);
+                    titleValue.setValue(text);
                     item->legendData()[i].setValue(QwtLegendData::TitleRole, titleValue);
 				}
 			}

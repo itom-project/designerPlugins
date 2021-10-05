@@ -441,7 +441,7 @@ public Q_SLOTS:
     ito::RetVal setGeometricShapeLabel(int idx, QString label);
     ito::RetVal setGeometricShapeLabelVisible(int idx, bool visible);
 
-    ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString::Null(), int plane = -1);
+    ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
     ito::RetVal showMarkers(QString id);
     ito::RetVal hideMarkers(QString id);
