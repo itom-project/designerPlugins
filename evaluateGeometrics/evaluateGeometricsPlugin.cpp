@@ -38,8 +38,8 @@ EvaluateGeometricsPlugin::EvaluateGeometricsPlugin(QObject *parent)
     : AbstractItomDesignerPlugin(parent)
 {
     m_plotDataFormats = ito::Format_Float32;
-    m_plotDataTypes = 0;
-    m_plotFeatures = 0;
+    m_plotDataTypes = ito::PlotDataTypes();
+    m_plotFeatures = ito::PlotFeatures();
 
     m_description = QObject::tr("itom measurement widget");
     m_detaildescription = QObject::tr("The evaluate geometrics plugin can be used to evaluate geometric parameters of shapes drawn in itom plots.");
