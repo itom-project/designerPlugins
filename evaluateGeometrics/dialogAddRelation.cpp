@@ -49,38 +49,38 @@ DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometric
         switch (shapes[ni].type())
         {
             case ito::Shape::Point:
-                ui.comboBoxFirst->addItem(str.sprintf("#%d: Point", ni), shapes[ni].index());
-                ui.comboBoxSecond->addItem(str.sprintf("#%d: Point", ni), shapes[ni].index());
+                ui.comboBoxFirst->addItem(str.asprintf("#%d: Point", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.asprintf("#%d: Point", ni), shapes[ni].index());
             break;
 
             case ito::Shape::Line:
-                ui.comboBoxFirst->addItem(str.sprintf("#%d: Line", ni), shapes[ni].index());
-                ui.comboBoxSecond->addItem(str.sprintf("#%d: Line", ni), shapes[ni].index());
+                ui.comboBoxFirst->addItem(str.asprintf("#%d: Line", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.asprintf("#%d: Line", ni), shapes[ni].index());
             break;
 
             case ito::Shape::Rectangle:
-                ui.comboBoxFirst->addItem(str.sprintf("#%d: Rectangle", ni), shapes[ni].index());
-                ui.comboBoxSecond->addItem(str.sprintf("#%d: Rectangle", ni), shapes[ni].index());
+                ui.comboBoxFirst->addItem(str.asprintf("#%d: Rectangle", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.asprintf("#%d: Rectangle", ni), shapes[ni].index());
             break;
 
             case ito::Shape::Square:
-                ui.comboBoxFirst->addItem(str.sprintf("#%d: Square", ni), shapes[ni].index());
-                ui.comboBoxSecond->addItem(str.sprintf("#%d: Square", ni), shapes[ni].index());
+                ui.comboBoxFirst->addItem(str.asprintf("#%d: Square", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.asprintf("#%d: Square", ni), shapes[ni].index());
             break;
 
             case ito::Shape::Circle:
-                ui.comboBoxFirst->addItem(str.sprintf("#%d: Circle", ni), shapes[ni].index());
-                ui.comboBoxSecond->addItem(str.sprintf("#%d: Circle", ni), shapes[ni].index());
+                ui.comboBoxFirst->addItem(str.asprintf("#%d: Circle", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.asprintf("#%d: Circle", ni), shapes[ni].index());
             break;
 
             case ito::Shape::Ellipse:
-                ui.comboBoxFirst->addItem(str.sprintf("#%d: Ellipse", ni), shapes[ni].index());
-                ui.comboBoxSecond->addItem(str.sprintf("#%d: Ellipse", ni), shapes[ni].index());
+                ui.comboBoxFirst->addItem(str.asprintf("#%d: Ellipse", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.asprintf("#%d: Ellipse", ni), shapes[ni].index());
             break;
 
             case ito::Shape::Polygon:
-                ui.comboBoxFirst->addItem(str.sprintf("#%d: Polygon", ni), shapes[ni].index());
-                ui.comboBoxSecond->addItem(str.sprintf("#%d: Polygon", ni), shapes[ni].index());
+                ui.comboBoxFirst->addItem(str.asprintf("#%d: Polygon", ni), shapes[ni].index());
+                ui.comboBoxSecond->addItem(str.asprintf("#%d: Polygon", ni), shapes[ni].index());
             break;
         }
         if (shapes[ni].index() == curItem)
