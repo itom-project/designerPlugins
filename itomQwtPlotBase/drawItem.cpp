@@ -1180,7 +1180,11 @@ bool DrawItem::hitLine(const QPointF &point_transformed, const QLineF &line, dou
     normal.translate(-line.p1() + point_transformed);
 
     QPointF intersection;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    line.intersects(normal, &intersection);
+#else
     line.intersect(normal, &intersection);
+#endif   
 
     if (std::abs(QLineF(point_transformed, intersection).dx()) <= tol_x && std::abs(QLineF(point_transformed, intersection).dy()) <= tol_y)
     {
