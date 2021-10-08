@@ -463,7 +463,7 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
         {
             beforeToolbar = beforeContextMenu = actGroup.m_pActions[0];
         }
-        actGroup.m_pActions.insert(position, action);
+        actGroup.m_pActions.insert(std::max(0, position), action);
     }
     else if (position >= actGroup.m_pActions.size())
     {
