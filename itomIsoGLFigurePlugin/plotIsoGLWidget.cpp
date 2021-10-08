@@ -2840,7 +2840,11 @@ int plotGLWidget::OGLTextOut(const char *buffer, double xpos, double ypos, const
 void plotGLWidget::OGLMakeFont(int size)
 {
     QFont oldFont = font();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+    QFont myFont("Arial", -size, QFont::Light & QFont::PreferBitmap);
+#else
     QFont myFont("Arial", -size, QFont::Light & QFont::OpenGLCompatible & QFont::PreferBitmap);
+#endif    
     this->setFont(myFont);
 
     if(m_myCharBitmapBuffer != 0)
