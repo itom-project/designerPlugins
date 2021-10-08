@@ -426,7 +426,7 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
         {
             button = 3;
         }
-        else if(btns & Qt::MidButton)
+        else if(btns & Qt::MiddleButton)
         {
             button = 2;
         }
@@ -517,14 +517,27 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
 {
     if (!hasFocus())
         return;
-    QPointF scenePos = mapToScene( event->pos().x(), event->pos().y() );
-    if(event->orientation() == Qt::Vertical)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QPointF scenePos = mapToScene(event->position().x(), event->position().y());
+    if (event->angleDelta().y() > 0)
+#else
+    QPointF scenePos = mapToScene(event->pos().x(), event->pos().y());
+    if (event->orientation() == Qt::Vertical)
+#endif    
     {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().y(), 1);
+#else
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 1);
+#endif   
     }
     else
     {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().y(), 0);
+#else
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 0);
+#endif 
     }
 }
 
