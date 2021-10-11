@@ -35,7 +35,7 @@ class FormTabWidget : public QWidget
 public:
     FormTabWidget(QWidget *parent = 0) :
         QWidget(parent),
-        m_pTabWidget(NULL)
+        m_pTabWidget(nullptr)
     {
         QVBoxLayout *layout = new QVBoxLayout(this);
 

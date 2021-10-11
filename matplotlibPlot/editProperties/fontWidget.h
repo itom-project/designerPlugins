@@ -42,10 +42,10 @@ class FontWidget : public QWidget
 public:
     FontWidget(const QFont &font, QWidget *parent = 0) :
         QWidget(parent),
-        m_pCheckBold(NULL),
-        m_pCheckItalic(NULL),
-        m_pComboSize(NULL),
-        m_pComboFamily(NULL)
+        m_pCheckBold(nullptr),
+        m_pCheckItalic(nullptr),
+        m_pComboSize(nullptr),
+        m_pComboFamily(nullptr)
     {
         QGridLayout *grid = new QGridLayout(this);
 

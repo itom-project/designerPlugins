@@ -102,8 +102,8 @@ class ColorWidget : public QWidget
 public:
     ColorWidget(const QColor &color, QWidget *parent = 0) :
         QWidget(parent),
-        m_pLineEdit(NULL),
-        m_pColorBtn(NULL)
+        m_pLineEdit(nullptr),
+        m_pColorBtn(nullptr)
     {
         QHBoxLayout *layout = new QHBoxLayout(this);
 

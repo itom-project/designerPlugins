@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -36,9 +36,9 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
     m_internalResize(false),
     m_keepSizeFixed(false),
     m_updatePlot(false),
-    m_scene(NULL),
-    m_rectItem(NULL),
-    m_pixmapItem(NULL),
+    m_scene(nullptr),
+    m_rectItem(nullptr),
+    m_pixmapItem(nullptr),
 #ifdef _DEBUG
     m_debugOutput(false), //set this to true in order to get qDebug() outputs in _DEBUG mode
 #endif

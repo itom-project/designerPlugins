@@ -34,8 +34,8 @@ class FormComboWidget : public QWidget
 public:
     FormComboWidget(QWidget *parent = 0) :
         QWidget(parent),
-        m_pComboBox(NULL),
-        m_pStackedWidget(NULL)
+        m_pComboBox(nullptr),
+        m_pStackedWidget(nullptr)
     {
         QVBoxLayout *layout = new QVBoxLayout(this);
         setLayout(layout);
