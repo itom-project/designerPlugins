@@ -1796,7 +1796,7 @@ void PlotCanvas::setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &sc
 		{
 			setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine());
 		}
-		else if ((int)scaleEngine < 1000)
+		else if ((int)scaleEngine < (int)ItomQwtPlotEnums::LogLog2)
 		{
 			setAxisScaleEngine(QwtPlot::yRight, new QwtLogScaleEngine((int)scaleEngine));
 		}
