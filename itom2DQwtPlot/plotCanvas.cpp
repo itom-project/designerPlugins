@@ -2826,7 +2826,7 @@ void PlotCanvas::lineCutAppendedPx(const QPoint &pt)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::lineCutAppendedPhys(const QPointF &pt)
 {
-    if (state() == stateLineCut && m_dObjPtr)
+    if (state() == stateLineCut)
     {
         QVector<QPointF> pts;
         pts.resize(2);
@@ -3068,7 +3068,7 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
 {
-    if (state() == stateVolumeCut && m_dObjPtr)
+    if (state() == stateVolumeCut)
     {
         QVector<QPointF> pts;
         pts.resize(2);
