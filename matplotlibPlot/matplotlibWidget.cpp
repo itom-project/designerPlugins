@@ -519,7 +519,7 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
         return;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QPointF scenePos = mapToScene(event->position().x(), event->position().y());
-    if (event->angleDelta().y() > 0)
+    if (std::abs(event->angleDelta().y()) > 0)
 #else
     QPointF scenePos = mapToScene(event->pos().x(), event->pos().y());
     if (event->orientation() == Qt::Vertical)
@@ -534,7 +534,7 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
     else
     {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().y(), 0);
+        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().x(), 0);
 #else
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 0);
 #endif 
