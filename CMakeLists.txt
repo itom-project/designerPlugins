@@ -22,6 +22,7 @@ option(PLUGIN_itom1DQwtPlot "Build with this solution." ON)
 option(PLUGIN_itom2DQwtPlot "Build with this solution." ON)
 option(PLUGIN_itomIsoGLFigurePlugin "Build with this solution." ON)
 option(PLUGIN_matplotlibPlot "Build with this solution." ON)
+option(PLUGIN_plotlyPlot "Build with this solution." ON)
 option(PLUGIN_motorController "Build with this solution." ON)
 option(PLUGIN_evaluateGeometrics "Build with this solution." ON)
 option(PLUGIN_vtk3dVisualizer "Build with this solution." ON)
@@ -50,6 +51,10 @@ endif()
 
 if(PLUGIN_matplotlibPlot)
     add_subdirectory(matplotlibPlot)
+endif()
+
+if(PLUGIN_plotlyPlot)
+    add_subdirectory(plotlyPlot)
 endif()
 
 if(PLUGIN_motorController)
