@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -22,33 +22,36 @@
 
 #include "plotlyPlot.h"
 
+#include <QWebEngineProfile>
 #include <QWebEngineView>
+#include <qfiledialog.h>
+#include <qfileinfo.h>
 #include <qsharedpointer.h>
-#include <qtemporaryfile.h>
 #include <qstatusbar.h>
+#include <qtemporaryfile.h>
 
 class PlotlyPlotPrivate
 {
 public:
-    PlotlyPlotPrivate() :
-        m_pWebEngineView(nullptr),
-        m_htmlFile(nullptr)
+    PlotlyPlotPrivate() : m_pWebEngineView(nullptr), m_htmlFile(nullptr)
     {
-
     }
 
-    QWebEngineView *m_pWebEngineView;
+    QWebEngineView* m_pWebEngineView;
     QSharedPointer<QTemporaryFile> m_htmlFile;
 };
 
 //-------------------------------------------------------------------------------------
-PlotlyPlot::PlotlyPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= 0*/)
-    : ito::AbstractFigure(itomSettingsFile, windowMode, parent),
+PlotlyPlot::PlotlyPlot(
+    const QString& itomSettingsFile,
+    AbstractFigure::WindowMode windowMode,
+    QWidget* parent /*= 0*/) :
+    ito::AbstractFigure(itomSettingsFile, windowMode, parent),
     d_ptr(new PlotlyPlotPrivate())
 {
     Q_D(PlotlyPlot);
 
-    setWindowFlags(Qt::Widget); //this is important such that this main window reacts as widget
+    setWindowFlags(Qt::Widget); // this is important such that this main window reacts as widget
 
     d->m_pWebEngineView = new QWebEngineView(this);
     setContentsMargins(0, 0, 0, 0);
@@ -56,7 +59,7 @@ PlotlyPlot::PlotlyPlot(const QString &itomSettingsFile, AbstractFigure::WindowMo
 
     setCentralWidget(d->m_pWebEngineView);
 
-    QStatusBar *statusBar = qobject_cast<QMainWindow*>(this)->statusBar();
+    QStatusBar* statusBar = qobject_cast<QMainWindow*>(this)->statusBar();
 
     connect(d->m_pWebEngineView, &QWebEngineView::loadStarted, [=]() {
         statusBar->showMessage(tr("Started Loading..."));
@@ -71,11 +74,23 @@ PlotlyPlot::PlotlyPlot(const QString &itomSettingsFile, AbstractFigure::WindowMo
         {
             statusBar->showMessage(tr("Error loading the content."), 2000);
         }
-        
     });
 
     connect(d->m_pWebEngineView, &QWebEngineView::loadProgress, [=](int progress) {
         statusBar->showMessage(tr("Loading (%1 %)").arg(progress));
+    });
+
+    QWebEngineProfile* profile = d->m_pWebEngineView->page()->profile();
+    connect(profile, &QWebEngineProfile::downloadRequested, [=](QWebEngineDownloadItem* download) {
+        QFileInfo fileInfo(download->path());
+        QString newPath = QFileDialog::getSaveFileName(
+            this, tr("File Location"), download->path(), tr("Image (*.%1)").arg(fileInfo.suffix()));
+
+        if (newPath != "")
+        {
+            download->setPath(newPath);
+            download->accept();
+        }
     });
 
     setPropertyObservedObject(this);
@@ -84,7 +99,6 @@ PlotlyPlot::PlotlyPlot(const QString &itomSettingsFile, AbstractFigure::WindowMo
 //-------------------------------------------------------------------------------------
 PlotlyPlot::~PlotlyPlot()
 {
-
 }
 
 //-------------------------------------------------------------------------------------
@@ -99,7 +113,7 @@ bool PlotlyPlot::getContextMenuEnabled() const
 }
 
 //-------------------------------------------------------------------------------------
-void PlotlyPlot::setHtml(const QString &html)
+void PlotlyPlot::setHtml(const QString& html)
 {
     Q_D(PlotlyPlot);
 
@@ -110,7 +124,8 @@ void PlotlyPlot::setHtml(const QString &html)
     }
     else
     {
-        d->m_htmlFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile("itom_plotly_XXXXXX.html"));
+        d->m_htmlFile =
+            QSharedPointer<QTemporaryFile>(new QTemporaryFile("itom_plotly_XXXXXX.html"));
 
         if (d->m_htmlFile->open())
         {
@@ -122,6 +137,3 @@ void PlotlyPlot::setHtml(const QString &html)
         d->m_pWebEngineView->setUrl(QUrl(filename));
     }
 }
-
-
-
