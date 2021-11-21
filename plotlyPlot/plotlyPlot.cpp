@@ -75,7 +75,7 @@ PlotlyPlot::PlotlyPlot(const QString &itomSettingsFile, AbstractFigure::WindowMo
     });
 
     connect(d->m_pWebEngineView, &QWebEngineView::loadProgress, [=](int progress) {
-        statusBar->showMessage(tr("Loading (%1 \%)").arg(progress));
+        statusBar->showMessage(tr("Loading (%1 %)").arg(progress));
     });
 
     setPropertyObservedObject(this);
@@ -103,16 +103,24 @@ void PlotlyPlot::setHtml(const QString &html)
 {
     Q_D(PlotlyPlot);
 
-    d->m_htmlFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile("itom_plotly_XXXXXX.html"));
-
-    if (d->m_htmlFile->open())
+    if (html == "")
     {
-        d->m_htmlFile->write(html.toLatin1());
-        d->m_htmlFile->close();
+        d->m_htmlFile.clear();
+        d->m_pWebEngineView->setUrl(QUrl());
     }
+    else
+    {
+        d->m_htmlFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile("itom_plotly_XXXXXX.html"));
 
-    QString filename = d->m_htmlFile->fileName();
-    d->m_pWebEngineView->setUrl(QUrl(filename));
+        if (d->m_htmlFile->open())
+        {
+            d->m_htmlFile->write(html.toLatin1());
+            d->m_htmlFile->close();
+        }
+
+        QString filename = d->m_htmlFile->fileName();
+        d->m_pWebEngineView->setUrl(QUrl(filename));
+    }
 }
 
 
