@@ -126,7 +126,7 @@ void PlotlyPlot::setHtml(const QString& html)
     {
         d->m_htmlFile =
             QSharedPointer<QTemporaryFile>(new QTemporaryFile("itom_plotly_XXXXXX.html"));
-
+        d->m_htmlFile->setAutoRemove(true);
         if (d->m_htmlFile->open())
         {
             d->m_htmlFile->write(html.toLatin1());
