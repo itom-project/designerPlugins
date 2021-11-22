@@ -23,9 +23,9 @@
 #pragma once
 
 #if defined(ITOMSHAREDDESIGNER)
-    #define ITOMMATPLOTLIB_EXPORT Q_DECL_EXPORT
+    #define ITOMPLOTLY_EXPORT Q_DECL_EXPORT
 #else
-    #define ITOMMATPLOTLIB_EXPORT Q_DECL_IMPORT
+    #define ITOMPLOTLY_EXPORT Q_DECL_IMPORT
 #endif
 
 #include <QtCore/QtGlobal>
@@ -37,7 +37,7 @@
 
 class PlotlyPlotPrivate;
 
-class ITOMMATPLOTLIB_EXPORT PlotlyPlot : public ito::AbstractFigure
+class ITOMPLOTLY_EXPORT PlotlyPlot : public ito::AbstractFigure
 {
     Q_OBJECT
 
