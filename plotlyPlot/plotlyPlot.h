@@ -45,6 +45,7 @@ class ITOMMATPLOTLIB_EXPORT PlotlyPlot : public ito::AbstractFigure
     //USER (default: false): property is visible in property editor of plot
 
     Q_CLASSINFO("slot://setHtml", "Set this html document as content.")
+    Q_CLASSINFO("slot://clear", "Clears the canvas.")
 
     Q_DECLARE_PRIVATE(PlotlyPlot)
 
@@ -65,6 +66,7 @@ private:
 
 public slots:
     void setHtml(const QString &html);
+    void clear();
 
 private slots:
 

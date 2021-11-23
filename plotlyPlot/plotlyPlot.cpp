@@ -29,6 +29,7 @@
 #include <qsharedpointer.h>
 #include <qstatusbar.h>
 #include <qtemporaryfile.h>
+#include <qdir.h>
 
 class PlotlyPlotPrivate
 {
@@ -124,8 +125,9 @@ void PlotlyPlot::setHtml(const QString& html)
     }
     else
     {
+        QString tempFile = QDir::tempPath() + "/itom_plotly_XXXXXX.html";
         d->m_htmlFile =
-            QSharedPointer<QTemporaryFile>(new QTemporaryFile("itom_plotly_XXXXXX.html"));
+            QSharedPointer<QTemporaryFile>(new QTemporaryFile(tempFile));
 
         if (d->m_htmlFile->open())
         {
@@ -136,4 +138,10 @@ void PlotlyPlot::setHtml(const QString& html)
         QString filename = d->m_htmlFile->fileName();
         d->m_pWebEngineView->setUrl(QUrl(filename));
     }
+}
+
+//-------------------------------------------------------------------------------------
+void PlotlyPlot::clear()
+{
+    setHtml("");
 }
