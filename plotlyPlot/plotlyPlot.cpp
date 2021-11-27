@@ -24,6 +24,7 @@
 
 #include <QWebEngineProfile>
 #include <QWebEngineView>
+#include <qwebenginedownloaditem.h>
 #include <qfiledialog.h>
 #include <qfileinfo.h>
 #include <qsharedpointer.h>
