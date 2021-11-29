@@ -1161,14 +1161,14 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
 
     if (!validX0 && !validX1)
     {
-        if (!xInterval.contains(m_dataObjPlane->getPixToPhys(dims - 1, 0)))
+        if (!xInterval.normalized().contains(m_dataObjPlane->getPixToPhys(dims - 1, 0)))
         {
             return QSharedPointer<ito::DataObject>(new ito::DataObject());
         }
     }
     else if (!validY0 && !validY1)
     {
-        if (!yInterval.contains(m_dataObjPlane->getPixToPhys(dims - 2, 0)))
+        if (!yInterval.normalized().contains(m_dataObjPlane->getPixToPhys(dims - 2, 0)))
         {
             return QSharedPointer<ito::DataObject>(new ito::DataObject());
         }
