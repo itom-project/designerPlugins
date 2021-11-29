@@ -58,6 +58,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QFont axisFont READ getAxisFont WRITE setAxisFont USER true)
     Q_PROPERTY(QFont labelFont READ getLabelFont WRITE setLabelFont USER true)
     Q_PROPERTY(QFont legendFont READ getLegendFont WRITE setLegendFont USER true)
+    Q_PROPERTY(double axisLabelRotation READ getAxisLabelRotation WRITE setAxisLabelRotation USER true)
+    Q_PROPERTY(Qt::Alignment axisLabelAlignment READ getAxisLabelAlignment WRITE setAxisLabelAlignment USER true)
     
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
     Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
@@ -102,6 +104,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://labelFont", "Font for axes descriptions.")
     Q_CLASSINFO("prop://axisFont", "Font for axes tick values.")
     Q_CLASSINFO("prop://legendFont", "Font for legend entries")
+
+    Q_CLASSINFO("prop://axisLabelRotation", "The rotation angle in degree of the labels on the bottom x-axis. If changed, the alignment should also be adapted.")
+    Q_CLASSINFO("prop://axisLabelAlignment", "The label alignment for the x-axis. This value has to be adjusted if the rotation is changed.")
+
     Q_CLASSINFO("prop://grid", "Style of the grid ('GridNo', 'GridMajorXY', 'GridMajorX', 'GridMajorY', 'GridMinorXY', 'GridMinorX', 'GridMinorY').")
 
     Q_CLASSINFO("prop://lineWidth", "width of all curves in pixel.")
@@ -282,6 +288,12 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
         QFont getLegendFont() const;
         void setLegendFont(const QFont &font);
+
+        double getAxisLabelRotation() const;
+        void setAxisLabelRotation(const double &rotation);
+
+        Qt::Alignment getAxisLabelAlignment() const;
+        void setAxisLabelAlignment(const Qt::Alignment &alignment);
 
         GridStyle getGrid(void) const;
         void setGrid(const GridStyle &gridStyle);

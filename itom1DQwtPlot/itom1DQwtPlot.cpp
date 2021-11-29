@@ -501,6 +501,7 @@ QFont Itom1DQwtPlot::getLabelFont(void) const
     }
     return QFont();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QFont Itom1DQwtPlot::getLegendFont() const
 {
@@ -510,6 +511,50 @@ QFont Itom1DQwtPlot::getLegendFont() const
     }
     return QFont();
 }
+
+//-------------------------------------------------------------------------------------
+double Itom1DQwtPlot::getAxisLabelRotation() const
+{
+    if (m_pContent)
+    {
+        return m_pContent->axisWidget(QwtPlot::xBottom)->scaleDraw()->labelRotation();
+    }
+
+    return 0.0;
+}
+
+//-------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setAxisLabelRotation(const double &rotation)
+{
+    if (m_pContent)
+    {
+        m_pContent->setAxisLabelRotation(QwtPlot::xBottom, rotation);
+        updatePropertyDock();
+    }
+}
+
+//-------------------------------------------------------------------------------------
+Qt::Alignment Itom1DQwtPlot::getAxisLabelAlignment() const
+{
+    if (m_pContent)
+    {
+        Qt::Alignment alignment = m_pContent->axisWidget(QwtPlot::xBottom)->scaleDraw()->labelAlignment();
+        return alignment;
+    }
+
+    return Qt::AlignHCenter | Qt::AlignBottom;
+}
+
+//-------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setAxisLabelAlignment(const Qt::Alignment &alignment)
+{
+    if (m_pContent)
+    {
+        m_pContent->setAxisLabelAlignment(QwtPlot::xBottom, alignment);
+        updatePropertyDock();
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLegendFont(const QFont &font)
 {
