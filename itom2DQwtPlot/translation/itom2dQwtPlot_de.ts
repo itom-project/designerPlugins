@@ -62,7 +62,7 @@
         <translation>Werte</translation>
     </message>
     <message>
-        <location filename="../dialog2DScale.cpp" line="+206"/>
+        <location filename="../dialog2DScale.cpp" line="+207"/>
         <source>invalid number</source>
         <translation type="unfinished">Ungültige Zahl</translation>
     </message>
@@ -133,20 +133,20 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+1697"/>
-        <location line="+1647"/>
+        <location filename="../plotCanvas.cpp" line="+1703"/>
+        <location line="+1656"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="-1780"/>
+        <location line="-1789"/>
         <location line="+141"/>
-        <location line="+1647"/>
+        <location line="+1656"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
-        <location line="-3114"/>
+        <location line="-3129"/>
         <source>plotting tools</source>
         <translation type="unfinished">Symbolleiste Plot</translation>
     </message>
@@ -161,7 +161,7 @@
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+21"/>
         <source>Tools</source>
         <translation type="unfinished">Werkzeuge</translation>
     </message>
@@ -375,12 +375,12 @@
         <translation>| &amp;&amp; Max</translation>
     </message>
     <message>
-        <location line="+2836"/>
+        <location line="+2849"/>
         <source>Could not activate the line cut.</source>
         <translation type="unfinished">Der Linienschnitt kann nicht aktiviert werden.</translation>
     </message>
     <message>
-        <location line="-2855"/>
+        <location line="-2868"/>
         <source>line cut through global minimum and maximum value</source>
         <translation type="unfinished">Globales Minimum und Maximum für Linienschnitt übernehmen</translation>
     </message>
@@ -440,7 +440,7 @@
         <translation type="unfinished">Bildebene auswählen</translation>
     </message>
     <message>
-        <location line="+232"/>
+        <location line="+236"/>
         <location line="+103"/>
         <location line="+143"/>
         <source>type not implemented yet</source>
@@ -459,13 +459,13 @@
     <message>
         <location line="+218"/>
         <location line="+131"/>
-        <location line="+1665"/>
+        <location line="+1674"/>
         <source>Selected color map has less than two points.</source>
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="-1673"/>
-        <location line="+1664"/>
+        <location line="-1682"/>
+        <location line="+1673"/>
         <source>error when loading color map</source>
         <translation type="unfinished">Fehler beim Laden der Farbpalette</translation>
     </message>
@@ -505,12 +505,12 @@
         <translation>Referenz auf Eingangsobjekt</translation>
     </message>
     <message>
-        <location filename="../plotCanvas.cpp" line="-2948"/>
+        <location filename="../plotCanvas.cpp" line="-2961"/>
         <source>plot2D</source>
         <translation type="unfinished">2D-Plot</translation>
     </message>
     <message>
-        <location line="+669"/>
+        <location line="+673"/>
         <source>y-axis</source>
         <translation>Y-Achse</translation>
     </message>

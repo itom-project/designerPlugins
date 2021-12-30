@@ -75,15 +75,15 @@
     <name>Vtk3dVisualizer</name>
     <message>
         <source>3D Visualizer</source>
-        <translation type="unfinished">3D-Visualisierer</translation>
+        <translation type="obsolete">3D-Visualisierer</translation>
     </message>
     <message>
         <source>Items</source>
-        <translation type="unfinished">Elemente</translation>
+        <translation type="obsolete">Elemente</translation>
     </message>
     <message>
         <source>Visualization Settings</source>
-        <translation type="unfinished">Visualisierungseinstellungen</translation>
+        <translation type="obsolete">Visualisierungseinstellungen</translation>
     </message>
     <message>
         <source>toolbars</source>

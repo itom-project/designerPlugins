@@ -130,12 +130,12 @@
 <context>
     <name>ItomQwtDObjFigure</name>
     <message>
-        <location filename="../itomQwtDObjFigure.cpp" line="+102"/>
+        <location filename="../itomQwtDObjFigure.cpp" line="+106"/>
         <source>Marker Info</source>
         <translation>Marker Info</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Picker Info</source>
         <translation>Picker Info</translation>
     </message>
@@ -156,7 +156,7 @@
     </message>
     <message>
         <location line="+76"/>
-        <location line="+58"/>
+        <location line="+64"/>
         <source>no content widget available.</source>
         <translation>Kein Widget für den Inhalt verfügbar.</translation>
     </message>
@@ -177,6 +177,8 @@
         <location line="+12"/>
         <location line="+83"/>
         <location line="+10"/>
+        <location line="+10"/>
+        <location line="+10"/>
         <source>content not available</source>
         <translation>Der Inhalt ist nicht verfügbar</translation>
     </message>
@@ -184,7 +186,7 @@
 <context>
     <name>ItomQwtPlot</name>
     <message>
-        <location filename="../itomQwtPlot.cpp" line="+242"/>
+        <location filename="../itomQwtPlot.cpp" line="+252"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -259,17 +261,16 @@
         <translation>Geometrische Formen löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Clear All Existing Geometric Shapes</source>
-        <translation>Alle vorhandenen geometrischen Formen löschen</translation>
+        <translation type="vanished">Alle vorhandenen geometrischen Formen löschen</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Lock Aspect Ratio</source>
         <translation>Seitenverhältnis sperren</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+18"/>
         <location line="+1"/>
         <source>Draw Geometric Shape</source>
         <translation>Geometrische Forme zeichnen</translation>
@@ -310,7 +311,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+1109"/>
+        <location line="+1111"/>
         <location line="+122"/>
         <location line="+62"/>
         <location line="+57"/>
@@ -453,7 +454,17 @@
         <translation>Bitte %1 Quadrate einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-581"/>
+        <location line="-2004"/>
+        <source>Clear all existing geometric shapes</source>
+        <translation type="unfinished">Alle geometrischen Formen entfernen</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Toolboxes</source>
+        <translation type="unfinished">Toolboxen</translation>
+    </message>
+    <message>
+        <location line="+1408"/>
         <location line="+585"/>
         <source>Please draw one square. Esc aborts the selection.</source>
         <translation>Bitte ein Quadrat einzeichnen. ESC bricht die Auswahl ab.</translation>
@@ -643,26 +654,70 @@
         <translation>Warnung beim Senden des Datenobjekts an Workspace</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+27"/>
         <location line="+1"/>
         <source>Could not plot marker, api is missing</source>
         <translation>Der Marker konnte nicht gezeichnet werden weil API fehlt</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+108"/>
         <source>The style tag does not correspond to the required format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</source>
         <translation>Die Stil-Bezeichnung entspricht nicht dem erforderlichen Format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,&gt;,v,^,&lt;,x,*,+,h)</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+53"/>
+        <location line="+18"/>
         <source>No marker with id &apos;%1&apos; found.</source>
         <translation>Es wurde kein Marker mit der ID %1 gefunden.</translation>
     </message>
 </context>
 <context>
+    <name>MarkerModel</name>
+    <message>
+        <location filename="../markerModel.cpp" line="+33"/>
+        <source>Index</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>X</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Y</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Plane Index</source>
+        <translation type="unfinished">Ebenenindex</translation>
+    </message>
+    <message>
+        <location line="+179"/>
+        <source>setname</source>
+        <translation type="unfinished">Unbenannt</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>setname%1</source>
+        <translation type="unfinished">Unbenannt%1</translation>
+    </message>
+    <message>
+        <location line="+71"/>
+        <source>#%1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>All</source>
+        <translation type="unfinished">Alles</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
-        <location filename="../drawItem.cpp" line="+1069"/>
+        <location filename="../drawItem.cpp" line="+1074"/>
         <source>invalid geometric shape type</source>
         <translation>Ungültiger Typ der geometischen Formen</translation>
     </message>

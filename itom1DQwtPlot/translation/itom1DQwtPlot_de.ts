@@ -4,22 +4,22 @@
 <context>
     <name>Dialog1DScale</name>
     <message>
-        <location filename="../dialog1DScale.cpp" line="+175"/>
+        <location filename="../dialog1DScale.cpp" line="+176"/>
         <source>invalid number</source>
         <translation type="unfinished">Ungültige Zahl</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="+1"/>
         <source>The &apos;%1&apos; number is no valid decimal number.</source>
         <translation type="unfinished">Die Zahl &apos;%1&apos; ist keine gültige Dezimalzahl.</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+7"/>
         <source>out of range</source>
         <translation type="unfinished">Außerhalb des Gültigkeitsbereichs</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="+1"/>
         <source>The &apos;%1&apos; number is out of range [%2,%3]</source>
         <translation type="unfinished">Die Zahl &apos;%1&apos; liegt außerhalb des Gültigkeitsbereichs [%2, %3]</translation>
     </message>
@@ -42,7 +42,7 @@
         <translation>Kurveneigenschaften</translation>
     </message>
     <message>
-        <location line="+818"/>
+        <location line="+863"/>
         <location line="+10"/>
         <source>Set picker failed, since canvas not initilized</source>
         <translation>Der Picker konnte nicht gesetzt werden, da &apos;Canvas&apos; nicht inizialisiert wurde</translation>
@@ -77,7 +77,7 @@
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+21"/>
         <source>Tools</source>
         <translation>Werkzeuge</translation>
     </message>
@@ -245,7 +245,7 @@
         <translation type="unfinished">Y fein</translation>
     </message>
     <message>
-        <location line="+1400"/>
+        <location line="+1409"/>
         <source>1D Object Slice</source>
         <translation type="unfinished">1D-Objektschnitt</translation>
     </message>
@@ -278,7 +278,7 @@
         <translation type="unfinished">xData enthält mehr Werte als das Quell-DataObject. Ungenutzte Werte werden ignoriert.</translation>
     </message>
     <message>
-        <location line="+1235"/>
+        <location line="+1247"/>
         <source>CurveIndex out of bounds [0,%i]</source>
         <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
@@ -318,7 +318,7 @@
         <translation type="unfinished">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-3725"/>
+        <location line="-3746"/>
         <location line="+1"/>
         <source>Color Representation</source>
         <translation type="unfinished">Farbdarstellung</translation>
@@ -360,7 +360,7 @@
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+703"/>
+        <location line="+712"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -384,13 +384,13 @@
         <translation>rot</translation>
     </message>
     <message>
-        <location line="+2984"/>
+        <location line="+2996"/>
         <source>itom API not available.</source>
         <translation type="unfinished">Die itom-API ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-3255"/>
-        <location line="+437"/>
+        <location line="-3276"/>
+        <location line="+446"/>
         <location line="+1"/>
         <location line="+86"/>
         <location line="+1"/>
@@ -398,12 +398,12 @@
         <translation>Kurve %1</translation>
     </message>
     <message>
-        <location line="-1392"/>
+        <location line="-1403"/>
         <source>Plotting Tools</source>
         <translation type="unfinished">Symbolleiste</translation>
     </message>
     <message>
-        <location line="+293"/>
+        <location line="+295"/>
         <source>Manual Picker Selection</source>
         <translation type="unfinished">Manuelle Pickerwahl</translation>
     </message>
@@ -462,7 +462,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation>Grauwert</translation>
     </message>
     <message>
-        <location line="+729"/>
+        <location line="+738"/>
         <location line="+12"/>
         <source>gray</source>
         <translation>grau</translation>
@@ -491,7 +491,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation type="unfinished">LGPL, für Qwt siehe Qwt-Lizenz</translation>
     </message>
     <message>
-        <location filename="../dataObjectSeriesData.cpp" line="+199"/>
+        <location filename="../dataObjectSeriesData.cpp" line="+200"/>
         <source>cv:Mat in data object seems corrupted</source>
         <translation type="unfinished">cv::Mat im Datenobjekt scheint defekt</translation>
     </message>
@@ -517,12 +517,12 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation>z-Achse</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-1057"/>
+        <location filename="../plot1DWidget.cpp" line="-1066"/>
         <source>Plot1D</source>
         <translation>Plot1D</translation>
     </message>
     <message>
-        <location line="+1876"/>
+        <location line="+1885"/>
         <source>wrong xData data type. Complex64 and Rgba32 are not supported.</source>
         <translation type="unfinished">Falscher xData-Datentyp. Complex64 und RGBA32 werden nicht unterstützt.</translation>
     </message>
