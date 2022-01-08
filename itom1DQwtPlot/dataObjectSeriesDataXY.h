@@ -45,7 +45,7 @@ public:
         ~DataObjectSeriesDataXY();
         RetVal updateDataObject(const ito::DataObject* dataObj,QVector<QPointF> bounds, const ito::DataObject* xVec = NULL, const QVector<QPointF>& boundsX = QVector<QPointF>());
         
-        int getPosToPix(const double physx, const double physy = -1) const;
+        int getPosToPix(const double physx, const double physy = -1, const int indexHint = -1) const;
 
         //size_t size() const;
         QRectF boundingRect() const;

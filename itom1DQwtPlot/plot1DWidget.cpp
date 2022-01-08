@@ -2548,14 +2548,14 @@ void Plot1DWidget::stickPickerToXPx(Picker* picker, double xScaleStart, int dir,
         return;
     }
 
-    DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[picker->curveIdx]->data());
+    const DataObjectSeriesData *data = (const DataObjectSeriesData*)(m_plotCurveItems[picker->curveIdx]->data());
 
     if (!qIsFinite(xScaleStart))
     {
         xScaleStart = picker->item->xValue();
     }
 
-    int thisIdx = data->getPosToPix(xScaleStart, yScaleStart); //yScaleStart is ignored in case of DataObjectSeriesData
+    int thisIdx = data->getPosToPix(xScaleStart, yScaleStart, picker->dObjDataIdx); //yScaleStart is ignored in case of DataObjectSeriesData
     int s = (int)data->size();
     QPointF p;
     bool found = false;
@@ -3518,9 +3518,9 @@ QVector<int> Plot1DWidget::getPickerPixel() const
         if ((m_pickers[idx]).curveIdx < 0 || (m_pickers[idx]).curveIdx > m_plotCurveItems.size() - 1)
             continue;
 
-        DataObjectSeriesData *data = (DataObjectSeriesData*)(m_plotCurveItems[(m_pickers[idx]).curveIdx]->data());
+        const DataObjectSeriesData *data = (const DataObjectSeriesData*)(m_plotCurveItems[(m_pickers[idx]).curveIdx]->data());
 
-        int thisIdx = data->getPosToPix((m_pickers[idx]).item->xValue());
+        int thisIdx = data->getPosToPix((m_pickers[idx]).item->xValue(), (m_pickers[idx]).item->yValue(), (m_pickers[idx]).dObjDataIdx);
         exportItem[idx] = thisIdx;
     }
 

@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2022, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -505,34 +505,53 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
     return rect;
 }
 
-template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const ito::DataObject *obj,  const QPointF& val)
+//-------------------------------------------------------------------------------------
+template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const ito::DataObject *obj,  const QPointF& val, const int indexHint)
 {
-    const DataObjectSeriesData::LineData& d= data->m_dX;
-    const size_t& nrPoints = data->size();
-    int layer = obj->seekMat(0);
-    int dims = obj->getDims();
-    int width = obj->getSize(dims - 1);
-    int height = obj->getSize(dims - 2);
-    const cv::Mat* mat(obj->getCvPlaneMat(d.plane));
+    const int numSamples = (int)(data->size());
     int col;
     int idx = 0;
-    _Tp* rowPtr;
-    double dif;
+    double length;
     double previous = std::numeric_limits<double>::infinity();
-    rowPtr = (_Tp*)mat->ptr(d.startPx.y());
     const double epsilon = std::numeric_limits<double>::epsilon();
+
+    if (indexHint >= 0 && indexHint < numSamples)
+    {
+        // check if the position of the index hint fits perfectly to
+        // val. If so, return this index.
+        QPointF candidate = data->sample(indexHint);
+        QPointF diff = candidate - val;
+
+        if (qIsFinite(val.y()))
+        {
+            length = diff.manhattanLength();
+
+            if (length <= epsilon)
+            {
+                return indexHint;
+            }
+        }
+        else
+        {
+            if (diff.x() <= epsilon)
+            {
+                return indexHint;
+            }
+        }
+    }
+
     if (qIsFinite(val.y()))
     {
         QPointF currentVal;
-        for (col = 0; col < width; ++col) //search along one row
+
+        for (col = 0; col < numSamples; ++col) //search along one row
         {
             currentVal = data->sample(col) - val;
-            dif = currentVal.manhattanLength();
-
+            length = currentVal.manhattanLength();
             
-            if ((previous - dif) > epsilon)
+            if ((previous - length) > epsilon)
             {
-                previous = dif;
+                previous = length;
                 idx = col;
             }
         }
@@ -540,9 +559,11 @@ template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const 
     else
     {
         double currentDist;
-        for (col = 0; col < width; ++col)
+
+        for (col = 0; col < numSamples; ++col)
         {
             currentDist = qAbs(data->sample(col).x() - val.x());
+
             if ((previous - currentDist) > epsilon)
             {
                 previous = currentDist;
@@ -554,35 +575,36 @@ template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectSeriesDataXY::getPosToPix(const double physx, const double physy) const
+int DataObjectSeriesDataXY::getPosToPix(const double physx, const double physy /*= -1*/, const int indexHint /*= -1*/) const
 {
     const QPointF coord(physx, physy);
     int idx = 0;
+
     switch (m_pXVec->getType())
     {
     case ito::tInt8:
-        idx = closestIdx<ito::int8>(this, m_pXVec, coord);
+        idx = closestIdx<ito::int8>(this, m_pXVec, coord, indexHint);
         break;
     case ito::tUInt8:
-        idx = closestIdx<ito::uint8>(this, m_pXVec, coord);
+        idx = closestIdx<ito::uint8>(this, m_pXVec, coord, indexHint);
         break;
     case ito::tInt16:
-        idx = closestIdx<ito::int16>(this, m_pXVec, coord);
+        idx = closestIdx<ito::int16>(this, m_pXVec, coord, indexHint);
         break;
     case ito::tUInt16:
-        idx = closestIdx<ito::uint16>(this, m_pXVec, coord);
+        idx = closestIdx<ito::uint16>(this, m_pXVec, coord, indexHint);
         break;
     case ito::tInt32:
-        idx = closestIdx<ito::int32>(this, m_pXVec, coord);
+        idx = closestIdx<ito::int32>(this, m_pXVec, coord, indexHint);
         break;
     case ito::tUInt32:
-        idx = closestIdx<ito::uint32>(this,m_pXVec, coord);
+        idx = closestIdx<ito::uint32>(this,m_pXVec, coord, indexHint);
         break;
     case ito::tFloat32:
-        idx = closestIdx<ito::float32>(this, m_pXVec, coord);
+        idx = closestIdx<ito::float32>(this, m_pXVec, coord, indexHint);
         break;
     case ito::tFloat64:
-        idx = closestIdx<ito::float64>(this, m_pXVec, coord);
+        idx = closestIdx<ito::float64>(this, m_pXVec, coord, indexHint);
         break;
     }
     return idx;
