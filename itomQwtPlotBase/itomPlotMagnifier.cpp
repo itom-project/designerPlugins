@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2022, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -29,6 +29,8 @@
 #include <qwt_transform.h>
 #include <QtCore/qmath.h>
 #include "itomPlotZoomer.h"
+
+#include <qdebug.h>
 
 /*!
    Constructor
@@ -76,7 +78,8 @@ bool ItomPlotMagnifier::isAxisEnabledSpecial(int axis)
     }
     else
     {
-        return isAxisEnabled(axis) && (!m_pActiveDisabledAxesSet->contains(axis) || (m_zoomer.data() && m_zoomer->fixedAspectRatio())); //if fixed aspect ratio: no single axis magnification is possible
+        //if fixed aspect ratio: no single axis magnification is possible
+        return isAxisEnabled(axis) && (!m_pActiveDisabledAxesSet->contains(axis) || (m_zoomer.data() && m_zoomer->fixedAspectRatio())); 
     }
 }
 
@@ -429,6 +432,7 @@ void ItomPlotMagnifier::widgetWheelEvent( QWheelEvent *wheelEvent )
             of 120 (== 15 * 8).
          */
         QPoint angleDeltaPt = wheelEvent->angleDelta();
+
         double angleDelta;
 
         if (std::abs(angleDeltaPt.x()) > std::abs(angleDeltaPt.y()))
@@ -440,10 +444,15 @@ void ItomPlotMagnifier::widgetWheelEvent( QWheelEvent *wheelEvent )
             angleDelta = angleDeltaPt.y();
         }
 
+        if (wheelEvent->inverted())
+        {
+            angleDelta *= -1.0;
+        }
+
         double f = qPow(wheelFactor(),
             qAbs(angleDelta / 120.0 ) );
 
-        if (angleDelta > 0)
+        if (angleDelta < 0)
         {
             f = 1 / f;
         }
