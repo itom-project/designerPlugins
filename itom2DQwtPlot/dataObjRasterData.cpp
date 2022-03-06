@@ -237,8 +237,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
 
                 if (!m_isOverlayData)
                 {
-                    m_pInternalData->m_selectedOutputParameters["sourceout"]->setVal<void*>((void*)&m_dataObj);
-                    m_pInternalData->m_selectedOutputParameters["displayed"]->setVal<void*>((void*)m_dataObjPlane);
+                    m_pInternalData->m_selectedOutputParameters["sourceout"]->setVal<ito::DataObject*>(&m_dataObj);
+                    m_pInternalData->m_selectedOutputParameters["displayed"]->setVal<ito::DataObject*>(m_dataObjPlane);
                 }
 
                 //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
@@ -265,7 +265,6 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
             ito::uint32 firstMin[3];
             ito::uint32 firstMax[3];
 
-
             if ((m_pInternalData->m_valueScaleAuto && !m_isOverlayData) || (m_pInternalData->m_overlayScaleAuto && m_isOverlayData))
             {
                 ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
@@ -273,7 +272,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                 if (min == std::numeric_limits<ito::float64>::max()) min = -10.0;
                 if (max == -std::numeric_limits<ito::float64>::max()) max = 10.0;
 
-                if ((max - min) < std::numeric_limits<double>::epsilon()) //the data object only contains the same value, then make the min-max range a little bit bigger in order to ensure a nice colorbar
+                //the data object only contains the same value, then make the min-max range a little bit bigger in order to ensure a nice colorbar
+                if ((max - min) < std::numeric_limits<double>::epsilon()) 
                 {
                     switch (m_pInternalData->m_dataType)
                     {
@@ -284,6 +284,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                     case ito::tUInt32:
                     case ito::tInt32:
                     case ito::tRGBA32:
+                    case ito::tDateTime:
+                    case ito::tTimeDelta:
                         min -= 1;
                         max += 1;
                         break;

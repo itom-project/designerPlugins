@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2022, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2022, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -22,14 +22,14 @@
 
 #include "dataObjectSeriesDataXY.h"
 #include "common/typeDefs.h"
+#include "qwt_date.h"
 #include <qcryptographichash.h>
 
 #include <qdebug.h>
 #include <qnumeric.h>
 
-//----------------------------------------------------------------------------------------------------------------------------------
-DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
-    DataObjectSeriesData(fastmode)
+//-------------------------------------------------------------------------------------
+DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode) : DataObjectSeriesData(fastmode)
 {
     m_dX.nrPoints = 0;
     m_dX.points.clear();
@@ -37,14 +37,22 @@ DataObjectSeriesDataXY::DataObjectSeriesDataXY(const int fastmode):
     m_hasXObj = true;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------
 DataObjectSeriesDataXY::~DataObjectSeriesDataXY()
 {
 }
-template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, const size_t &nrPoints)
+
+//-------------------------------------------------------------------------------------
+template <typename _Tp>
+void findMinMaxInteger(
+    const ito::DataObject* obj,
+    const DataObjectSeriesData::LineData& d,
+    double& min,
+    double& max,
+    const size_t& nrPoints)
 {
-    const cv::Mat *mat;
-    uchar *ptr;
+    const cv::Mat* mat;
+    const uchar* ptr;
     min = std::numeric_limits<float64>::max();
     max = -min;
     _Tp val;
@@ -57,11 +65,17 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
         ptr = (mat->data + d.matOffset);
         for (int i = 0; i < nrPoints; i++)
         {
-            val = *(reinterpret_cast<_Tp*>(ptr));
+            val = *(reinterpret_cast<const _Tp*>(ptr));
             ptr += d.matStepSize;
 
-            if (val > max) { max = val;}
-            if (val < min) { min = val;}
+            if (val > max)
+            {
+                max = val;
+            }
+            if (val < min)
+            {
+                min = val;
+            }
         }
         break;
 
@@ -70,10 +84,16 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
         ptr = (mat->data + d.matOffset);
         for (int i = 0; i < nrPoints; i++)
         {
-            val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
+            val = *(reinterpret_cast<const _Tp*>(ptr + d.matSteps[i]));
 
-            if (val > max) { max = val;}
-            if (val < min) { min = val;}
+            if (val > max)
+            {
+                max = val;
+            }
+            if (val < min)
+            {
+                min = val;
+            }
         }
         break;
     case DataObjectSeriesData::dirZ:
@@ -82,19 +102,107 @@ template<typename _Tp> void findMinMaxInteger(const ito::DataObject *obj, const 
         {
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
-            val = *(reinterpret_cast<_Tp*>(ptr));
+            val = *(reinterpret_cast<const _Tp*>(ptr));
 
-            if (val > max) { max = val;}
-            if (val < min) { min = val;}
+            if (val > max)
+            {
+                max = val;
+            }
+            if (val < min)
+            {
+                min = val;
+            }
         }
         break;
     }
 }
-//----------------------------------------------------------------------------------------------------------------------------------
-template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, const size_t &nrPoints)
+
+//-------------------------------------------------------------------------------------
+void findMinMaxDateTime(
+    const ito::DataObject* obj,
+    const DataObjectSeriesData::LineData& d,
+    double& minMsSinceEpoch,
+    double& maxMsSinceEpoch,
+    const size_t& nrPoints)
 {
-    const cv::Mat *mat;
-    uchar *ptr;
+    const cv::Mat* mat;
+    const uchar* ptr;
+    minMsSinceEpoch = std::numeric_limits<float64>::max();
+    maxMsSinceEpoch = -minMsSinceEpoch;
+    double val;
+
+    switch (d.dir)
+    {
+    case DataObjectSeriesData::dirX:
+    case DataObjectSeriesData::dirY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+
+        for (int i = 0; i < nrPoints; i++)
+        {
+            val = reinterpret_cast<const ito::DateTime*>(ptr)->datetime / 1000.0;
+            ptr += d.matStepSize;
+
+            if (val > maxMsSinceEpoch)
+            {
+                maxMsSinceEpoch = val;
+            }
+            if (val < minMsSinceEpoch)
+            {
+                minMsSinceEpoch = val;
+            }
+        }
+        break;
+
+    case DataObjectSeriesData::dirXY:
+        mat = obj->getCvPlaneMat(d.plane);
+        ptr = (mat->data + d.matOffset);
+        for (int i = 0; i < nrPoints; i++)
+        {
+            val = reinterpret_cast<const ito::DateTime*>(ptr)->datetime / 1000.0;
+
+            if (val > maxMsSinceEpoch)
+            {
+                maxMsSinceEpoch = val;
+            }
+            if (val < minMsSinceEpoch)
+            {
+                minMsSinceEpoch = val;
+            }
+        }
+        break;
+    case DataObjectSeriesData::dirZ:
+
+        for (int i = 0; i < nrPoints; i++)
+        {
+            mat = obj->getCvPlaneMat(i);
+            ptr = (mat->data + d.matOffset);
+            val = reinterpret_cast<const ito::DateTime*>(ptr)->datetime / 1000.0;
+
+            if (val > maxMsSinceEpoch)
+            {
+                maxMsSinceEpoch = val;
+            }
+            if (val < minMsSinceEpoch)
+            {
+                minMsSinceEpoch = val;
+            }
+        }
+        break;
+    }
+}
+
+//-------------------------------------------------------------------------------------
+template <typename _Tp>
+void findMinMaxFloat(
+    const ito::DataObject* obj,
+    const DataObjectSeriesData::LineData& d,
+    double& min,
+    double& max,
+    const size_t& nrPoints)
+{
+    const cv::Mat* mat;
+    const uchar* ptr;
     min = std::numeric_limits<_Tp>::max();
     max = -min;
     float32 val;
@@ -107,7 +215,7 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
         ptr = (mat->data + d.matOffset);
         for (int i = 0; i < nrPoints; i++)
         {
-            val = *(reinterpret_cast<_Tp*>(ptr));
+            val = *(reinterpret_cast<const _Tp*>(ptr));
             ptr += d.matStepSize;
 
             if (!qIsFinite(val))
@@ -115,8 +223,14 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
                 continue;
             }
 
-            if (val > max) { max = val;}
-            if (val < min) { min = val;}
+            if (val > max)
+            {
+                max = val;
+            }
+            if (val < min)
+            {
+                min = val;
+            }
         }
         break;
 
@@ -125,15 +239,21 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
         ptr = (mat->data + d.matOffset);
         for (int i = 0; i < nrPoints; i++)
         {
-            val = *(reinterpret_cast<_Tp*>(ptr + d.matSteps[i]));
+            val = *(reinterpret_cast<const _Tp*>(ptr + d.matSteps[i]));
 
             if (!qIsFinite(val))
             {
                 continue;
             }
 
-            if (val > max) { max = val;}
-            if (val < min) { min = val;}
+            if (val > max)
+            {
+                max = val;
+            }
+            if (val < min)
+            {
+                min = val;
+            }
         }
         break;
     case DataObjectSeriesData::dirZ:
@@ -142,34 +262,44 @@ template<typename _Tp> void findMinMaxFloat(const ito::DataObject *obj, const Da
         {
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
-            val = *(reinterpret_cast<_Tp*>(ptr));
+            val = *(reinterpret_cast<const _Tp*>(ptr));
 
             if (!qIsFinite(val))
             {
                 continue;
             }
 
-            if (val > max) { max = val;}
-            if (val < min) { min = val;}
+            if (val > max)
+            {
+                max = val;
+            }
+            if (val < min)
+            {
+                min = val;
+            }
         }
         break;
     }
 }
 
 //---------------------------------------------------------------------------------------------------
-RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/, const QVector<QPointF>& boundsX /*= QVector<QPointF>()*/)
+RetVal DataObjectSeriesDataXY::updateDataObject(
+    const ito::DataObject* dataObj,
+    QVector<QPointF> bounds,
+    const ito::DataObject* xVec /*= NULL*/,
+    const QVector<QPointF>& boundsX /*= QVector<QPointF>()*/)
 {
     DataObjectSeriesData::updateDataObject(dataObj, bounds);
     RetVal retval;
     bool _unused;
     QRectF p;
-    cv::Mat *mat;
+    cv::Mat* mat;
     int pxX1x, pxX2x, pxY1x, pxY2x;
     std::string description, unit;
 
-    if (dataObj == NULL )
+    if (dataObj == NULL)
     {
-        //data representing xObj
+        // data representing xObj
         m_dX.plane = 0;
         m_dX.dir = dirZ;
         m_dX.nrPoints = 0;
@@ -178,7 +308,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         m_dX.valid = false;
     }
 
-    if(xVec != NULL)
+    if (xVec != NULL)
     {
         int dimsX = xVec->getDims();
         int width = dimsX > 0 ? xVec->getSize(dimsX - 1) : 0;
@@ -196,10 +326,15 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
         }
 
         m_dX.plane = 0;
-        
+
         if (!xVec->get_mdata() || !(cv::Mat*)(xVec->get_mdata()[m_dX.plane])->data)
         {
-            return ito::RetVal(ito::retError, 0, QObject::tr("cv::Mat in data Object representing the xData seems corrupted").toLatin1().data());
+            return ito::RetVal(
+                ito::retError,
+                0,
+                QObject::tr("cv::Mat in data Object representing the xData seems corrupted")
+                    .toLatin1()
+                    .data());
         }
 
         if (!retval.containsError())
@@ -218,9 +353,8 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             saturation(pxY2x, 0, xVec->getSize(dimsX - 2) - 1);
 
 
-
             mat = (cv::Mat*)xVec->get_mdata()[xVec->seekMat(m_dX.plane)];
-            if (pxY1x == pxY2x) //pure line in x direction of x vector
+            if (pxY1x == pxY2x) // pure line in x direction of x vector
             {
                 m_dX.dir = dirX;
                 if (pxX2x > pxX1x)
@@ -230,38 +364,54 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                     {
                         if (m_dX.nrPoints > size())
                         {
-                            retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
+                            retval += RetVal(
+                                retWarning,
+                                0,
+                                "xData contains more values than the source dataObject. The last "
+                                "values will be ignored ignored.");
                         }
                         else
                         {
                             m_dX.valid = false;
-                            retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
+                            retval += RetVal(
+                                retError,
+                                0,
+                                "the xData does not contain enough values for the current source "
+                                "dataObject");
                         }
                     }
                     m_dX.startPx.setX(pxX1x);
                     m_dX.startPx.setY(pxY1x);
                     m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
-                    m_dX.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
+                    m_dX.matStepSize = (int)mat->step[1]; // step in x-direction (in bytes)
                     m_dX.stepSizePx.setWidth(1);
                     m_dX.stepSizePx.setHeight(0);
                 }
             }
-            else if(pxX1x == pxX2x)
+            else if (pxX1x == pxX2x)
             {
                 m_dX.dir = dirY;
                 if (pxY2x > pxY1x)
                 {
-                    m_dX.nrPoints = 1 + pxY2x -pxY1x;
+                    m_dX.nrPoints = 1 + pxY2x - pxY1x;
                     if (m_dX.nrPoints != size())
                     {
                         if (m_dX.nrPoints > size())
                         {
-                            retval += RetVal(retWarning, 0, "xData contains more values than the source dataObject. The last values will be ignored ignored.");
+                            retval += RetVal(
+                                retWarning,
+                                0,
+                                "xData contains more values than the source dataObject. The last "
+                                "values will be ignored ignored.");
                         }
                         else
                         {
                             m_dX.valid = false;
-                            retval += RetVal(retError, 0, "the xData does not contain enough values for the current source dataObject");
+                            retval += RetVal(
+                                retError,
+                                0,
+                                "the xData does not contain enough values for the current source "
+                                "dataObject");
                         }
                     }
                 }
@@ -270,9 +420,8 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                 m_dX.matOffset = (int)mat->step[0] * pxY1x + (int)mat->step[1] * pxX1x;
                 m_dX.stepSizePx.setWidth(0);
                 m_dX.stepSizePx.setHeight(1);
-                m_dX.matStepSize= (int)mat->step[0] ; //step in y-direction (in bytes)
-
-            } 
+                m_dX.matStepSize = (int)mat->step[0]; // step in y-direction (in bytes)
+            }
             else
             {
                 retval += RetVal(retError, 0, "recieved invalid bounds.");
@@ -284,7 +433,9 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             description = xVec->getValueDescription();
             unit = xVec->getValueUnit();
 
-            if (unit != "" || description != "") //xVec value description dominates over source axis- and unit decription
+            if (unit != "" ||
+                description !=
+                    "") // xVec value description dominates over source axis- and unit decription
             {
                 if (description == "")
                 {
@@ -292,7 +443,6 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
                 }
                 m_dObjAxisDescription = fromStdLatin1String(description);
                 m_dObjAxisUnit = fromStdLatin1String(unit);
-
             }
 
             switch (xVec->getType())
@@ -315,7 +465,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(const ito::DataObject * dataObj,
             calcHash();
         }
     }
-    
+
     return retval;
 }
 
@@ -335,9 +485,10 @@ void DataObjectSeriesDataXY::calcHash()
 
         if (dims > 0)
         {
-            cv::Mat *m = (cv::Mat*)m_pXVec->get_mdata()[m_pXVec->seekMat(m_dX.plane)];
+            cv::Mat* m = (cv::Mat*)m_pXVec->get_mdata()[m_pXVec->seekMat(m_dX.plane)];
             uchar* d = m->data;
-            ba.append(QByteArray((const char*)&d, (sizeof(int) / sizeof(char)))); //address to data of first plane
+            ba.append(QByteArray(
+                (const char*)&d, (sizeof(int) / sizeof(char)))); // address to data of first plane
 
             ba.append(QByteArray().setNum(m->size[0]));
         }
@@ -353,91 +504,104 @@ void DataObjectSeriesDataXY::calcHash()
 QPointF DataObjectSeriesDataXY::sample(size_t n) const
 {
     QPointF dObjPoint = DataObjectSeriesData::sample(n);
-    const cv::Mat *mat;
+    const cv::Mat* mat;
     const uchar* ptr[1];
 
     if (m_pXVec && m_dX.valid)
     {
-            switch (m_dX.dir)
-            {
-            case dirX:
-            case dirY:
-                mat = m_pXVec->getCvPlaneMat(m_dX.plane);
-                ptr[0] = (mat->data + m_dX.matOffset + m_dX.matStepSize * n);
-                //fPos = m_d.startPhys + m_d.stepSizePhys * n;
-                break;
+        switch (m_dX.dir)
+        {
+        case dirX:
+        case dirY:
+            mat = m_pXVec->getCvPlaneMat(m_dX.plane);
+            ptr[0] = (mat->data + m_dX.matOffset + m_dX.matStepSize * n);
+            // fPos = m_d.startPhys + m_d.stepSizePhys * n;
+            break;
 
-            /*case dirZ:
-                mat = m_pXVec->getCvPlaneMat((int)n);
-                ptr[0] = (mat->data + m_dX.matOffset);
-                //fPos = m_dX.startPhys + m_dX.stepSizePhys * n;
-                break;
+        /*case dirZ:
+            mat = m_pXVec->getCvPlaneMat((int)n);
+            ptr[0] = (mat->data + m_dX.matOffset);
+            //fPos = m_dX.startPhys + m_dX.stepSizePhys * n;
+            break;
 
-            case dirXY:
-                mat = m_pDataObj->getCvPlaneMat(m_d.plane);
-                ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
-                fPos = m_d.startPhys + m_d.stepSizePhys * n;
-                break;*/
-            default:
-                qDebug() << "Type not implemented";
-            }
-            switch (m_pXVec->getType())
-            {
-            case ito::tInt8:
-                dObjPoint.setX(*(reinterpret_cast<const ito::int8*>(ptr[0])));
-                return dObjPoint;
-                break;
-            case ito::tUInt8:
-                dObjPoint.setX(*(reinterpret_cast<const ito::uint8*>(ptr[0])));
-                return dObjPoint;
-                break;
-            case ito::tInt16:
-                dObjPoint.setX(*(reinterpret_cast<const ito::int16*>(ptr[0])));
-                return dObjPoint;
-                break;
-            case ito::tUInt16:
-                dObjPoint.setX(*(reinterpret_cast<const ito::uint16*>(ptr[0])));
-                return dObjPoint;
-                break;
-            case ito::tInt32:
-                dObjPoint.setX(*(reinterpret_cast<const ito::int32*>(ptr[0])));
-                return dObjPoint;
-                break;
-            case ito::tFloat32:
-                dObjPoint.setX(*(reinterpret_cast<const ito::float32*>(ptr[0])));
-                if (qIsNaN(dObjPoint.x()))
-                {
-                    dObjPoint.setY(dObjPoint.x());
-                }
-                return dObjPoint;
-                break;
-            case ito::tFloat64:
-                dObjPoint.setX(*(reinterpret_cast<const ito::float64*>(ptr[0])));
-                if (qIsNaN(dObjPoint.x()))
-                {
-                    dObjPoint.setY(dObjPoint.x());
-                }
-                return dObjPoint;
-                break;
-            default:
-                qDebug() << "Type not implemented yet";
-                return QPointF();
-                break;
-            }
-
+        case dirXY:
+            mat = m_pDataObj->getCvPlaneMat(m_d.plane);
+            ptr[0] = (mat->data + m_d.matOffset + m_d.matSteps[(int)n]);
+            fPos = m_d.startPhys + m_d.stepSizePhys * n;
+            break;*/
+        default:
+            qDebug() << "Type not implemented";
         }
+        switch (m_pXVec->getType())
+        {
+        case ito::tInt8:
+            dObjPoint.setX(*(reinterpret_cast<const ito::int8*>(ptr[0])));
+            return dObjPoint;
+            break;
+        case ito::tUInt8:
+            dObjPoint.setX(*(reinterpret_cast<const ito::uint8*>(ptr[0])));
+            return dObjPoint;
+            break;
+        case ito::tInt16:
+            dObjPoint.setX(*(reinterpret_cast<const ito::int16*>(ptr[0])));
+            return dObjPoint;
+            break;
+        case ito::tUInt16:
+            dObjPoint.setX(*(reinterpret_cast<const ito::uint16*>(ptr[0])));
+            return dObjPoint;
+            break;
+        case ito::tInt32:
+            dObjPoint.setX(*(reinterpret_cast<const ito::int32*>(ptr[0])));
+            return dObjPoint;
+            break;
+        case ito::tFloat32:
+            dObjPoint.setX(*(reinterpret_cast<const ito::float32*>(ptr[0])));
+            if (qIsNaN(dObjPoint.x()))
+            {
+                dObjPoint.setY(dObjPoint.x());
+            }
+            return dObjPoint;
+            break;
+        case ito::tFloat64:
+            dObjPoint.setX(*(reinterpret_cast<const ito::float64*>(ptr[0])));
+            if (qIsNaN(dObjPoint.x()))
+            {
+                dObjPoint.setY(dObjPoint.x());
+            }
+            return dObjPoint;
+            break;
+
+        case ito::tDateTime:
+
+            // equal to QwtDate::toDouble
+            dObjPoint.setX((reinterpret_cast<const ito::DateTime*>(ptr[0]))->datetime / 1000.0);
+
+            if (qIsNaN(dObjPoint.x()))
+            {
+                dObjPoint.setY(dObjPoint.x());
+            }
+
+            return dObjPoint;
+            break;
+        default:
+            qDebug() << "Type not implemented yet";
+            return QPointF();
+            break;
+        }
+    }
     return QPointF();
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QRectF DataObjectSeriesDataXY::boundingRect() const
 {
     QRectF rect = DataObjectSeriesData::boundingRect();
-    size_t samplesY = DataObjectSeriesData::size(); //ask for the number of y-values since this is the maximum numbers of points to be displayed
+    size_t samplesY = DataObjectSeriesData::size(); // ask for the number of y-values since this is
+                                                    // the maximum numbers of points to be displayed
 
 
-    //cv::Mat *mat;
-    //const uchar* ptr[4];
-    //float weights[4];
+    // cv::Mat *mat;
+    // const uchar* ptr[4];
+    // float weights[4];
 
     if (m_pXVec && m_dX.valid)
     {
@@ -468,8 +632,13 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
         case ito::tFloat64:
             findMinMaxFloat<ito::float64>(m_pXVec, m_dX, min, max, samplesY);
             break;
-        //todo xy: what about complex and rgba data types? are they blocked (which would be reasonable)
-            //they are blocked before
+        case ito::tDateTime:
+            findMinMaxDateTime(m_pXVec, m_dX, min, max, samplesY);
+            break;
+        default:
+            // todo xy: what about complex and rgba data types? are they blocked (which would be
+            // reasonable) they are blocked before
+            break;
         }
 
         if ((max - min) < std::numeric_limits<double>::epsilon())
@@ -489,24 +658,29 @@ QRectF DataObjectSeriesDataXY::boundingRect() const
                 min -= 0.1;
                 max += 0.1;
             }
-
-
         }
-        float width = max-min;
+
+        float width = max - min;
+
         if (width < 0)
         {
             min += width;
             width *= -1;
         }
+
         rect.setX(min);
         rect.setWidth(width);
-        
     }
+
     return rect;
 }
 
 //-------------------------------------------------------------------------------------
-template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const ito::DataObject *obj,  const QPointF& val, const int indexHint)
+int closestIdx(
+    const DataObjectSeriesDataXY* data,
+    const ito::DataObject* obj,
+    const QPointF& val,
+    const int indexHint)
 {
     const int numSamples = (int)(data->size());
     int col;
@@ -544,11 +718,11 @@ template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const 
     {
         QPointF currentVal;
 
-        for (col = 0; col < numSamples; ++col) //search along one row
+        for (col = 0; col < numSamples; ++col) // search along one row
         {
             currentVal = data->sample(col) - val;
             length = currentVal.manhattanLength();
-            
+
             if ((previous - length) > epsilon)
             {
                 previous = length;
@@ -571,42 +745,18 @@ template<typename _Tp> int closestIdx(const DataObjectSeriesDataXY* data, const 
             }
         }
     }
+
     return idx;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectSeriesDataXY::getPosToPix(const double physx, const double physy /*= -1*/, const int indexHint /*= -1*/) const
+int DataObjectSeriesDataXY::getPosToPix(
+    const double physx, const double physy /*= -1*/, const int indexHint /*= -1*/) const
 {
+    // in case of DateTime for x-axis, physx are the number of milliseconds since epoch
+    // in UTC time (see QwtDate::toDouble).
     const QPointF coord(physx, physy);
-    int idx = 0;
-
-    switch (m_pXVec->getType())
-    {
-    case ito::tInt8:
-        idx = closestIdx<ito::int8>(this, m_pXVec, coord, indexHint);
-        break;
-    case ito::tUInt8:
-        idx = closestIdx<ito::uint8>(this, m_pXVec, coord, indexHint);
-        break;
-    case ito::tInt16:
-        idx = closestIdx<ito::int16>(this, m_pXVec, coord, indexHint);
-        break;
-    case ito::tUInt16:
-        idx = closestIdx<ito::uint16>(this, m_pXVec, coord, indexHint);
-        break;
-    case ito::tInt32:
-        idx = closestIdx<ito::int32>(this, m_pXVec, coord, indexHint);
-        break;
-    case ito::tUInt32:
-        idx = closestIdx<ito::uint32>(this,m_pXVec, coord, indexHint);
-        break;
-    case ito::tFloat32:
-        idx = closestIdx<ito::float32>(this, m_pXVec, coord, indexHint);
-        break;
-    case ito::tFloat64:
-        idx = closestIdx<ito::float64>(this, m_pXVec, coord, indexHint);
-        break;
-    }
+    int idx = closestIdx(this, m_pXVec, coord, indexHint);
     return idx;
 }
 

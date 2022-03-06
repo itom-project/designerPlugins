@@ -168,6 +168,9 @@ protected:
     ItomQwtPlotPanner *panner() const;
     void configRescaler();
 
+    //!< styles and configures the xBottom and yLeft scale widgets
+    void styleXYScaleWidgets();
+
     ito::RetVal changeVisibleMarkers(int currentPlane);
 
     /*

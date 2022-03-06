@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>211</width>
+    <width>326</width>
     <height>271</height>
    </rect>
   </property>
@@ -88,6 +88,16 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtMaxX">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>0,000</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="sizePolicy">
@@ -114,13 +124,38 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="txtMaxX">
+        <item row="0" column="2">
+         <widget class="QDateTimeEdit" name="dateTimeMinX">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="text">
-           <string>0,000</string>
+          <property name="displayFormat">
+           <string>dd.MM.yyyy HH:mm:ss</string>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+          <property name="timeSpec">
+           <enum>Qt::UTC</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QDateTimeEdit" name="dateTimeMaxX">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="showGroupSeparator" stdset="0">
+           <bool>false</bool>
+          </property>
+          <property name="displayFormat">
+           <string>dd.MM.yyyy HH:mm:ss</string>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+          <property name="timeSpec">
+           <enum>Qt::UTC</enum>
           </property>
          </widget>
         </item>
@@ -327,12 +362,44 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
-     <y>285</y>
+     <x>121</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>207</x>
-     <y>287</y>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualX</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dateTimeMinX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>37</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioManualX</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dateTimeMaxX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>28</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>194</x>
+     <y>105</y>
     </hint>
    </hints>
   </connection>

@@ -26,6 +26,8 @@
 #include <qregularexpression.h>
 #include <qvalidator.h>
 
+#include "common/helperDatetime.h"
+
 //-----------------------------------------------------------------------------------------------
 Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData& data, QWidget* parent) :
     QDialog(parent), m_minX(-std::numeric_limits<double>::max()),
@@ -60,8 +62,22 @@ Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData& data, QWidget* pa
     ui.txtMinX->setValidator(numberValidator);
     ui.txtMaxX->setValidator(numberValidator);
 
-    ui.txtMinX->setText(m_locale.toString(data.m_axisMin, 'g'));
-    ui.txtMaxX->setText(m_locale.toString(data.m_axisMax, 'g'));
+    ui.dateTimeMinX->setVisible(data.m_hasDateTimeXAxis);
+    ui.dateTimeMaxX->setVisible(data.m_hasDateTimeXAxis);
+    ui.txtMinX->setVisible(!data.m_hasDateTimeXAxis);
+    ui.txtMaxX->setVisible(!data.m_hasDateTimeXAxis);
+
+    if (!data.m_hasDateTimeXAxis)
+    {
+        ui.txtMinX->setText(m_locale.toString(data.m_axisMin, 'g'));
+        ui.txtMaxX->setText(m_locale.toString(data.m_axisMax, 'g'));
+    }
+    else
+    {
+        const QDateTime epochDate(QDate(1970, 1, 1));
+        ui.dateTimeMinX->setDateTime(epochDate.addMSecs(data.m_axisMin));
+        ui.dateTimeMaxX->setDateTime(epochDate.addMSecs(data.m_axisMax));
+    }
 
     // y
     if (data.m_valueScaleAuto)
@@ -82,8 +98,6 @@ Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData& data, QWidget* pa
 
     ui.txtMinY->setValidator(numberValidator);
     ui.txtMaxY->setValidator(numberValidator);
-
-    // ui.groupPlane->setVisible(false);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -107,16 +121,24 @@ void Dialog1DScale::getData(Plot1DWidget::InternalData& data)
         data.m_valueMax = number;
     }
 
-    number = m_locale.toDouble(ui.txtMinX->text(), &ok);
-    if (ok)
+    if (data.m_hasDateTimeXAxis)
     {
-        data.m_axisMin = number;
+        data.m_axisMin = ui.dateTimeMinX->dateTime().toMSecsSinceEpoch();
+        data.m_axisMax = ui.dateTimeMaxX->dateTime().toMSecsSinceEpoch();
     }
-
-    number = m_locale.toDouble(ui.txtMaxX->text(), &ok);
-    if (ok)
+    else
     {
-        data.m_axisMax = number;
+        number = m_locale.toDouble(ui.txtMinX->text(), &ok);
+        if (ok)
+        {
+            data.m_axisMin = number;
+        }
+
+        number = m_locale.toDouble(ui.txtMaxX->text(), &ok);
+        if (ok)
+        {
+            data.m_axisMax = number;
+        }
     }
 }
 
@@ -157,6 +179,7 @@ void Dialog1DScale::getDataTypeRange(ito::tDataType type, double& min, double& m
         break;
     case ito::tFloat64:
     case ito::tComplex128:
+    case ito::tDateTime:
         min = -std::numeric_limits<ito::float64>::max();
         max = -min;
         break;
@@ -195,7 +218,6 @@ bool Dialog1DScale::checkValue(
 
     return ok;
 }
-
 
 //-----------------------------------------------------------------------------------------------
 void Dialog1DScale::on_buttonBox_accepted()

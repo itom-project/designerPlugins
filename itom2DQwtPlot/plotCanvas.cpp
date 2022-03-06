@@ -1264,13 +1264,25 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
     return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
     ito::RetVal retval;
     if (m_isRefreshingPlot || !m_pData)
     {
         return;
+    }
+
+    // the 2d plot does not accept a datetime or timedelta object
+    if (dObj)
+    {
+        switch (dObj->getType())
+        {
+        case ito::tDateTime:
+        case ito::tTimeDelta:
+            dObj = nullptr;
+            emit statusBarMessage(QObject::tr("Objects of type dateTime or timeDelta not supported by this plot."), 10000);
+            break;
+        }
     }
 
     m_isRefreshingPlot = true;

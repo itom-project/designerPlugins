@@ -163,6 +163,20 @@ class Plot1DWidget : public ItomQwtPlot
             int curveIdx;
             int dObjDataIdx;
         };
+
+        //!< Removes the last curves until a certain number of curves is left.
+        /*
+        returns true if at least one curve has been removed, else false
+        */
+        bool removeAllCurvesBesideTheNFirst(int numCurvesToKeep);
+
+        //!< get the index offset for the optional legendTitleIdx tag in the dataObj
+        /* This offset can occur, if the dataObj is a ROI of a bigger dataObject.
+
+        \returns the index offset
+        */
+        int getLegendOffset(const ito::DataObject *dataObj, ItomQwtPlotEnums::MultiLineMode multiLineMode) const;
+
         void setSendCurrentViewState(bool state);
         void stickPickerToXPx(Picker *picker, double xScaleStart, int dir, const double& yScaleStart = std::numeric_limits<double>::quiet_NaN());
         void stickPickerToSampleIdx(Picker *m, int idx, int dir);
@@ -187,8 +201,6 @@ class Plot1DWidget : public ItomQwtPlot
 
         bool m_xDirect;
         bool m_yDirect;
-        bool m_cmplxState;
-        bool m_colorState;
         bool m_layerState; //true: lines from different planes of the input data object are shown, false: lines from one plane only are displayed (default)
         Itom1DQwtPlot::GridStyle m_gridStyle;
 
@@ -302,6 +314,8 @@ class Plot1DWidget : public ItomQwtPlot
 struct Plot1DWidget::InternalData
 {
     InternalData() :
+        m_dataType(ito::tInt8),
+        m_hasDateTimeXAxis(false),
         m_title(""),
         m_axisLabel(""),
         m_valueLabel(""),
@@ -336,6 +350,7 @@ struct Plot1DWidget::InternalData
     }
 
     ito::tDataType m_dataType;
+    bool m_hasDateTimeXAxis;
      
     int m_pickerLimit;
 
@@ -363,8 +378,6 @@ struct Plot1DWidget::InternalData
     ItomQwtPlotEnums::PlotPickerType m_pickerType;
     Qt::Orientation m_pickerLabelOrientation;
     Qt::Alignment m_pickerLabelAlignment;
-
-    
 
     //true for one replot if setSource-Property has been set 
     //(even if the same data object is given one more time, 
