@@ -145,7 +145,7 @@ class Plot1DWidget : public ItomQwtPlot
         void setCurveFilled();
         //void setStickOrientation(const qreal &line);
         void setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
-        void setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
+        void setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine, bool forceUpdate = false);
 
         void updateLegendItems();
 

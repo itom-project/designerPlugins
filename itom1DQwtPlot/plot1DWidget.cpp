@@ -50,6 +50,7 @@
 #include <qwt_scale_engine.h>
 #include <qwt_text_label.h>
 #include <qwt_date_scale_draw.h>
+#include <qwt_date_scale_engine.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -733,7 +734,7 @@ void Plot1DWidget::setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngin
     {
         if (scaleEngine == ItomQwtPlotEnums::Linear)
         {
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
+            setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
         }
         else if ((int)scaleEngine < 1000)
         {
@@ -765,13 +766,20 @@ void Plot1DWidget::setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngin
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine)
+void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine, bool forceUpdate /*= false*/)
 {
-    if (scaleEngine != m_axisScale)
+    if (scaleEngine != m_axisScale || forceUpdate)
     {
         if (scaleEngine == ItomQwtPlotEnums::Linear)
         {
-        setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine());
+            if (m_pData && m_pData->m_hasDateTimeXAxis)
+            {
+                setAxisScaleEngine(QwtPlot::xBottom, new QwtDateScaleEngine(Qt::UTC));
+            }
+            else
+            {
+                setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine());
+            }
         }
         else if ((int)scaleEngine < 1000)
         {
@@ -1550,25 +1558,6 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             updateLegendItems();
 		}
 
-        if (xVec && (xVec->getType() == ito::tDateTime))
-        {
-            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) == nullptr)
-            {
-                setAxisScaleDraw(QwtAxis::XBottom, new QwtDateScaleDraw());
-                styleXYScaleWidgets();
-            }
-
-            m_pData->m_hasDateTimeXAxis = true;
-        }
-        else
-        {
-            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) != nullptr)
-            {
-                setAxisScaleDraw(QwtAxis::XBottom, new QwtScaleDraw());
-                styleXYScaleWidgets();
-            }
-        }
-
         if (bounds.size() == 0) //default plot
         {
             QVector<QPointF> pts(2);
@@ -1916,6 +1905,42 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         tag = dataObj->getTag("title", valid);
         m_pData->m_titleDObj = valid? QString::fromLatin1(tag.getVal_ToString().data()) : "";
+
+        if (xVec && (xVec->getType() == ito::tDateTime))
+        {
+            m_pData->m_hasDateTimeXAxis = true;
+
+            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) == nullptr)
+            {
+                setDefaultAxisScaleEngine(m_axisScale, true);
+
+                auto bottomScaleDraw = new QwtDateScaleDraw(Qt::UTC);
+
+                // ISO 8601 (en)
+                bottomScaleDraw->setDateFormat(QwtDate::Millisecond, "yyyy-MM-dd\nhh:mm:ss:zzz");
+                bottomScaleDraw->setDateFormat(QwtDate::Second, "yyyy-MM-dd\nhh:mm:ss");
+                bottomScaleDraw->setDateFormat(QwtDate::Minute, "yyyy-MM-dd\nhh:mm");
+                bottomScaleDraw->setDateFormat(QwtDate::Hour, "yyyy-MM-dd\nhh:mm");
+                bottomScaleDraw->setDateFormat(QwtDate::Day, "yyyy-MM-dd");
+                bottomScaleDraw->setDateFormat(QwtDate::Week, "yyyy-Www");
+                bottomScaleDraw->setDateFormat(QwtDate::Month, "MMM yyyy");
+                bottomScaleDraw->setDateFormat(QwtDate::Year, "yyyy");
+
+                setAxisScaleDraw(QwtAxis::XBottom, bottomScaleDraw);
+                styleXYScaleWidgets();
+            }
+        }
+        else
+        {
+            m_pData->m_hasDateTimeXAxis = false;
+
+            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) != nullptr)
+            {
+                setDefaultAxisScaleEngine(m_axisScale, true);
+                setAxisScaleDraw(QwtAxis::XBottom, new QwtScaleDraw());
+                styleXYScaleWidgets();
+            }
+        }
     } 
 
     updateLabels();
@@ -2964,13 +2989,19 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
         (m_pData->m_axisScaleAuto && qIsNaN(m_pData->m_axisMin)))
     {
         QRectF rect;
+        DataObjectSeriesData *curveData = nullptr;
         
         foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
-            QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
-            if (qIsFinite(tmpRect.height()))
+            curveData = (DataObjectSeriesData *)curve->data();
+
+            if (curveData)
             {
-                rect = rect.united(tmpRect);
+                QRectF tmpRect = curveData->boundingRect();
+                if (qIsFinite(tmpRect.height()))
+                {
+                    rect = rect.united(tmpRect);
+                }
             }
         }
 
