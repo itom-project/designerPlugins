@@ -26,8 +26,6 @@
 #include <qregularexpression.h>
 #include <qvalidator.h>
 
-#include "common/helperDatetime.h"
-
 //-----------------------------------------------------------------------------------------------
 Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData& data, QWidget* parent) :
     QDialog(parent), m_minX(-std::numeric_limits<double>::max()),
