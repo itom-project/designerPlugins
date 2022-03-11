@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2022, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -20,8 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef VALUEPICKER1D_H
-#define VALUEPICKER1D_H
+#pragma once
 
 #include <qwt_plot_picker.h>
 #include <qwt_plot_canvas.h>
@@ -41,11 +40,12 @@ public:
     void drawTracker( QPainter *painter ) const;
     void setBackgroundFillBrush( const QBrush &brush );
 
+    void setXAxisIsDateTime(bool isDateTime);
 
 protected:
 
 private:
-
+    bool m_xAxisIsDateTime;
     QBrush m_rectFillBrush;
 
 signals:
@@ -55,5 +55,3 @@ public slots:
 private slots:
 
 };
-
-#endif

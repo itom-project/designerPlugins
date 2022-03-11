@@ -1240,9 +1240,20 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtPlotCurveDataObject *dObjCurve = nullptr;
     bool boundsChanged = false;
     bool _unused;
-
     QwtLegendLabel *legendLabel = nullptr;
     int index;
+
+    // check for valid data types
+    if (dataObj && (dataObj->getType() == ito::tDateTime || dataObj->getType() == ito::tTimeDelta))
+    {
+        emit statusBarMessage(tr("A dateTime or timeDelta dataObject is not supported by this plot."), 10000);
+        dataObj = nullptr;
+    }
+    else if (xVec && xVec->getType() == ito::tTimeDelta)
+    {
+        emit statusBarMessage(tr("A timeDelta x-axis dataObject is not supported by this plot."), 10000);
+        dataObj = nullptr;
+    }
 
     if (dataObj)
     {
@@ -1909,6 +1920,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         if (xVec && (xVec->getType() == ito::tDateTime))
         {
             m_pData->m_hasDateTimeXAxis = true;
+            m_pValuePicker->setXAxisIsDateTime(true);
 
             if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) == nullptr)
             {
@@ -1933,6 +1945,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         else
         {
             m_pData->m_hasDateTimeXAxis = false;
+            m_pValuePicker->setXAxisIsDateTime(false);
 
             if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) != nullptr)
             {
@@ -1942,6 +1955,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             }
         }
     } 
+    else
+    {
+        removeAllCurvesBesideTheNFirst(0);
+    }
 
     updateLabels();
 
@@ -3227,6 +3244,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     for (int i = 0 ; i < m_pickers.size() ; i++)
     {
         m = &(m_pickers[i]);
+
         if (updatePositions)
         {
             stickPickerToXPx(m, std::numeric_limits<double>::quiet_NaN(), 0);
@@ -3244,7 +3262,11 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             m_pickers[i].item->setSymbol(new QwtSymbol(QwtSymbol::Diamond, colors[cur], QPen(colors[cur],2), QSize(6,6)));
         }
 
-        if (cur < 2) cur++;
+        if (cur < 2) 
+        { 
+            cur++; 
+        }
+
         points << QPointF(m->item->xValue(), m->item->yValue());   
 		idcs << i;
     }
@@ -3262,13 +3284,17 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
 
         QStringList coordTexts;
         bool yIntegerType, xIntegerType;
+        bool xDateTimeType;
         QString yCoord, xCoord;
         QString yUnit, xUnit;
 
         for (int i = 0; i < std::min(points.size(), 2); ++i) 
         {
             const DataObjectSeriesData* d = seriesData[i];
+            const DataObjectSeriesDataXY* dxy = dynamic_cast<const DataObjectSeriesDataXY*>(d);
+
             yIntegerType = false;
+            xDateTimeType = dxy && dxy->getXDataObject() && dxy->getXDataObject()->getType() == ito::tDateTime;
             xIntegerType = d->getXCoordsWholeNumber();
             const ito::DataObject *yObj = d->getDataObject();
 
@@ -3327,7 +3353,21 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
                 yCoord = floatformat(points[i].y());
             }
 
-            if (xIntegerType)
+            if (xDateTimeType)
+            {
+                auto dateTime = QwtDate::toDateTime(points[i].rx());
+
+                if (dateTime.time().msec() != 0)
+                {
+                    xCoord = dateTime.toString(Qt::ISODateWithMs);
+                }
+                else
+                {
+                    xCoord = dateTime.toString(Qt::ISODate);
+                }
+                
+            }
+            else if (xIntegerType)
             {
                 xCoord = QString("%1").arg(points[i].rx(), 0, 'f', 0);
             }

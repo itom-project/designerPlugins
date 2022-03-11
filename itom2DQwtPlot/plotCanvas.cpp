@@ -1307,6 +1307,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
         {
             emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
         }
+
         int dims = dObj->getDims();
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;

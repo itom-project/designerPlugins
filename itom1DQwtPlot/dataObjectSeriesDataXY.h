@@ -52,7 +52,7 @@ public:
     int getPosToPix(const double physx, const double physy = -1, const int indexHint = -1) const;
 
     QRectF boundingRect() const;
-    LineData m_dX;
+    
     QPointF sample(size_t n) const;
 
     inline QByteArray getHash() const
@@ -62,6 +62,8 @@ public:
 
     bool floatingPointXValues() const;
 
+    const ito::DataObject* getXDataObject() const { return m_pXVec; }
+
 private:
     void calcHash();
 
@@ -69,4 +71,6 @@ private:
     const ito::DataObject* m_pXVec; 
 
     QByteArray m_hash;
+
+    LineData m_dX;
 };
