@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -43,7 +43,10 @@ public:
         ui.sliderHSpace->setValue(valHSpace / 10.0);
     }
 
-    ~MatplotlibSubfigConfig() {};
+    ~MatplotlibSubfigConfig() 
+    {
+        int i = 1;
+    };
 
     //-------------------------------------------------------------------------------------------------------------------
     void modifyValues(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace)

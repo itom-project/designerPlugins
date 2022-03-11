@@ -29,10 +29,10 @@
 #include "plot1DWidget.h"
 #include "qwtPlotCurveProperty.h"
 
-
 #include "cmath"
-
 #include "limits"
+
+#include <qwt_text.h>
 
 //-----------------------------------------------------------------------------------------------
 WidgetCurveProperties::WidgetCurveProperties(Plot1DWidget* content, QWidget *parent /*= NULL*/) :

@@ -65,6 +65,24 @@ DataObjRasterData::~DataObjRasterData()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+void DataObjRasterData::setInterval(Qt::Axis axis, const QwtInterval& interval)
+{
+    if (axis >= 0 && axis <= 2)
+    {
+        m_intervals[axis] = interval;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QwtInterval DataObjRasterData::interval(Qt::Axis axis) const
+{
+    if (axis >= 0 && axis <= 2)
+        return m_intervals[axis];
+
+    return QwtInterval();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 /*
 dataHash only concerns fundamental items like the the number of dimensions or the pointer address to the real data
 apearanceHash contains things that might require a redraw of the data (however the current zoom... can be unchanged)
@@ -219,8 +237,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
 
                 if (!m_isOverlayData)
                 {
-                    m_pInternalData->m_selectedOutputParameters["sourceout"]->setVal<void*>((void*)&m_dataObj);
-                    m_pInternalData->m_selectedOutputParameters["displayed"]->setVal<void*>((void*)m_dataObjPlane);
+                    m_pInternalData->m_selectedOutputParameters["sourceout"]->setVal<ito::DataObject*>(&m_dataObj);
+                    m_pInternalData->m_selectedOutputParameters["displayed"]->setVal<ito::DataObject*>(m_dataObjPlane);
                 }
 
                 //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
@@ -247,7 +265,6 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
             ito::uint32 firstMin[3];
             ito::uint32 firstMax[3];
 
-
             if ((m_pInternalData->m_valueScaleAuto && !m_isOverlayData) || (m_pInternalData->m_overlayScaleAuto && m_isOverlayData))
             {
                 ito::dObjHelper::minMaxValue(m_dataObjPlane, min, firstMin, max, firstMax, true, m_pInternalData->m_cmplxType);
@@ -255,7 +272,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                 if (min == std::numeric_limits<ito::float64>::max()) min = -10.0;
                 if (max == -std::numeric_limits<ito::float64>::max()) max = 10.0;
 
-                if ((max - min) < std::numeric_limits<double>::epsilon()) //the data object only contains the same value, then make the min-max range a little bit bigger in order to ensure a nice colorbar
+                //the data object only contains the same value, then make the min-max range a little bit bigger in order to ensure a nice colorbar
+                if ((max - min) < std::numeric_limits<double>::epsilon()) 
                 {
                     switch (m_pInternalData->m_dataType)
                     {
@@ -266,6 +284,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                     case ito::tUInt32:
                     case ito::tInt32:
                     case ito::tRGBA32:
+                    case ito::tDateTime:
+                    case ito::tTimeDelta:
                         min -= 1;
                         max += 1;
                         break;
@@ -1143,14 +1163,14 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
 
     if (!validX0 && !validX1)
     {
-        if (!xInterval.contains(m_dataObjPlane->getPixToPhys(dims - 1, 0)))
+        if (!xInterval.normalized().contains(m_dataObjPlane->getPixToPhys(dims - 1, 0)))
         {
             return QSharedPointer<ito::DataObject>(new ito::DataObject());
         }
     }
     else if (!validY0 && !validY1)
     {
-        if (!yInterval.contains(m_dataObjPlane->getPixToPhys(dims - 2, 0)))
+        if (!yInterval.normalized().contains(m_dataObjPlane->getPixToPhys(dims - 2, 0)))
         {
             return QSharedPointer<ito::DataObject>(new ito::DataObject());
         }

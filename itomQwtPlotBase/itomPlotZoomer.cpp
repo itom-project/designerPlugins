@@ -23,6 +23,9 @@
 #include "itomPlotZoomer.h"
 
 #include <qevent.h>
+#include <qdebug.h>
+#include <qstack.h>
+#include <qrect.h>
 #include <qwt_plot.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_draw.h>

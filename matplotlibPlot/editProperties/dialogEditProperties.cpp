@@ -34,10 +34,10 @@
 //-------------------------------------------------------------------------------------
 DialogEditProperties::DialogEditProperties(bool showApplyButton, const QString &title /*= ""*/, QWidget *parent /*= 0*/) :
     QDialog(parent),
-    m_pBBox(NULL),
-    m_pBtnApply(NULL),
-    m_pContent(NULL),
-    m_pLayout(NULL)
+    m_pBBox(nullptr),
+    m_pBtnApply(nullptr),
+    m_pContent(nullptr),
+    m_pLayout(nullptr)
 {
     m_pLayout = new QVBoxLayout(this);
 

@@ -845,7 +845,15 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
 */
         case QEvent::Wheel:
         {
-            if (((const QWheelEvent *)e)->delta() > 0)
+#if QT_VERSION < 0x050000
+            const int wheelDelta = ((const QWheelEvent *)e)->delta();
+#else
+            const QPoint delta = ((const QWheelEvent *)e)->angleDelta();
+            const int wheelDelta = (qAbs(delta.x()) > qAbs(delta.y()))
+                ? delta.x() : delta.y();
+#endif
+
+            if (wheelDelta > 0)
             {
                 m_plotObj->reduceZAmplifierer(1.05);
                 

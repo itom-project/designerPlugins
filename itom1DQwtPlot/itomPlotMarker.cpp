@@ -21,7 +21,10 @@
 *********************************************************************** */
 
 #include "itomPlotMarker.h"
+
+#include <qpainter.h>
 #include <qwt_symbol.h>
+#include <qwt_text.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomPlotMarker::ItomPlotMarker(bool labelState, ItomQwtPlotEnums::PlotPickerType type, Qt::Alignment align, Qt::Orientation orient) : 

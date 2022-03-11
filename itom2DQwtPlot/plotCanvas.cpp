@@ -296,8 +296,10 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     menuView->addAction(m_pActCmplxSwitch);
     menuView->addAction(m_pActGrid);
     menuView->addSeparator();
-    menuView->addAction(m_pActProperties);
+    menuView->addMenu(m_pMenuToolboxes);
+    menuView->addSeparator();
     menuView->addAction(m_pActCamParameters);
+    menuView->addAction(m_pActProperties);
     m_menus.append(menuView);
 
     QMenu *menuTools = new QMenu(tr("Tools"), guiParent);
@@ -794,6 +796,8 @@ void PlotCanvas::setButtonStyle(int style)
         {
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReAbs.png"));
         }
+
+        m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/grid.png"));
     }
     else
     {
@@ -834,6 +838,8 @@ void PlotCanvas::setButtonStyle(int style)
         {
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReAbs_lt.png"));
         }
+
+        m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/grid_lt.png"));
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1265,13 +1271,25 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
     return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
     ito::RetVal retval;
     if (m_isRefreshingPlot || !m_pData)
     {
         return;
+    }
+
+    // the 2d plot does not accept a datetime or timedelta object
+    if (dObj)
+    {
+        switch (dObj->getType())
+        {
+        case ito::tDateTime:
+        case ito::tTimeDelta:
+            dObj = nullptr;
+            emit statusBarMessage(QObject::tr("Objects of type dateTime or timeDelta not supported by this plot."), 10000);
+            break;
+        }
     }
 
     m_isRefreshingPlot = true;
@@ -1797,7 +1815,7 @@ void PlotCanvas::setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &sc
 		{
 			setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine());
 		}
-		else if ((int)scaleEngine < 1000)
+		else if ((int)scaleEngine < (int)ItomQwtPlotEnums::LogLog2)
 		{
 			setAxisScaleEngine(QwtPlot::yRight, new QwtLogScaleEngine((int)scaleEngine));
 		}
@@ -1831,6 +1849,15 @@ void PlotCanvas::setGridStyle(Itom2dQwtPlot::GridStyle gridStyle)
     m_pPlotGrid->enableXMin(gridStyle == Itom2dQwtPlot::GridMinorX || gridStyle == Itom2dQwtPlot::GridMinorXY);
     m_pPlotGrid->enableYMin(gridStyle == Itom2dQwtPlot::GridMinorY || gridStyle == Itom2dQwtPlot::GridMinorXY);
     m_pActGrid->setChecked(gridStyle != Itom2dQwtPlot::GridNo);
+
+    foreach(QAction* a, m_pMnuGrid->actions())
+    {
+        if (a->data().toInt() == gridStyle)
+        {
+            m_pMnuGrid->setDefaultAction(a);
+        }
+    }
+
     replot();
 }
 
@@ -2818,7 +2845,7 @@ void PlotCanvas::lineCutAppendedPx(const QPoint &pt)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::lineCutAppendedPhys(const QPointF &pt)
 {
-    if (state() == stateLineCut && m_dObjPtr)
+    if (state() == stateLineCut)
     {
         QVector<QPointF> pts;
         pts.resize(2);
@@ -3060,7 +3087,7 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
 {
-    if (state() == stateVolumeCut && m_dObjPtr)
+    if (state() == stateVolumeCut)
     {
         QVector<QPointF> pts;
         pts.resize(2);

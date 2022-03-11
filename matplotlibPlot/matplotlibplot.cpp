@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -28,20 +28,20 @@
 //----------------------------------------------------------------------------------------------------------------------------------
 MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= 0*/)
     : ito::AbstractFigure(itomSettingsFile, windowMode, parent),
-    m_actHome(NULL),
-    m_actForward(NULL),
-    m_actBack(NULL),
-    m_actPan(NULL),
-    m_actZoomToRect(NULL), 
-    m_actSubplotConfig(NULL), 
-    m_actSave(NULL),
-    m_actMarker(NULL), 
-    m_contextMenu(NULL), 
-    m_pContent(NULL),
-    m_pMatplotlibSubfigConfig(NULL),
+    m_actHome(nullptr),
+    m_actForward(nullptr),
+    m_actBack(nullptr),
+    m_actPan(nullptr),
+    m_actZoomToRect(nullptr),
+    m_actSubplotConfig(nullptr),
+    m_actSave(nullptr),
+    m_actMarker(nullptr),
+    m_contextMenu(nullptr),
+    m_pContent(nullptr),
+    m_pMatplotlibSubfigConfig(nullptr),
     m_forceWindowResize(true),
     m_keepSizeFixed(false),
-    m_pResetFixedSizeTimer(NULL)
+    m_pResetFixedSizeTimer(nullptr)
 {
     setWindowFlags(Qt::Widget); //this is important such that this main window reacts as widget
 
@@ -164,7 +164,7 @@ MatplotlibPlot::~MatplotlibPlot()
     if (m_pMatplotlibSubfigConfig)
     {
         m_pMatplotlibSubfigConfig->deleteLater();
-        m_pMatplotlibSubfigConfig = NULL;
+        m_pMatplotlibSubfigConfig.clear();
     }
 }
 
@@ -258,7 +258,7 @@ ito::RetVal MatplotlibPlot::copyToClipBoard()
 
         if (ito::ITOM_API_FUNCS_GRAPH)
         {
-            dpi = qBound(48, apiGetFigureSetting(this, "copyClipboardResolutionDpi", 200, NULL).value<int>(), 2000);
+            dpi = qBound(48, apiGetFigureSetting(this, "copyClipboardResolutionDpi", 200, nullptr).value<int>(), 2000);
         }
 
         m_pContent->copyToClipboard(dpi);
@@ -291,9 +291,10 @@ bool MatplotlibPlot::getContextMenuEnabled() const
 //fractions of the image width and height multiplied by 1000 (resolution: 0.1%)
 void MatplotlibPlot::showSubplotConfig(float valLeft, float valTop, float valRight, float valBottom, float valWSpace, float valHSpace)
 {
-    if (m_pMatplotlibSubfigConfig == NULL)
+    if (m_pMatplotlibSubfigConfig.isNull())
     {
         m_pMatplotlibSubfigConfig = new MatplotlibSubfigConfig(valLeft, valTop, valRight, valBottom, valWSpace, valHSpace, this);
+        m_pMatplotlibSubfigConfig->setAttribute(Qt::WA_DeleteOnClose);
         connect((m_pMatplotlibSubfigConfig)->sliderLeftRight(), SIGNAL(minimumValueChanged(double)), this, SLOT(subplotConfigSliderLeftChanged(double)));
         connect((m_pMatplotlibSubfigConfig)->sliderLeftRight(), SIGNAL(maximumValueChanged(double)), this, SLOT(subplotConfigSliderRightChanged(double)));
         connect((m_pMatplotlibSubfigConfig)->sliderBottomTop(), SIGNAL(minimumValueChanged(double)), this, SLOT(subplotConfigSliderBottomChanged(double)));
@@ -381,7 +382,7 @@ void MatplotlibPlot::setLabelText(QString text)
 			temp = splits[i];
 			if (temp.size() >= 4)
 			{
-				hexCode = temp.left(4).toInt(NULL, 16);
+				hexCode = temp.left(4).toInt(nullptr, 16);
 				temp = QChar(hexCode) + temp.mid(4);
 				splits[i] = temp;
 			}
@@ -409,7 +410,7 @@ QAction* MatplotlibPlot::getActionFromGroupByName(const QString &name) const
         ++groupIt;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -432,7 +433,7 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
 
     ActionGroup &actGroup = m_actionGroups[groupName];
 
-    QAction *action = NULL;
+    QAction *action = nullptr;
 
     if (text == "")
     {
@@ -463,7 +464,7 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
         {
             beforeToolbar = beforeContextMenu = actGroup.m_pActions[0];
         }
-        actGroup.m_pActions.insert(position, action);
+        actGroup.m_pActions.insert(std::max(0, position), action);
     }
     else if (position >= actGroup.m_pActions.size())
     {
@@ -485,7 +486,7 @@ void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &te
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::removeUserDefinedAction(const QString &name)
 {
-    QAction *a = NULL;
+    QAction *a = nullptr;
     QMap<QString, ActionGroup>::iterator groupIt = m_actionGroups.begin();
 
     while (groupIt != m_actionGroups.end())

@@ -110,7 +110,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         inline void setCmplxState(ItomQwtPlotEnums::ComplexType state) { m_cmplxState = state; }
         inline ItomQwtPlotEnums::ComplexType getCmplxState() const { return m_cmplxState; }
 
-        virtual int getPosToPix(const double physx, const double physy = -1) const;
+        virtual int getPosToPix(const double physx, const double physy = -1, const int indexHint = -1) const;
         
         QString getDObjValueLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle) const;
         QString getDObjAxisLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle)  const;

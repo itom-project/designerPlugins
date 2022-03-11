@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -34,6 +34,7 @@
 #include <qaction.h>
 #include <qtoolbar.h>
 #include <qlabel.h>
+#include <qpointer.h>
 
 #include "plot/AbstractItomDesignerPlugin.h"
 
@@ -124,7 +125,7 @@ private:
     QToolBar *m_toolbar;
     QMenu *m_contextMenu;
     MatplotlibWidget *m_pContent;
-    MatplotlibSubfigConfig *m_pMatplotlibSubfigConfig;
+    QPointer<MatplotlibSubfigConfig> m_pMatplotlibSubfigConfig;
     bool m_forceWindowResize;
     bool m_keepSizeFixed;
     QTimer *m_pResetFixedSizeTimer;
@@ -167,7 +168,7 @@ public slots:
 	void setLabelText(QString text);
     void replot();
     void addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, 
-        const QString &tooltip, const QString &groupName, int position = -1);
+        const QString &tooltip, const QString &groupName, int position = 0);
     void removeUserDefinedAction(const QString &name);
     QWidget* createDialogEditProperties(bool showApplyButton, const QString &title = "");
 

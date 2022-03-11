@@ -399,18 +399,20 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 case tRadius:
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/radius.png"));
                     m_pData->m_relationsList[rel].myWidget->setText(1, "");
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                    m_pData->m_relationsList[rel].myWidget->setBackground(1, QColor(255, 255, 255));
                 break;
                 
                 case tAngle:
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
                     if (m_pData->m_relationsList[rel].secondElementIdx < 0)
                     {
-                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
+                        m_pData->m_relationsList[rel].myWidget->setBackground(
+                            1, QColor(255, 200, 200));
                     }
                     else
                     {
-                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                        m_pData->m_relationsList[rel].myWidget->setBackground(
+                            1, QColor(255, 255, 255));
                     }
                 break;
                 
@@ -418,11 +420,13 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
                     if (m_pData->m_relationsList[rel].secondElementIdx < 0)
                     {
-                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
+                        m_pData->m_relationsList[rel].myWidget->setBackground(
+                            1, QColor(255, 200, 200));
                     }
                     else
                     {
-                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                        m_pData->m_relationsList[rel].myWidget->setBackground(
+                            1, QColor(255, 255, 255));
                     }
                 break;
                 
@@ -431,11 +435,13 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
                     if (m_pData->m_relationsList[rel].secondElementIdx < 0)
                     {
-                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 200, 200));
+                        m_pData->m_relationsList[rel].myWidget->setBackground(
+                            1, QColor(255, 200, 200));
                     }
                     else
                     {
-                        m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                        m_pData->m_relationsList[rel].myWidget->setBackground(
+                            1, QColor(255, 255, 255));
                     }
                 }
                 break;
@@ -444,14 +450,14 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                 {
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/length.png"));
                     m_pData->m_relationsList[rel].myWidget->setText(1, "");
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                    m_pData->m_relationsList[rel].myWidget->setBackground(1, QColor(255, 255, 255));
                 }
                 break;
                 
                 case tArea:
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/area.png"));
                     m_pData->m_relationsList[rel].myWidget->setText(1, "");
-                    m_pData->m_relationsList[rel].myWidget->setBackgroundColor(1, QColor(255, 255, 255));
+                    m_pData->m_relationsList[rel].myWidget->setBackground(1, QColor(255, 255, 255));
                 break;
                 
                 default:
@@ -490,7 +496,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         else
         {
             m_pData->m_relationsList[rel].myWidget->setText(2, resultString);
-            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
+            m_pData->m_relationsList[rel].myWidget->setBackground(2, QColor(255, 200, 200));
             continue;
         }
 
@@ -570,11 +576,11 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
 
         if (check)
         {
-            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255,255,255));
+            m_pData->m_relationsList[rel].myWidget->setBackground(2, QColor(255, 255, 255));
         }
         else
         {
-            m_pData->m_relationsList[rel].myWidget->setBackgroundColor(2, QColor(255, 200, 200));
+            m_pData->m_relationsList[rel].myWidget->setBackground(2, QColor(255, 200, 200));
         }
     }
 }
@@ -594,7 +600,11 @@ bool PlotTreeWidget::calculateAngle(const ito::Shape &first, const ito::Shape &s
     QLineF line2(contour2[0], contour2[1]);
     QPointF intersection;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    if (line1.intersects(line2, &intersection) != QLineF::NoIntersection)
+#else
     if (line1.intersect(line2, &intersection) != QLineF::NoIntersection)
+#endif
     {
         angle = line1.angleTo(line2);
         return true;
@@ -952,12 +962,12 @@ ito::RetVal PlotTreeWidget::writeToCSV(const QFileInfo &fileName, const bool asT
         outBuffer.clear();
         QTreeWidgetItem *curItem = topLevelItem(geo);
         
-        outBuffer.append(curItem->text(0));
+        outBuffer.append(curItem->text(0).toLatin1());
         for (int col = 1; col < this->columnCount(); col++)
         {
             if (curItem->text(col).isEmpty() && !asTable) continue;
             outBuffer.append(", ");
-            outBuffer.append(curItem->text(col));
+            outBuffer.append(curItem->text(col).toLatin1());
         }
         
         if (asTable)
@@ -969,11 +979,11 @@ ito::RetVal PlotTreeWidget::writeToCSV(const QFileInfo &fileName, const bool asT
             for (int rel = 0; rel < relCount; rel ++)
             {
                 outBuffer.clear();
-                outBuffer.append(curItem->text(0));
+                outBuffer.append(curItem->text(0).toLatin1());
                 for (int col = 0; col < this->columnCount(); col++)
                 {
                     outBuffer.append(", ");
-                    outBuffer.append(curItem->child(rel)->text(col));
+                    outBuffer.append(curItem->child(rel)->text(col).toLatin1());
                 }
                 outBuffer.append('\n');
 
@@ -991,7 +1001,7 @@ ito::RetVal PlotTreeWidget::writeToCSV(const QFileInfo &fileName, const bool asT
                 {
                     if (curItem->child(rel)->text(col).isEmpty()) continue;
                     outBuffer.append(", ");
-                    outBuffer.append(curItem->child(rel)->text(col));
+                    outBuffer.append(curItem->child(rel)->text(col).toLatin1());
                 }
             }
             outBuffer.append('\n');

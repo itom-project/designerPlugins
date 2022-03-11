@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -33,9 +33,9 @@
 MatplotlibPlotFactory::MatplotlibPlotFactory(QObject *parent)
     : ito::AbstractItomDesignerPlugin(parent)
 {
-    m_plotDataFormats = 0;
-    m_plotDataTypes = 0;
-    m_plotFeatures = 0;
+    m_plotDataFormats = ito::PlotDataFormat();
+    m_plotDataTypes = ito::PlotDataTypes();
+    m_plotFeatures = ito::PlotFeatures();
 
     m_description = QObject::tr("itom widget for matplotlib plots.");
     m_detaildescription = QObject::tr("");

@@ -26,6 +26,7 @@
 
 #include <qdebug.h>
 #include <qnumeric.h>
+#include <QtMath>
 
 //----------------------------------------------------------------------------------------------------------------------------------
 DataObjectSeriesData::DataObjectSeriesData(const int fastmode) :
@@ -89,9 +90,11 @@ bool DataObjectSeriesData::floatingPointValues() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int DataObjectSeriesData::getPosToPix(const double physx, const double physy /*=-1*/) const
+int DataObjectSeriesData::getPosToPix(const double physx, const double physy /*=-1*/, const int indexHint /*= -1*/) const
 {
     Q_UNUSED(physy);
+    Q_UNUSED(indexHint);
+
     if (m_d.valid && m_d.nrPoints > 0)
     {
         double dist = (physx - m_d.startPhys);
@@ -101,14 +104,6 @@ int DataObjectSeriesData::getPosToPix(const double physx, const double physy /*=
     {
         return 0;
     }
-/*
-    int value = 0;
-    if (m_Scaling > 0) value = (int)((phys - m_startPos) / m_Scaling + 0.5);
-    else value = (int)((phys - m_startPos  - m_physLength) / abs(m_Scaling) + 0.5);
-
-    value = value > (m_plotPts.size()-1) ? (m_plotPts.size()-1) : value < 0 ? 0 : value;
-
-    return value;*/
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

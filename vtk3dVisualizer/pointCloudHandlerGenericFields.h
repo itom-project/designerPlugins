@@ -102,14 +102,26 @@ public:
         * \return true if the operation was successful (the handler is capable and 
         * the input cloud was given as a valid pointer), false otherwise
         */
+#if PCL_VERSION_COMPARE(>=,1,12,0)
+    virtual vtkSmartPointer<vtkDataArray>
+    getColor() const
+#else
     virtual bool
-    getColor (vtkSmartPointer<vtkDataArray> &scalars) const
+    getColor(vtkSmartPointer<vtkDataArray> &scalars) const
+#endif
     {
+#if PCL_VERSION_COMPARE(>=,1,12,0)
+        if (!capable_ || !cloud_)
+            return nullptr;
+
+        auto scalars = vtkSmartPointer<vtkFloatArray>::New();
+#else
         if (!capable_ || !cloud_)
             return (false);
 
         if (!scalars)
             scalars = vtkSmartPointer<vtkFloatArray>::New ();
+#endif
         scalars->SetNumberOfComponents (1);
 
         vtkIdType nr_points = cloud_->points.size ();
@@ -170,7 +182,11 @@ public:
         }
         }
         reinterpret_cast<vtkFloatArray*>(&(*scalars))->SetArray (colors, j, 0, vtkFloatArray::VTK_DATA_ARRAY_DELETE);
+#if PCL_VERSION_COMPARE(>=,1,12,0)
+        return scalars;
+#else
         return (true);
+#endif
     }
 
     /** \brief Set the input cloud to be used.

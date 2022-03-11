@@ -25,6 +25,7 @@
 #include <qpainter.h>
 #include <qbrush.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_text.h>
 
 #include "common/numeric.h"
 
@@ -80,31 +81,35 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
             QRgb value = m_valueData->value_rgb(pos.x(), pos.y());
             if(m_showOverlayInfo && m_overlayData)
             {
+                text = QString("\nL1:rgb %1,%2,%3 alpha %4\n").arg(qRed(value)).arg(qGreen(value)).arg(qBlue(value)).arg(qAlpha(value));
                 switch (m_overlayData->getTypeFlag())
                 {
                     case DataObjRasterData::tRGB:
                     {
                         QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
-                        text.sprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:rgb %i,%i,%i alpha %i", qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                        text += QString("L2:rgb %1,%2,%3 alpha %4").arg(qRed(value2)).arg(qGreen(value2)).arg(qBlue(value2)).arg(qAlpha(value2));
                     }
                     break;
                     case DataObjRasterData::tFloatOrComplex:
                     {
                         double value2 = m_overlayData->value(pos.x(), pos.y());
-                        text.sprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:%.4f", qRed(value), qGreen(value), qBlue(value), qAlpha(value), value2);
+                        text += QString("L2:%1").arg(value2, 0, 'g', 4);
                     }
                     break;
                     case DataObjRasterData::tInteger:
                     {
                         double value2 = m_overlayData->value(pos.x(), pos.y());
-                        text.sprintf("\nL1:rgb %i,%i,%i alpha %i\nL2:%d", qRed(value), qGreen(value), qBlue(value), qAlpha(value), qRound(value2));
+                        text += QString("L2:%1").arg(qRound(value2));
                     }
                     break;
+                    default:
+                        text = "";
+                        break;
                 }
             }
             else
             {
-                text.sprintf("\nrgb %i,%i,%i alpha %i", qRed(value), qGreen(value), qBlue(value), qAlpha(value));
+                text.append(QString("\nrgb %1,%2,%3 alpha %4").arg(qRed(value)).arg(qGreen(value)).arg(qBlue(value)).arg(qAlpha(value)));
             }
         }
         else if (m_valueData->getTypeFlag() == DataObjRasterData::tFloatOrComplex)
@@ -117,7 +122,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                     case DataObjRasterData::tRGB:
                     {
                         QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
-                        text.sprintf("\nL1:%.4f\nL2:rgb %i,%i,%i alpha %i", value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                        text.append(QString("\nL1:%1\nL2:rgb %2,%3,%4 alpha %5").arg(value, 0, 'g', 4).arg(qRed(value2)).arg(qGreen(value2)).arg(qBlue(value2)).arg(qAlpha(value2)));
                     }
                     break;
                     case DataObjRasterData::tFloatOrComplex:
@@ -149,7 +154,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                 case DataObjRasterData::tRGB:
                 {
                     QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
-                    text.sprintf("\nL1:%d\nL2:rgb %i,%i,%i alpha %i", value, qRed(value2), qGreen(value2), qBlue(value2), qAlpha(value2));
+                    text.append(QString("\nL1:%1\nL2:rgb %2,%3,%4 alpha %5").arg(value).arg(qRed(value2)).arg(qGreen(value2)).arg(qBlue(value2)).arg(qAlpha(value2)));
                 }
                 break;
                 case DataObjRasterData::tFloatOrComplex:
@@ -168,7 +173,7 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
             }
             else
             {
-                text.sprintf("\n%d", value);
+                text = QString("\n%1").arg(value);
             }
         }
     }

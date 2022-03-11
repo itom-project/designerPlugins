@@ -117,7 +117,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         QString bname(10);
         
         btn = new QPushButton("--", this);
-        bname.sprintf("%c--", m_axisName[i][0].toLatin1());
+        bname = QString("%1--").arg(m_axisName[i].at(0));
         btn->setToolTip(bname);
         btn->setMinimumSize(24, 24);
         btn->setMaximumSize(24, 24);
@@ -126,7 +126,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_pStepFastNegSignalMapper->setMapping(btn, i);
 
         btn = new QPushButton("-", this);
-        bname.sprintf("%c-", m_axisName[i][0].toLatin1());
+        bname = QString("%1-").arg(m_axisName[i].at(0));
         btn->setToolTip(bname);
         btn->setMinimumSize(24, 24);
         btn->setMaximumSize(24, 24);
@@ -135,7 +135,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_pStepSlowNegSignalMapper->setMapping(btn, i);
 
         btn = new QPushButton("+", this);
-        bname.sprintf("%c+", m_axisName[i][0].toLatin1());
+        bname = QString("%1+").arg(m_axisName[i].at(0));
         btn->setToolTip(bname);
         btn->setMinimumSize(24, 24);
         btn->setMaximumSize(24, 24);
@@ -144,7 +144,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_pStepSlowPosSignalMapper->setMapping(btn, i);
 
         btn = new QPushButton("++", this);
-        bname.sprintf("%c++", m_axisName[i][0].toLatin1());
+        bname = QString("%1++").arg(m_axisName[i].at(0));
         btn->setToolTip(bname);
         btn->setMinimumSize(24, 24);
         btn->setMaximumSize(24, 24);
@@ -913,7 +913,7 @@ void MotorController::setAbsRel(const bool absRel)
     for (int i = 0; i < m_posWidgets.size(); i ++)
     {
         axisName = m_axisName[i][0];
-        m_axisName[i].sprintf(text, axisName.toLatin1());
+        m_axisName[i] = axisName;
 
         m_posLabels[i]->setText(m_axisName[i]);
     }

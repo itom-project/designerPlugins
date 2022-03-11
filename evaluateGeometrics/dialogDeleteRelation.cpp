@@ -60,62 +60,62 @@ DialogDeleteRelation::DialogDeleteRelation(const InternalInfo &data, EvaluateGeo
     switch ((int)m_evalGeoFig->getShape((*curRel).at<ito::float32>(0, 0)).type())
     {
         case ito::Shape::Point:
-            ui.comboBoxFirst->addItem(str.sprintf("#%d: Point", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
+            ui.comboBoxFirst->addItem(str.asprintf("#%d: Point", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
         break;
 
         case ito::Shape::Line:
-            ui.comboBoxFirst->addItem(str.sprintf("#%d: Line", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
+            ui.comboBoxFirst->addItem(str.asprintf("#%d: Line", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
         break;
 
         case ito::Shape::Rectangle:
-            ui.comboBoxFirst->addItem(str.sprintf("#%d: Rectangle", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
+            ui.comboBoxFirst->addItem(str.asprintf("#%d: Rectangle", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
         break;
 
         case ito::Shape::Square:
-            ui.comboBoxFirst->addItem(str.sprintf("#%d: Square", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
+            ui.comboBoxFirst->addItem(str.asprintf("#%d: Square", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
         break;
 
         case ito::Shape::Circle:
-            ui.comboBoxFirst->addItem(str.sprintf("#%d: Circle", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
+            ui.comboBoxFirst->addItem(str.asprintf("#%d: Circle", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
         break;
 
         case ito::Shape::Ellipse:
-            ui.comboBoxFirst->addItem(str.sprintf("#%d: Ellipse", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
+            ui.comboBoxFirst->addItem(str.asprintf("#%d: Ellipse", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
         break;
 
         case ito::Shape::Polygon:
-            ui.comboBoxFirst->addItem(str.sprintf("#%d: Polygon", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
+            ui.comboBoxFirst->addItem(str.asprintf("#%d: Polygon", (int)(*curRel).at<ito::float32>(0, 0)), (*curRel).at<ito::float32>(0, 0));
         break;
     }
 
     switch ((int)m_evalGeoFig->getShape((*curRel).at<ito::float32>(2, 0)).type())
     {
         case ito::Shape::Point:
-            ui.comboBoxSecond->addItem(str.sprintf("#%d: Point", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
+            ui.comboBoxSecond->addItem(str.asprintf("#%d: Point", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
         break;
 
         case ito::Shape::Line:
-            ui.comboBoxSecond->addItem(str.sprintf("#%d: Line", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
+            ui.comboBoxSecond->addItem(str.asprintf("#%d: Line", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
         break;
 
         case ito::Shape::Rectangle:
-            ui.comboBoxSecond->addItem(str.sprintf("#%d: Rectangle", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
+            ui.comboBoxSecond->addItem(str.asprintf("#%d: Rectangle", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
         break;
 
         case ito::Shape::Square:
-            ui.comboBoxSecond->addItem(str.sprintf("#%d: Square", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
+            ui.comboBoxSecond->addItem(str.asprintf("#%d: Square", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
         break;
 
         case ito::Shape::Circle:
-            ui.comboBoxSecond->addItem(str.sprintf("#%d: Circle", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
+            ui.comboBoxSecond->addItem(str.asprintf("#%d: Circle", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
         break;
 
         case ito::Shape::Ellipse:
-            ui.comboBoxSecond->addItem(str.sprintf("#%d: Ellipse", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
+            ui.comboBoxSecond->addItem(str.asprintf("#%d: Ellipse", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(2, 0));
         break;
 
         case ito::Shape::Polygon:
-            ui.comboBoxSecond->addItem(str.sprintf("#%d: Polygon", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(0, 2));
+            ui.comboBoxSecond->addItem(str.asprintf("#%d: Polygon", (int)(*curRel).at<ito::float32>(2, 0)), (*curRel).at<ito::float32>(0, 2));
         break;
     }
 

@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -36,9 +36,9 @@ MatplotlibWidget::MatplotlibWidget(QMenu *contextMenu, QWidget * parent) :
     m_internalResize(false),
     m_keepSizeFixed(false),
     m_updatePlot(false),
-    m_scene(NULL),
-    m_rectItem(NULL),
-    m_pixmapItem(NULL),
+    m_scene(nullptr),
+    m_rectItem(nullptr),
+    m_pixmapItem(nullptr),
 #ifdef _DEBUG
     m_debugOutput(false), //set this to true in order to get qDebug() outputs in _DEBUG mode
 #endif
@@ -426,7 +426,7 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
         {
             button = 3;
         }
-        else if(btns & Qt::MidButton)
+        else if(btns & Qt::MiddleButton)
         {
             button = 2;
         }
@@ -517,14 +517,27 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
 {
     if (!hasFocus())
         return;
-    QPointF scenePos = mapToScene( event->pos().x(), event->pos().y() );
-    if(event->orientation() == Qt::Vertical)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QPointF scenePos = mapToScene(event->position().x(), event->position().y());
+    if (std::abs(event->angleDelta().y()) > 0)
+#else
+    QPointF scenePos = mapToScene(event->pos().x(), event->pos().y());
+    if (event->orientation() == Qt::Vertical)
+#endif    
     {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().y(), 1);
+#else
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 1);
+#endif   
     }
     else
     {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().x(), 0);
+#else
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 0);
+#endif 
     }
 }
 

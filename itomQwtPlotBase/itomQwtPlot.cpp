@@ -40,6 +40,7 @@
 #include <qprintpreviewdialog.h>
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
+#include <qregularexpression.h>
 #include <qwidgetaction.h>
 
 #include "itomPlotZoomer.h"
@@ -50,11 +51,13 @@
 #include "multiPointPickerMachine.h"
 #include "dialogExportProperties.h"
 #include "itomQwtPlotPanner.h"
+#include "markerWidget.h"
 
 #include "../DataObject/dataObjectFuncs.h"
 
 #include "common/apiFunctionsGraphInc.h"
 #include "common/retVal.h"
+#include "plot/designerPluginInterfaceVersion.h"
 
 #include <qwt_plot_picker.h>
 #include <qwt_plot_panner.h>
@@ -85,7 +88,6 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_buttonStyle(0),
     m_boxFrame(true),
     m_plottingEnabled(true),
-    m_markerLabelVisible(false),
     m_shapesLabelVisible(false),
     m_unitLabelStyle(ito::AbstractFigure::UnitLabelSlash),
     m_pActSave(NULL),
@@ -96,12 +98,16 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pActAspectRatio(NULL),
     m_pActSendCurrentToWorkspace(NULL),
     m_pActCopyClipboard(NULL),
+    m_pActShapesToolbox(nullptr),
+    m_pActMarkerToolbox(nullptr),
+    m_pActDObjInfoToolbox(nullptr),
+    m_pActPickerToolbox(nullptr),
+    m_pMenuToolboxes(nullptr),
     m_pMenuShapeType(NULL),
     m_pActClearShapes(NULL),
     m_pActProperties(NULL),
     m_pActCamParameters(NULL),
     m_pActShapeType(NULL),
-    m_currentPlane(0),
     m_axisColor(Qt::black),
     m_textColor(Qt::black),
     m_backgroundColor(Qt::white),
@@ -111,7 +117,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_shapeModifiedByMouseMove(false),
     m_geometricShapeOpacity(0),
     m_geometricShapeOpacitySelected(0),
-	m_mouseCatchTolerancePx(8)
+	m_mouseCatchTolerancePx(8),
+    m_markerModel(new MarkerModel(false, this))
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -179,29 +186,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     //plotLayout()->setAlignCanvasToScales(true); //directly connects the bottom-left-corners of the y-left and x-bottom axis.
     plotLayout()->setCanvasMargin(2,-1);
 
-    //left axis
-    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
-    leftAxis->setMargin(0);                 //distance backbone <-> canvas
-    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
-    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    leftAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
-    axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtScaleDraw::Backbone, !m_boxFrame);
-
-    //bottom axis
-    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
-    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
-    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
-    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    bottomAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
-    axisScaleDraw(QwtPlot::xBottom)->enableComponent(QwtScaleDraw::Backbone, !m_boxFrame);
-
-    ////top axis
-    //QwtScaleWidget *topAxis = axisWidget(QwtPlot::xTop);
-    //enableAxis(QwtPlot::xTop, true);
-    //topAxis->setMargin(0);                 //distance backbone <-> canvas
-    //topAxis->setSpacing(6);                //distance tick labels <-> axis label
-    //topAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
-    //topAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
+    styleXYScaleWidgets();
 
     setState(stateIdle);
 
@@ -212,6 +197,9 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
 
         m_pActCamParameters = parent->cameraParamEditorDockWidget()->toggleViewAction();
         m_pActCamParameters->setVisible(false);
+
+        MarkerWidget* markerInfoWidget = parent->markerInfoWidget();
+        markerInfoWidget->setModel(m_markerModel.data());
     }
     
 }
@@ -294,7 +282,7 @@ void ItomQwtPlot::createBaseActions()
     a->setObjectName("actClearGeometrics");
     a->setCheckable(false);
     a->setChecked(false);
-    a->setToolTip(tr("Clear All Existing Geometric Shapes"));
+    a->setToolTip(tr("Clear all existing geometric shapes"));
     connect(a, SIGNAL(triggered()), this, SLOT(clearAllGeometricShapes()));
 
     //m_actApectRatio
@@ -305,6 +293,15 @@ void ItomQwtPlot::createBaseActions()
     a->setToolTip(tr("Toggle fixed / variable aspect ration between axis x and y"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActRatio(bool)));
 
+    m_pActShapesToolbox = p->shapesDockWidget()->toggleViewAction();
+    m_pActMarkerToolbox = p->markerDockWidget()->toggleViewAction();
+    m_pActDObjInfoToolbox = p->dObjectDockWidget()->toggleViewAction();
+    m_pActPickerToolbox = p->pickerDockWidget()->toggleViewAction();
+    m_pMenuToolboxes = new QMenu(tr("Toolboxes"), p);
+    m_pMenuToolboxes->addAction(m_pActShapesToolbox);
+    m_pMenuToolboxes->addAction(m_pActMarkerToolbox);
+    m_pMenuToolboxes->addAction(m_pActPickerToolbox);
+    m_pMenuToolboxes->addAction(m_pActDObjInfoToolbox);
 
     //m_pActShapeType
     m_pActShapeType = new QAction(tr("Draw Geometric Shape"), p);
@@ -340,7 +337,7 @@ void ItomQwtPlot::createBaseActions()
     a->setCheckable(true);
 
     m_pMenuShapeType->addSeparator();
-    m_pMenuShapeType->addAction(p->shapesDockWidget()->toggleViewAction());
+    m_pMenuShapeType->addAction(m_pActShapesToolbox);
 
     m_pActShapeType->setData(ito::Shape::Rectangle);
     m_pActShapeType->setVisible(true);
@@ -415,6 +412,26 @@ void ItomQwtPlot::loadStyles(bool overwriteDesignableProperties)
             item->setColor(m_inverseColor0, m_inverseColor1, m_inverseColor1);
         //}
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::styleXYScaleWidgets()
+{
+    //left axis
+    QwtScaleWidget *leftAxis = axisWidget(QwtPlot::yLeft);
+    leftAxis->setMargin(0);                 //distance backbone <-> canvas
+    leftAxis->setSpacing(6);                //distance tick labels <-> axis label
+    leftAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
+    leftAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
+    axisScaleDraw(QwtPlot::yLeft)->enableComponent(QwtScaleDraw::Backbone, !m_boxFrame);
+
+    //bottom axis
+    QwtScaleWidget *bottomAxis = axisWidget(QwtPlot::xBottom);
+    bottomAxis->setMargin(0);                 //distance backbone <-> canvas
+    bottomAxis->setSpacing(6);                //distance tick labels <-> axis label
+    bottomAxis->scaleDraw()->setSpacing(4);   //distance tick labels <-> ticks
+    bottomAxis->setContentsMargins(0, 0, 0, 0);  //left axis starts and ends at same level than canvas
+    axisScaleDraw(QwtPlot::xBottom)->enableComponent(QwtScaleDraw::Backbone, !m_boxFrame);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -520,7 +537,8 @@ void ItomQwtPlot::setCanvasColor(const QColor &color)
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::setButtonStyle(int style)
-{
+{    m_pMenuToolboxes->setIcon(QIcon(":/application/icons/list.png"));
+
     if (style == 0)
     {
         m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"));
@@ -1471,11 +1489,11 @@ void ItomQwtPlot::multiPointActivated(bool on)
 
                     emit p->geometricShapeFinished(shapes, aborted);
 
-                    PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
+                    /*PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
                     if (pim)
                     {
                         pim->updateMarkers(shapes);
-                    }
+                    }*/
                 }
 
                 m_pMultiPointPicker->setEnabled(false);
@@ -3037,7 +3055,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         QClipboard *clipboard = QApplication::clipboard();
 
 
-        if ((hMyParent->markerWidget()  && hMyParent->markerWidget()->isVisible()) ||
+        if ((hMyParent->markerInfoWidget()  && hMyParent->markerInfoWidget()->isVisible()) ||
             (hMyParent->pickerWidget()  && hMyParent->pickerWidget()->isVisible()) ||
             (hMyParent->dObjectWidget() && hMyParent->dObjectWidget()->isVisible()) ||
             (hMyParent->shapesWidget()  && hMyParent->shapesWidget()->isVisible()))
@@ -3063,7 +3081,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
         {
             QList<QWidget*> widgets;
             widgets << hMyParent->dObjectWidget() << hMyParent->pickerWidget() << \
-                hMyParent->markerWidget()  << hMyParent->shapesWidget();
+                hMyParent->markerInfoWidget()  << hMyParent->shapesWidget();
             QList<QPixmap> pixmaps;
             int height = 0;
             int width = 0;
@@ -3135,7 +3153,7 @@ ito::RetVal ItomQwtPlot::printCanvas()
     if (!m_pPrinter)
     {
         m_pPrinter = new QPrinter();
-        m_pPrinter->setPageMargins(15, 15, 15, 15, QPrinter::Millimeter);
+        m_pPrinter->setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Unit::Millimeter);
     }
 
     QPrintPreviewDialog printPreviewDialog(m_pPrinter, this, Qt::Window);
@@ -3421,17 +3439,11 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 {
     ito::RetVal retval;
     int limits[] = { 2, 2, 0, std::numeric_limits<int>::max() };
+    QString setname = id;
 
-    QString tmpID = id;
-    if (tmpID == "")
+    if (setname == "")
     {
-        tmpID = "undef";
-        int cnt = 0;
-        while (m_plotMarkers.contains(tmpID))
-        {
-            tmpID = QString("undef%1").arg(cnt);
-            cnt++;
-        }
+        setname = m_markerModel->getNextDefaultSetname();
     }
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -3449,10 +3461,13 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         QBrush symBrush(Qt::NoBrush);
         QPen symPen(Qt::red);
 
-        QRegExp rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)(;(\\d*))?$");
-        if (rgexp.indexIn(style) != -1)
+        QRegularExpression rgexp("^([b|g|r|c|m|y|k|w]?)([.|o|s|d|\\^|v|<|>|x|+|*|h]?)(\\d*)(;(\\d*))?$");
+
+        auto match = rgexp.match(style);
+
+        if (match.hasMatch())
         {
-            char s = rgexp.cap(1).toLatin1()[0];
+            char s = match.captured(1).toLatin1()[0];
 
             switch (s)
             {
@@ -3482,7 +3497,7 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
                 break;
             }
 
-            s = rgexp.cap(2).toLatin1()[0];
+            s = match.captured(2).toLatin1()[0];
             bool ok;
 
             switch (s)
@@ -3524,13 +3539,13 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
             }
 
             //s = rgexp.cap(3);
-            int size = rgexp.cap(3).toInt(&ok);
+            int size = match.captured(3).toInt(&ok);
             if (ok)
             {
                 symSize = QSize(size, size);
             }
 
-            size = rgexp.cap(5).toInt(&ok);
+            size = match.captured(5).toInt(&ok);
             if (ok)
             {
                 symPen.setWidth(size);
@@ -3538,21 +3553,23 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         }
         else
         {
-            retval += ito::RetVal(ito::retError, 0, tr("The style tag does not correspond to the required format: ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; Style = o,s,d,>,v,^,<,x,*,+,h)").toLatin1().data());
+            retval += ito::RetVal(
+                ito::retError, 
+                0, 
+                tr("The style tag does not correspond to the required format: "
+                    "ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; "
+                    "Style = o,s,d,>,v,^,<,x,*,+,h)").toLatin1().data());
         }
 
         QwtPlotMarker *marker = NULL;
         int nrOfMarkers = dObj.getSize(1);
 
         const cv::Mat *mat = dObj.getCvPlaneMat(0);
-
         const ito::float32 *xRow = mat->ptr<const ito::float32>(0);
         const ito::float32 *yRow = mat->ptr<const ito::float32>(1);
 
         QPolygonF markerPolygon;
-        markerPolygon.clear();
-
-		QwtText label(QString(" %1").arg(tmpID));
+        QList<MarkerItem> markers;
 
         for (int i = 0; i < nrOfMarkers; ++i)
         {
@@ -3566,31 +3583,11 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 				marker->setSymbol(new QwtSymbol(symStyle, symBrush, symPen, symSize));
 				marker->setValue(xRow[i], yRow[i]);
 				marker->attach(this);
-
-				if (m_markerLabelVisible)
-				{
-					marker->setLabel(label);
+                markers.append(MarkerItem(marker, plane, true));
+				}
 				}
 
-				if (plane == -1 || plane == m_currentPlane)
-				{
-					marker->setVisible(true);
-				}
-				else
-				{
-					marker->setVisible(false);
-				}
-
-				m_plotMarkers.insert(tmpID, QPair<int, QwtPlotMarker*>(plane, marker));
-			}
-        }
-
-        PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
-        if (pim)
-        {
-            ito::Shape shapes = ito::Shape::fromMultipoint(markerPolygon, m_plotMarkers.size(), tmpID);
-            pim->updateMarker(shapes);
-        }
+        m_markerModel->addMarkers(setname, markers);
 
         replot();
     }
@@ -3599,74 +3596,48 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal ItomQwtPlot::deleteMarkers(const QString &id)
+ito::RetVal ItomQwtPlot::deleteMarkers(const QString &setname)
 {
     ito::RetVal retval;
-    bool found = false;
-    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
     
-    while (i.hasNext())
+    if (setname == "")
     {
-        i.next();
-        if (i.key() == id || id == "")
-        {
-            i.value().second->detach();
-            delete i.value().second;
-            found = true;
-            i.remove();
+        m_markerModel->removeAllMarkers();
+        replot();
         }
-    }
-
-    PlotInfoMarker *pim = ((ItomQwtDObjFigure*)parent())->markerWidget();
-    if (pim)
+    else
     {
-        pim->removeMarker(id);
-    }
-
-    if (!found && id != "")
+        if (!m_markerModel->removeAllMarkersFromSet(setname))
     {
-        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(id).toLatin1().data());
+            retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(setname).toLatin1().data());
     }
     else
     {
         replot();
     }
+    }
 
     return retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtPlot::setMarkerLabelVisible(bool visible)
+ito::RetVal ItomQwtPlot::showHideMarkers(const QString &setname, bool show)
 {
-    if (m_markerLabelVisible != visible)
-    {
-        if (visible)
-        {
-            QPair<int, QwtPlotMarker*> pair;
-            QList<QString> keys = m_plotMarkers.keys();
-            QString label;
-            foreach(label, keys)
-            {
-                foreach(pair, m_plotMarkers.values(label))
-                {
-                    if (pair.second) pair.second->setLabel(label);
-                }
-            }
-        }
-        else
-        {
-            QPair<int, QwtPlotMarker*> pair;
+    ito::RetVal retval;
 
-            foreach(pair, m_plotMarkers)
-            {
-                if (pair.second) pair.second->setLabel(QwtText());
-            }
-        }
+    if (!m_markerModel->setVisibility(setname, show))
+    {
+        retval += ito::RetVal::format(
+            ito::retError, 0, tr("No marker with id '%1' found.").arg(setname).toLatin1().data());
     }
 
-    m_markerLabelVisible = visible;
+    return retval;
+ }
 
-    replot();
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::setMarkerLabelVisible(bool visible)
+            {
+    m_markerModel->setMarkerLabelsVisible(visible);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -3688,16 +3659,7 @@ void ItomQwtPlot::setShapesLabelVisible(bool visible)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal ItomQwtPlot::changeVisibleMarkers(int currentPlane)
 {
-    m_currentPlane = currentPlane;
-
-    QMutableHashIterator<QString, QPair<int, QwtPlotMarker*> > i(m_plotMarkers);
-
-    while (i.hasNext())
-    {
-        i.next();
-        i.value().second->setVisible(i.value().first == -1 || i.value().first == currentPlane);
-    }
-
+    m_markerModel->changeCurrentPlane(currentPlane);
     return ito::retOk;
 }
 

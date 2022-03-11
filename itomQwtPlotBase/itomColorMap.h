@@ -64,9 +64,10 @@ public:
 	QColor color2() const;
 
 	virtual QRgb rgb(const QwtInterval &, double value) const;
-	virtual unsigned char colorIndex(
-		const QwtInterval &, double value) const;
-	virtual QVector<QRgb> colorTable(const QwtInterval &interval) const;
+	virtual uint colorIndex(int numColors,
+        const QwtInterval& interval, double value) const;
+    virtual QVector<QRgb> colorTable256() const;
+    virtual QVector< QRgb > colorTable(int numColors) const;
 
 	class ColorStops;
 

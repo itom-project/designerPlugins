@@ -33,7 +33,6 @@
 #include "common/shape.h"
 
 #include "itomWidgets/plotInfoShapes.h"
-#include "itomWidgets/plotInfoMarker.h"
 #include "itomWidgets/plotInfoPicker.h"
 #include "itomWidgets/plotInfoDObject.h"
 
@@ -56,6 +55,8 @@
 class ItomQwtPlot;
 class ItomQwtDObjFigurePrivate;
 class ParamEditorWidget;
+class MarkerWidget;
+class PlotInfoMarker;
 class QWidgetAction;
 
 
@@ -234,6 +235,20 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     "------------\n"
     "id : {str} \n"
     "    name of the marker set that should be removed (optional)")
+    
+    Q_CLASSINFO("slot://showMarkers", "Shows all existing markers with the given name\n"
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "id : {str}\n"
+        "    Name of the set of markers, that should be shown.")
+
+    Q_CLASSINFO("slot://hideMarkers", "Hides all existing markers with the given name\n"
+        "\n"
+        "Parameters\n"
+        "------------\n"
+        "id : {str}\n"
+        "    Name of the set of markers, that should be hidden.")
     
     Q_CLASSINFO("slot://replot", "Force a replot which is for instance necessary if values of the displayed data object changed and you want to update the plot, too.")
 
@@ -429,8 +444,12 @@ public Q_SLOTS:
     ito::RetVal setGeometricShapeLabel(int idx, QString label);
     ito::RetVal setGeometricShapeLabelVisible(int idx, bool visible);
 
-    ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString::Null(), int plane = -1);
+    ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
+    ito::RetVal showMarkers(QString id);
+    
+    
+    ito::RetVal hideMarkers(QString id);
     ito::RetVal setDisplayedCameraChannel(const QString& channel);
     void replot();
  
@@ -438,13 +457,17 @@ private Q_SLOTS:
     void cameraParamEditorVisibilityChanged(bool visible);
 
 protected:
-    inline PlotInfoMarker* markerWidget(void) const { return m_pMarkerInfo; }
+
+    //!< deprecated. Do not use this method any more. Use ``markerInfoWidget`` instead.
+    inline PlotInfoMarker* markerWidget(void) const { return nullptr; }
+
     inline PlotInfoPicker* pickerWidget(void) const { return m_pPickerInfo; }
     inline PlotInfoShapes* shapesWidget(void) const { return m_pShapesInfo; }
     inline PlotInfoDObject* dObjectWidget(void) const { return m_pObjectInfo; }
+
     QDockWidget* cameraParamEditorDockWidget() const;
     ParamEditorWidget* cameraParamEditorWidget() const;
-
+    MarkerWidget* markerInfoWidget() const;
 
     void addToolbarsAndMenus();
     
@@ -453,7 +476,9 @@ protected:
 private:
     void construct();
 
+    //!< this is deprecated. This member will be deleted in a next major version change.
     PlotInfoMarker  *m_pMarkerInfo;
+
     PlotInfoPicker  *m_pPickerInfo;
     PlotInfoShapes  *m_pShapesInfo;
     PlotInfoDObject *m_pObjectInfo;

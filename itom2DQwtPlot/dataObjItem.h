@@ -34,7 +34,7 @@ class DataObjItem: public QwtPlotSpectrogram
 {
 public:
 
-    explicit DataObjItem( const QString &title = QString::null );
+    explicit DataObjItem( const QString &title = QString() );
     virtual ~DataObjItem();
     virtual QPen contourPen(double level) const;
     void setContourPalette(const ito::ItomPalette &palette);

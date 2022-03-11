@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
    Universitaet Stuttgart, Germany 
  
    This file is part of itom.
@@ -20,8 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef ITOMQWTPLOT_H
-#define ITOMQWTPLOT_H
+#pragma once
 
 #include "itomQwtPlotBase.h"
 
@@ -29,6 +28,7 @@
 
 #include "plot/AbstractFigure.h"
 #include "itomQwtPlotEnums.h"
+#include "markerModel.h"
 
 #include <qhash.h>
 #include <qcolor.h>
@@ -37,6 +37,7 @@
 #include <qsize.h>
 #include <qstring.h>
 #include <qprinter.h>
+#include <qscopedpointer.h>
 
 #include "DataObject/dataobj.h"
 #include "common/shape.h"
@@ -56,6 +57,7 @@ class QActionGroup;
 class QToolBar;
 class UserInteractionPlotPicker;
 class ItomQwtDObjFigure;
+class QTreeWidgetItem;
 
 class ITOMQWTPLOTBASE_EXPORT ItomQwtPlot : public QwtPlot
 {
@@ -85,7 +87,7 @@ public:
     bool keepAspectRatio() const { return m_keepAspectRatio; }
     void setKeepAspectRatio(bool keep);
 
-    bool markerLabelVisible() const { return m_markerLabelVisible; }
+    bool markerLabelVisible() const { return m_markerModel->markerLabelsVisible(); }
     void setMarkerLabelVisible(bool visible);
 
     bool shapesLabelVisible() const { return m_shapesLabelVisible; }
@@ -153,7 +155,8 @@ public:
     ito::RetVal printCanvas();
 
     ito::RetVal plotMarkers(const QSharedPointer<ito::DataObject> coordinates, const QString &style, const QString &id, int plane);
-    ito::RetVal deleteMarkers(const QString &id);
+    ito::RetVal deleteMarkers(const QString &setname);
+    ito::RetVal showHideMarkers(const QString &setname, bool show);
 
 protected:
 
@@ -164,6 +167,9 @@ protected:
     ItomPlotZoomer *zoomer() const;
     ItomQwtPlotPanner *panner() const;
     void configRescaler();
+
+    //!< styles and configures the xBottom and yLeft scale widgets
+    void styleXYScaleWidgets();
 
     ito::RetVal changeVisibleMarkers(int currentPlane);
 
@@ -211,6 +217,11 @@ protected:
 
     QAction *m_pActProperties;
     QAction *m_pActCamParameters;
+    QAction *m_pActShapesToolbox;
+    QAction *m_pActMarkerToolbox;
+    QAction *m_pActDObjInfoToolbox;
+    QAction *m_pActPickerToolbox;
+    QMenu *m_pMenuToolboxes;
 
 
     QList<QToolBar*> m_toolbars;
@@ -250,8 +261,10 @@ private:
     int m_geometricShapeOpacitySelected;
 
     //markers
-    QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
-    bool m_markerLabelVisible;
+
+    //!< label -> pair(planeIndex, marker). The planeIndex is -1 if visible in all planes (default)
+    //QMultiHash<QString, QPair<int, QwtPlotMarker*> > m_plotMarkers;
+    QScopedPointer<MarkerModel> m_markerModel;
 
     bool m_ignoreNextMouseEvent; //todo: what is this?
     bool m_shapeModifiedByMouseMove;
@@ -267,7 +280,6 @@ private:
     
     int m_state; /*!< current state (value of enum State or stateUser + X) */
     bool m_stateIsChanging;
-    int m_currentPlane;
 
     QColor m_backgroundColor;       //!> plot background color
     QColor m_axisColor;         //!> color of axis
@@ -317,5 +329,3 @@ signals:
     void statusBarClear();
     void statusBarMessage(const QString &message, int timeout = 0);
 };
-
-#endif //ITOMQWTPLOT_H
