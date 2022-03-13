@@ -1243,6 +1243,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtLegendLabel *legendLabel = nullptr;
     int index;
 
+    // currently this feature is not implemented for an x-over-y plot.
+    m_pActSetPickerMinMaxLocal->setEnabled(xVec == nullptr);
+
     // check for valid data types
     if (dataObj && (dataObj->getType() == ito::tDateTime || dataObj->getType() == ito::tTimeDelta))
     {
@@ -3238,7 +3241,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     QVector<QPointF> points;
     QVector<const DataObjectSeriesData*> seriesData;
 
-	QVector< int > idcs;
+	QVector< int > indices;
     int actIdx = -1;
 
     for (int i = 0 ; i < m_pickers.size() ; i++)
@@ -3268,7 +3271,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
         }
 
         points << QPointF(m->item->xValue(), m->item->yValue());   
-		idcs << i;
+		indices << i;
     }
 
     Itom1DQwtPlot *plot1d = (Itom1DQwtPlot*)(this->parent());
@@ -3279,7 +3282,23 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
 
         if (plot1d->pickerWidget())
         {
-            (plot1d->pickerWidget())->updatePickers(idcs, points);
+            if (m_pData->m_hasDateTimeXAxis)
+            {
+                QVector<QDateTime> xpositions;
+                QVector<qreal> ypositions;
+
+                foreach(const auto &pt, points)
+                {
+                    xpositions << QwtDate::toDateTime(pt.x());
+                    ypositions << pt.y();
+                }
+
+                (plot1d->pickerWidget())->updatePickers(indices, xpositions, ypositions);
+            }
+            else
+            {
+                (plot1d->pickerWidget())->updatePickers(indices, points);
+            }
         }
 
         QStringList coordTexts;
@@ -4359,6 +4378,7 @@ void Plot1DWidget::mnuSetPickerGlobalMinMax()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mnuSetPickerRoiMinMax()
 {
+    // this is currently not implemented for x over y plots.
     setPickerToMinMax(false);
 }
 
