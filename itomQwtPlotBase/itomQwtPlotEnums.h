@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -32,15 +32,16 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtPlotEnums : public QObject
     Q_OBJECT
 
 public:
-    
-    enum ComplexType 
-    { 
-        CmplxAbs = 0, 
-        CmplxImag = 1, 
-        CmplxReal = 2, 
-        CmplxArg = 3 
-    }; //definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3: argument-Value
-    
+    // definition like in dataObject: 0:abs-Value, 1:imaginary-Value, 2:real-Value, 3:
+    // argument-Value
+    enum ComplexType
+    {
+        CmplxAbs = 0,
+        CmplxImag = 1,
+        CmplxReal = 2,
+        CmplxArg = 3
+    };
+
     enum ModificationMode
     {
         Move = 0x01,
@@ -48,8 +49,8 @@ public:
         Resize = 0x04
     };
     Q_DECLARE_FLAGS(ModificationModes, ModificationMode)
-    
-    enum AxisState 
+
+    enum AxisState
     {
         evenlySpaced = 0x0001,
         xAxisObject = 0x00002,
@@ -58,25 +59,84 @@ public:
         noPerfectFit = 0x0010,
         mismatch = 0x0020
     };
-    enum MultiLineMode { AutoRowCol, FirstRow, FirstCol, MultiRows, MultiCols, MultiLayerAuto, MultiLayerCols, MultiLayerRows };
-    enum ColorHandling { AutoColor, Gray, RGB, RGBA, RGBGray};
-    enum DataChannel 
-    { 
-        //0x01XX: single channel if rgba data type, 0x00XX: coloured if rgba data type
-        ChannelAuto =  0x0000, 
-        ChannelRGBA =  0x0001,
-        ChannelGray =  0x0100,    
-        ChannelRed =   0x0101,  
-        ChannelGreen = 0x0102,  
-        ChannelBlue =  0x0104, 
+
+    enum MultiLineMode
+    {
+        AutoRowCol,
+        FirstRow,
+        FirstCol,
+        MultiRows,
+        MultiCols,
+        MultiLayerAuto,
+        MultiLayerCols,
+        MultiLayerRows
+    };
+
+    enum ColorHandling
+    {
+        AutoColor,
+        Gray,
+        RGB,
+        RGBA,
+        RGBGray
+    };
+
+    enum DataChannel
+    {
+        // 0x01XX: single channel if rgba data type, 0x00XX: coloured if rgba data type
+        ChannelAuto = 0x0000,
+        ChannelRGBA = 0x0001,
+        ChannelGray = 0x0100,
+        ChannelRed = 0x0101,
+        ChannelGreen = 0x0102,
+        ChannelBlue = 0x0104,
         ChannelAlpha = 0x0108
     };
-    enum PlotPickerType { DefaultMarker, RangeMarker, ValueRangeMarker, AxisRangeMarker };
-    enum CurveStyle {   NoCurve = -1,  Lines, FittedLines, Sticks, SticksHorizontal, SticksVertical, Steps, StepsRight, StepsLeft,  Dots };
-    enum FillCurveStyle {   NoCurveFill = -1,  FillBaseLine, FillFromTop, FillFromBottom};
-    enum ScaleEngine { Linear = 1, Log2 = 2, Log10 = 10, Log16 = 16, LogLog2 = 1002, LogLog10 = 1010, LogLog16 = 1016};
 
-    enum ShapeType //this enum is identical to ito::Shape::ShapeType but can be used for the Qt Meta System, such that the properties can be set in QtDesigner and via Python
+    enum PlotPickerType
+    {
+        DefaultMarker,
+        RangeMarker,
+        ValueRangeMarker,
+        AxisRangeMarker
+    };
+
+    enum CurveStyle
+    {
+        NoCurve = -1,
+        Lines,
+        FittedLines,
+        Sticks,
+        SticksHorizontal,
+        SticksVertical,
+        Steps,
+        StepsRight,
+        StepsLeft,
+        Dots
+    };
+
+    enum FillCurveStyle
+    {
+        NoCurveFill = -1,
+        FillBaseLine,
+        FillFromTop,
+        FillFromBottom
+    };
+
+    enum ScaleEngine
+    {
+        Linear = 1,
+        Log2 = 2,
+        Log10 = 10,
+        Log16 = 16,
+        LogLog2 = 1002,
+        LogLog10 = 1010,
+        LogLog16 = 1016
+    };
+
+    // this enum is identical to ito::Shape::ShapeType but can be used for the Qt Meta System, such
+    // that the properties can be set in QtDesigner and via Python
+    enum ShapeType
     {
         /*Invalid = 0, */ /*ignore invalid*/
         MultiPointPick = 0x00000001,
@@ -90,8 +150,8 @@ public:
     };
     Q_DECLARE_FLAGS(ShapeTypes, ShapeType)
 
-    //Q_ENUM exposes a meta object to the enumeration types, such that the key names for the enumeration
-    //values are always accessible.
+    // Q_ENUM exposes a meta object to the enumeration types, such that the key names for the
+    // enumeration values are always accessible.
 
     Q_ENUM(ComplexType);
     Q_ENUM(ShapeType);
@@ -111,4 +171,4 @@ public:
 Q_DECLARE_OPERATORS_FOR_FLAGS(ItomQwtPlotEnums::ModificationModes)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ItomQwtPlotEnums::ShapeTypes)
 
-#endif //ITOMQWTPLOTENUMS_H
+#endif // ITOMQWTPLOTENUMS_H

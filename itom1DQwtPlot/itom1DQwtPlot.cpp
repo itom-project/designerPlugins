@@ -465,7 +465,7 @@ void Itom1DQwtPlot::setAxisScale(const ItomQwtPlotEnums::ScaleEngine &scale)
 {
     if (m_pContent)
     {
-        m_pContent->setDefaultAxisScaleEngine(scale);
+        m_pContent->setDefaultAxisScaleEngine(scale, false);
     }
     updatePropertyDock();
 }
@@ -555,13 +555,13 @@ void Itom1DQwtPlot::setAxisLabelAlignment(const Qt::Alignment &alignment)
     }
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLegendFont(const QFont &font)
 {
     m_pContent->setLegendFont(font);
     updatePropertyDock();
 }
-//----------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setLabelFont(const QFont &font)
 {
     if (m_pContent)
