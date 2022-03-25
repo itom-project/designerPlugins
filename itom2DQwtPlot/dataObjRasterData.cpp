@@ -1219,32 +1219,40 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
 
     ito::DataObject dataObjectOut;
     int type = m_dataObjPlane->getType();
-    if (copyDisplayedAsComplex == false)
+    if (copyDisplayedAsComplex)
     {
         m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
     }
-    else if(type == ito::tComplex64 || type == ito::tComplex128)
+    else if(!copyDisplayedAsComplex)
     {
-        ito::DataObject temp;
-
-        switch (cmplxState)
+        if (type == ito::tComplex64 || type == ito::tComplex128)
         {
-        default:
-        case ItomQwtPlotEnums::CmplxAbs:
-            temp = ito::abs(*(m_dataObjPlane));
-            break;
-        case ItomQwtPlotEnums::CmplxReal:
-            temp = ito::real(*(m_dataObjPlane));
-            break;
-        case ItomQwtPlotEnums::CmplxImag:
-            temp = ito::imag(*(m_dataObjPlane));
-            break;
-        case ItomQwtPlotEnums::CmplxArg:
-            temp = ito::arg(*(m_dataObjPlane));
-            break;
-        }
+            ito::DataObject temp;
 
-        temp.at(curRange).copyTo(dataObjectOut);       
+            switch (cmplxState)
+            {
+            default:
+            case ItomQwtPlotEnums::CmplxAbs:
+                temp = ito::abs(*(m_dataObjPlane));
+                break;
+            case ItomQwtPlotEnums::CmplxReal:
+                temp = ito::real(*(m_dataObjPlane));
+                break;
+            case ItomQwtPlotEnums::CmplxImag:
+                temp = ito::imag(*(m_dataObjPlane));
+                break;
+            case ItomQwtPlotEnums::CmplxArg:
+                temp = ito::arg(*(m_dataObjPlane));
+                break;
+            }
+
+            temp.at(curRange).copyTo(dataObjectOut);
+        }
+        else
+        {
+            m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
+        }
+        
     }
             
     DELETE_AND_SET_NULL_ARRAY(curRange)
