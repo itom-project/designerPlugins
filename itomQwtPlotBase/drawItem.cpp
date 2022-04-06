@@ -550,7 +550,7 @@ QPointF DrawItem::getMarkerPosScale(int index) const
         case ito::Shape::Line:
         case ito::Shape::Polygon:
         case ito::Shape::MultiPointPick:
-            if (index >= 0 || index < d->m_shape.rbasePoints().size())
+            if (index >= -1 && index < d->m_shape.rbasePoints().size())
             {
                 return d->m_shape.rtransform().map(d->m_shape.rbasePoints()[0]);
             }
@@ -558,20 +558,80 @@ QPointF DrawItem::getMarkerPosScale(int index) const
             {
                 return QPointF();
             }
-
-        case ito::Shape::Rectangle:
-        case ito::Shape::Ellipse:
-        case ito::Shape::Square:
+        
         case ito::Shape::Circle:
-        {
+        case ito::Shape::Ellipse: {
             QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
-            bool keepAspect = ((d->m_shape.type() == ito::Shape::Square) || (d->m_shape.type() == ito::Shape::Circle));
+            bool keepAspect = d->m_shape.type() == ito::Shape::Circle;
+            QTransform& trafo = d->m_shape.rtransform();
+
+            if (index == -1)
+            {
+                // label position
+                QPointF pt = box.center();
+                qreal a = box.width() / 2;
+                qreal b = box.height() / 2;
+                pt.rx() += a * qCos(M_PI * 225.0 / 180.0);
+                pt.ry() += b * qCos(M_PI * 225.0 / 180.0);
+                return trafo.map(pt);
+            }
+
+            if (keepAspect)
+            {
+                switch (index)
+                {
+                case 0:
+                    return trafo.map(box.topLeft());
+                case 1:
+                    return trafo.map(box.topRight());
+                case 2:
+                    return trafo.map(box.bottomRight());
+                case 3:
+                    return trafo.map(box.bottomLeft());
+                case 4: // rotation marker
+                    return trafo.map(QPointF(
+                        0.5 * (box.topLeft().x() + box.topRight().x()),
+                        0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
+                }
+            }
+            else
+            {
+                switch (index)
+                {
+                case 0:
+                    return trafo.map(box.topLeft());
+                case 1:
+                    return trafo.map(0.5 * (box.topRight() + box.topLeft()));
+                case 2:
+                    return trafo.map(box.topRight());
+                case 3:
+                    return trafo.map(0.5 * (box.bottomRight() + box.topRight()));
+                case 4:
+                    return trafo.map(box.bottomRight());
+                case 5:
+                    return trafo.map(0.5 * (box.bottomLeft() + box.bottomRight()));
+                case 6:
+                    return trafo.map(box.bottomLeft());
+                case 7:
+                    return trafo.map(0.5 * (box.bottomLeft() + box.topLeft()));
+                case 8: // rotation marker
+                    trafo.map(QPointF(
+                        0.5 * (box.topLeft().x() + box.topRight().x()),
+                        0.5 * (box.topLeft().y() + box.topRight().y()) - 5));
+                }
+            }
+        }
+        case ito::Shape::Rectangle:
+        case ito::Shape::Square: {
+            QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
+            bool keepAspect = d->m_shape.type() == ito::Shape::Circle;
             QTransform &trafo = d->m_shape.rtransform();
 
             if (keepAspect)
             {
                 switch (index)
                 {
+                    case -1: // label position
                     case 0:
                         return trafo.map(box.topLeft());
                     case 1:
@@ -588,6 +648,7 @@ QPointF DrawItem::getMarkerPosScale(int index) const
             {
                 switch (index)
                 {
+                    case -1: // label position
                     case 0:
                         return trafo.map(box.topLeft());
                     case 1:
@@ -1119,7 +1180,7 @@ void DrawItem::draw( QPainter *painter,
 
     QwtPlotShapeItem::draw(painter, xMap, yMap, canvasRect);
 
-	//label will only be print, if the property 'geometricShapesLabelsVisible' is true, if the label is empty (then a default name is chosen) or
+	//label will only be printed, if the property 'geometricShapesLabelsVisible' is true, if the label is empty (then a default name is chosen) or
 	//if the trimmed label name is not empty. Hence, if you choose a label name consisting of spaces, the label is not printed!
     if(d->m_labelVisible)
     {
@@ -1140,11 +1201,11 @@ void DrawItem::draw( QPainter *painter,
 
 			const QSizeF textSize = label.textSize(painter->font());
 			const QPointF textSizeScales = QPointF(textSize.width() * fabs(xMap.sDist() / xMap.pDist()), textSize.height() * fabs(yMap.sDist() / yMap.pDist()));
-			QPointF marker0Position = getMarkerPosScale(0);
+			QPointF labelPosition = getMarkerPosScale(-1);
 
-			if (marker0Position.isNull() == false)
+			if (labelPosition.isNull() == false)
 			{
-				myRect = QRectF(marker0Position - textSizeScales, marker0Position);
+                myRect = QRectF(labelPosition - textSizeScales, labelPosition);
 
 				QRectF cRect = QwtScaleMap::transform(xMap, yMap, myRect);
 				//cRect.translate(QPoint(-10, -10));
