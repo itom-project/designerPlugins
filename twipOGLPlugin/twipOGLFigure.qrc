@@ -1,0 +1,57 @@
+<RCC>
+    <qresource prefix="/twipOGLFigure">
+        <file>icons/directLight.png</file>
+        <file>icons/directLightOn.png</file>
+        <file>icons/light.png</file>
+        <file>icons/lightDir.png</file>
+        <file>icons/lightDirOn.png</file>
+        <file>icons/lightOn.png</file>
+        <file>icons/plotDelta.png</file>
+        <file>icons/plotZ.png</file>
+        <file>icons/rothl.png</file>
+        <file>icons/rothl_or.png</file>
+        <file>icons/rothr.png</file>
+        <file>icons/rothr_or.png</file>
+        <file>icons/rotipl.png</file>
+        <file>icons/rotipl_or.png</file>
+        <file>icons/rotl.png</file>
+        <file>icons/rotl_or.png</file>
+        <file>icons/rotr.png</file>
+        <file>icons/rotr_or.png</file>
+        <file>icons/rotvl.png</file>
+        <file>icons/rotvl_or.png</file>
+        <file>icons/rotvr.png</file>
+        <file>icons/rotvr_or.png</file>
+        <file>icons/rotzl.png</file>
+        <file>icons/rotzl_or.png</file>
+        <file>icons/rotzr.png</file>
+        <file>icons/rotzr_or.png</file>
+    </qresource>
+    <qresource prefix="/twipDesignerPlugins/general">
+        <file>icons/logoSmall.png</file>
+        <file>icons/topoTwip.png</file>
+        <file>icons/twip.png</file>
+        <file>icons/home.png</file>
+        <file>icons/home_or.png</file>
+        <file>icons/info.png</file>
+        <file>icons/info_or.png</file>
+        <file>icons/ioIcon.png</file>
+        <file>icons/ioIcon_or.png</file>
+        <file>icons/copyImg.png</file>
+    </qresource>
+    <qresource prefix="/twipDesignerPlugins/plot">
+        <file>icons/aspRatio.png</file>
+        <file>icons/bgColor.png</file>
+        <file>icons/changeColor.png</file>
+        <file>icons/colorBar.png</file>
+        <file>icons/colorBarOff.png</file>
+        <file>icons/grid.png</file>
+        <file>icons/grid_or.png</file>
+        <file>icons/rescale.png</file>
+        <file>icons/rescale_or.png</file>
+        <file>icons/highZScale.png</file>
+        <file>icons/highZScale_or.png</file>
+        <file>icons/lowZScale.png</file>
+        <file>icons/lowZScale_or.png</file>
+    </qresource>
+</RCC>
