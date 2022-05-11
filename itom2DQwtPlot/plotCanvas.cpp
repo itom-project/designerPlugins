@@ -449,7 +449,8 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
             axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>(); //designable
         }
 
-        
+        setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, NULL).value<bool>());
+                                        
     }
     if (inverseColor1().isValid())
     {
@@ -471,6 +472,8 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
             contourPen.setColor(inverseColor1());
         }
     }
+
+
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
