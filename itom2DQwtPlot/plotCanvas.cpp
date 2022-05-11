@@ -450,7 +450,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
         }
 
         setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, NULL).value<bool>());
-                                        
+        m_pData->m_yaxisFlipped = apiGetFigureSetting(parent(), "yAxisFlipped", false, NULL).value<bool>();
     }
     if (inverseColor1().isValid())
     {
