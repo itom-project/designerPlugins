@@ -146,7 +146,9 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
         }
         else if (m_valueData->getTypeFlag() == DataObjRasterData::tInteger)
         {
-            int value = qRound(m_valueData->value(pos.x(), pos.y()));
+            double value = m_valueData->value(pos.x(), pos.y());
+            QString valueText = std::isnan(value) ? "nan" : QString::number(qRound(value));
+
             if (m_showOverlayInfo && m_overlayData)
             {
                 switch (m_overlayData->getTypeFlag())
@@ -154,26 +156,31 @@ QwtText ValuePicker2D::trackerTextF( const QPointF &pos ) const
                 case DataObjRasterData::tRGB:
                 {
                     QRgb value2 = m_overlayData->value_rgb(pos.x(), pos.y());
-                    text.append(QString("\nL1:%1\nL2:rgb %2,%3,%4 alpha %5").arg(value).arg(qRed(value2)).arg(qGreen(value2)).arg(qBlue(value2)).arg(qAlpha(value2)));
+                    text.append(QString("\nL1:%1\nL2:rgb %2,%3,%4 alpha %5")
+                                    .arg(valueText)
+                                    .arg(qRed(value2))
+                                    .arg(qGreen(value2))
+                                    .arg(qBlue(value2))
+                                    .arg(qAlpha(value2)));
                 }
                 break;
                 case DataObjRasterData::tFloatOrComplex:
                 {
                     double value2 = m_overlayData->value(pos.x(), pos.y());
-                    text.append(QString("\nL1:%1\nL2:%2").arg(value).arg(value2, 0, 'g', 4));
+                    text.append(QString("\nL1:%1\nL2:%2").arg(valueText).arg(value2, 0, 'g', 4));
                 }
                 break;
                 case DataObjRasterData::tInteger:
                 {
                     double value2 = m_overlayData->value(pos.x(), pos.y());
-                    text.append(QString("\nL1:%1\nL2:%2").arg(value).arg(qRound(value2)));
+                    text.append(QString("\nL1:%1\nL2:%2").arg(valueText).arg(qRound(value2)));
                 }
                 break;
                 }
             }
             else
             {
-                text = QString("\n%1").arg(value);
+                text = QString("\n%1").arg(valueText);
             }
         }
     }

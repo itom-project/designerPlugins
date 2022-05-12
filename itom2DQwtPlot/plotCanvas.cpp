@@ -2200,6 +2200,18 @@ void PlotCanvas::synchronizeScaleValues()
     m_pData->m_yaxisMax = std::max(ival.minValue(), ival.maxValue());
 }
 
+//---------------------------------------------------------------------------------
+//!< if an interval has size of 0, the automatically determined scale will have strange values.
+void fixZeroInterval(QwtInterval &interval)
+{
+    auto dist = qAbs(interval.maxValue() - interval.minValue());
+
+    if (dist < std::numeric_limits<double>::epsilon())
+    {
+        interval = QwtInterval(interval.minValue() - 0.5, interval.maxValue() + 0.5);
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 /*
 @param doReplot forces a replot of the content
@@ -2228,6 +2240,7 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     if (m_pData->m_xaxisScaleAuto)
     {
         ival = m_rasterData->interval(Qt::XAxis);
+        fixZeroInterval(ival);
         m_pData->m_xaxisMin = ival.minValue();
         m_pData->m_xaxisMax = ival.maxValue();
     }
@@ -2235,6 +2248,7 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     if (m_pData->m_yaxisScaleAuto)
     {
         ival = m_rasterData->interval(Qt::YAxis);
+        fixZeroInterval(ival);
         m_pData->m_yaxisMin = ival.minValue();
         m_pData->m_yaxisMax = ival.maxValue();
     }
