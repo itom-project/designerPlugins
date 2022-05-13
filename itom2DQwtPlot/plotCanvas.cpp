@@ -426,6 +426,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
     QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);
     QPen contourPen = QPen(Qt::black, 1.0, Qt::SolidLine);
     int buttonSet = buttonStyle();
+    QString colorMap = "__first__";
 
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -447,10 +448,16 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
             titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>(); //designable
             labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>(); //designable
             axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>(); //designable
+
+            colorMap = apiGetFigureSetting(parent(), "defaultColorMap", colorMap, NULL).value<QString>();
+            setColorMap(colorMap);
         }
 
+        setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, NULL).value<bool>());
+        m_pData->m_yaxisFlipped = apiGetFigureSetting(parent(), "yAxisFlipped", false, NULL).value<bool>();
         
     }
+
     if (inverseColor1().isValid())
     {
         rubberBandPen.setColor(inverseColor1());
@@ -471,6 +478,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
             contourPen.setColor(inverseColor1());
         }
     }
+
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
@@ -526,6 +534,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 		t.setFont(labelFont);
 		axisWidget(QwtPlot::yRight)->setTitle(t);
 	}
+
 
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
