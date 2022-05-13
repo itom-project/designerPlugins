@@ -307,8 +307,7 @@ struct PlotCanvas::InternalData
         m_alpha(0),
         m_overlayScaleAuto(true),
         m_overlayMin(0),
-        m_overlayMax(0),
-        m_keepAspectRatio(false)
+        m_overlayMax(0)
     {
     }
     ~InternalData(){}
@@ -352,8 +351,6 @@ struct PlotCanvas::InternalData
 
     bool m_colorBarVisible;
     unsigned char m_alpha;
-
-    bool m_keepAspectRatio;
 
     ItomQwtPlotEnums::ComplexType m_cmplxType;
     ItomQwtPlotEnums::DataChannel m_dataChannel;
