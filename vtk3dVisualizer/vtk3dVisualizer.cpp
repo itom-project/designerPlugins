@@ -459,25 +459,6 @@ ito::RetVal Vtk3dVisualizer::searchRecursiveTree(const QString &path, QTreeWidge
 }
 
 //-------------------------------------------------------------------------------------
-bool Vtk3dVisualizer::propertiesSorted() const
-{
-    if (d->propertyWidget)
-    {
-        return d->propertyWidget->sorted();
-    }
-    return false;
-}
-
-//-------------------------------------------------------------------------------------
-void Vtk3dVisualizer::setPropertiesSorted(bool value)
-{
-    if (d->propertyWidget)
-    {
-        d->propertyWidget->setSorted(value);
-    }
-}
-
-//-------------------------------------------------------------------------------------
 void Vtk3dVisualizer::setPointPickSphereRadius(double radius)
 {
     if (d->pointPickSphereRadius != radius)
