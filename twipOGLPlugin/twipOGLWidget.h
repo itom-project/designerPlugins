@@ -585,7 +585,9 @@ class TwipOGLWidget : public QGLWidget
         GLuint m_cBarTex;
 
         template<typename _Tp, typename _TpMat> ito::RetVal GLSetTriangles(const int id = 0, const bool isComplex = false);
+#ifdef USEPCL
         template<typename _Tp> ito::RetVal GLSetPointsPCL(pcl::PointCloud<_Tp> *pcl, const int id = 0);
+#endif
         template<typename _Tp> cv::Mat* newMatFromComplex(const cv::Mat* inData);
         void generateObjectInfoText(const int fromID = 0);
         void DrawObjectInfo(void);
@@ -599,6 +601,7 @@ class TwipOGLWidget : public QGLWidget
         int makeShaderProg(const QString &progStr, GLint &progName);
 
         template<typename _Tp> ito::RetVal updateOverlayImage(const int objectID);
+#ifdef USEPCL
         template<typename _Tp> void pclFindMinMax(pcl::PointCloud<_Tp> *pcl, const int id)
         {
             _Tp pt;
@@ -686,6 +689,7 @@ class TwipOGLWidget : public QGLWidget
             m_pclMaxZ[id] = zmax;
             m_pclMaxDev[id] = cv::saturate_cast<ito::float64>(devmax);
         }
+#endif
 
         inline uint32_t nearestPOT(const uint32_t num)
         {
@@ -704,7 +708,7 @@ class TwipOGLWidget : public QGLWidget
         inline cv::Mat makePerspective(const float field_of_view,
                 const float nearPt, const float farPt, const float aspect_ratio)
         {
-            float size = nearPt * tanf(field_of_view / 180.0 * M_PI / 2.0f);
+            float size = nearPt * tanf(field_of_view / 180.0 * CV_PI / 2.0f);
 
             return makeFrustum(-size, size, -size / aspect_ratio,
                      size / aspect_ratio, nearPt, farPt);

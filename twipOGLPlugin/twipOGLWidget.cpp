@@ -1729,6 +1729,7 @@ void TwipOGLWidget::paintGL()
     return;
 }
 
+#ifdef USEPCL
 //----------------------------------------------------------------------------------------------------------------------------------
 /** method for loading point cloud to vertex array
 *   @param [in] pcl        templated pointcloud 
@@ -2092,6 +2093,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
 
     return retVal;
 }
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------------------
 /** method for loading dataObjects to vertex array
@@ -3323,7 +3325,7 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
     {
         qDebug() << "Object or pointClouds empty";
 #else
-    if (m_pContentDObj == NULL)
+    if (m_pContentDObj.isEmpty())
     {
         qDebug() << "Object empty";
 #endif
@@ -4476,6 +4478,7 @@ void TwipOGLWidget::updateCurvature()
     {
         ito::float64 minDev = std::numeric_limits<ito::float64>::max();
         ito::float64 maxDev = -std::numeric_limits<ito::float64>::max();
+#ifdef USEPCL
         for (QHash<int, QSharedPointer<ito::PCLPointCloud> >::ConstIterator it = m_pContentPC.begin(); it != m_pContentPC.end(); it++)
         {
             if (m_pclMinDev.value(it.key()) < minDev)
@@ -4483,6 +4486,7 @@ void TwipOGLWidget::updateCurvature()
             if (m_pclMaxDev.value(it.key()) > maxDev)
                 maxDev = m_pclMaxDev.value(it.key());
         }
+#endif
 
         m_axes.m_devAxis.setMin(minDev);
         m_axes.m_devAxis.setMax(maxDev);
