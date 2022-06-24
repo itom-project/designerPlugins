@@ -186,7 +186,7 @@
 <context>
     <name>ItomQwtPlot</name>
     <message>
-        <location filename="../itomQwtPlot.cpp" line="+252"/>
+        <location filename="../itomQwtPlot.cpp" line="+231"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -311,7 +311,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+1111"/>
+        <location line="+1131"/>
         <location line="+122"/>
         <location line="+62"/>
         <location line="+57"/>
@@ -454,17 +454,17 @@
         <translation>Bitte %1 Quadrate einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-2004"/>
+        <location line="-2024"/>
         <source>Clear all existing geometric shapes</source>
         <translation type="unfinished">Alle geometrischen Formen entfernen</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Toolboxes</source>
-        <translation type="unfinished">Toolboxen</translation>
+        <translation>Toolboxen</translation>
     </message>
     <message>
-        <location line="+1408"/>
+        <location line="+1428"/>
         <location line="+585"/>
         <source>Please draw one square. Esc aborts the selection.</source>
         <translation>Bitte ein Quadrat einzeichnen. ESC bricht die Auswahl ab.</translation>
@@ -644,7 +644,7 @@
         <translation>Das Objekt kann nicht in den Workspace gesendet werden. Die API wurde nicht gefunden.</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+77"/>
         <source>Error sending data object to workspace</source>
         <translation>Fehler beim Senden des Datenobjekts an Workspace</translation>
     </message>
@@ -717,7 +717,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../drawItem.cpp" line="+1074"/>
+        <location filename="../drawItem.cpp" line="+1135"/>
         <source>invalid geometric shape type</source>
         <translation>Ungültiger Typ der geometischen Formen</translation>
     </message>

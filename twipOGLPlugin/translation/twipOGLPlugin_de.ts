@@ -5,7 +5,7 @@
     <name>AboutTwip</name>
     <message>
         <source>About Twip</source>
-        <translation>Über twip</translation>
+        <translation type="vanished">Über twip</translation>
     </message>
     <message>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -35,7 +35,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;{WRANGLERGL}&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -74,7 +74,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/twipDesignerPlugins/general/icons/logoSmall.png&quot; width=&quot;66&quot; height=&quot;60&quot; style=&quot;vertical-align: middle;&quot; /&gt;&lt;/p&gt;&lt;/td&gt;
 &lt;td style=&quot; vertical-align:middle;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;twip optical solutions GmbH&lt;br /&gt;Nobelstraße 15&lt;br /&gt;70569 Stuttgart&lt;br /&gt;info@twip-os.com&lt;br /&gt;www.twip-os.com&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -87,7 +87,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>close</source>
-        <translation>schließen</translation>
+        <translation type="vanished">schließen</translation>
     </message>
 </context>
 <context>
@@ -111,7 +111,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Adding DataObject with different size or scaling is currently not supported
 </source>
-        <translation>Hinzufügen eines Datenobjekts mit unterschiedlicher Größe oder Bitttiefe wird momentan nicht unterstützt</translation>
+        <translation>Hinzufügen eines Datenobjekts mit unterschiedlicher Größe oder Bitttiefe wird momentan nicht unterstützt
+</translation>
     </message>
 </context>
 <context>
@@ -138,11 +139,11 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Reset original view</source>
-        <translation>Ursprüngliche Ansicht </translation>
+        <translation>Ursprüngliche Ansicht</translation>
     </message>
     <message>
         <source>Save...</source>
-        <translation>Speichern ... </translation>
+        <translation>Speichern ...</translation>
     </message>
     <message>
         <source>Export current view...</source>
@@ -282,7 +283,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Images (</source>
-        <translation>Bilder</translation>
+        <translation type="vanished">Bilder</translation>
     </message>
     <message>
         <source>Export File Name</source>
@@ -291,6 +292,30 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Could not save data.</source>
         <translation>Konnte Daten nicht speichern.</translation>
+    </message>
+    <message>
+        <source>Aspect ratio</source>
+        <translation>Seitenverhältnis</translation>
+    </message>
+    <message>
+        <source>Set aspect ratio between x- and y-Axis</source>
+        <translation>Seitenverhältnis zwischen x- und y-Achse festlegen</translation>
+    </message>
+    <message>
+        <source>JPG Image (</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Bitmap (</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Portable Network Graphics (</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Tagged Image File (</source>
+        <translation></translation>
     </message>
 </context>
 <context>

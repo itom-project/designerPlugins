@@ -182,41 +182,41 @@
 <context>
     <name>plotGLWidget</name>
     <message>
-        <location filename="../plotIsoGLWidget.cpp" line="+930"/>
-        <location line="+250"/>
-        <location line="+15"/>
+        <location filename="../plotIsoGLWidget.cpp" line="+921"/>
+        <location line="+259"/>
+        <location line="+21"/>
         <source>Error allocating memory</source>
         <translation type="unfinished">Fehler bei der Speicheranforderung</translation>
     </message>
     <message>
-        <location line="-214"/>
-        <location line="+691"/>
+        <location line="-222"/>
+        <location line="+762"/>
         <source>invalid point cloud</source>
         <translation type="unfinished">Ungültige Punktewolke</translation>
     </message>
     <message>
-        <location line="-635"/>
-        <location line="+399"/>
+        <location line="-701"/>
+        <location line="+444"/>
         <source>Error calculating points / triangles</source>
         <translation type="unfinished">Fehler beim Berechnen der Punkte / Dreiecke</translation>
     </message>
     <message>
-        <location line="-347"/>
+        <location line="-391"/>
         <source>DataObject empty, calc triangles failed</source>
         <translation type="unfinished">Leeres DataObjects. Die Dreiecksberechnung ist fehlgeschlagen</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="+53"/>
         <source>Unknown DataObject-Type, calc triangles failed</source>
         <translation type="unfinished">Unbekannter Typ des DataObjects. Die Dreiecksberechnung ist fehlgeschlagen</translation>
     </message>
     <message>
-        <location line="+551"/>
+        <location line="+624"/>
         <source>compiled without pointCloud support</source>
         <translation type="unfinished">Die Anwendung wurde ohne PCL (pointCloud) kompiliert</translation>
     </message>
     <message>
-        <location line="+164"/>
+        <location line="+192"/>
         <source>DataObject-Container empty and compiled without pointCloud support</source>
         <translation type="unfinished">Die Anwendung wurde ohne PCL (pointCloud) kompiliert und der Datenobjekt-Container ist leer</translation>
     </message>
