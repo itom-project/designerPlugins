@@ -5,19 +5,19 @@
     <name>PlotlyPlot</name>
     <message>
         <source>Started Loading...</source>
-        <translation type="unfinished">Laden starten...</translation>
+        <translation type="unfinished">Der Ladevorgang wurde begonnen...</translation>
     </message>
     <message>
         <source>Error loading the content.</source>
-        <translation type="unfinished">Fehler beim Laden des Inhalts.</translation>
+        <translation type="unfinished">Fehler beim Öffnen des Inhalts.</translation>
     </message>
     <message>
         <source>Loading (%1 %)</source>
-        <translation type="unfinished">Laden (%1 %)</translation>
+        <translation type="unfinished">Öffnen (%1 %)</translation>
     </message>
     <message>
         <source>File Location</source>
-        <translation type="unfinished">Dateiort</translation>
+        <translation type="unfinished">Speicherort</translation>
     </message>
     <message>
         <source>Image (*.%1)</source>

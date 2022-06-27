@@ -431,6 +431,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
     QPen centerMarkerPen = QPen(QBrush(Qt::red), 1);
     QPen contourPen = QPen(Qt::black, 1.0, Qt::SolidLine);
     int buttonSet = buttonStyle();
+    QString colorMap = "__first__";
 
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
@@ -452,10 +453,16 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
             titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>(); //designable
             labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>(); //designable
             axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>(); //designable
+
+            colorMap = apiGetFigureSetting(parent(), "defaultColorMap", colorMap, NULL).value<QString>();
+            setColorMap(colorMap);
         }
 
+        setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, NULL).value<bool>());
+        m_pData->m_yaxisFlipped = apiGetFigureSetting(parent(), "yAxisFlipped", false, NULL).value<bool>();
         
     }
+
     if (inverseColor1().isValid())
     {
         rubberBandPen.setColor(inverseColor1());
@@ -476,6 +483,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
             contourPen.setColor(inverseColor1());
         }
     }
+
 
     m_pValuePicker->setTrackerFont(trackerFont);
     m_pValuePicker->setTrackerPen(trackerPen);
@@ -531,6 +539,7 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 		t.setFont(labelFont);
 		axisWidget(QwtPlot::yRight)->setTitle(t);
 	}
+
 
     //axisWidget(QwtPlot::yRight)->setLabelRotation(-90.0); //this rotates the tick values for the color bar ;)
     //axisScaleDraw(QwtPlot::yRight)->setLabelRotation(90); //this also ;)
@@ -1314,6 +1323,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
         {
             emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
         }
+
         int dims = dObj->getDims();
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
@@ -2206,6 +2216,18 @@ void PlotCanvas::synchronizeScaleValues()
     m_pData->m_yaxisMax = std::max(ival.minValue(), ival.maxValue());
 }
 
+//---------------------------------------------------------------------------------
+//!< if an interval has size of 0, the automatically determined scale will have strange values.
+void fixZeroInterval(QwtInterval &interval)
+{
+    auto dist = qAbs(interval.maxValue() - interval.minValue());
+
+    if (dist < std::numeric_limits<double>::epsilon())
+    {
+        interval = QwtInterval(interval.minValue() - 0.5, interval.maxValue() + 0.5);
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 /*
 @param doReplot forces a replot of the content
@@ -2234,6 +2256,7 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     if (m_pData->m_xaxisScaleAuto)
     {
         ival = m_rasterData->interval(Qt::XAxis);
+        fixZeroInterval(ival);
         m_pData->m_xaxisMin = ival.minValue();
         m_pData->m_xaxisMax = ival.maxValue();
     }
@@ -2241,6 +2264,7 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
     if (m_pData->m_yaxisScaleAuto)
     {
         ival = m_rasterData->interval(Qt::YAxis);
+        fixZeroInterval(ival);
         m_pData->m_yaxisMin = ival.minValue();
         m_pData->m_yaxisMax = ival.maxValue();
     }

@@ -411,125 +411,115 @@ double DataObjRasterData::value(double x, double y) const
     {
         int d = m_dataObj.getDims();
 
-        if ( d>1 )
+        if (d > 1)
         {
+            int n = qRound(m_dataObj.getPhysToPix(d - 1, x, inside1));
+            int m = qRound(m_dataObj.getPhysToPix(d - 2, y, inside2));
 
-                    int n = qRound(m_dataObj.getPhysToPix(d - 1, x, inside1));
-                    int m = qRound(m_dataObj.getPhysToPix(d - 2, y, inside2));
-
-                    if (inside1 && inside2)
-                    {
-                        switch (m_dataObj.getType())
-                        {
-                        case ito::tInt8:
-                        {
-                            return m_plane->at<ito::int8>(m, n);
-                        }
-                        case ito::tUInt8:
-                        {
-                            return m_plane->at<ito::uint8>(m, n);
-                        }
-                        case ito::tInt16:
-                        {
-                            return m_plane->at<ito::int16>(m, n);
-                        }
-                        case ito::tUInt16:
-                        {
-                            return m_plane->at<ito::uint16>(m, n);
-                        }
-                        case ito::tInt32:
-                        {
-                            return m_plane->at<ito::int32>(m, n);
-                        }
-                        case ito::tUInt32:
-                        {
-                            return m_plane->at<ito::uint32>(m, n);
-                        }
-                        case ito::tFloat32:
-                        {
-                            return m_plane->at<ito::float32>(m, n);
-                        }
-                        case ito::tFloat64:
-                        {
-                            return m_plane->at<ito::float64>(m, n);
-                        }
-                        case ito::tComplex64:
-                        {
-                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
-                            {
-                                return m_plane->at<ito::complex64>(m, n).real();
-                            }
-                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
-                            {
-                                return m_plane->at<ito::complex64>(m, n).imag();
-                            }
-                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
-                            {
-                                return std::arg(m_plane->at<ito::complex64>(m, n));
-                            }
-                            else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
-                            {
-                                return std::abs(m_plane->at<ito::complex64>(m, n));
-                            }
-                        }
-                        case ito::tComplex128:
-                        {
-                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
-                            {
-                                return m_plane->at<ito::complex128>(m, n).real();
-                            }
-                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
-                            {
-                                return m_plane->at<ito::complex128>(m, n).imag();
-                            }
-                            if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
-                            {
-                                return std::arg(m_plane->at<ito::complex128>(m, n));
-                            }
-                            else //if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
-                            {
-                                return std::abs(m_plane->at<ito::complex128>(m, n));
-                            }
-                        }
-                        case ito::tRGBA32:
-                        {
-
-                            if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAuto) //channelAuto
-                            {
-                                return m_plane->at<ito::Rgba32>(m, n).gray();
-                            }
-                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRGBA)//rgba
-                            {
-                                return m_plane->at<ito::Rgba32>(m, n).gray();
-                            }
-                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGray)//gray
-                            {
-                                return m_plane->at<ito::Rgba32>(m, n).gray();
-                            }
-                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRed)//red
-                            {
-                                return m_plane->at<ito::Rgba32>(m, n).red();
-                            }
-                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGreen)//green
-                            {
-                                return m_plane->at<ito::Rgba32>(m, n).green();
-                            }
-                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelBlue)//blue
-                            {
-                                return m_plane->at<ito::Rgba32>(m, n).blue();
-                            }
-                            else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAlpha)//alpha
-                            {
-                                return m_plane->at<ito::Rgba32>(m, n).alpha();
-                            }
-
-                        }
-                        default:
-                            return quietNaN;
-                        }
-                        
+            if (inside1 && inside2)
+            {
+                switch (m_dataObj.getType())
+                {
+                case ito::tInt8: {
+                    return m_plane->at<ito::int8>(m, n);
                 }
-               
+                case ito::tUInt8: {
+                    return m_plane->at<ito::uint8>(m, n);
+                }
+                case ito::tInt16: {
+                    return m_plane->at<ito::int16>(m, n);
+                }
+                case ito::tUInt16: {
+                    return m_plane->at<ito::uint16>(m, n);
+                }
+                case ito::tInt32: {
+                    return m_plane->at<ito::int32>(m, n);
+                }
+                case ito::tUInt32: {
+                    return m_plane->at<ito::uint32>(m, n);
+                }
+                case ito::tFloat32: {
+                    return m_plane->at<ito::float32>(m, n);
+                }
+                case ito::tFloat64: {
+                    return m_plane->at<ito::float64>(m, n);
+                }
+                case ito::tComplex64: {
+                    if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
+                    {
+                        return m_plane->at<ito::complex64>(m, n).real();
+                    }
+                    if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
+                    {
+                        return m_plane->at<ito::complex64>(m, n).imag();
+                    }
+                    if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
+                    {
+                        return std::arg(m_plane->at<ito::complex64>(m, n));
+                    }
+                    else // if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
+                    {
+                        return std::abs(m_plane->at<ito::complex64>(m, n));
+                    }
+                }
+                case ito::tComplex128: {
+                    if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
+                    {
+                        return m_plane->at<ito::complex128>(m, n).real();
+                    }
+                    if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxImag)
+                    {
+                        return m_plane->at<ito::complex128>(m, n).imag();
+                    }
+                    if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxArg)
+                    {
+                        return std::arg(m_plane->at<ito::complex128>(m, n));
+                    }
+                    else // if (m_pInternalData->m_cmplxType == PlotCanvas::CmplxAbs)
+                    {
+                        return std::abs(m_plane->at<ito::complex128>(m, n));
+                    }
+                }
+                case ito::tRGBA32: {
+                    if (m_pInternalData->m_dataChannel ==
+                        ItomQwtPlotEnums::ChannelAuto) // channelAuto
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).gray();
+                    }
+                    else if (
+                        m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRGBA) // rgba
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).gray();
+                    }
+                    else if (
+                        m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGray) // gray
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).gray();
+                    }
+                    else if (m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelRed) // red
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).red();
+                    }
+                    else if (
+                        m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelGreen) // green
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).green();
+                    }
+                    else if (
+                        m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelBlue) // blue
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).blue();
+                    }
+                    else if (
+                        m_pInternalData->m_dataChannel == ItomQwtPlotEnums::ChannelAlpha) // alpha
+                    {
+                        return m_plane->at<ito::Rgba32>(m, n).alpha();
+                    }
+                }
+                default:
+                    return quietNaN;
+                }
+            }
         }
     }
     return quietNaN;
@@ -539,6 +529,7 @@ double DataObjRasterData::value(double x, double y) const
 QRgb DataObjRasterData::value_rgb(double x, double y) const
 {
     bool inside1, inside2;
+
     if (m_dataObj.getDims() > 0 && m_plane)
     {
         int d = m_dataObj.getDims();
@@ -568,61 +559,61 @@ QRgb DataObjRasterData::value_rgb(double x, double y) const
 //----------------------------------------------------------------------------------------------------------------------------------
 double DataObjRasterData::value2(int m, int n) const
 {
-    if(m_validData)
+    if (m_validData && m_xIndizes[n] >= 0)
     {
         switch(m_dataObj.getType())
         {
         case ito::tInt8:
             {
-                ito::int8 *line = (ito::int8*)m_rasteredLinePtr[m];
+                const ito::int8 *line = (const ito::int8*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt8:
             {
-                ito::uint8 *line = (ito::uint8*)m_rasteredLinePtr[m];
+                const ito::uint8 *line = (const ito::uint8*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tInt16:
             {
-                ito::int16 *line = (ito::int16*)m_rasteredLinePtr[m];
+                const ito::int16 *line = (const ito::int16*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt16:
             {
-                ito::uint16 *line = (ito::uint16*)m_rasteredLinePtr[m];
+                const ito::uint16 *line = (const ito::uint16*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tInt32:
             {
-                ito::int32 *line = (ito::int32*)m_rasteredLinePtr[m];
+                const ito::int32 *line = (const ito::int32*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tUInt32:
             {
-                ito::uint32 *line = (ito::uint32*)m_rasteredLinePtr[m];
+                const ito::uint32 *line = (const ito::uint32*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tFloat32:
             {
-                ito::float32 *line = (ito::float32*)m_rasteredLinePtr[m];
+                const ito::float32 *line = (const ito::float32*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tFloat64:
             {
-                ito::float64 *line = (ito::float64*)m_rasteredLinePtr[m];
+                const ito::float64 *line = (const ito::float64*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 return line[ m_xIndizes[n] ];
             }
         case ito::tComplex64:
             {
-                ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
+                const ito::complex64 *line = (const ito::complex64*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 ito::complex64 i = line[ m_xIndizes[n] ];
 
@@ -645,7 +636,7 @@ double DataObjRasterData::value2(int m, int n) const
             }
         case ito::tComplex128:
             {
-                ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
+                const ito::complex128 *line = (const ito::complex128*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 ito::complex128 i = line[ m_xIndizes[n] ];
                 
@@ -668,7 +659,7 @@ double DataObjRasterData::value2(int m, int n) const
             }
         case ito::tRGBA32:
             {
-                ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
+                const ito::Rgba32 *line = (const ito::Rgba32*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
 
                 switch (m_pInternalData->m_dataChannel)
@@ -715,62 +706,63 @@ double DataObjRasterData::value2(int m, int n) const
 //----------------------------------------------------------------------------------------------------------------------------------
 double DataObjRasterData::value2_yinv(int m, int n) const
 {
-    if(m_validData)
+    if(m_validData && m_xIndizes[n] >= 0)
     {
         m = m_rasteredLines - m - 1; //invert y-coordinate
+
         switch (m_dataObj.getType())
         {
         case ito::tInt8:
         {
-            ito::int8 *line = (ito::int8*)m_rasteredLinePtr[m];
+            const ito::int8 *line = (const ito::int8*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tUInt8:
         {
-            ito::uint8 *line = (ito::uint8*)m_rasteredLinePtr[m];
+            const ito::uint8 *line = (const ito::uint8*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tInt16:
         {
-            ito::int16 *line = (ito::int16*)m_rasteredLinePtr[m];
+            const ito::int16 *line = (const ito::int16*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tUInt16:
         {
-            ito::uint16 *line = (ito::uint16*)m_rasteredLinePtr[m];
+            const ito::uint16 *line = (const ito::uint16*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tInt32:
         {
-            ito::int32 *line = (ito::int32*)m_rasteredLinePtr[m];
+            const ito::int32 *line = (const ito::int32*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tUInt32:
         {
-            ito::uint32 *line = (ito::uint32*)m_rasteredLinePtr[m];
+            const ito::uint32 *line = (const ito::uint32*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tFloat32:
         {
-            ito::float32 *line = (ito::float32*)m_rasteredLinePtr[m];
+            const ito::float32 *line = (const ito::float32*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tFloat64:
         {
-            ito::float64 *line = (ito::float64*)m_rasteredLinePtr[m];
+            const ito::float64 *line = (const ito::float64*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             return line[m_xIndizes[n]];
         }
         case ito::tComplex64:
         {
-            ito::complex64 *line = (ito::complex64*)m_rasteredLinePtr[m];
+            const ito::complex64 *line = (const ito::complex64*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             ito::complex64 i = line[m_xIndizes[n]];
 
@@ -793,7 +785,7 @@ double DataObjRasterData::value2_yinv(int m, int n) const
         }
         case ito::tComplex128:
         {
-            ito::complex128 *line = (ito::complex128*)m_rasteredLinePtr[m];
+            const ito::complex128 *line = (const ito::complex128*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
             ito::complex128 i = line[m_xIndizes[n]];
 
@@ -816,7 +808,7 @@ double DataObjRasterData::value2_yinv(int m, int n) const
         }
         case ito::tRGBA32:
         {
-            ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
+            const ito::Rgba32 *line = (const ito::Rgba32*)m_rasteredLinePtr[m];
             if (!line) return quietNaN;
 
             switch (m_pInternalData->m_dataChannel)
@@ -865,13 +857,14 @@ double DataObjRasterData::value2_yinv(int m, int n) const
 //----------------------------------------------------------------------------------------------------------------------------------
 QRgb DataObjRasterData::value2_rgb(int m, int n) const
 {
-    if(m_validData)
+    if (m_validData && m_xIndizes[n] >= 0)
     {
         switch(m_dataObj.getType())
         {
         case ito::tRGBA32:
             {
-                ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
+                const ito::Rgba32 *line = (const ito::Rgba32*)m_rasteredLinePtr[m];
+
                 if(!line) return transparentColor;
 
                 switch (m_pInternalData->m_dataChannel)
@@ -925,7 +918,7 @@ QRgb DataObjRasterData::value2_rgb(int m, int n) const
 //----------------------------------------------------------------------------------------------------------------------------------
 QRgb DataObjRasterData::value2_yinv_rgb(int m, int n) const
 {
-    if(m_validData)
+    if (m_validData && m_xIndizes[n] >= 0)
     {
         m = m_rasteredLines - m - 1; //invert y-coordinate
 
@@ -933,7 +926,8 @@ QRgb DataObjRasterData::value2_yinv_rgb(int m, int n) const
         {
         case ito::tRGBA32:
             {
-                ito::Rgba32 *line = (ito::Rgba32*)m_rasteredLinePtr[m];
+                const ito::Rgba32 *line = (const ito::Rgba32*)m_rasteredLinePtr[m];
+
                 if(!line) return transparentColor;
                 
                 switch (m_pInternalData->m_dataChannel)
@@ -1219,32 +1213,40 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
 
     ito::DataObject dataObjectOut;
     int type = m_dataObjPlane->getType();
-    if (copyDisplayedAsComplex == false)
+    if (copyDisplayedAsComplex)
     {
         m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
     }
-    else if(type == ito::tComplex64 || type == ito::tComplex128)
+    else if(!copyDisplayedAsComplex)
     {
-        ito::DataObject temp;
-
-        switch (cmplxState)
+        if (type == ito::tComplex64 || type == ito::tComplex128)
         {
-        default:
-        case ItomQwtPlotEnums::CmplxAbs:
-            temp = ito::abs(*(m_dataObjPlane));
-            break;
-        case ItomQwtPlotEnums::CmplxReal:
-            temp = ito::real(*(m_dataObjPlane));
-            break;
-        case ItomQwtPlotEnums::CmplxImag:
-            temp = ito::imag(*(m_dataObjPlane));
-            break;
-        case ItomQwtPlotEnums::CmplxArg:
-            temp = ito::arg(*(m_dataObjPlane));
-            break;
-        }
+            ito::DataObject temp;
 
-        temp.at(curRange).copyTo(dataObjectOut);       
+            switch (cmplxState)
+            {
+            default:
+            case ItomQwtPlotEnums::CmplxAbs:
+                temp = ito::abs(*(m_dataObjPlane));
+                break;
+            case ItomQwtPlotEnums::CmplxReal:
+                temp = ito::real(*(m_dataObjPlane));
+                break;
+            case ItomQwtPlotEnums::CmplxImag:
+                temp = ito::imag(*(m_dataObjPlane));
+                break;
+            case ItomQwtPlotEnums::CmplxArg:
+                temp = ito::arg(*(m_dataObjPlane));
+                break;
+            }
+
+            temp.at(curRange).copyTo(dataObjectOut);
+        }
+        else
+        {
+            m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
+        }
+        
     }
             
     DELETE_AND_SET_NULL_ARRAY(curRange)

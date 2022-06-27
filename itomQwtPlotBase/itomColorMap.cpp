@@ -599,7 +599,7 @@ QVector<QRgb> ItomColorMap::colorTable256() const
     }
     break;
     default: {
-        const QwtInterval interval(0, 256);
+        const QwtInterval interval(0, 255);
 
         for (int i = 0; i < 256; i++)
         {

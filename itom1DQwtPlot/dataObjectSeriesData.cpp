@@ -1867,13 +1867,15 @@ template<typename _Tp> bool findMinMaxNonWeightedIntegerCropped(const ito::DataO
     min = std::numeric_limits<float64>::max();
     max = -min;
     _Tp val;
+    
+    int startIdx = qBound(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    int endIdx = qBound(0, qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
 
-    int startIdx = std::max(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys));
-    int endIdx = std::min(qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
     if (startIdx > endIdx)
     {
         std::swap(startIdx, endIdx);
     }
+
     double yAxisRange[] = { yInterval.minValue(), yInterval.maxValue() };
 
     switch (d.dir)
@@ -1929,8 +1931,9 @@ template<typename _Tp> bool findMinMaxNonWeightedFloatCropped(const ito::DataObj
     max = -min;
     float32 val;
 
-    int startIdx = std::max(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys));
-    int endIdx = std::min(qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    int startIdx = qBound(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    int endIdx = qBound(0, qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+
     if (startIdx > endIdx)
     {
         std::swap(startIdx, endIdx);
@@ -2006,12 +2009,14 @@ template<typename _Tp, typename _Tp2> bool findMinMaxNonWeightedComplexCropped(c
     ito::float32 val;
     ito::complex64 val_;
 
-    int startIdx = std::max(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys));
-    int endIdx = std::min(qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    int startIdx = qBound(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+    int endIdx = qBound(0, qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
+
     if (startIdx > endIdx)
     {
         std::swap(startIdx, endIdx);
     }
+
     double yAxisRange[] = { yInterval.minValue(), yInterval.maxValue() };
 
     switch (d.dir)
@@ -2092,6 +2097,7 @@ template<typename _Tp, typename _Tp2> bool findMinMaxNonWeightedComplexCropped(c
             mat = obj->getCvPlaneMat(i);
             ptr = (mat->data + d.matOffset);
             val_ = *(reinterpret_cast<_Tp2*>(ptr));
+
             switch (cmplxState)
             {
             case ItomQwtPlotEnums::CmplxAbs:

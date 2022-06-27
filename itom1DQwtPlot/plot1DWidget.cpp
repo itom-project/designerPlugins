@@ -50,6 +50,7 @@
 #include <qwt_scale_engine.h>
 #include <qwt_text_label.h>
 #include <qwt_date_scale_draw.h>
+#include <qwt_date_scale_engine.h>
 
 #include <qimage.h>
 #include <qpixmap.h>
@@ -733,7 +734,7 @@ void Plot1DWidget::setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngin
     {
         if (scaleEngine == ItomQwtPlotEnums::Linear)
         {
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
+            setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
         }
         else if ((int)scaleEngine < 1000)
         {
@@ -765,13 +766,20 @@ void Plot1DWidget::setDefaultValueScaleEngine(const ItomQwtPlotEnums::ScaleEngin
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine)
+void Plot1DWidget::setDefaultAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine, bool forceUpdate /*= false*/)
 {
-    if (scaleEngine != m_axisScale)
+    if (scaleEngine != m_axisScale || forceUpdate)
     {
         if (scaleEngine == ItomQwtPlotEnums::Linear)
         {
-        setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine());
+            if (m_pData && m_pData->m_hasDateTimeXAxis)
+            {
+                setAxisScaleEngine(QwtPlot::xBottom, new QwtDateScaleEngine(Qt::UTC));
+            }
+            else
+            {
+                setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine());
+            }
         }
         else if ((int)scaleEngine < 1000)
         {
@@ -1232,9 +1240,23 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     QwtPlotCurveDataObject *dObjCurve = nullptr;
     bool boundsChanged = false;
     bool _unused;
-
     QwtLegendLabel *legendLabel = nullptr;
     int index;
+
+    // currently this feature is not implemented for an x-over-y plot.
+    m_pActSetPickerMinMaxLocal->setEnabled(xVec == nullptr);
+
+    // check for valid data types
+    if (dataObj && (dataObj->getType() == ito::tDateTime || dataObj->getType() == ito::tTimeDelta))
+    {
+        emit statusBarMessage(tr("A dateTime or timeDelta dataObject is not supported by this plot."), 10000);
+        dataObj = nullptr;
+    }
+    else if (xVec && xVec->getType() == ito::tTimeDelta)
+    {
+        emit statusBarMessage(tr("A timeDelta x-axis dataObject is not supported by this plot."), 10000);
+        dataObj = nullptr;
+    }
 
     if (dataObj)
     {
@@ -1549,25 +1571,6 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 			widgetCurveProperties->updateProperties();
             updateLegendItems();
 		}
-
-        if (xVec && (xVec->getType() == ito::tDateTime))
-        {
-            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) == nullptr)
-            {
-                setAxisScaleDraw(QwtAxis::XBottom, new QwtDateScaleDraw());
-                styleXYScaleWidgets();
-            }
-
-            m_pData->m_hasDateTimeXAxis = true;
-        }
-        else
-        {
-            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) != nullptr)
-            {
-                setAxisScaleDraw(QwtAxis::XBottom, new QwtScaleDraw());
-                styleXYScaleWidgets();
-            }
-        }
 
         if (bounds.size() == 0) //default plot
         {
@@ -1916,7 +1919,49 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
         tag = dataObj->getTag("title", valid);
         m_pData->m_titleDObj = valid? QString::fromLatin1(tag.getVal_ToString().data()) : "";
+
+        if (xVec && (xVec->getType() == ito::tDateTime))
+        {
+            m_pData->m_hasDateTimeXAxis = true;
+            m_pValuePicker->setXAxisIsDateTime(true);
+
+            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) == nullptr)
+            {
+                setDefaultAxisScaleEngine(m_axisScale, true);
+
+                auto bottomScaleDraw = new QwtDateScaleDraw(Qt::UTC);
+
+                // ISO 8601 (en)
+                bottomScaleDraw->setDateFormat(QwtDate::Millisecond, "yyyy-MM-dd\nhh:mm:ss:zzz");
+                bottomScaleDraw->setDateFormat(QwtDate::Second, "yyyy-MM-dd\nhh:mm:ss");
+                bottomScaleDraw->setDateFormat(QwtDate::Minute, "yyyy-MM-dd\nhh:mm");
+                bottomScaleDraw->setDateFormat(QwtDate::Hour, "yyyy-MM-dd\nhh:mm");
+                bottomScaleDraw->setDateFormat(QwtDate::Day, "yyyy-MM-dd");
+                bottomScaleDraw->setDateFormat(QwtDate::Week, "yyyy-Www");
+                bottomScaleDraw->setDateFormat(QwtDate::Month, "MMM yyyy");
+                bottomScaleDraw->setDateFormat(QwtDate::Year, "yyyy");
+
+                setAxisScaleDraw(QwtAxis::XBottom, bottomScaleDraw);
+                styleXYScaleWidgets();
+            }
+        }
+        else
+        {
+            m_pData->m_hasDateTimeXAxis = false;
+            m_pValuePicker->setXAxisIsDateTime(false);
+
+            if (dynamic_cast<QwtDateScaleDraw*>(axisScaleDraw(QwtAxis::XBottom)) != nullptr)
+            {
+                setDefaultAxisScaleEngine(m_axisScale, true);
+                setAxisScaleDraw(QwtAxis::XBottom, new QwtScaleDraw());
+                styleXYScaleWidgets();
+            }
+        }
     } 
+    else
+    {
+        removeAllCurvesBesideTheNFirst(0);
+    }
 
     updateLabels();
 
@@ -2964,13 +3009,19 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
         (m_pData->m_axisScaleAuto && qIsNaN(m_pData->m_axisMin)))
     {
         QRectF rect;
+        DataObjectSeriesData *curveData = nullptr;
         
         foreach(QwtPlotCurve *curve, m_plotCurveItems)
         {
-            QRectF tmpRect = ((DataObjectSeriesData *)curve->data())->boundingRect();
-            if (qIsFinite(tmpRect.height()))
+            curveData = (DataObjectSeriesData *)curve->data();
+
+            if (curveData)
             {
-                rect = rect.united(tmpRect);
+                QRectF tmpRect = curveData->boundingRect();
+                if (qIsFinite(tmpRect.height()))
+                {
+                    rect = rect.united(tmpRect);
+                }
             }
         }
 
@@ -3190,12 +3241,13 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
     QVector<QPointF> points;
     QVector<const DataObjectSeriesData*> seriesData;
 
-	QVector< int > idcs;
+	QVector< int > indices;
     int actIdx = -1;
 
     for (int i = 0 ; i < m_pickers.size() ; i++)
     {
         m = &(m_pickers[i]);
+
         if (updatePositions)
         {
             stickPickerToXPx(m, std::numeric_limits<double>::quiet_NaN(), 0);
@@ -3213,9 +3265,13 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
             m_pickers[i].item->setSymbol(new QwtSymbol(QwtSymbol::Diamond, colors[cur], QPen(colors[cur],2), QSize(6,6)));
         }
 
-        if (cur < 2) cur++;
+        if (cur < 2) 
+        { 
+            cur++; 
+        }
+
         points << QPointF(m->item->xValue(), m->item->yValue());   
-		idcs << i;
+		indices << i;
     }
 
     Itom1DQwtPlot *plot1d = (Itom1DQwtPlot*)(this->parent());
@@ -3226,18 +3282,38 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
 
         if (plot1d->pickerWidget())
         {
-            (plot1d->pickerWidget())->updatePickers(idcs, points);
+            if (m_pData->m_hasDateTimeXAxis)
+            {
+                QVector<QDateTime> xpositions;
+                QVector<qreal> ypositions;
+
+                foreach(const auto &pt, points)
+                {
+                    xpositions << QwtDate::toDateTime(pt.x());
+                    ypositions << pt.y();
+                }
+
+                (plot1d->pickerWidget())->updatePickers(indices, xpositions, ypositions);
+            }
+            else
+            {
+                (plot1d->pickerWidget())->updatePickers(indices, points);
+            }
         }
 
         QStringList coordTexts;
         bool yIntegerType, xIntegerType;
+        bool xDateTimeType;
         QString yCoord, xCoord;
         QString yUnit, xUnit;
 
         for (int i = 0; i < std::min(points.size(), 2); ++i) 
         {
             const DataObjectSeriesData* d = seriesData[i];
+            const DataObjectSeriesDataXY* dxy = dynamic_cast<const DataObjectSeriesDataXY*>(d);
+
             yIntegerType = false;
+            xDateTimeType = dxy && dxy->getXDataObject() && dxy->getXDataObject()->getType() == ito::tDateTime;
             xIntegerType = d->getXCoordsWholeNumber();
             const ito::DataObject *yObj = d->getDataObject();
 
@@ -3296,7 +3372,21 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
                 yCoord = floatformat(points[i].y());
             }
 
-            if (xIntegerType)
+            if (xDateTimeType)
+            {
+                auto dateTime = QwtDate::toDateTime(points[i].rx());
+
+                if (dateTime.time().msec() != 0)
+                {
+                    xCoord = dateTime.toString(Qt::ISODateWithMs);
+                }
+                else
+                {
+                    xCoord = dateTime.toString(Qt::ISODate);
+                }
+                
+            }
+            else if (xIntegerType)
             {
                 xCoord = QString("%1").arg(points[i].rx(), 0, 'f', 0);
             }
@@ -4288,6 +4378,7 @@ void Plot1DWidget::mnuSetPickerGlobalMinMax()
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::mnuSetPickerRoiMinMax()
 {
+    // this is currently not implemented for x over y plots.
     setPickerToMinMax(false);
 }
 

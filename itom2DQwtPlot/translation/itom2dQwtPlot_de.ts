@@ -133,20 +133,20 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+1703"/>
-        <location line="+1656"/>
+        <location filename="../plotCanvas.cpp" line="+1725"/>
+        <location line="+1670"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="-1789"/>
+        <location line="-1803"/>
         <location line="+141"/>
-        <location line="+1656"/>
+        <location line="+1670"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
-        <location line="-3129"/>
+        <location line="-3165"/>
         <source>plotting tools</source>
         <translation type="unfinished">Symbolleiste Plot</translation>
     </message>
@@ -166,7 +166,7 @@
         <translation type="unfinished">Werkzeuge</translation>
     </message>
     <message>
-        <location line="+246"/>
+        <location line="+255"/>
         <source>Scale Settings...</source>
         <translation type="unfinished">Skaleneinstellungen...</translation>
     </message>
@@ -375,12 +375,12 @@
         <translation>| &amp;&amp; Max</translation>
     </message>
     <message>
-        <location line="+2849"/>
+        <location line="+2876"/>
         <source>Could not activate the line cut.</source>
         <translation type="unfinished">Der Linienschnitt kann nicht aktiviert werden.</translation>
     </message>
     <message>
-        <location line="-2868"/>
+        <location line="-2895"/>
         <source>line cut through global minimum and maximum value</source>
         <translation type="unfinished">Globales Minimum und Maximum für Linienschnitt übernehmen</translation>
     </message>
@@ -452,20 +452,20 @@
         <translation>x/y-Achse</translation>
     </message>
     <message>
-        <location line="+160"/>
+        <location line="+173"/>
         <source>2D Object Plot</source>
-        <translation type="unfinished">2D Objekt Plod</translation>
+        <translation type="unfinished">2D Objekt Plot</translation>
     </message>
     <message>
         <location line="+218"/>
         <location line="+131"/>
-        <location line="+1674"/>
+        <location line="+1688"/>
         <source>Selected color map has less than two points.</source>
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="-1682"/>
-        <location line="+1673"/>
+        <location line="-1696"/>
+        <location line="+1687"/>
         <source>error when loading color map</source>
         <translation type="unfinished">Fehler beim Laden der Farbpalette</translation>
     </message>
@@ -505,12 +505,12 @@
         <translation>Referenz auf Eingangsobjekt</translation>
     </message>
     <message>
-        <location filename="../plotCanvas.cpp" line="-2961"/>
+        <location filename="../plotCanvas.cpp" line="-2997"/>
         <source>plot2D</source>
         <translation type="unfinished">2D-Plot</translation>
     </message>
     <message>
-        <location line="+673"/>
+        <location line="+682"/>
         <source>y-axis</source>
         <translation>Y-Achse</translation>
     </message>
@@ -525,6 +525,11 @@
         <location line="-164"/>
         <source>x-axis</source>
         <translation>x-Achse</translation>
+    </message>
+    <message>
+        <location line="+196"/>
+        <source>Objects of type dateTime or timeDelta not supported by this plot.</source>
+        <translation type="unfinished">Dieser Plot untersützt keine Objekte vom Typ dateTime oder timeDelta.</translation>
     </message>
     <message>
         <location filename="../itom2dqwtplotplugin.cpp" line="+38"/>

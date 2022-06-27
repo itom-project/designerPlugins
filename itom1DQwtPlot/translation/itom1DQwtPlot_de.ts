@@ -4,7 +4,7 @@
 <context>
     <name>Dialog1DScale</name>
     <message>
-        <location filename="../dialog1DScale.cpp" line="+176"/>
+        <location filename="../dialog1DScale.cpp" line="+197"/>
         <source>invalid number</source>
         <translation type="unfinished">Ungültige Zahl</translation>
     </message>
@@ -67,7 +67,7 @@
 <context>
     <name>Plot1DWidget</name>
     <message>
-        <location filename="../plot1DWidget.cpp" line="+220"/>
+        <location filename="../plot1DWidget.cpp" line="+216"/>
         <source>File</source>
         <translation type="unfinished">Datei</translation>
     </message>
@@ -245,40 +245,50 @@
         <translation type="unfinished">Y fein</translation>
     </message>
     <message>
-        <location line="+1409"/>
+        <location line="+625"/>
+        <source>A dateTime or timeDelta dataObject is not supported by this plot.</source>
+        <translation type="unfinished">Dieser Plot untersützt keine Objekte vom Typ dateTime oder timeDelta.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>A timeDelta x-axis dataObject is not supported by this plot.</source>
+        <translation type="unfinished">Die x-Achsen dieses Plot untersützt kein Objekt vom Typ timeDelta.</translation>
+    </message>
+    <message>
+        <location line="+812"/>
         <source>1D Object Slice</source>
         <translation type="unfinished">1D-Objektschnitt</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+124"/>
         <source>xData requires a 2d dataObject or the first (n-2) dimension must have a shape of 1</source>
         <translation>xData benötigt ein 2D-DataObject oder die ersten (n-2) Dimensionen müssen die Größe 1 haben</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <location line="+16"/>
+        <location line="+10"/>
+        <location line="+17"/>
         <source>wrong xData shape. Expect a shape of (1 x %2) or (%1 x %2)</source>
         <translation type="unfinished">Falsche xData-Dimensionen. Erwartet wird ein (1 x %2) oder (%1 x %2) Objekt</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+16"/>
+        <location line="-13"/>
+        <location line="+17"/>
         <source>wrong xData shape. Expect a shape of (%1 x 1) or (%1 x %2)</source>
         <translation type="unfinished">Falsche xData-Dimensionen. Erwartet wird ein (%1 x 1) oder (%1 x %2) Objekt</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+16"/>
+        <location line="-13"/>
+        <location line="+17"/>
         <source>unexpected axis state</source>
         <translation type="unfinished">Unerwarteter Status der Achse</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+15"/>
         <source>xData contains more values than the source dataObject. Unused values will be ignored.</source>
         <translation type="unfinished">xData enthält mehr Werte als das Quell-DataObject. Ungenutzte Werte werden ignoriert.</translation>
     </message>
     <message>
-        <location line="+1247"/>
+        <location line="+1293"/>
         <source>CurveIndex out of bounds [0,%i]</source>
         <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
@@ -298,7 +308,7 @@
         <translation type="unfinished">Die ID liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
     <message>
-        <location line="+782"/>
+        <location line="+783"/>
         <source>Select a visible curve</source>
         <translation type="unfinished">Eine sichbare Kurve auswählen</translation>
     </message>
@@ -318,7 +328,7 @@
         <translation type="unfinished">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-3746"/>
+        <location line="-3894"/>
         <location line="+1"/>
         <source>Color Representation</source>
         <translation type="unfinished">Farbdarstellung</translation>
@@ -360,7 +370,7 @@
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+712"/>
+        <location line="+729"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -384,21 +394,21 @@
         <translation>rot</translation>
     </message>
     <message>
-        <location line="+2996"/>
+        <location line="+3127"/>
         <source>itom API not available.</source>
         <translation type="unfinished">Die itom-API ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-3276"/>
-        <location line="+446"/>
+        <location line="-3417"/>
+        <location line="+403"/>
         <location line="+1"/>
-        <location line="+86"/>
+        <location line="+101"/>
         <location line="+1"/>
         <source>curve %1</source>
         <translation>Kurve %1</translation>
     </message>
     <message>
-        <location line="-1403"/>
+        <location line="-1382"/>
         <source>Plotting Tools</source>
         <translation type="unfinished">Symbolleiste</translation>
     </message>
@@ -462,7 +472,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation>Grauwert</translation>
     </message>
     <message>
-        <location line="+738"/>
+        <location line="+755"/>
         <location line="+12"/>
         <source>gray</source>
         <translation>grau</translation>
@@ -491,7 +501,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation type="unfinished">LGPL, für Qwt siehe Qwt-Lizenz</translation>
     </message>
     <message>
-        <location filename="../dataObjectSeriesData.cpp" line="+200"/>
+        <location filename="../dataObjectSeriesData.cpp" line="+194"/>
         <source>cv:Mat in data object seems corrupted</source>
         <translation type="unfinished">cv::Mat im Datenobjekt scheint defekt</translation>
     </message>
@@ -517,22 +527,30 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation>z-Achse</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-1066"/>
+        <location filename="../plot1DWidget.cpp" line="-1083"/>
         <source>Plot1D</source>
         <translation>Plot1D</translation>
     </message>
     <message>
-        <location line="+1885"/>
+        <location line="+1985"/>
+        <source>wrong xData data type. Complex64, complex128, rgba32 and timeDelta are not supported.</source>
+        <translation type="unfinished">Falscher Datentyp von xData. Complex64, complex128, rgba32 und timeDelta werden nicht unterstützt.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>received a NULL pointer</source>
+        <translation type="unfinished">Es wurde ein NULL-Pointer übergeben</translation>
+    </message>
+    <message>
         <source>wrong xData data type. Complex64 and Rgba32 are not supported.</source>
-        <translation type="unfinished">Falscher xData-Datentyp. Complex64 und RGBA32 werden nicht unterstützt.</translation>
+        <translation type="obsolete">Falscher xData-Datentyp. Complex64 und RGBA32 werden nicht unterstützt.</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>recieved a NULL pointer</source>
-        <translation type="unfinished">NULL-Pointer übergeben</translation>
+        <translation type="obsolete">NULL-Pointer übergeben</translation>
     </message>
     <message>
-        <location filename="../dataObjectSeriesDataXY.cpp" line="+202"/>
+        <location filename="../dataObjectSeriesDataXY.cpp" line="+335"/>
         <source>cv::Mat in data Object representing the xData seems corrupted</source>
         <translation type="unfinished">cv::Mat im Datenobjekt repräsentierendes xData schein defekt</translation>
     </message>

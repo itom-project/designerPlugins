@@ -57,7 +57,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool propertiesSorted READ propertiesSorted WRITE setPropertiesSorted DESIGNABLE true USER true);
+    //Q_PROPERTY(bool propertiesSorted READ propertiesSorted WRITE setPropertiesSorted DESIGNABLE true USER true);
     Q_PROPERTY(bool enablePointPick READ enablePointPick WRITE setEnablePointPick DESIGNABLE true USER true);
     Q_PROPERTY(double pointPickSphereRadius READ pointPickSphereRadius WRITE setPointPickSphereRadius DESIGNABLE true USER true);
     Q_PROPERTY(QColor pointPickSphereColor READ pointPickSphereColor WRITE setpointPickSphereColor DESIGNABLE true USER true);
@@ -198,9 +198,6 @@ public:
     virtual ~Vtk3dVisualizer();
 
     ito::RetVal applyUpdate(); 
-
-    bool propertiesSorted() const;
-    void setPropertiesSorted(bool value);
 
     bool enablePointPick() const;
     void setEnablePointPick(bool enabled);

@@ -66,6 +66,7 @@
 #include <qwt_symbol.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_date_scale_draw.h>
 
 //---------------------------------------------------------------------------
 ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
@@ -3393,7 +3394,13 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     }
     else
     {
-        varname = QInputDialog::getText(p, tr(dialogTitle.toLatin1().data()), tr(userText.toLatin1().data()), QLineEdit::Normal, "zoom_object", &ok);
+        varname = QInputDialog::getText(
+            p,
+            tr(dialogTitle.toLatin1().data()),
+            tr(userText.toLatin1().data()),
+            QLineEdit::Normal,
+            varname,
+            &ok);
     }    
     
     if (ok && varname != "")
