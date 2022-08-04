@@ -456,11 +456,11 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 
             colorMap = apiGetFigureSetting(parent(), "defaultColorMap", colorMap, NULL).value<QString>();
             setColorMap(colorMap);
+            
+            setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, NULL).value<bool>());
+            m_pData->m_yaxisFlipped = apiGetFigureSetting(parent(), "yAxisFlipped", false, NULL).value<bool>();
         }
-
-        setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, NULL).value<bool>());
-        m_pData->m_yaxisFlipped = apiGetFigureSetting(parent(), "yAxisFlipped", false, NULL).value<bool>();
-        
+                
     }
 
     if (inverseColor1().isValid())

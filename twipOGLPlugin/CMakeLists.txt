@@ -55,7 +55,7 @@ itom_init_cmake_policy(3.12)
 itom_init_designerplugin_library(${target_name})
 
 if(BUILD_WITH_PCL)
-    find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointCloud itomCommonPlotLib REQUIRED)
+    find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib pointcloud itomCommonPlotLib REQUIRED)
 else()
     find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib REQUIRED)
 endif()
