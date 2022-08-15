@@ -1836,7 +1836,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
     {
         //!> opengl uses 'normalized' coordinates therefore we must transform the
         //!> input data accordingly. Normalized means in this case:
-        //!> x € [-1, 1], y € [-1, 1], z € [0, -1]
+        //!> x ï¿½ [-1, 1], y ï¿½ [-1, 1], z ï¿½ [0, -1]
         if (m_pConfigData->m_elementMode & PAINT_POINTS)
         {
             float zmin = m_axes.m_axisZ.getMin();
@@ -3019,8 +3019,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
             m_axes.m_devAxis.m_label = "deviation";
             m_axes.m_devAxis.m_unit  = "mm";
 
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure ï¿½m can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure ï¿½m can be displayed
             ((TwipOGLFigure*)parent())->updateLegend(id, TwipLegend::tPointCloud, m_pContentPC[id]->getType(), 255, true);
         }
 
@@ -3077,8 +3077,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
 
         if(!retval.containsError())
         {
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure ï¿½m can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure ï¿½m can be displayed
 
             m_scaleX = 2.0 / (m_axes.m_axisX.getMax() - m_axes.m_axisX.getMin());
             if (cvIsNaN(m_scaleX) || cvIsInf(m_scaleX))
@@ -3173,8 +3173,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
     {
         if(!retval.containsError())
         {
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure ï¿½m can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure ï¿½m can be displayed
 
             m_scaleX = 2.0 / (m_axes.m_axisX.getMax() - m_axes.m_axisX.getMin());
             if (cvIsNaN(m_scaleX) || cvIsInf(m_scaleX))
@@ -4670,6 +4670,105 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::updateOverlayImage(const int o
 
     return ito::retOk;
 }
+
+
+#ifdef USEPCL
+//----------------------------------------------------------------------------------------------------------------------------------
+/** Find the minimum and maximum positional values in a point cloud
+*
+*   @param [in] *pcl    reference to the point cloude object
+*   @param [in] *id     index value to access the member variable and return the specific distance value
+*
+*/
+template<typename _Tp> void TwipOGLWidget::pclFindMinMax(pcl::PointCloud<_Tp> *pcl, const int id)
+{
+    _Tp pt;
+
+    ito::float64 xmin = std::numeric_limits<ito::float64>::max();
+    ito::float64 ymin = std::numeric_limits<ito::float64>::max();
+    ito::float64 zmin = std::numeric_limits<ito::float64>::max();
+    float devmin = std::numeric_limits<float>::max();
+
+#if linux
+    ito::float64 xmax = -std::numeric_limits<ito::float64>::max();
+    ito::float64 ymax = -std::numeric_limits<ito::float64>::max();
+    ito::float64 zmax = -std::numeric_limits<ito::float64>::max();
+    float devmax = -std::numeric_limits<float>::max();
+#else
+    ito::float64 xmax = std::numeric_limits<ito::float64>::lowest();
+    ito::float64 ymax = std::numeric_limits<ito::float64>::lowest();
+    ito::float64 zmax = std::numeric_limits<ito::float64>::lowest();
+    ito::float32 devmax = std::numeric_limits<ito::float32>::lowest();
+#endif
+
+    int size = (int)pcl->points.size();
+    if(hasPointToCurvature<_Tp>())
+    {
+        ito::float32 val;
+        for (int np = 0; np < size; np++)
+        {
+            pt = pcl->at(np);
+            if (ito::isFinite<ito::float32>(pt.z))
+            {
+                if (pt.x < xmin)
+                    xmin = pt.x;
+                if (pt.x > xmax)
+                    xmax = pt.x;
+                if (pt.y < ymin)
+                    ymin = pt.y;
+                if (pt.y > ymax)
+                    ymax = pt.y;
+                if (pt.z < zmin)
+                    zmin = pt.z;
+                if (pt.z > zmax)
+                    zmax = pt.z;
+
+                pointToCurvature<_Tp>(pt, val);
+                if (ito::isFinite<float>(val))
+                {
+                    if (val < devmin)
+                        devmin = val;
+                    if (val > devmax)
+                        devmax = val;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int np = 0; np < size; np++)
+        {
+            pt = pcl->at(np);
+            if (ito::isFinite<ito::float32>(pt.z))
+            {
+                if (pt.x < xmin)
+                    xmin = pt.x;
+                if (pt.x > xmax)
+                    xmax = pt.x;
+                if (pt.y < ymin)
+                    ymin = pt.y;
+                if (pt.y > ymax)
+                    ymax = pt.y;
+                if (pt.z < zmin)
+                    zmin = pt.z;
+                if (pt.z > zmax)
+                    zmax = pt.z;
+            }
+        }
+            devmax = 0.0f;
+            devmin = 0.0f;
+    }
+
+    this->m_pclMinX[id] = xmin;
+    this->m_pclMinY[id] = ymin;
+    this->m_pclMinZ[id] = zmin;
+    this->m_pclMinDev[id] = cv::saturate_cast<ito::float64>(devmin);
+    this->m_pclMaxX[id] = xmax;
+    this->m_pclMaxY[id] = ymax;
+    this->m_pclMaxZ[id] = zmax;
+    this->m_pclMaxDev[id] = cv::saturate_cast<ito::float64>(devmax);
+}
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------------------
 /** Set new overlay image for a topography
