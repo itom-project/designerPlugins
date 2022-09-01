@@ -111,7 +111,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     canvas()->setCursor(Qt::ArrowCursor);
 
     m_pPlotGrid = new QwtPlotGrid();
-    m_pPlotGrid->setZ(10.0);
+    m_pPlotGrid->setZ(11.0);
     m_pPlotGrid->attach(this);
     setGridStyle(m_gridStyle);
     m_pPlotGrid->setMajorPen(Qt::gray, 1);
@@ -119,7 +119,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
 
     //main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
-    m_dObjItem->setZ(11.0);
+    m_dObjItem->setZ(10.0);
     m_dObjItem->setRenderThreadCount(0); //uses ideal thread count
     //m_dObjItem->setColorMap(new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     m_rasterData = new DataObjRasterData(m_pData);
@@ -325,6 +325,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     m_pContextMenu->addAction(mainTb->toggleViewAction());
 
 	setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine());
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -469,6 +470,8 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
         //trackerPen.setColor(inverseColor0());
         centerMarkerPen.setColor(inverseColor0());
         zStackMarkerPen.setColor(inverseColor0());
+        m_pPlotGrid->setMajorPen(inverseColor0(), 1);
+        m_pPlotGrid->setMinorPen(inverseColor0(), 1, Qt::DashLine);
         if (m_dObjItem)
         {
            contourPen = m_dObjItem->defaultContourPen();//hold setting from default pen
