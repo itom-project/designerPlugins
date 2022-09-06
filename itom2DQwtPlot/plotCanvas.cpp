@@ -2340,6 +2340,25 @@ void PlotCanvas::home()
 {
     zoomer()->zoom(0);
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::zoomUndo()
+{
+    unsigned int index = zoomer()->zoomRectIndex();
+    if (index > 0)
+    {
+        zoomer()->zoom(-1);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::zoomRedo()
+{
+    unsigned int index = zoomer()->zoomRectIndex();
+    if (index < zoomer()->zoomStack().length()-1)
+    {
+        zoomer()->zoom(1);
+    }
+    
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::setInterval(Qt::Axis axis, const ito::AutoInterval &interval)

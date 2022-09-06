@@ -148,6 +148,8 @@ class PlotCanvas : public ItomQwtPlot
         void alphaChanged();
 
         void home();
+        void zoomUndo();
+        void zoomRedo();
         void adjustColorDataTypeRepresentation();
 
         void lineCutMovedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)

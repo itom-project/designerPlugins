@@ -150,6 +150,8 @@ class Plot1DWidget : public ItomQwtPlot
         void updateLegendItems();
 
         void home();
+        void zoomUndo();
+        void zoomRedo();
 
         void stateChanged(int state);
 
