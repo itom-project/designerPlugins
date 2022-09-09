@@ -1479,9 +1479,9 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
                 p->setPlaneRange(0, 0);
             }
         }
-
         updateScaleValues(false, updateState & changeData); //no replot here
         updateAxes();
+        updateZoomOptionState();
 
 
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
@@ -2341,18 +2341,18 @@ void PlotCanvas::home()
     zoomer()->zoom(0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::zoomUndo()
+void PlotCanvas::zoomUndo() const
 {
-    unsigned int index = zoomer()->zoomRectIndex();
+    const unsigned int index = zoomer()->zoomRectIndex();
     if (index > 0)
     {
         zoomer()->zoom(-1);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::zoomRedo()
+void PlotCanvas::zoomRedo() const
 {
-    unsigned int index = zoomer()->zoomRectIndex();
+    const unsigned int index = zoomer()->zoomRectIndex();
     if (index < zoomer()->zoomStack().length()-1)
     {
         zoomer()->zoom(1);

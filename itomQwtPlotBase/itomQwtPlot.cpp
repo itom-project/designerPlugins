@@ -240,9 +240,9 @@ void ItomQwtPlot::createBaseActions()
 
     m_pMenuZoom = new QMenu(tr("Zoom"), p);
     m_pActHome->setMenu(m_pMenuZoom);
-    m_pActZoomRedo = m_pMenuZoom->addAction("redo zoom");
+    m_pActZoomRedo = m_pMenuZoom->addAction(tr("Redo zoom"));
     connect(m_pActZoomRedo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomRedo()));
-    m_pActZoomUndo = m_pMenuZoom->addAction("undo zoom");
+    m_pActZoomUndo = m_pMenuZoom->addAction(tr("Undo zoom"));
     connect(m_pActZoomUndo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomUndo()));
 
     //m_actSave
@@ -558,6 +558,8 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general/icons/move.png"));
         m_pActClearShapes->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
+        m_pActZoomRedo->setIcon(QIcon(":/itomDesignerPlugins/general/icons/redoZoom.png"));
+        m_pActZoomUndo->setIcon(QIcon(":/itomDesignerPlugins/general/icons/undoZoom.png"));
         
         if (m_pActProperties)
         {

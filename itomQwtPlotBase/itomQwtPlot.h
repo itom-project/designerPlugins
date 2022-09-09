@@ -193,8 +193,8 @@ protected:
     QColor inverseColor1() const { return m_inverseColor1; }
 
     virtual void home() = 0;
-    virtual void zoomRedo() = 0;
-    virtual void zoomUndo() = 0;
+    virtual void zoomRedo() const = 0;
+    virtual void zoomUndo() const = 0;
     
     void keyPressEvent(QKeyEvent * event);
     void mousePressEvent(QMouseEvent * event);

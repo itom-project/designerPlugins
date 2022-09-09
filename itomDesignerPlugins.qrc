@@ -116,6 +116,8 @@
         <file>icons/editDelete.png</file>
         <file>icons/copyImg.png</file>
         <file>icons/decimals.png</file>
+        <file>icons/undoZoom.png</file>
+        <file>icons/redoZoom.png</file>
     </qresource>
     <qresource prefix="/itomDesignerPlugins/general_lt">
         <file>icons/back_lt.png</file>

@@ -3490,13 +3490,22 @@ void Plot1DWidget::home()
     zoomer()->zoom(0);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::zoomRedo()
+void Plot1DWidget::zoomUndo() const
 {
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index > 0)
+    {
+        zoomer()->zoom(-1);
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::zoomUndo()
+void Plot1DWidget::zoomRedo() const
 {
-
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index < zoomer()->zoomStack().length() - 1)
+    {
+        zoomer()->zoom(1);
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Plot1DWidget::getPlotPicker() const
