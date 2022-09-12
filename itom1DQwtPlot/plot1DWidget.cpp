@@ -3076,9 +3076,21 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             QStack<QRectF> stack = zoomer()->zoomStack();
             if ((initialIdx >= 0) && (initialIdx < stack.size()))
             {
-                stack[initialIdx] = zoom;
+                if (initialIdx == 0 && stack.size() == 1) // we have to set the zoom base correct
+                {
+                    QRectF boundingRect;
+                    foreach (QwtPlotCurve* curve, m_plotCurveItems)
+                    {
+                        boundingRect = boundingRect.united(
+                            ((DataObjectSeriesData*)curve->data())->boundingRect());
+                    }
+                    stack[initialIdx] = boundingRect;
+                    zoomer()->setZoomStack(stack, initialIdx);
+                }
+                if (stack[0] != zoom) // we have a new zoom
+                    zoomer()->zoom(zoom);
             }
-            zoomer()->setZoomStack(stack, initialIdx);
+            //zoomer()->setZoomStack(stack, initialIdx);
 
             zoomer()->rescale(false);
             /*zoomer()->setZoomBase(base); //set the new base
@@ -3476,18 +3488,12 @@ void Plot1DWidget::home()
     {
         boundingRect = boundingRect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
     }
-
-    if (currentZoomStack.empty())
+    if (boundingRect != zoomer()->zoomRect())//only zoom if we are not zoomed
     {
         currentZoomStack.push(boundingRect);
-    }
-    else
-    {
-        currentZoomStack.first() = boundingRect;
-    }
-
-    zoomer()->setZoomStack(currentZoomStack, 0);
-    zoomer()->zoom(0);
+        zoomer()->setZoomStack(currentZoomStack, -1);
+        updateZoomOptionState(); //we changed the zoom but the zoomed Signal isn't triggered therefore we have to do it
+    } 
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::zoomUndo() const

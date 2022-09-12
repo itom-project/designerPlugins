@@ -2338,7 +2338,11 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::home()
 {
-    zoomer()->zoom(0);
+    QStack<QRectF> stack = zoomer()->zoomStack();
+    if (stack[0] != zoomer()->zoomRect())
+    {
+        zoomer()->zoom(stack[0]);
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::zoomUndo() const
