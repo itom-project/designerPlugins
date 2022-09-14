@@ -241,8 +241,10 @@ void ItomQwtPlot::createBaseActions()
     m_pMenuZoom = new QMenu(tr("Zoom"), p);
     m_pActHome->setMenu(m_pMenuZoom);
     m_pActZoomUndo = m_pMenuZoom->addAction(tr("Undo zoom"));
+    m_pActZoomUndo->setShortcut(QKeySequence(QKeySequence::Undo));
     connect(m_pActZoomUndo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomUndo()));
     m_pActZoomRedo = m_pMenuZoom->addAction(tr("Redo zoom"));
+    m_pActZoomRedo->setShortcut(QKeySequence(QKeySequence::Redo));
     connect(m_pActZoomRedo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomRedo()));
 
 
