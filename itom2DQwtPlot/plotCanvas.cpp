@@ -2338,10 +2338,15 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::home()
 {
+    QRectF boundingRect(
+        m_pData->m_xaxisMin,
+        m_pData->m_yaxisMin,
+        (m_pData->m_xaxisMax - m_pData->m_xaxisMin),
+        (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
     QStack<QRectF> stack = zoomer()->zoomStack();
-    if (stack[0] != zoomer()->zoomRect())
+    if (boundingRect != zoomer()->zoomRect())
     {
-        zoomer()->zoom(stack[0]);
+        zoomer()->zoom(boundingRect);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
