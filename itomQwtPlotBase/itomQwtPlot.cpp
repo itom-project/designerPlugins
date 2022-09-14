@@ -240,10 +240,11 @@ void ItomQwtPlot::createBaseActions()
 
     m_pMenuZoom = new QMenu(tr("Zoom"), p);
     m_pActHome->setMenu(m_pMenuZoom);
-    m_pActZoomRedo = m_pMenuZoom->addAction(tr("Redo zoom"));
-    connect(m_pActZoomRedo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomRedo()));
     m_pActZoomUndo = m_pMenuZoom->addAction(tr("Undo zoom"));
     connect(m_pActZoomUndo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomUndo()));
+    m_pActZoomRedo = m_pMenuZoom->addAction(tr("Redo zoom"));
+    connect(m_pActZoomRedo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomRedo()));
+
 
     //m_actSave
     m_pActSave = a = new QAction(tr("Save..."), p);
