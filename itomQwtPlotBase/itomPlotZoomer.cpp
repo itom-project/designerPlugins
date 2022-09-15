@@ -403,23 +403,3 @@ void ItomPlotZoomer::canvasPanned(int /*dx*/, int /*dy*/) //connect this to pann
         setZoomStack(currentStack);
     }
 }
-
-//--------------------------------------------------------------------------------------
-void ItomPlotZoomer::appendZoomStack(const QRectF &rect)
-{
-    QStack<QRectF> currentStack = zoomStack();
-
-    if (maxStackDepth() < 0 || currentStack.count() < maxStackDepth())
-    {
-        currentStack.append(rect);
-        setZoomStack(currentStack);
-    }
-    else if (currentStack.count() >= 1)
-    {
-        //remove 2nd element (1st is base - do not change this) from stack and append this one to the end
-        //since the max stack depth is reached.
-        currentStack.remove(1);
-        currentStack.append(rect);
-        setZoomStack(currentStack);
-    }
-}

@@ -2315,7 +2315,6 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
-            QStack<QRectF> stack = zoomer()->zoomStack();
             QRectF rect = zoomer()->zoomRect();
             bool isEqualRect = true;
             qreal x1, x2, y1, y2 = 0;
@@ -2333,11 +2332,6 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
                 zoomer()->zoom(zoom);
                 zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
-            //else
-            //{
-            //    zoomer()->appendZoomStack(zoom);
-            //}
-            QStack<QRectF> stack2 = zoomer()->zoomStack();
 
         }
     }
