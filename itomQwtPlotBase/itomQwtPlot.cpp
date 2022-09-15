@@ -3702,7 +3702,6 @@ void ItomQwtPlot::updateZoomOptionState()
                                          : m_pActZoomRedo->setEnabled(false);
     currentZoomIndex > 0 ? m_pActZoomUndo->setEnabled(true) : m_pActZoomUndo->setEnabled(false);
     QStack<QRectF> testStack = zoomer()->zoomStack();
-    int i = 0;
 
 }
 

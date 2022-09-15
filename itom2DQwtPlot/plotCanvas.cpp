@@ -2315,16 +2315,29 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
-            
-            if (zoom == zoomer()->zoomRect())
+            QStack<QRectF> stack = zoomer()->zoomStack();
+            QRectF rect = zoomer()->zoomRect();
+            bool isEqualRect = true;
+            qreal x1, x2, y1, y2 = 0;
+            qreal zoomx1, zoomx2, zoomy1, zoomy2 = 0; 
+            rect.getCoords(&x1, &y1, &x2, &y2);
+            zoom.getCoords(&zoomx1, &zoomy1, &zoomx2, &zoomy2);
+
+            isEqualRect = (x1 - zoomx1) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (y1 - zoomy1) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (y2 - zoomy2) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (x2 - zoomx2) < std::numeric_limits<qreal>::epsilon();
+
+            if (!isEqualRect)
             {
                 zoomer()->zoom(zoom);
                 zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
             }
-            else
-            {
-                zoomer()->appendZoomStack(zoom);
-            }
+            //else
+            //{
+            //    zoomer()->appendZoomStack(zoom);
+            //}
+            QStack<QRectF> stack2 = zoomer()->zoomStack();
 
         }
     }
