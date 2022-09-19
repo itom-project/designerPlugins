@@ -2330,10 +2330,9 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 
             if (!isEqualRect)
             {
-                zoomer()->zoom(zoom);
-                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+                zoomer()->zoom(zoom);              
             }
-
+            zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
         }
     }
 
