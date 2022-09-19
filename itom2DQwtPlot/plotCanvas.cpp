@@ -1488,6 +1488,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
         if (updateState & changeData)
         {
             zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            updateZoomOptionState();
         }
         else
         {
