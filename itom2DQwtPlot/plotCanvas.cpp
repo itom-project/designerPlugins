@@ -1479,6 +1479,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
                 p->setPlaneRange(0, 0);
             }
         }
+
         updateScaleValues(false, updateState & changeData); //no replot here
         updateAxes();
         updateZoomOptionState();
@@ -1487,7 +1488,14 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
         if (updateState & changeData)
         {
-            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            QStack<QRectF> stack; //we can not call setZoomBase since this scales to the current scalingRect, leading to a wrong zoomStack in case of keepAspectRatio is set by the api
+            QRectF boundingRect(
+                m_pData->m_xaxisMin,
+                m_pData->m_yaxisMin,
+                (m_pData->m_xaxisMax - m_pData->m_xaxisMin),
+                (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+            stack.push(boundingRect);
+            zoomer()->setZoomStack(stack, -1);
             updateZoomOptionState();
         }
         else
@@ -2224,7 +2232,6 @@ void fixZeroInterval(QwtInterval &interval)
         interval = QwtInterval(interval.minValue() - 0.5, interval.maxValue() + 0.5);
     }
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 /*
 @param doReplot forces a replot of the content
@@ -2332,7 +2339,7 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
             {
                 zoomer()->zoom(zoom);              
             }
-            zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
+            zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here      
         }
     }
 
