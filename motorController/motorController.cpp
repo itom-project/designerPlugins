@@ -114,7 +114,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
         QList<QPushButton* > buttons;
         buttons.reserve(4);
-        QString bname(10);
+        QString bname;
         
         btn = new QPushButton("--", this);
         bname = QString("%1--").arg(m_axisName[i].at(0));
