@@ -136,7 +136,6 @@ set_target_properties(${target_name} PROPERTIES
     AUTORCC ON
     AUTOUIC ON)
 
-if (0)
 itom_qt_wrap_ui(uic_files ${target_name} ${DESIGNER_UI})
 
 set(additional_include_folders "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -153,7 +152,6 @@ set_target_properties(
     PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${additional_include_folders}"
 )
-endif()
 
 # translations
 set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})
