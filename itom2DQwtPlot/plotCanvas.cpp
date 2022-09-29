@@ -1482,12 +1482,21 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
 
         updateScaleValues(false, updateState & changeData); //no replot here
         updateAxes();
+        updateZoomOptionState();
 
 
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
         if (updateState & changeData)
         {
-            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            QStack<QRectF> stack; //we can not call setZoomBase since this scales to the current scalingRect, leading to a wrong zoomStack in case of keepAspectRatio is set by the api
+            QRectF boundingRect(
+                m_pData->m_xaxisMin,
+                m_pData->m_yaxisMin,
+                (m_pData->m_xaxisMax - m_pData->m_xaxisMin),
+                (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+            stack.push(boundingRect);
+            zoomer()->setZoomStack(stack, -1);
+            updateZoomOptionState();
         }
         else
         {
@@ -2223,7 +2232,6 @@ void fixZeroInterval(QwtInterval &interval)
         interval = QwtInterval(interval.minValue() - 0.5, interval.maxValue() + 0.5);
     }
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 /*
 @param doReplot forces a replot of the content
@@ -2315,17 +2323,23 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
-            
-            if (zoom == zoomer()->zoomRect())
-            {
-                zoomer()->zoom(zoom);
-                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
-            }
-            else
-            {
-                zoomer()->appendZoomStack(zoom);
-            }
+            QRectF rect = zoomer()->zoomRect();
+            bool isEqualRect = true;
+            qreal x1, x2, y1, y2 = 0;
+            qreal zoomx1, zoomx2, zoomy1, zoomy2 = 0; 
+            rect.getCoords(&x1, &y1, &x2, &y2);
+            zoom.getCoords(&zoomx1, &zoomy1, &zoomx2, &zoomy2);
 
+            isEqualRect = (x1 - zoomx1) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (y1 - zoomy1) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (y2 - zoomy2) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (x2 - zoomx2) < std::numeric_limits<qreal>::epsilon();
+
+            if (!isEqualRect)
+            {
+                zoomer()->zoom(zoom);              
+            }
+            zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here      
         }
     }
 
@@ -2338,7 +2352,35 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::home()
 {
-    zoomer()->zoom(0);
+    QRectF boundingRect(
+        m_pData->m_xaxisMin,
+        m_pData->m_yaxisMin,
+        (m_pData->m_xaxisMax - m_pData->m_xaxisMin),
+        (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+    QStack<QRectF> stack = zoomer()->zoomStack();
+    if (boundingRect != zoomer()->zoomRect())
+    {
+        zoomer()->zoom(boundingRect);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::zoomUndo() const
+{
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index > 0)
+    {
+        zoomer()->zoom(-1);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::zoomRedo() const
+{
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index < zoomer()->zoomStack().length()-1)
+    {
+        zoomer()->zoom(1);
+    }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

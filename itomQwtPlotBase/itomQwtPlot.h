@@ -193,6 +193,8 @@ protected:
     QColor inverseColor1() const { return m_inverseColor1; }
 
     virtual void home() = 0;
+    virtual void zoomRedo() const = 0;
+    virtual void zoomUndo() const = 0;
     
     void keyPressEvent(QKeyEvent * event);
     void mousePressEvent(QMouseEvent * event);
@@ -221,7 +223,10 @@ protected:
     QAction *m_pActMarkerToolbox;
     QAction *m_pActDObjInfoToolbox;
     QAction *m_pActPickerToolbox;
+    QAction* m_pActZoomRedo;
+    QAction* m_pActZoomUndo;
     QMenu *m_pMenuToolboxes;
+    QMenu* m_pMenuZoom; /*!< menu for zoom*/
 
     QList<QToolBar*> m_toolbars;
     QList<QMenu*> m_menus;
@@ -305,6 +310,7 @@ private:
     
 public slots:
     void clearAllGeometricShapes();
+    void updateZoomOptionState();
 
 private slots:
     void multiPointActivated(bool on);
@@ -319,6 +325,8 @@ private slots:
     void mnuShapeType(bool checked);
     void mnuCopyToClipboard();
     void mnuSendCurrentToWorkspace();
+    void mnuActZoomRedo();
+    void mnuActZoomUndo();
 
     void updateColors(void);
 
