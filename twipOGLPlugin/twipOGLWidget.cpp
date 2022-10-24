@@ -939,7 +939,14 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
         FChar fc;
 
         // get the width of the font and calculate the ^2 size
-        float charWidth = metric.width(ch);
+        float charWidth;
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+        charWidth = metric.horizontalAdvance(ch);
+#else
+        charWidth = metric.width(ch);
+#endif
+
         int widthPow2 = nearestPOT(charWidth);
 
         // now we set the texture co-ords for our quad it is a simple
@@ -971,7 +978,11 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
 #endif
 
         // we need to store the font width for later drawing
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+        fc.m_width = metric.horizontalAdvance(ch);
+#else
         fc.m_width = metric.width(ch);
+#endif
 
         // now we will create a QImage to store the texture, basically we are going to draw
         // into the qimage then save this in OpenGL format and load as a texture.
@@ -986,7 +997,17 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
         painter.begin(&finalImage);
 
         // try and use high quality text rendering (works well on the mac not as good on linux)
-        painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing | QPainter::NonCosmeticDefaultPen);
+        painter.setRenderHints(
+            QPainter::Antialiasing | 
+            QPainter::SmoothPixmapTransform |  
+            QPainter::TextAntialiasing | 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+            QPainter::Antialiasing
+#else
+            QPainter::HighQualityAntialiasing |
+            QPainter::NonCosmeticDefaultPen
+#endif
+        );
 
         // set the font to draw with
         painter.setFont(font);
@@ -996,7 +1017,7 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
         painter.setPen(Qt::black);
 
         // finally we draw the text to the Image
-        painter.drawText(0, metric.ascent(), QString(c));
+        painter.drawText(0, metric.ascent(), QString(ch));
         painter.end();
 
         // now we create the OpenGL texture ID and bind to make it active
@@ -1114,7 +1135,7 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
         // thing we do
         glfont.m_chars[c - startChar] = fc;
     }
-    m_fonts.insert(font.family() + QString(font.pixelSize()), glfont);
+    m_fonts.insert(font.family() + QString::number(font.pixelSize()), glfont);
 
     return ito::retOk;
 }
@@ -1371,7 +1392,7 @@ void TwipOGLWidget::DrawAxesOGL(void)
         if (m_pConfigData->m_pitchAng < GL_PI - 0.17 && m_pConfigData->m_pitchAng > -GL_PI + 0.17)
         {
             QString buf;
-            buf.sprintf("%.3g", m_axes.m_axisZ.getMin());
+            buf.asprintf("%.3g", m_axes.m_axisZ.getMin());
             OGLTextOut(buf, ((zaxPos.at<float>(0, 0) + align * ticklen) / 2.0 + 0.5) * width(),
                 ((zaxPos.at<float>(1, 0) + align * ticklen) / -2.0 + 0.5) * height(), alignrt, alignrt,
                 QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
@@ -1383,7 +1404,7 @@ void TwipOGLWidget::DrawAxesOGL(void)
         if (m_pConfigData->m_pitchAng < -0.17 || m_pConfigData->m_pitchAng > 0.17)
         {
             QString buf;
-            buf.sprintf("%.3g", m_axes.m_axisZ.getMax());
+            buf.asprintf("%.3g", m_axes.m_axisZ.getMax());
             OGLTextOut(buf, ((zaxPos.at<float>(0, 0) + align * ticklen) / 2.0 + 0.5) * width(),
                 ((zaxPos.at<float>(1, 0) + align * ticklen) / -2.0 + 0.5) * height(), alignrt, alignrt,
                 QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
@@ -1437,14 +1458,14 @@ void TwipOGLWidget::DrawAxesOGL(void)
     char aligntbx = xaxPos0.at<float>(1, 0) - xaxPos2.at<float>(1, 0) > 0 ? 1 : 0;
 
     QString buf;
-    buf.sprintf("%.3g", m_axes.m_axisX.getMin());
+    buf.asprintf("%.3g", m_axes.m_axisX.getMin());
     if ((m_pConfigData->m_yawAng < -GL_PI / 2.0 -0.08 || m_pConfigData->m_yawAng > -GL_PI / 2.0 + 0.08)
         && (m_pConfigData->m_pitchAng < -GL_PI / 2.0 - 0.08 || m_pConfigData->m_pitchAng > -GL_PI / 2.0 + 0.08))
         OGLTextOut(buf, ((xaxPos0.at<float>(0, 0)) / 2.0 + 0.5) * width(),
             ((xaxPos0.at<float>(1, 0)) / -2.0 + 0.5) * height(), alignrlx, aligntbx,
             QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
 
-    buf.sprintf("%.3g", m_axes.m_axisX.getMax());
+    buf.asprintf("%.3g", m_axes.m_axisX.getMax());
     if ((m_pConfigData->m_yawAng < -GL_PI / 2.0 -0.08 || m_pConfigData->m_yawAng > -GL_PI / 2.0 + 0.08)
         && (m_pConfigData->m_pitchAng < GL_PI / 2.0 - 0.08 || m_pConfigData->m_pitchAng > GL_PI / 2.0 + 0.08))
         OGLTextOut(buf, ((xaxPos1.at<float>(0, 0)) / 2.0 + 0.5) * width(),
@@ -1489,14 +1510,14 @@ void TwipOGLWidget::DrawAxesOGL(void)
     char alignrly = yaxPos0.at<float>(0, 0) - yaxPos2.at<float>(0, 0) > 0 ? 0 : 1;
     char aligntby = yaxPos0.at<float>(1, 0) - yaxPos2.at<float>(1, 0) > 0 ? 1 : 0;
 
-    buf.sprintf("%.3g", m_axes.m_axisY.getMin());
+    buf.asprintf("%.3g", m_axes.m_axisY.getMin());
     if ((m_pConfigData->m_yawAng < -GL_PI / 2.0 -0.08 || m_pConfigData->m_yawAng > -GL_PI / 2.0 + 0.08)
         && (m_pConfigData->m_pitchAng < -GL_PI / 2.0 - 0.08 || m_pConfigData->m_pitchAng > -GL_PI / 2.0 + 0.08))
         OGLTextOut(buf, ((yaxPos0.at<float>(0, 0)) / 2.0 + 0.5) * width(),
             ((yaxPos0.at<float>(1, 0)) / -2.0 + 0.5) * height(), alignrly, aligntby,
             QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
 
-    buf.sprintf("%.3g", m_axes.m_axisY.getMax());
+    buf.asprintf("%.3g", m_axes.m_axisY.getMax());
     if ((m_pConfigData->m_yawAng < -GL_PI / 2.0 -0.08 || m_pConfigData->m_yawAng > -GL_PI / 2.0 + 0.08)
         && (m_pConfigData->m_pitchAng < GL_PI / 2.0 - 0.08 || m_pConfigData->m_pitchAng > GL_PI / 2.0 + 0.08))
         OGLTextOut(buf, ((yaxPos1.at<float>(0, 0)) / 2.0 + 0.5) * width(),
@@ -1673,19 +1694,19 @@ void TwipOGLWidget::paintGL()
     buf.clear();
     if(m_pConfigData->m_plotAngles)
     {
-        buf.sprintf("Angles:");
+        buf.asprintf("Angles:");
         OGLTextOut(buf, 10, yPos, 0, 0, QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
         yPos += m_axes.m_fontSize;
-        buf.sprintf("P: %.3f", m_pConfigData->m_pitchAng);
+        buf.asprintf("P: %.3f", m_pConfigData->m_pitchAng);
 //        buf.sprintf("P: %.3f", m_pConfigData->m_lightDirPitch);
         OGLTextOut(buf, 10, yPos, 0, 0, QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
         yPos += m_axes.m_fontSize;
-        buf.sprintf("Y: %.3f", m_pConfigData->m_yawAng);
+        buf.asprintf("Y: %.3f", m_pConfigData->m_yawAng);
 //        buf.sprintf("Y: %.3f", m_pConfigData->m_lightDirYaw);
         OGLTextOut(buf, 10, yPos, 0, 0, QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
 
         yPos += m_axes.m_fontSize;
-        buf.sprintf("A: %.3f", m_pConfigData->m_zAmpl);
+        buf.asprintf("A: %.3f", m_pConfigData->m_zAmpl);
         OGLTextOut(buf, 10, yPos, 0, 0, QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
     }
 
@@ -3568,7 +3589,7 @@ int TwipOGLWidget::OGLTextOut(QString &text, double xpos, double ypos, const boo
     int textLength = text.length();
     float _x = xpos;
     SFont uFont;
-    if (!m_fonts.contains(ffamily + QString(fsize)))
+    if (!m_fonts.contains(ffamily + QString::number(fsize)))
     {
         QFont nf(ffamily);
         nf.setPixelSize(fsize);
@@ -3577,7 +3598,7 @@ int TwipOGLWidget::OGLTextOut(QString &text, double xpos, double ypos, const boo
     }
     else
     {
-        uFont = m_fonts[ffamily + QString(fsize)];
+        uFont = m_fonts[ffamily + QString::number(fsize)];
     }
 
     if (topAligned == 0)
@@ -3859,11 +3880,11 @@ void TwipOGLWidget::DrawColorBar(const GLfloat posX, const GLfloat posY, const G
     GLFPTR(glUseProgram)(0);
 
     QString buf;
-    buf.sprintf("%g", zMin);
+    buf.asprintf("%g", zMin);
     OGLTextOut(buf, posX + (centerRight ? dX : 0.0) , posY + dY, centerRight, 0, QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
 
     buf.clear();
-    buf.sprintf("%g", zMax);
+    buf.asprintf("%g", zMax);
     OGLTextOut(buf, posX + (centerRight ? dX : 0.0), posY, centerRight, 1, QString::fromStdString(m_axes.getFontName()), m_axes.getFontSize(), m_axes.getFontColor());
 
     buf.clear();
@@ -5289,7 +5310,7 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                     {
                         int color = (1.0 - row / (float)rows) * m_currentPalette.size();
                         color = std::max(0, color);
-                        color = std::min(color, m_currentPalette.size() - 1);
+                        color = std::min(color, (int)m_currentPalette.size() - 1);
                         
                         for(int col = 0; col < cols; col++)
                         {
@@ -5641,7 +5662,7 @@ void TwipOGLWidget::wheelEvent ( QWheelEvent * event )
 
     if(m_activeModifiers == Qt::ControlModifier)
     {
-        if (event->delta() > 0)
+        if (event->angleDelta().y() > 0)
         {
             zoomInByOne();
         }
@@ -5652,7 +5673,7 @@ void TwipOGLWidget::wheelEvent ( QWheelEvent * event )
     }
     else
     {
-        if (event->delta() > 0)
+        if (event->angleDelta().y() > 0)
         {
             m_pConfigData->m_zAmpl *= 1.05;
         }
