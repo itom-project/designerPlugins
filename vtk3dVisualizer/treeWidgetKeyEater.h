@@ -20,8 +20,7 @@ You should have received a copy of the GNU General Public License
 along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef TREEWIDGETKEYEATER_H
-#define TREEWIDGETKEYEATER_H
+#pragma once
 
 #include <qobject.h>
 #include <qevent.h>
@@ -33,7 +32,7 @@ class TreeWidgetKeyEater : public QObject
     Q_OBJECT
 
 public:
-    TreeWidgetKeyEater(QObject *obj, QPropertyEditorWidget* propertyEditorWidget = NULL) : QObject(obj), pew(propertyEditorWidget) {}
+    TreeWidgetKeyEater(QObject *obj, QPropertyEditorWidget* propertyEditorWidget = nullptr) : QObject(obj), pew(propertyEditorWidget) {}
     virtual ~TreeWidgetKeyEater() {}
 
 protected:
@@ -41,5 +40,3 @@ protected:
     
     QPropertyEditorWidget* pew;
 };
-
-#endif
