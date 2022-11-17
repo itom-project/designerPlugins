@@ -36,7 +36,11 @@ if(ITOM_SDK_PCL_SUPPORT)
     #set(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked
 
     include(Setup_PCL_Plugins)
-    find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization PATHS ${PCL_CMAKE_DIR} NO_DEFAULT_PATH)
+    if(WIN32)
+        find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization PATHS ${PCL_CMAKE_DIR} NO_DEFAULT_PATH)
+    else(WIN32)
+        find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization)
+    endif(WIN32)
 
     if(${VTK_MAJOR_VERSION} LESS 8)
         message(STATUS "For VTK <= 8.1, the legacy VTK Qt widget is used.")
