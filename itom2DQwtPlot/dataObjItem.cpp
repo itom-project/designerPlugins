@@ -166,7 +166,7 @@ QImage DataObjItem::renderImage(
         {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0) 
             futures += QtConcurrent::run(
-                this, &renderTile,
+                this, &DataObjItem::renderTile,
                 xMap, yMap, dataTypeFlag, tile, &image );
 #else
             futures += QtConcurrent::run(
