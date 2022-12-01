@@ -494,15 +494,25 @@ void MatplotlibWidget::leaveEvent ( QEvent * event )
 }
 
 //-------------------------------------------------------------------------------------
-void MatplotlibWidget::enterEvent ( QEvent * event )
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+void MatplotlibWidget::enterEvent(QEvent* event)
+#else
+void MatplotlibWidget::enterEvent(QEnterEvent* event)
+#endif
 {
     if (!hasFocus())
         return;
 
     QEnterEvent *e = static_cast<QEnterEvent*>(event);
-    if (e)
+
+    if (event)
     {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         emit eventEnter(e->pos().x(), e->pos().y());
+#else
+        emit eventEnter(qRound(e->position().x()), qRound(e->position().y()));
+#endif
+        
     }
     else
     {
