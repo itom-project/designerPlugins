@@ -59,8 +59,8 @@
 #include <qnumeric.h>
 #include <qinputdialog.h>
 
-/*static*/ QStringList Plot1DWidget::siLengthUnits = QStringList() << "pm" << "nm" << (QLatin1String("\u00B5m")) << "mm" << "m" << "km";
-/*static*/ QStringList Plot1DWidget::siTimeUnits = QStringList() << "ps" << "ns" << (QLatin1String("\u00B5s")) << "ms" << "s";
+/*static*/ QStringList Plot1DWidget::siLengthUnits = QStringList() << "pm" << "nm" << (QString(QChar(0xb5, 0x00)) + "m") << "mm" << "m" << "km";
+/*static*/ QStringList Plot1DWidget::siTimeUnits = QStringList() << "ps" << "ns" << (QString(QChar(0xb5, 0x00)) + "s") << "ms" << "s";
 
 //namespace ito {
 //    extern void **ITOM_API_FUNCS_GRAPH;
