@@ -181,17 +181,17 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 #endif
     this->setCentralWidget(d->pclCanvas);
 
-    d->pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
+    d->pclCanvas->setRenderWindow(win); //pviz.getRenderWindow());
 #ifdef LEGACY_VTK
     QVTKInteractor *interactor = d->pclCanvas->GetInteractor();
 #else
-    vtkRenderWindowInteractor *interactor = d->pclCanvas->GetInteractor();
+    vtkRenderWindowInteractor *interactor = d->pclCanvas->interactor();
 #endif
 
     d->PCLVis->setShowFPS(true);
     
 
-    d->PCLVis->setupInteractor(interactor, d->pclCanvas->GetRenderWindow());
+    d->PCLVis->setupInteractor(interactor, d->pclCanvas->renderWindow());
     d->PCLVis->getInteractorStyle()->setKeyboardModifier(pcl::visualization::INTERACTOR_KB_MOD_SHIFT);
     d->PCLVis->getRenderWindow()->Render(); //wichtig, dass dieser befehl vor dem ersten Hinzufuegen von Elementen oder setzen von visuellen Eigenschaften kommt, da sonst addPointCloud crashed, alternativ kann auch setBackgroundColor gerufen werden, aber das ruft intern auch render() auf.
 
@@ -310,7 +310,7 @@ Vtk3dVisualizer::~Vtk3dVisualizer()
 {
     //this timerEvent must be removed, else crashes can occure in some situations if visualization is already destroyed 
     //and the timer event is fired afterwards.
-    d->pclCanvas->GetInteractor()->RemoveObservers(vtkCommand::TimerEvent);
+    d->pclCanvas->interactor()->RemoveObservers(vtkCommand::TimerEvent);
 
     d->PCLVis->getInteractorStyle()->SetEnabled(0);
 
@@ -2565,6 +2565,6 @@ void Vtk3dVisualizer::updateCanvasImmediately()
 #else
     //new opengl
     d->canvasUpdateQueued = false;
-    d->pclCanvas->GetRenderWindow()->Render();
+    d->pclCanvas->renderWindow()->Render();
 #endif
 }
