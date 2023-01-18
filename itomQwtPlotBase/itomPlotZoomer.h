@@ -48,7 +48,6 @@ public:
 
     virtual void rescale(bool resizeEvent);
 
-    void appendZoomStack(const QRectF &rect);
 
 public Q_SLOTS:
     void setEnabled(bool enabled);
@@ -67,6 +66,8 @@ private:
     bool m_aspectRatioChanged;
     int m_invertedAxes; //this member remembers the inversion of the xBottom and yLeft axis
     int m_nrOfRescaleCalls;
+signals:
+    void test();
 };
 
 #endif //ITOMPLOTZOOMER_H
