@@ -114,7 +114,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
         QList<QPushButton* > buttons;
         buttons.reserve(4);
-        QString bname(10);
+        QString bname;
         
         btn = new QPushButton("--", this);
         bname = QString("%1--").arg(m_axisName[i].at(0));
@@ -155,7 +155,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_changePosButtons.append(buttons);
     }
 
-    QString micronString(2, 181);
+    QString micronString(2, QChar(181));
     micronString[1] = 'm';
 
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
@@ -783,7 +783,7 @@ void MotorController::setUnit(const Unit unit)
     }
     else
     {
-        unitString = QString(2, 181);
+        unitString = QString(2, QChar(181));
         unitString[1] = 'm';
     }
 

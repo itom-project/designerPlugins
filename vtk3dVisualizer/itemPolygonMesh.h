@@ -23,7 +23,7 @@
 #ifndef ITEMPOLYGONMESH_H
 #define ITEMPOLYGONMESH_H
 
-#include "common/qtMetaTypeDeclarations.h"
+// #include "common/qtMetaTypeDeclarations.h"
 #include "common/sharedStructures.h"
 #include "common/interval.h"
 #include "PointCloud/pclStructures.h"

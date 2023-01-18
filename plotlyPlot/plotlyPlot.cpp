@@ -24,7 +24,12 @@
 
 #include <QWebEngineProfile>
 #include <QWebEngineView>
-#include <qwebenginedownloaditem.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <qwebenginedownloaditem.h>
+#else
+    #include <QWebEngineDownloadRequest>
+#endif
 #include <qfiledialog.h>
 #include <qfileinfo.h>
 #include <qsharedpointer.h>
@@ -83,6 +88,8 @@ PlotlyPlot::PlotlyPlot(
     });
 
     QWebEngineProfile* profile = d->m_pWebEngineView->page()->profile();
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(profile, &QWebEngineProfile::downloadRequested, [=](QWebEngineDownloadItem* download) {
         QFileInfo fileInfo(download->path());
         QString newPath = QFileDialog::getSaveFileName(
@@ -94,6 +101,21 @@ PlotlyPlot::PlotlyPlot(
             download->accept();
         }
     });
+#else
+    connect(profile, &QWebEngineProfile::downloadRequested, [=](QWebEngineDownloadRequest* download) {
+        QFileInfo fileInfo(download->downloadDirectory(), download->downloadFileName());
+        QString newPath = QFileDialog::getSaveFileName(
+            this, tr("File Location"), fileInfo.absoluteFilePath(), tr("Image (*.%1)").arg(fileInfo.suffix()));
+
+        if (newPath != "")
+        {
+            fileInfo.setFile(newPath);
+            download->setDownloadDirectory(fileInfo.absoluteDir().absolutePath());
+            download->setDownloadFileName(fileInfo.fileName());
+            download->accept();
+        }
+        });
+#endif
 
     setPropertyObservedObject(this);
 }

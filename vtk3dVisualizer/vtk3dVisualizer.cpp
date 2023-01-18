@@ -55,7 +55,7 @@
 
 #include "vtkSmartPointer.h"
 #include "vtkCubeAxesActor.h"
-
+#include "vtkVersionMacros.h"
 #include "vtkCamera.h"
 #include "vtkVersion.h"
 
@@ -181,17 +181,37 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 #endif
     this->setCentralWidget(d->pclCanvas);
 
+#if VTK_MAJOR_VERSION >= 9
     d->pclCanvas->setRenderWindow(win); //pviz.getRenderWindow());
+#else
+    d->pclCanvas->SetRenderWindow(win); //pviz.getRenderWindow());
+#endif
+
 #ifdef LEGACY_VTK
     QVTKInteractor *interactor = d->pclCanvas->GetInteractor();
 #else
-    vtkRenderWindowInteractor *interactor = d->pclCanvas->interactor();
+    vtkRenderWindowInteractor *interactor = nullptr;
+
+#if VTK_MAJOR_VERSION >= 9
+    interactor = d->pclCanvas->interactor();
+#else
+    interactor = d->pclCanvas->GetInteractor();
+#endif
+
 #endif
 
     d->PCLVis->setShowFPS(true);
-    
 
-    d->PCLVis->setupInteractor(interactor, d->pclCanvas->renderWindow());
+    d->PCLVis->setupInteractor(
+        interactor,
+
+#if VTK_MAJOR_VERSION >= 9
+        d->pclCanvas->renderWindow()
+#else
+        d->pclCanvas->GetRenderWindow()
+#endif
+    );
+
     d->PCLVis->getInteractorStyle()->setKeyboardModifier(pcl::visualization::INTERACTOR_KB_MOD_SHIFT);
     d->PCLVis->getRenderWindow()->Render(); //wichtig, dass dieser befehl vor dem ersten Hinzufuegen von Elementen oder setzen von visuellen Eigenschaften kommt, da sonst addPointCloud crashed, alternativ kann auch setBackgroundColor gerufen werden, aber das ruft intern auch render() auf.
 
@@ -310,7 +330,11 @@ Vtk3dVisualizer::~Vtk3dVisualizer()
 {
     //this timerEvent must be removed, else crashes can occure in some situations if visualization is already destroyed 
     //and the timer event is fired afterwards.
+#if VTK_MAJOR_VERSION >= 9
     d->pclCanvas->interactor()->RemoveObservers(vtkCommand::TimerEvent);
+#else
+    d->pclCanvas->GetInteractor()->RemoveObservers(vtkCommand::TimerEvent);
+#endif
 
     d->PCLVis->getInteractorStyle()->SetEnabled(0);
 
@@ -2565,6 +2589,12 @@ void Vtk3dVisualizer::updateCanvasImmediately()
 #else
     //new opengl
     d->canvasUpdateQueued = false;
+
+#if VTK_MAJOR_VERSION >= 9
     d->pclCanvas->renderWindow()->Render();
+#else
+    d->pclCanvas->GetRenderWindow()->Render();
+#endif
+
 #endif
 }

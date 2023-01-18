@@ -54,7 +54,7 @@ if(ITOM_SDK_PCL_SUPPORT)
             endif()
         elseif(VTK3DVISUALIZER_FORCE_LEGACY_VTK)
             add_definitions(-DLEGACY_VTK)
-        elseif(Qt5_VERSION VERSION_LESS 5.10.0)
+        elseif(QT5_FOUND AND (Qt5_VERSION VERSION_LESS 5.10.0))
             message(WARNING "For Qt < 5.10 it is recommended to enable VTK3DVISUALIZER_FORCE_LEGACY_VTK")
         endif()
 
@@ -159,14 +159,14 @@ if(ITOM_SDK_PCL_SUPPORT)
         # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
 set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
-        if(QT5_FOUND)
+        #if(QT5_FOUND)
             #parse all *.ui files by Qt's uic process and get the parsed source files
-            qt5_wrap_ui(DESIGNER_UIC ${DESIGNER_UI})
+        #    qt5_wrap_ui(DESIGNER_UIC ${DESIGNER_UI})
             #add the output files to the target
-            target_sources(${target_name} PRIVATE ${DESIGNER_UIC})
-        else()
-            message(SEND_ERROR "Currently only Qt5 is supported")
-        endif()
+        #    target_sources(${target_name} PRIVATE ${DESIGNER_UIC})
+        #else()
+        #    message(SEND_ERROR "Currently only Qt5 is supported")
+        #endif()
 
         # translations
                 set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})
