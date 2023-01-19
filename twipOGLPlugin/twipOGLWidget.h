@@ -601,94 +601,9 @@ class TwipOGLWidget : public QGLWidget
         int makeShaderProg(const QString &progStr, GLint &progName);
 
         template<typename _Tp> ito::RetVal updateOverlayImage(const int objectID);
+
 #ifdef USEPCL
-        template<typename _Tp> void pclFindMinMax(pcl::PointCloud<_Tp> *pcl, const int id)
-        {
-            _Tp pt;
-
-            ito::float64 xmin = std::numeric_limits<ito::float64>::max();
-            ito::float64 ymin = std::numeric_limits<ito::float64>::max();
-            ito::float64 zmin = std::numeric_limits<ito::float64>::max();
-            float devmin = std::numeric_limits<float>::max();
-
-#if linux
-            ito::float64 xmax = -std::numeric_limits<ito::float64>::max();
-            ito::float64 ymax = -std::numeric_limits<ito::float64>::max();
-            ito::float64 zmax = -std::numeric_limits<ito::float64>::max();
-            float devmax = -std::numeric_limits<float>::max();
-#else
-            ito::float64 xmax = std::numeric_limits<ito::float64>::lowest();
-            ito::float64 ymax = std::numeric_limits<ito::float64>::lowest();
-            ito::float64 zmax = std::numeric_limits<ito::float64>::lowest();
-            float devmax = std::numeric_limits<float>::lowest();
-#endif
-
-            int size = (int)pcl->points.size();
-            if(hasPointToCurvature<_Tp>())
-            {
-                float val;
-                for (int np = 0; np < size; np++)
-                {
-                    pt = pcl->at(np);
-                    if (ito::isFinite<float>(pt.z))
-                    {
-                        if (pt.x < xmin)
-                            xmin = pt.x;
-                        if (pt.x > xmax)
-                            xmax = pt.x;
-                        if (pt.y < ymin)
-                            ymin = pt.y;
-                        if (pt.y > ymax)
-                            ymax = pt.y;
-                        if (pt.z < zmin)
-                            zmin = pt.z;
-                        if (pt.z > zmax)
-                            zmax = pt.z;
-
-                        pointToCurvature<_Tp>(pt, val);
-                        if (ito::isFinite<float>(val))
-                        {
-                            if (val < devmin)
-                                devmin = val;
-                            if (val > devmax)
-                                devmax = val;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for (int np = 0; np < size; np++)
-                {
-                    pt = pcl->at(np);
-                    if (ito::isFinite<float>(pt.z))
-                    {
-                        if (pt.x < xmin)
-                            xmin = pt.x;
-                        if (pt.x > xmax)
-                            xmax = pt.x;
-                        if (pt.y < ymin)
-                            ymin = pt.y;
-                        if (pt.y > ymax)
-                            ymax = pt.y;
-                        if (pt.z < zmin)
-                            zmin = pt.z;
-                        if (pt.z > zmax)
-                            zmax = pt.z;
-                    }
-                }
-                devmax = 0.0f;
-                devmin = 0.0f;
-            }
-            m_pclMinX[id] = xmin;
-            m_pclMinY[id] = ymin;
-            m_pclMinZ[id] = zmin;
-            m_pclMinDev[id] = cv::saturate_cast<ito::float64>(devmin);
-            m_pclMaxX[id] = xmax;
-            m_pclMaxY[id] = ymax;
-            m_pclMaxZ[id] = zmax;
-            m_pclMaxDev[id] = cv::saturate_cast<ito::float64>(devmax);
-        }
+        template<typename _Tp> void pclFindMinMax(pcl::PointCloud<_Tp> *pcl, const int id);
 #endif
 
         inline uint32_t nearestPOT(const uint32_t num)
@@ -875,6 +790,8 @@ class TwipOGLWidget : public QGLWidget
         void oglAboutToDestroy();
 
 #if linux
+        void setColorMap(QString colormap = QString());
+#elif __APPLE__
         void setColorMap(QString colormap = QString());
 #else
         void setColorMap(QString colormap = QString::QString(""));

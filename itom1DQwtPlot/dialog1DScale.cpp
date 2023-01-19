@@ -72,7 +72,7 @@ Dialog1DScale::Dialog1DScale(const Plot1DWidget::InternalData& data, QWidget* pa
     }
     else
     {
-        const QDateTime epochDate(QDate(1970, 1, 1));
+        const QDateTime epochDate(QDate(1970, 1, 1), QTime(0, 0, 0));
         ui.dateTimeMinX->setDateTime(epochDate.addMSecs(data.m_axisMin));
         ui.dateTimeMaxX->setDateTime(epochDate.addMSecs(data.m_axisMax));
     }

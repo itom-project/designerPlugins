@@ -164,10 +164,15 @@ QImage DataObjItem::renderImage(
         }
         else
         {
-            
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0) 
             futures += QtConcurrent::run(
                 this, &DataObjItem::renderTile,
                 xMap, yMap, dataTypeFlag, tile, &image );
+#else
+            futures += QtConcurrent::run(
+                &DataObjItem::renderTile, this,
+                xMap, yMap, dataTypeFlag, tile, &image);
+#endif
                 
         }
     }

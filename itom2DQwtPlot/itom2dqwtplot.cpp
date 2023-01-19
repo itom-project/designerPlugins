@@ -33,7 +33,7 @@
 #include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qshortcut.h>
-#include <qdesktopwidget.h>
+//#include <qdesktopwidget.h>
 #include <qpointer.h>
 
 #include <qwt_plot_renderer.h>
@@ -1303,8 +1303,33 @@ ito::RetVal Itom2dQwtPlot::moveChildPlotCloseToThis(QWidget *child)
     }
 
     //check if the desired geometry is within the available desktop
-    QDesktopWidget *dw = QApplication::desktop();
-    QRect screenGeom = dw->screenGeometry(this);
+    const auto allScreens = QGuiApplication::screens();
+    QRect thisRect = this->geometry();
+    QRect screenGeom;
+    int bestArea = 0;
+    int area;
+    QRect tempGeom;
+
+    // get the screen, where this widget is mainly contained.
+    foreach(const auto screen, allScreens)
+    {
+        tempGeom = screen->geometry().intersected(thisRect);
+        area = tempGeom.width()* tempGeom.height();
+
+        if (area > bestArea)
+        {
+            screenGeom = screen->geometry();
+            bestArea = area;
+        }
+    }
+
+    if (screenGeom.isNull())
+    {
+        screenGeom = QGuiApplication::primaryScreen()->geometry();
+    }
+
+    /*QDesktopWidget *dw = QApplication::desktop();
+    QRect screenGeom = dw->screenGeometry(this);*/
 
     //move the new figure close to the right, bottom position of this figure
     geom.setX(geom.x() + 2 * width() / 3);

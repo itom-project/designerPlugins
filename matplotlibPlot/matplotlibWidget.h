@@ -73,8 +73,14 @@ public:
 protected:
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void keyReleaseEvent ( QKeyEvent * event );
-    virtual void leaveEvent ( QEvent * event );
+    virtual void leaveEvent(QEvent* event);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     virtual void enterEvent ( QEvent * event );
+#else
+    virtual void enterEvent(QEnterEvent* event);
+#endif
+
     virtual void wheelEvent( QWheelEvent * event );
     virtual void mouseDoubleClickEvent ( QMouseEvent * event );
     virtual void mouseMoveEvent ( QMouseEvent * event );

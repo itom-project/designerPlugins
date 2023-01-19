@@ -111,7 +111,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     canvas()->setCursor(Qt::ArrowCursor);
 
     m_pPlotGrid = new QwtPlotGrid();
-    m_pPlotGrid->setZ(10.0);
+    m_pPlotGrid->setZ(11.0);
     m_pPlotGrid->attach(this);
     setGridStyle(m_gridStyle);
     m_pPlotGrid->setMajorPen(Qt::gray, 1);
@@ -119,7 +119,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
 
     //main item on canvas -> the data object
     m_dObjItem = new DataObjItem("Data Object");
-    m_dObjItem->setZ(11.0);
+    m_dObjItem->setZ(10.0);
     m_dObjItem->setRenderThreadCount(0); //uses ideal thread count
     //m_dObjItem->setColorMap(new QwtLinearColorMap(QColor::fromRgb(0,0,0), QColor::fromRgb(255,255,255), QwtColorMap::Indexed));
     m_rasterData = new DataObjRasterData(m_pData);
@@ -330,6 +330,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     m_pContextMenu->addAction(mainTb->toggleViewAction());
 
 	setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine());
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -474,6 +475,8 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
         //trackerPen.setColor(inverseColor0());
         centerMarkerPen.setColor(inverseColor0());
         zStackMarkerPen.setColor(inverseColor0());
+        m_pPlotGrid->setMajorPen(inverseColor0(), 1);
+        m_pPlotGrid->setMinorPen(inverseColor0(), 1, Qt::DashLine);
         if (m_dObjItem)
         {
            contourPen = m_dObjItem->defaultContourPen();//hold setting from default pen
@@ -1486,12 +1489,21 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
 
         updateScaleValues(false, updateState & changeData); //no replot here
         updateAxes();
+        updateZoomOptionState();
 
 
         //set the base view for the zoomer (click on 'house' symbol) to the current representation (only if data changed)
         if (updateState & changeData)
         {
-            zoomer()->setZoomBase(false); //do not replot in order to not destroy the recently set scale values, a rescale is executed at the end though
+            QStack<QRectF> stack; //we can not call setZoomBase since this scales to the current scalingRect, leading to a wrong zoomStack in case of keepAspectRatio is set by the api
+            QRectF boundingRect(
+                m_pData->m_xaxisMin,
+                m_pData->m_yaxisMin,
+                (m_pData->m_xaxisMax - m_pData->m_xaxisMin),
+                (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+            stack.push(boundingRect);
+            zoomer()->setZoomStack(stack, -1);
+            updateZoomOptionState();
         }
         else
         {
@@ -2227,7 +2239,6 @@ void fixZeroInterval(QwtInterval &interval)
         interval = QwtInterval(interval.minValue() - 0.5, interval.maxValue() + 0.5);
     }
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
 /*
 @param doReplot forces a replot of the content
@@ -2319,17 +2330,23 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 
             QRectF zoom(m_pData->m_xaxisMin, m_pData->m_yaxisMin, (m_pData->m_xaxisMax - m_pData->m_xaxisMin), (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
             zoom = zoom.normalized();
-            
-            if (zoom == zoomer()->zoomRect())
-            {
-                zoomer()->zoom(zoom);
-                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
-            }
-            else
-            {
-                zoomer()->appendZoomStack(zoom);
-            }
+            QRectF rect = zoomer()->zoomRect();
+            bool isEqualRect = true;
+            qreal x1, x2, y1, y2 = 0;
+            qreal zoomx1, zoomx2, zoomy1, zoomy2 = 0; 
+            rect.getCoords(&x1, &y1, &x2, &y2);
+            zoom.getCoords(&zoomx1, &zoomy1, &zoomx2, &zoomy2);
 
+            isEqualRect = (x1 - zoomx1) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (y1 - zoomy1) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (y2 - zoomy2) < std::numeric_limits<qreal>::epsilon();
+            isEqualRect &= (x2 - zoomx2) < std::numeric_limits<qreal>::epsilon();
+
+            if (!isEqualRect)
+            {
+                zoomer()->zoom(zoom);              
+            }
+            zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here      
         }
     }
 
@@ -2342,7 +2359,35 @@ void PlotCanvas::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /*=
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::home()
 {
-    zoomer()->zoom(0);
+    QRectF boundingRect(
+        m_pData->m_xaxisMin,
+        m_pData->m_yaxisMin,
+        (m_pData->m_xaxisMax - m_pData->m_xaxisMin),
+        (m_pData->m_yaxisMax - m_pData->m_yaxisMin));
+    QStack<QRectF> stack = zoomer()->zoomStack();
+    if (boundingRect != zoomer()->zoomRect())
+    {
+        zoomer()->zoom(boundingRect);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::zoomUndo() const
+{
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index > 0)
+    {
+        zoomer()->zoom(-1);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::zoomRedo() const
+{
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index < zoomer()->zoomStack().length()-1)
+    {
+        zoomer()->zoom(1);
+    }
+    
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

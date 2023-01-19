@@ -59,7 +59,7 @@ set(qwt_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_spectrocurve.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_graphicitem.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_spectrogram.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_glcanvas.h
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_glcanvas.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_svgitem.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_directpainter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_textlabel.h
@@ -269,7 +269,7 @@ set(qwt_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_tradingcurve.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_directpainter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_textlabel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_glcanvas.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_glcanvas.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_svgitem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_graphicitem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_spectrogram.cpp

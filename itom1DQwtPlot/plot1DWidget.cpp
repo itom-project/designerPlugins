@@ -59,8 +59,8 @@
 #include <qnumeric.h>
 #include <qinputdialog.h>
 
-/*static*/ QStringList Plot1DWidget::siLengthUnits = QStringList() << "pm" << "nm" << (QLatin1String("\u00B5m")) << "mm" << "m" << "km";
-/*static*/ QStringList Plot1DWidget::siTimeUnits = QStringList() << "ps" << "ns" << (QLatin1String("\u00B5s")) << "ms" << "s";
+/*static*/ QStringList Plot1DWidget::siLengthUnits = QStringList() << "pm" << "nm" << (QString(QChar(0xb5, 0x00)) + "m") << "mm" << "m" << "km";
+/*static*/ QStringList Plot1DWidget::siTimeUnits = QStringList() << "ps" << "ns" << (QString(QChar(0xb5, 0x00)) + "s") << "ms" << "s";
 
 //namespace ito {
 //    extern void **ITOM_API_FUNCS_GRAPH;
@@ -1537,7 +1537,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 
 		// re-use old legend titles entries, if no new curves have been appended 
         // (e.g. important if 'the' same shape of object is only updated via resetting its source property
-		for (int i = curveNames.size(); i < std::min(numCurves, m_legendTitles.size()); ++i)
+		for (int i = curveNames.size(); i < std::min(numCurves, (int)m_legendTitles.size()); ++i)
 		{
 			curveNames.append(m_legendTitles[i]);
 		}
@@ -1968,7 +1968,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
     if (seriesData)
     {
         QByteArray hash = seriesData->getHash();
-        QByteArray hashX(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject ? seriesData->getHash() : "");
+        QByteArray hashX(m_pData->m_axisState & ItomQwtPlotEnums::xAxisObject ? seriesData->getHash() : QByteArray(""));
 
         if (hash != m_hash || hashX != m_hashX || m_pData->m_valueScaleAuto)
         {
@@ -3076,9 +3076,21 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             QStack<QRectF> stack = zoomer()->zoomStack();
             if ((initialIdx >= 0) && (initialIdx < stack.size()))
             {
-                stack[initialIdx] = zoom;
+                if (initialIdx == 0 && stack.size() == 1) // we have to set the zoom base correct
+                {
+                    QRectF boundingRect;
+                    foreach (QwtPlotCurve* curve, m_plotCurveItems)
+                    {
+                        boundingRect = boundingRect.united(
+                            ((DataObjectSeriesData*)curve->data())->boundingRect());
+                    }
+                    stack[initialIdx] = boundingRect;
+                    zoomer()->setZoomStack(stack, initialIdx);
+                }
+                if (stack[0] != zoom) // we have a new zoom
+                    zoomer()->zoom(zoom);
             }
-            zoomer()->setZoomStack(stack, initialIdx);
+            //zoomer()->setZoomStack(stack, initialIdx);
 
             zoomer()->rescale(false);
             /*zoomer()->setZoomBase(base); //set the new base
@@ -3307,7 +3319,7 @@ void Plot1DWidget::updatePickerPosition(bool updatePositions, bool clear/* = fal
         QString yCoord, xCoord;
         QString yUnit, xUnit;
 
-        for (int i = 0; i < std::min(points.size(), 2); ++i) 
+        for (int i = 0; i < std::min((int)points.size(), 2); ++i) 
         {
             const DataObjectSeriesData* d = seriesData[i];
             const DataObjectSeriesDataXY* dxy = dynamic_cast<const DataObjectSeriesDataXY*>(d);
@@ -3476,20 +3488,31 @@ void Plot1DWidget::home()
     {
         boundingRect = boundingRect.united(((DataObjectSeriesData *)curve->data())->boundingRect());
     }
-
-    if (currentZoomStack.empty())
+    if (boundingRect != zoomer()->zoomRect())//only zoom if we are not zoomed
     {
         currentZoomStack.push(boundingRect);
-    }
-    else
-    {
-        currentZoomStack.first() = boundingRect;
-    }
-
-    zoomer()->setZoomStack(currentZoomStack, 0);
-    zoomer()->zoom(0);
+        zoomer()->setZoomStack(currentZoomStack, -1);
+        updateZoomOptionState(); //we changed the zoom but the zoomed Signal isn't triggered therefore we have to do it
+    } 
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::zoomUndo() const
+{
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index > 0)
+    {
+        zoomer()->zoom(-1);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void Plot1DWidget::zoomRedo() const
+{
+    const unsigned int index = zoomer()->zoomRectIndex();
+    if (index < zoomer()->zoomStack().length() - 1)
+    {
+        zoomer()->zoom(1);
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Plot1DWidget::getPlotPicker() const
 {
@@ -3547,7 +3570,7 @@ ito::RetVal Plot1DWidget::setPicker(const QVector<double> &coords, int curveInde
 
     if (!retVal.containsError())
     {
-        int cnt = std::min(coords.size(), m_pData->m_pickerLimit);
+        int cnt = std::min((int)coords.size(), m_pData->m_pickerLimit);
         int coord_px;
         int picker_offset = (append ? m_pickers.size() : 0);
 

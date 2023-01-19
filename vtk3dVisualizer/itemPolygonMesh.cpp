@@ -693,7 +693,7 @@ void ItemPolygonMesh::setFaceColor(const QColor& color)
         if(it != map->end())
         {
             vtkProperty *prop = it->second.actor->GetProperty();
-            unsigned char ucharColor[] = {color.red(), color.green(), color.blue()};
+            unsigned char ucharColor[] = {static_cast<unsigned char>(color.red()), static_cast<unsigned char>(color.green()), static_cast<unsigned char>(color.blue())};
 
             vtkPolyData *d = (vtkPolyData*)it->second.actor->GetMapper()->GetInput();
 

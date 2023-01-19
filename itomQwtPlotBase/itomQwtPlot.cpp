@@ -67,7 +67,6 @@
 #include <qwt_plot_layout.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_date_scale_draw.h>
-
 //---------------------------------------------------------------------------
 ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     QwtPlot(parent),
@@ -119,7 +118,10 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_geometricShapeOpacity(0),
     m_geometricShapeOpacitySelected(0),
 	m_mouseCatchTolerancePx(8),
-    m_markerModel(new MarkerModel(false, this))
+    m_markerModel(new MarkerModel(false, this)),
+    m_pMenuZoom(NULL),
+    m_pActZoomRedo(NULL),
+    m_pActZoomUndo(NULL)
 {
     if (qobject_cast<QMainWindow*>(parent))
     {
@@ -141,6 +143,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pZoomer->setEnabled(false);
     m_pZoomer->setTrackerMode(QwtPicker::AlwaysOn);
     m_pZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton); //right click should open the context menu, not a zoom out to level 0 (Ctrl+0) if zoomer is enabled.
+    connect(m_pZoomer, SIGNAL(zoomed(const QRectF)), this, SLOT(updateZoomOptionState()));
     //all others settings for zoomer are set in init (since they need access to the settings via api)
 
     //panner tool
@@ -236,6 +239,16 @@ void ItomQwtPlot::createBaseActions()
     a->setShortcut(Qt::CTRL + Qt::Key_0);
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActHome()));
 
+    m_pMenuZoom = new QMenu(tr("Zoom"), p);
+    m_pActHome->setMenu(m_pMenuZoom);
+    m_pActZoomUndo = m_pMenuZoom->addAction(tr("Undo zoom"));
+    m_pActZoomUndo->setShortcut(QKeySequence(QKeySequence::Undo));
+    connect(m_pActZoomUndo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomUndo()));
+    m_pActZoomRedo = m_pMenuZoom->addAction(tr("Redo zoom"));
+    m_pActZoomRedo->setShortcut(QKeySequence(QKeySequence::Redo));
+    connect(m_pActZoomRedo, SIGNAL(triggered(bool)), this, SLOT(mnuActZoomRedo()));
+
+
     //m_actSave
     m_pActSave = a = new QAction(tr("Save..."), p);
     a->setShortcut(QKeySequence::Save);
@@ -277,6 +290,7 @@ void ItomQwtPlot::createBaseActions()
     a->setChecked(false);
     a->setToolTip(tr("Zoom to rectangle"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActZoom(bool)));
+    
 
     //m_pActClearDrawings
     m_pActClearShapes = a = new QAction(tr("Clear Geometric Shapes"), p);
@@ -549,6 +563,8 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general/icons/move.png"));
         m_pActClearShapes->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
+        m_pActZoomRedo->setIcon(QIcon(":/itomDesignerPlugins/general/icons/redoZoom.png"));
+        m_pActZoomUndo->setIcon(QIcon(":/itomDesignerPlugins/general/icons/undoZoom.png"));
         
         if (m_pActProperties)
         {
@@ -694,9 +710,18 @@ void ItomQwtPlot::mnuActZoom(bool checked)
         setState(stateIdle);
     }
 }
-
 //----------------------------------------------------------------------------------------------------------------------------------
-void ItomQwtPlot::setShapeModificationModes(const ItomQwtPlotEnums::ModificationModes &modes)
+void ItomQwtPlot::mnuActZoomUndo()
+{
+    zoomUndo();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::mnuActZoomRedo()
+{
+    zoomRedo();
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+    void ItomQwtPlot::setShapeModificationModes(const ItomQwtPlotEnums::ModificationModes &modes)
 {
     m_shapeModificationModes = modes;
 
@@ -3668,6 +3693,15 @@ ito::RetVal ItomQwtPlot::changeVisibleMarkers(int currentPlane)
 {
     m_markerModel->changeCurrentPlane(currentPlane);
     return ito::retOk;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+void ItomQwtPlot::updateZoomOptionState()
+{
+    const unsigned int currentZoomIndex = zoomer()->zoomRectIndex();
+    const int zoomStackSize = zoomer()->zoomStack().size();
+    currentZoomIndex < zoomStackSize - 1 ? m_pActZoomRedo->setEnabled(true)
+                                         : m_pActZoomRedo->setEnabled(false);
+    currentZoomIndex > 0 ? m_pActZoomUndo->setEnabled(true) : m_pActZoomUndo->setEnabled(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
