@@ -70,14 +70,14 @@ target_link_libraries(${target_name} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VI
 # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
 set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
-if(QT5_FOUND)
-    #parse all *.ui files by Qt's uic process and get the parsed source files
-    qt5_wrap_ui(DESIGNER_UIC ${DESIGNER_UI})
-    #add the output files to the target
-    target_sources(${target_name} PRIVATE ${DESIGNER_UIC})
-else()
-    message(SEND_ERROR "Currently only Qt5 is supported")
-endif()
+#if(QT5_FOUND)
+#    #parse all *.ui files by Qt's uic process and get the parsed source files
+#    qt5_wrap_ui(DESIGNER_UIC ${DESIGNER_UI})
+#    #add the output files to the target
+#    target_sources(${target_name} PRIVATE ${DESIGNER_UIC})
+#else()
+#    message(SEND_ERROR "Currently only Qt5 is supported")
+#endif()
 
 # translations
 set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})

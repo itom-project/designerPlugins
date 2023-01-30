@@ -33,6 +33,7 @@
 #include <qmessagebox.h>
 #include <qsharedpointer.h>
 #include <qfiledialog.h>
+#include <qregularexpression.h>
 
 using namespace ito;
 
@@ -294,7 +295,7 @@ void EvaluateGeometricsFigure::mnuExport(QAction* action)
                 
     if (m_pContent && !fileName.isEmpty())
     {
-        QFileInfo exportFile = fileName; 
+        QFileInfo exportFile(fileName);
         m_lastFolder = exportFile.path();
 
         switch(saveType)
@@ -343,7 +344,7 @@ ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, int exportFla
                 
     if (m_pContent && !fileName.isEmpty())
     {
-        QFileInfo exportFile = fileName; 
+        QFileInfo exportFile(fileName); 
         m_lastFolder = exportFile.path();
 
         switch(exportFlag & 0x0F)
@@ -1002,10 +1003,12 @@ int EvaluateGeometricsFigure::getCurrentItem(void)
     if (idx.isValid())
     {
         QString txt = m_pContent->topLevelItem(idx.row())->text(0);
-        QRegExp re("([0-9]+)");
-        if (re.indexIn(txt, 0) != -1)
+        QRegularExpression re("([0-9]+)");
+        auto match = re.match(txt);
+
+        if (match.hasMatch())
         {
-            return re.cap().toInt();
+            return match.captured().toInt();
         }
     }
     return -1;

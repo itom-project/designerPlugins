@@ -1030,7 +1030,8 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
     QXmlStreamWriter stream(&saveFile);
     QString attrname;
 
-    stream.setCodec("UTF-8");       // Set text codec
+    // utf-8 is always the default codec for XML
+    //stream.setCodec("UTF-8");       // Set text codec
     stream.setAutoFormatting(true);
 
     stream.writeStartDocument();

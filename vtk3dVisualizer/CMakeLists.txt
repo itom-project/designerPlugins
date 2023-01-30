@@ -34,8 +34,31 @@ if(ITOM_SDK_PCL_SUPPORT)
 
     #set(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
     #set(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked
+    
+    # vtk 8.0 is required to support QOpenGLWidget, vtk 6.0 is required to support the deprecated QVTKWidget
+    find_package(VTK)
+    if(EXISTS ${VTK_DIR})
+    
+        find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
+        
+        if(${VTK_MAJOR_VERSION} LESS 8)
+            message(STATUS "For VTK <= 8.1, the legacy VTK Qt widget is used.")
+            add_definitions(-DLEGACY_VTK)
+        elseif(${VTK_MAJOR_VERSION} EQUAL 8 AND ${VTK_MINOR_VERSION} LESS_EQUAL 2)
+            message(STATUS "For VTK <= 8.1, the legacy VTK Qt widget is used.")
+            add_definitions(-DLEGACY_VTK)
+        elseif(${VTK_MAJOR_VERSION} GREATER_EQUAL 9)
+            # VTK9 does not support the legacy interface
+            if (VTK3DVISUALIZER_FORCE_LEGACY_VTK)
+                message(WARNING "For VTK9 or higher, the legacy VTK Qt widget is not supported.")
+            endif()
+        elseif(VTK3DVISUALIZER_FORCE_LEGACY_VTK)
+            add_definitions(-DLEGACY_VTK)
+        elseif(QT5_FOUND AND (Qt5_VERSION VERSION_LESS 5.10.0))
+            message(WARNING "For Qt < 5.10 it is recommended to enable VTK3DVISUALIZER_FORCE_LEGACY_VTK")
+        endif()
+    endif()
 
-    include(Setup_PCL_Plugins)
     if(WIN32)
         find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization PATHS ${PCL_CMAKE_DIR} NO_DEFAULT_PATH)
     else(WIN32)
@@ -143,6 +166,15 @@ if(ITOM_SDK_PCL_SUPPORT)
         list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
         endif()
 
+        #if(QT5_FOUND)
+            #parse all *.ui files by Qt's uic process and get the parsed source files
+        #    qt5_wrap_ui(DESIGNER_UIC ${DESIGNER_UI})
+            #add the output files to the target
+        #    target_sources(${target_name} PRIVATE ${DESIGNER_UIC})
+        #else()
+        #    message(SEND_ERROR "Currently only Qt5 is supported")
+        #endif()
+
     set(PCLVTK_LIBS "")
 
     if("${VTK_MAJOR_VERSION}" EQUAL 5)
@@ -159,15 +191,6 @@ if(ITOM_SDK_PCL_SUPPORT)
     
     # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
     set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
-
-    if(QT5_FOUND)
-        #parse all *.ui files by Qt's uic process and get the parsed source files
-        qt5_wrap_ui(DESIGNER_UIC ${DESIGNER_UI})
-        #add the output files to the target
-        target_sources(${target_name} PRIVATE ${DESIGNER_UIC})
-    else()
-        message(SEND_ERROR "Currently only Qt5 is supported")
-    endif()
 
     # translations
     set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})

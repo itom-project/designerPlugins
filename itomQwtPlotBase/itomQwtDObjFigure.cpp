@@ -454,7 +454,7 @@ bool ItomQwtDObjFigure::getEnabledPlotting(void) const
 {
     if (m_pBaseContent)
         return m_pBaseContent->plottingEnabled();
-    return QSharedPointer<ito::DataObject>();
+    return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

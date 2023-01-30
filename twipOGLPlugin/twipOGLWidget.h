@@ -791,6 +791,8 @@ class TwipOGLWidget : public QGLWidget
 
 #if linux
         void setColorMap(QString colormap = QString());
+#elif __APPLE__
+        void setColorMap(QString colormap = QString());
 #else
         void setColorMap(QString colormap = QString::QString(""));
 #endif
