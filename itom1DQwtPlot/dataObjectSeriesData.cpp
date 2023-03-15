@@ -1664,6 +1664,13 @@ template<typename _Tp> void findMinMaxNonWeightedInteger(const ito::DataObject *
         }
         break;
     }
+
+    if (max < min)
+    {
+        // no points found.
+        min = -1.0;
+        max = 1.0;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1733,6 +1740,13 @@ template<typename _Tp> void findMinMaxNonWeightedFloat(const ito::DataObject *ob
             if (val < min) { min = val; minIdx = i; }           
         }
         break;
+    }
+
+    if (max < min)
+    {
+        // no points found.
+        min = -1.0;
+        max = 1.0;
     }
 }
 
@@ -1855,6 +1869,13 @@ template<typename _Tp, typename _Tp2> void findMinMaxNonWeightedComplex(const it
             if (val < min) { min = val; minIdx = i; }            
         }
         break;
+    }
+
+    if (max < min)
+    {
+        // no points found.
+        min = -1.0;
+        max = 1.0;
     }
 }
 
@@ -2410,11 +2431,13 @@ QRectF DataObjectSeriesData::boundingRect() const
         {
             float minX = m_d.startPhys;
             float width = m_d.stepSizePhys * (m_d.nrPoints - 1);
-           /* if (width < 0)
+           
+            if (std::abs(width) < std::numeric_limits<float>::epsilon())
             {
-                minX += width;
-                width *= -1;
-            }*/
+                minX -= 0.001f;
+                width = 0.002f;
+            }
+
             res = QRectF(minX, min, width, max - min);
         }
         else

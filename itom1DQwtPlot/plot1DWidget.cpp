@@ -3049,22 +3049,13 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
     {
         QRectF zoom(m_pData->m_axisMin, m_pData->m_valueMin, (m_pData->m_axisMax - m_pData->m_axisMin), (m_pData->m_valueMax - m_pData->m_valueMin));
         zoom = zoom.normalized();
+
         if (zoomer()->isActive())
         {
             if (initialIdx == 0)
             {
                 zoomer()->zoom(0);
             }
-
-           /* if (zoom == zoomer()->zoomRect())
-            {
-                zoomer()->zoom(zoom);
-                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
-            }
-            else
-            {
-                zoomer()->zoom(zoom);
-            }*/
         }
         else
         {
@@ -3074,47 +3065,57 @@ void Plot1DWidget::updateScaleValues(bool doReplot /*= true*/, bool doZoomBase /
             updateGeometry(); //if the interval changes, the tick positions... change as well. Therefore, the sizeHint() might change, too, possibly allowing a smaller plot window
 
             QStack<QRectF> stack = zoomer()->zoomStack();
+
             if ((initialIdx >= 0) && (initialIdx < stack.size()))
             {
                 if (initialIdx == 0 && stack.size() == 1) // we have to set the zoom base correct
                 {
                     QRectF boundingRect;
+
                     foreach (QwtPlotCurve* curve, m_plotCurveItems)
                     {
                         boundingRect = boundingRect.united(
                             ((DataObjectSeriesData*)curve->data())->boundingRect());
                     }
-                    stack[initialIdx] = boundingRect;
+
+                    stack[0] = boundingRect;
                     zoomer()->setZoomStack(stack, initialIdx);
                 }
+
                 if (stack[0] != zoom) // we have a new zoom
+                {
                     zoomer()->zoom(zoom);
+                }
             }
-            //zoomer()->setZoomStack(stack, initialIdx);
 
             zoomer()->rescale(false);
-            /*zoomer()->setZoomBase(base); //set the new base
-            int idx = zoomer()->zoomRectIndex();
-            int i = 0;
-            if (zoom == zoomer()->zoomRect())
-            {
-                zoomer()->zoom(zoom);
-                zoomer()->rescale(false); //zoom of zoomer does not call rescale in this case, therefore we do it here
-            }
-            else
-            {
-                zoomer()->appendZoomStack(zoom);
-            }*/
         }
     }
-    if (clearStack)//set zoom to base and clear history
-    {
-        
-        QStack<QRectF> stack;
-        stack.push((zoomer()->zoomBase()));
-        zoomer()->setZoomStack(stack);
 
+    if (clearStack) //set zoom to base and clear history
+    {
+        QStack<QRectF> stack;
+
+        if (doZoomBase)
+        {
+            QRectF boundingRect;
+
+            foreach(QwtPlotCurve * curve, m_plotCurveItems)
+            {
+                boundingRect = boundingRect.united(
+                    ((DataObjectSeriesData*)curve->data())->boundingRect());
+            }
+
+            stack.push(boundingRect);
+        }
+        else
+        {
+            stack.push((zoomer()->zoomBase()));
+        }
+
+        zoomer()->setZoomStack(stack);
     }
+
     if (doReplot)
     {
         replot();
