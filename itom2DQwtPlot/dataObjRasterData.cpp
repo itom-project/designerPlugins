@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -105,7 +105,7 @@ void DataObjRasterData::calcHash(const ito::DataObject *dObj, QByteArray &dataHa
         ba2.append( m_pInternalData->m_cmplxType );
         ba2.append( m_pInternalData->m_yaxisFlipped );
         ba2.append( (char)m_D.m_planeIdx );
-        
+
 
 
         if( dims > 0 )
@@ -149,9 +149,9 @@ returns 0 if nothing changed, 1 if only the appearance changed and 3 if data and
 ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, int planeIdx /*= -1*/)
 {
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
-    // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is 
+    // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is
     // responsible that no dataObject is deleted when it is still in use by any object of this entire plot plugin.
-    
+
     ito::uint8 newHash = PlotCanvas::changeNo;
     bool dataObjPlaneWasShallow = (&m_dataObj != m_dataObjPlane);
 
@@ -273,7 +273,7 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                 if (max == -std::numeric_limits<ito::float64>::max()) max = 10.0;
 
                 //the data object only contains the same value, then make the min-max range a little bit bigger in order to ensure a nice colorbar
-                if ((max - min) < std::numeric_limits<double>::epsilon()) 
+                if ((max - min) < std::numeric_limits<double>::epsilon())
                 {
                     switch (m_pInternalData->m_dataType)
                     {
@@ -334,7 +334,7 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
                     setInterval(Qt::ZAxis, QwtInterval(m_pInternalData->m_valueMin, m_pInternalData->m_valueMax));
                 }
             }
-        
+
     }
     else
     {
@@ -370,8 +370,8 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
         setInterval(Qt::YAxis, QwtInterval() );
         setInterval(Qt::ZAxis, QwtInterval() );
     }
-    
-    
+
+
     return newHash;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -381,8 +381,8 @@ bool DataObjRasterData::pointValid(const QPointF &point) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DataObjRasterData::RasterDataType DataObjRasterData::getTypeFlag() const 
-{ 
+DataObjRasterData::RasterDataType DataObjRasterData::getTypeFlag() const
+{
     int type = m_dataObj.getType();
     if(type == ito::tRGBA32)
     {
@@ -395,12 +395,12 @@ DataObjRasterData::RasterDataType DataObjRasterData::getTypeFlag() const
                 return tInteger;
         }
     }
-    else if (type == ito::tFloat32 || type == ito::tFloat64 || type == ito::tComplex64 || type == ito::tComplex128) 
+    else if (type == ito::tFloat32 || type == ito::tFloat64 || type == ito::tComplex64 || type == ito::tComplex128)
     {
         return tFloatOrComplex;
     }
 
-    return tInteger; 
+    return tInteger;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -639,7 +639,7 @@ double DataObjRasterData::value2(int m, int n) const
                 const ito::complex128 *line = (const ito::complex128*)m_rasteredLinePtr[m];
                 if(!line) return quietNaN;
                 ito::complex128 i = line[ m_xIndizes[n] ];
-                
+
                 if (m_pInternalData->m_cmplxType == ItomQwtPlotEnums::CmplxReal)
                 {
                     return line[ m_xIndizes[n] ].real();
@@ -845,7 +845,7 @@ double DataObjRasterData::value2_yinv(int m, int n) const
         default:
             return quietNaN;
         }
-        
+
     }
     else
     {
@@ -929,7 +929,7 @@ QRgb DataObjRasterData::value2_yinv_rgb(int m, int n) const
                 const ito::Rgba32 *line = (const ito::Rgba32*)m_rasteredLinePtr[m];
 
                 if(!line) return transparentColor;
-                
+
                 switch (m_pInternalData->m_dataChannel)
                 {
                 case ItomQwtPlotEnums::ChannelAuto:
@@ -1000,7 +1000,7 @@ void DataObjRasterData::getPlaneScaleAndOffset(double &scaleY, double &scaleX, d
 //----------------------------------------------------------------------------------------------------------------------------------
 void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
 {
-    //timer1.restart();    
+    //timer1.restart();
     //qDebug() << "framerate: " << (1000.0) / ((float)timer2.elapsed());
     //timer2.restart();
     if(m_rasteredLinePtr)
@@ -1070,7 +1070,7 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
                         m_xIndizes[i] = -1;
                     }
                 }
-                
+
             /*
             todo: delete if pointer aproach fails
                 else if (m_D.m_dir == dirY)
@@ -1082,7 +1082,7 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
                     int nrOfCols = raster.width();
                     m_rasteredLinePtr = new uchar*[m_rasteredLines];
                     int i;
-                    
+
                     int lineOffset = (m_dataObj.elemSize()*startX);
                     for (i=0; i < m_rasteredLines; i++)
                     {
@@ -1246,9 +1246,9 @@ QSharedPointer<ito::DataObject> DataObjRasterData::rasterToObject(const QwtInter
         {
             m_dataObjPlane->at(curRange).copyTo(dataObjectOut);
         }
-        
+
     }
-            
+
     DELETE_AND_SET_NULL_ARRAY(curRange)
     return QSharedPointer<ito::DataObject>(new ito::DataObject(dataObjectOut));
 }

@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -61,7 +61,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_PROPERTY(bool enablePointPick READ enablePointPick WRITE setEnablePointPick DESIGNABLE true USER true);
     Q_PROPERTY(double pointPickSphereRadius READ pointPickSphereRadius WRITE setPointPickSphereRadius DESIGNABLE true USER true);
     Q_PROPERTY(QColor pointPickSphereColor READ pointPickSphereColor WRITE setpointPickSphereColor DESIGNABLE true USER true);
-    
+
     Q_PROPERTY(bool cubeAxesVisible READ getCubeAxesVisible WRITE setCubeAxesVisible USER true)
     Q_PROPERTY(QColor cubeAxesColor READ getCubeAxesColor WRITE setCubeAxesColor USER true)
     Q_PROPERTY(QColor cubeGridlinesColor READ getCubeGridlinesColor WRITE setCubeGridlinesColor USER true)
@@ -69,7 +69,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_PROPERTY(TickLocation cubeAxesTickLocation READ getCubeAxesTickLocation WRITE setCubeAxesTickLocation USER true)
     Q_PROPERTY(bool enableDistanceLOD READ getEnableDistanceLOD WRITE setEnableDistanceLOD USER true)
     Q_PROPERTY(bool enableViewAngleLOD READ getEnableViewAngleLOD WRITE setEnableViewAngleLOD USER true)
-    
+
     Q_PROPERTY(QString xAxisLabel READ getxAxisLabel WRITE setxAxisLabel USER true)
     Q_PROPERTY(QString yAxisLabel READ getyAxisLabel WRITE setyAxisLabel USER true)
     Q_PROPERTY(QString zAxisLabel READ getzAxisLabel WRITE setzAxisLabel USER true)
@@ -107,7 +107,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_CLASSINFO("cameraView", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
     Q_PROPERTY(QVector3D cameraFocalPoint READ getCameraFocalPoint WRITE setCameraFocalPoint DESIGNABLE true USER true)
     Q_CLASSINFO("cameraFocalPoint", "minimumX=-2147483647;maximumX=2147483647;minimumY=-2147483647;maximumY=2147483647;minimumZ=-2147483647;maximumZ=2147483647;");
-        
+
 
     Q_CLASSINFO("prop://propertiesSorted", "sort the properties of one item in an alphabetical order or not")
     Q_CLASSINFO("prop://enablePointPick", "if True, a click to any point on the canvas and pressing the shift key emits the signal 'pointPicked' with the currently clicked 3d coordinate and the index of the closest point of the cloud / mesh that has been given by 'setPickPointCloud' or 'setPickPointMesh'.")
@@ -180,7 +180,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_CLASSINFO("slot://setPickPointMesh", "set mesh for pick point event. The cloud of the mesh is used only (arguments: mesh)")
 
     Q_CLASSINFO("signal://pointPicked", "This signal is emitted if the property ``enablePointPick`` is true and the user pressed somewhere on the canvas together with the Shift key.")
-    
+
     DESIGNER_PLUGIN_ITOM_API
 
 public:
@@ -197,7 +197,7 @@ public:
     Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = 0);
     virtual ~Vtk3dVisualizer();
 
-    ito::RetVal applyUpdate(); 
+    ito::RetVal applyUpdate();
 
     bool enablePointPick() const;
     void setEnablePointPick(bool enabled);
@@ -209,7 +209,7 @@ public:
     void setpointPickSphereColor(QColor color);
 
     bool getContextMenuEnabled() const { return false; };
-    void setContextMenuEnabled(bool show) {}; 
+    void setContextMenuEnabled(bool show) {};
 
     virtual ito::AutoInterval getXAxisInterval(void) const;
     virtual void setXAxisInterval(ito::AutoInterval interval);
@@ -315,7 +315,7 @@ public:
 
     bool getParallelProjection() const;
     void setParallelProjection(const bool& on);
-    
+
     QString getTitle() const;
     void setTitle(const QString& title);
 

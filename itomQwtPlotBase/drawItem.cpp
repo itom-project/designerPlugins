@@ -49,7 +49,7 @@ class DrawItemPrivate
         bool m_selected;
 
         QVector<QwtPlotMarker*> m_marker;
-        char m_type;    
+        char m_type;
 
         bool m_autoColor; //!< if true, the given shape brings it own valid color, which is used as line color. Else, the line color depends on the invalid color of the current color palette
         bool m_labelVisible;
@@ -77,12 +77,12 @@ class DrawItemPrivate
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/, bool labelVisible /*= false*/) : 
-    QwtPlotShapeItem(shape.name()), 
+DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes &modificationModes, QwtPlot *parent, ito::RetVal *retVal /*=NULL*/, bool labelVisible /*= false*/) :
+    QwtPlotShapeItem(shape.name()),
     d(NULL)
 {
     d = new DrawItemPrivate();
-    
+
     d->m_pparent = parent;
     d->m_autoColor = true;
     d->m_selected = false;
@@ -137,7 +137,7 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
         d->m_shape.setIndex(idxCtr);
         idxVec.append(idxCtr);
     }
-    else 
+    else
     {
         idxVec.append(shape.index());
     }
@@ -160,13 +160,13 @@ DrawItem::~DrawItem()
     idxVec.remove(idxVec.indexOf(d->m_shape.index()));
 
     delete d;
-    d = NULL; 
+    d = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 int DrawItem::getSelectedMarker() const
-{ 
-    return d->m_currentMarker; 
+{
+    return d->m_currentMarker;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
         break;
 
         case ito::Shape::Point:
-        case ito::Shape::MultiPointPick:    
+        case ito::Shape::MultiPointPick:
             {
                 // the color of point markers must be the line color,
                 // since this is the color that can be defined by shape.color (if desired).
@@ -437,7 +437,7 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
                     d->m_rotationMarkerIndex = d->m_marker.size() - 1;
                     d->m_marker[d->m_rotationMarkerIndex]->setXValue(pt.x());
                     d->m_marker[d->m_rotationMarkerIndex]->setYValue(pt.y());
-                    
+
                 }
             }
             else
@@ -453,10 +453,10 @@ void DrawItem::setSelected(const bool selected, int nMarker /*= -1*/)
         }
         break;
 
-        default:        
+        default:
         break;
     }
-    
+
     //line width of painter path also depends on selected state
     setPen(d->m_lineColor, d->m_selected ? d->m_elementPen.width() + 2 : d->m_elementPen.width(), d->m_elementPen.style());
 
@@ -538,7 +538,7 @@ QPointF DrawItem::getMarkerPosScale(int index) const
     {
         return QPointF(d->m_marker[index]->xValue(), d->m_marker[index]->yValue());
     }
-    
+
     //marker not available (e.g. no resize mode allowed, there we need to calculate the positions by hand...)
 
     switch (d->m_shape.type())
@@ -558,7 +558,7 @@ QPointF DrawItem::getMarkerPosScale(int index) const
             {
                 return QPointF();
             }
-        
+
         case ito::Shape::Circle:
         case ito::Shape::Ellipse: {
             QRectF box(d->m_shape.rbasePoints()[0], d->m_shape.rbasePoints()[1]);
@@ -742,7 +742,7 @@ bool DrawItem::shapeResizeOrRotate(int hitTypeAndMarkerIndex, const QPointF &mar
                 {
                     basePoints[markerIndex] = newPoint;
                     success = true;
-                }            
+                }
             }
             break;
 
@@ -778,31 +778,31 @@ bool DrawItem::shapeResizeOrRotate(int hitTypeAndMarkerIndex, const QPointF &mar
                     case 0: //top, left
                         baseRect.setTopLeft(newPoint);
                     break;
-            
+
                     case 1: //top, center
                         baseRect.setTop(newPoint.y());
                     break;
-            
+
                     case 2: //top, right
                         baseRect.setTopRight(newPoint);
                     break;
-            
+
                     case 3: //right, center
                         baseRect.setRight(newPoint.x());
                     break;
-            
+
                     case 4: //bottom, right
                         baseRect.setBottomRight(newPoint);
                     break;
-            
+
                     case 5: //bottom, center
                         baseRect.setBottom(newPoint.y());
                     break;
-            
+
                     case 6: //bottom, left
                         baseRect.setBottomLeft(newPoint);
                     break;
-            
+
                     case 7: //left, center
                         baseRect.setLeft(newPoint.x());
                     break;
@@ -880,7 +880,7 @@ bool DrawItem::shapeResizeOrRotate(int hitTypeAndMarkerIndex, const QPointF &mar
                     QwtPlot *canvas = plot();
                     if (canvas)
                     {
-                            
+
                         diffScreen = QPointF(canvas->transform(QwtPlot::xBottom, markerScaleCoordinate.x()), canvas->transform(QwtPlot::yLeft, markerScaleCoordinate.y())) - \
                             QPointF(canvas->transform(QwtPlot::xBottom, centerScale.x()), canvas->transform(QwtPlot::yLeft, centerScale.y()));
                     }
@@ -888,11 +888,11 @@ bool DrawItem::shapeResizeOrRotate(int hitTypeAndMarkerIndex, const QPointF &mar
                     {
                         diffScreen = markerScaleCoordinate - centerScale;
                     }
-                        
+
 					float angle = - (+atan2(diffScreen.y(), diffScreen.x()) - (M_PI / 2)) - d->m_shape.rotationAngleRad();
 
                     //qDebug() << d->m_shape.rotationAngleRad() << (+atan2(diffScreen.y(), diffScreen.x()) + (M_PI / 2)) << angle;
-                        
+
 
                     if (modifiers & Qt::ShiftModifier)
                     {
@@ -997,7 +997,7 @@ void DrawItem::setColor(const QColor &markerColor, const QColor &lineColor, cons
             QColor fillColor = d->m_lineColor;
             fillColor.setAlpha(alpha);
             d->m_fillBrushSelected.setColor(fillColor);
-        }   
+        }
 
         if (d->m_shape.type() != ito::Shape::Point && \
             d->m_shape.type() != ito::Shape::MultiPointPick)
@@ -1088,7 +1088,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
                 tmpPath.addRect(rect);
 
                 path.addPath(shape.transform().map(tmpPath));
-            }        
+            }
         break;
 
         case ito::Shape::Ellipse:
@@ -1102,7 +1102,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape)
             }
             else
             {
-                QRectF rect(shape.basePoints()[0], shape.basePoints()[1]);                
+                QRectF rect(shape.basePoints()[0], shape.basePoints()[1]);
                 QPainterPath tmpPath;
                 tmpPath.addEllipse(rect);
 
@@ -1163,7 +1163,7 @@ ito::RetVal DrawItem::setShape(const ito::Shape &shape, const QColor &firstColor
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void DrawItem::draw( QPainter *painter, 
+void DrawItem::draw( QPainter *painter,
             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
             const QRectF &canvasRect ) const
 {
@@ -1185,7 +1185,7 @@ void DrawItem::draw( QPainter *painter,
     if(d->m_labelVisible)
     {
 		QString name = d->m_shape.name();
-		
+
 		if (name.isEmpty())
 		{
 			name = QString("(%1)").arg(d->m_shape.index());
@@ -1245,7 +1245,7 @@ bool DrawItem::hitLine(const QPointF &point_transformed, const QLineF &line, dou
     line.intersects(normal, &intersection);
 #else
     line.intersect(normal, &intersection);
-#endif   
+#endif
 
     if (std::abs(QLineF(point_transformed, intersection).dx()) <= tol_x && std::abs(QLineF(point_transformed, intersection).dy()) <= tol_y)
     {
@@ -1334,7 +1334,7 @@ int DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
             // rotation marker must be checked separately
             if (rotatable && d->m_selected && d->m_marker.size() > 0)
             {
-                if (std::abs(d->m_marker[d->m_marker.size() - 1]->xValue() - point.x()) < tol_x 
+                if (std::abs(d->m_marker[d->m_marker.size() - 1]->xValue() - point.x()) < tol_x
                     && std::abs(d->m_marker[d->m_marker.size() - 1]->yValue() - point.y()) < tol_y)
                 {
                     result = hitRotation - (d->m_marker.size() - 1); //rotation marker clicked
@@ -1400,7 +1400,7 @@ int DrawItem::hitEdge(const QPointF &point, double tol_x, double tol_y) const
 
 			//if selected, some markers are out of the circle, therefore their area must be checked separately
 			if (result == hitNone && resizeable && d->m_selected)
-			{ 
+			{
 				for (int i = 0; i < d->m_marker.size() - 1; ++i)
 				{
 					if (std::abs(d->m_marker[i]->xValue() - point.x()) < tol_x && std::abs(d->m_marker[i]->yValue() - point.y()) < tol_y)

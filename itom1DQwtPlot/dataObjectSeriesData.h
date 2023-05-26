@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -111,7 +111,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         inline ItomQwtPlotEnums::ComplexType getCmplxState() const { return m_cmplxState; }
 
         virtual int getPosToPix(const double physx, const double physy = -1, const int indexHint = -1) const;
-        
+
         QString getDObjValueLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle) const;
         QString getDObjAxisLabel(const AbstractFigure::UnitLabelStyle &unitLabelStyle)  const;
         void getDObjValueDescriptionAndUnit(std::string &description, std::string &unit) const;
@@ -120,7 +120,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         void setIntervalRange(Qt::Axis axis, bool autoCalcLimits, double minValue, double maxValue);
 
         inline QByteArray getHash() const { return m_hash; }
-        
+
         void calcHash();
 
         void setColorState(int newVal) {m_colorState = (ColorType)newVal;}
@@ -142,14 +142,14 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
         QString m_dObjAxisUnit;
 
     private:
-        
+
         LineData m_d;
         const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
         ColorType m_colorState;
         bool inSamplingMode;
         int m_fast;
         QByteArray m_hash;
-        
+
         QString m_dObjValueDescription;
         QString m_dObjValueUnit;
 

@@ -115,7 +115,7 @@ class PlotCanvas : public ItomQwtPlot
         void setContourLineWidth(const float &width);
 
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
-        
+
 		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
 		ItomQwtPlotEnums::ComplexType getComplexStyle() const;
@@ -143,7 +143,7 @@ class PlotCanvas : public ItomQwtPlot
         inline QString colorOverlayMapName() const { return m_colorOverlayMapName; }
 
         void refreshStyles(bool overwriteDesignableProperties);
-        
+
         void setOverlayObject(ito::DataObject* newOverlay);
         void alphaChanged();
 
@@ -185,7 +185,7 @@ class PlotCanvas : public ItomQwtPlot
         QString m_colorContourMapName;
         QString m_colorOverlayMapName;
         QString m_colorMapName;
-        
+
 
         int m_curColorMapIndex;
         int m_curOverlayColorMapIndex;
@@ -201,7 +201,7 @@ class PlotCanvas : public ItomQwtPlot
 
         DataObjRasterData *m_rasterData;
         DataObjRasterData *m_rasterOverlayData;
-        
+
         Direction m_dir;
         bool m_lineCutValidStart; //true if the first point of the line cut is a valid point inside of the data object
         bool m_volumeCutValidStart; ////true if the first point of the volume cut is a valid point inside of the data object

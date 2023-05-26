@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -60,7 +60,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(QFont legendFont READ getLegendFont WRITE setLegendFont USER true)
     Q_PROPERTY(double axisLabelRotation READ getAxisLabelRotation WRITE setAxisLabelRotation USER true)
     Q_PROPERTY(Qt::Alignment axisLabelAlignment READ getAxisLabelAlignment WRITE setAxisLabelAlignment USER true)
-    
+
     Q_PROPERTY(LegendPos legendPosition READ getLegendPosition WRITE setLegendPosition USER true);
     Q_PROPERTY(QStringList legendTitles READ getLegendTitles WRITE setLegendTitles USER true);
 
@@ -76,15 +76,15 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true);
 
     Q_PROPERTY(GridStyle grid READ getGrid WRITE setGrid USER true)
-    
+
     Q_PROPERTY(ItomQwtPlotEnums::MultiLineMode columnInterpretation READ getRowPresentation WRITE setRowPresentation RESET resetRowPresentation DESIGNABLE true USER true)
-    
+
     Q_PROPERTY(ItomQwtPlotEnums::PlotPickerType pickerType READ getPickerType WRITE setPickerType USER true);
     Q_PROPERTY(int pickerLimit READ getPickerLimit WRITE setPickerLimit RESET resetPickerLimit DESIGNABLE true USER true)
     Q_PROPERTY(int pickerCount READ getPickerCount DESIGNABLE false USER true)
     Q_PROPERTY(int currentPickerIndex READ getCurrentPickerIndex WRITE setCurrentPickerIndex DESIGNABLE false USER true)
     Q_PROPERTY(QSharedPointer< ito::DataObject > picker READ getPicker DESIGNABLE false)
-    
+
     Q_PROPERTY(bool pickerLabelVisible READ getPickerLabelVisible WRITE setPickerLabelVisible USER true);
     Q_PROPERTY(Qt::Orientation pickerLabelOrientation READ getPickerLabelOrientation WRITE setPickerLabelOrientation USER true);
     Q_PROPERTY(Qt::Alignment pickerLabelAlignment READ getPickerLabelAlignment WRITE setPickerLabelAlignment USER true);
@@ -96,7 +96,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     Q_PROPERTY(bool antiAliased READ getAntiAliased WRITE setAntiAliased DESIGNABLE true USER true);
 	Q_PROPERTY(int legendLabelWidth READ getLegendLabelWidth WRITE setLegendLabelWidth USER true);
-    
+
     Q_CLASSINFO("prop://title", "Title of the plot or '<auto>' if the title of the data object should be used.")
     Q_CLASSINFO("prop://axisLabel", "Label of the direction (x/y) axis or '<auto>' if the descriptions from the data object should be used.")
     Q_CLASSINFO("prop://valueLabel", "Label of the value axis (y-axis) or '<auto>' if the description should be used from data object.")
@@ -209,7 +209,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     "-------------\n"
     "value : {variant}\n"
     "    value of the requested property")
-    
+
     Q_CLASSINFO("slot://getDisplayed", "returns the currently displayed dataObject.")
 
     Q_CLASSINFO("signal://pickerChanged", "This signal is emitted whenever the current picker changed its position\n"
@@ -245,7 +245,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         Q_ENUM(GridStyle);
 
         ito::RetVal applyUpdate();                              //!< propagates updated data through the subtree
-        
+
         //properties
         QVector<QPointF> getBounds(void) const;
         void setBounds(QVector<QPointF> bounds);
@@ -318,18 +318,18 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         ito::RetVal setSource(QSharedPointer<ito::DataObject> source);
 
         void setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style);
-    
+
         ItomQwtPlotEnums::MultiLineMode getRowPresentation(void) const;
         void setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx);
-        void resetRowPresentation(); 
+        void resetRowPresentation();
 
         int getRGBPresentation() const;
         void setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx);
-        void resetRGBPresentation(); 
+        void resetRGBPresentation();
 
         int getPickerLimit() const;
         void setPickerLimit(const int idx);
-        void resetPickerLimit(); 
+        void resetPickerLimit();
 
         int getPickerCount() const;
         QSharedPointer< ito::DataObject > getPicker() const;
@@ -386,14 +386,14 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         QSharedPointer<ito::DataObject> getXData() const;
 
 
-		
+
         friend Plot1DWidget;
 
     protected:
         ito::RetVal init(); // { return m_pContent->init(); }; //called when api-pointers are transmitted, directly after construction
 
     private:
-        
+
         void constructor();
 
         Plot1DWidget *m_pContent;
@@ -421,7 +421,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 		void updatePropertiesDock();
 
     signals:
-        void pickerChanged(int pickerIndex, double positionX, double positionY, int curveIndex);        
+        void pickerChanged(int pickerIndex, double positionX, double positionY, int curveIndex);
 };
 //----------------------------------------------------------------------------------------------------------------------------------
 

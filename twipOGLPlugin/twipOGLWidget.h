@@ -1,12 +1,12 @@
 /* ********************************************************************
 #    twipOGLFigure-Plugin for itom
 #    URL: http://www.twip-os.com
-#    Copyright (C) 2014, twip optical solutions GmbH, 
-#    Stuttgart, Germany 
+#    Copyright (C) 2014, twip optical solutions GmbH,
+#    Stuttgart, Germany
 #
-#    This files is part of the designer-Plugin twipOGLFigure for the 
+#    This files is part of the designer-Plugin twipOGLFigure for the
 #    measurement software itom. All files of this plugin, where not stated
-#    as port of the itom sdk, fall under the GNU Library General 
+#    as port of the itom sdk, fall under the GNU Library General
 #    Public Licence and must behandled accordingly.
 #
 #    twipOGLFigure is free software; you can redistribute it and/or modify it
@@ -21,9 +21,9 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under 
-#    GNU General Public License as published by the Free Software 
-#    Foundation. See <https://bitbucket.org/itom/> 
+#    itom is free software by ITO, University Stuttgart published under
+#    GNU General Public License as published by the Free Software
+#    Foundation. See <https://bitbucket.org/itom/>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
@@ -77,10 +77,10 @@
 */
 struct InternalData
 {
-    InternalData() 
+    InternalData()
     {
         m_drawTitle = false;
-        
+
         m_keepVoxel = true;
         m_drawLightDir = false;
         m_forceCubicVoxel = true;
@@ -95,7 +95,7 @@ struct InternalData
         m_enableOverlay = false;
         m_alpha = 0.0f;
         m_autoTitle = true;
-        
+
 //        m_overlayInterval = QPointF(0.0f, 255.0f);
         m_overlayInterval = ito::AutoInterval(0, 255.0, true);
 //        m_curvatureInterval = QPointF(0.0f, 0.0f);#
@@ -143,17 +143,17 @@ struct InternalData
     bool m_stackState;
     bool m_enableOverlay;           //!> flag for enabling / disabling intensity overlay
     char m_colorBarMode;            //!> flag indicating if and where colorbar is displayed
-    
+
     bool m_forceCubicVoxel;         //!> flag to set isometric voxel displaying
     bool m_drawTitle;               //!> flag inidcating if title is shown
     bool m_drawLightDir;            //!> flag inidicating if light direction arrow is shown
     bool m_keepVoxel;
     float m_alpha;                  //!> aplha value for intensity overlay
-    ito::AutoInterval m_overlayInterval;      
+    ito::AutoInterval m_overlayInterval;
     ito::AutoInterval m_curvatureInterval;
     QString m_title;                //!> plot title string
-    bool m_autoTitle;               //!> flag setting automatic / manual title generation 
-    
+    bool m_autoTitle;               //!> flag setting automatic / manual title generation
+
     ito::int32 m_backgnd;           //!> plot background color
     ito::int32 m_axisColor;         //!> color of axis
     ito::int32 m_textColor;         //!> text color
@@ -186,14 +186,14 @@ struct InternalData
     template<> inline bool hasPointToNormal<pcl::PointXYZINormal>(void){return true;}
     template<> inline bool hasPointToNormal<pcl::PointXYZRGBNormal>(void){return true;}
 
-    template<typename _Tp> inline void pointToIntensity(_Tp &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 &norm) 
+    template<typename _Tp> inline void pointToIntensity(_Tp &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 &norm)
     {
         r = 1.0;
         g = 1.0;
         b = 1.0;
     }
 
-    template<> inline void pointToIntensity<pcl::PointXYZI>(pcl::PointXYZI &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 &norm) 
+    template<> inline void pointToIntensity<pcl::PointXYZI>(pcl::PointXYZI &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 &norm)
     {
         r = point.intensity /* * norm*/;
         g = point.intensity /* * norm*/;
@@ -201,7 +201,7 @@ struct InternalData
         return;
     }
 
-    template<> inline void pointToIntensity<pcl::PointXYZRGBA>(pcl::PointXYZRGBA &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 & /*norm*/) 
+    template<> inline void pointToIntensity<pcl::PointXYZRGBA>(pcl::PointXYZRGBA &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 & /*norm*/)
     {
         r = point.r / 255.0;
         g = point.g / 255.0;
@@ -209,7 +209,7 @@ struct InternalData
         return;
     }
 
-    template<> inline void pointToIntensity<pcl::PointXYZINormal>(pcl::PointXYZINormal &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 &norm) 
+    template<> inline void pointToIntensity<pcl::PointXYZINormal>(pcl::PointXYZINormal &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 &norm)
     {
         r = point.intensity * norm;
         g = point.intensity * norm;
@@ -217,7 +217,7 @@ struct InternalData
         return;
     }
 
-    template<> inline void pointToIntensity<pcl::PointXYZRGBNormal>(pcl::PointXYZRGBNormal &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 & /*norm*/) 
+    template<> inline void pointToIntensity<pcl::PointXYZRGBNormal>(pcl::PointXYZRGBNormal &point, GLfloat &r, GLfloat &g, GLfloat &b, const ito::float32 & /*norm*/)
     {
         r = point.r / 255.0;
         g = point.g / 255.0;
@@ -310,11 +310,11 @@ struct ObjectInfo
 
     bool show;
     double meanVal;         //!> mean value of data values
-    double divVal;          
+    double divVal;
     std::string xLength;    //!> object x size in pixel
     std::string yLength;    //!> object y size in pixel
     std::string matrix;
-    std::string PeakText;   
+    std::string PeakText;
     std::string MeanText;
     std::string DevText;
 };
@@ -326,7 +326,7 @@ struct VBO {
     VBO() : m_vbufId(0), m_ebufId(0), m_VAO(0) {}
     ~VBO() {}
 
-    GLuint m_vbufId;        
+    GLuint m_vbufId;
     GLuint m_ebufId;
 #if QT_VERSION < 0x050000
     GLuint m_VAO;
@@ -391,13 +391,13 @@ class TwipOGLWidget : public QGLWidget
         }
 
         inline void setStackStatus(const int value)
-        { 
-            m_pConfigData->m_stackState = value  % 4; m_forceReplot = true; 
+        {
+            m_pConfigData->m_stackState = value  % 4; m_forceReplot = true;
         }
 
         inline void setCmplxMode(const int cmplxMode)
-        { 
-            m_pConfigData->m_cmplxMode = cmplxMode % 4; m_forceReplot = true; 
+        {
+            m_pConfigData->m_cmplxMode = cmplxMode % 4; m_forceReplot = true;
         }
 
         void updateVisMode();
@@ -457,7 +457,7 @@ class TwipOGLWidget : public QGLWidget
         {
             NO_INIT = 0x00,
             IS_INIT = 0x01,                 //!> opengl has been initialized
-            HAS_TRIANG = 0x02,              //!> triangle plotting mode 
+            HAS_TRIANG = 0x02,              //!> triangle plotting mode
             IS_RENDERING = 0x10,            //!> currently an opengl paint is executed
             IS_CALCTRIANG = 0x20,           //!> updating triangles
             CACHE_STARTUP = 0x40            //!> opengl is being initialized, data has been pushed and is being processed
@@ -517,17 +517,17 @@ class TwipOGLWidget : public QGLWidget
 
         double m_transX, m_transY, m_transZ;
         double m_scaleX, m_scaleY, m_scaleZ;
-        
+
         QVector<ito::uint32> m_currentPalette;
-        
+
         std::string m_errorDisplMsg;
         QHash<int, int> m_numVert;
         QHash<QString, SFont> m_fonts;
         QHash<int, int *> m_pUseTextPix;
-               
+
         QHash<int, ito::float64> m_pclMinX, m_pclMinY, m_pclMinZ, m_pclMinDev;
         QHash<int, ito::float64> m_pclMaxX, m_pclMaxY, m_pclMaxZ, m_pclMaxDev;
-        
+
         QHash<int, ito::uint8> m_transperency;
         QHash<int, bool> m_enabledHash;
 

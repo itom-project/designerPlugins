@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -231,7 +231,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     m_d.startPhys= dataObj->getPixToPhys(dims-2, pxY1, _unused); //tmpBounds[0].y() ;
                     right = dataObj->getPixToPhys(dims-2, pxY2, _unused); //tmpBounds[1].y();
                     m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
-                        
+
                     m_d.startPx.setX(pxX1);
                     m_d.startPx.setY(pxY1);
                     m_d.stepSizePx.setWidth(0);
@@ -246,7 +246,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     {
                         m_d.matStepSize = -(int)mat->step[0]; //step in y-direction (in bytes)
                     }
-                    
+
 
                     description = dataObj->getAxisDescription(dims-2,_unused);
                     unit = dataObj->getAxisUnit(dims-2,_unused);
@@ -264,7 +264,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_dObjAxisDescription = fromStdLatin1String(description);
                         m_dObjAxisUnit = fromStdLatin1String(unit);
                     }
-                   
+
                     description = dataObj->getValueDescription();
                     unit = dataObj->getValueUnit();
                     if (unit == "")
@@ -292,7 +292,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     m_d.startPhys= dataObj->getPixToPhys(dims-1, pxX1, _unused); //tmpBounds[0].y() ;
                     right = dataObj->getPixToPhys(dims-1, pxX2, _unused); //tmpBounds[1].y();
                     m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
-                        
+
                     m_d.startPx.setX(pxX1);
                     m_d.startPx.setY(pxY1);
                     m_d.stepSizePx.setWidth(1);
@@ -315,7 +315,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                             m_d.matStepSize = -4;
                         }
                     }
-                        
+
                     /*}
                     else
                     {
@@ -349,7 +349,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_dObjAxisDescription = fromStdLatin1String(description);
                         m_dObjAxisUnit = fromStdLatin1String(unit);
                     }
-                   
+
                     description = dataObj->getValueDescription();
                     unit = dataObj->getValueUnit();
                     if (unit == "")
@@ -366,7 +366,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                 else
                 {
                     m_d.dir = dirXY;
-                
+
                     if (m_fast)
                     {
                         // simple line points calculation using Bresenham
@@ -398,7 +398,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         m_d.stepSizePx.setHeight(incy);
 
                         m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                        m_d.matStepSize= 0 ; 
+                        m_d.matStepSize= 0 ;
 
                         int pdx, pdy, ddx, ddy, es, el;
                         if (dx>dy)
@@ -484,12 +484,12 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                         //else if (ydirect)
                         //{
                         //    m_startPos = tmpBounds[0].y();
-                        //    m_physLength = yscale* dy ;      
+                        //    m_physLength = yscale* dy ;
                         //}
                         //else
                         //{
                         //    m_startPos = tmpBounds[0].x();
-                        //    m_physLength = xscale* dx ;             
+                        //    m_physLength = xscale* dx ;
                         //}
 
                         //m_Scaling = m_physLength / length;
@@ -573,7 +573,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                             m_dObjAxisUnit = QString("%1/%2").arg( fromStdLatin1String(unit), fromStdLatin1String(unit2) );
                         }
                     }
-                   
+
                     description = dataObj->getValueDescription();
                     unit = dataObj->getValueUnit();
                     if (unit == "")
@@ -643,7 +643,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
                     m_dObjAxisDescription = fromStdLatin1String(description);
                     m_dObjAxisUnit = fromStdLatin1String(unit);
                 }
-                   
+
                 description = dataObj->getValueDescription();
                 unit = dataObj->getValueUnit();
                 if (unit == "")
@@ -662,7 +662,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
         default:
             retval += RetVal(retError, 0, "bounds vector must have 1 or 2 entries");
             break;
-        }    
+        }
     }
     m_pDataObj = dataObj;
 
@@ -692,7 +692,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
     //{
     //    m_zDirect = true;
     //}
-    //else 
+    //else
     //{
     //    m_zDirect = false;
     //}
@@ -725,7 +725,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
     //    {
     //        m_plotPts[n].rangeX[0] = pts[0].x();
     //        m_plotPts[n].rangeY[0] = pts[0].y();
-    //        m_plotPts[n].weights[0] = 1;        
+    //        m_plotPts[n].weights[0] = 1;
     //    }
     //}
     //else //not z-direct
@@ -740,7 +740,7 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
     //    else
     //    {
     //        pts[1].setX(static_cast<float>(dataObj->getPhysToPix(dataObjectDims-1,bounds[1].x(),testValid)));
-    //        pts[1].setY(static_cast<float>(dataObj->getPhysToPix(dataObjectDims-2,bounds[1].y(),testValid)));  
+    //        pts[1].setY(static_cast<float>(dataObj->getPhysToPix(dataObjectDims-2,bounds[1].y(),testValid)));
     //    }
 
     //    double xscale = dataObj->getAxisScale(dataObjectDims - 1);
@@ -827,12 +827,12 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
         //    else if (ydirect)
         //    {
         //        m_startPos = bounds[0].y();
-        //        m_physLength = yscale* dy ;      
+        //        m_physLength = yscale* dy ;
         //    }
         //    else
         //    {
         //        m_startPos = bounds[0].x();
-        //        m_physLength = xscale* dx ;             
+        //        m_physLength = xscale* dx ;
         //    }
 
         //    m_Scaling = m_physLength / length;
@@ -1030,7 +1030,7 @@ QPointF DataObjectSeriesData::sample(size_t n) const
                             return QPointF(fPos, (reinterpret_cast<const ito::Rgba32*>(ptr[0]))->alpha() );
                         break;
                     }
-                    
+
                 break;
             }
         }
@@ -1613,7 +1613,7 @@ void DataObjectSeriesData::setIntervalRange(Qt::Axis axis, bool autoCalcLimits, 
 
 //----------------------------------------------------------------------------------------------------------------------------------
 /*
-This helper method returns the min/max values for an fixed-point typed dataObject and the line, which is represented 
+This helper method returns the min/max values for an fixed-point typed dataObject and the line, which is represented
 by this dataObjectSeriesData.
 */
 template<typename _Tp> void findMinMaxNonWeightedInteger(const ito::DataObject *obj, const DataObjectSeriesData::LineData &d, double &min, double &max, int &minIdx, int &maxIdx)
@@ -1660,7 +1660,7 @@ template<typename _Tp> void findMinMaxNonWeightedInteger(const ito::DataObject *
             val = *(reinterpret_cast<_Tp*>(ptr));
 
             if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; }           
+            if (val < min) { min = val; minIdx = i; }
         }
         break;
     }
@@ -1737,7 +1737,7 @@ template<typename _Tp> void findMinMaxNonWeightedFloat(const ito::DataObject *ob
             }
 
             if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; }           
+            if (val < min) { min = val; minIdx = i; }
         }
         break;
     }
@@ -1801,7 +1801,7 @@ template<typename _Tp, typename _Tp2> void findMinMaxNonWeightedComplex(const it
             }
 
             if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; } 
+            if (val < min) { min = val; minIdx = i; }
         }
         break;
 
@@ -1866,7 +1866,7 @@ template<typename _Tp, typename _Tp2> void findMinMaxNonWeightedComplex(const it
             }
 
             if (val > max) { max = val; maxIdx = i; }
-            if (val < min) { min = val; minIdx = i; }            
+            if (val < min) { min = val; minIdx = i; }
         }
         break;
     }
@@ -1888,7 +1888,7 @@ template<typename _Tp> bool findMinMaxNonWeightedIntegerCropped(const ito::DataO
     min = std::numeric_limits<float64>::max();
     max = -min;
     _Tp val;
-    
+
     int startIdx = qBound(0, qRound((xInterval.minValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
     int endIdx = qBound(0, qRound((xInterval.maxValue() - d.startPhys) / d.stepSizePhys), d.nrPoints - 1);
 
@@ -2431,7 +2431,7 @@ QRectF DataObjectSeriesData::boundingRect() const
         {
             float minX = m_d.startPhys;
             float width = m_d.stepSizePhys * (m_d.nrPoints - 1);
-           
+
             if (std::abs(width) < std::numeric_limits<float>::epsilon())
             {
                 minX -= 0.001f;
@@ -2446,7 +2446,7 @@ QRectF DataObjectSeriesData::boundingRect() const
             //not implemented yet
         }
     }
-    
+
     return res;
 }
 
@@ -2509,7 +2509,7 @@ RetVal DataObjectSeriesData::getMinMaxLoc(double &min, double &max, int &minSamp
     {
         retval += RetVal(retError, 0, "no dataObject");
     }
-    
+
     return retval;
 }
 

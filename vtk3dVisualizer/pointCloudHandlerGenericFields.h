@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////////////
 /** \brief Generic field handler class for colors. Uses an user given field to extract
     * 1D data and display the color at each point using a min-max lookup table.
-    * \author Radu B. Rusu 
+    * \author Radu B. Rusu
     * \ingroup visualization
     */
 template <typename PointT>
@@ -54,8 +54,8 @@ public:
 
     /** \brief Constructor. */
     PointCloudColorHandlerGenericFields (const PointCloudConstPtr &cloud,
-                                        const std::string &field_name1, 
-                                        const std::string &field_name2, 
+                                        const std::string &field_name1,
+                                        const std::string &field_name2,
                                         const std::string &field_name3)
         : pcl::visualization::PointCloudColorHandler<PointT> (cloud)
     {
@@ -78,8 +78,8 @@ public:
     virtual ~PointCloudColorHandlerGenericFields () {}
 
     /** \brief Get the name of the field used. */
-    virtual std::string getFieldName () const 
-    { 
+    virtual std::string getFieldName () const
+    {
         if (field_names_.empty())
         {
             return "";
@@ -99,7 +99,7 @@ public:
 
     /** \brief Obtain the actual color for the input dataset as vtk scalars.
         * \param[out] scalars the output scalars containing the color for the dataset
-        * \return true if the operation was successful (the handler is capable and 
+        * \return true if the operation was successful (the handler is capable and
         * the input cloud was given as a valid pointer), false otherwise
         */
 #if PCL_VERSION_COMPARE(>=,1,12,0)

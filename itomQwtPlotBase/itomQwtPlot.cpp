@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -167,7 +167,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
     m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
 
-    
+
 
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
@@ -253,7 +253,7 @@ void ItomQwtPlot::createBaseActions()
     a->setObjectName("actSave");
     a->setToolTip(tr("Export current view..."));
     connect(a, SIGNAL(triggered()), this, SLOT(mnuActSave()));
-    
+
     //m_pActPrint
     m_pActPrint = a = new QAction(tr("Print..."), p);
     a->setShortcut(QKeySequence::Print);
@@ -288,7 +288,7 @@ void ItomQwtPlot::createBaseActions()
     a->setChecked(false);
     a->setToolTip(tr("Zoom to rectangle"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActZoom(bool)));
-    
+
 
     //m_pActClearDrawings
     m_pActClearShapes = a = new QAction(tr("Clear Geometric Shapes"), p);
@@ -450,7 +450,7 @@ void ItomQwtPlot::updateColors(void)
 {
     QwtPlotCanvas* c = dynamic_cast<QwtPlotCanvas*>(canvas());
 
-    //at first, it was possible to let the windows be styled by os-dependent tools. However, the QFrame::Box 
+    //at first, it was possible to let the windows be styled by os-dependent tools. However, the QFrame::Box
     //created undesired corner forms when printing the canvas. Therefore, stylesheets are always used.
 
     /*if (testAttribute(Qt::WA_StyledBackground))
@@ -562,7 +562,7 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect/icons/AspRatio11.png"));
         m_pActZoomRedo->setIcon(QIcon(":/itomDesignerPlugins/general/icons/redoZoom.png"));
         m_pActZoomUndo->setIcon(QIcon(":/itomDesignerPlugins/general/icons/undoZoom.png"));
-        
+
         if (m_pActProperties)
         {
             m_pActProperties->setIcon(QIcon(":/itomDesignerPlugins/general/icons/settings.png"));
@@ -572,7 +572,7 @@ void ItomQwtPlot::setButtonStyle(int style)
         {
             m_pActCamParameters->setIcon(QIcon(":/itomDesignerPlugins/general/icons/camParams.png"));
         }
-        
+
         m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general/icons/zoom_to_rect.png"));
         m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython.png"));
 
@@ -671,10 +671,10 @@ void ItomQwtPlot::configRescaler(void)
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::setKeepAspectRatio(bool keep)
-{ 
-    m_keepAspectRatio = keep; 
+{
+    m_keepAspectRatio = keep;
     m_pActAspectRatio->setChecked(keep);
-    configRescaler(); 
+    configRescaler();
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(this->parent());
     if (p)
     {
@@ -736,7 +736,7 @@ void ItomQwtPlot::setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &
     m_allowedShapeTypes = allowedTypes;
     ito::Shape::ShapeType potentialCurrentShape = ito::Shape::Invalid;
 
-    bool ok; // only modify actions of m_pMenuShapeType, that have an 
+    bool ok; // only modify actions of m_pMenuShapeType, that have an
              // integer data(). Do not touch the separator or dock widget toggle action
 
     foreach(QAction *a, m_pMenuShapeType->actions())
@@ -827,7 +827,7 @@ void ItomQwtPlot::mnuShapeType(bool checked)
 {
     if (checked && m_allowedShapeTypes.testFlag((ItomQwtPlotEnums::ShapeType)m_currentShapeType))
     {
-        setState(stateDrawShape); 
+        setState(stateDrawShape);
     }
     else if (state() == stateDrawShape)
     {
@@ -971,7 +971,7 @@ void ItomQwtPlot::setState(int state)
                 }
             }
 
-            bool ok; // only modify actions of m_pMenuShapeType, that have an 
+            bool ok; // only modify actions of m_pMenuShapeType, that have an
                      // integer data(). Do not touch the separator or dock widget toggle action
             foreach(QAction *act, m_pMenuShapeType->actions())
             {
@@ -1036,14 +1036,14 @@ void ItomQwtPlot::keyPressEvent(QKeyEvent * event)
             }
         }
 
-        if (indices_to_delete.size() == 1 && 
+        if (indices_to_delete.size() == 1 &&
             m_pShapes[indices_to_delete[0]]->getShape().type() == ito::Shape::Polygon)
         {
             const ito::Shape &shape = m_pShapes[indices_to_delete[0]]->getShape();
 			QPolygonF newBasePoints = shape.basePoints();
 			int marker_index = m_pShapes[indices_to_delete[0]]->getSelectedMarker();
 
-			if (marker_index >= 0 && 
+			if (marker_index >= 0 &&
                 marker_index < newBasePoints.size() &&
                 newBasePoints.size() > 1)
 			{
@@ -1097,7 +1097,7 @@ void ItomQwtPlot::keyPressEvent(QKeyEvent * event)
     {
         QwtPlot::keyPressEvent(event);
     }
-    
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1135,7 +1135,7 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
         {
             it = m_pShapes.begin();
         }
-        
+
         for (; it != m_pShapes.end(); ++it)
         {
             if (it.value() == NULL)
@@ -1258,13 +1258,13 @@ void ItomQwtPlot::mousePressEvent(QMouseEvent * event)
 void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
 {
     // mouse tracking should be only used when drawing polygon, so make a short cut here,
-    // avoiding to run too much of code 
+    // avoiding to run too much of code
     if (event->buttons() == Qt::NoButton)
     {
         if (m_state == stateDrawShape)
         {
-            if (m_pShapes.size() > 0 && 
-                m_currentShapeIndices.size() > 0 && 
+            if (m_pShapes.size() > 0 &&
+                m_currentShapeIndices.size() > 0 &&
                 m_pShapes[m_currentShapeIndices.last()]->getShape().type() == ito::Shape::Polygon)
             {
                 const ito::Shape &thisShape = m_pShapes[m_currentShapeIndices.last()]->getShape();
@@ -1278,11 +1278,11 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                     invTransform(QwtPlot::xBottom, 0)); //tolerance in pixel for snapping to a geometric shape in x-direction
 
                 double tol_y = std::abs(
-                    invTransform(QwtPlot::yLeft, m_mouseCatchTolerancePx) - 
+                    invTransform(QwtPlot::yLeft, m_mouseCatchTolerancePx) -
                     invTransform(QwtPlot::yLeft, 0)); //tolerance in pixel for snapping to a geometric shape in y-direction
 
                 QLineF line(poly[0], scalePos);
-                
+
                 if ((std::abs(line.dx()) <= tol_x) && (std::abs(line.dy()) <= tol_y))
                 {
                     if (!QApplication::overrideCursor())
@@ -1294,7 +1294,7 @@ void ItomQwtPlot::mouseMoveEvent(QMouseEvent * event)
                 {
                     QApplication::restoreOverrideCursor();
                 }
-            }            
+            }
         }
         return;
     }
@@ -1630,13 +1630,13 @@ void ItomQwtPlot::pointPickingFinished()
             m_pMultiPointPicker->setEnabled(true);
         }
 
-        if (m_numShapesToPick > 1) 
-        { 
-            emit statusBarMessage(tr("Please draw %1 points. Esc aborts the selection.").arg(m_numShapesToPick)); 
+        if (m_numShapesToPick > 1)
+        {
+            emit statusBarMessage(tr("Please draw %1 points. Esc aborts the selection.").arg(m_numShapesToPick));
         }
-        else 
-        { 
-            emit statusBarMessage(tr("Please draw one point. Esc aborts the selection.")); 
+        else
+        {
+            emit statusBarMessage(tr("Please draw one point. Esc aborts the selection."));
         }
     }
     else
@@ -1743,9 +1743,9 @@ void ItomQwtPlot::squarePickingFinished()
         m_numShapesToPick--;
         m_pMultiPointPicker->setEnabled(true);
 
-        if (m_numShapesToPick > 1) 
-        { 
-            emit statusBarMessage(tr("Please draw %1 squares. Esc aborts the selection.").arg(m_numShapesToPick)); 
+        if (m_numShapesToPick > 1)
+        {
+            emit statusBarMessage(tr("Please draw %1 squares. Esc aborts the selection.").arg(m_numShapesToPick));
         }
         else
         {
@@ -1799,9 +1799,9 @@ void ItomQwtPlot::rectanglePickingFinished()
         m_numShapesToPick--;
         m_pMultiPointPicker->setEnabled(true);
 
-        if (m_numShapesToPick > 1) 
-        { 
-            emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_numShapesToPick)); 
+        if (m_numShapesToPick > 1)
+        {
+            emit statusBarMessage(tr("Please draw %1 rectangles. Esc aborts the selection.").arg(m_numShapesToPick));
         }
         else
         {
@@ -1961,7 +1961,7 @@ void ItomQwtPlot::polygonSinglePointPickingFinished()
     {
         int lastModifiedShapeIdx = m_currentShapeIndices.size() > 0 ? m_currentShapeIndices.last() : -1;
 
-        if (m_pShapes.contains(lastModifiedShapeIdx) && 
+        if (m_pShapes.contains(lastModifiedShapeIdx) &&
             m_pShapes[lastModifiedShapeIdx]->getShape().unclosed())
         {
             const ito::Shape &thisShape = m_pShapes[lastModifiedShapeIdx]->getShape();
@@ -1969,15 +1969,15 @@ void ItomQwtPlot::polygonSinglePointPickingFinished()
 
             // tolerance in pixel for snapping to a geometric shape in x-direction
             double tol_x_scale = std::abs(
-                invTransform(QwtPlot::xBottom, m_mouseCatchTolerancePx) 
+                invTransform(QwtPlot::xBottom, m_mouseCatchTolerancePx)
                 - invTransform(QwtPlot::xBottom, 0));
 
             // tolerance in pixel for snapping to a geometric shape in y-direction
             double tol_y_scale = std::abs(
-                invTransform(QwtPlot::yLeft, m_mouseCatchTolerancePx) 
-                - invTransform(QwtPlot::yLeft, 0)); 
+                invTransform(QwtPlot::yLeft, m_mouseCatchTolerancePx)
+                - invTransform(QwtPlot::yLeft, 0));
 
-            if (abs(poly[0].x() - polygonScale.back().x()) < tol_x_scale && 
+            if (abs(poly[0].x() - polygonScale.back().x()) < tol_x_scale &&
                 abs(poly[0].y() - polygonScale.back().y()) < tol_y_scale)
             {
                 // close the current shape
@@ -2122,7 +2122,7 @@ void ItomQwtPlot::polygonSinglePointPickingFinished()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-// during an interactive shape session, this method collect all current shapes and returns its vector. 
+// during an interactive shape session, this method collect all current shapes and returns its vector.
 // additionally, the shape toolbox is updated and (if desired) the geometricShapeChanged signal
 // is emitted for the last added shape in the m_currentShapeIndices vector.
 QVector<ito::Shape> ItomQwtPlot::getAndUpdateAllCurrentShapes(bool emitUpdateForLastModifiedShape)
@@ -2421,7 +2421,7 @@ ito::RetVal ItomQwtPlot::startOrStopDrawGeometricShape(bool start)
         //if spinbox for multiple planes has the focus, a possible ESC is not correctly caught.
         //therefore set the focus to the canvas.
         canvas()->setFocus();
-    } 
+    }
     else //start = false
     {
         m_pMultiPointPicker->setEnabled(false);
@@ -2497,7 +2497,7 @@ void ItomQwtPlot::clearAllGeometricShapes()
     m_pShapes.clear();
 
     m_pActClearShapes->setEnabled(false);
-    
+
     if (thingsToDo)
     {
         replot();
@@ -2692,7 +2692,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
     else
     {
         int nrOfShapes = geometricShapes.size();
-            
+
         DrawItem *newItem = NULL;
         // The definition do not correspond to the definetion of primitiv elements
 
@@ -2761,13 +2761,13 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
-    
+
     if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
-    
-    if (p && updatedShapes.size() > 0) 
+
+    if (p && updatedShapes.size() > 0)
     {
         emit  p->geometricShapeFinished(updatedShapes, retVal.containsError());
     }
@@ -2799,7 +2799,7 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
         }
         else
         {
-            
+
             DrawItem *newItem = NULL;
             switch (geometricShape.type())
             {
@@ -2836,7 +2836,7 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
 
                 default:
                     retVal += ito::RetVal(ito::retError, 0, tr("Invalid or unsupported shape type").toLatin1().data());
-                break;                
+                break;
             }
 
             replot();
@@ -2844,13 +2844,13 @@ ito::RetVal ItomQwtPlot::addGeometricShape(const ito::Shape &geometricShape, int
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
-    
+
     if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
-    
-    if (p && updatedShapes.size() > 0) 
+
+    if (p && updatedShapes.size() > 0)
     {
         emit  p->geometricShapeFinished(updatedShapes, retVal.containsError());
     }
@@ -2875,7 +2875,7 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
         retVal += ito::RetVal(ito::retError, 0, tr("The type of the shape is not allowed for this plot.").toLatin1().data());
     }
     else
-    {            
+    {
         DrawItem *newItem = NULL;
         // The definition do not correspond to the definetion of primitiv elements
 
@@ -2938,13 +2938,13 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
     }
 
     m_pActClearShapes->setEnabled(m_plottingEnabled && countGeometricShapes() > 0);
-    
+
     if (retVal.hasErrorMessage())
     {
         emit statusBarMessage(retVal.errorMessage(), 12000);
     }
-    
-    if (p && updatedShapes.size() > 0) 
+
+    if (p && updatedShapes.size() > 0)
     {
         emit  p->geometricShapeFinished(updatedShapes, retVal.containsError());
     }
@@ -3022,7 +3022,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
                 QFile file(fileName);
                 if (!file.open(QIODevice::WriteOnly))
                 {
-                    return ito::RetVal::format(ito::retError, 0, tr("The file '%s' already exists but cannot be overwritten (Maybe it is opened in another application).").toLatin1().data(), 
+                    return ito::RetVal::format(ito::retError, 0, tr("The file '%s' already exists but cannot be overwritten (Maybe it is opened in another application).").toLatin1().data(),
                         fileName.toLatin1().data());
                 }
                 file.close();
@@ -3039,7 +3039,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
             }
             file.close();
             file.remove();
-            
+
         }
     }
 
@@ -3091,7 +3091,7 @@ ito::RetVal ItomQwtPlot::exportCanvas(const bool copyToClipboardNotFile, const Q
             emit statusBarMessage(tr("Copy current view to clipboard ..."));
         }
 
-        
+
         QImage img(newSizePx, QImage::Format_ARGB32);
         QPainter painter(&img);
         painter.scale(resFactor, resFactor);
@@ -3365,36 +3365,36 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     {
         emit statusBarMessage(tr("Could not send object to workspace, api is missing."), 4000);
     }
-    
-    if (p->getSource()->getType() == ito::tComplex128 || p->getSource()->getType() == ito::tComplex64) //checkBox if dataObject is complex to copy complex/not-displayed dataObject real and imaginary part. 
+
+    if (p->getSource()->getType() == ito::tComplex128 || p->getSource()->getType() == ito::tComplex64) //checkBox if dataObject is complex to copy complex/not-displayed dataObject real and imaginary part.
     {
         QDialog *dialog = new QDialog(this);
         dialog->setWindowTitle(dialogTitle);
 
         QVBoxLayout *layout = new QVBoxLayout(dialog);
-        
+
         QLabel *label = new QLabel(dialog);
         label->setText(userText);
         layout->addWidget(label);
-        
+
         QLineEdit *lineEdit = new QLineEdit(dialog);
         lineEdit->setText(varname);
         lineEdit->setFocus();
         connect(lineEdit, SIGNAL(returnPressed()), dialog, SLOT(accept()));
         layout->addWidget(lineEdit);
-        
+
         QCheckBox *checkBox = new QCheckBox("copy as complex dataType", dialog);
         checkBox->setCheckable(true);
-        checkBox->setCheckState(Qt::Checked); 
+        checkBox->setCheckState(Qt::Checked);
         layout->addWidget(checkBox);
-        
+
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
         layout->addWidget(buttonBox);
         buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
         buttonBox->button(QDialogButtonBox::Cancel)->setDefault(true);
         connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
         connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
-        
+
         dialog->setLayout(layout);
         dialog->setModal(true);
 
@@ -3423,8 +3423,8 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
             QLineEdit::Normal,
             varname,
             &ok);
-    }    
-    
+    }
+
     if (ok && varname != "")
     {
         QSharedPointer<ito::DataObject> obj = p->getDisplayed();
@@ -3585,8 +3585,8 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
         else
         {
             retval += ito::RetVal(
-                ito::retError, 
-                0, 
+                ito::retError,
+                0,
                 tr("The style tag does not correspond to the required format: "
                     "ColorStyleSize[;Linewidth] (Color = b,g,r,c,m,y,k,w; "
                     "Style = o,s,d,>,v,^,<,x,*,+,h)").toLatin1().data());

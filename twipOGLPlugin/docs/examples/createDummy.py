@@ -25,8 +25,8 @@ bump[np.where(bump < 0)] = 0
 
 x0 = int(intensity.shape[1] / 2)
 x1 = int(intensity.shape[1] / 2) +bump.shape[1]
-y0 = int(intensity.shape[0] / 2) 
-y1 = int(intensity.shape[0] / 2) + bump.shape[0] 
+y0 = int(intensity.shape[0] / 2)
+y1 = int(intensity.shape[0] / 2) + bump.shape[0]
 
 # add the bumb to the current sphere
 topo[y0 : y1, x0 : y1] = topo[y0 : y1, x0 : y1] + dataObject(bump[:,:])
@@ -52,4 +52,3 @@ del y
 del xx
 del yy
 del radius
-

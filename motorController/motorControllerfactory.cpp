@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 * \file motorControllerFactory.cpp
 * \brief In this file the functions of the factory for the MotorController-Widget are defined
 *
-*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
+*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorController.h

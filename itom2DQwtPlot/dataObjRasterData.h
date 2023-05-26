@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -67,26 +67,26 @@ class DataObjRasterData : public QwtRasterData
         ito::uint8 updateDataObject(const ito::DataObject *dataObj, int planeIdx = -1);
 
         bool pointValid(const QPointF &point) const;
-       
+
         ito::int32 getCurrentPlane() const {return (ito::int32)m_D.m_planeIdx;}
         QSharedPointer<ito::DataObject> rasterToObject(void);
         QSharedPointer<ito::DataObject> rasterToObject(const QwtInterval &xInterval, const QwtInterval &yInterval, const bool copyDisplayedAsComplex, const int cmplxState);
 
         bool isInit() const {return m_dataObj.getDims() > 0 && m_dataObjPlane != NULL;}
 
-        RasterDataType getTypeFlag() const; 
+        RasterDataType getTypeFlag() const;
 
         void getPlaneScaleAndOffset(double &scaleY, double &scaleX, double &offsetY, double &offsetX) const;
 
         void getMinMaxLoc(double &min, ito::uint32 *minLoc, double &max, ito::uint32 *maxLoc) const;
 
-        
+
 
     protected:
         //Definition: Scale-Coordinate of dataObject =  ( px-Coordinate - Offset)* Scale
         inline double pxToScaleCoords(double px, double offset, double scaling) { return ((double)px - offset) * scaling; }
         inline double scaleToPxCoords(double coord, double offset, double scaling) { return (coord / scaling) + offset; }
-        
+
 
     private:
         static double quietNaN;
@@ -101,7 +101,7 @@ class DataObjRasterData : public QwtRasterData
         ito::DataObject *m_dataObjPlane; //pointer to the source data object (<=2D) or a shallow copy to the depicted plane (>=3D)
 
         bool m_validData;
-        
+
         QCryptographicHash m_hashGenerator;
         QRectF m_lastRasteredArea;
         QSize m_lastRasteredRaster;

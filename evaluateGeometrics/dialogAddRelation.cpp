@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -86,7 +86,7 @@ DialogAddRelation::DialogAddRelation(const InternalInfo &data, EvaluateGeometric
         if (shapes[ni].index() == curItem)
             setItem = ni;
     }
-    
+
     ui.comboBoxFirst->setCurrentIndex(setItem);
     ui.comboBoxSecond->setCurrentIndex(setItem);
 
@@ -169,7 +169,7 @@ void DialogAddRelation::on_buttonBox_clicked(QAbstractButton* btn)
             dPtr[2] = idx2.toFloat();
         }
 
-        dPtr[0] = idx1.toFloat();    
+        dPtr[0] = idx1.toFloat();
         dPtr[1] = ui.comboBoxType->currentData().toFloat();
 
         if (m_evalGeoFig)

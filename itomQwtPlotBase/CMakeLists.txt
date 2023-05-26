@@ -95,7 +95,7 @@ set(DESIGNER_RCC
     #${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
 
-set(DESIGNER_SOURCES 
+set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogExportProperties.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.cpp

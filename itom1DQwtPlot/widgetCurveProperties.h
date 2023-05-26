@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 class Plot1DWidget; //forward declaration
 class QwtPlotCurve;
 
-class WidgetCurveProperties : public QWidget 
+class WidgetCurveProperties : public QWidget
 {
     Q_OBJECT
 public:
@@ -51,10 +51,10 @@ private:
 
 private slots:
 	void on_spinBoxSymbolSize_valueChanged(int val);
-	
+
 	void on_doubleSpinBoxLineWidth_valueChanged(double i);
 	void on_comboBoxLineStyle_currentIndexChanged(int val);
-	
+
 	void on_colorPickerButtonLineStyle_colorChanged(QColor color);
 	void on_comboBoxLineSymbol_currentIndexChanged(int val);
 	void on_checkBoxLegendVisible_stateChanged(int val);
@@ -64,7 +64,7 @@ private slots:
 	void on_lineEditName_editingFinished();
 
 public slots:
-	
+
 	void on_listWidget_itemSelectionChanged();
 	void visibilityChanged(bool visible);
 	void updateCurveList();

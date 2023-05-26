@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     setColumnCount(5);
 
     setEditTriggers(QAbstractItemView::NoEditTriggers);
-    
+
     m_rowHash.clear();
 
     setColumnCount(5);
@@ -60,7 +60,7 @@ PlotTreeWidget::PlotTreeWidget(QMenu *contextMenu, InternalInfo *data, QWidget *
     setColumnWidth(2, 72);
     setColumnWidth(3, 72);
     setColumnWidth(4, 72);
-    
+
     setIconSize(QSize(24, 24));
 
 
@@ -78,7 +78,7 @@ ito::RetVal PlotTreeWidget::init()
     QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Verdana", 12), NULL).value<QFont>();
     QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Verdana", 10), NULL).value<QFont>();
     QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Verdana", 10), NULL).value<QFont>();
-    
+
     return ito::retOk;
 }
 
@@ -97,7 +97,7 @@ void PlotTreeWidget::displayShape(const int row, const bool update, const ito::S
         {
             topLevelItem(row)->setText(0, tr("unknown type (%1)").arg(shape.index()));
         }
-        
+
         switch (shape.type())
         {
             default:
@@ -278,7 +278,7 @@ void PlotTreeWidget::displayShape(const int row, const bool update, const ito::S
             topLevelItem(row)->setText(2, QString(coordsString)
                                         .arg(QString::number(val[4], 'f', m_pData->m_numberOfDigits))
                                         .arg(QString::number(val[5], 'f', m_pData->m_numberOfDigits)));
-            
+
 
              topLevelItem(row)->setText(3, QString("%1 [%2]")
                                          .arg(QString::number(val[7], 'f', m_pData->m_numberOfDigits))
@@ -310,7 +310,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
         // first check if we have left over relations and remove them
         for (int rel = 0; rel < m_pData->m_relationsList.size(); rel++)
         {
-            if (!keys.contains(m_pData->m_relationsList[rel].firstElementIdx) 
+            if (!keys.contains(m_pData->m_relationsList[rel].firstElementIdx)
                 || (m_pData->m_relationsList[rel].secondElementIdx != -1) && !keys.contains(m_pData->m_relationsList[rel].secondElementIdx))
             {
                 m_pData->m_relationsList.remove(rel);
@@ -401,7 +401,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     m_pData->m_relationsList[rel].myWidget->setText(1, "");
                     m_pData->m_relationsList[rel].myWidget->setBackground(1, QColor(255, 255, 255));
                 break;
-                
+
                 case tAngle:
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/angle.png"));
                     if (m_pData->m_relationsList[rel].secondElementIdx < 0)
@@ -415,7 +415,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                             1, QColor(255, 255, 255));
                     }
                 break;
-                
+
                 case tDistance:
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/distance.png"));
                     if (m_pData->m_relationsList[rel].secondElementIdx < 0)
@@ -429,7 +429,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                             1, QColor(255, 255, 255));
                     }
                 break;
-                
+
                 case tIntersection:
                 {
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/intersec.png"));
@@ -453,13 +453,13 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                     m_pData->m_relationsList[rel].myWidget->setBackground(1, QColor(255, 255, 255));
                 }
                 break;
-                
+
                 case tArea:
                     m_pData->m_relationsList[rel].myWidget->setIcon(0, QIcon(":/evaluateGeometrics/icons/area.png"));
                     m_pData->m_relationsList[rel].myWidget->setText(1, "");
                     m_pData->m_relationsList[rel].myWidget->setBackground(1, QColor(255, 255, 255));
                 break;
-                
+
                 default:
                 break;
             }
@@ -486,7 +486,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                            .arg(m_pData->m_valueUnit);
 
-            m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
+            m_pData->m_relationsList[rel].myWidget->setText(2, resultString);
             continue;
         }
         else if (m_rowHash.contains(m_pData->m_relationsList[rel].firstElementIdx))
@@ -518,7 +518,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
             check = calculateArea(first, m_pData->m_relationsList[rel].extValue);
             resultString = QString("%1 %2%3").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                             .arg(m_pData->m_valueUnit)
-                                            .arg(QChar(0x00B2));      
+                                            .arg(QChar(0x00B2));
         }
         else
         {
@@ -533,7 +533,7 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                         resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
                                                       .arg(QChar(0x00B0));
                     break;
-                    
+
                     case tDistance:
                         check = calculateDistance(first, second, m_pData->m_relationsList[rel].extValue);
                         resultString = QString("%1 %2").arg(QString::number(m_pData->m_relationsList[rel].extValue, 'f', m_pData->m_numberOfDigits))
@@ -548,31 +548,31 @@ void PlotTreeWidget::updateRelationShips(const bool fastUpdate)
                         {
                             resultString = QString("%1, %2 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
                                                                      .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
-                                                                     .arg(m_pData->m_valueUnit);                       
+                                                                     .arg(m_pData->m_valueUnit);
                         }
                         else
                         {
                             resultString = QString("%1, %2, %3 [%4]").arg(QString::number(val[0], 'f', m_pData->m_numberOfDigits))
                                                                      .arg(QString::number(val[1], 'f', m_pData->m_numberOfDigits))
                                                                      .arg(QString::number(val[2], 'f', m_pData->m_numberOfDigits))
-                                                                     .arg(m_pData->m_valueUnit);                    
+                                                                     .arg(m_pData->m_valueUnit);
                         }
                         break;
                     }
                     */
 
                     default:
-                        m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
+                        m_pData->m_relationsList[rel].myWidget->setText(2, resultString);
                         continue;
                 }
             }
             else
             {
-                m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
+                m_pData->m_relationsList[rel].myWidget->setText(2, resultString);
                 continue;
             }
-        }        
-        m_pData->m_relationsList[rel].myWidget->setText(2, resultString); 
+        }
+        m_pData->m_relationsList[rel].myWidget->setText(2, resultString);
 
         if (check)
         {
@@ -623,7 +623,7 @@ bool PlotTreeWidget::calculateDistance(const ito::Shape &first, const ito::Shape
         case ito::Shape::Point:
             p1 = first.rtransform().map(first.rbasePoints()[0]);
         break;
-        
+
         case ito::Shape::Circle:
         case ito::Shape::Ellipse:
             p1 = first.rtransform().map(0.5 * (first.rbasePoints()[0] + first.rbasePoints()[1]));
@@ -635,7 +635,7 @@ bool PlotTreeWidget::calculateDistance(const ito::Shape &first, const ito::Shape
         case ito::Shape::Point:
             p2 = second.rtransform().map(second.rbasePoints()[0]);
         break;
-        
+
         case ito::Shape::Circle:
         case ito::Shape::Ellipse:
             p2 = second.rtransform().map(0.5 * (second.rbasePoints()[0] + second.rbasePoints()[1]));
@@ -772,7 +772,7 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
     // Vectors are the same we have to check if the positions vectors are on the same line
     if (ito::isNotZero(firstLineDirVector[0] - secondLineDirVector[0]) &&
         ito::isNotZero(firstLineDirVector[1] - secondLineDirVector[1]) &&
-        ito::isNotZero(firstLineDirVector[2] - secondLineDirVector[2])) 
+        ito::isNotZero(firstLineDirVector[2] - secondLineDirVector[2]))
     {
         secondLinePosVector -= firstLinePosVector;
         lambda = secondLinePosVector[0] / firstLinePosVector[0];
@@ -791,17 +791,17 @@ bool PlotTreeWidget::calculateIntersections(ito::float32 *first, ito::float32 *s
             return true;
         }
     }
-    else if (eval2D ||  
-            (!ito::isNotZero(firstLinePosVector[2]) && 
+    else if (eval2D ||
+            (!ito::isNotZero(firstLinePosVector[2]) &&
             !ito::isNotZero(secondLinePosVector[2]) &&
-            !ito::isNotZero(firstLineDirVector[2]) && 
+            !ito::isNotZero(firstLineDirVector[2]) &&
             !ito::isNotZero(secondLineDirVector[2]))) // is a two dimensional problem
     {
 
     }
     else // otherwise we have do do it the hard way
     {
-    
+
         return false;
     }
 
@@ -816,7 +816,7 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
     bool identical = false;
     int cols = 0;
     int dims = 0;
-   
+
     identical = true;
     QList<ito::int32> hashKeys = m_rowHash.keys();
 
@@ -891,7 +891,7 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
             }
         }
     }
-     
+
     if (clear)
     {
         QList<ito::int32> hashTags = m_rowHash.keys();
@@ -899,7 +899,7 @@ void PlotTreeWidget::setShapes(const QVector<ito::Shape> &shapes)
         {
             m_rowHash.remove(hashTags[i]);
         }
-        
+
         m_pData->m_relationsList.clear();
         this->clear();
     }
@@ -961,7 +961,7 @@ ito::RetVal PlotTreeWidget::writeToCSV(const QFileInfo &fileName, const bool asT
     {
         outBuffer.clear();
         QTreeWidgetItem *curItem = topLevelItem(geo);
-        
+
         outBuffer.append(curItem->text(0).toLatin1());
         for (int col = 1; col < this->columnCount(); col++)
         {
@@ -969,7 +969,7 @@ ito::RetVal PlotTreeWidget::writeToCSV(const QFileInfo &fileName, const bool asT
             outBuffer.append(", ");
             outBuffer.append(curItem->text(col).toLatin1());
         }
-        
+
         if (asTable)
         {
             outBuffer.append('\n');
@@ -1038,7 +1038,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
     stream.writeStartElement("itomGeometricShapes");
     {
         stream.writeAttribute("href", "http://www.ito.uni-stuttgart.de");
-        
+
         QHash<ito::int32, ito::Shape >::const_iterator curValue = m_rowHash.constBegin();
         for (int geo = 0; curValue !=  m_rowHash.end(); ++curValue, geo++)
         {
@@ -1072,7 +1072,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
             switch(shape.type())
             {
                 case ito::Shape::Point:
-                {                    
+                {
                     QPointF p = trafo.map(bp[0]);
                     stream.writeAttribute("x0", QString::number(p.x()));
                     stream.writeAttribute("y0", QString::number(p.y()));
@@ -1137,7 +1137,7 @@ ito::RetVal PlotTreeWidget::writeToXML(const QFileInfo &fileName)
                 {
                     stream.writeAttribute("Total", QString::number(bp.size()));
                 }
-                break; 
+                break;
             }
 
             for (int rel = 0; rel < relationIdxVec.size(); rel++)
@@ -1228,7 +1228,7 @@ void PlotTreeWidget::updateGeometricShapes()
         displayShape(c, true, it.value());
         c++;
         ++it;
-    }  
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1254,7 +1254,7 @@ void PlotTreeWidget::autoFitCols()
                 {
                     max = val;
                 }
-            }            
+            }
         }
     }
     setColumnWidth(0 ,max);
@@ -1280,7 +1280,7 @@ void PlotTreeWidget::autoFitCols()
                     {
                         max = val;
                     }
-                }            
+                }
             }
         }
         setColumnWidth(col, max);
@@ -1300,7 +1300,7 @@ ito::RetVal PlotTreeWidget::updateElement(const ito::int32 &idx, const ito::Shap
             displayShape(c, true, shape);
             break;
         }
-        
+
         c++;
         ++it;
     }

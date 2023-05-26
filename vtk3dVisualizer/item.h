@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ class Item : public QObject
 
 public:
     enum rttiItem { rttiRoot, rttiCanvas, rttiGeometry, rttiMesh, rttiPointCloud, rttiPointCloudNormal };
-    
+
     Item(const QString &name, rttiItem rtti, QTreeWidgetItem *treeItem);
     virtual ~Item();
 
@@ -73,7 +73,7 @@ protected:
     bool m_visible;
 
     QTreeWidgetItem* m_treeItem;
-    
+
 };
 
 typedef QSharedPointer<Item> SharedItemPtr;
@@ -96,7 +96,7 @@ typedef QSharedPointer<Item> SharedItemPtr;
 //    //bool selected() const { return m_selected; }
 //    //void setSelected(bool value);
 //
-//    Representation representation() const; 
+//    Representation representation() const;
 //
 //protected:
 //    boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;

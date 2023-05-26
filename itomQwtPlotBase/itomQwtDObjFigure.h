@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -83,17 +83,17 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(ItomQwtPlotEnums::ShapeTypes allowedGeometricShapes READ getAllowedGeometricShapes WRITE setAllowedGeometricShapes DESIGNABLE true USER true);
     Q_PROPERTY(int geometricShapesFillOpacity READ getGeometricShapesFillOpacity WRITE setGeometricShapesFillOpacity DESIGNABLE true USER true);
     Q_PROPERTY(int geometricShapesFillOpacitySelected READ getGeometricShapesFillOpacitySelected WRITE setGeometricShapesFillOpacitySelected DESIGNABLE true USER true);
-    
+
     Q_PROPERTY(bool geometricShapesLabelsVisible READ getShapesLabelsVisible WRITE setShapesLabelsVisible DESIGNABLE true USER true)
 
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
-    
+
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
 	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
 
     // DESIGNABLE true: property can be edited in QtDesigner and by Python/C++, USER false: property cannot be changed in property editor of plot.
     Q_PROPERTY(bool allowCameraParameterEditor READ allowCameraParameterEditor WRITE setAllowCameraParameterEditor DESIGNABLE true USER false);
-    
+
     Q_CLASSINFO("prop://enableBoxFrame", "If true, a 1px solid border is drawn as a boxed rectangle around the canvas, else no margin is visible on the upper and right side.")
     Q_CLASSINFO("prop://buttonSet", "Get/set the button set used (normal or light color for dark themes).")
     Q_CLASSINFO("prop://axisColor", "Get/set the color of the axis.")
@@ -115,7 +115,7 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
 	Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
-    
+
     Q_CLASSINFO("prop://allowCameraParameterEditor", "If a live camera is connected to this plot, a camera parameter editor can be displayed as toolbox of the plot. If this property is false, this toolbox is not available (default: true)")
 
     Q_CLASSINFO("slot://copyToClipBoard", "copies the entire plot to the clipboard as bitmap data (uses the default export resolution).")
@@ -132,7 +132,7 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     "    y-size of the canvas in mm. If 0.0 [default], the size of the canvas is determined by the current size of the figure\n"
     "resolution : {int}\n"
     "    resolution of image components in the plot in dpi (default: 300dpi)")
-    
+
     Q_CLASSINFO("slot://renderToPixMap", "returns a QPixmap with the content of the plot\n"
     "\n"
     "Parameters\n"
@@ -247,7 +247,7 @@ Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let 
         "------------\n"
         "id : {str}\n"
         "    Name of the set of markers, that should be hidden.")
-    
+
     Q_CLASSINFO("slot://replot", "Force a replot which is for instance necessary if values of the displayed data object changed and you want to update the plot, too.")
 
     Q_CLASSINFO("signal://geometricShapeStartUserInput", "This signal is emitted whenever the plot enters a mode where the user can add a new geometric shape using the mouse\n"
@@ -289,16 +289,16 @@ Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let 
     "    index of the changed shape (this is the index of the second parameter 'shape')\n"
     "shape : {shape}\n"
     "    shape that has been changed")
-    
+
     Q_CLASSINFO("signal://geometricShapeDeleted", "This signal is emitted whenever a geometric shape has been deleted\n"
     "\n"
     "Parameters\n"
     "-------------\n"
     "idx : {int}\n"
     "    index of the deleted shape")
-    
+
     Q_CLASSINFO("signal://geometricShapesDeleted", "This signal is emitted when the last geometric shape has been deleted or removed.")
-    
+
     Q_CLASSINFO("signal://geometricShapeFinished", "This signal is emitted whenever one or multiple geometric shapes have been added, removed or modified\n"
     "\n"
     "Parameters\n"
@@ -307,7 +307,7 @@ Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let 
     "    A tuple containing all shapes that have been modified\n"
     "aborted : {bool}\n"
     "    True if the modification process has been aborted, else False")
-    
+
     Q_CLASSINFO("signal://geometricShapeCurrentChanged", "This signal is emitted whenever the currently selected geometric has been changed\n"
     "\n"
     "Parameters\n"
@@ -405,13 +405,13 @@ public:
 
     ItomQwtPlotEnums::ModificationModes getModificationModes() const;
     void setModificationModes(const ItomQwtPlotEnums::ModificationModes modes);
-    
+
     ItomQwtPlotEnums::ShapeTypes getAllowedGeometricShapes() const;
     void setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes);
 
 	virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
 	virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
-    
+
     //!< overwrite to configure the camera parameters toolbox
     virtual ito::RetVal setCamera(QPointer<ito::AddInDataIO> camera);
 
@@ -425,7 +425,7 @@ public:
 
     friend ItomQwtPlot;
 
-    
+
 public Q_SLOTS:
     ito::RetVal copyToClipBoard();
     ito::RetVal savePlot(const QString &filename, float xsize = 0, float ysize = 0, int resolution = 300);
@@ -447,7 +447,7 @@ public Q_SLOTS:
     ito::RetVal hideMarkers(QString id);
 
     void replot();
- 
+
 private Q_SLOTS:
     void cameraParamEditorVisibilityChanged(bool visible);
 
@@ -465,7 +465,7 @@ protected:
     MarkerWidget* markerInfoWidget() const;
 
     void addToolbarsAndMenus();
-    
+
     ItomQwtPlot *m_pBaseContent;
 
 private:
@@ -477,7 +477,7 @@ private:
 	PlotInfoPicker  *m_pPickerInfo;
 	PlotInfoShapes  *m_pShapesInfo;
 	PlotInfoDObject *m_pObjectInfo;
-    
+
     //avoid to add private members but put them in the ItomQwtDObjFigurePrivate container
     //since this file is part of the itom SDK and can be included in other plugin's source code.
     //The container is defined in the cpp file only, therefore members can be changed there, without

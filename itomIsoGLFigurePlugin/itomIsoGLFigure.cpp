@@ -288,7 +288,7 @@ ItomIsoGLWidget::ItomIsoGLWidget(const QString &itomSettingsFile, const ito::Par
         SiTerminate ();
         m_SpwDeviceHandle = NULL;
     }
-/*  
+/*
     myTimer.setInterval(50);
     myTimer.setSingleShot(false);
     connect(&myTimer, SIGNAL(timeout()), this, SLOT(callMeMaybe()));
@@ -366,19 +366,19 @@ ItomIsoGLWidget::~ItomIsoGLWidget()
     {
         delete m_mnuTringModeSwitch;
         m_toggleInfoText = NULL;
-    } 
+    }
 
     if(m_actTringModeSwitch != NULL)
     {
         delete m_actTringModeSwitch;
         m_actTringModeSwitch = NULL;
-    } 
+    }
 
     if(m_toggleInfoText != NULL)
     {
         delete m_toggleInfoText;
         m_toggleInfoText = NULL;
-    }    
+    }
 
     if(m_lblCoordinates != NULL)
     {
@@ -856,7 +856,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
             if (wheelDelta > 0)
             {
                 m_plotObj->reduceZAmplifierer(1.05);
-                
+
             }
             else
             {
@@ -884,7 +884,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
         case QEvent::MouseButtonRelease:
         case QEvent::MouseMove:
         {
-            if (!rotating) 
+            if (!rotating)
                 break;
 
             double deltaZ = (QCursor::pos().x() - startPos[0]) / 200.0;
@@ -990,7 +990,7 @@ bool GL3DEFilter::eventFilter(QObject *object, QEvent *e)
                 break;
             }
         }
-        default: 
+        default:
             break;
     }
 
@@ -1005,8 +1005,8 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
 
     if (!m_pContent || !message || message->message != WM_3DXWARE)
         return false;
-  
-    SiSpwEvent     pEvent;    /* SpaceWare Event */ 
+
+    SiSpwEvent     pEvent;    /* SpaceWare Event */
     SiGetEventData EData;    /* SpaceWare Event Data */
 
     /* init Window platform specific data for a call to SiGetEvent */
@@ -1046,24 +1046,24 @@ bool ItomIsoGLWidget::winEvent(MSG * message, long * result)
                 }
             }
             break;
-           
+
             case SI_ZERO_EVENT:
-                //SbZeroEvent();          /* process 3D mouse zero event */     
+                //SbZeroEvent();          /* process 3D mouse zero event */
             break;
-           
+
             case  SI_BUTTON_EVENT:
             /*
-            if ((num = SiButtonPressed (&Event)) != SI_NO_BUTTON)    
+            if ((num = SiButtonPressed (&Event)) != SI_NO_BUTTON)
             {
             SbButtonPressEvent(num);     // process 3D mouse button event
             }
-            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)    
+            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)
             {
             SbButtonReleaseEvent(num);   // process 3D mouse button event
             }
             */
             break;
-        
+
         } // end switch
         *result = 0;
         return true;

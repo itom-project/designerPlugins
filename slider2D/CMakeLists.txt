@@ -52,7 +52,7 @@ set(DESIGNER_RCC
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
 
-set(DESIGNER_SOURCES 
+set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/slider2D.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/slider2DFactory.cpp
 )

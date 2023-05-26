@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2019, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2019, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ public:
 
     ~FormWidget() {};
 
-    
+
 private:
     QFormLayout *m_pFormLayout;
     int m_rows;
@@ -147,7 +147,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void updateButtons();
-    
+
 
 };
 

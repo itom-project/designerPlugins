@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -90,7 +90,7 @@ class PlotTable : public QTabWidget
             tArea         =   6,
             tProtected    =   0x4000,
             tExtern       =   0x8000
-        }; 
+        };
 
         bool m_showContextMenu;
         void refreshPlot(const ito::DataObject* dataObj);

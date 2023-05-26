@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ class EvaluateGeomatricsFigure;
 struct relationShip
 {
     relationShip() : firstElementIdx(0), type(0), secondElementIdx(0), myWidget(NULL), extValue(0) {}
-    relationShip(ito::int32 firstIdx, ito::int32 secondIdx, ito::uint32 type) 
+    relationShip(ito::int32 firstIdx, ito::int32 secondIdx, ito::uint32 type)
         : firstElementIdx(firstIdx), type(type), secondElementIdx(secondIdx), myWidget(NULL), extValue(0) {}
     ~relationShip() {}
 
@@ -146,7 +146,7 @@ class PlotTreeWidget : public QTreeWidget
             tArea         =   6,
             tProtected    =   0x4000,
             tExtern       =   0x8000
-        }; 
+        };
 
         bool m_showContextMenu;                                                       /*!< Toggle wether context menu should be accessable or not */
 

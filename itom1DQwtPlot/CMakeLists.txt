@@ -71,7 +71,7 @@ set(DESIGNER_RCC
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
 
-set(DESIGNER_SOURCES 
+set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjectSeriesDataXY.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog1DScale.cpp

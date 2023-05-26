@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -72,7 +72,7 @@ void DataObjItem::setContourPalette(const ito::ItomPalette &palette)
     QPen pen(defaultContourPen());
     pen.setStyle(Qt::NoPen);
     setDefaultContourPen(pen);
-    
+
 }
 
 /*!
@@ -95,7 +95,7 @@ QImage DataObjItem::renderImage(
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRectF &area, const QSize &imageSize ) const
 {
-    if ( imageSize.isEmpty() || data() == NULL 
+    if ( imageSize.isEmpty() || data() == NULL
         || colorMap() == NULL )
     {
         return QImage();
@@ -164,7 +164,7 @@ QImage DataObjItem::renderImage(
         }
         else
         {
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0) 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             futures += QtConcurrent::run(
                 this, &DataObjItem::renderTile,
                 xMap, yMap, dataTypeFlag, tile, &image );
@@ -173,7 +173,7 @@ QImage DataObjItem::renderImage(
                 &DataObjItem::renderTile, this,
                 xMap, yMap, dataTypeFlag, tile, &image);
 #endif
-                
+
         }
     }
     for ( int i = 0; i < futures.size(); i++ )
@@ -242,7 +242,7 @@ void DataObjItem::renderTile(
         }
     }
     else //single-value data types, color map of qwt plot is considered (either index8 or rgb)
-    { 
+    {
         if (colorMap()->format() == QwtColorMap::RGB || dataTypeFlag == DataObjRasterData::tFloatOrComplex)
         {
             if (yMap.isInverting())

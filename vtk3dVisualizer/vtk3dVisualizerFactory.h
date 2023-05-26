@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ public:
     QString toolTip() const;
     QString whatsThis() const;
     QWidget *createWidget(QWidget *parent);
-    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent); 
+    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
     void initialize(QDesignerFormEditorInterface *core);
 
 private:

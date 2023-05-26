@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -71,7 +71,7 @@ EvaluateGeometricsFigure::EvaluateGeometricsFigure(const QString &itomSettingsFi
     m_actSetting->setObjectName("actScaleSetting");
     m_actSetting->setToolTip(tr("Set the ranges and offsets of this view"));
     connect(m_actSetting, SIGNAL(triggered()), this, SLOT(mnuSetting()));
-    
+
     //m_actAddRel
     m_actAddRel = new QAction(QIcon(":/evaluateGeometrics/icons/addRel.png"), tr("add relation"), this);
     m_actAddRel->setObjectName("actAddRelation");
@@ -208,7 +208,7 @@ QVector<ito::Shape> EvaluateGeometricsFigure::getGeometricShapes() const
             ++it;
         }
     }
-    
+
     return shapes;
 }
 
@@ -292,7 +292,7 @@ void EvaluateGeometricsFigure::mnuExport(QAction* action)
     }
 
     fileName = QFileDialog::getSaveFileName(this, tr("select destination file"), m_lastFolder, saveFilter);
-                
+
     if (m_pContent && !fileName.isEmpty())
     {
         QFileInfo exportFile(fileName);
@@ -304,15 +304,15 @@ void EvaluateGeometricsFigure::mnuExport(QAction* action)
             case exportCSVTree:
                 m_pContent->writeToCSV(exportFile, false);
             break;
-            
+
             case exportCSVTable:
                 m_pContent->writeToCSV(exportFile, true);
             break;
-            
+
             case exportXMLTree:
                 m_pContent->writeToXML(exportFile);
             break;
-            
+
             case exportCSVList:
                 m_pContent->writeToRAW(exportFile);
             break;
@@ -331,20 +331,20 @@ ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, int exportFla
     {
         saveFilter = "*.xml";
     }
-    
+
     if (!fileName.isEmpty())
     {
-        m_lastFolder = fileName;        
+        m_lastFolder = fileName;
     }
 
     if (exportXMLTree & showExportWindow)
     {
         fileName = QFileDialog::getSaveFileName(this, tr("select destination file"), m_lastFolder, saveFilter);
     }
-                
+
     if (m_pContent && !fileName.isEmpty())
     {
-        QFileInfo exportFile(fileName); 
+        QFileInfo exportFile(fileName);
         m_lastFolder = exportFile.path();
 
         switch(exportFlag & 0x0F)
@@ -353,15 +353,15 @@ ito::RetVal EvaluateGeometricsFigure::exportData(QString fileName, int exportFla
             case exportCSVTree:
                 retVal = m_pContent->writeToCSV(exportFile, false);
             break;
-            
+
             case exportCSVTable:
                 retVal = m_pContent->writeToCSV(exportFile, true);
             break;
-            
+
             case exportXMLTree:
                 retVal = m_pContent->writeToXML(exportFile);
             break;
-            
+
             case exportCSVList:
                 retVal = m_pContent->writeToRAW(exportFile);
             break;
@@ -385,7 +385,7 @@ void EvaluateGeometricsFigure::mnuSetting()
 
     delete dlg;
     dlg = NULL;
-}  
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void EvaluateGeometricsFigure::setRelations(QSharedPointer<ito::DataObject> importedData)
@@ -525,37 +525,37 @@ ito::RetVal EvaluateGeometricsFigure::modifyRelation(const int idx, QSharedPoint
     }
 
     relationShip newRelation;
-            
+
     newRelation.myWidget = NULL;
 
     switch(relation->getSize(1))
     {
         case 4:
         default:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.extValue = relation->at<ito::float32>(0,3);
-            else 
+            else
                 newRelation.extValue = (ito::float32)(relation->at<ito::float64>(0,3));
 
         case 3:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float32>(0,2));
-            else 
+            else
                 newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float64>(0,2));
 
         case 2:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.type = (ito::int32)(relation->at<ito::float32>(0,1));
-            else 
+            else
                 newRelation.type = (ito::int32)(relation->at<ito::float64>(0,1));
-        
+
         case 1:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float32>(0,0));
-            else 
+            else
                 newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float64>(0,0));
         break;
-        
+
         case 0:
             return ito::RetVal(ito::retError, 0, tr("set relation failed due to empty vector").toLatin1().data());
     }
@@ -586,7 +586,7 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getRelations(void) con
     {
         ptr = myMat->ptr<ito::float32>(i);
         ptr[0] = (ito::float32)m_pInfo->m_relationsList[i].firstElementIdx;
-        ptr[1] = (ito::float32)m_pInfo->m_relationsList[i].type; 
+        ptr[1] = (ito::float32)m_pInfo->m_relationsList[i].type;
         ptr[2] = (ito::float32)m_pInfo->m_relationsList[i].secondElementIdx;
         ptr[3] = (ito::float32)m_pInfo->m_relationsList[i].extValue;
     }
@@ -624,7 +624,7 @@ QSharedPointer<ito::DataObject> EvaluateGeometricsFigure::getCurrentRelation(voi
 ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject> relation)
 {
     relationShip newRelation;
-            
+
     if (relation.isNull() || relation->getDims() != 2 || relation->getSize(0) != 1)
     {
         return ito::RetVal(ito::retError, 0, tr("relation data object must be a 1xM float32 or float64 data object (M=1..4)").toLatin1().data());
@@ -640,24 +640,24 @@ ito::RetVal EvaluateGeometricsFigure::addRelation(QSharedPointer<ito::DataObject
     {
         case 4:
         default:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.extValue = relation->at<ito::float32>(0,3);
-            else 
+            else
                 newRelation.extValue = (ito::float32)(relation->at<ito::float64>(0,3));
         case 3:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float32>(0,2));
-            else 
+            else
                 newRelation.secondElementIdx = (ito::int32)(relation->at<ito::float64>(0,2));
         case 2:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.type = (ito::int32)(relation->at<ito::float32>(0,1));
-            else 
+            else
                 newRelation.type = (ito::int32)(relation->at<ito::float64>(0,1));
         case 1:
-            if (relation->getType() == ito::tFloat32) 
+            if (relation->getType() == ito::tFloat32)
                 newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float32>(0,0));
-            else 
+            else
                 newRelation.firstElementIdx = (ito::int32)(relation->at<ito::float64>(0,0));
         break;
         case 0:
@@ -778,7 +778,7 @@ void EvaluateGeometricsFigure::mnuFitToObject()
 }
 
 //---------------------------------------------------------------------------------------------------------
-ito::RetVal EvaluateGeometricsFigure::clearAll(void) 
+ito::RetVal EvaluateGeometricsFigure::clearAll(void)
 {
     m_pInfo->m_relationsList.clear();
 
@@ -829,7 +829,7 @@ void EvaluateGeometricsFigure::setRelationNames(const QStringList input)
 }
 
 //---------------------------------------------------------------------------------------------------------
-QStringList EvaluateGeometricsFigure::getRelationNames(void) const 
+QStringList EvaluateGeometricsFigure::getRelationNames(void) const
 {
     return m_pInfo->m_relationNames;
 }
@@ -837,7 +837,7 @@ QStringList EvaluateGeometricsFigure::getRelationNames(void) const
 //---------------------------------------------------------------------------------------------------------
 ito::RetVal EvaluateGeometricsFigure::init() //called when api-pointers are transmitted, directly after construction
 {
-    return m_pContent->init(); 
+    return m_pContent->init();
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -854,7 +854,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
     {
         curSize = QSizeF(m_pContent->width(), m_pContent->height());
     }
-    
+
     QPixmap destinationImage(xsize, ysize);
 
     if(!m_pContent)
@@ -863,15 +863,15 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
         return destinationImage;
     }
     destinationImage.fill(Qt::white);
-    
+
     QPainter painter( &destinationImage );
 
 
     int ySpacing = m_pInfo->m_rowPrintSpacing;
     int ySpacingTp = m_pInfo->m_tpPrintSpacing;
     int xSpacing = m_pInfo->m_columnPrintSpacing;
-    int yStartPos = 5; 
-    
+    int yStartPos = 5;
+
     int linesize = m_pContent->iconSize().height() + ySpacing;
 
     //if(m_pContent->topLevelItemCount() > 0) yStartPos = (m_pContent->iconSize().height() - m_pContent->topLevelItem(0)->font(0).pixelSize()) / 2;
@@ -899,7 +899,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
                 painter.drawPixmap(posI, m_pContent->topLevelItem(topItem)->child(childItem)->icon(0).pixmap(m_pContent->iconSize()));
                 pos.setY(pos.y() + linesize);
                 posI.setY(posI.y() + linesize);
-            }            
+            }
         }
         pos.setY(pos.y() + ySpacingTp);
         posI.setY(posI.y() + ySpacingTp);
@@ -911,7 +911,7 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
         pos.setY(yStartPos);
         for (int topItem = 0; topItem < m_pContent->topLevelItemCount(); topItem++)
         {
-            
+
             painter.setFont(  m_pContent->topLevelItem(topItem)->font(col) );
             painter.drawStaticText(pos, (QStaticText)m_pContent->topLevelItem(topItem)->text(col));
             pos.setY(pos.y() + linesize);
@@ -923,12 +923,12 @@ QPixmap EvaluateGeometricsFigure::renderToPixMap(const int xsize, const int ysiz
                     painter.setFont(  m_pContent->topLevelItem(topItem)->child(childItem)->font(col) );
                      painter.drawStaticText(pos, (QStaticText)m_pContent->topLevelItem(topItem)->child(childItem)->text(col));
                     pos.setY(pos.y() + linesize);
-                }            
+                }
             }
             pos.setY(pos.y() + ySpacingTp);
         }
     }
-    
+
     return destinationImage;
 }
 

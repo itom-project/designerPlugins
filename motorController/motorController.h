@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 * \file motorController.h
 * \brief In this file the MotorController-Class is declared
 *
-*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
+*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorControllerFactory.h
@@ -114,7 +114,7 @@ public:
 
     //! Destructor for the class
     ~MotorController();
-    
+
     //! Set the actuator-handle
     void setActuator(QPointer<ito::AddInActuator> actuator);
 
@@ -194,7 +194,7 @@ private:
     SiOpenData m_SpwData;
 
     bool m_conNeedsTermination;
-   
+
 #endif
 
     void initializeJoystick();
@@ -292,7 +292,7 @@ private:
     QSignalMapper *m_pStepSlowNegSignalMapper;
     QSignalMapper *m_pStepFastPosSignalMapper;
     QSignalMapper *m_pStepSlowPosSignalMapper;
-    
+
 
 public slots:
 

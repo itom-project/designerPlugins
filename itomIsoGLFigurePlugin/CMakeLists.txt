@@ -34,7 +34,7 @@ find_package(OpenGL)
 
 if(OPENGL_FOUND)
 
-    
+
     if(ITOM_SDK_PCL_SUPPORT) #this comes from itom_sdk.cmake, describing the build configuration of itom
         find_package(PCL 1.5.1 REQUIRED COMPONENTS common)
         add_definitions(-DUSEPCL -D_USEPCL)
@@ -58,7 +58,7 @@ if(OPENGL_FOUND)
         set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
     endif()
 
-    
+
 
     include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
@@ -108,7 +108,7 @@ if(OPENGL_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.qrc
     )
 
-    set(DESIGNER_SOURCES 
+    set(DESIGNER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.cpp
@@ -124,24 +124,24 @@ if(OPENGL_FOUND)
     #If you want to use automatical metadata for dlls under windows use the following if-case.
     if(MSVC)
         list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
-    endif() 
+    endif()
 
     add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
 
     if(3DCONNEXION_FOUND)
         Message(STATUS "3DCONNEXION was found ${3DCONNEXION_SIAPP}.")
         target_link_libraries(${target_name} ${3DCONNEXION_SIAPP} ${3DCONNEXION_SPWMATH} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
-        
+
     else(3DCONNEXION_FOUND)
         Message(STATUS "WARNING: 3DCONNEXION was not found or disabled.")
         target_link_libraries(${target_name} ${ITOM_SDK_LIBRARIES} ${OPENGL_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
     endif(3DCONNEXION_FOUND)
-    
-    
+
+
     # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
     set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
-        
+
     # translations
         set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})
     itom_library_translation(QM_FILES TARGET ${target_name} FILES_TO_TRANSLATE ${FILES_TO_TRANSLATE})

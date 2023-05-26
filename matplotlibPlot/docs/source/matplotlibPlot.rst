@@ -11,4 +11,3 @@ matplotlibPlot - itom desinger widget
 **Platforms**:  Windows, Linux
 **Author**:     :plotauthor:`matplotlibPlot`
 =============== ========================================================================================================
-

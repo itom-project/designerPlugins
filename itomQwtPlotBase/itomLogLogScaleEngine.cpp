@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 
 //! Smallest allowed value for logarithmic scalQwtPowerTransformes: 1.0e-150
 const double ItomLogLogTransform::LogMin = 1.0e-150;
-    
+
 //! Largest allowed value for logarithmic scales: 1.0e150
 const double ItomLogLogTransform::LogMax = 1.0e150;
 
@@ -53,7 +53,7 @@ static inline QwtInterval itomLogLogInterval( double base, const QwtInterval &in
             itomLogLog( base, interval.maxValue() ) );
 }
 
-static inline QwtInterval itomPowerPowerInterval( double base, const QwtInterval &interval ) 
+static inline QwtInterval itomPowerPowerInterval( double base, const QwtInterval &interval )
 {
     return QwtInterval( qPow( base, qPow( base, interval.minValue() )),
             qPow(base, qPow( base, interval.maxValue() )) );
@@ -140,7 +140,7 @@ void ItomLogLogScaleEngine::autoScale( int maxNumSteps,
     if ( interval.width() == 0.0 )
         interval = buildInterval( interval.minValue() );
 
-    stepSize = divideInterval( itomLogLogInterval( logBase, interval ).width(), 
+    stepSize = divideInterval( itomLogLogInterval( logBase, interval ).width(),
         qMax( maxNumSteps, 1 ) );
     if ( stepSize < 1.0 )
         stepSize = 1.0;
@@ -209,7 +209,7 @@ QwtScaleDiv ItomLogLogScaleEngine::divideScale( double x1, double x2,
         if ( maxMajorSteps < 1 )
             maxMajorSteps = 1;
 
-        stepSize = divideInterval( 
+        stepSize = divideInterval(
             itomLogLogInterval( logBase, interval ).width(), maxMajorSteps );
         if ( stepSize < 1.0 )
             stepSize = 1.0; // major step must be >= 1 decade
@@ -317,8 +317,8 @@ void ItomLogLogScaleEngine::buildMinorTicks(
         double minStep = divideInterval( stepSize, maxMinorSteps + 1 );
         if ( minStep == 0.0 )
             return;
-        
-        const int numSteps = qRound( stepSize / minStep ); 
+
+        const int numSteps = qRound( stepSize / minStep );
 
         int mediumTickIndex = -1;
         if ( ( numSteps > 2 ) && ( numSteps % 2 == 0 ) )
@@ -372,7 +372,7 @@ void ItomLogLogScaleEngine::buildMinorTicks(
         }
 
         if ( numTicks < 1 )
-            return; 
+            return;
 
         int mediumTickIndex = -1;
         if ( ( numTicks > 2 ) && ( numTicks % 2 ) )
@@ -437,7 +437,7 @@ ItomLogLogTransform::~ItomLogLogTransform()
 {
 }
 
-/*! 
+/*!
   \param value Value to be transformed
   \return log( value )
  */
@@ -446,7 +446,7 @@ double ItomLogLogTransform::transform( double value ) const
     return ::log(::log( value ));
 }
 
-/*! 
+/*!
   \param value Value to be transformed
   \return exp( value )
  */
@@ -455,7 +455,7 @@ double ItomLogLogTransform::invTransform( double value ) const
     return qExp(qExp( value ));
 }
 
-/*! 
+/*!
   \param value Value to be bounded
   \return qBound( LogMin, value, LogMax )
  */
@@ -491,7 +491,7 @@ ItomLogLogTransform *ItomLogLogTransform::copy() const
 //{
 //}
 //
-///*! 
+///*!
 //  \param value Value to be transformed
 //  \return Exponentiation preserving the sign
 // */
@@ -501,10 +501,10 @@ ItomLogLogTransform *ItomLogLogTransform::copy() const
 //        return -qPow( -value, 1.0 / d_exponent );
 //    else
 //        return qPow( value, 1.0 / d_exponent );
-//    
+//
 //}
 //
-///*! 
+///*!
 //  \param value Value to be transformed
 //  \return Inverse exponentiation preserving the sign
 // */

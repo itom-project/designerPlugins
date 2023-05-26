@@ -79,7 +79,7 @@ set(DESIGNER_RCC
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
 
-set(DESIGNER_SOURCES 
+set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjItem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dataObjRasterData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplot.cpp

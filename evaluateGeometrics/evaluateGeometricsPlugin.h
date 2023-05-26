@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -48,14 +48,14 @@ public:
     bool isInitialized() const;                                                                 /*!< Check wether factory is initialized and return status */
     QIcon icon() const;                                                                         /*!< Return icon for the qt-designer */
     QString domXml() const;                                                                     /*!< The group of this widget is itom.... */
-    QString group() const;                                                                      
-    QString includeFile() const;                                                                
-    QString name() const;                                                                       
-    QString toolTip() const;                                                                    
-    QString whatsThis() const;                                                                  
-    QWidget *createWidget(QWidget *parent);                                                    
-    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);   
-    void initialize(QDesignerFormEditorInterface *core);                                        
+    QString group() const;
+    QString includeFile() const;
+    QString name() const;
+    QString toolTip() const;
+    QString whatsThis() const;
+    QWidget *createWidget(QWidget *parent);
+    QWidget *createWidgetWithMode(ito::AbstractFigure::WindowMode winMode, QWidget * parent);
+    void initialize(QDesignerFormEditorInterface *core);
 
 private:
     bool initialized;                                                                           /*!< If this plugin was initialized, this variable becomes true, else false */

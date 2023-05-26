@@ -54,12 +54,12 @@ class ITOMQWTPLOTBASE_EXPORT DrawItem : public QwtPlotShapeItem
         virtual ~DrawItem();
         ito::RetVal setShape(const ito::Shape &shape);
         ito::RetVal setShape(const ito::Shape &shape, const QColor &markerColor, const QColor &lineColor);
-        
+
         void setColor(const QColor &markerColor, const QColor &lineColor, const QColor &markerColor2 = QColor());
-        
+
         bool getSelected() const;
         void setSelected(const bool selected, const int nMarker = -1);
-        
+
         QString getLabel() const;
         void setLabel(const QString &label);
 
@@ -97,8 +97,8 @@ class ITOMQWTPLOTBASE_EXPORT DrawItem : public QwtPlotShapeItem
 
     private:
         DrawItemPrivate *d;
-        
-        
+
+
 };
 
 #endif //DRAWITEM_H

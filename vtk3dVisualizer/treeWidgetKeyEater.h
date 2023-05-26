@@ -37,6 +37,6 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *obj, QEvent *event);
-    
+
     QPropertyEditorWidget* pew;
 };

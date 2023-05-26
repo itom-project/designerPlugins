@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2022, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2022, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -79,7 +79,7 @@ bool ItomPlotMagnifier::isAxisEnabledSpecial(int axis)
     else
     {
         //if fixed aspect ratio: no single axis magnification is possible
-        return isAxisEnabled(axis) && (!m_pActiveDisabledAxesSet->contains(axis) || (m_zoomer.data() && m_zoomer->fixedAspectRatio())); 
+        return isAxisEnabled(axis) && (!m_pActiveDisabledAxesSet->contains(axis) || (m_zoomer.data() && m_zoomer->fixedAspectRatio()));
     }
 }
 
@@ -98,7 +98,7 @@ void ItomPlotMagnifier::rescale(double factor)
 
     const bool autoReplot = plt->autoReplot();
     plt->setAutoReplot( false );
-    
+
     int xAxisZoomer = -1;
     int yAxisZoomer = -1;
     QRectF zoomRect;

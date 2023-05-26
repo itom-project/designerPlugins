@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ DialogSettings::DialogSettings(const InternalInfo &data, const int &geometicElem
         relationString.append("\n");
         relationString.append(data.m_relationNames[i]);
     }
-    
+
     ui.plainTextEditRelationNames->setPlainText(relationString);
 }
 

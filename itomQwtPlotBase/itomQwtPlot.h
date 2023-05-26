@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -103,9 +103,9 @@ public:
     bool plottingEnabled() const { return m_plottingEnabled; }
 
     ito::AbstractFigure::UnitLabelStyle unitLabelStyle() const { return m_unitLabelStyle; }
-    virtual void setUnitLabelStyle(ito::AbstractFigure::UnitLabelStyle style) 
-	{ 
-		m_unitLabelStyle = style; 
+    virtual void setUnitLabelStyle(ito::AbstractFigure::UnitLabelStyle style)
+	{
+		m_unitLabelStyle = style;
 	};
 
     ItomQwtPlotEnums::ModificationModes shapeModificationModes() const { return m_shapeModificationModes; }
@@ -160,9 +160,9 @@ public:
 
 protected:
 
-    void** getItomApiFuncsPtr() const; 
+    void** getItomApiFuncsPtr() const;
     void** getItomApiFuncsPtrGraph() const;
-    
+
     void loadStyles(bool overwriteDesignableProperties);
     ItomPlotZoomer *zoomer() const;
     ItomQwtPlotPanner *panner() const;
@@ -195,7 +195,7 @@ protected:
     virtual void home() = 0;
     virtual void zoomRedo() const = 0;
     virtual void zoomUndo() const = 0;
-    
+
     void keyPressEvent(QKeyEvent * event);
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
@@ -233,7 +233,7 @@ protected:
     QMenu *m_pContextMenu;
     bool m_styledBackground;
     bool m_firstTimeVisible; /*!< true if this plot becomes visible for the first time */
-    
+
 
 private:
     void createBaseActions();
@@ -281,7 +281,7 @@ private:
     int m_buttonStyle; /*!< 0: dark buttons for bright theme, 1: bright buttons for dark theme */
     bool m_boxFrame;
 	int m_mouseCatchTolerancePx; /*!< number of pixels used as tolerance for clicking a certain marker or object with the mouse (default: 8px).*/
-    
+
     int m_state; /*!< current state (value of enum State or stateUser + X) */
     bool m_stateIsChanging;
 
@@ -293,7 +293,7 @@ private:
     ito::AbstractFigure::UnitLabelStyle m_unitLabelStyle;
 
     QPrinter *m_pPrinter;
-    
+
     void attachAndSelectNewShape(const ito::Shape &shape);
     void linePickingFinished();
     void squarePickingFinished();
@@ -303,11 +303,11 @@ private:
     void pointPickingFinished();
     void polygonSinglePointPickingFinished();
 
-    // during an interactive shape session, this method collect all current shapes and returns its vector. 
+    // during an interactive shape session, this method collect all current shapes and returns its vector.
     // additionally, the shape toolbox is updated and (if desired) the geometricShapeChanged signal
     // is emitted for the last added shape in the m_currentShapeIndices vector.
     QVector<ito::Shape> getAndUpdateAllCurrentShapes(bool emitUpdateForLastModifiedShape);
-    
+
 public slots:
     void clearAllGeometricShapes();
     void updateZoomOptionState();

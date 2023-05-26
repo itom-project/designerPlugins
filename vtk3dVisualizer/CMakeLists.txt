@@ -29,18 +29,18 @@ find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCo
 
 if(ITOM_SDK_PCL_SUPPORT)
     find_package(ITOM_SDK COMPONENTS dataobject itomCommonLib itomCommonQtLib itomCommonPlotLib pointcloud qpropertyeditor REQUIRED)
-    
+
     itom_find_package_qt(ON Core Widgets Designer OpenGL LinguistTools)
 
     #set(VTK_INSTALL_EXPORT_NAME 1) #avoid that vtk directly links to an absolute Qt-library, that is located somewhere on their computer configuration.
     #set(ANDROID_NDK TRUE) #hack, such that tkCommon vtkRendering and vtkHybrid are not linked in PCLConfig.cmake, since VTK is externally linked
-    
+
     # vtk 8.0 is required to support QOpenGLWidget, vtk 6.0 is required to support the deprecated QVTKWidget
     find_package(VTK)
     if(EXISTS ${VTK_DIR})
-    
-        find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked. 
-        
+
+        find_package(PCL 1.5.1 REQUIRED COMPONENTS common kdtree search surface filters visualization) # do not include anything with visualization -> this is done manually since Vtk is externally linked.
+
         if(${VTK_MAJOR_VERSION} LESS 8)
             message(STATUS "For VTK <= 8.1, the legacy VTK Qt widget is used.")
             add_definitions(-DLEGACY_VTK)
@@ -66,7 +66,7 @@ if(ITOM_SDK_PCL_SUPPORT)
         else()
             set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
         endif()
-        
+
         #PCL does not have a proper version number. Sometimes, new enumerations or methods are introduced without incrementing
         #the version. Therefore, a search has to be done to check for the availability of some features.
         find_file(PCL_VISUALIZER_COMMON_H common.h PATHS ${PCL_INCLUDE_DIRS} PATH_SUFFIXES pcl/visualization/common)
@@ -77,7 +77,7 @@ if(ITOM_SDK_PCL_SUPPORT)
                 message(WARNING "PCL is no final version of 1.8.0 and does not have the enumeration pcl::visualization::LookUpTableRepresentationProperties with the value PCL_VISUALIZER_LUT_BLUE2RED. Not all features are available.")
             else()
                 add_definitions(-DPCL_HASLUT)
-            endif()  
+            endif()
         endif()
 
         include_directories(
@@ -123,7 +123,7 @@ if(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.qrc
         )
 
-        set(DESIGNER_SOURCES 
+        set(DESIGNER_SOURCES
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizerFactory.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/coordSysProperty.cpp
@@ -141,21 +141,21 @@ if(ITOM_SDK_PCL_SUPPORT)
         if(MSVC)
             list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
         endif()
-        
+
         set(PCLVTK_LIBS "")
-        
+
         if("${VTK_MAJOR_VERSION}" EQUAL 5)
             set(VTK_COMPONENTS QVTK)
             foreach(__comps ${VTK_COMPONENTS})
                 set(PCLVTK_LIBS ${PCLVTK_LIBS} debug ${__comps}-gd.lib optimized ${__comps}.lib)
             endforeach(__comps)
         endif()
-        
+
         add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
-        
+
         target_link_libraries(${target_name} ${PCL_LIBRARIES} ${PCLVTK_LIBS} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
-        
-        
+
+
         # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
 set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
@@ -171,7 +171,7 @@ set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON
         # translations
                 set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})
         itom_library_translation(QM_FILES TARGET ${target_name} FILES_TO_TRANSLATE ${FILES_TO_TRANSLATE})
-        
+
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/doxygen/doxygen.dox.in ${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen/doxygen.dox )
 
         # COPY SECTION
@@ -181,7 +181,7 @@ set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON
         itom_add_designer_qm_files_to_copy_list(QM_FILES COPY_SOURCES COPY_DESTINATIONS)
         itom_add_designerplugin_headers_to_copy_list(${target_name} DESIGNER_HEADERS_COPY COPY_SOURCES COPY_DESTINATIONS)
         itom_post_build_copy_files(${target_name} COPY_SOURCES COPY_DESTINATIONS)
-        
+
     else(EXISTS ${VTK_DIR})
         message(WARNING "VTK_DIR does not exist. ${target_name} will not be build.")
     endif(EXISTS ${VTK_DIR})

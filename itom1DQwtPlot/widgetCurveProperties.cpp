@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -107,7 +107,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	bool constLegendVisible = true;// if the current selection does not have the same legend visibility at all, than constLegendVisible will be set to false in the following
 	bool constSymbolColor = true;// if the current selection does not have the same symbol color at all, than constSymbolColor will be set to false in the following
 
-	bool first = true; //marks the first line witch is checked 
+	bool first = true; //marks the first line witch is checked
 	float width;
 	Qt::PenStyle lineStyle;
 	QColor lineColor;
@@ -117,7 +117,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 	bool legendVisible;
 	QColor symbolColor;
 
-	
+
 		if (selection.size() == 1)
 		{
 			ui.lineEditName->setText(m_pContent->getplotCurveItems().at(ui.listWidget->row(selection.at(0)))->title().text());//sets the name of the curve into the line edit.
@@ -277,13 +277,13 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			if (m_pContent->getplotCurveItems().at(row)->symbol() && symbolSize == m_pContent->getplotCurveItems().at(row)->symbol()->size().height())//check if symbol is not NUll and height equal to width
 			{
 				ui.spinBoxSymbolSize->setValue(symbolSize);
-				
+
 			}
 			else
 			{
 				ui.spinBoxSymbolSize->setValue(0);
 			}
-			
+
 
 		}
 		else
@@ -300,7 +300,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			{
 				ui.checkBoxLegendVisible->setCheckState(Qt::Unchecked);
 			}
-			
+
 		}
 		else
 		{
@@ -393,7 +393,7 @@ void WidgetCurveProperties::on_colorPickerButtonLineStyle_colorChanged(QColor co
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val) 
+void WidgetCurveProperties::on_comboBoxLineSymbol_currentIndexChanged(int val)
 {
 	if (!m_isUpdating)
 	{
@@ -516,7 +516,7 @@ void WidgetCurveProperties::on_colorPickerButtonSymbol_colorChanged(QColor color
 				pen.setColor(color);
 				QwtSymbol *newSymbol = new QwtSymbol(oldSymbol->style(), oldSymbol->brush(), pen, oldSymbol->size());
 				m_pContent->getplotCurveItems().at(row)->setSymbol(newSymbol);
-			}		
+			}
 		}
         m_pContent->applyLegendFont();
 		m_pContent->replot();
@@ -536,7 +536,7 @@ void WidgetCurveProperties::on_lineEditName_editingFinished()
 		m_pContent->getplotCurveItems().at(row)->setTitle(text);
         emit titleChanged(generateLegendList());
         m_pContent->applyLegendFont();
-		
+
 		m_isUpdating = false;
 	}
 }
@@ -548,7 +548,7 @@ const QStringList WidgetCurveProperties::generateLegendList() const
     {
         QListWidgetItem* item = ui.listWidget->item(i);
         list.append(item->text());
-        
+
     }
     return list;
 }

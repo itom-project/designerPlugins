@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -27,11 +27,11 @@
 #include <qwt_text.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomPlotMarker::ItomPlotMarker(bool labelState, ItomQwtPlotEnums::PlotPickerType type, Qt::Alignment align, Qt::Orientation orient) : 
-    QwtPlotMarker(), 
-    m_plotType(type), 
+ItomPlotMarker::ItomPlotMarker(bool labelState, ItomQwtPlotEnums::PlotPickerType type, Qt::Alignment align, Qt::Orientation orient) :
+    QwtPlotMarker(),
+    m_plotType(type),
     m_labelState(labelState)
-{ 
+{
     setLabelAlignment(align);
     setLabelOrientation(orient);
     setLabelEnabled(m_labelState);
@@ -274,7 +274,7 @@ void ItomPlotMarker::drawLabel( QPainter *painter,
         }
         cnt++;
     }
-    
+
 
     alignPos = alignPosTmp;
 

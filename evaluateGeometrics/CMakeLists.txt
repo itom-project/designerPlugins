@@ -47,7 +47,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogDeleteRelation.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/dialogAddRelation.h    
+    ${CMAKE_CURRENT_SOURCE_DIR}/dialogAddRelation.h
 )
 
 set(DESIGNER_UI
@@ -60,7 +60,7 @@ set(DESIGNER_RCC
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.qrc
 )
 
-set(DESIGNER_SOURCES 
+set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometrics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotTreeWidget.cpp

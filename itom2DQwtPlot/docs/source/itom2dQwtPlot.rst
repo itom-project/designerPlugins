@@ -12,4 +12,3 @@ itom2dQwtPlot - itom desinger widget
 **Platforms**:  Windows, Linux
 **Author**:     :plotauthor:`itom2dQwtPlot`
 =============== ========================================================================================================
-

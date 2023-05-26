@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universität Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -52,11 +52,11 @@ PlotTable::PlotTable(QMenu *contextMenu, InternalInfo *data, QWidget * parent) :
     m_geometrics = new QTableWidget();
     m_relations = new QTableWidget();
 
-    QHBoxLayout *pLayout1 = new QHBoxLayout(m_firstTab); 
+    QHBoxLayout *pLayout1 = new QHBoxLayout(m_firstTab);
     pLayout1->addWidget(m_geometrics);
     m_firstTab->setLayout(pLayout1);
 
-    QHBoxLayout *pLayout2 = new QHBoxLayout(m_secondTab); 
+    QHBoxLayout *pLayout2 = new QHBoxLayout(m_secondTab);
     pLayout2->addWidget(m_relations);
     m_secondTab->setLayout(pLayout2);
 
@@ -96,14 +96,14 @@ ito::RetVal PlotTable::init()
     QFont titleFont = apiGetFigureSetting(parent(), "titleFont", QFont("Helvetica",12),NULL).value<QFont>();
     QFont labelFont = apiGetFigureSetting(parent(), "labelFont", QFont("Helvetica",12),NULL).value<QFont>();
     QFont axisFont = apiGetFigureSetting(parent(), "axisFont", QFont("Helvetica",10),NULL).value<QFont>();
-    
+
     return ito::retOk;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 //void PlotTable::setLabels(const QString &title, const QString &valueLabel, const QString &axisLabel)
 //{
-//   
+//
 //}
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
         QLabel* secondElement = new QLabel("", m_geometrics, 0);
         m_geometrics->setCellWidget(row, 0, firstElement);
         m_geometrics->setCellWidget(row, 1, secondElement);
-       
+
 
         switch (((ito::uint32)(val[1])) & 0x0000FFFF)
         {
@@ -141,7 +141,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x0->setSuffix(m_data->m_valueLabel);
                 x0->setFrame(false);
                 m_geometrics->setCellWidget(row, 2, x0);
-                
+
                 QDoubleSpinBox* y0 = new QDoubleSpinBox(m_geometrics);
                 y0->setPrefix("y = ");
                 y0->setStatusTip("position");
@@ -174,7 +174,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x0->setSuffix(m_data->m_valueLabel);
                 x0->setFrame(false);
                 m_geometrics->setCellWidget(row, 2, x0);
-                
+
                 QDoubleSpinBox* y0 = new QDoubleSpinBox(m_geometrics);
                 y0->setPrefix("y = ");
                 y0->setStatusTip("1. point");
@@ -201,7 +201,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x1->setSuffix(m_data->m_valueLabel);
                 x1->setFrame(false);
                 m_geometrics->setCellWidget(row, 5, x1);
-                
+
                 QDoubleSpinBox* y1 = new QDoubleSpinBox(m_geometrics);
                 y1->setPrefix("y = ");
                 y1->setStatusTip("2. point");
@@ -234,7 +234,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x0->setSuffix(m_data->m_valueLabel);
                 x0->setFrame(false);
                 m_geometrics->setCellWidget(row, 2, x0);
-                
+
                 QDoubleSpinBox* y0 = new QDoubleSpinBox(m_geometrics);
                 y0->setPrefix("y = ");
                 y0->setStatusTip("center position");
@@ -287,7 +287,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x0->setSuffix(m_data->m_valueLabel);
                 x0->setFrame(false);
                 m_geometrics->setCellWidget(row, 2, x0);
-                
+
                 QDoubleSpinBox* y0 = new QDoubleSpinBox(m_geometrics);
                 y0->setPrefix("y = ");
                 y0->setStatusTip("center position");
@@ -331,7 +331,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x0->setSuffix(m_data->m_valueLabel);
                 x0->setFrame(false);
                 m_geometrics->setCellWidget(row, 2, x0);
-                
+
                 QDoubleSpinBox* y0 = new QDoubleSpinBox(m_geometrics);
                 y0->setPrefix("y = ");
                 y0->setStatusTip("1. edge");
@@ -358,7 +358,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x1->setSuffix(m_data->m_valueLabel);
                 x1->setFrame(false);
                 m_geometrics->setCellWidget(row, 5, x1);
-                
+
                 QDoubleSpinBox* y1 = new QDoubleSpinBox(m_geometrics);
                 y1->setPrefix("y = ");
                 y1->setStatusTip("2. edge");
@@ -401,7 +401,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x0->setSuffix(m_data->m_valueLabel);
                 x0->setFrame(false);
                 m_geometrics->setCellWidget(row, 2, x0);
-                
+
                 QDoubleSpinBox* y0 = new QDoubleSpinBox(m_geometrics);
                 y0->setPrefix("y = ");
                 y0->setStatusTip("center position");
@@ -453,7 +453,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x0->setSuffix(m_data->m_valueLabel);
                 x0->setFrame(false);
                 m_geometrics->setCellWidget(row, 2, x0);
-                
+
                 QDoubleSpinBox* y0 = new QDoubleSpinBox(m_geometrics);
                 y0->setPrefix("y = ");
                 y0->setStatusTip("1. point");
@@ -480,7 +480,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
                 x1->setSuffix(m_data->m_valueLabel);
                 x1->setFrame(false);
                 m_geometrics->setCellWidget(row, 5, x1);
-                
+
                 QDoubleSpinBox* y1 = new QDoubleSpinBox(m_geometrics);
                 y1->setPrefix("y = ");
                 y1->setStatusTip("direction vector");
@@ -536,7 +536,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
     {
         curSpin = ((QDoubleSpinBox*) m_geometrics->cellWidget(row, i));
         curSpin->setValue(val[i]);
-        
+
         curSpin->setStyleSheet(style);
     }
 
@@ -546,9 +546,9 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
     {
         curSpin = ((QDoubleSpinBox*) m_geometrics->cellWidget(row, i));
         curSpin->setValue(-0.0);
-        
+
         curSpin->setStyleSheet(style);
-    } 
+    }
 
     return;
 }
@@ -565,8 +565,8 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
         {
             m_relations->setRowCount(m_data->m_relationsList.size());
         }
-        
-        
+
+
         for(int i = 0; i < m_relations->rowCount(); i++)
         {
             QLabel* test = (QLabel*)(m_relations->cellWidget(i, 0));
@@ -577,7 +577,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             {
                 m_relations->setCellWidget(i, 0, new QLabel("", m_relations, 0));
                 test = (QLabel*)(m_relations->cellWidget(i, 0));
-                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);               
+                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
             }
             test->setText(m_data->m_relationNames[idx]);
 
@@ -613,7 +613,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             {
                 m_relations->setCellWidget(i, 1, new QLabel("", m_relations, 0));
                 test = (QLabel*)(m_relations->cellWidget(i, 1));
-                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);               
+                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
             }
 
             if(idx > - 1) test->setText(QString(primitivNames[firstType]).append(QString::number(idx)));
@@ -624,7 +624,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             {
                 m_relations->setCellWidget(i, 2, new QLabel("", m_relations, 0));
                 test = (QLabel*)(m_relations->cellWidget(i, 2));
-                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);               
+                test->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
             }
             if(idx2 > - 1) test->setText(QString(primitivNames[secondType]).append(QString::number(idx2)));
             else test->setText(QString(primitivNames[secondType]));
@@ -650,7 +650,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
         ito::float32* first;
         ito::float32* second;
         bool check;
-        
+
         QLabel* resultLabel = (QLabel*)(m_relations->cellWidget(i, 3));
 
         resultString = "NaN";
@@ -658,7 +658,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
         if(m_data->m_relationsList[i].type & tExtern)
         {
             resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
-            
+
             resultLabel->setText(resultString);
             continue;
         }
@@ -714,7 +714,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
                     resultLabel->setText(resultString);
                     continue;
                 }
-                
+
             }
             else
             {
@@ -723,7 +723,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
             }
         }
 
-        
+
         resultLabel->setText(resultString);
 
     }
@@ -750,7 +750,7 @@ bool PlotTable::calculateAngle(ito::float32 *first, ito::float32 *second, ito::f
     if(ito::dObjHelper::isNotZero(abs))
     {
         angle = acos(firstVector.dot(secondVector) / abs) * 180 / 3.14159265358979323846;
-        return true;    
+        return true;
     }
     angle = std::numeric_limits<ito::float32>::signaling_NaN();
     return false;
@@ -798,7 +798,7 @@ bool PlotTable::calculateDistance(ito::float32 *first, ito::float32 *second, ito
         return false;
     }
 
-    ito::float32 lambda = (pointPosVector.dot(lineDirVector) - lineDirVector.dot(linePosVector) /  lineDirVector.dot(lineDirVector)); 
+    ito::float32 lambda = (pointPosVector.dot(lineDirVector) - lineDirVector.dot(linePosVector) /  lineDirVector.dot(lineDirVector));
 
     pointDirVector = (lambda * lineDirVector + linePosVector) - pointPosVector;
 
@@ -816,7 +816,7 @@ bool PlotTable::calculateRadius(ito::float32 *first, ito::float32 &radius)
     }
     else if((ito::uint32)(first[1]) == ito::PrimitiveContainer::tElipse)
     {
-        radius = (first[5] +  first[6])/2;   
+        radius = (first[5] +  first[6])/2;
         return true;
     }
     radius = std::numeric_limits<ito::float32>::signaling_NaN();
@@ -872,7 +872,7 @@ bool PlotTable::calculateIntersections(ito::float32 *first, ito::float32 *second
     // Vectors are the same we have to check if the positions vectors are on the same line
     if( ito::dObjHelper::isNotZero(firstLineDirVector[0] - secondLineDirVector[0]) &&
         ito::dObjHelper::isNotZero(firstLineDirVector[1] - secondLineDirVector[1]) &&
-        ito::dObjHelper::isNotZero(firstLineDirVector[2] - secondLineDirVector[2])) 
+        ito::dObjHelper::isNotZero(firstLineDirVector[2] - secondLineDirVector[2]))
     {
         secondLinePosVector -= firstLinePosVector;
         lambda = secondLinePosVector[0] / firstLinePosVector[0];
@@ -891,9 +891,9 @@ bool PlotTable::calculateIntersections(ito::float32 *first, ito::float32 *second
             return true;
         }
     }
-    else if(ito::dObjHelper::isNotZero(firstLinePosVector[2]) && 
+    else if(ito::dObjHelper::isNotZero(firstLinePosVector[2]) &&
             ito::dObjHelper::isNotZero(secondLinePosVector[2]) &&
-            ito::dObjHelper::isNotZero(firstLineDirVector[2]) && 
+            ito::dObjHelper::isNotZero(firstLineDirVector[2]) &&
             ito::dObjHelper::isNotZero(secondLineDirVector[2])) // is a two dimensional problem
     {
         secondLinePosVector -= firstLinePosVector;
@@ -904,7 +904,7 @@ bool PlotTable::calculateIntersections(ito::float32 *first, ito::float32 *second
     }
     else // otherwise we have do do it the hard way
     {
-    
+
         return false;
     }
 
@@ -914,7 +914,7 @@ bool PlotTable::calculateIntersections(ito::float32 *first, ito::float32 *second
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::updateLabels()
 {
-  
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -926,7 +926,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
     bool identical = false;
     int cols = 0;
     int dims = 0;
-   
+
 
     if(dataObj)
     {
@@ -940,7 +940,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
         else if(dataObj->getType() != ito::tFloat32)
         {
             m_lastRetVal = ito::RetVal(ito::retError, 0,tr("DataObject must be ito::float32").toAscii().data());
-            identical = false;            
+            identical = false;
         }
         else if(dataObj->getSize(dims-1) < 2)
         {
@@ -952,7 +952,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
             cv::Mat* scrMat = (cv::Mat*)(dataObj->get_mdata()[dataObj->seekMat(0)]);
 
             bool found = false;
-            
+
             cols = std::min(scrMat->cols, (int)(sizeof(geometricPrimitives) / 4));
 
             ito::float32* srcPtr;
@@ -1004,7 +1004,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
                     srcPtr = scrMat->ptr<ito::float32>(scnt);
                     for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
                     {
-                   
+
                         if(m_rowHash[dcnt].cells[0] == srcPtr[0])
                         {
                             memset(m_rowHash[dcnt].cells, 0, sizeof(geometricPrimitives));
@@ -1027,7 +1027,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
 
 
     }
-     
+
     if(identical)
     {
         cv::Mat* scrMat = (cv::Mat*)(dataObj->get_mdata()[dataObj->seekMat(0)]);
@@ -1051,7 +1051,7 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
         m_geometrics->setColumnWidth(0,32);
         m_geometrics->setColumnWidth(1,32);
         //m_geometrics->setAlternatingRowColors(true);
-    
+
         for(int dcnt = 0; dcnt < m_rowHash.size(); dcnt++)
         {
             setPrimitivElement(dcnt, false, cols, m_rowHash[dcnt].cells);
@@ -1069,25 +1069,25 @@ void PlotTable::refreshPlot(const ito::DataObject* dataObj)
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::keyPressEvent ( QKeyEvent * event )
 {
-    
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::mousePressEvent ( QMouseEvent * event )
 {
-   
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::mouseMoveEvent ( QMouseEvent * event )
 {
-   
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::mouseReleaseEvent ( QMouseEvent * event )
 {
-    
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1099,7 +1099,7 @@ void PlotTable::contextMenuEvent(QContextMenuEvent * event)
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal PlotTable::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
 {
- 
+
 
     return ito::retOk;
 }
@@ -1107,24 +1107,23 @@ ito::RetVal PlotTable::setInterval(const Qt::Axis axis, const bool autoCalcLimit
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::setZoomerEnable(const bool checked)
 {
- 
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::setPickerEnable(const bool checked)
 {
-   
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::setPannerEnable(const bool checked)
 {
-   
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotTable::updateScaleValues(bool recalculateBoundaries /*= false*/)
 {
-   
-}
 
+}

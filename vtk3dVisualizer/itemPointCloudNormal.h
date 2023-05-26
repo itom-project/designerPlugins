@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ public:
     QColor color() const { return m_color; }
     void setColor(QColor value);
 
-    
+
     virtual void setVisible(bool value);
 
     int pointSize() const { return m_pointSize; }

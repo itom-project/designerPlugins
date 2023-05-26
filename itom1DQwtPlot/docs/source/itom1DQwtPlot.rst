@@ -12,4 +12,3 @@ itom1DQwtPlot -itom desinger widget
 **Platforms**:  Windows, Linux
 **Author**:     :plotauthor:`itom1DQwtPlot`
 =============== ========================================================================================================
-

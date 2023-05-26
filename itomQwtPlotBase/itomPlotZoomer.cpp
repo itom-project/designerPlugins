@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -113,7 +113,7 @@ bool ItomPlotZoomer::accept( QPolygon &pa ) const
         const int minZoomSize = qMax(11, qMax(rect.width(), rect.height()));
 
         const QPoint center = rect.center();
-        
+
         rect.setSize( rect.size().expandedTo( QSize( minZoomSize, minZoomSize ) ) );
         rect.moveCenter( center );
 
@@ -327,7 +327,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
             plt->setAxisScale( yAxisId, y1, y2 );
             plt->setAxisScale( xAxisId, x1, x2 );
 
-            m_aspectRatioChanged = false; 
+            m_aspectRatioChanged = false;
         }
 
         plt->setAutoReplot( doReplot );
