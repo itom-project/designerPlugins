@@ -23,7 +23,7 @@
 #
 #    itom is free software by ITO, University Stuttgart published under
 #    GNU General Public License as published by the Free Software
-#    Foundation. See <https://bitbucket.org/itom/>
+#    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
