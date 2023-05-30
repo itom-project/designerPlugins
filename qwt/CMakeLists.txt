@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.1...3.15)
 message(STATUS "\n<--- BASE LIBRARY ${target_name} --->")
 message(STATUS "-- Build directory: ${CMAKE_CURRENT_BINARY_DIR}")
 
+
 #this is to automatically detect the SDK subfolder of the itom build directory.
 if(NOT EXISTS ${ITOM_SDK_DIR})
     find_path(ITOM_SDK_DIR "cmake/itom_sdk.cmake"
@@ -27,10 +28,13 @@ set(CMAKE_MODULE_PATH
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include("ItomBuildMacros")
-itom_init_designerplugin_library(${target_name})
 
 find_package(ITOM_SDK COMPONENTS itomCommonLib REQUIRED)
+include(ItomBuildMacros)
+
+itom_init_cmake_policy(3.12)
+itom_init_designerplugin_library(${target_name})
+
 itom_find_package_qt(ON Core Widgets PrintSupport Xml Designer Widgets Svg OpenGL Concurrent)
 
 add_definitions(-DQWT_DLL)
