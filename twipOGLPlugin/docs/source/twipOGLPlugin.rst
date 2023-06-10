@@ -27,15 +27,15 @@ Basicly 3 different display modes are supported. In normal display mode, each po
 
 If dataObjects are plotted, all DataTypes except "rgba32" are accepted. To plot complex objects, it is possible to select between the following modes: "absolut", "phase", "real" and "imaginary". An additional overlay (usually an intensity image) can be added. The overlay can be of everytype except complexTypes.
 
-If pointClouds are plotted, the plot features differ slightly. E.g. the overlay can not be added seperatly, but the intensity from pointClouds of types including RGB- or I-values are interpreted as the overlay directly. 
+If pointClouds are plotted, the plot features differ slightly. E.g. the overlay can not be added seperatly, but the intensity from pointClouds of types including RGB- or I-values are interpreted as the overlay directly.
 
 Plotting pointClouds of types with normals defined, allow the visualisation of the curvature as a false color map for the points. Some itomfilter code imformation within the curvature. The plot type also allows illumination and intensity overlay.
 
-The "TwipOGLFigure" does neither support graphic element / marker plotting nor line or pixel picking at the moment. 
-  
-Examples  
+The "TwipOGLFigure" does neither support graphic element / marker plotting nor line or pixel picking at the moment.
+
+Examples
 ----------------
-	
+
 Properties
 ------------------------------------------
 
@@ -49,7 +49,7 @@ The following slots are public and either callable by python or c++. See the c++
 
 .. plotslots::
     :plugin: twipOGLFigure
-	
+
 Signals
 ------------------------------------------
 

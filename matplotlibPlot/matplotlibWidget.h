@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ public:
     MatplotlibWidget(QMenu *contextMenu, QWidget * parent = 0);
     ~MatplotlibWidget();
 
-    void setKeepSizeFixed(bool fixed) 
+    void setKeepSizeFixed(bool fixed)
     {
         m_keepSizeFixed = fixed;
     }
@@ -95,7 +95,7 @@ protected:
 private:
 
     struct PendingEvent
-    { 
+    {
     public:
         PendingEvent() : m_x(0), m_y(0), m_button(0), m_h(0), m_w(0), m_valid(false) {}
         PendingEvent(int x, int y, int button) : m_type(typeMouseMove), m_x(x), m_y(y), m_button(button), m_valid(true) {}

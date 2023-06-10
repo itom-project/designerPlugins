@@ -1,12 +1,12 @@
 /* ********************************************************************
 #    twipOGLFigure-Plugin for itom
 #    URL: http://www.twip-os.com
-#    Copyright (C) 2014, twip optical solutions GmbH, 
-#    Stuttgart, Germany 
+#    Copyright (C) 2014, twip optical solutions GmbH,
+#    Stuttgart, Germany
 #
-#    This files is part of the designer-Plugin twipOGLFigure for the 
+#    This files is part of the designer-Plugin twipOGLFigure for the
 #    measurement software itom. All files of this plugin, where not stated
-#    as port of the itom sdk, fall under the GNU Library General 
+#    as port of the itom sdk, fall under the GNU Library General
 #    Public Licence and must behandled accordingly.
 #
 #    twipOGLFigure is free software; you can redistribute it and/or modify it
@@ -21,9 +21,9 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under 
-#    GNU General Public License as published by the Free Software 
-#    Foundation. See <https://bitbucket.org/itom/> 
+#    itom is free software by ITO, University Stuttgart published under
+#    GNU General Public License as published by the Free Software
+#    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.

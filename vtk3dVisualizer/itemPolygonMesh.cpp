@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -258,7 +258,7 @@ void ItemPolygonMesh::setEdgeVisibility(bool value)
     if(it != map->end())
     {
         vtkProperty *prop = it->second.actor->GetProperty();
-        
+
         if (value)
         {
             prop->EdgeVisibilityOn();
@@ -295,7 +295,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
 
     pcl::visualization::CloudActorMap *map = m_visualizer->getCloudActorMap().get();
     pcl::visualization::CloudActorMap::iterator it = map->find( m_name.toStdString() );
-    
+
 
     if (mesh.get() && it != map->end())
     {
@@ -444,7 +444,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                         evalColorMap(std::sqrt(v1*v1+v2*v2), r, g, b, limits);
                         colors->InsertNextTuple3( r, g, b );
                     }
-                }      
+                }
                 else // mode == XYZ
                 {
                     float v1, v2, v3, v;
@@ -467,7 +467,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                         limits[0] = m_colorValueRange.minimum();
                         limits[1] = m_colorValueRange.maximum();
                     }
-                    
+
 
                     for (int i = 0; i < points; ++i)
                     {
@@ -480,7 +480,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                 }
 
                 colors->SetName ("Colors");
-                d->GetPointData()->SetScalars(colors); 
+                d->GetPointData()->SetScalars(colors);
                 it->second.actor->Modified();
 
                 emit updateCanvasRequest();
@@ -538,7 +538,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                         evalColorMap(*( (float*)(cloudDataPtr + i * point_size + offset)), r, g, b, limits);
                         colors->InsertNextTuple3( r, g, b );
                     }
-                }     
+                }
                 else // mode == NormalMagnitude
                 {
                     float v1, v2, v3, v;
@@ -572,7 +572,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                 }
 
                 colors->SetName ("Colors");
-                d->GetPointData()->SetScalars(colors); 
+                d->GetPointData()->SetScalars(colors);
                 it->second.actor->Modified();
 
                 emit updateCanvasRequest();
@@ -583,7 +583,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
             //check whether RGBA type is available and return its index
             int rgba_idx = pcl::getFieldIndex(mesh->cloud, "rgba");
             if (rgba_idx == -1) rgba_idx = pcl::getFieldIndex(mesh->cloud, "rgb"); //both types are mixed up in PCL < 2.0
-            
+
 
             if (rgba_idx == -1)
             {
@@ -599,7 +599,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                 pcl::PointXYZRGBA rgba;
                 const std::vector<uchar>* cloudData = &(mesh->cloud.data);
                 const uchar* cloudDataPtr = cloudData->data();
-        
+
                 int points = (mesh->cloud.height * mesh->cloud.width);
                 int point_size = points == 0 ? 0 : static_cast<int> (cloudData->size () / points);
 
@@ -613,7 +613,7 @@ void ItemPolygonMesh::setColorMode(const ColorMode& mode)
                 vtkPolyData *d = (vtkPolyData*)it->second.actor->GetMapper()->GetInput();
 
                 colors->SetName ("Colors");
-                d->GetPointData()->SetScalars(colors); 
+                d->GetPointData()->SetScalars(colors);
                 it->second.actor->Modified();
 
                 emit updateCanvasRequest();
@@ -711,7 +711,7 @@ void ItemPolygonMesh::setFaceColor(const QColor& color)
             }
 
             colors->SetName ("SolidColor");
-            d->GetPointData()->SetScalars(colors); 
+            d->GetPointData()->SetScalars(colors);
             it->second.actor->Modified();
         }
 
@@ -749,9 +749,9 @@ void ItemPolygonMesh::evalColorMap(float value, float &red, float &green, float 
         {
             value = (value - limits[0]) / (limits[1] - limits[0]);
         }
- 
+
         QColor c = m_colorMapData.colorVector256[qBound<int>(0, qRound(value*255.0), 255)];
- 
+
         red   = c.red();
         green = c.green();
         blue  = c.blue();

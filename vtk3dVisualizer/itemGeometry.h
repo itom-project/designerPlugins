@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -113,7 +113,7 @@ protected:
     void syncActorProperties(vtkProp *actor);
 
     boost::shared_ptr<pcl::visualization::PCLVisualizer> m_visualizer;
-    
+
     Type m_geometryType;
     pcl::ModelCoefficients m_coefficients;
     Representation m_representation;

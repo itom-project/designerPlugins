@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
     Q_PROPERTY(int printTopLevbelSpacing READ getPrintTopLevelRowSpacing WRITE setPrintTopLevelRowSpacing DESIGNABLE true)
     Q_PROPERTY(int printColumnSpacing READ getPrintColumnSpacing WRITE setPrintColumnSpacing DESIGNABLE true)
     Q_PROPERTY(QVector<ito::Shape> geometricShapes READ getGeometricShapes WRITE setGeometricShapes DESIGNABLE true)
-    
+
 
     Q_CLASSINFO("prop://valueUnit", "The value unit for the metrical calculations that is used within the plot.")
     Q_CLASSINFO("prop://relations", "Get or set geometric elements via N x 11 dataObject of type float32.")
@@ -114,7 +114,7 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
 
         //properties
         bool getContextMenuEnabled() const;
-        void setContextMenuEnabled(bool show); 
+        void setContextMenuEnabled(bool show);
 
         QVector<ito::Shape> getGeometricShapes() const;
         void setGeometricShapes(QVector<ito::Shape> shapes);
@@ -136,7 +136,7 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         void setNumberOfDigits(const int val);
 
         //QSharedPointer<ito::DataObject> readLastRelation(void) {return QSharedPointer<ito::DataObject>(new ito::DataObject());}
-        
+
         enum exportFlags
         {
             exportCSVTree  = 0x00,
@@ -154,7 +154,7 @@ class EVALUATEGEOMETRICS_EXPORT EvaluateGeometricsFigure : public ito::AbstractF
         int getLastRelation(void) const {return m_lastAddedRelation;}
         int getCurrentItem(void);
         ito::RetVal delRelation(const int idx);                 //> remove a relation
-        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution); 
+        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
         int getPrintRowSpacing(void) const;
         void setPrintRowSpacing(const int val);

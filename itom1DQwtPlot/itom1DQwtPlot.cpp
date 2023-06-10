@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -40,15 +40,15 @@
 using namespace ito;
 
 //------------------------------------------------------------------------------------------------------------------------
-class Itom1DQwtPlotPrivate 
+class Itom1DQwtPlotPrivate
 {
 public:
-    Itom1DQwtPlotPrivate() : 
+    Itom1DQwtPlotPrivate() :
         m_pData(NULL),
         m_pLinePropertiesDock(NULL),
 		m_pLinePropertyWidget(NULL)
     {}
-    
+
     Plot1DWidget::InternalData *m_pData;
     QDockWidget *m_pLinePropertiesDock;
 	WidgetCurveProperties *m_pLinePropertyWidget;
@@ -136,7 +136,7 @@ Itom1DQwtPlot::~Itom1DQwtPlot()
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom1DQwtPlot::init()
-{ 
+{
     return m_pContent->init(getWindowMode() != ito::AbstractFigure::ModeStandaloneInUi);
 } //called when api-pointers are transmitted, directly after construction
 
@@ -163,12 +163,12 @@ void Itom1DQwtPlot::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx
 {
     if (m_pContent)
     {
-        m_pContent->setRowPresentation(idx);  
+        m_pContent->setRowPresentation(idx);
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::resetRowPresentation() 
+void Itom1DQwtPlot::resetRowPresentation()
 {
     setRowPresentation(ItomQwtPlotEnums::AutoRowCol);
 }
@@ -189,7 +189,7 @@ void Itom1DQwtPlot::setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::resetRGBPresentation() 
+void Itom1DQwtPlot::resetRGBPresentation()
 {
     setRGBPresentation(ItomQwtPlotEnums::AutoColor);
 }
@@ -250,7 +250,7 @@ void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
         m_pContent->refreshPlot(getInputParam("source")->getVal<const ito::DataObject*>(), bounds);
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
-        m_pContent->updateInterval(Qt::YAxis, *(d->m_pData)); //replot is done here 
+        m_pContent->updateInterval(Qt::YAxis, *(d->m_pData)); //replot is done here
     }
     updatePropertyDock();
 }
@@ -266,7 +266,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
     {
         getOutputParam("displayed")->copyValueFrom(sourceParam);
         // why "source" is used here and not "displayed" .... ck 05/15/2013
-        
+
         QList<QSharedPointer<Channel> > dataChannels = getConnectedInputChannels("source");
 
         m_pContent->m_hasParentForRescale = false;
@@ -290,8 +290,8 @@ ito::RetVal Itom1DQwtPlot::setSource(QSharedPointer<ito::DataObject> source)
     return ito::retOk;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds) 
-{ 
+void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds)
+{
     double *pointArr = new double[2 * bounds.size()];
     for (int np = 0; np < bounds.size(); np++)
     {
@@ -304,7 +304,7 @@ void Itom1DQwtPlot::setBounds(QVector<QPointF> bounds)
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QVector<QPointF> Itom1DQwtPlot::getBounds(void) const
-{ 
+{
     int numPts = getInputParam("bounds")->getLen();
     QVector<QPointF> boundsVec;
 
@@ -433,7 +433,7 @@ void Itom1DQwtPlot::resetValueLabel()
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ScaleEngine Itom1DQwtPlot::getValueScale() const
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         return m_pContent->m_valueScale;
     }
@@ -453,7 +453,7 @@ void Itom1DQwtPlot::setValueScale(const ItomQwtPlotEnums::ScaleEngine &scale)
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ScaleEngine Itom1DQwtPlot::getAxisScale() const
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         return m_pContent->m_axisScale;
     }
@@ -618,7 +618,7 @@ void Itom1DQwtPlot::setGrid(const Itom1DQwtPlot::GridStyle &gridStyle)
     {
         m_pContent->setGridStyle(gridStyle);
     }
-    
+
     updatePropertyDock();
 }
 
@@ -701,7 +701,7 @@ void Itom1DQwtPlot::setLineSymbol(const Symbol symbol)
 {
     if (m_pContent)
     {
-        
+
         if (symbol <= QwtSymbol::Path && symbol >= 0 )
         {
             m_pContent->setSymbolStyle((QwtSymbol::Style)(symbol - 1), d->m_pData->m_lineSymboleSize);
@@ -860,15 +860,15 @@ void Itom1DQwtPlot::setLegendTitles(const QStringList &legends)
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::AutoInterval Itom1DQwtPlot::getYAxisInterval(void) const
-{ 
+{
     m_pContent->synchronizeCurrentScaleValues();
     ito::AutoInterval interval(d->m_pData->m_valueMin, d->m_pData->m_valueMax, d->m_pData->m_valueScaleAuto);
     return interval;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------        
-void Itom1DQwtPlot::setYAxisInterval(ito::AutoInterval interval) 
-{ 
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setYAxisInterval(ito::AutoInterval interval)
+{
     if ((interval.minimum() != d->m_pData->m_valueMin) ||
         (interval.maximum() != d->m_pData->m_valueMax) ||
         (interval.isAuto() != d->m_pData->m_valueScaleAuto))
@@ -884,19 +884,19 @@ void Itom1DQwtPlot::setYAxisInterval(ito::AutoInterval interval)
         m_pContent->updateScaleValues(interval.isAuto());
         updatePropertyDock();
     }
-}   
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ito::AutoInterval Itom1DQwtPlot::getXAxisInterval(void) const
-{ 
+{
     m_pContent->synchronizeCurrentScaleValues();
     ito::AutoInterval interval(d->m_pData->m_axisMin, d->m_pData->m_axisMax, d->m_pData->m_axisScaleAuto);
     return interval;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------        
-void Itom1DQwtPlot::setXAxisInterval(ito::AutoInterval interval) 
-{ 
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setXAxisInterval(ito::AutoInterval interval)
+{
     if ((interval.minimum() != d->m_pData->m_axisMin) ||
         (interval.maximum() != d->m_pData->m_axisMax) ||
         (interval.isAuto() != d->m_pData->m_axisScaleAuto))
@@ -912,11 +912,11 @@ void Itom1DQwtPlot::setXAxisInterval(ito::AutoInterval interval)
         m_pContent->updateScaleValues(interval.isAuto());
         updatePropertyDock();
     }
-}  
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
-{ 
+{
     m_pContent->enableObjectGUIElements(mode);
 }
 
@@ -925,7 +925,7 @@ QSharedPointer<ito::DataObject> Itom1DQwtPlot::getDisplayed()
 {
     if (!m_pContent)
     {
-        return QSharedPointer<ito::DataObject>(); 
+        return QSharedPointer<ito::DataObject>();
     }
     else
     {
@@ -986,7 +986,7 @@ QVector<float> Itom1DQwtPlot::getPickerPhys() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerLabelVisible(const bool state)
 {
-    if (d->m_pData) 
+    if (d->m_pData)
     {
         d->m_pData->m_pickerLabelVisible = state;
     }
@@ -1000,7 +1000,7 @@ void Itom1DQwtPlot::setPickerLabelVisible(const bool state)
 //----------------------------------------------------------------------------------------------------------------------------------
 bool Itom1DQwtPlot::getPickerLabelVisible() const
 {
-    if (!d->m_pData) 
+    if (!d->m_pData)
     {
         return false;
     }
@@ -1010,7 +1010,7 @@ bool Itom1DQwtPlot::getPickerLabelVisible() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerLabelOrientation(const Qt::Orientation val)
 {
-    if (d->m_pData) 
+    if (d->m_pData)
     {
         d->m_pData->m_pickerLabelOrientation = val;
     }
@@ -1024,7 +1024,7 @@ void Itom1DQwtPlot::setPickerLabelOrientation(const Qt::Orientation val)
 //----------------------------------------------------------------------------------------------------------------------------------
 Qt::Orientation Itom1DQwtPlot::getPickerLabelOrientation() const
 {
-    if (!d->m_pData) 
+    if (!d->m_pData)
     {
         return Qt::Horizontal;
     }
@@ -1034,7 +1034,7 @@ Qt::Orientation Itom1DQwtPlot::getPickerLabelOrientation() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerLabelAlignment(const Qt::Alignment val)
 {
-    if (d->m_pData) 
+    if (d->m_pData)
     {
         d->m_pData->m_pickerLabelAlignment = val;
     }
@@ -1048,7 +1048,7 @@ void Itom1DQwtPlot::setPickerLabelAlignment(const Qt::Alignment val)
 //----------------------------------------------------------------------------------------------------------------------------------
 Qt::Alignment Itom1DQwtPlot::getPickerLabelAlignment()const
 {
-    if (!d->m_pData) 
+    if (!d->m_pData)
     {
         return Qt::AlignRight;
     }
@@ -1058,7 +1058,7 @@ Qt::Alignment Itom1DQwtPlot::getPickerLabelAlignment()const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setPickerType(const ItomQwtPlotEnums::PlotPickerType val)
 {
-    if (d->m_pData) 
+    if (d->m_pData)
     {
         d->m_pData->m_pickerType = val;
     }
@@ -1072,7 +1072,7 @@ void Itom1DQwtPlot::setPickerType(const ItomQwtPlotEnums::PlotPickerType val)
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::PlotPickerType Itom1DQwtPlot::getPickerType() const
 {
-    if (!d->m_pData) 
+    if (!d->m_pData)
     {
         return ItomQwtPlotEnums::DefaultMarker;
     }
@@ -1082,7 +1082,7 @@ ItomQwtPlotEnums::PlotPickerType Itom1DQwtPlot::getPickerType() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setBaseLine(const qreal val)
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         return m_pContent->setBaseLine(val);
     }
@@ -1092,7 +1092,7 @@ void Itom1DQwtPlot::setBaseLine(const qreal val)
 //----------------------------------------------------------------------------------------------------------------------------------
 qreal Itom1DQwtPlot::getBaseLine() const
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         return m_pContent->m_baseLine;
     }
@@ -1102,7 +1102,7 @@ qreal Itom1DQwtPlot::getBaseLine() const
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor Itom1DQwtPlot::getCurveFillColor() const
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         return m_pContent->m_filledColor;
     }
@@ -1112,7 +1112,7 @@ QColor Itom1DQwtPlot::getCurveFillColor() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setCurveFillColor(const QColor val)
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         m_pContent->m_filledColor = val;
         m_pContent->m_filledColor.setAlpha(m_pContent->m_fillCurveAlpa);
@@ -1130,7 +1130,7 @@ void Itom1DQwtPlot::resetCurveFillColor()
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::FillCurveStyle Itom1DQwtPlot::getCurveFilled() const
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
 
         return m_pContent->m_curveFilled;
@@ -1141,7 +1141,7 @@ ItomQwtPlotEnums::FillCurveStyle Itom1DQwtPlot::getCurveFilled() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setCurveFilled(const ItomQwtPlotEnums::FillCurveStyle state)
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         m_pContent->m_curveFilled = state;
         m_pContent->setCurveFilled();
@@ -1152,7 +1152,7 @@ void Itom1DQwtPlot::setCurveFilled(const ItomQwtPlotEnums::FillCurveStyle state)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setCurveFillAlpha(const int val)
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         m_pContent->m_fillCurveAlpa = cv::saturate_cast<ito::uint8>(val);
         m_pContent->m_filledColor.setAlpha(m_pContent->m_fillCurveAlpa);
@@ -1164,7 +1164,7 @@ void Itom1DQwtPlot::setCurveFillAlpha(const int val)
 //----------------------------------------------------------------------------------------------------------------------------------
 int Itom1DQwtPlot::getCurveFillAlpha() const
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         return m_pContent->m_fillCurveAlpa;
     }

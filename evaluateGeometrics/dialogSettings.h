@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@
  * \brief This class manages the dialog for basic settings and it inherrits the ui-dialog "dialogSettings.ui"
  */
 
-class DialogSettings : public QDialog 
+class DialogSettings : public QDialog
 {
 public:
     DialogSettings(const InternalInfo &input, const int &geometicElements, QWidget *parent = NULL); /*!< Class constructor, which takes all necessary informations to create the correspondig dialog.*/

@@ -1,12 +1,12 @@
 /* ********************************************************************
 #    twipOGLFigure-Plugin for itom
 #    URL: http://www.twip-os.com
-#    Copyright (C) 2014, twip optical solutions GmbH, 
-#    Stuttgart, Germany 
+#    Copyright (C) 2014, twip optical solutions GmbH,
+#    Stuttgart, Germany
 #
-#    This files is part of the designer-Plugin twipOGLFigure for the 
+#    This files is part of the designer-Plugin twipOGLFigure for the
 #    measurement software itom. All files of this plugin, where not stated
-#    as port of the itom sdk, fall under the GNU Library General 
+#    as port of the itom sdk, fall under the GNU Library General
 #    Public Licence and must behandled accordingly.
 #
 #    twipOGLFigure is free software; you can redistribute it and/or modify it
@@ -21,15 +21,15 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under 
-#    GNU General Public License as published by the Free Software 
-#    Foundation. See <https://bitbucket.org/itom/> 
+#    itom is free software by ITO, University Stuttgart published under
+#    GNU General Public License as published by the Free Software
+#    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#if linux 
+#if linux
     #include <unistd.h>
 #endif
 #include <qglobal.h>
@@ -90,13 +90,13 @@ extern int NTHREADS;
 float tickDist = 20;
 
 //----------------------------------------------------------------------------------------------------------------------------------
-/** 
+/**
 *   \class TwipOGLWidget
 *   \brief OpenGL Widget for displaying perspective plots of dataObjects and pointClouds
 *
 *   Inner widget which actually does all the drawing job. The widget can render perspective
 *   plots of dataObjects and different types of pointClouds. The 3D data can be overlayed
-*   with an intensity image and some basic illumination is available. For pointClouds it is 
+*   with an intensity image and some basic illumination is available. For pointClouds it is
 *   also possible to use the values stored in the curvature for color coding. This can e.g.
 *   used to color code the difference to a model.
 */
@@ -180,7 +180,7 @@ TwipOGLWidget::TwipOGLWidget(QMenu *contextMenu, void* configData, QGLFormat &fm
     updateColorsAndVisibility(false);
 
     //(mouse tracking is controled by action in WinMatplotlib)
-    this->setMouseTracking(false); 
+    this->setMouseTracking(false);
     int ret = 0;
 
     m_transperency.clear();
@@ -320,7 +320,7 @@ void TwipOGLWidget::doCleanUp(void)
         delete m_glf;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------    
+//----------------------------------------------------------------------------------------------------------------------------------
 TwipOGLWidget::~TwipOGLWidget()
 {
     delete m_pConfigData;
@@ -639,7 +639,7 @@ void TwipOGLWidget::initializeGL()
     m_VAO3D.insert(0, tmpArr);
     m_transperency.insert(0, 255);
     m_enabledHash.insert(0, true);
-    
+
     #if QT_VERSION >= 0x050400
     m_glf = new QOpenGLFunctions(context());
     #else
@@ -662,11 +662,11 @@ void TwipOGLWidget::initializeGL()
 //    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  //Perspektivenkorrektur an
     GLFPTR(glHint)(GL_LINE_SMOOTH_HINT, GL_NICEST);             //Linien Antialiasing
     GLFPTR(glHint)(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    
+
     GLFPTR(glClearColor)((float)((m_pConfigData->m_backgnd >> 16) & 0xFF),
-                 (float)((m_pConfigData->m_backgnd >> 8 ) & 0xFF), 
-                 (float)((m_pConfigData->m_backgnd      ) & 0xFF), 
-                 0.0f);             
+                 (float)((m_pConfigData->m_backgnd >> 8 ) & 0xFF),
+                 (float)((m_pConfigData->m_backgnd      ) & 0xFF),
+                 0.0f);
 
     if (makeShaderProg("3D", m_prog3D) != 0)
     {
@@ -729,9 +729,9 @@ void TwipOGLWidget::initializeGL()
     GLFPTR(glUniform1f)(m_unifText, 0.0f);
     GLFPTR(glUniform1i)(m_unifLighting, 0);
 
-    GLFPTR(glUniform4f)(m_unifGlColorInv, 
-        ((m_pConfigData->m_invColor & 0x00FF0000) >> 16) / 255.0f, 
-        ((m_pConfigData->m_invColor & 0x0000FF00) >> 8 ) / 255.0f, 
+    GLFPTR(glUniform4f)(m_unifGlColorInv,
+        ((m_pConfigData->m_invColor & 0x00FF0000) >> 16) / 255.0f,
+        ((m_pConfigData->m_invColor & 0x0000FF00) >> 8 ) / 255.0f,
         ((m_pConfigData->m_invColor & 0x000000FF)      ) / 255.0f,
         ((m_pConfigData->m_invColor & 0xFF000000)>> 24 ) / 255.0f);
 
@@ -788,7 +788,7 @@ void TwipOGLWidget::initializeGL()
     m_attribTxtVert = GLFPTR(glGetAttribLocation)(m_prog2DPx, "inVert");
     m_attribTxtUV = GLFPTR(glGetAttribLocation)(m_prog2DPx, "inUV");
     GLFPTR(glUniform3f)(m_unifTextColor, 1.0, 0.0, 1.0);
-    
+
     ret = glGetError();
 
     nf = QFont(QString::fromStdString(m_axes.m_fontName));
@@ -842,7 +842,7 @@ SFont::~SFont()
 *   @param [in] ratio       ratio of x/y size
 *   @return     returns the calculated matrix as cv:Mat
 *
-*   This method calculates a projection matrix used generally for 3D output and stores it into the shader program variable passed. 
+*   This method calculates a projection matrix used generally for 3D output and stores it into the shader program variable passed.
 *   Except the variables passed the according member variables for zoom, and shift are used for the matrix calculation.
 */
 cv::Mat TwipOGLWidget::setMVP(const GLint uniformLoc, const float fov, const float near, const float far, const float ratio, const bool noScale)
@@ -998,9 +998,9 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
 
         // try and use high quality text rendering (works well on the mac not as good on linux)
         painter.setRenderHints(
-            QPainter::Antialiasing | 
-            QPainter::SmoothPixmapTransform |  
-            QPainter::TextAntialiasing | 
+            QPainter::Antialiasing |
+            QPainter::SmoothPixmapTransform |
+            QPainter::TextAntialiasing |
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             QPainter::Antialiasing
 #else
@@ -1141,11 +1141,11 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
 }
 
 //-----------------------------------------------------------------------------------------------
-/** Draw 3D axis 
+/** Draw 3D axis
 *
 *   This methods draws the axis including their ticks and labels around the plot. The z-axis
 *   can be turned on / off with the member variable m_axes.m_axisZ.m_isVisible. All settings
-*   for the axis are defined via the member variables in m_axes.maxisN. Drawing the axis is 
+*   for the axis are defined via the member variables in m_axes.maxisN. Drawing the axis is
 *   quite simple. What makes the whole thing a little bit tricky is to determine when and where
 *   we want to have the axes ticks and labels. Therefore we find out how the 3D pose is oriented.
 */
@@ -1164,9 +1164,9 @@ void TwipOGLWidget::DrawAxesOGL(void)
 
     GLFPTR(glLineWidth)(m_axes.m_lineWidth);
 
-    GLFPTR(glUniform3f)(m_unifGlColor3DPri, 
-        ((m_pConfigData->m_axisColor & 0x00FF0000) >> 16) / 255.0f, 
-        ((m_pConfigData->m_axisColor & 0x0000FF00) >> 8) / 255.0f, 
+    GLFPTR(glUniform3f)(m_unifGlColor3DPri,
+        ((m_pConfigData->m_axisColor & 0x00FF0000) >> 16) / 255.0f,
+        ((m_pConfigData->m_axisColor & 0x0000FF00) >> 8) / 255.0f,
         ((m_pConfigData->m_axisColor & 0x000000FF)) / 255.0f);
 
     GLfloat vertices[12] = {
@@ -1190,7 +1190,7 @@ void TwipOGLWidget::DrawAxesOGL(void)
     float ticklen = 0.03f;
     float signX1 = 1.0f;
     float signY1 = 1.0f;
-    if ((m_pConfigData->m_pitchAng > -GL_PI && m_pConfigData->m_pitchAng <= -GL_PI / 2.0) || 
+    if ((m_pConfigData->m_pitchAng > -GL_PI && m_pConfigData->m_pitchAng <= -GL_PI / 2.0) ||
         (m_pConfigData->m_pitchAng > 0 && m_pConfigData->m_pitchAng <= GL_PI / 2.0))
     {
         signX1 = 1.0;
@@ -1207,7 +1207,7 @@ void TwipOGLWidget::DrawAxesOGL(void)
     }
 
     float signX3 = 1.0;
-    if ((m_pConfigData->m_yawAng > GL_PI / 2.0 && m_pConfigData->m_yawAng <= GL_PI) || 
+    if ((m_pConfigData->m_yawAng > GL_PI / 2.0 && m_pConfigData->m_yawAng <= GL_PI) ||
         (m_pConfigData->m_yawAng > -GL_PI && m_pConfigData->m_yawAng <= -GL_PI / 2.0))
     {
         //signX3 = 1.0;
@@ -1550,23 +1550,23 @@ void TwipOGLWidget::DrawAxesOGL(void)
 //----------------------------------------------------------------------------------------------------------------------------------
 /** OpenGL paint routine
 *
-*   In this method all painting is done. So we work through the different part of our gl scene. 
+*   In this method all painting is done. So we work through the different part of our gl scene.
 *   These are the axis, the 3D data, the colorbar, the title / infotext and if necessary we handle the lighting.
 *   A multiple call of paintGL is avoided using the m_isInit status variable.
 */
 void TwipOGLWidget::paintGL()
 {
     int glErr = 0;
-    
+
     if (m_isInit != (IS_INIT | HAS_TRIANG))
         return;
 
     m_isInit |= IS_RENDERING;
 
     GLFPTR(glClearColor)((float)((m_pConfigData->m_backgnd >> 16) & 0xFF),
-                 (float)((m_pConfigData->m_backgnd >> 8 ) & 0xFF), 
-                 (float)((m_pConfigData->m_backgnd      ) & 0xFF), 
-                 0.0f); 
+                 (float)((m_pConfigData->m_backgnd >> 8 ) & 0xFF),
+                 (float)((m_pConfigData->m_backgnd      ) & 0xFF),
+                 0.0f);
 
     GLFPTR(glClear)(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // clear screen and depth buffer
 
@@ -1583,7 +1583,7 @@ void TwipOGLWidget::paintGL()
         return;
     }
 
-    //!> When illumination is enabled calculate the illumination vectors and push them to the shader program 
+    //!> When illumination is enabled calculate the illumination vectors and push them to the shader program
     if (m_pConfigData->m_elementMode & ENABLE_ILLUMINATION)
     {
         GLfloat directionLS[3] = {0.0f, 0.0f, 1.0f};
@@ -1628,7 +1628,7 @@ void TwipOGLWidget::paintGL()
     GLFPTR(glUniform1f)(m_unifDiffNorm, devNorm);
     GLFPTR(glUniform1f)(m_unifDiffMin, devMin);
     GLFPTR(glUniform1f)(m_uniCurAlpha, 1.0);
-    
+
 
     //!> Draw all points / triangles
     setVCT(m_unifVCT, 1);
@@ -1753,18 +1753,18 @@ void TwipOGLWidget::paintGL()
 #ifdef USEPCL
 //----------------------------------------------------------------------------------------------------------------------------------
 /** method for loading point cloud to vertex array
-*   @param [in] pcl        templated pointcloud 
+*   @param [in] pcl        templated pointcloud
 *   @param [in] id         internal id for storing / referencing the pointcloud
 *   @return     returns ito::retOk on success otherwise ito::retError
 *
-*   In this method a given point cloud is transformed into the according vertex array and 
-*   uploaded to the graphics board. If the point cloud has an intensity it is uploaded 
+*   In this method a given point cloud is transformed into the according vertex array and
+*   uploaded to the graphics board. If the point cloud has an intensity it is uploaded
 *   as well. We use the curvature parameter of the point clouds to store the difference
 *   to a model and use this as a scaling for the color palette. So the input point cloud is
 *   analysed for this parameter. At last if normals are given we use them as well, as
 *   we need them for lighting. If have normals we first try to get memory for points &
 *   normals if that fails we just try points and if that fails as well we give up.
-*   If an intensity overlay should be used the values must be scaled between 0 and 1 
+*   If an intensity overlay should be used the values must be scaled between 0 and 1
 *   to work as expected.
 */
 template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud<_Tp> *pcl, const int id)
@@ -1801,7 +1801,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
         {
             if(hasPointToNormal<_Tp>() && useNormals)
             {
-                //!> try to acquire memory for pointy & normals 
+                //!> try to acquire memory for pointy & normals
                 ptSize = 8;
                 vertBuf = static_cast<GLfloat *>(calloc(width * height * ptSize, sizeof(GLfloat)));
                 if (vertBuf == NULL)
@@ -2035,8 +2035,8 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
             m_VAO3D.value(id)->bind();
 #endif
             //!> Here we activate the various buffers used in the shader, upload the buffer(s) and set their properties.
-            //!> Even if we don't use some of the features, e.g. normals we must set the attributePointer to a 
-            //!> meaningful value, other we get problems on some graphics boards ... even if the attribute array 
+            //!> Even if we don't use some of the features, e.g. normals we must set the attributePointer to a
+            //!> meaningful value, other we get problems on some graphics boards ... even if the attribute array
             //!> is diabled ...
             GLFPTR(glBindBuffer)(GL_ARRAY_BUFFER, m_vertBuf3D.value(id));
             GLFPTR(glEnableVertexAttribArray)(m_attribVert);
@@ -2046,7 +2046,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
 
             GLFPTR(glVertexAttribPointer)(m_attribVert, 3, GL_FLOAT, GL_FALSE, ptSize * sizeof(GLfloat), 0);
             GLFPTR(glVertexAttribPointer)(m_attribVertColor, 1, GL_FLOAT, GL_FALSE, ptSize * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-            
+
             if (hasPointToCurvature<_Tp>())
                 GLFPTR(glVertexAttribPointer)(m_attribDiff, 1, GL_FLOAT, GL_FALSE, ptSize * sizeof(GLfloat), (void*)(4 * sizeof(GLfloat)));
             else
@@ -2122,8 +2122,8 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
 *   @param [in] isComplex  flag indicating whether the input data object is complex
 *   @return     returns ito::retOk on success otherwise ito::retError
 *
-*   In this method a given dataObject is transformed into the according vertex array and 
-*   uploaded to the graphics board. There are two methods. One painting triangles 
+*   In this method a given dataObject is transformed into the according vertex array and
+*   uploaded to the graphics board. There are two methods. One painting triangles
 *   and one painting points. The triangulation is quite dumb, it always uses four
 *   neighbouring points to create 2 triangles including their normal vectors. This results
 *   in an overall number of triangles 2 times the number of points. Painting just points
@@ -2342,7 +2342,7 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
                         vertBuf[count * ptSize + 2] = dpixel1;
 
                         if (fillInvalids && invPixel1)
-                        {   
+                        {
                             vertBuf[count * ptSize + 3] = cv::saturate_cast<unsigned char>((dpixel1 - zmin) * znorm);
                         }
                         m_pUseTextPix[id][count * 2] = cntY;
@@ -2439,7 +2439,7 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
                         {
                             vertBuf[count * ptSize + 3] = cv::saturate_cast<unsigned char>((dpixel1 - zmin) * znorm);
                             vertBuf[count * ptSize + pt2Inc + 3] = cv::saturate_cast<unsigned char>((dpixel2 - zmin) * znorm);
-                            vertBuf[count * ptSize + pt3Inc + 3] = cv::saturate_cast<unsigned char>((dpixel3 - zmin) * znorm);                        
+                            vertBuf[count * ptSize + pt3Inc + 3] = cv::saturate_cast<unsigned char>((dpixel3 - zmin) * znorm);
                         }
 
                         m_pUseTextPix[id][count * 6] = cntY;
@@ -2503,7 +2503,7 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
                         vertBuf[count * ptSize] = xval;
                         vertBuf[count * ptSize + 1] = yval1;
                         vertBuf[count * ptSize + 2] = dpixel2;
-                        
+
 
                         vertBuf[count * ptSize + pt2Inc] = xval1;
                         vertBuf[count * ptSize + pt2Inc + 1] = yval;
@@ -2512,7 +2512,7 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
                         vertBuf[count * ptSize + pt3Inc] = xval1;
                         vertBuf[count * ptSize + pt3Inc + 1] = yval1;
                         vertBuf[count * ptSize + pt3Inc + 2] = dpixel4;
-                        
+
 
                         if(fillInvalids && (invPixel2 || invPixel3 || invPixel4))
                         {
@@ -2524,7 +2524,7 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
                         {
                             vertBuf[count * ptSize + 3] = cv::saturate_cast<unsigned char>((dpixel2 - zmin) * znorm);
                             vertBuf[count * ptSize + pt2Inc + 3] = cv::saturate_cast<unsigned char>((dpixel3 - zmin) * znorm);
-                            vertBuf[count * ptSize + pt3Inc + 3] = cv::saturate_cast<unsigned char>((dpixel4 - zmin) * znorm);                      
+                            vertBuf[count * ptSize + pt3Inc + 3] = cv::saturate_cast<unsigned char>((dpixel4 - zmin) * znorm);
                         }
 
                         m_pUseTextPix[id][count * 6] = (cntY + 1);
@@ -2657,8 +2657,8 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
             m_VAO3D.value(id)->bind();
 #endif
             //!> Here we activate the various buffers used in the shader, upload the buffer(s) and set their properties.
-            //!> Even if we don't use some of the features, e.g. normals we must set the attributePointer to a 
-            //!> meaningful value, other we get problems on some graphics boards ... even if the attribute array 
+            //!> Even if we don't use some of the features, e.g. normals we must set the attributePointer to a
+            //!> meaningful value, other we get problems on some graphics boards ... even if the attribute array
             //!> is diabled ...
             GLFPTR(glBindBuffer)(GL_ARRAY_BUFFER, m_vertBuf3D.value(id));
             GLFPTR(glEnableVertexAttribArray)(m_attribVert);
@@ -2722,8 +2722,8 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
 *   @param [in] id         internal id for storing / referencing the pointcloud
 *
 *   This method is used to update the plotted data. The data is encapsulated in a ito::ParamBase
-*   and either dataObjects or pointClouds can be plotted. The method can be called without 
-*   passing a param as well. In this case only an update of the plot using the 
+*   and either dataObjects or pointClouds can be plotted. The method can be called without
+*   passing a param as well. In this case only an update of the plot using the
 *   previously passed object is done. Otherwise the currently displayed object
 *   is replaced with the new one and an update is triggered.
 */
@@ -2933,7 +2933,7 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
                 case ito::pclXYZ:
                 {
                     pcl::PointCloud<pcl::PointXYZ> *pcl = m_pContentPC[id]->toPointXYZ().get();
-                    pclFindMinMax<pcl::PointXYZ>(pcl, id);   
+                    pclFindMinMax<pcl::PointXYZ>(pcl, id);
                 }
                 break;
 
@@ -3274,7 +3274,7 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
                     case ito::pclXYZNormal:
                     {
                         pcl::PointCloud<pcl::PointNormal> *pcl = m_pContentPC[id]->toPointXYZNormal().get();
-                        retval += GLSetPointsPCL<pcl::PointNormal>(pcl, id);  
+                        retval += GLSetPointsPCL<pcl::PointNormal>(pcl, id);
                     }
                     break;
 
@@ -3309,7 +3309,7 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
     }
 #endif // #ifdef USEPCL
 
-    
+
 #ifdef USEPCL
     bool hasNoPC = true;
     bool hasNoDObj = true;
@@ -3423,13 +3423,13 @@ ito::RetVal TwipOGLWidget::ResetColors()
     }
     #endif
 
-    //!> upload buffer to the graphics board. So we can 
+    //!> upload buffer to the graphics board. So we can
     //!> use color indices to address the palette colors
     GLFPTR(glUseProgram)(m_prog3D);
     GLFPTR(glUniform3fv)(m_unifPalette, 256, src);
-    GLFPTR(glUniform4f)(m_unifGlColorInv, 
-        ((m_pConfigData->m_invColor & 0x00FF0000) >> 16) / 255.0f, 
-        ((m_pConfigData->m_invColor & 0x0000FF00) >> 8 ) / 255.0f, 
+    GLFPTR(glUniform4f)(m_unifGlColorInv,
+        ((m_pConfigData->m_invColor & 0x00FF0000) >> 16) / 255.0f,
+        ((m_pConfigData->m_invColor & 0x0000FF00) >> 8 ) / 255.0f,
         ((m_pConfigData->m_invColor & 0x000000FF)      ) / 255.0f,
         ((m_pConfigData->m_invColor & 0xFF000000)>> 24 ) / 255.0f);
 
@@ -3493,9 +3493,9 @@ void TwipOGLWidget::paintLightArrow()
 
     glLineWidth(m_axes.m_lineWidth);
 
-    GLFPTR(glUniform3f)(m_unifGlColor3DPri, 
-        ((m_pConfigData->m_axisColor & 0x00FF0000) >> 16) / 255.0f, 
-        ((m_pConfigData->m_axisColor & 0x0000FF00) >> 8) / 255.0f, 
+    GLFPTR(glUniform3f)(m_unifGlColor3DPri,
+        ((m_pConfigData->m_axisColor & 0x00FF0000) >> 16) / 255.0f,
+        ((m_pConfigData->m_axisColor & 0x0000FF00) >> 8) / 255.0f,
         ((m_pConfigData->m_axisColor & 0x000000FF)) / 255.0f);
 
 
@@ -3563,7 +3563,7 @@ void TwipOGLWidget::paintLightArrow()
 *   @param [in] ffamily         font family, style used for printing text
 *   @param [in] fsize           font size used
 *   @param [in] fcolor          font color used
-*   
+*
 *   @return     returns ito::retOk on success otherwise ito::retError
 *
 *   The input text is transformed into a bitmap using the previously prepared font composing it from
@@ -3808,9 +3808,9 @@ void TwipOGLWidget::DrawColorBar(const GLfloat posX, const GLfloat posY, const G
     const GLfloat zMax = useDev ? m_axes.m_devAxis.getMax() : m_axes.m_axisZ.getMax();
 
     // draw outline
-    GLFPTR(glUniform3f)(m_unifGlColor2D, 
-        ((m_pConfigData->m_axisColor & 0x00FF0000) >> 16) / 255.0f, 
-        ((m_pConfigData->m_axisColor & 0x0000FF00) >> 8) / 255.0f, 
+    GLFPTR(glUniform3f)(m_unifGlColor2D,
+        ((m_pConfigData->m_axisColor & 0x00FF0000) >> 16) / 255.0f,
+        ((m_pConfigData->m_axisColor & 0x0000FF00) >> 8) / 255.0f,
         ((m_pConfigData->m_axisColor & 0x000000FF)) / 255.0f);
 
     // we are creating a billboard with two triangles so we only need the
@@ -3929,7 +3929,7 @@ void TwipOGLWidget::DrawTitle()
 *   @param [in] value        Amplication value
 *
 *   Usually the feature we want to see are quite small compared to the lateral size of the field.
-*   Therefore we us an amplication factor to show them. This function sets the factor to the passed 
+*   Therefore we us an amplication factor to show them. This function sets the factor to the passed
 *   value.
 */
 void TwipOGLWidget::validateZAmplification()
@@ -3953,7 +3953,7 @@ void TwipOGLWidget::validateZAmplification()
 *   @param [in] value        Amplication value
 *
 *   Usually the feature we want to see are quite small compared to the lateral size of the field.
-*   Therefore we us an amplication factor to show them. This function sets the factor to the passed 
+*   Therefore we us an amplication factor to show them. This function sets the factor to the passed
 *   value.
 */
 void TwipOGLWidget::setZAmplification(double value)
@@ -4088,7 +4088,7 @@ void TwipOGLWidget::setColorMap(QString palette)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-/** Set interval for axis 
+/** Set interval for axis
 *
 *   @param [in] axis            axis to change
 *   @param [in] autoCalcLimits  auto calculate limits from data
@@ -4096,7 +4096,7 @@ void TwipOGLWidget::setColorMap(QString palette)
 *   @param [in] maxValue        maximum value to display
 *
 *   Though obivously not working yet this function should set the limits for the displayed
-*   data. 
+*   data.
 */
 ito::RetVal TwipOGLWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
 {
@@ -4104,7 +4104,7 @@ ito::RetVal TwipOGLWidget::setInterval(const Qt::Axis axis, const bool autoCalcL
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-/** Update window 
+/** Update window
 *
 *   Update window content after an overlay image has been set.
 */
@@ -4188,7 +4188,7 @@ void TwipOGLWidget::updateColorsAndVisibility(const bool forceUpdate)
 
     m_objectInfo.show = m_pConfigData->m_infoVisible;
 
-    if(forceUpdate) 
+    if(forceUpdate)
         update();
 }
 
@@ -4223,7 +4223,7 @@ void TwipOGLWidget::toggleObjectInfoText(const bool enabled, const int fromID)
 //----------------------------------------------------------------------------------------------------------------------------------
 /** Generates the object info text
 *
-*   Generates the object info text from the objects physical properties and 
+*   Generates the object info text from the objects physical properties and
 *   some tags. The state of the object info text is changed by the method
 *   \ref{toggleObjectInfoText} and the painting is done by the method
 *   \ref{DrawObjectInfo}
@@ -4314,7 +4314,7 @@ inline void TwipOGLWidget::generateObjectInfoText(const int fromID)
             case  pclXYZINormal:
                 sprintf(buf, "PointCloud Type: XYZ + I + Normals");
                 break;
-            case pclXYZRGBNormal: 
+            case pclXYZRGBNormal:
                 sprintf(buf, "PointCloud Type: XYZ + RGB + Normals");
                 break;
         }
@@ -4368,7 +4368,7 @@ inline void TwipOGLWidget::generateObjectInfoText(const int fromID)
 *   @param [in] deltaZ      Position change in z
 *
 *   Moves the position of the view inside the window, which is done by moving the coordinate
-*   system. This comes handy when we zoom into the object and whant to see a detail that is 
+*   system. This comes handy when we zoom into the object and whant to see a detail that is
 *   not in the central part. Uses the method \ref{setViewTranslation} to incrementally
 *   move the view.
 */
@@ -4378,11 +4378,11 @@ void TwipOGLWidget::moveView(const double deltaX, const double deltaY, const dou
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-/** Changes the zoom 
+/** Changes the zoom
 *
 *   @param [in] factor      Amplication factor
 *
-*   Changes the zoom for the view, e.g. when the mouse wheel is used. 
+*   Changes the zoom for the view, e.g. when the mouse wheel is used.
 */
 void TwipOGLWidget::setCanvasZoomView(const double factor)
 {
@@ -4403,9 +4403,9 @@ void TwipOGLWidget::setCanvasZoomView(const double factor)
         m_zoomer.enabled = true;
     }
     else if(
-        fabs(m_zoomer.shiftz) < 0.001 && 
-        fabs(m_zoomer.shifty) < 0.001 && 
-        fabs(m_zoomer.shiftx) < 0.001) 
+        fabs(m_zoomer.shiftz) < 0.001 &&
+        fabs(m_zoomer.shifty) < 0.001 &&
+        fabs(m_zoomer.shiftx) < 0.001)
     {
         m_zoomer.enabled = false;
     }
@@ -4420,7 +4420,7 @@ void TwipOGLWidget::setCanvasZoomView(const double factor)
 *   @param [in] transZ      Position change in z
 *
 *   Moves the position of the view inside the window, which is done by moving the coordinate
-*   system. This comes handy when we zoom into the object and whant to see a detail that is 
+*   system. This comes handy when we zoom into the object and whant to see a detail that is
 *   not in the central part.
 */
 void TwipOGLWidget::setViewTranslation(const double transX, const double transY, const double transZ)
@@ -4551,7 +4551,7 @@ void TwipOGLWidget::updateCurvature()
 *   @return     returns ito::retOk on success otherwise ito::retError
 *
 *   When a new overlay image has been set this method is used to update the view
-*   The intensity values are normalized and then uploaded as texture to the 
+*   The intensity values are normalized and then uploaded as texture to the
 *   graphics board.
 */
 template<typename _Tp> ito::RetVal TwipOGLWidget::updateOverlayImage(const int objectID)
@@ -4571,11 +4571,11 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::updateOverlayImage(const int o
     ito::uint32 minLoc[3], maxLoc[3];
     ito::float64 minVal, maxVal;
     ito::float64 normVal = 1.0;
-    
+
     dObjHelper::minMaxValue(m_overlayImage[objectID].data(), minVal, minLoc, maxVal, maxLoc);
-    
+
     if( ito::isNotZero( maxVal - minVal ) ) normVal = 1.0 / (maxVal - minVal);
-    
+
     if( m_pConfigData->m_elementMode & PAINT_POINTS)
     {
         GLfloat *textBuf = (GLfloat*)calloc(m_numVert[objectID] * 3, sizeof(GLfloat));
@@ -4628,7 +4628,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::updateOverlayImage(const int o
 
         GLFPTR(glUseProgram)(0);
         doneCurrent();
-        update();    
+        update();
     }
     else if( m_pConfigData->m_elementMode & PAINT_TRIANG)
     {
@@ -4795,7 +4795,7 @@ template<typename _Tp> void TwipOGLWidget::pclFindMinMax(pcl::PointCloud<_Tp> *p
 /** Set new overlay image for a topography
 *
 *   @param [in] overlayImage    Image data
-*   @param [in] objectID        internal id of topography 
+*   @param [in] objectID        internal id of topography
 *
 *   @return     returns ito::retOk on success otherwise ito::retError
 *
@@ -4877,7 +4877,7 @@ ito::RetVal TwipOGLWidget::setOverlayImage(QSharedPointer< ito::DataObject > ove
 /** Set new invalid map for a topography
 *
 *   @param [in] overlayImage    Image data
-*   @param [in] objectID        internal id of topography 
+*   @param [in] objectID        internal id of topography
 *
 *   @return     returns ito::retOk on success otherwise ito::retError
 *
@@ -4916,9 +4916,9 @@ ito::RetVal TwipOGLWidget::setInvalidImage(QSharedPointer< ito::DataObject > inv
     {
         retval = ito::RetVal(ito::retError, 0, tr("Object has invalid type or size").toLatin1().data());
     }
-    
+
     if (!retval.containsWarningOrError())
-    { 
+    {
         m_errorDisplMsg.append(retval.errorMessage());
     }
     return retval;
@@ -5101,7 +5101,7 @@ template<> cv::Mat* TwipOGLWidget::newMatFromComplex<ito::complex128>(const cv::
 *   @param [in] index    index of plane on hash table or -1 for all
 *   @param [in] alpha    new alpha value
 *
-*   
+*
 */
 void TwipOGLWidget::setPlaneAlpha(int idx, int alpha)
 {
@@ -5126,7 +5126,7 @@ void TwipOGLWidget::setPlaneAlpha(int idx, int alpha)
 *   @param [in] index    index of plane on hash table
 *   @param [in] alpha    new alpha value
 *
-*   
+*
 */
 void TwipOGLWidget::setPlaneVisState(int idx, bool state)
 {
@@ -5146,7 +5146,7 @@ void TwipOGLWidget::setPlaneVisState(int idx, bool state)
     repaint();
 }
 
-        
+
 //----------------------------------------------------------------------------------------------------------------------------------
 /** Get displayed frame buffer for copying / printing
 *
@@ -5156,7 +5156,7 @@ void TwipOGLWidget::setPlaneVisState(int idx, bool state)
 *   Grabs the currently displayed object(s) into a QImage for copy or printing purpose. An oversamling
 *   factor between 1 (window resolution) and 4 (4 x window resolution) can be set for higher quality
 *   images, e.g. for presentations or printing.
-*   
+*
 */
 void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
 {
@@ -5188,7 +5188,7 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
         double increase = resFaktor < 4 ? resFaktor : 4;
         double delta = (resFaktor - 1.0) / resFaktor;
         delta = std::min(0.75, delta);
-        
+
         //this->setCanvasZoomView(increase);
         m_zoomer.scalexy *= increase;
         m_zoomer.enabled = true;
@@ -5219,7 +5219,7 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 xTrans = - x / (double)(resFaktor - 1) + delta;
                 xTrans /= tempZoomer.scalexy;
                 setViewTranslation(xTrans, yTrans, 0.0);
-                
+
                 update();
                 repaint();
 //                QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
@@ -5240,7 +5240,7 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
 
 
         m_pConfigData->m_drawTitle = tempDrawTitle;
-        m_pConfigData->m_colorBarMode = tempBarMode; 
+        m_pConfigData->m_colorBarMode = tempBarMode;
         m_objectInfo.show = tempInfoShow;
 
         // okay add a new color bar
@@ -5253,14 +5253,14 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
 
             if(m_pConfigData->m_drawTitle)
             {
-                painter.setPen(curFond.getFontColor()); // The font color comes from user select on a 
-                painter.setFont(QFont(QString::fromStdString(curFond.getFontName()), curFond.getFontSize() * resFaktor)); // The font size comes from user 
+                painter.setPen(curFond.getFontColor()); // The font color comes from user select on a
+                painter.setFont(QFont(QString::fromStdString(curFond.getFontName()), curFond.getFontSize() * resFaktor)); // The font size comes from user
                 int estimatedWidth = m_pConfigData->m_title.length() * curFond.getFontSize() * resFaktor;
-                QRect titleRect(std::max(0 , (myRect.width() - estimatedWidth )/2), curFond.getFontSize(), estimatedWidth, curFond.getFontSize() * resFaktor * 2); 
+                QRect titleRect(std::max(0 , (myRect.width() - estimatedWidth )/2), curFond.getFontSize(), estimatedWidth, curFond.getFontSize() * resFaktor * 2);
 
                 painter.drawText(titleRect, m_pConfigData->m_title, QTextOption(Qt::AlignBottom | Qt::AlignHCenter));
             }
-            
+
             if(m_pConfigData->m_colorBarMode != COLORBAR_NO)
             {
                 //QImage colorBar(15 * resFaktor, , QImage::Format_ARGB32);
@@ -5298,20 +5298,20 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 }
 
                 painter.setPen(m_axes.getFontColor()); // The font color comes from user select on a
-            
+
                 //painter.drawImage(0, 0, colorBar, 0, 0, -1, -1);
 
                 painter.drawRect(x0-1, y0-1, cols+1, rows+1);
                 painter.drawRect(x0, y0, cols, rows);
                 if(m_currentPalette.size() > 1)
                 {
-                
+
                     for(int row = 0; row < rows - 1; row++)
                     {
                         int color = (1.0 - row / (float)rows) * m_currentPalette.size();
                         color = std::max(0, color);
                         color = std::min(color, (int)m_currentPalette.size() - 1);
-                        
+
                         for(int col = 0; col < cols; col++)
                         {
                             img.setPixel(col + x0, y0 + row, m_currentPalette[color] | 0xFF000000);
@@ -5325,9 +5325,9 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 }
 
                 int curFontSize = m_axes.getFontSize() / 1.5;
-                painter.setPen(m_axes.getFontColor()); // The font color comes from user select on a 
-                painter.setFont(QFont(QString::fromStdString(m_axes.getFontName()), curFontSize )); // The font size comes from user 
-                
+                painter.setPen(m_axes.getFontColor()); // The font color comes from user select on a
+                painter.setFont(QFont(QString::fromStdString(m_axes.getFontName()), curFontSize )); // The font size comes from user
+
                 bool useDev = false;
                 if(this->m_pConfigData)
                 {
@@ -5335,19 +5335,19 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 }
                 const float zMin = useDev ? m_axes.m_devAxis.getMin() : m_axes.m_axisZ.getMin();
                 const float zMax = useDev ? m_axes.m_devAxis.getMax() : m_axes.m_axisZ.getMax();
-                
+
                 QString upperText;
                 if(useDev)
                 {
-                    upperText = QString("%1 %2\n%3").arg(QString::fromStdString(m_axes.m_devAxis.getLabel()), 
-                                                                 QString::fromStdString(m_axes.m_devAxis.getUnit()), 
+                    upperText = QString("%1 %2\n%3").arg(QString::fromStdString(m_axes.m_devAxis.getLabel()),
+                                                                 QString::fromStdString(m_axes.m_devAxis.getUnit()),
                                                                  QString::number(zMax, 'g', 4));
 
                 }
                 else
                 {
-                    upperText = QString("%1 %2\n%3").arg(QString::fromStdString(m_axes.m_axisZ.getLabel()), 
-                                                                 QString::fromStdString(m_axes.m_axisZ.getUnit()), 
+                    upperText = QString("%1 %2\n%3").arg(QString::fromStdString(m_axes.m_axisZ.getLabel()),
+                                                                 QString::fromStdString(m_axes.m_axisZ.getUnit()),
                                                                  QString::number(zMax, 'g', 4));
                 }
 
@@ -5357,7 +5357,7 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 painter.drawText(upperRect, upperText, QTextOption(Qt::AlignBottom | align));
 
                 QString lowerText = QString::number(zMin, 'g', 4);
-                
+
                 QRect lowerRect = QRect(x0, y0 + rows, estimatedWidth, curFontSize * 2);
                 if(align == Qt::AlignRight) lowerRect.moveRight(x0 + cols);
                 painter.drawText(lowerRect, lowerText, QTextOption(Qt::AlignTop | align));
@@ -5369,9 +5369,9 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 int rows = 0;
                 int curLen = 0;
                 int maxLen = 0;
-                painter.setPen(m_axes.getFontColor()); // The font color comes from user select on a 
-                painter.setFont(QFont(QString::fromStdString(m_axes.getFontName()), curFontSize )); // The font size comes from user 
-                
+                painter.setPen(m_axes.getFontColor()); // The font color comes from user select on a
+                painter.setFont(QFont(QString::fromStdString(m_axes.getFontName()), curFontSize )); // The font size comes from user
+
                 QString buf("");
 
 
@@ -5379,7 +5379,7 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 {
                     rows++;
                     maxLen = std::max(curLen, maxLen);
-                    
+
                     buf.append(QString::fromStdString(m_objectInfo.MeanText.data()));
                 }
 
@@ -5432,9 +5432,9 @@ void TwipOGLWidget::getFrameBuffer(QImage &img, const int oversampling)
                 }
             }
             painter.end();
-            
+
         }
-        
+
         m_axes.setFontSize(axisTextSize);
     }
     else

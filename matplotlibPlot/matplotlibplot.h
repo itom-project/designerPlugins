@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ class ITOMMATPLOTLIB_EXPORT MatplotlibPlot : public ito::AbstractFigure
 
     Q_PROPERTY(bool forceWindowResize READ getForceWindowResize WRITE setForceWindowResize USER true)
     Q_PROPERTY(bool keepSizeFixed READ getKeepSizeFixed WRITE setKeepSizeFixed USER true)
-    
+
 
     Q_CLASSINFO("prop://forceWindowResize", "If set, the plot widget / area is resized to the desired sizes given by matplotlib. Uncheck this option, if you want to keep the canvas unchanged e.g. in an user-defined GUI")
     Q_CLASSINFO("prop://keepSizeFixed", "If you want to control the size of the canvas by python / matplotlib (e.g. set_size_inches), set this to true. The canvas will then have a fixed size, that is not affected by the window size.")
@@ -96,10 +96,10 @@ public:
     ~MatplotlibPlot();
 
     //properties
-    void setContextMenuEnabled(bool show); 
+    void setContextMenuEnabled(bool show);
     bool getContextMenuEnabled() const;
 
-    void setForceWindowResize(bool force) { m_forceWindowResize = force; } 
+    void setForceWindowResize(bool force) { m_forceWindowResize = force; }
     bool getForceWindowResize() const { return m_forceWindowResize; }
 
     void setKeepSizeFixed(bool fixed);
@@ -109,7 +109,7 @@ public:
 
     ito::RetVal applyUpdate(void) { return ito::RetVal(ito::retWarning, 0, "not used in this plugin"); }
     ito::RetVal update(void) { return ito::RetVal(ito::retWarning, 0, "not used in this plugin"); }
-   
+
 private:
     QAction *m_actHome;
     QAction *m_actForward;
@@ -167,7 +167,7 @@ public slots:
     void modifySubplotSliders(float left, float top, float right, float bottom, float wSpace, float hSpace);
 	void setLabelText(QString text);
     void replot();
-    void addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, 
+    void addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename,
         const QString &tooltip, const QString &groupName, int position = 0);
     void removeUserDefinedAction(const QString &name);
     QWidget* createDialogEditProperties(bool showApplyButton, const QString &title = "");

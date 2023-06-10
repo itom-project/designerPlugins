@@ -424,7 +424,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>set two pickers to the absolute minimum and maximum of the curve. 
+        <source>set two pickers to the absolute minimum and maximum of the curve.
 If multiple curves are visible, the user can select the appropriate one.</source>
         <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve.
 Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</translation>
@@ -436,7 +436,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
     </message>
     <message>
         <location line="+1"/>
-        <source>set two pickers to the absolute minimum and maximum of the curve (within the current view). 
+        <source>set two pickers to the absolute minimum and maximum of the curve (within the current view).
 If multiple curves are visible, the user can select the appropriate one.</source>
         <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve. (in der aktuellen Ansicht).
 Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</translation>

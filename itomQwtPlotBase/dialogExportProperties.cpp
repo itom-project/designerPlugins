@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ DialogExportProperties::DialogExportProperties(const QSizeF &currentSizePx, QWid
     m_keepAspectRatio(false)
 {
     ui.setupUi(this);
- 
+
     ui.lblCanvasWidth->setText(QString("%1 px").arg(currentSizePx.width()));
     ui.lblCanvasHeight->setText(QString("%1 px").arg(currentSizePx.height()));
 
@@ -97,7 +97,7 @@ void DialogExportProperties::updateOutput()
     ui.sB_destWidth->setEnabled(enable);
     ui.dSB_destWidth->setEnabled(enable);
 
-    m_keepAspectRatio = (index > 0);    
+    m_keepAspectRatio = (index > 0);
 
     switch(index)
     {
@@ -169,7 +169,7 @@ void DialogExportProperties::updateOutput()
             }
             else
             {
-                ui.dSB_destWidth->setValue(210.0);    
+                ui.dSB_destWidth->setValue(210.0);
                 ui.dSB_destHeight->setValue( 210.0 / m_aspect);
             }
 
@@ -184,12 +184,12 @@ void DialogExportProperties::updateOutput()
             }
             else
             {
-                ui.dSB_destWidth->setValue(148.0);   
+                ui.dSB_destWidth->setValue(148.0);
                 ui.dSB_destHeight->setValue( 148.0 / m_aspect);
             }
 
             break;
-        
+
     }
 
     ui.sB_destWidth->setValue(mmToPx(ui.dSB_destWidth->value()));

@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -127,7 +127,7 @@ MatplotlibPlot::MatplotlibPlot(const QString &itomSettingsFile, AbstractFigure::
     m_pToolbarBeforeAct = m_actSubplotConfig;
     m_toolbar->addAction(m_actSubplotConfig);
     m_toolbar->addAction(m_actMarker);
-    
+
     QAction *lblAction = m_toolbar->addWidget(m_lblCoordinates);
     lblAction->setVisible(true);
 
@@ -215,17 +215,17 @@ void MatplotlibPlot::setKeepSizeFixed(bool fixed)
             resetFixedSize();
         }
         m_keepSizeFixed = fixed;
-        
+
         if (m_pContent)
             m_pContent->setKeepSizeFixed(fixed);
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::resetFixedSize() 
-{ 
-    setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX); 
-    //qDebug() << "resetFixedSize"; 
+void MatplotlibPlot::resetFixedSize()
+{
+    setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    //qDebug() << "resetFixedSize";
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -270,7 +270,7 @@ ito::RetVal MatplotlibPlot::copyToClipBoard()
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::setContextMenuEnabled(bool show)
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         m_pContent->m_showContextMenu = show;
     }
@@ -358,7 +358,7 @@ void MatplotlibPlot::subplotConfigSliderHSpaceChanged(double value)
 //----------------------------------------------------------------------------------------------------------------------------------
 void MatplotlibPlot::replot()
 {
-    if (m_pContent) 
+    if (m_pContent)
     {
         m_pContent->replot();
     }
@@ -406,7 +406,7 @@ QAction* MatplotlibPlot::getActionFromGroupByName(const QString &name) const
                 return a;
             }
         }
-        
+
         ++groupIt;
     }
 
@@ -414,7 +414,7 @@ QAction* MatplotlibPlot::getActionFromGroupByName(const QString &name) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename, 
+void MatplotlibPlot::addUserDefinedAction(const QString &name, const QString &text, const QString &iconFilename,
     const QString &tooltip, const QString &groupName, int position /*= -1*/)
 {
     if (getActionFromGroupByName(name))
@@ -523,6 +523,3 @@ QWidget* MatplotlibPlot::createDialogEditProperties(bool showApplyButton, const 
     return dialog;
 
 }
-
-
-

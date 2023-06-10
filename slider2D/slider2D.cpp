@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -400,16 +400,16 @@ void Slider2D::paintEvent(QPaintEvent *)
     {
         painter.drawText(text_rect_2, Qt::AlignCenter | Qt::TextDontClip, QString::number(p->xVal, 'f', p->decimals));
     }
-    
+
     painter.drawRect(text_rect_2);
 
     painter.setClipping(false);
 
-    painter.setPen(QPen(Qt::black, 2)); 
+    painter.setPen(QPen(Qt::black, 2));
     painter.setBrush(Qt::NoBrush);
     painter.drawEllipse(selector2DPosition, 0.03*side, 0.03*side);
 
-    painter.setPen(QPen(Qt::black, 2));  
+    painter.setPen(QPen(Qt::black, 2));
     painter.drawLine(0, yValRanged*side, side, yValRanged*side);
     painter.drawLine(xValRanged*side, 0, xValRanged*side, side);
     painter.fillPath (path_tri_1, QBrush (QColor ("black")));
@@ -449,7 +449,7 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
             yval = p->yStep * counts;
         }
 
-        p->xVal = xval + p->xRange.x();  
+        p->xVal = xval + p->xRange.x();
         p->yVal = yval + p->yRange.x();
 
 
@@ -518,7 +518,7 @@ void Slider2D::mouseMoveEvent(QMouseEvent *ev)
 //------------------------------------------------------------------------------------------
 void Slider2D::mousePressEvent(QMouseEvent *ev)
 {
-    
+
     if ( ev->buttons() & Qt::LeftButton )
     {
         qreal side = p->squareSize();
@@ -526,9 +526,9 @@ void Slider2D::mousePressEvent(QMouseEvent *ev)
         QLineF ray = p->lineToPoint(ev->pos());
         if ( qAbs(ray.dx()) <= (p->squareSize()/2)*1.1 && qAbs(ray.dy()) <= (p->squareSize()/2)*1.1)
             QLineF ray_ = p->lineToPoint(ev->pos());
-            if (ev->x() > side*1.15)  //((abs(ev->x() - side*0.13 - p->xVal*side)> 0.1*side) && (abs(ev->y() - side*0.13 - p->yVal*side) < 0.06*side)) || 
+            if (ev->x() > side*1.15)  //((abs(ev->x() - side*0.13 - p->xVal*side)> 0.1*side) && (abs(ev->y() - side*0.13 - p->yVal*side) < 0.06*side)) ||
                 p->mouseStatus = dragY;
-            else if (ev->y() > side*1.12) //(((abs(ev->y() - side*0.2 - p->yVal*side)> 0.1*side) && (abs(ev->x() - side*0.2 - p->xVal*side) < 0.06*side)) || 
+            else if (ev->y() > side*1.12) //(((abs(ev->y() - side*0.2 - p->yVal*side)> 0.1*side) && (abs(ev->x() - side*0.2 - p->xVal*side) < 0.06*side)) ||
                 p->mouseStatus = dragX;
             else
                 p->mouseStatus = dragSquare;
@@ -547,6 +547,3 @@ void Slider2D::resizeEvent(QResizeEvent *)
 {
     p->renderBackground();
 }
-
-
-

@@ -1,12 +1,12 @@
 /* ********************************************************************
 #    twipOGLFigure-Plugin for itom
 #    URL: http://www.twip-os.com
-#    Copyright (C) 2014, twip optical solutions GmbH, 
-#    Stuttgart, Germany 
+#    Copyright (C) 2014, twip optical solutions GmbH,
+#    Stuttgart, Germany
 #
-#    This files is part of the designer-Plugin twipOGLFigure for the 
+#    This files is part of the designer-Plugin twipOGLFigure for the
 #    measurement software itom. All files of this plugin, where not stated
-#    as port of the itom sdk, fall under the GNU Library General 
+#    as port of the itom sdk, fall under the GNU Library General
 #    Public Licence and must behandled accordingly.
 #
 #    twipOGLFigure is free software; you can redistribute it and/or modify it
@@ -21,9 +21,9 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under 
-#    GNU General Public License as published by the Free Software 
-#    Foundation. See <https://bitbucket.org/itom/> 
+#    itom is free software by ITO, University Stuttgart published under
+#    GNU General Public License as published by the Free Software
+#    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
@@ -88,7 +88,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
     Q_PROPERTY(QString yAxisLabel READ getyAxisLabel WRITE setyAxisLabel RESET resetyAxisLabel USER true)
     Q_PROPERTY(bool yAxisVisible READ getyAxisVisible WRITE setyAxisVisible USER true)
     Q_PROPERTY(bool yAxisFlipped READ getyAxisFlipped WRITE setyAxisFlipped USER true)
-    Q_PROPERTY(double zAxisAmplification READ getZAmplification WRITE setZAmplification RESET resetZAmplification USER true DESIGNABLE true) 
+    Q_PROPERTY(double zAxisAmplification READ getZAmplification WRITE setZAmplification RESET resetZAmplification USER true DESIGNABLE true)
     Q_PROPERTY(QString valueLabel READ getValueLabel WRITE setValueLabel RESET resetValueLabel USER true)
     Q_PROPERTY(bool valueAxisVisible  READ getVAxisVisible WRITE setVAxisVisible USER true)
     Q_PROPERTY(bool colorBarVisible READ getColorBarVisible WRITE setColorBarVisible DESIGNABLE true USER true)
@@ -177,9 +177,9 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
 #endif
         friend class TwipOGLWidget;
 
-        /** Constructor with settings 
+        /** Constructor with settings
         *   @param [in] itomSettingsFile    General (user) settings file of itom
-        *   @param [in] inpType             
+        *   @param [in] inpType
         *   @param [in] windowMode          mode for opening widget (Standalone, window, widget)
         *   @param [in] parent              parent for widget
         */
@@ -228,7 +228,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
 
         //!> read the current z amplification factor
         double getZAmplification() const;
-        
+
         //!> set a new z amplification factor to the plot
         void setZAmplification(const double value);
 
@@ -249,7 +249,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
 
         //!> return current colormap
         QString getColorMap(void) const;
-        
+
         /** set color map
         *   @param [in] colormap    new colormap
         */
@@ -259,7 +259,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         *   @param [in] show    bool flag to enable / disable context menu
         */
         void setContextMenuEnabled(bool show);
-        
+
         //!> get state of context menu (enabled / disabled)
         bool getContextMenuEnabled() const;
 
@@ -274,16 +274,16 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         void resetTitle();
 
         //!> return label of x-axis
-        QString getxAxisLabel() const 
-        { 
-            return QString::fromStdString(m_pContent->m_axes.m_axisX.m_label); 
+        QString getxAxisLabel() const
+        {
+            return QString::fromStdString(m_pContent->m_axes.m_axisX.m_label);
         }
 
         /** set x-axis label
         *   @param [in] value   new x-axis label
         */
-        void setxAxisLabel(const QString value, const int fromID = 0) 
-        { 
+        void setxAxisLabel(const QString value, const int fromID = 0)
+        {
             if (value != "<auto>")
                 m_pContent->m_axes.m_axisX.m_label = std::string(value.toLatin1().data());
             else
@@ -305,8 +305,8 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         /** reset x-axis label
         *   set to automatic label generation i.e. from object physical properties
         */
-        void resetxAxisLabel(const int fromID = 0) 
-        { 
+        void resetxAxisLabel(const int fromID = 0)
+        {
             if ( m_pContent->m_pContentDObj[fromID] != NULL )
             {
                 bool test;
@@ -317,14 +317,14 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
             {
                 m_pContent->m_axes.m_axisX.m_label = "x";
             }
-            return; 
+            return;
         }
 
         bool getxAxisVisible() const;
         void setxAxisVisible(const bool value);
 
         //!> return label of y-axis
-        QString getyAxisLabel() const 
+        QString getyAxisLabel() const
         {
             return QString::fromStdString(m_pContent->m_axes.m_axisY.m_label);
         }
@@ -332,8 +332,8 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         /** set y-axis label
         *   @param [in] value   new y-axis label
         */
-        void setyAxisLabel(const QString value, const int fromID = 0) 
-        { 
+        void setyAxisLabel(const QString value, const int fromID = 0)
+        {
             if (value != "<auto>")
                 m_pContent->m_axes.m_axisY.m_label = std::string(value.toLatin1().data());
             else
@@ -349,13 +349,13 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
                      m_pContent->m_axes.m_axisY.m_label = "y";
                 }
             }
-            return; 
+            return;
         }
 
         /** reset y-axis label
         *   set to automatic label generation i.e. from object physical properties
         */
-        void resetyAxisLabel(const int fromID = 0) 
+        void resetyAxisLabel(const int fromID = 0)
         {
             if (m_pContent->m_pContentDObj[fromID] != NULL)
             {
@@ -377,7 +377,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         void setyAxisFlipped(const bool value);
 
         //!> get label of z-axis
-        QString getValueLabel() const 
+        QString getValueLabel() const
         {
             return QString::fromStdString(m_pContent->m_axes.m_axisZ.m_label);
         }
@@ -385,7 +385,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         /** set label of z-axis
         *   @param [in] value   set new label for z-axis
         */
-        void setValueLabel(const QString value, const int fromID = 0) 
+        void setValueLabel(const QString value, const int fromID = 0)
         {
             if (value != "<auto>")
                 m_pContent->m_axes.m_axisZ.m_label = std::string(value.toLatin1().data());
@@ -408,7 +408,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         /** reset z-axis label
         *   set to automatic label generation i.e. from object physical properties
         */
-        void resetValueLabel(const int fromID = 0) 
+        void resetValueLabel(const int fromID = 0)
         {
             if (m_pContent->m_pContentDObj[fromID] != NULL)
             {
@@ -427,10 +427,10 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         void setVAxisVisible(const bool value);
 
         //!> return if colorbar is visible
-        bool getColorBarVisible() const; 
+        bool getColorBarVisible() const;
 
         //!> enable colorbar displaying
-        void setColorBarVisible(const bool value); 
+        void setColorBarVisible(const bool value);
 
         //!> return font used for title
         QFont getTitleFont() const;
@@ -441,7 +441,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         void setTitleFont(const QFont value);
 
         //!> return font used for labels
-        QFont getLabelFont() const 
+        QFont getLabelFont() const
         {
             return QFont();
         }
@@ -449,7 +449,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         /** set new label font
         *   @param [in] value   new font used for labels
         */
-        void setLabelFont(const QFont value) 
+        void setLabelFont(const QFont value)
         {
             return;
         }
@@ -458,7 +458,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         QFont getAxisFont() const;
 
         /** set new axis font
-        *   @param [in] value   new font used for axis, i.e. numbers 
+        *   @param [in] value   new font used for axis, i.e. numbers
         */
         void setAxisFont(const QFont value);
 
@@ -489,7 +489,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
 
         //!> setInvalidMap to zeros
         void resetInvalidMap(void);
-        
+
         /** set invalid color
         *   @param [in] newVal  new invalid color
         */
@@ -538,7 +538,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         *   @param [in] ysize   vertival size of pixmap
         *   @param [in] resolution
         */
-        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution); 
+        QPixmap renderToPixMap(const int xsize, const int ysize, const int resolution);
 
         //!> set new background color
         void setBackgroundColor(const QColor newVal);
@@ -579,11 +579,11 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         //!> return if currently status or angle information visibility
         bool getShowAngleInfo(void) const;
 
-        /** switch visibility of angle infomation 
+        /** switch visibility of angle infomation
         *   @param [in] newVal  true for enabled, false for invisible
         */
         void setShowAngleInfo(const bool newVal);
-        
+
 
         //!> enable button to switch between triangle and point rendering
         void enableRenderModeSelector(const int newVal);
@@ -667,8 +667,8 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         void mnuTwip();             //!> spawn twip info dialog
         void mnuHome();             //!> home view, i.e. reset to default orientation / zoom
         void mnuAspRatio();
-        void mnuScaleSetting();     
-        void mnuPalette();          
+        void mnuScaleSetting();
+        void mnuPalette();
         void mnuColorBar();
         void mnuToggleBPColor();
         void mnutoggleIllumination(const bool checked);
@@ -696,8 +696,8 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         {
             if(m_pContent)
                 return m_pContent->setOverlayImage(overlayImage, objID);
-            else 
-                return ito::RetVal(ito::retError, 0, tr("Could not write overlay to uninitilized GL-Widget").toLatin1().data());            
+            else
+                return ito::RetVal(ito::retError, 0, tr("Could not write overlay to uninitilized GL-Widget").toLatin1().data());
         }
 
 };

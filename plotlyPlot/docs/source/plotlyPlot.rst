@@ -11,4 +11,3 @@ plotlyPlot - itom designer widget
 **Platforms**:  Windows, Linux
 **Author**:     :plotauthor:`plotlyPlot`
 =============== ========================================================================================================
-

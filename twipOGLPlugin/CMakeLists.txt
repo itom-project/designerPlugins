@@ -1,12 +1,12 @@
 #********************************************************************
 #    twipOGLFigure-Plugin for itom
 #    URL: http://www.twip-os.com
-#    Copyright (C) 2014, twip optical solutions GmbH, 
-#    Stuttgart, Germany 
+#    Copyright (C) 2014, twip optical solutions GmbH,
+#    Stuttgart, Germany
 #
-#    This files is part of the designer-Plugin twipOGLFigure for the 
+#    This files is part of the designer-Plugin twipOGLFigure for the
 #    measurement software itom. All files of this plugin, where not stated
-#    as port of the itom sdk, fall under the GNU Library General 
+#    as port of the itom sdk, fall under the GNU Library General
 #    Public Licence and must behandled accordingly.
 #
 #    twipOGLFigure is free software; you can redistribute it and/or modify it
@@ -21,9 +21,9 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under 
-#    GNU General Public License as published by the Free Software 
-#    Foundation. See <https://bitbucket.org/itom/> 
+#    itom is free software by ITO, University Stuttgart published under
+#    GNU General Public License as published by the Free Software
+#    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
@@ -33,17 +33,17 @@ set(target_name twipOGLPlugin)
 
 cmake_minimum_required(VERSION 3.1...3.15)
 
-set(ITOM_SDK_DIR NOTFOUND CACHE PATH "path of SDK subfolder of itom root (build) directory")
-
 #this is to automatically detect the SDK subfolder of the itom build directory.
-find_path(ITOM_SDK_DIR "cmake/itom_sdk.cmake"
-    HINTS "C:/itom/build/itom/SDK"
-          "${CMAKE_CURRENT_BINARY_DIR}/../../itom/SDK"
-    DOC "path of SDK subfolder of itom root (build) directory")
+if(NOT EXISTS ${ITOM_SDK_DIR})
+    find_path(ITOM_SDK_DIR "cmake/itom_sdk.cmake"
+    HINTS "$ENV{ITOM_SDK_ROOT}"
+          "${CMAKE_CURRENT_BINARY_DIR}/../itom/SDK"
+    DOC "Path of SDK subfolder of itom root (build) directory")
+endif(NOT EXISTS ${ITOM_SDK_DIR})
 
-if(NOT ITOM_SDK_DIR)
-    message(SEND_ERROR "ITOM_SDK_DIR is invalid. Provide itom SDK directory path first")
-endif()
+if(NOT EXISTS ${ITOM_SDK_DIR})
+    message(FATAL_ERROR "ITOM_SDK_DIR is invalid. Provide itom SDK directory path first")
+endif(NOT EXISTS ${ITOM_SDK_DIR})
 
 # ...which contains useful scripts for completing this file
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ITOM_SDK_DIR}/cmake)
@@ -116,7 +116,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
-set(DESIGNER_SOURCES 
+set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLFigure.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLWidget.cpp

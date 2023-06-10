@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -30,19 +30,19 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------
 UserInteractionPlotPicker::UserInteractionPlotPicker(QWidget *canvas) : QwtPlotPicker(canvas), m_keepAspectRatio(false)
-{ 
-    init(); 
+{
+    init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-UserInteractionPlotPicker::~UserInteractionPlotPicker() 
+UserInteractionPlotPicker::~UserInteractionPlotPicker()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis, QWidget *widget) : QwtPlotPicker(xAxis,yAxis,widget), m_keepAspectRatio(false)
-{ 
-    init(); 
+{
+    init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -50,8 +50,8 @@ UserInteractionPlotPicker::UserInteractionPlotPicker(int xAxis, int yAxis,
     RubberBand rubberBand, DisplayMode trackerMode, QWidget *widget) :
     QwtPlotPicker(xAxis,yAxis,rubberBand,trackerMode,widget),
     m_keepAspectRatio(false)
-{ 
-    init(); 
+{
+    init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ void UserInteractionPlotPicker::reset()
             //at the beginning no point is clicked, nevertheless the Abort-Key should abort the selection and
             // send activated(false) such that itom is able to continue
             emit activated(false);
-        } 
+        }
     }
 
     QwtPlotPicker::reset();
@@ -289,6 +289,6 @@ QPolygon UserInteractionPlotPicker::adjustedPoints(const QPolygon &points) const
         {
             return points;
         }
-        
+
     }
 }

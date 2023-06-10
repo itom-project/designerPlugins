@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -28,19 +28,19 @@
 #include <qwt_text.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomPlotPicker::ItomPlotPicker( QWidget *parent ) : 
+ItomPlotPicker::ItomPlotPicker( QWidget *parent ) :
     QwtPlotPicker(parent)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomPlotPicker::ItomPlotPicker( int xAxis, int yAxis, QWidget *parent) : 
+ItomPlotPicker::ItomPlotPicker( int xAxis, int yAxis, QWidget *parent) :
     QwtPlotPicker(xAxis, yAxis, parent)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomPlotPicker::ItomPlotPicker( int xAxis, int yAxis, RubberBand rubberBand, DisplayMode trackerMode, QWidget *parent ) : 
+ItomPlotPicker::ItomPlotPicker( int xAxis, int yAxis, RubberBand rubberBand, DisplayMode trackerMode, QWidget *parent ) :
     QwtPlotPicker(xAxis, yAxis, rubberBand, trackerMode, parent)
 {
 }

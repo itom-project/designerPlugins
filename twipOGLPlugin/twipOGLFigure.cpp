@@ -1,12 +1,12 @@
 /* ********************************************************************
 #    twipOGLFigure-Plugin for itom
 #    URL: http://www.twip-os.com
-#    Copyright (C) 2014, twip optical solutions GmbH, 
-#    Stuttgart, Germany 
+#    Copyright (C) 2014, twip optical solutions GmbH,
+#    Stuttgart, Germany
 #
-#    This files is part of the designer-Plugin twipOGLFigure for the 
+#    This files is part of the designer-Plugin twipOGLFigure for the
 #    measurement software itom. All files of this plugin, where not stated
-#    as port of the itom sdk, fall under the GNU Library General 
+#    as port of the itom sdk, fall under the GNU Library General
 #    Public Licence and must behandled accordingly.
 #
 #    twipOGLFigure is free software; you can redistribute it and/or modify it
@@ -21,9 +21,9 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under 
-#    GNU General Public License as published by the Free Software 
-#    Foundation. See <https://bitbucket.org/itom/> 
+#    itom is free software by ITO, University Stuttgart published under
+#    GNU General Public License as published by the Free Software
+#    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
@@ -78,7 +78,7 @@ TwipOGLFigure::TwipOGLFigure(const QString &itomSettingsFile, const ito::ParamBa
     m_dObjID(0)
 {
     m_updateLook = 0;
-    m_pvConfigData = (void*) new InternalData; 
+    m_pvConfigData = (void*) new InternalData;
 
     addOutputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
 
@@ -200,7 +200,7 @@ TwipOGLFigure::TwipOGLFigure(const QString &itomSettingsFile, const ito::ParamBa
     //m_pActToggleColorBar = tempAction = new QAction(QIcon(":/twipDesignerPlugins/plot/icons/colorBar.png"), tr("Show Colorbar"), this);
     tempAction->setObjectName("ShowColorBar");
     tempAction->setToolTip(tr("Toggle visibility of the color bar on right canvas side"));
-    
+
     //m_pActLegendIcon
     m_pActLegendIcon = tempAction = new QAction(QIcon(":/icons/listview.png"), tr("Show legend widget"), this);
     //m_pActToggleColorBar = tempAction = new QAction(QIcon(":/twipDesignerPlugins/plot/icons/colorBar.png"), tr("Show Colorbar"), this);
@@ -623,7 +623,7 @@ void TwipOGLFigure::mnuActSave()
 
     if (imageFormats.size() > 0)
     {
-        
+
         for (int i = 0; i < imageFormats.size(); i++)
         {
             if (QString(imageFormats[i]).contains("jpg", Qt::CaseInsensitive))
@@ -667,7 +667,7 @@ void TwipOGLFigure::mnuActSave()
                 imageFilter += ")";
                 filter += imageFilter;
             }
-            
+
         }
         //imageFilter += ")";
 
@@ -696,7 +696,7 @@ void TwipOGLFigure::mnuActSave()
 
         m_pContent->getFrameBuffer(img, 2);
 
-        img.save(fileName, QFileInfo(fileName).completeSuffix().toLatin1().data(), 100);  
+        img.save(fileName, QFileInfo(fileName).completeSuffix().toLatin1().data(), 100);
     }
 }
 
@@ -704,7 +704,7 @@ void TwipOGLFigure::mnuActSave()
 ito::RetVal TwipOGLFigure::copyToClipBoard()
 {
     if(!m_pContent) return ito::RetVal(ito::retError, 0, tr("Could not save data.").toLatin1().data());
-    
+
     m_pContent->update();
 
     QImage img;
@@ -720,7 +720,7 @@ ito::RetVal TwipOGLFigure::copyToClipBoard()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QPixmap TwipOGLFigure::renderToPixMap(const int xsize, const int ysize, const int resolution) 
+QPixmap TwipOGLFigure::renderToPixMap(const int xsize, const int ysize, const int resolution)
 {
     m_pContent->repaint();
     int resFaktor = cv::saturate_cast<int>(resolution / 72.0 + 0.5);
@@ -739,7 +739,7 @@ QPixmap TwipOGLFigure::renderToPixMap(const int xsize, const int ysize, const in
     m_pContent->getFrameBuffer(img, resFaktor);
 
     destinationImage.convertFromImage(img);
-    
+
     //Would be nice but does not work and destroys the gl-shader!
     //destinationImage = m_pContent->renderPixmap( xsize * resFaktor, ysize * resFaktor, true);
 
@@ -964,7 +964,7 @@ void TwipOGLFigure::triggerReplot()
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::mnuToggleBPColor()
 {
-    if(m_pvConfigData) 
+    if(m_pvConfigData)
     {
         InternalData* intData = ((InternalData*)m_pvConfigData);
 
@@ -987,7 +987,7 @@ void TwipOGLFigure::mnuToggleBPColor()
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor TwipOGLFigure::getBackgroundColor(void) const
 {
-    if(m_pvConfigData) 
+    if(m_pvConfigData)
     {
         return ((InternalData*)m_pvConfigData)->m_backgnd;
     }
@@ -998,7 +998,7 @@ QColor TwipOGLFigure::getBackgroundColor(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::setBackgroundColor(const QColor newVal)
 {
-    if(m_pvConfigData && newVal.isValid()) 
+    if(m_pvConfigData && newVal.isValid())
     {
         InternalData* intData = ((InternalData*)m_pvConfigData);
         intData->m_backgnd = newVal.rgb() & 0x00FFFFFF;
@@ -1011,7 +1011,7 @@ void TwipOGLFigure::setBackgroundColor(const QColor newVal)
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor TwipOGLFigure::getAxisColor(void) const
 {
-    if(m_pvConfigData) 
+    if(m_pvConfigData)
     {
         return ((InternalData*)m_pvConfigData)->m_axisColor;
     }
@@ -1022,7 +1022,7 @@ QColor TwipOGLFigure::getAxisColor(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::setAxisColor(const QColor newVal)
 {
-    if(m_pvConfigData && newVal.isValid()) 
+    if(m_pvConfigData && newVal.isValid())
     {
         InternalData* intData = ((InternalData*)m_pvConfigData);
         intData->m_axisColor = newVal.rgb() & 0x00FFFFFF;
@@ -1035,7 +1035,7 @@ void TwipOGLFigure::setAxisColor(const QColor newVal)
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor TwipOGLFigure::getTextColor(void) const
 {
-    if(m_pvConfigData) 
+    if(m_pvConfigData)
     {
         return ((InternalData*)m_pvConfigData)->m_textColor;
     }
@@ -1046,7 +1046,7 @@ QColor TwipOGLFigure::getTextColor(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::setTextColor(const QColor newVal)
 {
-    if(m_pvConfigData && newVal.isValid()) 
+    if(m_pvConfigData && newVal.isValid())
     {
         InternalData* intData = ((InternalData*)m_pvConfigData);
         intData->m_textColor = newVal.rgb() & 0x00FFFFFF;
@@ -1059,7 +1059,7 @@ void TwipOGLFigure::setTextColor(const QColor newVal)
 //----------------------------------------------------------------------------------------------------------------------------------
 QColor TwipOGLFigure::getInvalidColor(void) const
 {
-    if(m_pvConfigData) 
+    if(m_pvConfigData)
     {
         return ((InternalData*)m_pvConfigData)->m_invColor;
     }
@@ -1070,13 +1070,13 @@ QColor TwipOGLFigure::getInvalidColor(void) const
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::setInvalidColor(const QColor newVal)
 {
-    if(m_pvConfigData && newVal.isValid()) 
+    if(m_pvConfigData && newVal.isValid())
     {
         InternalData* intData = ((InternalData*)m_pvConfigData);
         intData->m_invColor = newVal.rgba();
         if(m_pContent) m_pContent->ResetColors();
     }
-    
+
 
     return;
 }
@@ -1084,7 +1084,7 @@ void TwipOGLFigure::setInvalidColor(const QColor newVal)
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::resetInvalidColor()
 {
-    if(m_pvConfigData) 
+    if(m_pvConfigData)
     {
         InternalData* intData = ((InternalData*)m_pvConfigData);
         intData->m_invColor = 0x000F0F0F;
@@ -1331,11 +1331,11 @@ void TwipOGLFigure::setColorBarVisible(const bool value)
         return;
 
     InternalData *intData = (InternalData *)m_pvConfigData;
-    if (value && intData->m_colorBarMode == TwipOGLWidget::COLORBAR_NO) 
+    if (value && intData->m_colorBarMode == TwipOGLWidget::COLORBAR_NO)
         intData->m_colorBarMode = TwipOGLWidget::COLORBAR_LEFT;
-    else if (!value) 
-        intData->m_colorBarMode = TwipOGLWidget::COLORBAR_NO; 
-    
+    else if (!value)
+        intData->m_colorBarMode = TwipOGLWidget::COLORBAR_NO;
+
     if(m_pContent) m_pContent->update();
     return;
 }
@@ -1385,7 +1385,7 @@ void TwipOGLFigure::setCurvatureInterval(const ito::AutoInterval interval)
 
     if(m_pContent)
         m_pContent->updateCurvature();
-    
+
     return;
 }
 
@@ -1422,29 +1422,29 @@ void TwipOGLFigure::resetInvalidMap(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QFont TwipOGLFigure::getAxisFont() const 
+QFont TwipOGLFigure::getAxisFont() const
 {
     return m_pContent->m_axes.getQFont();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void TwipOGLFigure::setAxisFont(const QFont value) 
+void TwipOGLFigure::setAxisFont(const QFont value)
 {
     if(m_pContent) m_pContent->m_axes.fromQFont(value);
     return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QFont TwipOGLFigure::getTitleFont() const 
+QFont TwipOGLFigure::getTitleFont() const
 {
     if(m_pContent) return m_pContent->m_titleFont.getQFont();
     else return QFont();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void TwipOGLFigure::setTitleFont(const QFont value) 
+void TwipOGLFigure::setTitleFont(const QFont value)
 {
-    m_pContent->m_titleFont.fromQFont(value); 
+    m_pContent->m_titleFont.fromQFont(value);
     return;
 }
 
@@ -1479,7 +1479,7 @@ void TwipOGLFigure::setShowTriangles(const bool newVal)
             m_pMnuTringModeSwitch->setTitle("Points");
             ((InternalData*)m_pvConfigData)->m_elementMode &=~ TwipOGLWidget::PAINT_TRIANG;
             ((InternalData*)m_pvConfigData)->m_elementMode |= TwipOGLWidget::PAINT_POINTS;
-        }        
+        }
     }
     if (m_pContent)
     {
@@ -1555,8 +1555,8 @@ bool TwipOGLFigure::getIllumunationEnabled(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool TwipOGLFigure::getxAxisVisible() const 
-{ 
+bool TwipOGLFigure::getxAxisVisible() const
+{
     if (!m_pvConfigData)
         return false;
 
@@ -1564,8 +1564,8 @@ bool TwipOGLFigure::getxAxisVisible() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void TwipOGLFigure::setxAxisVisible(const bool value) 
-{ 
+void TwipOGLFigure::setxAxisVisible(const bool value)
+{
     if (!m_pvConfigData)
         return;
     ((InternalData *)m_pvConfigData)->m_xAxisVisible = value;
@@ -1574,8 +1574,8 @@ void TwipOGLFigure::setxAxisVisible(const bool value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool TwipOGLFigure::getyAxisVisible() const 
-{ 
+bool TwipOGLFigure::getyAxisVisible() const
+{
     if (!m_pvConfigData)
         return false;
 
@@ -1583,8 +1583,8 @@ bool TwipOGLFigure::getyAxisVisible() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void TwipOGLFigure::setyAxisVisible(const bool value) 
-{ 
+void TwipOGLFigure::setyAxisVisible(const bool value)
+{
     if (!m_pvConfigData)
         return;
     ((InternalData *)m_pvConfigData)->m_yAxisVisible = value;
@@ -1593,8 +1593,8 @@ void TwipOGLFigure::setyAxisVisible(const bool value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool TwipOGLFigure::getVAxisVisible() const 
-{ 
+bool TwipOGLFigure::getVAxisVisible() const
+{
     if (!m_pvConfigData)
         return false;
 
@@ -1602,8 +1602,8 @@ bool TwipOGLFigure::getVAxisVisible() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void TwipOGLFigure::setVAxisVisible(const bool value) 
-{ 
+void TwipOGLFigure::setVAxisVisible(const bool value)
+{
     if (!m_pvConfigData)
         return;
     ((InternalData *)m_pvConfigData)->m_vAxisVisible = value;
@@ -1613,13 +1613,13 @@ void TwipOGLFigure::setVAxisVisible(const bool value)
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::setyAxisFlipped(const bool value)
-{ 
+{
     m_pContent->m_axes.m_axisY.m_isflipped = value;
-    if(m_pContent) m_pContent->update(); 
+    if(m_pContent) m_pContent->update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool TwipOGLFigure::getkeepAspectRatio() const 
+bool TwipOGLFigure::getkeepAspectRatio() const
 {
     if (!m_pvConfigData)
         return false;
@@ -1669,7 +1669,7 @@ void TwipOGLFigure::setRotationAngle(const QVector<float> newAngles)
     ((InternalData *)m_pvConfigData)->m_pitchAng = newAngles[2] / GL_RAD_GRAD;
     TwipOGLWidget::normalizeAngle(((InternalData *)m_pvConfigData)->m_pitchAng);
 
-    if(m_pContent) m_pContent->update();   
+    if(m_pContent) m_pContent->update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1702,7 +1702,7 @@ void TwipOGLFigure::setRotationLightAngle(const QVector<float> newAngles)
     ((InternalData *)m_pvConfigData)->m_lightDirYaw = newAngles[1] / GL_RAD_GRAD;
     TwipOGLWidget::normalizeAngle(((InternalData *)m_pvConfigData)->m_lightDirYaw);
 
-    if(m_pContent) m_pContent->update();   
+    if(m_pContent) m_pContent->update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1764,7 +1764,7 @@ QString TwipOGLFigure::getTitle() const
 //----------------------------------------------------------------------------------------------------------------------------------
 void TwipOGLFigure::setTitle(const QString &title)
 {
-    if(m_pvConfigData == NULL) 
+    if(m_pvConfigData == NULL)
         return;
     if (title == "<auto>")
     {

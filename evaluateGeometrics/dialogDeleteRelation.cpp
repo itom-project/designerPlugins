@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -121,7 +121,7 @@ DialogDeleteRelation::DialogDeleteRelation(const InternalInfo &data, EvaluateGeo
 
     switch ((int)(*curRel).at<ito::float32>(1, 0))
     {
-        case 1: 
+        case 1:
             ui.comboBoxType->addItem("Radius", 1);
         break;
 
@@ -132,11 +132,11 @@ DialogDeleteRelation::DialogDeleteRelation(const InternalInfo &data, EvaluateGeo
         case 3:
             ui.comboBoxType->addItem("Distance", 3);
         break;
-        
+
         case 4:
             ui.comboBoxType->addItem("Intersection", 4);
         break;
-        
+
         case 5:
             ui.comboBoxType->addItem("Length", 5);
         break;
@@ -151,8 +151,8 @@ DialogDeleteRelation::DialogDeleteRelation(const InternalInfo &data, EvaluateGeo
 /*
 void DialogDeleteRelation::getData(InternalInfo &data)
 {
-    data.m_relationsList.append(relationShip(ui.comboBoxFirst->currentData().toInt(), 
-        ui.comboBoxSecond->currentData().toInt(), 
+    data.m_relationsList.append(relationShip(ui.comboBoxFirst->currentData().toInt(),
+        ui.comboBoxSecond->currentData().toInt(),
         ui.comboBoxType->currentData().toInt()));
 }
 */

@@ -277,7 +277,7 @@ QVariant MarkerModel::data(const QModelIndex& index, int role) const
             {
                 const auto& marker = markerList[index.row()];
 
-                
+
 
                 if (role == Qt::DisplayRole)
                 {

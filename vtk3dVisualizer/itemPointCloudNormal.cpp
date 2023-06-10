@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -245,7 +245,7 @@ void ItemPointCloudNormal::updatePointCloudNormal()
                 }
             }
 
-            data->SetArray (&pts[0], 2 * nr_normals * 3, 0);        
+            data->SetArray (&pts[0], 2 * nr_normals * 3, 0);
         }
         else if( point_step > 0) //non organized
         {
@@ -356,7 +356,7 @@ void ItemPointCloudNormal::updatePointCloudNormal()
 #else
         mapper->SetInputData (polyData);
 #endif
-        
+
         mapper->SetColorModeToMapScalars();
         mapper->SetScalarModeToUsePointData();
 

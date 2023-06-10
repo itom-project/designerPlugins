@@ -12,4 +12,3 @@ motorController - designer Widget
 **Platforms**:  Windows, Linux
 **Author**:     :plotauthor:`motorController`
 =============== ========================================================================================================
-

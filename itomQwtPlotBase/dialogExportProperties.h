@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ class ITOMQWTPLOTBASE_EXPORT DialogExportProperties : public QDialog
     Q_OBJECT
 
 public:
-    
+
 
     DialogExportProperties(const QSizeF &currentSizePx, QWidget *parent = NULL);
     ~DialogExportProperties() {};

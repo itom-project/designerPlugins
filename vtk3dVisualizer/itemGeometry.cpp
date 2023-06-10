@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -285,7 +285,7 @@ ito::RetVal ItemGeometry::addCuboid(const ito::DataObject *points, const QColor 
     const ito::float32 *yPtr = (ito::float32*)points->rowPtr(0,1);
     const ito::float32 *zPtr = (ito::float32*)points->rowPtr(0,2);
 
-    m_geometryType = tCuboid; 
+    m_geometryType = tCuboid;
     m_nrOfShapes = 1;
     pcl::PolygonMesh mesh;
     pcl::Vertices indices;
@@ -743,7 +743,7 @@ void ItemGeometry::setLighting(bool value)
         {
             m_lighting = value;
             a->GetProperty()->SetLighting(value);
-        }        
+        }
     }
 
     emit updateCanvasRequest();
@@ -784,7 +784,7 @@ ito::RetVal ItemGeometry::updatePose(const Eigen::Affine3f &pose)
 }
 
 //-------------------------------------------------------------------------------------------
-QVector<vtkProp*> ItemGeometry::getSafeActors() 
+QVector<vtkProp*> ItemGeometry::getSafeActors()
 {
     vtkSmartPointer<vtkRendererCollection> _rens = m_visualizer->getRendererCollection();
     vtkRenderer *rend = m_visualizer->getRendererCollection()->GetFirstRenderer();

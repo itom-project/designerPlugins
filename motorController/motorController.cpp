@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 * \file motorController.cpp
 * \brief In this file the functions of the MotorController-Class are defined
 *
-*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are 
+*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorControllerFactory.h
@@ -115,7 +115,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         QList<QPushButton* > buttons;
         buttons.reserve(4);
         QString bname;
-        
+
         btn = new QPushButton("--", this);
         bname = QString("%1--").arg(m_axisName[i].at(0));
         btn->setToolTip(bname);
@@ -185,13 +185,13 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     a->setCheckable(true);
     a->setData(m);
     m_unitActionGroup->addAction(a);
-    
+
     m_actSetUnit->setMenu(m_mnuSetUnit);
     connect(m_mnuSetUnit, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetUnit(QAction*)));
-    
+
 
     m_actUpdatePos = new QAction(tr("Update"), this);
-    
+
     m_actSetAbsRel = new QAction(tr("Toggle Abs/Rel"), this);
     m_mnuSetAbsRel = new QMenu(tr("AbsRel-Switch"), this);
     m_mnuSetAbsRel->addAction(tr("abs"));
@@ -201,9 +201,9 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_actSetAbsRel->setMenu(m_mnuSetAbsRel);
 
     connect(m_mnuSetAbsRel, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAbsRel(QAction*)));
-    
+
     connect(m_actUpdatePos, SIGNAL(triggered()), this, SLOT(triggerUpdatePosition()));
-    
+
     //QMenu *contextMenu = new QMenu(QObject::tr("motorController"), this);
     m_actSetAutoUpdate = new QAction(tr("Toggle Update (off)"), this);
     m_mnuSetAutoUpdate = new QMenu(tr("Update Switch"), this);
@@ -212,7 +212,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
     m_actSetAutoUpdate->setMenu(m_mnuSetAutoUpdate);
 
     connect(m_mnuSetAutoUpdate, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetAutoUpdate(QAction*)));
-    
+
     setContextMenuPolicy(Qt::ActionsContextMenu);
     addAction(m_actUpdatePos);
     addAction(m_actSetAutoUpdate);
@@ -243,7 +243,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
         m_posWidgets[i]->setMinimum(-9999.999);
         m_posWidgets[i]->setMaximum(9999.999);
         m_posWidgets[i]->setDecimals(3);
-        
+
         m_posLabels[i]->setText(m_axisName[i]);
         m_posLabels[i]->setReadOnly(true);
         m_posLabels[i]->setMaximumWidth(30);
@@ -335,7 +335,7 @@ MotorController::MotorController(QWidget *parent /*= 0*/)
 
             m_smallStepWidgets[i]->setVisible(false);
             m_largeStepWidgets[i]->setVisible(false);
-        }   
+        }
     }
 
 #if (CONNEXION_ENABLE)
@@ -384,7 +384,7 @@ void MotorController::resizeEvent(QResizeEvent * event)
     }
     else
     {
-        
+
         for (int i = 0; i < m_numVisAxis; i++)
         {
             curpX = 75 * x + border;
@@ -518,7 +518,7 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
         connect(m_pActuator, SIGNAL(actuatorStatusChanged(QVector<int>,QVector<double>)), this, SLOT(actuatorStatusChanged(QVector<int>,QVector<double>)));
         connect(m_pActuator, SIGNAL(destroyed()), this, SLOT(actuatorDestroyed()));
         m_updateBySignal = connect(this, SIGNAL(requestStatusAndPosition(bool, bool)), m_pActuator, SLOT(requestStatusAndPosition(bool, bool)));
-        
+
         if (m_allowJoyStick)
         {
             initializeJoystick();
@@ -527,14 +527,14 @@ void MotorController::setActuator(QPointer<ito::AddInActuator> actuator)
         triggerUpdatePosition();
 
         // Use invoke or do it directly?
-        // directly 
+        // directly
         QMap<QString, ito::Param> *paramList = NULL;
         m_pActuator->getParamList(&paramList);
         m_needStepAdaption = paramList->contains("stepwidth");
         setEnabled(true);
     }
 
-    return;  
+    return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -697,9 +697,9 @@ void MotorController::setNumAxis(const int numAxis)
 //----------------------------------------------------------------------------------------------------------------------------------
 QSize MotorController::sizeHint() const
 {
-    
+
     return QSize(10,10);
-    
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -796,11 +796,11 @@ void MotorController::setUnit(const Unit unit)
 
         if (m_absRelPosition)
         {
-            m_posWidgets[i]->setValue(m_curAbsPos[i] - m_relPosNull[i]);            
+            m_posWidgets[i]->setValue(m_curAbsPos[i] - m_relPosNull[i]);
         }
         else
         {
-            m_posWidgets[i]->setValue(m_curAbsPos[i]);    
+            m_posWidgets[i]->setValue(m_curAbsPos[i]);
         }
         m_posWidgets[i]->setSuffix(unitString);
         m_smallStepWidgets[i]->setSuffix(unitString);
@@ -872,9 +872,9 @@ void MotorController::setSmallStep(const double value)
         m_smallStep = value;
     }
 
-    for (int i = 0; i < m_smallStepWidgets.size(); i++) 
+    for (int i = 0; i < m_smallStepWidgets.size(); i++)
     {
-        m_smallStepWidgets[i]->setValue(m_smallStep * m_baseScale);    
+        m_smallStepWidgets[i]->setValue(m_smallStep * m_baseScale);
     }
 
 
@@ -891,9 +891,9 @@ void MotorController::setBigStep(const double value)
         m_bigStep = value;
     }
 
-    for (int i = 0; i < m_smallStepWidgets.size(); i++) 
+    for (int i = 0; i < m_smallStepWidgets.size(); i++)
     {
-        m_largeStepWidgets[i]->setValue(m_bigStep * m_baseScale);    
+        m_largeStepWidgets[i]->setValue(m_bigStep * m_baseScale);
     }
     m_isUpdating = false;
     return;
@@ -904,7 +904,7 @@ void MotorController::setAbsRel(const bool absRel)
 {
     m_absRelPosition = absRel;
     QChar axisName;
-    
+
     char text[4] = {'%','c', ' ', 0};
     if (m_absRelPosition)
     {
@@ -972,7 +972,7 @@ void MotorController::triggerActuatorStep(const int axisNo, const bool smallBig,
         {
             ready = false;
             std::cout << locker.getSemaphore()->returnValue.errorMessage() << "\n";
-        }   
+        }
     }
 
     if (ready)
@@ -1042,12 +1042,12 @@ bool MotorController::winEvent(MSG * message, long * result)
     std::cout << "Got event\n";
 
     int            num;      /* number of button returned */
-    SiSpwEvent     pEvent;    /* SpaceWare Event */ 
+    SiSpwEvent     pEvent;    /* SpaceWare Event */
     SiGetEventData EData;    /* SpaceWare Event Data */
-   
+
     /* init Window platform specific data for a call to SiGetEvent */
     SiGetEventWinInit(&EData, message->message, message->wParam, message->lParam);
-  
+
     /* check whether msg was a 3D mouse event and process it */
     if (SiGetEvent (m_SpwDeviceHandle, 0, &EData, &pEvent) == SI_IS_EVENT)
     {
@@ -1077,7 +1077,7 @@ bool MotorController::winEvent(MSG * message, long * result)
                 this->setEnabled(false);
             }
             break;
-           
+
             case SI_ZERO_EVENT:
             {
                 vel[0] = 0.0;
@@ -1085,21 +1085,21 @@ bool MotorController::winEvent(MSG * message, long * result)
                 this->setEnabled(false);
             }
             break;
-           
+
             case  SI_BUTTON_EVENT:
-            
-            if ((num = SiButtonPressed (&pEvent)) != SI_NO_BUTTON)    
+
+            if ((num = SiButtonPressed (&pEvent)) != SI_NO_BUTTON)
             {
-                m_joyModeFast = m_joyModeFast ? false : true; 
+                m_joyModeFast = m_joyModeFast ? false : true;
             }
             /*
-            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)    
+            if ((num = SiButtonReleased (&Event)) != SI_NO_BUTTON)
             {
             SbButtonReleaseEvent(num);   // process 3D mouse button event
             }
             */
             break;
-        
+
         } // end switch
     } /* end SiGetEvent */
     return true;

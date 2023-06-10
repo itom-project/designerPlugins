@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -54,10 +54,10 @@
 #include "itomWidgets/paramEditorWidget.h"
 
 //------------------------------------------------------------------------------------------------------------------------
-class ItomQwtDObjFigurePrivate 
+class ItomQwtDObjFigurePrivate
 {
 public:
-    ItomQwtDObjFigurePrivate() : 
+    ItomQwtDObjFigurePrivate() :
         m_pMarkerDock(NULL),
         m_pPickerDock(NULL),
         m_pShapesDock(NULL),
@@ -68,7 +68,7 @@ public:
         m_pMarkerInfoWidget(nullptr),
         m_pActCameraChannelSelector(NULL)
     {}
-    
+
     QDockWidget *m_pMarkerDock;
     QDockWidget *m_pPickerDock;
     QDockWidget *m_pShapesDock;
@@ -81,7 +81,7 @@ public:
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) : 
+ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) :
         ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
     m_pBaseContent(NULL),
     m_pMarkerInfo(NULL),
@@ -93,7 +93,7 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) : 
+ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) :
         ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
     m_pBaseContent(NULL),
     m_pMarkerInfo(NULL),
@@ -147,7 +147,7 @@ void ItomQwtDObjFigure::construct()
 #if ITOM_ADDININTERFACE_VERSION >= CREATEVERSION(4,1,0)
     d->m_pCameraParamEditorWidget->setPopupSlider(true);
 #endif
-    
+
     d->m_pCameraParamEditorDock->setWidget(d->m_pCameraParamEditorWidget);
     connect(d->m_pCameraParamEditorDock, &QDockWidget::visibilityChanged, this, &ItomQwtDObjFigure::cameraParamEditorVisibilityChanged);
 
@@ -157,14 +157,14 @@ void ItomQwtDObjFigure::construct()
     d->m_pActCameraChannelSelector->setObjectName("actChannelSelector");
     d->m_pActCameraChannelSelector->setToolTip(tr("Select channel of connected grabber"));
     d->m_pActCameraChannelSelector->setVisible(false);
-    
+
 
     addToolbox(d->m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
     addToolbox(d->m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
     addToolbox(d->m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
     addToolbox(d->m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
     addToolbox(d->m_pCameraParamEditorDock, "camera parameters", Qt::LeftDockWidgetArea);
-    
+
     if (getPropertyDockWidget())
     {
         tabifyDockWidget(d->m_pMarkerDock, getPropertyDockWidget());
@@ -178,20 +178,20 @@ void ItomQwtDObjFigure::construct()
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::~ItomQwtDObjFigure()
 {
-    d->m_pShapesDock = NULL;
-    m_pShapesInfo = NULL;
-    
-    d->m_pPickerDock = NULL;
-    m_pPickerInfo = NULL;
+    d->m_pShapesDock = nullptr;
+    m_pShapesInfo = nullptr;
 
-    d->m_pObjectInfoDock = NULL;
-    m_pObjectInfo = NULL;
+    d->m_pPickerDock = nullptr;
+    m_pPickerInfo = nullptr;
 
-    d->m_pMarkerDock = NULL;
-    m_pMarkerInfo = NULL;
+    d->m_pObjectInfoDock = nullptr;
+    m_pObjectInfo = nullptr;
+
+    d->m_pMarkerDock = nullptr;
+    m_pMarkerInfo = nullptr;
 
     delete d;
-    d = NULL;
+    d = nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ void ItomQwtDObjFigure::addToolbarsAndMenus()
         {
             addMenu(m);
         }
-    }    
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -272,8 +272,8 @@ ito::RetVal ItomQwtDObjFigure::savePlot(const QString &filename, float xsize /*=
         {
             s << b;
         }
-        return ito::RetVal::format(ito::retError, 0, 
-            tr("%s is an unsupported file suffix. Supported values are: %s").toLatin1().data(), 
+        return ito::RetVal::format(ito::retError, 0,
+            tr("%s is an unsupported file suffix. Supported values are: %s").toLatin1().data(),
             fileInfo.suffix().toLatin1().data(), s.join("; ").toLatin1().data());
     }
 
@@ -312,7 +312,7 @@ QPixmap ItomQwtDObjFigure::renderToPixMap(const int xsize, const int ysize, cons
     QBrush curBrush = plot->canvasBackground();
 
     QPalette curPalette = plot->palette();
-    
+
     plot->setAutoFillBackground(true);
     plot->setPalette(Qt::white);
     plot->setCanvasBackground(Qt::white);
@@ -507,7 +507,7 @@ ItomQwtPlotEnums::ModificationModes ItomQwtDObjFigure::getModificationModes() co
     {
         return m_pBaseContent->shapeModificationModes();
     }
-    
+
     return ItomQwtPlotEnums::Move | ItomQwtPlotEnums::Resize | ItomQwtPlotEnums::Rotate;
 }
 
@@ -834,7 +834,7 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
     ito::RetVal retval = AbstractDObjFigure::setCamera(camera);
     ParamEditorWidget *pew = cameraParamEditorWidget();
     QDockWidget *dw = cameraParamEditorDockWidget();
-    
+
     if (d->m_pActCameraChannelSelector)
     {
         if (camera.isNull())
@@ -868,7 +868,7 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
                             {
                                 channelCombo->addItem(QString(channelList[i].data()));
                             }
-                            
+
                         }
                         connect(channelCombo, &QComboBox::currentTextChanged, this, &ItomQwtDObjFigure::setDisplayedCameraChannel);
                         connect(this, &AbstractDObjFigure::cameraChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListerners);
@@ -971,7 +971,7 @@ void ItomQwtDObjFigure::setAllowCameraParameterEditor(bool allowed)
                 dw->toggleViewAction()->setVisible(false);
             }
         }
-        
+
     }
 }
 //-------------------------------------------------------------------------------------
@@ -1000,7 +1000,7 @@ bool ItomQwtDObjFigure::allowCameraParameterEditor() const
 void ItomQwtDObjFigure::cameraParamEditorVisibilityChanged(bool visible)
 {
     ParamEditorWidget *pew = cameraParamEditorWidget();
-    
+
     if (pew)
     {
         if (!visible)
@@ -1020,5 +1020,3 @@ void ItomQwtDObjFigure::cameraParamEditorVisibilityChanged(bool visible)
         }
     }
 }
-
-

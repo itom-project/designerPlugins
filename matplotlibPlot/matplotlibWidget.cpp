@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -132,7 +132,7 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     int imgWidth = 0;
 
     m_timer.stop();
-    
+
     if(blit == false)
     {
         QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
@@ -165,7 +165,7 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
     }
 
     paintRect(false);
-    
+
     QSize s = size();
 
 	//it seems that screens with scaling factor cannot render pixmaps with all sizes,
@@ -187,7 +187,7 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
         fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
         m_pendingEvent = PendingEvent(s.height(), s.width());
     }
-    
+
     //handle possible further update requests
     paintTimeout();
 
@@ -208,7 +208,7 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
     int imgWidth = 0;
 
     m_timer.stop();
-    
+
     if(blit == false)
     {
         QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
@@ -239,7 +239,7 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
     }
 
     paintRect(false);
-    
+
     QSize s = size();
 
     if (m_keepSizeFixed || (abs(m_pixmap.width() - s.width()) < 6 && abs(m_pixmap.height() - s.height()) < 6))
@@ -251,7 +251,7 @@ void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int 
     {
         fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
     }
-    
+
     //handle possible further update requests
     paintTimeout();
 
@@ -309,7 +309,7 @@ void MatplotlibWidget::paintRect(bool drawRect, int x /*= 0*/, int y /*= 0*/, in
             y += h;
             h *= -1;
         }
-        
+
         m_rectItem->setRect(x, y, w, h);
         m_rectItem->setVisible(true);
         m_rectItem->update();
@@ -336,7 +336,7 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
     if(m_internalResize == false)
     {
         if(m_pixmapItem)
-        {            
+        {
             fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
         }
 
@@ -354,7 +354,7 @@ void MatplotlibWidget::resizeEvent ( QResizeEvent * event )
         }
     }
     m_internalResize = false;
-    
+
     QGraphicsView::resizeEvent(event);
 }
 
@@ -383,7 +383,7 @@ void MatplotlibWidget::paintTimeout()
 
     if(m_pendingEvent.isValid())
     {
-        
+
         switch(m_pendingEvent.m_type)
         {
         case PendingEvent::typeResize:
@@ -414,10 +414,10 @@ void MatplotlibWidget::handleMouseEvent( int type, QMouseEvent *event)
     Qt::MouseButtons btns = event->buttons();
     int button = 0;
     QPointF scenePos = mapToScene( event->pos().x(), event->pos().y() );
-    
+
     if(type == 2 /*&& button != 0*/) //move, handle by timer in order to not overload the repaint process in python (if no button is pressed, send immediately, since no repaint or rect-paint is pending)
     {
-        
+
         if(btns & Qt::LeftButton)
         {
             button = 1;
@@ -512,7 +512,7 @@ void MatplotlibWidget::enterEvent(QEnterEvent* event)
 #else
         emit eventEnter(qRound(e->position().x()), qRound(e->position().y()));
 #endif
-        
+
     }
     else
     {
@@ -533,13 +533,13 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
 #else
     QPointF scenePos = mapToScene(event->pos().x(), event->pos().y());
     if (event->orientation() == Qt::Vertical)
-#endif    
+#endif
     {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().y(), 1);
 #else
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 1);
-#endif   
+#endif
     }
     else
     {
@@ -547,7 +547,7 @@ void MatplotlibWidget::wheelEvent( QWheelEvent * event )
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->angleDelta().x(), 0);
 #else
         emit eventWheel(qRound(scenePos.x()), qRound(scenePos.y()), event->delta(), 0);
-#endif 
+#endif
     }
 }
 
@@ -623,5 +623,3 @@ void MatplotlibWidget::contextMenuEvent(QContextMenuEvent * event)
         event->ignore();
     }
 }
-
-

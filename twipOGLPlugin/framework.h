@@ -1,12 +1,12 @@
 /* ********************************************************************
 #    twipOGLFigure-Plugin for itom
 #    URL: http://www.twip-os.com
-#    Copyright (C) 2014, twip optical solutions GmbH, 
-#    Stuttgart, Germany 
+#    Copyright (C) 2014, twip optical solutions GmbH,
+#    Stuttgart, Germany
 #
-#    This files is part of the designer-Plugin twipOGLFigure for the 
+#    This files is part of the designer-Plugin twipOGLFigure for the
 #    measurement software itom. All files of this plugin, where not stated
-#    as port of the itom sdk, fall under the GNU Library General 
+#    as port of the itom sdk, fall under the GNU Library General
 #    Public Licence and must behandled accordingly.
 #
 #    twipOGLFigure is free software; you can redistribute it and/or modify it
@@ -21,17 +21,17 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under 
-#    GNU General Public License as published by the Free Software 
-#    Foundation. See <https://bitbucket.org/itom/> 
+#    itom is free software by ITO, University Stuttgart published under
+#    GNU General Public License as published by the Free Software
+#    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
 /*!
-\file 
-\brief 
+\file
+\brief
 \author twip optical solutions GmbH
 
 
@@ -73,10 +73,10 @@ class LineStyle
 
         //! Set the linewidth between 0 and 100. Returns -1 if failed.
         inline int setLineWidth(int lineWidth) { if (lineWidth < 0 || lineWidth > 100) return -1; m_lineWidth = lineWidth; return 0; }
-        
+
         //! Get the lineColor coded as RGB in a signed integer form
         inline int getLineColor() { return m_lineColor;}
-        
+
         //! Set the lineColor as signed int (RGB). Returns -1 if failed.
         inline int setLineColor(int lineColor) { if (lineColor < 0 || lineColor > 16581375) return -1; m_lineColor = lineColor; return 0; }
 
@@ -97,7 +97,7 @@ class FontStyle
     public:
         //! Basic NULL constructor
         FontStyle() : m_fontSize(12), m_bold(0), m_italic(0), m_fontName("Arial"), m_fontColor(0) {}
-        FontStyle(int size, std::string name = "Arial", bool bold = false, bool italic = false, ito::uint32 fontColor = 0) : m_fontSize(size), 
+        FontStyle(int size, std::string name = "Arial", bool bold = false, bool italic = false, ito::uint32 fontColor = 0) : m_fontSize(size),
             m_fontName(name), m_bold(bold), m_italic(italic), m_fontColor(fontColor) {}
         ~FontStyle() {}
 
@@ -120,16 +120,16 @@ class FontStyle
         inline bool getItalic() { return m_italic; }
 
         //! Set the current font to bold
-        inline int setBold(bool bold) 
-        { 
-            m_bold = bold; 
+        inline int setBold(bool bold)
+        {
+            m_bold = bold;
             return 0;
         }
 
         //! Set the current font to italic
-        inline int setItalic(bool italic) 
-        { 
-            m_italic = italic; 
+        inline int setItalic(bool italic)
+        {
+            m_italic = italic;
             return 0;
         }
 
@@ -183,7 +183,7 @@ class Scaling
 {
     public:
         Scaling() : m_sizePx(1), m_scaleAU(1) {}
-        Scaling(int size, ito::float64 scale = 1.0) : m_sizePx(size), m_scaleAU(scale) 
+        Scaling(int size, ito::float64 scale = 1.0) : m_sizePx(size), m_scaleAU(scale)
         {
             if (fabs(scale) <= std::numeric_limits<ito::float64>::epsilon())
             {
@@ -201,7 +201,7 @@ class Scaling
         inline int setScaleAU(ito::float64 scale) { if (fabs(scale) <= std::numeric_limits<ito::float64>::epsilon()) return -1; m_scaleAU = scale; return 0; }
         inline ito::float64 transPx2AU(ito::float64 px) { return px * m_scaleAU; }
         inline ito::float64 transAU2Px(ito::float64 au) { return au / m_scaleAU; }
-        
+
         int m_sizePx;               //!> length in pixel
         ito::float64 m_scaleAU;     //!> conversion factor from pixels size to physical size
 };
@@ -226,7 +226,7 @@ class ColorBar : protected Scaling, protected LineStyle, protected FontStyle
         inline int getPosition() { return m_position; }
         inline int setPosition(int position) { m_position = position; return 0; }
 
-        Ticks m_majorTicks; 
+        Ticks m_majorTicks;
         Ticks m_minorTicks;
         std::string m_title;    //!> colorbar title
         std::string m_unit;     //!> colorbar unit
@@ -251,10 +251,10 @@ class Axis: public Scaling
         *   @param [in] label   new axis label
         */
         inline int setLAbel(std::string label) { m_label = label; return 0; }
-        
+
         //!> get axis unit
         inline std::string getUnit() { return m_unit; }
-        
+
         /** set axis unit
         *   @param [in] unit    new axis unit
         */
@@ -324,7 +324,7 @@ class Axis: public Scaling
                 autoscale = 0;
         }
         inline ito::float64 getLength(void)
-        { 
+        {
             float tmpLen = transPx2AU(transAU2Px(m_max) - transAU2Px(m_min));
             return (tmpLen == 0) ? 1.0 : tmpLen;
         }
@@ -339,7 +339,7 @@ class Axis: public Scaling
         ito::int32 m_idxMax;    //!> highest possible index in data
         ito::uint8 m_autoscale; //!> flag for axis autoscaling (min, max)
         ito::int8 m_idxDim;     //!> axis dimension index
-        ito::int8 m_isMetric;   
+        ito::int8 m_isMetric;
         ito::int8 m_isVisible;
         bool m_isflipped;
 };

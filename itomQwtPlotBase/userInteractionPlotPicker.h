@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ class ITOMQWTPLOTBASE_EXPORT UserInteractionPlotPicker: public QwtPlotPicker
 
 public:
     explicit UserInteractionPlotPicker( QWidget *canvas );
-    
+
     explicit UserInteractionPlotPicker( int xAxis, int yAxis, QWidget *widget );
 
     explicit UserInteractionPlotPicker( int xAxis, int yAxis,

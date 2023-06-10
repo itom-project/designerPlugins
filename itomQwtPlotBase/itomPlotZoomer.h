@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -58,7 +58,7 @@ protected:
     bool eventFilter( QObject *object, QEvent *event );
 
     virtual void rescale() { rescale(false); };
-    
+
     virtual bool accept( QPolygon & ) const;
 
 private:

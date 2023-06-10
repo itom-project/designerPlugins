@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -80,10 +80,10 @@
 Q_DECLARE_METATYPE ( SharedItemPtr )
 
 //------------------------------------------------------------------------------------------------------------------------
-class Vtk3dVisualizerPrivate 
+class Vtk3dVisualizerPrivate
 {
 public:
-    Vtk3dVisualizerPrivate() : 
+    Vtk3dVisualizerPrivate() :
         propertyWidget(NULL),
         treeWidget(NULL),
         meshItem(NULL),
@@ -103,7 +103,7 @@ public:
         coordinateSysPos(0,0,0),
         canvasUpdateQueued(false)
     {}
-    
+
     double pointPickSphereRadius;
     QColor pointPickSphereColor;
     pcl::PointXYZ pointPickSphereCurrentPosition;
@@ -126,7 +126,7 @@ public:
     pcl::octree::OctreePointCloudSearch<pcl::PointXYZ> pointPickSearch;
     pcl::octree::OctreePointCloudSearch<pcl::PointNormal> pointPickSearchNormal;
     bool pointPickSearchHasNormals;
-    
+
 #ifdef LEGACY_VTK
     QVTKWidget *pclCanvas;
 #else
@@ -289,7 +289,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     d->cubeAxesActor->SetGridLineLocation(vtkCubeAxesActor::VTK_GRID_LINES_FURTHEST);
 #elif VTK_MAJOR_VERSION > 5
     d->cubeAxesActor->SetGridLineLocation(VTK_GRID_LINES_FURTHEST);
-#endif	
+#endif
 
     d->cubeAxesActor->XAxisMinorTickVisibilityOff();
     d->cubeAxesActor->YAxisMinorTickVisibilityOff();
@@ -328,7 +328,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 //-------------------------------------------------------------------------------------
 Vtk3dVisualizer::~Vtk3dVisualizer()
 {
-    //this timerEvent must be removed, else crashes can occure in some situations if visualization is already destroyed 
+    //this timerEvent must be removed, else crashes can occure in some situations if visualization is already destroyed
     //and the timer event is fired afterwards.
 #if VTK_MAJOR_VERSION >= 9
     d->pclCanvas->interactor()->RemoveObservers(vtkCommand::TimerEvent);
@@ -377,7 +377,7 @@ ito::RetVal Vtk3dVisualizer::applyUpdate()
     default:
         retval += ito::RetVal(ito::retError, 0, tr("unsupported input type").toLatin1().data());
     }
-    
+
     return retval;
 }
 
@@ -491,9 +491,9 @@ void Vtk3dVisualizer::setPointPickSphereRadius(double radius)
 
         if (d->pointPickSphereRadius > 0.0 && d->pointPickSphereName != "")
         {
-            d->PCLVis->updateSphere(d->pointPickSphereCurrentPosition, 
-                d->pointPickSphereRadius, d->pointPickSphereColor.red() / 256.0, 
-                d->pointPickSphereColor.green() / 256.0, 
+            d->PCLVis->updateSphere(d->pointPickSphereCurrentPosition,
+                d->pointPickSphereRadius, d->pointPickSphereColor.red() / 256.0,
+                d->pointPickSphereColor.green() / 256.0,
                 d->pointPickSphereColor.blue() / 256.0, "__pointPickingSphere");
 
             updateCanvas();
@@ -502,9 +502,9 @@ void Vtk3dVisualizer::setPointPickSphereRadius(double radius)
 }
 
 //-------------------------------------------------------------------------------------
-double Vtk3dVisualizer::pointPickSphereRadius() const 
-{ 
-    return d->pointPickSphereRadius; 
+double Vtk3dVisualizer::pointPickSphereRadius() const
+{
+    return d->pointPickSphereRadius;
 }
 
 //-------------------------------------------------------------------------------------
@@ -527,9 +527,9 @@ void Vtk3dVisualizer::setpointPickSphereColor(QColor color)
 }
 
 //-------------------------------------------------------------------------------------
-QColor Vtk3dVisualizer::pointPickSphereColor() const 
-{ 
-    return d->pointPickSphereColor; 
+QColor Vtk3dVisualizer::pointPickSphereColor() const
+{
+    return d->pointPickSphereColor;
 }
 
 
@@ -625,7 +625,7 @@ ito::RetVal Vtk3dVisualizer::addPointCloudNormal(ito::PCLPointCloud pcl, const Q
         }
 
         SharedItemPtr i;
-        
+
         if(pcl.getType() == ito::pclXYZNormal || pcl.getType() == ito::pclXYZINormal || pcl.getType() == ito::pclXYZRGBNormal)
         {
             if (!item)
@@ -751,7 +751,7 @@ ito::RetVal Vtk3dVisualizer::addCylinder(QVector<double> point, QVector<double> 
             item->setData(0, Qt::DisplayRole, name);
             item->setData(0, Qt::ToolTipRole, fullname);
             parent->addChild(item);
-        }        
+        }
         SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
         item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
         connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -805,7 +805,7 @@ ito::RetVal Vtk3dVisualizer::addPyramid(const ito::DataObject &points, const QSt
                 item->setData(0, Qt::DisplayRole, name);
                 item->setData(0, Qt::ToolTipRole, fullname);
                 parent->addChild(item);
-            }        
+            }
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
             connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -862,7 +862,7 @@ ito::RetVal Vtk3dVisualizer::addCuboid(const ito::DataObject &points, const QStr
                 item->setData(0, Qt::DisplayRole, name);
                 item->setData(0, Qt::ToolTipRole, fullname);
                 parent->addChild(item);
-            }        
+            }
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
             connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -958,7 +958,7 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
                 item->setData(0, Qt::DisplayRole, name);
                 item->setData(0, Qt::ToolTipRole, fullname);
                 parent->addChild(item);
-            }        
+            }
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
             connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -967,7 +967,7 @@ ito::RetVal Vtk3dVisualizer::addCube(QVector<double> size, QVector<double> trans
 
         updateCanvas();
     }
-        
+
         //Eigen::Matrix<float, 3, 8, Eigen::RowMajor> points;
         //points.col(0) = Eigen::Vector3f(minimums[0], minimums[1], minimums[2]); //p0
         //points.col(1) = Eigen::Vector3f(minimums[0], minimums[1], maximums[2]); //p1
@@ -1042,7 +1042,7 @@ ito::RetVal Vtk3dVisualizer::addSphere(QVector<double> point, double radius, con
                 item->setData(0, Qt::DisplayRole, name);
                 item->setData(0, Qt::ToolTipRole, fullname);
                 parent->addChild(item);
-            }        
+            }
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
             connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -1070,7 +1070,7 @@ ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QSt
     ito::RetVal retval;
 
     ito::DataObject points2 = ito::dObjHelper::squeezeConvertCheck2DDataObject(&points, "points", ito::Range(1,std::numeric_limits<int>::max()), ito::Range(3,3), retval, ito::tFloat32, 0);
-    
+
 
     if (!retval.containsError())
     {
@@ -1107,7 +1107,7 @@ ito::RetVal Vtk3dVisualizer::addPolygon(const ito::DataObject &points, const QSt
                 item->setData(0, Qt::DisplayRole, name);
                 item->setData(0, Qt::ToolTipRole, fullname);
                 parent->addChild(item);
-            }        
+            }
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
             connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -1156,7 +1156,7 @@ ito::RetVal Vtk3dVisualizer::addText(const QString &text, const int x, const int
             item->setData(0, Qt::DisplayRole, name);
             item->setData(0, Qt::ToolTipRole, fullname);
             parent->addChild(item);
-        }        
+        }
         SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
         item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
         connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -1240,7 +1240,7 @@ ito::RetVal Vtk3dVisualizer::addLines(const ito::DataObject &points, const QStri
                 item->setData(0, Qt::DisplayRole, name);
                 item->setData(0, Qt::ToolTipRole, fullname);
                 parent->addChild(item);
-            }        
+            }
             SharedItemPtr i = SharedItemPtr(new ItemGeometry(d->PCLVis, fullname, item));
             item->setData(0, Item::itemRole, QVariant::fromValue(i)); //add it before adding any VTK or PCL geometry such that possible existing item, previously stored in the same user data, is deleted.
             connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
@@ -1399,7 +1399,7 @@ ito::RetVal Vtk3dVisualizer::addMesh(ito::PCLPolygonMesh mesh, const QString &fu
                 item->setData(0, Qt::ToolTipRole, fullname);
                 parent->addChild(item);
             }
-        
+
             SharedItemPtr i = SharedItemPtr(new ItemPolygonMesh(d->PCLVis, fullname, item));
             connect(i.data(), &Item::updateCanvasRequest, this, &Vtk3dVisualizer::updateCanvas);
             retval += ((ItemPolygonMesh*)(i.data()))->addPolygonMesh(mesh);
@@ -1529,7 +1529,7 @@ ito::RetVal Vtk3dVisualizer::setItemProperty(const QString &name, const QByteArr
                 }
                 else
                 {
-                    retval += ito::RetVal::format(ito::retError, 0, tr("Given value could not be parsed to the required ito::AutoInterval type ('auto' or [min,max] requested)").toLatin1().data(), 
+                    retval += ito::RetVal::format(ito::retError, 0, tr("Given value could not be parsed to the required ito::AutoInterval type ('auto' or [min,max] requested)").toLatin1().data(),
                         property.data());
                 }
             }
@@ -1686,7 +1686,7 @@ void Vtk3dVisualizer::point_picking_callback (const pcl::visualization::PointPic
             std::vector<int> indices (1);
             std::vector<float> distances (1);
 
-            
+
 
             d->pointPickSearchNormal.nearestKSearch(ptN, 1, indices, distances);
             if (indices[0] >= 0 && indices[0] < d->pointPickSearchNormal.getInputCloud()->size())
@@ -1716,7 +1716,7 @@ void Vtk3dVisualizer::point_picking_callback (const pcl::visualization::PointPic
             }
             else
             {
-                
+
                 d->PCLVis->addSphere(pt, d->pointPickSphereRadius, d->pointPickSphereColor.red() / 256.0, d->pointPickSphereColor.green() / 256.0, d->pointPickSphereColor.blue() / 256.0, "__pointPickingSphere");
                 d->PCLVis->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION ,pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "__pointPickingSphere");
                 d->PCLVis->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_LINE_WIDTH ,2.0, "__pointPickingSphere");
@@ -1735,7 +1735,7 @@ void Vtk3dVisualizer::point_picking_callback (const pcl::visualization::PointPic
                 pt2.x += ptN.normal_x;
                 pt2.y += ptN.normal_y;
                 pt2.z += ptN.normal_z;
-                
+
                 d->PCLVis->addArrow(pt2, pt, d->pointPickSphereColor.red() / 256.0, d->pointPickSphereColor.green() / 256.0, d->pointPickSphereColor.blue() / 256.0, false, "__pointPickingArrow");
                 d->pointPickArrowName = "__pointPickingArrow";
             }
@@ -1788,9 +1788,9 @@ void Vtk3dVisualizer::setEnablePointPick(bool enabled)
 }
 
 //------------------------------------------------------------------------------------------------------------
-bool Vtk3dVisualizer::enablePointPick() const 
-{ 
-    return d->pointPickConnection.connected(); 
+bool Vtk3dVisualizer::enablePointPick() const
+{
+    return d->pointPickConnection.connected();
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -2546,7 +2546,7 @@ void Vtk3dVisualizer::setTitle(const QString& title)
         this->setWindowTitleExtension(title);
         d->title = title;
     }
-    
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 class Slider2D : public QWidget
 {
     Q_OBJECT
-    
+
     //keep the order, the initialization from an ui file is processed in this order
     Q_PROPERTY(QPointF xRange READ xRange WRITE setXRange DESIGNABLE true )
     Q_PROPERTY(QPointF yRange READ yRange WRITE setYRange DESIGNABLE true )
@@ -51,7 +51,7 @@ class Slider2D : public QWidget
     Q_CLASSINFO("prop://xVal", "get/set current horizontal value (x-value) of the slider");
     Q_CLASSINFO("prop://yVal", "get/set current vertical value (y-value) of the slider");
     Q_CLASSINFO("prop://decimals", "get/set the number of decimals");
-    
+
     Q_CLASSINFO("signal://xValChanged", "signal is emitted if the x-value of the slider changed.")
     Q_CLASSINFO("signal://yValChanged", "signal is emitted if the y-value of the slider changed.")
     Q_CLASSINFO("signal://valuesChanged", "signal is emitted if the hoirzontal and/or vertical value of the slider changed.")

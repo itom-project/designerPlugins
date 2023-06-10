@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -81,7 +81,7 @@ class Plot1DWidget : public ItomQwtPlot
         ito::RetVal clearPicker(int id = -1, bool doReplot = true);
 
         void setLegendPosition(LegendPosition position, bool visible);
-        
+
 		void setLegendLabelWidth(const int &width);
         void setLegendTitles(const QStringList &legends, const ito::DataObject *object);
 		void toggleLegendLabel(QwtPlotCurve* curve, const bool state);
@@ -100,7 +100,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         void synchronizeCurrentScaleValues();
         void updateScaleValues(bool doReplot = true, bool doZoomBase = true, bool clearStack = false);
-        
+
         void enableObjectGUIElements(const int mode);
 
         int getPickerCount() const { return m_pickers.size(); }
@@ -133,7 +133,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         void updateLabels();
         void setPickerText(const QString &coords, const QString &offsets);
-		
+
 
         void updatePickerStyle(void);
 
@@ -220,7 +220,7 @@ class Plot1DWidget : public ItomQwtPlot
         ValuePicker1D *m_pValuePicker;
 
         QList<Picker> m_pickers;
-        
+
         LegendPosition m_legendPosition;
         bool m_legendVisible;
 		int m_pLegendLabelWidth;
@@ -309,7 +309,7 @@ class Plot1DWidget : public ItomQwtPlot
         void mnuDeletePicker();
         void mnuSetPickerGlobalMinMax();
         void mnuSetPickerRoiMinMax();
-        
+
 
 };
 
@@ -348,12 +348,12 @@ struct Plot1DWidget::InternalData
     }
 
     ~InternalData()
-    { 
+    {
     }
 
     ito::tDataType m_dataType;
     bool m_hasDateTimeXAxis;
-     
+
     int m_pickerLimit;
 
     QString m_title;
@@ -381,15 +381,15 @@ struct Plot1DWidget::InternalData
     Qt::Orientation m_pickerLabelOrientation;
     Qt::Alignment m_pickerLabelAlignment;
 
-    //true for one replot if setSource-Property has been set 
-    //(even if the same data object is given one more time, 
-    //the hash might be the same, but we want to recalcuate 
+    //true for one replot if setSource-Property has been set
+    //(even if the same data object is given one more time,
+    //the hash might be the same, but we want to recalcuate
     //boundaries if values of dataObject changed.
-    bool m_forceValueParsing; 
+    bool m_forceValueParsing;
 
     ItomQwtPlotEnums::MultiLineMode m_multiLine;
     ItomQwtPlotEnums::ColorHandling m_colorLine;
-    
+
     QwtSymbol::Style m_lineSymbole;
     int m_lineSymboleSize;
     int m_axisState; /*!< indicates if there is an object for axis scaling or if the values are evenly space (default). */

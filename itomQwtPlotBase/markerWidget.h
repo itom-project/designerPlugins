@@ -45,4 +45,3 @@ private:
 private slots:
     void rowsInserted(const QModelIndex &parent, int first, int last);
 };
-

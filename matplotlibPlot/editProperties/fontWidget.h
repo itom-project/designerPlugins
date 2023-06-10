@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2019, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2019, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -94,13 +94,13 @@ public:
         setContentsMargins(0, 0, 0, 0);
     }
 
-    QFont getFont() 
+    QFont getFont()
     {
         m_font = m_pComboFamily->currentFont();
         m_font.setItalic(m_pCheckItalic->isChecked());
         m_font.setBold(m_pCheckBold->isChecked());
         m_font.setPointSize((m_pComboSize->currentText().toInt()));
-        return m_font; 
+        return m_font;
     }
 
 private:

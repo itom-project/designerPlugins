@@ -18,10 +18,10 @@ myPointsDistance = pointCloud()
 filter("pclDistanceToModel", myPointCloud, myPointsDistance, 4, cPt, [], cRad)
 
 #Just plot the data
-[number, handle] = plot(myPointsDistance, "twipOGLFigure")	
+[number, handle] = plot(myPointsDistance, "twipOGLFigure")
 
 #Set the overlay and the topography color to 50 / 50
-handle["overlayAlpha"] = 128	
+handle["overlayAlpha"] = 128
 
 #We change the false color rendering from topography (z-Value) to curvature (curvature-Value of each point)
 handle["curvatureToColor"] = True
