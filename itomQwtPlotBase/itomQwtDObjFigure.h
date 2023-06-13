@@ -330,8 +330,11 @@ public:
     //values are always accessible.
     Q_ENUM(ButtonStyle)
 
-    explicit ItomQwtDObjFigure(QWidget *parent = NULL);
-    explicit ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = NULL);
+    explicit ItomQwtDObjFigure(QWidget* parent = nullptr);
+    explicit ItomQwtDObjFigure(
+        const QString& itomSettingsFile,
+        AbstractFigure::WindowMode windowMode,
+        QWidget* parent = nullptr);
     virtual ~ItomQwtDObjFigure();
 
     //!> set new button set
@@ -438,8 +441,13 @@ public Q_SLOTS:
     ito::RetVal clearGeometricShapes(void);
     ito::RetVal deleteGeometricShape(int idx);
     ito::RetVal setGeometricShapes(QVector<ito::Shape> geometricShapes);
-    ito::RetVal addGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //add the new shape (only if its index does not already exist)
-    ito::RetVal updateGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //updates the shape with the same index or add the given shape if its index does not already exist.
+    ito::RetVal addGeometricShape(
+        const ito::Shape& geometricShape,
+        int* newIndex = nullptr); // add the new shape (only if its index does not already exist)
+    ito::RetVal updateGeometricShape(
+        const ito::Shape& geometricShape,
+        int* newIndex = nullptr); // updates the shape with the same index or add the given shape if
+                                  // its index does not already exist.
 
     ito::RetVal setGeometricShapeLabel(int idx, QString label);
     ito::RetVal setGeometricShapeLabelVisible(int idx, bool visible);

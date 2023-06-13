@@ -3698,7 +3698,7 @@ ito::RetVal ItomQwtPlot::changeVisibleMarkers(int currentPlane)
 void ItomQwtPlot::updateZoomOptionState()
 {
     const unsigned int currentZoomIndex = zoomer()->zoomRectIndex();
-    const int zoomStackSize = zoomer()->zoomStack().size();
+    const unsigned int zoomStackSize = zoomer()->zoomStack().size();
     currentZoomIndex < zoomStackSize - 1 ? m_pActZoomRedo->setEnabled(true)
                                          : m_pActZoomRedo->setEnabled(false);
     currentZoomIndex > 0 ? m_pActZoomUndo->setEnabled(true) : m_pActZoomUndo->setEnabled(false);

@@ -58,15 +58,13 @@ class ItomQwtDObjFigurePrivate
 {
 public:
     ItomQwtDObjFigurePrivate() :
-        m_pMarkerDock(NULL),
-        m_pPickerDock(NULL),
-        m_pShapesDock(NULL),
-        m_pObjectInfoDock(NULL),
-        m_pCameraParamEditorDock(NULL),
-        m_pCameraParamEditorWidget(NULL),
+        m_pMarkerDock(nullptr),
+        m_pPickerDock(nullptr), m_pShapesDock(nullptr),
+        m_pObjectInfoDock(nullptr), m_pCameraParamEditorDock(nullptr),
+        m_pCameraParamEditorWidget(nullptr),
         m_allowCameraParamEditor(true),
         m_pMarkerInfoWidget(nullptr),
-        m_pActCameraChannelSelector(NULL)
+        m_pActCameraChannelSelector(nullptr)
     {}
 
     QDockWidget *m_pMarkerDock;
@@ -81,13 +79,10 @@ public:
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) :
+ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= nullptr*/) :
         ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
-    m_pBaseContent(NULL),
-    m_pMarkerInfo(NULL),
-    m_pPickerInfo(NULL),
-    m_pShapesInfo(NULL),
-    m_pObjectInfo(NULL)
+    m_pBaseContent(nullptr), m_pMarkerInfo(nullptr), m_pPickerInfo(nullptr), m_pShapesInfo(nullptr),
+    m_pObjectInfo(nullptr)
 {
     construct();
 }
@@ -95,11 +90,8 @@ ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) :
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) :
         ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
-    m_pBaseContent(NULL),
-    m_pMarkerInfo(NULL),
-    m_pPickerInfo(NULL),
-    m_pShapesInfo(NULL),
-    m_pObjectInfo(NULL)
+    m_pBaseContent(nullptr), m_pMarkerInfo(nullptr), m_pPickerInfo(nullptr), m_pShapesInfo(nullptr),
+    m_pObjectInfo(nullptr)
 {
     construct();
 }
