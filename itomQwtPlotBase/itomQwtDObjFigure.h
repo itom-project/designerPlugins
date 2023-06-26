@@ -57,6 +57,8 @@ class ItomQwtDObjFigurePrivate;
 class ParamEditorWidget;
 class MarkerWidget;
 class PlotInfoMarker;
+class QWidgetAction;
+
 
 class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
 {
@@ -89,7 +91,7 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     Q_PROPERTY(ito::AbstractFigure::UnitLabelStyle unitLabelStyle READ getUnitLabelStyle WRITE setUnitLabelStyle USER true);
 
     Q_PROPERTY(bool markerLabelsVisible READ getMarkerLabelsVisible WRITE setMarkerLabelsVisible DESIGNABLE true USER true)
-	Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
+    Q_PROPERTY(ItomQwtPlotEnums::ComplexType complexStyle READ getComplexStyle WRITE setComplexStyle DESIGNABLE true USER true);
 
     // DESIGNABLE true: property can be edited in QtDesigner and by Python/C++, USER false: property cannot be changed in property editor of plot.
     Q_PROPERTY(bool allowCameraParameterEditor READ allowCameraParameterEditor WRITE setAllowCameraParameterEditor DESIGNABLE true USER false);
@@ -114,7 +116,7 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
 
     Q_CLASSINFO("prop://unitLabelStyle", "style of the axes label (slash: 'name / unit', keyword-in: 'name in unit', square brackets: 'name [unit]'")
     Q_CLASSINFO("prop://markerLabelsVisible", "Toggle visibility of marker labels, the label is the set name of the marker.")
-	Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
+    Q_CLASSINFO("prop://complexStyle", "Defines whether the real, imaginary, phase or absolute of a complex number is shown. Possible options are CmplxAbs(0), CmplxImag (1), CmplxReal (2) and CmplxArg (3).")
 
     Q_CLASSINFO("prop://allowCameraParameterEditor", "If a live camera is connected to this plot, a camera parameter editor can be displayed as toolbox of the plot. If this property is false, this toolbox is not available (default: true)")
 
@@ -139,12 +141,12 @@ class ITOMQWTPLOTBASE_EXPORT ItomQwtDObjFigure : public ito::AbstractDObjFigure
     "------------\n"
     "xsize : {int}\n"
     "    width of the pixmap\n"
-"ysize : {int}\n"
-"    height of the pixmap\n"
-"resolution : {int}\n"
-"    resolution of the pixmap in dpi")
+    "ysize : {int}\n"
+    "    height of the pixmap\n"
+    "resolution : {int}\n"
+    "    resolution of the pixmap in dpi")
 
-Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let the user add a certain number of geometric shapes to the canvas.\n"
+    Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let the user add a certain number of geometric shapes to the canvas.\n"
     "\n"
     "Parameters\n"
     "-----------\n"
@@ -158,81 +160,81 @@ Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let 
     Q_CLASSINFO("slot://clearGeometricShapes", "removes all geometric shapes from the canvas.")
 
     Q_CLASSINFO("slot://deleteGeometricShape", "deletes the geometric shape with the given index.\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "idx : {int}\n"
-        "    idx is the index of the shape to be removed. This is the index of the shape instance itself and must not always correspond to the index-position of the shape within the tuple of all shapes")
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "idx : {int}\n"
+    "    idx is the index of the shape to be removed. This is the index of the shape instance itself and must not always correspond to the index-position of the shape within the tuple of all shapes")
 
     Q_CLASSINFO("slot://setGeometricShapes", "This slot is the same than assigning a sequence of shape to the property 'geometricShapes'. It replaces all existing shapes by the new set of shapes.\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "geometricShapes : {seq. of shapes}\n"
-        "    Sequence (e.g tuple or list) of shapes that replace all existing shapes by this new set.")
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "geometricShapes : {seq. of shapes}\n"
+    "    Sequence (e.g tuple or list) of shapes that replace all existing shapes by this new set.")
 
     Q_CLASSINFO("slot://addGeometricShape", "Add a new geometric shape to the canvas if no shape with the same index already exists. \n"
-        "\n"
-        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
-        "stored in the optional 'newIndex' parameter).\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "geometricShape : {shape}\n"
-        "    new geometric shape\n"
-        "\n"
-        "Raises\n"
-        "------------\n"
-        "RuntimeError\n"
-        "    if the index of the shape is != -1 and does already exist")
+    "\n"
+    "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+    "stored in the optional 'newIndex' parameter).\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "geometricShape : {shape}\n"
+    "    new geometric shape\n"
+    "\n"
+    "Raises\n"
+    "------------\n"
+    "RuntimeError\n"
+    "    if the index of the shape is != -1 and does already exist")
 
     Q_CLASSINFO("slot://updateGeometricShape", "Updates an existing geometric shape by the new shape if the index of the shape already exists, else add the new shape to the canvas (similar to 'addGeometricShape'. \n"
-        "\n"
-        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
-        "stored in the optional 'newIndex' parameter).\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "geometricShape : {shape}\n"
-        "    new geometric shape")
+    "\n"
+    "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+    "stored in the optional 'newIndex' parameter).\n"
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "geometricShape : {shape}\n"
+    "    new geometric shape")
 
     Q_CLASSINFO("slot://setGeometricShapeLabel", "Set the label of geometric shape with the index idx.\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "idx : {int}\n"
-        "    index of the shape\n"
-        "label : {str}\n"
-        "    new label of the shape")
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "idx : {int}\n"
+    "    index of the shape\n"
+    "label : {str}\n"
+    "    new label of the shape")
 
     Q_CLASSINFO("slot://setGeometricShapeLabelVisible", "Set the visibility of the label of a geometric shape with the given index.\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "idx : {int}\n"
-        "    index of the shape\n"
-        "visible : {bool}\n"
-        "    True if the label should be displayed close to the shape, else False")
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "idx : {int}\n"
+    "    index of the shape\n"
+    "visible : {bool}\n"
+    "    True if the label should be displayed close to the shape, else False")
 
     Q_CLASSINFO("slot://plotMarkers", "Draws sub-pixel wise markers to the canvas of the plot\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "coordinates : {dataObject}\n"
-        "    2xN data object with the 2D coordinates of the markers (first row: X, second row: Y coordinates in axis coordinates of the plot)\n"
-        "style : {str}\n"
-        "    Style string for the set of markers (e.g. 'r+20' for red crosses with a size of 20px)\n"
-        "id : {str}\n"
-        "    Name of the set of added markers (optional, default='')\n"
-        "plane : {int}\n"
-        "    If the dataObject has more than 2 dimensions, it is possible to add the markers to a specific plane only (optional, default=-1 -> all planes)")
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "coordinates : {dataObject}\n"
+    "    2xN data object with the 2D coordinates of the markers (first row: X, second row: Y coordinates in axis coordinates of the plot)\n"
+    "style : {str}\n"
+    "    Style string for the set of markers (e.g. 'r+20' for red crosses with a size of 20px)\n"
+    "id : {str}\n"
+    "    Name of the set of added markers (optional, default='')\n"
+    "plane : {int}\n"
+    "    If the dataObject has more than 2 dimensions, it is possible to add the markers to a specific plane only (optional, default=-1 -> all planes)")
 
     Q_CLASSINFO("slot://deleteMarkers", "Delete all sets of markers with the given id or all markers if no or an empty id is passed.\n"
-        "\n"
-        "Parameters\n"
-        "------------\n"
-        "id : {str} \n"
-        "    name of the marker set that should be removed (optional)")
+    "\n"
+    "Parameters\n"
+    "------------\n"
+    "id : {str} \n"
+    "    name of the marker set that should be removed (optional)")
 
     Q_CLASSINFO("slot://showMarkers", "Shows all existing markers with the given name\n"
         "\n"
@@ -328,8 +330,11 @@ public:
     //values are always accessible.
     Q_ENUM(ButtonStyle)
 
-    explicit ItomQwtDObjFigure(QWidget *parent = NULL);
-    explicit ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent = NULL);
+    explicit ItomQwtDObjFigure(QWidget* parent = nullptr);
+    explicit ItomQwtDObjFigure(
+        const QString& itomSettingsFile,
+        AbstractFigure::WindowMode windowMode,
+        QWidget* parent = nullptr);
     virtual ~ItomQwtDObjFigure();
 
     //!> set new button set
@@ -409,8 +414,8 @@ public:
     ItomQwtPlotEnums::ShapeTypes getAllowedGeometricShapes() const;
     void setAllowedGeometricShapes(const ItomQwtPlotEnums::ShapeTypes &allowedTypes);
 
-	virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
-	virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
+    virtual void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type) = 0;
+    virtual ItomQwtPlotEnums::ComplexType getComplexStyle() const = 0;
 
     //!< overwrite to configure the camera parameters toolbox
     virtual ito::RetVal setCamera(QPointer<ito::AddInDataIO> camera);
@@ -422,6 +427,7 @@ public:
     QDockWidget *pickerDockWidget() const;
     QDockWidget *shapesDockWidget() const;
     QDockWidget *dObjectDockWidget() const;
+    QWidgetAction *actCameraChannelSelector() const;
 
     friend ItomQwtPlot;
 
@@ -435,8 +441,13 @@ public Q_SLOTS:
     ito::RetVal clearGeometricShapes(void);
     ito::RetVal deleteGeometricShape(int idx);
     ito::RetVal setGeometricShapes(QVector<ito::Shape> geometricShapes);
-    ito::RetVal addGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //add the new shape (only if its index does not already exist)
-    ito::RetVal updateGeometricShape(const ito::Shape &geometricShape, int *newIndex = NULL); //updates the shape with the same index or add the given shape if its index does not already exist.
+    ito::RetVal addGeometricShape(
+        const ito::Shape& geometricShape,
+        int* newIndex = nullptr); // add the new shape (only if its index does not already exist)
+    ito::RetVal updateGeometricShape(
+        const ito::Shape& geometricShape,
+        int* newIndex = nullptr); // updates the shape with the same index or add the given shape if
+                                  // its index does not already exist.
 
     ito::RetVal setGeometricShapeLabel(int idx, QString label);
     ito::RetVal setGeometricShapeLabelVisible(int idx, bool visible);
@@ -444,8 +455,10 @@ public Q_SLOTS:
     ito::RetVal plotMarkers(QSharedPointer<ito::DataObject> coordinates, QString style, QString id = QString(), int plane = -1);
     ito::RetVal deleteMarkers(QString id = "");
     ito::RetVal showMarkers(QString id);
-    ito::RetVal hideMarkers(QString id);
 
+
+    ito::RetVal hideMarkers(QString id);
+    ito::RetVal setDisplayedCameraChannel(const QString& channel);
     void replot();
 
 private Q_SLOTS:
@@ -469,14 +482,14 @@ protected:
     ItomQwtPlot *m_pBaseContent;
 
 private:
-	void construct();
+    void construct();
 
     //!< this is deprecated. This member will be deleted in a next major version change.
     PlotInfoMarker  *m_pMarkerInfo;
 
-	PlotInfoPicker  *m_pPickerInfo;
-	PlotInfoShapes  *m_pShapesInfo;
-	PlotInfoDObject *m_pObjectInfo;
+    PlotInfoPicker  *m_pPickerInfo;
+    PlotInfoShapes  *m_pShapesInfo;
+    PlotInfoDObject *m_pObjectInfo;
 
     //avoid to add private members but put them in the ItomQwtDObjFigurePrivate container
     //since this file is part of the itom SDK and can be included in other plugin's source code.
