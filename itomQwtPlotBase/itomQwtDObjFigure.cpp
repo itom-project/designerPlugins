@@ -869,7 +869,7 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
                         }
 
                         connect(comboChannel, &QComboBox::currentTextChanged, this, &ItomQwtDObjFigure::setDisplayedCameraChannel);
-                        connect(this, &AbstractDObjFigure::cameraChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListerners);
+                        connect(this, &AbstractDObjFigure::cameraChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListeners);
                     }
                     else
                     {
