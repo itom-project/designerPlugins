@@ -251,6 +251,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         void setBounds(QVector<QPointF> bounds);
         void resetBounds();
 
+        // deprecated, since not used. Is a no-op method now. //todo : remove if major interface change is executed.
         void enableObjectGUIElements(const int mode);
 
         QString getTitle() const;
