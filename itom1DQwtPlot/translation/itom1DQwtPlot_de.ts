@@ -44,18 +44,18 @@
     <message>
         <location line="+863"/>
         <location line="+10"/>
-        <source>Set picker failed, since canvas not initilized</source>
+        <source>Set picker failed, since canvas not initialized</source>
         <translation>Der Picker konnte nicht gesetzt werden, da &apos;Canvas&apos; nicht inizialisiert wurde</translation>
     </message>
     <message>
         <location line="+10"/>
-        <source>Delete picker failed, since canvas not initilized</source>
+        <source>Delete picker failed, since canvas not initialized</source>
         <translation>Der Picker konnte nicht gelöscht werden, da &apos;Canvas&apos; nicht inizialisiert wurde</translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+10"/>
-        <source>Get picker failed, canvas handle not initilized.</source>
+        <source>Get picker failed, canvas handle not initialized.</source>
         <translation>Fehler: &apos;Canvas-Handle&apos; wurde nicht initialisiert.</translation>
     </message>
     <message>

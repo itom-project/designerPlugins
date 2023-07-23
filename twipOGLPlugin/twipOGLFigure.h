@@ -696,8 +696,8 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         {
             if(m_pContent)
                 return m_pContent->setOverlayImage(overlayImage, objID);
-            else
-                return ito::RetVal(ito::retError, 0, tr("Could not write overlay to uninitilized GL-Widget").toLatin1().data());
+            else 
+                return ito::RetVal(ito::retError, 0, tr("Could not write overlay to uninitialized GL-Widget").toLatin1().data());            
         }
 
 };
