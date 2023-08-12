@@ -869,7 +869,7 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
                         }
 
                         connect(comboChannel, &QComboBox::currentTextChanged, this, &ItomQwtDObjFigure::setDisplayedCameraChannel);
-                        connect(this, &AbstractDObjFigure::cameraChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListeners);
+                        connect(this, &AbstractDObjFigure::cameraChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListener);
                     }
                     else
                     {
@@ -989,6 +989,7 @@ ito::RetVal ItomQwtDObjFigure::setDisplayedCameraChannel(const QString& channel)
             combo->setCurrentText(getDisplayedCameraChannel());
         }
     }
+
     return retValue;
 
 }
