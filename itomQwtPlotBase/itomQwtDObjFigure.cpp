@@ -35,10 +35,15 @@
 #include <qapplication.h>
 #include <qtoolbar.h>
 #include <qfileinfo.h>
+#include <qwidgetaction.h>
+#include <qcombobox.h>
 #include <qpainter.h>
+#include "common/addInMultiChannelGrabber.h"
+
 
 #include "DataObject/dataobj.h"
 #include "itomQwtPlot.h"
+#include "common/byteArray.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_renderer.h>
@@ -53,48 +58,42 @@ class ItomQwtDObjFigurePrivate
 {
 public:
     ItomQwtDObjFigurePrivate() :
-        m_pMarkerDock(NULL),
-        m_pPickerDock(NULL),
-        m_pShapesDock(NULL),
-        m_pObjectInfoDock(NULL),
-        m_pCameraParamEditorDock(NULL),
-        m_pCameraParamEditorWidget(NULL),
+        m_pMarkerDock(nullptr),
+        m_pPickerDock(nullptr), m_pShapesDock(nullptr),
+        m_pObjectInfoDock(nullptr), m_pCameraParamEditorDock(nullptr),
+        m_pCameraParamEditorWidget(nullptr),
         m_allowCameraParamEditor(true),
-        m_pMarkerInfoWidget(nullptr)
+        m_pMarkerInfoWidget(nullptr),
+        m_pActCameraChannelSelector(nullptr)
     {}
 
     QDockWidget *m_pMarkerDock;
-	QDockWidget *m_pPickerDock;
-	QDockWidget *m_pShapesDock;
-	QDockWidget *m_pObjectInfoDock;
+    QDockWidget *m_pPickerDock;
+    QDockWidget *m_pShapesDock;
+    QDockWidget *m_pObjectInfoDock;
     QDockWidget *m_pCameraParamEditorDock;
     ParamEditorWidget *m_pCameraParamEditorWidget;
     MarkerWidget *m_pMarkerInfoWidget;
     bool m_allowCameraParamEditor;
+    QWidgetAction *m_pActCameraChannelSelector;
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= NULL*/) :
+ItomQwtDObjFigure::ItomQwtDObjFigure(QWidget *parent /*= nullptr*/) :
         ito::AbstractDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent),
-    m_pBaseContent(NULL),
-    m_pMarkerInfo(NULL),
-    m_pPickerInfo(NULL),
-    m_pShapesInfo(NULL),
-    m_pObjectInfo(NULL)
+    m_pBaseContent(nullptr), m_pMarkerInfo(nullptr), m_pPickerInfo(nullptr), m_pShapesInfo(nullptr),
+    m_pObjectInfo(nullptr)
 {
-	construct();
+    construct();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::ItomQwtDObjFigure(const QString &itomSettingsFile, AbstractFigure::WindowMode windowMode, QWidget *parent /*= NULL*/) :
         ito::AbstractDObjFigure(itomSettingsFile, windowMode, parent),
-	m_pBaseContent(NULL),
-    m_pMarkerInfo(NULL),
-    m_pPickerInfo(NULL),
-    m_pShapesInfo(NULL),
-    m_pObjectInfo(NULL)
+    m_pBaseContent(nullptr), m_pMarkerInfo(nullptr), m_pPickerInfo(nullptr), m_pShapesInfo(nullptr),
+    m_pObjectInfo(nullptr)
 {
-	construct();
+    construct();
 }
 
 
@@ -103,28 +102,28 @@ void ItomQwtDObjFigure::construct()
 {
     d = new ItomQwtDObjFigurePrivate();
 
-	d->m_pMarkerDock = new QDockWidget(tr("Marker Info"), this);
-	d->m_pMarkerDock->setVisible(false);
-	d->m_pMarkerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    d->m_pMarkerDock = new QDockWidget(tr("Marker Info"), this);
+    d->m_pMarkerDock->setVisible(false);
+    d->m_pMarkerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
     d->m_pMarkerInfoWidget = new MarkerWidget(this);
     d->m_pMarkerDock->setWidget(d->m_pMarkerInfoWidget);
 
-	d->m_pPickerDock = new QDockWidget(tr("Picker Info"), this);
-	d->m_pPickerDock->setVisible(false);
-	d->m_pPickerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
-	m_pPickerInfo = new PlotInfoPicker(d->m_pPickerDock);
-	d->m_pPickerDock->setWidget(m_pPickerInfo);
+    d->m_pPickerDock = new QDockWidget(tr("Picker Info"), this);
+    d->m_pPickerDock->setVisible(false);
+    d->m_pPickerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    m_pPickerInfo = new PlotInfoPicker(d->m_pPickerDock);
+    d->m_pPickerDock->setWidget(m_pPickerInfo);
 
-	d->m_pShapesDock = new QDockWidget(tr("Shapes Info"), this);
-	d->m_pShapesDock->setVisible(false);
-	d->m_pShapesDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
-	m_pShapesInfo = new PlotInfoShapes(d->m_pShapesDock);
-	d->m_pShapesDock->setWidget(m_pShapesInfo);
+    d->m_pShapesDock = new QDockWidget(tr("Shapes Info"), this);
+    d->m_pShapesDock->setVisible(false);
+    d->m_pShapesDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    m_pShapesInfo = new PlotInfoShapes(d->m_pShapesDock);
+    d->m_pShapesDock->setWidget(m_pShapesInfo);
 
-	d->m_pObjectInfoDock = new QDockWidget(tr("Data Object Info"), this);
-	d->m_pObjectInfoDock->setVisible(false);
-	d->m_pObjectInfoDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    d->m_pObjectInfoDock = new QDockWidget(tr("Data Object Info"), this);
+    d->m_pObjectInfoDock->setVisible(false);
+    d->m_pObjectInfoDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     m_pObjectInfo = new PlotInfoDObject(d->m_pObjectInfoDock);
     d->m_pObjectInfoDock->setWidget(m_pObjectInfo);
 
@@ -144,42 +143,47 @@ void ItomQwtDObjFigure::construct()
     d->m_pCameraParamEditorDock->setWidget(d->m_pCameraParamEditorWidget);
     connect(d->m_pCameraParamEditorDock, &QDockWidget::visibilityChanged, this, &ItomQwtDObjFigure::cameraParamEditorVisibilityChanged);
 
+    d->m_pActCameraChannelSelector = new QWidgetAction(this);
+    QComboBox* channelSelector = new QComboBox(this);
+    d->m_pActCameraChannelSelector->setDefaultWidget(channelSelector);
+    d->m_pActCameraChannelSelector->setObjectName("actChannelSelector");
+    d->m_pActCameraChannelSelector->setToolTip(tr("Select channel of connected grabber"));
+    d->m_pActCameraChannelSelector->setVisible(false);
 
 
-
-	addToolbox(d->m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
-	addToolbox(d->m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
-	addToolbox(d->m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
-	addToolbox(d->m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
+    addToolbox(d->m_pMarkerDock, "marker info", Qt::RightDockWidgetArea);
+    addToolbox(d->m_pPickerDock, "picker info", Qt::RightDockWidgetArea);
+    addToolbox(d->m_pShapesDock, "shapes info", Qt::RightDockWidgetArea);
+    addToolbox(d->m_pObjectInfoDock, "object info", Qt::RightDockWidgetArea);
     addToolbox(d->m_pCameraParamEditorDock, "camera parameters", Qt::LeftDockWidgetArea);
 
-	if (getPropertyDockWidget())
-	{
-		tabifyDockWidget(d->m_pMarkerDock, getPropertyDockWidget());
-	}
+    if (getPropertyDockWidget())
+    {
+        tabifyDockWidget(d->m_pMarkerDock, getPropertyDockWidget());
+    }
 
-	tabifyDockWidget(d->m_pPickerDock, d->m_pMarkerDock);
-	tabifyDockWidget(d->m_pShapesDock, d->m_pPickerDock);
-	tabifyDockWidget(d->m_pObjectInfoDock, d->m_pShapesDock);
+    tabifyDockWidget(d->m_pPickerDock, d->m_pMarkerDock);
+    tabifyDockWidget(d->m_pShapesDock, d->m_pPickerDock);
+    tabifyDockWidget(d->m_pObjectInfoDock, d->m_pShapesDock);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtDObjFigure::~ItomQwtDObjFigure()
 {
-	d->m_pShapesDock = NULL;
-	m_pShapesInfo = NULL;
+    d->m_pShapesDock = nullptr;
+    m_pShapesInfo = nullptr;
 
-	d->m_pPickerDock = NULL;
-	m_pPickerInfo = NULL;
+    d->m_pPickerDock = nullptr;
+    m_pPickerInfo = nullptr;
 
-	d->m_pObjectInfoDock = NULL;
-	m_pObjectInfo = NULL;
+    d->m_pObjectInfoDock = nullptr;
+    m_pObjectInfo = nullptr;
 
-	d->m_pMarkerDock = NULL;
-	m_pMarkerInfo = NULL;
+    d->m_pMarkerDock = nullptr;
+    m_pMarkerInfo = nullptr;
 
     delete d;
-    d = NULL;
+    d = nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -813,11 +817,95 @@ ParamEditorWidget* ItomQwtDObjFigure::cameraParamEditorWidget() const
 }
 
 //-------------------------------------------------------------------------------------
+QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
+{
+    return d->m_pActCameraChannelSelector;
+}
+
+//-------------------------------------------------------------------------------------
 /*virtual*/ ito::RetVal ItomQwtDObjFigure::setCamera(QPointer<ito::AddInDataIO> camera)
 {
     ito::RetVal retval = AbstractDObjFigure::setCamera(camera);
     ParamEditorWidget *pew = cameraParamEditorWidget();
     QDockWidget *dw = cameraParamEditorDockWidget();
+
+    if (d->m_pActCameraChannelSelector)
+    {
+        if (camera.isNull())
+        {
+            d->m_pActCameraChannelSelector->setVisible(false);
+        }
+        else
+        {
+            const ito::AddInMultiChannelGrabber* multichannelGrabber = qobject_cast<const ito::AddInMultiChannelGrabber*>(camera);
+
+            if (multichannelGrabber)
+            {
+                d->m_pActCameraChannelSelector->setVisible(true);
+                QComboBox* comboChannel = qobject_cast<QComboBox*>(d->m_pActCameraChannelSelector->defaultWidget());
+
+                if (comboChannel)
+                {
+                    comboChannel->clear();
+                    ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
+                    QSharedPointer<ito::Param> channelListParam(new ito::Param("channelList", ito::ParamBase::StringList));
+
+                    if (QMetaObject::invokeMethod(camera, "getParam", Q_ARG(QSharedPointer<ito::Param>, channelListParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore())))
+                    {
+                        while (!locker.getSemaphore()->wait(500))
+                        {
+                            retval += ito::RetVal(ito::retError, 0, tr("timeout while getting channelList parameter").toLatin1().data());
+                            break;
+                        }
+                        if (!retval.containsError())
+                        {
+                            int len = 0;
+                            const ito::ByteArray* channelList = channelListParam->getVal<const ito::ByteArray*>(len);
+
+                            for (int i = 0; i < len; i++)
+                            {
+                                comboChannel->addItem(QLatin1String(channelList[i].data()));
+                            }
+                        }
+
+                        connect(comboChannel, &QComboBox::currentTextChanged, this, &ItomQwtDObjFigure::setDisplayedCameraChannel);
+                        connect(this, &AbstractDObjFigure::cameraChannelChanged, multichannelGrabber, &ito::AddInMultiChannelGrabber::changeChannelForListener);
+                    }
+                    else
+                    {
+                        retval += ito::RetVal(ito::retError, 0, QObject::tr("Member 'getParam' of plugin could not be invoked.").toLatin1().data());
+                    }
+
+                    QSharedPointer<ito::Param> defaultChannelParam(new ito::Param("defaultChannel", ito::ParamBase::String));
+                    ItomSharedSemaphoreLocker locker2(new ItomSharedSemaphore());
+
+                    if (QMetaObject::invokeMethod(camera, "getParam", Q_ARG(QSharedPointer<ito::Param>, defaultChannelParam), Q_ARG(ItomSharedSemaphore*, locker2.getSemaphore())))
+                    {
+                        while (!locker2.getSemaphore()->wait(500))
+                        {
+                            retval += ito::RetVal(ito::retError, 0, tr("timeout while getting defaultChannel parameter").toLatin1().data());
+                            break;
+                        }
+                        if (!retval.containsError())
+                        {
+                            QString channel = QLatin1String(defaultChannelParam->getVal<const char*>());
+                            retval += setDisplayedCameraChannel(channel);
+                        }
+
+                    }
+                    else
+                    {
+                        retval += ito::RetVal(ito::retError, 0, tr("could not read defaultChannel parameter").toLatin1().data());
+                    }
+
+                }
+            }
+            else
+            {
+                d->m_pActCameraChannelSelector->setVisible(false);
+            }
+        }
+    }
 
     if (pew)
     {
@@ -858,7 +946,6 @@ ParamEditorWidget* ItomQwtDObjFigure::cameraParamEditorWidget() const
 
     return retval;
 }
-
 //-------------------------------------------------------------------------------------
 void ItomQwtDObjFigure::setAllowCameraParameterEditor(bool allowed)
 {
@@ -887,7 +974,25 @@ void ItomQwtDObjFigure::setAllowCameraParameterEditor(bool allowed)
 
     }
 }
+//-------------------------------------------------------------------------------------
+ito::RetVal ItomQwtDObjFigure::setDisplayedCameraChannel(const QString& channel)
+{
+    ito::RetVal retValue(ito::retOk);
+    retValue += AbstractDObjFigure::setDisplayedCameraChannel(channel);
 
+    if (!retValue.containsError())
+    {
+        QComboBox* combo = qobject_cast<QComboBox*>(d->m_pActCameraChannelSelector->defaultWidget());
+
+        if (combo)
+        {
+            combo->setCurrentText(getDisplayedCameraChannel());
+        }
+    }
+
+    return retValue;
+
+}
 //-------------------------------------------------------------------------------------
 bool ItomQwtDObjFigure::allowCameraParameterEditor() const
 {

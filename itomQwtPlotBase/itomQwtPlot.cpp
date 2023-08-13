@@ -41,6 +41,7 @@
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
 #include <qregularexpression.h>
+#include <qwidgetaction.h>
 
 #include "itomPlotZoomer.h"
 #include "itomPlotMagnifier.h"
@@ -204,6 +205,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
         MarkerWidget* markerInfoWidget = parent->markerInfoWidget();
         markerInfoWidget->setModel(m_markerModel.data());
     }
+
 }
 
 //---------------------------------------------------------------------------
@@ -357,6 +359,8 @@ void ItomQwtPlot::createBaseActions()
     m_pActShapeType->setCheckable(true);
     connect(m_pMenuShapeType, SIGNAL(triggered(QAction*)), this, SLOT(mnuGroupShapeTypes(QAction*)));
     connect(m_pActShapeType, SIGNAL(triggered(bool)), this, SLOT(mnuShapeType(bool)));
+
+
 }
 
 //---------------------------------------------------------------------------
@@ -548,8 +552,7 @@ void ItomQwtPlot::setCanvasColor(const QColor &color)
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::setButtonStyle(int style)
-{
-    m_pMenuToolboxes->setIcon(QIcon(":/application/icons/list.png"));
+{    m_pMenuToolboxes->setIcon(QIcon(":/application/icons/list.png"));
 
     if (style == 0)
     {
@@ -3468,14 +3471,12 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 {
     ito::RetVal retval;
     int limits[] = { 2, 2, 0, std::numeric_limits<int>::max() };
-
     QString setname = id;
 
     if (setname == "")
     {
         setname = m_markerModel->getNextDefaultSetname();
     }
-
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
         emit statusBarMessage(tr("Could not plot marker, api is missing"), 4000);
@@ -3615,8 +3616,8 @@ ito::RetVal ItomQwtPlot::plotMarkers(const QSharedPointer<ito::DataObject> coord
 				marker->setValue(xRow[i], yRow[i]);
 				marker->attach(this);
                 markers.append(MarkerItem(marker, plane, true));
-			}
-        }
+				}
+				}
 
         m_markerModel->addMarkers(setname, markers);
 
@@ -3635,17 +3636,17 @@ ito::RetVal ItomQwtPlot::deleteMarkers(const QString &setname)
     {
         m_markerModel->removeAllMarkers();
         replot();
-    }
+        }
     else
     {
         if (!m_markerModel->removeAllMarkersFromSet(setname))
-        {
+    {
             retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(setname).toLatin1().data());
-        }
-        else
-        {
-            replot();
-        }
+    }
+    else
+    {
+        replot();
+    }
     }
 
     return retval;
@@ -3658,15 +3659,16 @@ ito::RetVal ItomQwtPlot::showHideMarkers(const QString &setname, bool show)
 
     if (!m_markerModel->setVisibility(setname, show))
     {
-        retval += ito::RetVal::format(ito::retError, 0, tr("No marker with id '%1' found.").arg(setname).toLatin1().data());
+        retval += ito::RetVal::format(
+            ito::retError, 0, tr("No marker with id '%1' found.").arg(setname).toLatin1().data());
     }
 
     return retval;
-}
+ }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 void ItomQwtPlot::setMarkerLabelVisible(bool visible)
-{
+            {
     m_markerModel->setMarkerLabelsVisible(visible);
 }
 
@@ -3696,7 +3698,7 @@ ito::RetVal ItomQwtPlot::changeVisibleMarkers(int currentPlane)
 void ItomQwtPlot::updateZoomOptionState()
 {
     const unsigned int currentZoomIndex = zoomer()->zoomRectIndex();
-    const int zoomStackSize = zoomer()->zoomStack().size();
+    const unsigned int zoomStackSize = zoomer()->zoomStack().size();
     currentZoomIndex < zoomStackSize - 1 ? m_pActZoomRedo->setEnabled(true)
                                          : m_pActZoomRedo->setEnabled(false);
     currentZoomIndex > 0 ? m_pActZoomUndo->setEnabled(true) : m_pActZoomUndo->setEnabled(false);

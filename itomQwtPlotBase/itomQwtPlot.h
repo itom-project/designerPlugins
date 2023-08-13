@@ -228,6 +228,7 @@ protected:
     QMenu *m_pMenuToolboxes;
     QMenu* m_pMenuZoom; /*!< menu for zoom*/
 
+
     QList<QToolBar*> m_toolbars;
     QList<QMenu*> m_menus;
     QMenu *m_pContextMenu;
