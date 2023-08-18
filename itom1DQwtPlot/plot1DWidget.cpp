@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2023, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2023, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -1291,15 +1291,15 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             guiElementOptions |= GuiElementOption::MultiRowsAvailable;
         }
 
-        if (m_pData->m_dataType == ito::tComplex128 || 
+        if (m_pData->m_dataType == ito::tComplex128 ||
             m_pData->m_dataType == ito::tComplex64)
         {
             guiElementOptions |= GuiElementOption::DataTypeComplex;
             enableObjectGUIElements(guiElementOptions);
 
-            // a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 
+            // a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check,
             // 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
-            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale); 
+            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale);
         }
         else if (m_pData->m_dataType == ito::tRGBA32)
         {
@@ -1314,9 +1314,9 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             guiElementOptions |= GuiElementOption::DataTypeReal;
             enableObjectGUIElements(guiElementOptions);
 
-            // a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 
+            // a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check,
             // 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
-            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale); 
+            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale);
         }
 
         //if this 1d plot is based on bounds (hence, a line cut or similar of a 2d cut, all pickers should be deleted if the boundaries changed)
@@ -3812,6 +3812,7 @@ void Plot1DWidget::updatePickerStyle(void)
         m.item->setLabelOrientation(m_pData->m_pickerLabelOrientation);
         m.item->setLabelEnabled(m_pData->m_pickerLabelVisible);
         m.item->setPlotType(m_pData->m_pickerType);
+    }
     replot();
 }
 
