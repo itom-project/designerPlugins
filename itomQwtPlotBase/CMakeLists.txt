@@ -1,6 +1,6 @@
-set(target_name itomQwtPlotBase)
+cmake_minimum_required(VERSION 3.12...3.24)
 
-cmake_minimum_required(VERSION 3.1...3.15)
+set(target_name itomQwtPlotBase)
 
 message(STATUS "\n<--- BASE LIBRARY ${target_name} --->")
 message(STATUS "-- Build directory: ${CMAKE_CURRENT_BINARY_DIR}")

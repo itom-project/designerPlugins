@@ -118,7 +118,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>TwipOGLFigure</name>
     <message>
-        <source>Could not write overlay to uninitilized GL-Widget</source>
+        <source>Could not write overlay to uninitialized GL-Widget</source>
         <translation>Konnte Überlagerung (Overlay) für uninitialisiertes GL-Widget nicht setzen</translation>
     </message>
     <message>
@@ -337,7 +337,7 @@ p, li { white-space: pre-wrap; }
         <translation>Überlagerungsebene in ungültiges Objekt geschrieben</translation>
     </message>
     <message>
-        <source>No valid data loaded or GL-context not initilized correct</source>
+        <source>No valid data loaded or GL-context not initialized correct</source>
         <translation>Keine Daten vorhanden oder OpenGL-Kontext nicht richtig initialisiert</translation>
     </message>
     <message>

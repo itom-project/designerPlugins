@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
-
+   Copyright (C) 2023, Institut fuer Technische Optik (ITO), 
+   Universitaet Stuttgart, Germany 
+ 
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -20,8 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef PLOT1DWIDGET_H
-#define PLOT1DWIDGET_H
+#pragma once
 
 #include "common/sharedStructures.h"
 #include "DataObject/dataobj.h"
@@ -63,9 +62,19 @@ class Plot1DWidget : public ItomQwtPlot
         Plot1DWidget(Plot1DWidget::InternalData *data, ItomQwtDObjFigure *parent = 0);
         ~Plot1DWidget();
 
+        enum GuiElementOption {
+            DataTypeReal = 0x01,
+            DataTypeColor = 0x02,
+            DataTypeComplex = 0x04,
+            MultiLayerAvailable = 0x10,
+            MultiRowsAvailable = 0x100,
+            MultiColsAvailable = 0x200
+        };
+        Q_DECLARE_FLAGS(GuiElementOptions, GuiElementOption)
+
         ito::RetVal init(bool overwriteDesignableProperties);
 
-        void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>(), const ito::DataObject* xVec = NULL);
+        void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>(), const ito::DataObject* xVec = nullptr);
 
         ito::RetVal updateInterval(const Qt::Axis axis, const Plot1DWidget::InternalData &data);
 
@@ -101,7 +110,7 @@ class Plot1DWidget : public ItomQwtPlot
         void synchronizeCurrentScaleValues();
         void updateScaleValues(bool doReplot = true, bool doZoomBase = true, bool clearStack = false);
 
-        void enableObjectGUIElements(const int mode);
+        void enableObjectGUIElements(const GuiElementOptions guiElementOptions);
 
         int getPickerCount() const { return m_pickers.size(); }
         void setPickerLimit(int limit);
@@ -110,7 +119,7 @@ class Plot1DWidget : public ItomQwtPlot
         bool getAntiAliased() const { return m_antiAliased; }
         void setAntiAliased(bool antiAliased);
 
-        void setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx);
+        void setDataRepresentation(const ItomQwtPlotEnums::MultiLineMode idx);
         void setRGBPresentation(const ItomQwtPlotEnums::ColorHandling idx);
 
         ito::RetVal setCurveProperty(int index, const QByteArray &property, const QVariant &value);
@@ -230,7 +239,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         qreal m_baseLine;
         bool m_hasParentForRescale;
-        int m_guiModeCache;
+        GuiElementOptions m_guiElementOptionsCache;
 
         QColor m_filledColor;
         ItomQwtPlotEnums::FillCurveStyle m_curveFilled;
@@ -261,17 +270,17 @@ class Plot1DWidget : public ItomQwtPlot
         QAction* m_pActGrid;
 		QMenu* m_pMnuGrid;
         QAction* m_pActGridSettings;
-        QAction* m_pActMultiRowSwitch;
-        QMenu* m_pMnuMultiRowSwitch;
+        QAction* m_pActDataReprSwitch;
+        QMenu* m_pMnuDataReprSwitch;
         QAction* m_pActLegendSwitch;
         QMenu* m_pMnuLegendSwitch;
 
-        QAction* m_pActXVAuto;
-        QAction* m_pActXVFR;
-        QAction* m_pActXVFC;
-        QAction* m_pActXVMR;
-        QAction* m_pActXVMC;
-        QAction* m_pActXVML;
+        QAction* m_pActDataReprAuto;
+        QAction* m_pActDataReprFirstRow;
+        QAction* m_pActDataReprFirstColumn;
+        QAction* m_pActDataReprMultiRows;
+        QAction* m_pActDataReprMultiCols;
+        QAction* m_pActDataReprMultiLayer;
         QAction* m_pActRGBA;
         QAction* m_pActGray;
         QAction* m_pActRGBL;
@@ -299,7 +308,7 @@ class Plot1DWidget : public ItomQwtPlot
         void legendItemChecked(const QVariant &itemInfo, bool on);
         void mnuCmplxSwitch(QAction*);
         void mnuLegendSwitch(QAction*);
-        void mnuMultiRowSwitch(QAction*);
+        void mnuDataRepresentationSwitch(QAction*);
         void mnuRGBSwitch(QAction*);
         void mnuParentScaleSetting();
         void mnuGridEnabled(bool checked);
@@ -394,5 +403,3 @@ struct Plot1DWidget::InternalData
     int m_lineSymboleSize;
     int m_axisState; /*!< indicates if there is an object for axis scaling or if the values are evenly space (default). */
 };
-
-#endif

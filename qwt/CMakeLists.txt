@@ -1,6 +1,6 @@
+cmake_minimum_required(VERSION 3.12...3.24)
+
 set(target_name qwt)
- 
-cmake_minimum_required(VERSION 3.1...3.15)
 
 message(STATUS "\n<--- BASE LIBRARY ${target_name} --->")
 message(STATUS "-- Build directory: ${CMAKE_CURRENT_BINARY_DIR}")

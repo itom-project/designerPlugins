@@ -204,7 +204,7 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
 {
     //displayed and sourceout is set by dataObjRasterData, since the data is analyzed there
     /*
-    if (subplotStates()["lineCut"] & ito::AbstractFigure::tUninitilizedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
+    if (subplotStates()["lineCut"] & ito::AbstractFigure::tUninitializedExtern && m_pOutput["bounds"]->getLen() < 2 && m_pInput["source"]->getVal<ito::DataObject*>())
     {
         ito::DataObject* tmp = m_pInput["source"]->getVal<ito::DataObject*>();
         int dims = tmp->getDims();

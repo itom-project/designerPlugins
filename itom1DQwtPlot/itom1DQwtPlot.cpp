@@ -123,15 +123,15 @@ Itom1DQwtPlot::Itom1DQwtPlot(QWidget *parent) :
 Itom1DQwtPlot::~Itom1DQwtPlot()
 {
     m_pContent->deleteLater();
-    m_pContent = NULL;
-    m_pBaseContent = NULL;
+    m_pContent = nullptr;
+    m_pBaseContent = nullptr;
 
     if (d->m_pData)
         delete d->m_pData;
-    d->m_pData = NULL;
+    d->m_pData = nullptr;
 
     delete d;
-    d = NULL;
+    d = nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ void Itom1DQwtPlot::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx
 {
     if (m_pContent)
     {
-        m_pContent->setRowPresentation(idx);
+        m_pContent->setDataRepresentation(idx);  
     }
 }
 
@@ -917,7 +917,7 @@ void Itom1DQwtPlot::setXAxisInterval(ito::AutoInterval interval)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::enableObjectGUIElements(const int mode)
 {
-    m_pContent->enableObjectGUIElements(mode);
+    // no op
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -938,7 +938,7 @@ ito::RetVal Itom1DQwtPlot::setPicker(const QVector<double> &coordinates, int cur
 {
     if (!m_pContent)
     {
-        return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initilized").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initialized").toLatin1().data());
     }
     return m_pContent->setPicker(coordinates, curveIndex, physicalCoordinates, false);
 }
@@ -948,7 +948,7 @@ ito::RetVal Itom1DQwtPlot::appendPicker(const QVector<double> &coordinates, int 
 {
     if (!m_pContent)
     {
-        return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initilized").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Set picker failed, since canvas not initialized").toLatin1().data());
     }
     return m_pContent->setPicker(coordinates, curveIndex, physicalCoordinates, true);
 }
@@ -958,7 +958,7 @@ ito::RetVal Itom1DQwtPlot::deletePicker(int id /*= -1*/)
 {
     if (!m_pContent)
     {
-        return ito::RetVal(ito::retError, 0, tr("Delete picker failed, since canvas not initilized").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("Delete picker failed, since canvas not initialized").toLatin1().data());
     }
     return m_pContent->clearPicker(id);
 }
@@ -968,7 +968,7 @@ QVector<int> Itom1DQwtPlot::getPickerPixel() const
 {
     if (!m_pContent)
     {
-        emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initilized."), 12000 );
+        emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initialized."), 12000 );
     }
     return m_pContent->getPickerPixel();
 }
@@ -978,7 +978,7 @@ QVector<float> Itom1DQwtPlot::getPickerPhys() const
 {
     if (!m_pContent)
     {
-        emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initilized."), 12000 );
+        emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initialized."), 12000 );
     }
     return m_pContent->getPickerPhys();
 }

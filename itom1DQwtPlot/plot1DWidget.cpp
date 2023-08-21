@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2023, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -68,7 +68,7 @@
 //----------------------------------------------------------------------------------------------------------------------------------
 Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     ItomQwtPlot(parent),
-    m_pPlotGrid(NULL),
+    m_pPlotGrid(nullptr),
     m_xDirect(false),
     m_yDirect(false),
     m_lineCol(0),
@@ -86,42 +86,42 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     m_fillCurveAlpa(128),
     m_filledColor(QColor::Invalid),
     m_curveFilled(ItomQwtPlotEnums::NoCurveFill),
-    m_pLegend(NULL),
-    m_guiModeCache(-1),
+    m_pLegend(nullptr),
+    m_guiElementOptionsCache(),
     m_valueScale(ItomQwtPlotEnums::Linear),
     m_axisScale(ItomQwtPlotEnums::Linear),
-    m_pActScaleSettings(NULL),
-    m_pRescaleParent(NULL),
-    m_pActForward(NULL),
-    m_pActBack(NULL),
-    m_pActPicker(NULL),
-    m_pActSetPickerMinMaxGlobal(NULL),
-    m_pActSetPickerMinMaxLocal(NULL),
-    m_pActSetPicker(NULL),
-    m_pActDeletePickers(NULL),
-    m_pMnuSetPicker(NULL),
-    m_pMnuCmplxSwitch(NULL),
-    m_pMnuRGBSwitch(NULL),
-    m_pMnuGrid(NULL),
-    m_pLblMarkerOffsets(NULL),
-    m_pLblMarkerCoords(NULL),
-    m_pMnuMultiRowSwitch(NULL),
-    m_pActXVAuto(NULL),
-    m_pActXVFR(NULL),
-    m_pActXVFC(NULL),
-    m_pActXVMR(NULL),
-    m_pActXVMC(NULL),
-    m_pActXVML(NULL),
-    m_pActRGBA(NULL),
-    m_pActGray(NULL),
-    m_pActRGBL(NULL),
-    m_pActRGBAL(NULL),
-    m_pActRGBG(NULL),
-    m_pActMultiRowSwitch(NULL),
-    m_pActRGBSwitch(NULL),
-    m_pActCmplxSwitch(NULL),
-    m_pActLegendSwitch(NULL),
-    m_pMnuLegendSwitch(NULL),
+    m_pActScaleSettings(nullptr),
+    m_pRescaleParent(nullptr),
+    m_pActForward(nullptr),
+    m_pActBack(nullptr),
+    m_pActPicker(nullptr),
+    m_pActSetPickerMinMaxGlobal(nullptr),
+    m_pActSetPickerMinMaxLocal(nullptr),
+    m_pActSetPicker(nullptr),
+    m_pActDeletePickers(nullptr),
+    m_pMnuSetPicker(nullptr),
+    m_pMnuCmplxSwitch(nullptr),
+    m_pMnuRGBSwitch(nullptr),
+    m_pMnuGrid(nullptr),
+    m_pLblMarkerOffsets(nullptr),
+    m_pLblMarkerCoords(nullptr),
+    m_pMnuDataReprSwitch(nullptr),
+    m_pActDataReprAuto(nullptr),
+    m_pActDataReprFirstRow(nullptr),
+    m_pActDataReprFirstColumn(nullptr),
+    m_pActDataReprMultiRows(nullptr),
+    m_pActDataReprMultiCols(nullptr),
+    m_pActDataReprMultiLayer(nullptr),
+    m_pActRGBA(nullptr),
+    m_pActGray(nullptr),
+    m_pActRGBL(nullptr),
+    m_pActRGBAL(nullptr),
+    m_pActRGBG(nullptr),
+    m_pActDataReprSwitch(nullptr),
+    m_pActRGBSwitch(nullptr),
+    m_pActCmplxSwitch(nullptr),
+    m_pActLegendSwitch(nullptr),
+    m_pMnuLegendSwitch(nullptr),
     m_antiAliased(false),
     m_pComplexStyle(ItomQwtPlotEnums::CmplxAbs),
     m_legendOffset(0)
@@ -132,18 +132,6 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     canvas()->setCursor(Qt::ArrowCursor);
 
     m_colorList.reserve(12);
-    /*m_colorList.append("blue");
-    m_colorList.append("green");
-    m_colorList.append("red");
-    m_colorList.append("magenta");
-    m_colorList.append("cyan");
-    m_colorList.append("yellow");
-    m_colorList.append("darkBlue");
-    m_colorList.append("darkGreen");
-    m_colorList.append("darkRed");
-    m_colorList.append("darkMagenta");
-    m_colorList.append("darkCyan");
-    m_colorList.append("darkYellow");*/
 
     //12-class Paired list from colorbrewer2.org (Cynthia Brewer, Geography, Pennsylvania State University). (reordered)
     m_colorList.append("#1f78b4"); //also used for blue in RGBA values
@@ -191,7 +179,7 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
     mainTb->addAction(m_pActAspectRatio);
-    mainTb->addAction(m_pActMultiRowSwitch);
+    mainTb->addAction(m_pActDataReprSwitch);
     mainTb->addAction(m_pActRGBSwitch);
     // first block is zoom, scale settings, home
     mainTb->addSeparator();
@@ -279,6 +267,7 @@ Plot1DWidget::~Plot1DWidget()
         c->detach();
         delete c;
     }
+
     m_plotCurveItems.clear();
 
     foreach(QwtPlotCurveProperty* c, m_plotCurvePropertyItems)
@@ -288,6 +277,7 @@ Plot1DWidget::~Plot1DWidget()
             delete c;
         }
     }
+
     m_plotCurvePropertyItems.clear();
 
     foreach (Picker m, m_pickers)
@@ -295,13 +285,14 @@ Plot1DWidget::~Plot1DWidget()
         m.item->detach();
         delete m.item;
     }
+
     m_pickers.clear();
 
     if (m_pPlotGrid)
     {
         m_pPlotGrid->detach();
         delete m_pPlotGrid;
-        m_pPlotGrid = NULL;
+        m_pPlotGrid = nullptr;
     }
 
 
@@ -309,7 +300,7 @@ Plot1DWidget::~Plot1DWidget()
     if (m_pLegend)
     {
         m_pLegend->deleteLater();
-        m_pLegend = NULL;
+        m_pLegend = nullptr;
     }
 }
 
@@ -430,7 +421,7 @@ ito::RetVal Plot1DWidget::init(bool overwriteDesignableProperties)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::createActions()
 {
-    QAction *a = NULL;
+    QAction *a = nullptr;
     ItomQwtDObjFigure *p = qobject_cast<ItomQwtDObjFigure*>(parent());
 
     //m_actScaleSetting
@@ -536,30 +527,30 @@ void Plot1DWidget::createActions()
     connect(m_pMnuLegendSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuLegendSwitch(QAction*)));
 
     //m_pActMultiRowSwitch
-    m_pActMultiRowSwitch = new QAction(tr("Data Representation"), p);
-    m_pMnuMultiRowSwitch = new QMenu(tr("Data Representation"), p);
-    m_pActMultiRowSwitch->setMenu(m_pMnuMultiRowSwitch);
-    m_pActXVAuto = a = m_pMnuMultiRowSwitch->addAction(tr("Auto"));
+    m_pActDataReprSwitch = new QAction(tr("Data Representation"), p);
+    m_pMnuDataReprSwitch = new QMenu(tr("Data Representation"), p);
+    m_pActDataReprSwitch->setMenu(m_pMnuDataReprSwitch);
+    m_pActDataReprAuto = a = m_pMnuDataReprSwitch->addAction(tr("Auto"));
     a->setData(ItomQwtPlotEnums::AutoRowCol);
-    m_pMnuMultiRowSwitch->setDefaultAction(a);
+    m_pMnuDataReprSwitch->setDefaultAction(a);
 
-    m_pActXVFR = a = m_pMnuMultiRowSwitch->addAction(tr("First Row"));
+    m_pActDataReprFirstRow = a = m_pMnuDataReprSwitch->addAction(tr("First Row"));
     a->setData(ItomQwtPlotEnums::FirstRow);
 
-    m_pActXVFC = a = m_pMnuMultiRowSwitch->addAction(tr("First Column"));
+    m_pActDataReprFirstColumn = a = m_pMnuDataReprSwitch->addAction(tr("First Column"));
     a->setData(ItomQwtPlotEnums::FirstCol);
 
-    m_pActXVMR = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Row"));
+    m_pActDataReprMultiRows = a = m_pMnuDataReprSwitch->addAction(tr("Multi Row"));
     a->setData(ItomQwtPlotEnums::MultiRows);
 
-    m_pActXVMC = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Column"));
+    m_pActDataReprMultiCols = a = m_pMnuDataReprSwitch->addAction(tr("Multi Column"));
     a->setData(ItomQwtPlotEnums::MultiCols);
 
-    m_pActXVML = a = m_pMnuMultiRowSwitch->addAction(tr("Multi Layer"));
+    m_pActDataReprMultiLayer = a = m_pMnuDataReprSwitch->addAction(tr("Multi Layer"));
     a->setData(ItomQwtPlotEnums::MultiLayerAuto);
 
-    m_pActMultiRowSwitch->setVisible(true);
-    connect(m_pMnuMultiRowSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuMultiRowSwitch(QAction*)));
+    m_pActDataReprSwitch->setVisible(true);
+    connect(m_pMnuDataReprSwitch, &QMenu::triggered, this, &Plot1DWidget::mnuDataRepresentationSwitch);
 
     //m_pActRGBSwitch
     m_pActRGBSwitch = new QAction(tr("Color Representation"), p);
@@ -582,7 +573,7 @@ void Plot1DWidget::createActions()
     a->setData(ItomQwtPlotEnums::RGBGray);
 
     m_pActRGBSwitch->setVisible(false);
-    connect(m_pMnuRGBSwitch, SIGNAL(triggered(QAction*)), this, SLOT(mnuRGBSwitch(QAction*)));
+    connect(m_pMnuRGBSwitch, &QMenu::triggered, this, &Plot1DWidget::mnuRGBSwitch);
 
     //Labels for current cursor position
     m_pLblMarkerCoords = new QLabel("    \n    ", p);
@@ -600,7 +591,6 @@ void Plot1DWidget::createActions()
     a->setCheckable(true);
     a->setChecked(false);
     a->setToolTip(tr("Shows/hides a grid"));
-    //connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuGridEnabled(bool)));
 
 	m_pMnuGrid = new QMenu(tr("Grid"), p);
 	m_pActGrid->setMenu(m_pMnuGrid);
@@ -627,7 +617,7 @@ void Plot1DWidget::createActions()
 	a = m_pMnuGrid->addAction(tr("Minor Y"));
 	a->setData(Itom1DQwtPlot::GridMinorY);
 
-	connect(m_pMnuGrid, SIGNAL(triggered(QAction*)), this, SLOT(mnuSetGrid(QAction*)));
+    connect(m_pMnuGrid, &QMenu::triggered, this, &Plot1DWidget::mnuSetGrid);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -646,23 +636,22 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActSetPickerMinMaxGlobal->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max.png"));
         m_pActSetPickerMinMaxLocal->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/picker_min_max_cropped.png"));
         m_pActDeletePickers->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete.png"));
-        m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
-        m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
-        m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
-        m_pActXVMR->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvm_plot.png"));
-        m_pActXVMC->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"));
-        m_pActXVML->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yxvzm_plot.png"));
+        m_pActDataReprAuto->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvauto_plot.png"));
+        m_pActDataReprFirstRow->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xv_plot.png"));
+        m_pActDataReprFirstColumn->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yv_plot.png"));
+        m_pActDataReprMultiRows->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/xvm_plot.png"));
+        m_pActDataReprMultiCols->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yvm_plot.png"));
+        m_pActDataReprMultiLayer->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/yxvzm_plot.png"));
         m_pActRGBA->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"));
         m_pActGray->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGB_Gray.png"));
         m_pActRGBL->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGB.png"));
         m_pActRGBAL->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGBA_RGBA.png"));
         m_pActRGBG->setIcon(QIcon(":/itomDesignerPlugins/axis/icons/RGB_RGBGray.png"));
         m_pActRGBSwitch->setIcon(m_pMnuRGBSwitch->defaultAction()->icon());
-        m_pActMultiRowSwitch->setIcon(m_pMnuMultiRowSwitch->defaultAction()->icon());
+        m_pActDataReprSwitch->setIcon(m_pMnuDataReprSwitch->defaultAction()->icon());
         m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/grid.png"));
-
-
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
+
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
         {
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex/icons/ImReImag.png"));
@@ -691,22 +680,23 @@ void Plot1DWidget::setButtonStyle(int style)
         m_pActSetPickerMinMaxGlobal->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_lt.png"));
         m_pActSetPickerMinMaxLocal->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/picker_min_max_cropped_lt.png"));
         m_pActDeletePickers->setIcon(QIcon(":/itomDesignerPlugins/general/icons/editDelete_lt.png"));
-        m_pActXVAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
-        m_pActXVFR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
-        m_pActXVFC->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yv_plot_lt.png"));
-        m_pActXVMR->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvm_plot_lt.png"));
-        m_pActXVMC->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yvm_plot_lt.png"));
-        m_pActXVML->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yxvzm_plot_lt.png"));
+        m_pActDataReprAuto->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvauto_plot_lt.png"));
+        m_pActDataReprFirstRow->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xv_plot_lt.png"));
+        m_pActDataReprFirstColumn->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yv_plot_lt.png"));
+        m_pActDataReprMultiRows->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/xvm_plot_lt.png"));
+        m_pActDataReprMultiCols->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yvm_plot_lt.png"));
+        m_pActDataReprMultiLayer->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/yxvzm_plot_lt.png"));
         m_pActRGBA->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"));
         m_pActGray->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGB_Gray_lt.png"));
         m_pActRGBL->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGB_lt.png"));
         m_pActRGBAL->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGBA_RGBA_lt.png"));
         m_pActRGBG->setIcon(QIcon(":/itomDesignerPlugins/axis_lt/icons/RGB_RGBGray_lt.png"));
         m_pActRGBSwitch->setIcon(m_pMnuRGBSwitch->defaultAction()->icon());
-        m_pActMultiRowSwitch->setIcon(m_pMnuMultiRowSwitch->defaultAction()->icon());
+        m_pActDataReprSwitch->setIcon(m_pMnuDataReprSwitch->defaultAction()->icon());
         m_pActGrid->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/grid_lt.png"));
 
         int cmplxIdx = m_pMnuCmplxSwitch->defaultAction()->data().toInt();
+
         if (cmplxIdx == ItomQwtPlotEnums::CmplxImag)
         {
             m_pActCmplxSwitch->setIcon(QIcon(":/itomDesignerPlugins/complex_lt/icons/ImReImag_lt.png"));
@@ -1230,6 +1220,13 @@ void Plot1DWidget::updateLabels()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+/*
+\param bounds: 1 value: this 1D plot is the destination for a z-stack and bounds is the x/y coordinate
+               2 values: this 1D plot is the destination for a line cut and bounds are the coordinates
+                         of the start and end points
+               3 values: this 1d plot is the destination for a line cut of a dataObject with > 2 dims,
+                         the first bounds is the the plane index, the other two the start and end points.
+*/
 void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*=NULL*/)
 {
     ito::RetVal retval(ito::retOk);
@@ -1271,22 +1268,55 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         int height = dims > 1 ? dataObj->getSize(dims - 2) : (width == 0) ? 0 : 1;
 		m_pData->m_dataType = (ito::tDataType)dataObj->getType();
         m_pData->m_hasDateTimeXAxis = false;
+        GuiElementOptions guiElementOptions;
+
+        if (dims > 2 && (bounds.size() == 0 || bounds.size() == 3))
+        {
+            // multi layer is also available for a line-cut of a original
+            // dataObject with more than two dimensions.
+            guiElementOptions |= GuiElementOption::MultiLayerAvailable;
+        }
+
+        if (width > 1 && bounds.size() == 0)
+        {
+            // if this plot is a z-stack or line-cut, no multi line within
+            // one plane is available.
+            guiElementOptions |= GuiElementOption::MultiColsAvailable;
+        }
+
+        if (height > 1 && bounds.size() == 0)
+        {
+            // if this plot is a z-stack or line-cut, no multi line within
+            // one plane is available.
+            guiElementOptions |= GuiElementOption::MultiRowsAvailable;
+        }
 
         if (m_pData->m_dataType == ito::tComplex128 ||
             m_pData->m_dataType == ito::tComplex64)
         {
-            enableObjectGUIElements(2 /*complex*/ | (dims > 1 ? 0x10 : 0x00) /*multi-layer: yes : no*/);
-            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale); //a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
+            guiElementOptions |= GuiElementOption::DataTypeComplex;
+            enableObjectGUIElements(guiElementOptions);
+
+            // a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check,
+            // 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
+            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale);
         }
         else if (m_pData->m_dataType == ito::tRGBA32)
         {
-            enableObjectGUIElements(1 /*rgba, no multi-layer*/);
-            m_pRescaleParent->setVisible(false); //a coloured data object has no color map and can therefore not be cropped.
+            guiElementOptions |= GuiElementOption::DataTypeColor;
+            enableObjectGUIElements(guiElementOptions);
+
+            // a coloured data object has no color map and can therefore not be cropped.
+            m_pRescaleParent->setVisible(false);
         }
         else
         {
-            enableObjectGUIElements(0 /*gray*/ | (dims > 1 ? 0x10 : 0x00) /*multi-layer: yes : no*/);
-            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale); //a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check, 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
+            guiElementOptions |= GuiElementOption::DataTypeReal;
+            enableObjectGUIElements(guiElementOptions);
+
+            // a z-stack 1d plot should not be able to rescale its parent (therefore the bounds.size() check,
+            // 1: z-stack, 2: line-cut 2D object, 3: line-cut 3D object (first bounds is the plane)).
+            m_pRescaleParent->setVisible(bounds.size() > 1 && m_hasParentForRescale);
         }
 
         //if this 1d plot is based on bounds (hence, a line cut or similar of a 2d cut, all pickers should be deleted if the boundaries changed)
@@ -1318,8 +1348,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         if (m_pData->m_dataType == ito::tRGBA32)
         {
             m_layerState = false;
+
             if (bounds.size() == 0) m_pData->m_multiLine = width == 1 ? ItomQwtPlotEnums::FirstCol : ItomQwtPlotEnums::FirstRow;
             m_legendTitles.clear();
+
             switch(m_pData->m_colorLine)
             {
                 case ItomQwtPlotEnums::Gray:
@@ -1348,6 +1380,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         else if (bounds.size() == 0)
         {
             m_pData->m_colorLine = ItomQwtPlotEnums::AutoColor;
+
             switch (m_pData->m_multiLine)
             {
                 case ItomQwtPlotEnums::FirstRow:
@@ -1376,6 +1409,10 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     {
                         multiLineMode = ItomQwtPlotEnums::MultiLayerCols;
                     }
+#if __cplusplus > 201703L
+                    // C++17 only
+                    [[fallthrough]]
+#endif
                 case ItomQwtPlotEnums::MultiLayerCols:
                 case ItomQwtPlotEnums::MultiLayerRows:
                     numCurves = dims > 2 ? dataObj->getSize(dims - 3) : 1;
@@ -3500,6 +3537,7 @@ void Plot1DWidget::home()
 void Plot1DWidget::zoomUndo() const
 {
     const unsigned int index = zoomer()->zoomRectIndex();
+
     if (index > 0)
     {
         zoomer()->zoom(-1);
@@ -3639,7 +3677,9 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
             m.item->detach();
             delete m.item;
         }
+
         m_pickers.clear();
+
 		if (((Itom1DQwtPlot*)(parent()))->pickerWidget())
 		{
 			(((Itom1DQwtPlot*)(parent()))->pickerWidget())->removePickers();
@@ -3654,6 +3694,7 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
         m_pickers[id].item->detach();
         delete m_pickers[id].item;
         m_pickers.removeAt(id);
+
 		if (((Itom1DQwtPlot*)(parent()))->pickerWidget())
 		{
 			(((Itom1DQwtPlot*)(parent()))->pickerWidget())->removePicker(id);
@@ -3661,8 +3702,11 @@ ito::RetVal Plot1DWidget::clearPicker(int id /*=-1 (all)*/, bool doReplot /*= tr
     }
 
     updatePickerPosition(false, false);
+
     if (doReplot)
+    {
         replot();
+    }
 
     return ito::retOk;
 }
@@ -3748,10 +3792,11 @@ void Plot1DWidget::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::legendItemChecked(const QVariant &itemInfo, bool on)
 {
-    QwtPlotItem *pi = infoToItem(itemInfo);
-    if (pi)
+    QwtPlotItem *plotItem = infoToItem(itemInfo);
+
+    if (plotItem)
     {
-        pi->setVisible(on);
+        plotItem->setVisible(on);
         replot();
     }
 }
@@ -3782,6 +3827,7 @@ void Plot1DWidget::setQwtLineStyle(const ItomQwtPlotEnums::CurveStyle &style)
         {
             setQwtLineStyle(dObjCurve, style);
         }
+
         applyLegendFont();
         replot();
     }
@@ -3868,6 +3914,7 @@ void Plot1DWidget::setBaseLine(const qreal &line)
 void Plot1DWidget::setCurveFilled()
 {
     int colorIndex = 0;
+
     foreach(QwtPlotCurve *c, m_plotCurveItems)
     {
         if (c->baseline() != m_baseLine)
@@ -3876,6 +3923,7 @@ void Plot1DWidget::setCurveFilled()
         }
 
         ((QwtPlotCurveDataObject*)c)->setCurveFilled(m_curveFilled);
+
         if (m_curveFilled != ItomQwtPlotEnums::NoCurveFill)
         {
             if (m_filledColor.isValid())
@@ -3895,6 +3943,7 @@ void Plot1DWidget::setCurveFilled()
             ((QwtPlotCurveDataObject*)c)->setBrush(Qt::NoBrush);
         }
     }
+
     applyLegendFont();
     replot();
 }
@@ -3917,6 +3966,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
                 return QSharedPointer<ito::DataObject>();
             }
         }
+
         //for linecuts from a 2d object the data must be copy in a different way, especially in case of a diagonal linecut
         //complex64 will be mapped to float32 and complex128 to float64
         if (copyDisplayedAsComplex == false)
@@ -3931,10 +3981,12 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
         QwtInterval ival = axisInterval(QwtPlot::xBottom);
         size_t firstIdx = std::numeric_limits<size_t>::max();
         size_t lastIdx = 0;
+
         if (ival.minValue() > ival.maxValue())//change boarders to make the interval valid.
         {
             ival.setInterval(ival.maxValue(), ival.minValue());
         }
+
         //get start and end index of sample within interval
         for (size_t i = 0; i < seriesData->size(); ++i)
         {
@@ -3954,7 +4006,7 @@ QSharedPointer<ito::DataObject> Plot1DWidget::getDisplayed(bool copyDisplayedAsC
         double lengthPhys = seriesData->sample(lastIdx).x() - seriesData->sample(firstIdx).x();
         size_t lengthPx = lastIdx - firstIdx;
 
-        displayed = new ito::DataObject((int)m_plotCurveItems.size(), lengthPx + 1, type);
+        displayed = new ito::DataObject((int)m_plotCurveItems.size(), (int)lengthPx + 1, type);
 
         std::string descr, unit;
         seriesData->getDObjValueDescriptionAndUnit(descr, unit);
@@ -4085,72 +4137,42 @@ void Plot1DWidget::setPickerText(const QString &coords, const QString &offsets)
     m_pLblMarkerCoords->setText(coords != "" ? coords : "    \n    ");
     m_pLblMarkerOffsets->setText(offsets != "" ? offsets : "    \n    ");
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Plot1DWidget::setSendCurrentViewState(bool state)
 {
     m_pActSendCurrentToWorkspace->setEnabled(state);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::enableObjectGUIElements(const int mode)
+void Plot1DWidget::enableObjectGUIElements(const GuiElementOptions guiElementOptions)
 {
-    if (mode != m_guiModeCache)
+    if (guiElementOptions != m_guiElementOptionsCache)
     {
-        switch (mode & 0x0F)
-        {
-        case 0: // Standard
-            m_pActCmplxSwitch->setVisible(false);
-            m_pActRGBSwitch->setVisible(false);
-            m_pMnuMultiRowSwitch->actions()[3]->setEnabled(true); //multi-row
-            m_pMnuMultiRowSwitch->actions()[4]->setEnabled(true); //multi-column
-            if ((mode & 0xF0) == 0x10)
-            {
-                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(true); //multi-layer
-            }
-            else
-            {
-                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(false); //multi-layer
-            }
-
-            break;
-        case 1: // RGB
-            m_pActCmplxSwitch->setVisible(false);
-            m_pActRGBSwitch->setVisible(true);
-            m_pMnuMultiRowSwitch->actions()[3]->setEnabled(false); //multi-row
-            m_pMnuMultiRowSwitch->actions()[4]->setEnabled(false); //multi-column
-            m_pMnuMultiRowSwitch->actions()[5]->setEnabled(false); //multi-layer
-
-            break;
-        case 2: // Complex
-            m_pActCmplxSwitch->setVisible(true);
-            m_pActRGBSwitch->setVisible(false);
-            m_pMnuMultiRowSwitch->actions()[3]->setEnabled(true); //multi-row
-            m_pMnuMultiRowSwitch->actions()[4]->setEnabled(true); //multi-column
-
-            if ((mode & 0xF0) == 0x10)
-            {
-                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(true); //multi-layer
-            }
-            else
-            {
-                m_pMnuMultiRowSwitch->actions()[5]->setEnabled(false); //multi-layer
-            }
-            break;
-        }
+        m_pActCmplxSwitch->setVisible(guiElementOptions & DataTypeComplex);
+        m_pActRGBSwitch->setVisible(guiElementOptions & DataTypeColor);
+        m_pActDataReprAuto->setEnabled(true);
+        m_pActDataReprFirstRow->setEnabled(guiElementOptions & MultiColsAvailable);
+        m_pActDataReprFirstColumn->setEnabled(guiElementOptions & MultiRowsAvailable);
+        m_pActDataReprMultiRows->setEnabled((guiElementOptions & MultiColsAvailable) && (guiElementOptions & MultiRowsAvailable));
+        m_pActDataReprMultiCols->setEnabled((guiElementOptions & MultiColsAvailable) && (guiElementOptions & MultiRowsAvailable));
+        m_pActDataReprMultiLayer->setEnabled(guiElementOptions & MultiLayerAvailable);
     }
 
-    m_guiModeCache = mode;
+    m_guiElementOptionsCache = guiElementOptions;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx)
+void Plot1DWidget::setDataRepresentation(const ItomQwtPlotEnums::MultiLineMode idx)
 {
     bool ok;
-    foreach(QAction *a, m_pMnuMultiRowSwitch->actions())
+
+    foreach(QAction *a, m_pMnuDataReprSwitch->actions())
     {
         if (a->data().toInt(&ok) == idx && ok)
         {
-            m_pActMultiRowSwitch->setIcon(a->icon());
-            m_pMnuMultiRowSwitch->setDefaultAction(a);
+            m_pActDataReprSwitch->setIcon(a->icon());
+            m_pMnuDataReprSwitch->setDefaultAction(a);
         }
     }
 
@@ -4166,10 +4188,11 @@ void Plot1DWidget::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx)
     }
 
     Itom1DQwtPlot *p = (Itom1DQwtPlot*)(this->parent());
+
     if (p)
     {
-        QVector<QPointF> bounds = p->getBounds();
-        refreshPlot(p->getInputParam("source")->getVal<ito::DataObject*>(), bounds, p->getInputParam("xData")->getVal<ito::DataObject*>());
+        const QVector<QPointF> bounds = p->getBounds();
+        refreshPlot(p->getInputParam("source")->getVal<const ito::DataObject*>(), bounds, p->getInputParam("xData")->getVal<const ito::DataObject*>());
 
         //if y-axis is set to auto, it is rescaled here with respect to the new limits, else the manual range is kept unchanged.
         updateInterval(Qt::YAxis, *m_pData); //replot is done here
@@ -4254,14 +4277,14 @@ void Plot1DWidget::mnuLegendSwitch(QAction *action)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void Plot1DWidget::mnuMultiRowSwitch(QAction *action)
+void Plot1DWidget::mnuDataRepresentationSwitch(QAction *action)
 {
     bool ok;
     int idx = action->data().toInt(&ok);
 
     if (ok)
     {
-        setRowPresentation((ItomQwtPlotEnums::MultiLineMode)idx);
+        setDataRepresentation((ItomQwtPlotEnums::MultiLineMode)idx);
     }
 }
 

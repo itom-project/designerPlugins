@@ -4563,7 +4563,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::updateOverlayImage(const int o
 
     if(m_pUseTextPix[objectID] == NULL)
     {
-        return ito::RetVal(ito::retError, 0, tr("No valid data loaded or GL-context not initilized correct").toLatin1().data());
+        return ito::RetVal(ito::retError, 0, tr("No valid data loaded or GL-context not initialized correct").toLatin1().data());
     }
 
     cv::Mat *dMat = ((cv::Mat*)m_overlayImage[objectID]->get_mdata()[m_overlayImage[objectID]->seekMat(0)]);
