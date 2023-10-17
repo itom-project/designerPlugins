@@ -848,23 +848,24 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
                 {
                     comboChannel->clear();
                     ItomSharedSemaphoreLocker locker(new ItomSharedSemaphore());
-                    QSharedPointer<ito::Param> channelListParam(new ito::Param("channelList", ito::ParamBase::StringList));
+                    QSharedPointer<ito::Param> availableChannelsParam(new ito::Param("availableChannels", ito::ParamBase::StringList));
 
-                    if (QMetaObject::invokeMethod(camera, "getParam", Q_ARG(QSharedPointer<ito::Param>, channelListParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore())))
+                    if (QMetaObject::invokeMethod(camera, "getParam", Q_ARG(QSharedPointer<ito::Param>, availableChannelsParam), Q_ARG(ItomSharedSemaphore*, locker.getSemaphore())))
                     {
                         while (!locker.getSemaphore()->wait(500))
                         {
                             retval += ito::RetVal(ito::retError, 0, tr("timeout while getting channelList parameter").toLatin1().data());
                             break;
                         }
+
                         if (!retval.containsError())
                         {
                             int len = 0;
-                            const ito::ByteArray* channelList = channelListParam->getVal<const ito::ByteArray*>(len);
+                            const ito::ByteArray* availableChannels = availableChannelsParam->getVal<const ito::ByteArray*>(len);
 
                             for (int i = 0; i < len; i++)
                             {
-                                comboChannel->addItem(QLatin1String(channelList[i].data()));
+                                comboChannel->addItem(QLatin1String(availableChannels[i].data()));
                             }
                         }
 
@@ -886,6 +887,7 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
                             retval += ito::RetVal(ito::retError, 0, tr("timeout while getting defaultChannel parameter").toLatin1().data());
                             break;
                         }
+
                         if (!retval.containsError())
                         {
                             QString channel = QLatin1String(defaultChannelParam->getVal<const char*>());
