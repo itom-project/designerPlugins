@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2023, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -20,8 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef ITOMQWTDOBJFIGURE_H
-#define ITOMQWTDOBJFIGURE_H
+#pragma once
 
 #include "itomQwtPlotBase.h"
 
@@ -479,6 +478,8 @@ protected:
 
     void addToolbarsAndMenus();
 
+    virtual ito::RetVal removeLiveSource();
+
     ItomQwtPlot *m_pBaseContent;
 
 private:
@@ -507,5 +508,3 @@ signals :
     void geometricShapeFinished(QVector<ito::Shape> shapes, bool aborted);
     void geometricShapeCurrentChanged(ito::Shape currentShape); /*invalid shape if nothing is selected*/
 };
-
-#endif //ITOMQWTDOBJFIGURE_H

@@ -1283,7 +1283,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
     return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
+void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
     ito::RetVal retval;
     if (m_isRefreshingPlot || !m_pData)

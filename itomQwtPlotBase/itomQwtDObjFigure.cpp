@@ -823,6 +823,22 @@ QWidgetAction* ItomQwtDObjFigure::actCameraChannelSelector() const
 }
 
 //-------------------------------------------------------------------------------------
+/*virtual*/ ito::RetVal ItomQwtDObjFigure::removeLiveSource()
+{
+    d->m_pActCameraChannelSelector->setVisible(false);
+    QComboBox* comboChannel = qobject_cast<QComboBox*>(d->m_pActCameraChannelSelector->defaultWidget());
+
+    if (comboChannel)
+    {
+        disconnect(comboChannel, &QComboBox::currentTextChanged, nullptr, nullptr);
+    }
+
+    disconnect(this, &AbstractDObjFigure::cameraChannelChanged, nullptr, nullptr);
+
+    return AbstractDObjFigure::removeLiveSource();
+}
+
+//-------------------------------------------------------------------------------------
 /*virtual*/ ito::RetVal ItomQwtDObjFigure::setCamera(QPointer<ito::AddInDataIO> camera)
 {
     ito::RetVal retval = AbstractDObjFigure::setCamera(camera);

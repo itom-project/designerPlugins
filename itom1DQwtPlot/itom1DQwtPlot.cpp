@@ -163,7 +163,7 @@ void Itom1DQwtPlot::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx
 {
     if (m_pContent)
     {
-        m_pContent->setDataRepresentation(idx);  
+        m_pContent->setDataRepresentation(idx);
     }
 }
 
@@ -1260,6 +1260,12 @@ void Itom1DQwtPlot::setCurrentPickerIndex(int index)
         m_pContent->updatePickerPosition(false, false);
         refreshPlot();
     }
+}
+
+//-------------------------------------------------------------------------------------
+Qt::Axis Itom1DQwtPlot::getValueAxis() const
+{
+    return Qt::YAxis;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
