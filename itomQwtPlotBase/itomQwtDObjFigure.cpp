@@ -1001,10 +1001,11 @@ ito::RetVal ItomQwtDObjFigure::setDisplayedCameraChannel(const QString& channel)
     if (!retValue.containsError())
     {
         QComboBox* combo = qobject_cast<QComboBox*>(d->m_pActCameraChannelSelector->defaultWidget());
+        QString newChannel = getDisplayedCameraChannel();
 
-        if (combo)
+        if (combo && combo->currentText() != newChannel)
         {
-            combo->setCurrentText(getDisplayedCameraChannel());
+            combo->setCurrentText(newChannel);
         }
     }
 
