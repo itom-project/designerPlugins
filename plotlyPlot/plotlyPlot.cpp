@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2023, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -154,7 +154,7 @@ void PlotlyPlot::setHtml(const QString& html)
         d->m_htmlFile->setAutoRemove(true);
         if (d->m_htmlFile->open())
         {
-            d->m_htmlFile->write(html.toLatin1());
+            d->m_htmlFile->write(html.toUtf8());
             d->m_htmlFile->close();
         }
 
