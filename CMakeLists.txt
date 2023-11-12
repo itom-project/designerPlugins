@@ -24,9 +24,16 @@ option(PLUGIN_matplotlibPlot "Build with this solution." ON)
 option(PLUGIN_plotlyPlot "Build with this solution." ON)
 option(PLUGIN_motorController "Build with this solution." ON)
 option(PLUGIN_evaluateGeometrics "Build with this solution." ON)
-option(PLUGIN_vtk3dVisualizer "Build with this solution." ON)
 option(PLUGIN_slider2D "Build with this solution." ON)
-option(PLUGIN_twipOGLPlugin "Build with this solution." ON)
+
+# PclTools
+if(BUILD_WITH_PCL)
+	option(PLUGIN_vtk3dVisualizer "Build with this solution." ON)
+	option(PLUGIN_twipOGLPlugin "Build with this solution." ON)
+elseif(BUILD_WITH_PCL)
+    option(PLUGIN_vtk3dVisualizer "Build with this solution." OFF)
+	option(PLUGIN_twipOGLPlugin "Build with this solution." OFF)
+endif(BUILD_WITH_PCL)
 
 if(PLUGIN_itom1DQwtPlot OR PLUGIN_itom2DQwtPlot)
     add_subdirectory(qwt)
