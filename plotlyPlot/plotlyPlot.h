@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2024, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -37,6 +37,12 @@
 
 class PlotlyPlotPrivate;
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+class QWebEngineDownloadItem;
+#else
+class QWebEngineDownloadRequest;
+#endif
+
 class ITOMPLOTLY_EXPORT PlotlyPlot : public ito::AbstractFigure
 {
     Q_OBJECT
@@ -69,5 +75,11 @@ public slots:
     void clear();
 
 private slots:
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    void downloadRequested(QWebEngineDownloadItem* download);
+#else
+    void downloadRequested(QWebEngineDownloadRequest* download);
+#endif
 
 };
