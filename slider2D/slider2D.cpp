@@ -40,8 +40,6 @@
 
 #include <QMouseEvent>
 #include <QPainter>
-#include <qstylepainter.h>
-#include <qstyleoption.h>
 #include <QSlider>
 #include <QHBoxLayout>
 #include <QLineF>
@@ -348,10 +346,10 @@ void Slider2D::paintEvent(QPaintEvent *)
     qreal yValRanged = (p->yVal - p->yRange.y()) / (p->yRange.x() - p->yRange.y());
 
 
-    QStylePainter painter(this);
+    QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing);
-    /*painter.translate(geometry().width() / 2, geometry().height() / 2);
+    painter.translate(geometry().width() / 2, geometry().height() / 2);
 
 
 
@@ -415,14 +413,7 @@ void Slider2D::paintEvent(QPaintEvent *)
     painter.drawLine(0, yValRanged*side, side, yValRanged*side);
     painter.drawLine(xValRanged*side, 0, xValRanged*side, side);
     painter.fillPath (path_tri_1, QBrush (QColor ("black")));
-    painter.fillPath (path_tri_2, QBrush (QColor ("black")));*/
-
-    QStyleOptionButton option;
-    option.initFrom(this);
-    option.rect = QRect(0, 0, p->squareSize(), p->squareSize());
-    painter.drawPrimitive(QStyle::PrimitiveElement::PE_FrameGroupBox, option);
-
-    painter.drawControl(QStyle::ControlElement::CE_PushButton, option);
+    painter.fillPath (path_tri_2, QBrush (QColor ("black")));
 
 }
 
