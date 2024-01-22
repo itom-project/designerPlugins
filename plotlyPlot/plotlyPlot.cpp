@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2023, Institut fuer Technische Optik (ITO),
+   Copyright (C) 2024, Institut fuer Technische Optik (ITO),
    Universitaet Stuttgart, Germany
 
    This file is part of itom.
@@ -24,6 +24,7 @@
 
 #include <QWebEngineProfile>
 #include <QWebEngineView>
+#include <QtGlobal>
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     #include <qwebenginedownloaditem.h>
@@ -36,6 +37,8 @@
 #include <qstatusbar.h>
 #include <qtemporaryfile.h>
 #include <qdir.h>
+#include <qdebug.h>
+#include <qcoreapplication.h>
 
 class PlotlyPlotPrivate
 {
@@ -89,33 +92,7 @@ PlotlyPlot::PlotlyPlot(
 
     QWebEngineProfile* profile = d->m_pWebEngineView->page()->profile();
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    connect(profile, &QWebEngineProfile::downloadRequested, [=](QWebEngineDownloadItem* download) {
-        QFileInfo fileInfo(download->path());
-        QString newPath = QFileDialog::getSaveFileName(
-            this, tr("File Location"), download->path(), tr("Image (*.%1)").arg(fileInfo.suffix()));
-
-        if (newPath != "")
-        {
-            download->setPath(newPath);
-            download->accept();
-        }
-    });
-#else
-    connect(profile, &QWebEngineProfile::downloadRequested, [=](QWebEngineDownloadRequest* download) {
-        QFileInfo fileInfo(download->downloadDirectory(), download->downloadFileName());
-        QString newPath = QFileDialog::getSaveFileName(
-            this, tr("File Location"), fileInfo.absoluteFilePath(), tr("Image (*.%1)").arg(fileInfo.suffix()));
-
-        if (newPath != "")
-        {
-            fileInfo.setFile(newPath);
-            download->setDownloadDirectory(fileInfo.absoluteDir().absolutePath());
-            download->setDownloadFileName(fileInfo.fileName());
-            download->accept();
-        }
-        });
-#endif
+    connect(profile, &QWebEngineProfile::downloadRequested, this, &PlotlyPlot::downloadRequested);
 
     setPropertyObservedObject(this);
 }
@@ -124,6 +101,37 @@ PlotlyPlot::PlotlyPlot(
 PlotlyPlot::~PlotlyPlot()
 {
 }
+
+//-------------------------------------------------------------------------------------
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+void PlotlyPlot::downloadRequested(QWebEngineDownloadItem* download)
+{
+    QFileInfo fileInfo(download->path());
+    QString newPath = QFileDialog::getSaveFileName(
+            this, tr("File Location"), download->path(), tr("Image (*.%1)").arg(fileInfo.suffix()));
+
+    if (newPath != "")
+    {
+        download->setPath(newPath);
+        download->accept();
+    }
+}
+#else
+void PlotlyPlot::downloadRequested(QWebEngineDownloadRequest* download)
+{
+    QFileInfo fileInfo(download->downloadDirectory(), download->downloadFileName());
+    QString newPath = QFileDialog::getSaveFileName(
+        this, tr("File Location"), fileInfo.absoluteFilePath(), tr("Image (*.%1)").arg(fileInfo.suffix()));
+
+    if (newPath != "")
+    {
+        fileInfo.setFile(newPath);
+        download->setDownloadDirectory(fileInfo.absoluteDir().absolutePath());
+        download->setDownloadFileName(fileInfo.fileName());
+        download->accept();
+    }
+}
+#endif
 
 //-------------------------------------------------------------------------------------
 void PlotlyPlot::setContextMenuEnabled(bool show)
