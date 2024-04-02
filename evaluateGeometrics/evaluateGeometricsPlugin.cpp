@@ -43,7 +43,7 @@ EvaluateGeometricsPlugin::EvaluateGeometricsPlugin(QObject *parent)
 
     m_description = QObject::tr("itom measurement widget");
     m_detaildescription = QObject::tr("The evaluate geometrics plugin can be used to evaluate geometric parameters of shapes drawn in itom plots.");
-    m_author = "Christian Kohler and Wolfram Lyda, twip OS";
+    m_author = PLUGIN_AUTHOR;
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL 2.0");
 

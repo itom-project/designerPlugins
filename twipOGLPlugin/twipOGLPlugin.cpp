@@ -45,7 +45,7 @@ TwipOGLPlugin::TwipOGLPlugin(QObject *parent)
 
     m_description = QObject::tr("twip optical solutions GmbH widget for visualisation of 2D / 3D DataObjects and PointClouds.");
     m_detaildescription = QObject::tr("");
-    m_author = "Christian Kohler, twip optical solutions GmbH";
+    m_author = PLUGIN_AUTHOR;
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("Published under LGPL v2.0 by twip optical solutions GmbH");
 

@@ -39,7 +39,7 @@ MatplotlibPlotFactory::MatplotlibPlotFactory(QObject *parent)
 
     m_description = QObject::tr("itom widget for matplotlib plots.");
     m_detaildescription = QObject::tr("");
-    m_author = "Marc Gronle, ITO";
+    m_author = PLUGIN_AUTHOR;
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
     m_license = QObject::tr("LGPL");
 

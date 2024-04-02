@@ -44,7 +44,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/evaluateGeometricsPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotTreeWidget.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogDeleteRelation.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogAddRelation.h
@@ -68,6 +68,9 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogDeleteRelation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogAddRelation.cpp
 )
+
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
 if(MSVC)

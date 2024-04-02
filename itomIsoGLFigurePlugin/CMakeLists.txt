@@ -96,7 +96,7 @@ if(OPENGL_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.h
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.h
         ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+        ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
     )
 
     set(DESIGNER_UI

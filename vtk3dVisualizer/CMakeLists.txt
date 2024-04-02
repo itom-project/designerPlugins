@@ -97,7 +97,7 @@ if(ITOM_SDK_PCL_SUPPORT)
 
         set(DESIGNER_HEADERS
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizerFactory.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+            ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
             ${CMAKE_CURRENT_SOURCE_DIR}/vtk3dVisualizer.h
             ${CMAKE_CURRENT_SOURCE_DIR}/coordSysProperty.h
             ${CMAKE_CURRENT_SOURCE_DIR}/CustomTypes.h
@@ -136,6 +136,9 @@ if(ITOM_SDK_PCL_SUPPORT)
             ${CMAKE_CURRENT_SOURCE_DIR}/itemGeometry.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/treeWidgetKeyEater.cpp
         )
+
+        #Define Version in pluginVersion.h
+        configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
         #If you want to use automatical metadata for dlls under windows use the following if-case.
         if(MSVC)

@@ -1,7 +1,7 @@
 /* ********************************************************************
     itom software
     URL: http://www.uni-stuttgart.de/ito
-    Copyright (C) 2024, Institut fuer Technische Optik (ITO),
+    Copyright (C) 2021, Institut fuer Technische Optik (ITO),
     Universitaet Stuttgart, Germany
 
     This file is part of itom and its software development toolkit (SDK).
@@ -25,17 +25,21 @@
     along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#pragma once
+#ifndef PLUGINVERSION_H
+#define PLUGINVERSION_H
 
 #include "itom_sdk.h"
 
-#define PLUGIN_VERSION_MAJOR 1
-#define PLUGIN_VERSION_MINOR 0
-#define PLUGIN_VERSION_PATCH 2
-#define PLUGIN_VERSION_REVISION 0
-#define PLUGIN_VERSION        CREATE_VERSION(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
-#define PLUGIN_VERSION_STRING CREATE_VERSION_STRING(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
-#define PLUGIN_COMPANY        "Institut fuer Technische Optik, University Stuttgart"
-#define PLUGIN_COPYRIGHT       "(C) 2024, ITO, University Stuttgart"
-#define PLUGIN_NAME           "plotlyPlot"
+#define PLUGIN_VERSION_MAJOR        ${itom_designerPlugin_VERSION_MAJOR}
+#define PLUGIN_VERSION_MINOR        ${itom_designerPlugin_VERSION_MINOR}
+#define PLUGIN_VERSION_PATCH        ${itom_designerPlugin_VERSION_PATCH}
+#define PLUGIN_VERSION              CREATEVERSION(PLUGIN_VERSION_MAJOR ,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH) //ITOM_VERSION is (major << 16) + (minor << 8) + patch
+#define PLUGIN_VERSION_STRING       CREATE_VERSION_STRING(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
+#define PLUGIN_COMPANY              "Institut fuer Technische Optik, University Stuttgart"
+#define PLUGIN_AUTHOR               "Marc Gronle, Wolfram Lyda, Christian Kohler, ITO, University Stuttgart";
+#define PLUGIN_COPYRIGHT            "(C) 2021, ITO, University Stuttgart"
+#define PLUGIN_NAME                 "itom2dQwtPlot"
 
+//----------------------------------------------------------------------------------------------------------------------------------
+
+#endif // PLUGINVERSION_H

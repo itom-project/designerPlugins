@@ -45,7 +45,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplotfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibSubfigConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibWidget.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/dialogEditProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/colorWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/fontWidget.h
@@ -72,6 +72,9 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/dialogEditProperties.cpp
 )
+
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
 itom_add_source_group(editProperties)
 

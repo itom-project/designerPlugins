@@ -52,7 +52,7 @@ add_definitions(-DQWT_DLL) #use the shared library version of qwt
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/version
+    ${CMAKE_CURRENT_BINARY_DIR}/version
     ${ITOM_SDK_INCLUDE_DIRS}
     #${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
 )
@@ -62,7 +62,7 @@ link_directories(
 )
 
 set(DESIGNER_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/version/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/version/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogExportProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.h
@@ -111,6 +111,9 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/markerModel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/markerWidget.cpp
 )
+
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/version/pluginVersion.h)
 
 #If you want to use automatical metadata for dlls under windows use the following if-case.
 if(MSVC)
