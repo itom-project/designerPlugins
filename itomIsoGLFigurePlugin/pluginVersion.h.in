@@ -30,15 +30,16 @@
 
 #include "itom_sdk.h"
 
-#define PLUGIN_VERSION_MAJOR        ${itom_designerPlugin_VERSION_MAJOR}
-#define PLUGIN_VERSION_MINOR        ${itom_designerPlugin_VERSION_MINOR}
-#define PLUGIN_VERSION_PATCH        ${itom_designerPlugin_VERSION_PATCH}
-#define PLUGIN_VERSION              CREATEVERSION(PLUGIN_VERSION_MAJOR ,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH) //ITOM_VERSION is (major << 16) + (minor << 8) + patch
-#define PLUGIN_VERSION_STRING       CREATE_VERSION_STRING(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
-#define PLUGIN_COMPANY              "Institut fuer Technische Optik, University Stuttgart"
-#define PLUGIN_AUTHOR               "Christian Kohler, ITO";
-#define PLUGIN_COPYRIGHT            "(C) 2019, ITO, University Stuttgart"
-#define PLUGIN_NAME                 "itomIsoGLFigurePlugin"
+#define PLUGIN_VERSION_MAJOR         ${itom_designerPlugin_VERSION_MAJOR}
+#define PLUGIN_VERSION_MINOR         ${itom_designerPlugin_VERSION_MINOR}
+#define PLUGIN_VERSION_PATCH         ${itom_designerPlugin_VERSION_PATCH}
+#define PLUGIN_VERSION_IDENTIFIERS   "${itom_designerPlugin_VERSION_IDENTIFIERS}"
+#define PLUGIN_VERSION               CREATEVERSION(PLUGIN_VERSION_MAJOR ,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH) //ITOM_VERSION is (major << 16) + (minor << 8) + patch
+#define PLUGIN_VERSION_STRING        CREATE_VERSION_STRING(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
+#define PLUGIN_COMPANY               "Institut fuer Technische Optik, University Stuttgart"
+#define PLUGIN_AUTHOR                "Christian Kohler, ITO";
+#define PLUGIN_COPYRIGHT             "(C) 2019, ITO, University Stuttgart"
+#define PLUGIN_NAME                  "itomIsoGLFigurePlugin"
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
