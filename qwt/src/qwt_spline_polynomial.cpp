@@ -31,4 +31,3 @@ QDebug operator<<( QDebug debug, const QwtSplinePolynomial& polynomial )
 }
 
 #endif
-

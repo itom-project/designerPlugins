@@ -329,4 +329,3 @@ QDebug operator<<( QDebug debug, const QwtScaleDiv& scaleDiv )
 }
 
 #endif
-

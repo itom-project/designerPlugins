@@ -28,7 +28,7 @@
 /**
  * \brief Display an analog widget that allows the selection of a HSV color
  *
- * It has an outer wheel to select the Hue and an intenal square to select
+ * It has an outer wheel to select the Hue and an internal square to select
  * Saturation and Lightness.
  */
 class Slider2D : public QWidget
@@ -46,8 +46,8 @@ class Slider2D : public QWidget
 
     Q_CLASSINFO("prop://xRange", "get/set the range of the x-value");
     Q_CLASSINFO("prop://yRange", "get/set the range of the y-value");
-    Q_CLASSINFO("prop://xStepSize", "get/set the step size of the x-value (default: 0.0, no step size contraints)");
-    Q_CLASSINFO("prop://yStepSize", "get/set the step size of the y-value (default: 0.0, no step size contraints)");
+    Q_CLASSINFO("prop://xStepSize", "get/set the step size of the x-value (default: 0.0, no step size constraints)");
+    Q_CLASSINFO("prop://yStepSize", "get/set the step size of the y-value (default: 0.0, no step size constraints)");
     Q_CLASSINFO("prop://xVal", "get/set current horizontal value (x-value) of the slider");
     Q_CLASSINFO("prop://yVal", "get/set current vertical value (y-value) of the slider");
     Q_CLASSINFO("prop://decimals", "get/set the number of decimals");

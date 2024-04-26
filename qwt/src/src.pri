@@ -100,7 +100,7 @@ SOURCES += \
     qwt_transform.cpp \
     qwt_widget_overlay.cpp
 
- 
+
 contains(QWT_CONFIG, QwtPlot) {
 
     HEADERS += \
@@ -156,7 +156,7 @@ contains(QWT_CONFIG, QwtPlot) {
         qwt_series_data.h \
         qwt_series_store.h \
         qwt_point_data.h \
-        qwt_scale_widget.h 
+        qwt_scale_widget.h
 
     SOURCES += \
         qwt_curve_fitter.cpp \
@@ -236,7 +236,7 @@ contains(QWT_CONFIG, QwtPlot) {
                 HEADERS += qwt_plot_opengl_canvas.h
                 SOURCES += qwt_plot_opengl_canvas.cpp
             }
-            
+
         }
 
     }
@@ -291,7 +291,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
     QT += printsupport
     QT += concurrent
-} 
+}
 
 contains(QWT_CONFIG, QwtSvg) {
 
@@ -351,7 +351,7 @@ contains(QWT_CONFIG, QwtWidgets) {
         qwt_slider.h \
         qwt_thermo.h \
         qwt_wheel.h
-    
+
     SOURCES += \
         qwt_abstract_slider.cpp \
         qwt_abstract_scale.cpp \

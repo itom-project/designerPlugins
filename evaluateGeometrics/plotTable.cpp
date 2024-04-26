@@ -2,7 +2,7 @@
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
    Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universität Stuttgart, Germany
+   Universitï¿½t Stuttgart, Germany
 
    This file is part of itom.
 
@@ -379,7 +379,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
 
                 QDoubleSpinBox* alpha0 = new QDoubleSpinBox(m_geometrics);
                 alpha0->setPrefix("alpha = ");
-                alpha0->setStatusTip("Angle between global x-axis and retangle x-axis");
+                alpha0->setStatusTip("Angle between global x-axis and rectangle x-axis");
                 alpha0->setReadOnly(true);
                 alpha0->setButtonSymbols(QAbstractSpinBox::NoButtons);
                 alpha0->setSuffix(m_data->m_valueLabel);
@@ -431,7 +431,7 @@ void PlotTable::setPrimitivElement(const int row, const bool update, const int c
 
                 QDoubleSpinBox* alpha0 = new QDoubleSpinBox(m_geometrics);
                 alpha0->setPrefix("alpha = ");
-                alpha0->setStatusTip("Angle between global x-axis and retangle x-axis");
+                alpha0->setStatusTip("Angle between global x-axis and rectangle x-axis");
                 alpha0->setReadOnly(true);
                 alpha0->setButtonSymbols(QAbstractSpinBox::NoButtons);
                 alpha0->setSuffix(m_data->m_valueLabel);
@@ -708,7 +708,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
                 }
                 case tArea:
                     //check = calculateArea(first, m_data->m_relationsList[i].extValue);
-                    //resultString = QString("%1%2²").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
+                    //resultString = QString("%1%2ï¿½").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
                     //break;
                 default:
                     resultLabel->setText(resultString);

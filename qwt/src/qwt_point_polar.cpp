@@ -142,4 +142,3 @@ QDebug operator<<( QDebug debug, const QwtPointPolar& point )
 }
 
 #endif
-

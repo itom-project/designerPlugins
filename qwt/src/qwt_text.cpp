@@ -740,4 +740,3 @@ bool QwtText::isEmpty() const
 {
     return m_data->text.isEmpty();
 }
-

@@ -1318,4 +1318,3 @@ QDateTime QwtDateScaleEngine::toDateTime( double value ) const
 
     return dt;
 }
-

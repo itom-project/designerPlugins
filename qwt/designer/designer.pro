@@ -28,7 +28,7 @@ CONFIG( debug_and_release ) {
 }
 
 contains(QWT_CONFIG, QwtDesigner ) {
-    
+
     greaterThan(QT_MAJOR_VERSION, 4) {
 
         !qtHaveModule(designer) QWT_CONFIG -= QwtDesigner
@@ -44,7 +44,7 @@ contains(QWT_CONFIG, QwtDesigner ) {
 
 contains(QWT_CONFIG, QwtDesigner) {
 
-    CONFIG    += qt plugin 
+    CONFIG    += qt plugin
 
     greaterThan(QT_MAJOR_VERSION, 4) {
 
@@ -61,8 +61,8 @@ contains(QWT_CONFIG, QwtDesigner) {
 
     DESTDIR         = plugins/designer
 
-    INCLUDEPATH    += $${QWT_ROOT}/src 
-    DEPENDPATH     += $${QWT_ROOT}/src 
+    INCLUDEPATH    += $${QWT_ROOT}/src
+    DEPENDPATH     += $${QWT_ROOT}/src
 
     contains(QWT_CONFIG, QwtDll) {
 
@@ -72,8 +72,8 @@ contains(QWT_CONFIG, QwtDesigner) {
 
     } else {
 
-        # for linking against a static library the 
-        # plugin will be self contained anyway 
+        # for linking against a static library the
+        # plugin will be self contained anyway
     }
 
     contains(QWT_CONFIG, include_src) {

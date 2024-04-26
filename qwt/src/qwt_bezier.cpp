@@ -249,4 +249,3 @@ QPointF QwtBezier::pointAt( const QPointF& p1,
 
     return QPointF( x, y );
 }
-

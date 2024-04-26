@@ -1168,4 +1168,3 @@ QVector< QwtSplinePolynomial > QwtSplineCubic::polynomials( const QPolygonF& poi
 {
     return QwtSplineC2::polynomials( points );
 }
-

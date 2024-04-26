@@ -424,7 +424,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(
             }
             else
             {
-                retval += RetVal(retError, 0, "recieved invalid bounds.");
+                retval += RetVal(retError, 0, "received invalid bounds.");
             }
         }
 
@@ -435,7 +435,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(
 
             if (unit != "" ||
                 description !=
-                    "") // xVec value description dominates over source axis- and unit decription
+                    "") // xVec value description dominates over source axis- and unit description
             {
                 if (description == "")
                 {

@@ -37,9 +37,9 @@ The following properties are often used properties of **Slider2D**:
 * xVal : {float}
     get/set current horizontal value (x-value) of the slider
 * yStepSize : {float}
-    get/set the step size of the y-value (default: 0.0, no step size contraints)
+    get/set the step size of the y-value (default: 0.0, no step size constraints)
 * xStepSize : {float}
-    get/set the step size of the x-value (default: 0.0, no step size contraints)
+    get/set the step size of the x-value (default: 0.0, no step size constraints)
 * yRange : {seq. of two floats}
     get/set the range of the y-value
 * xRange : {seq. of two floats}

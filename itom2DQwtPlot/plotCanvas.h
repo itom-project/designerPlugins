@@ -216,7 +216,7 @@ class PlotCanvas : public ItomQwtPlot
 
         Qt::KeyboardModifiers m_activeModifiers;
 
-        bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interative, stacked calls to refreshPlot)
+        bool m_isRefreshingPlot; //true if the refreshPlot method is currently executed (in order to avoid interactive, stacked calls to refreshPlot)
         bool m_showCenterMarker;
 		bool m_pPaletteIsChanging; //true if the color palette is currently changing in order to avoid that the fonts are set to default
 

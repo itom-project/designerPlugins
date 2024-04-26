@@ -136,8 +136,8 @@ class plotGLWidget : public QGLWidget
         bool lightArrowEnabled();
         void paintGL();
         void resizeGL(int width, int height);
-//        void paintEvent(QPaintEvent *pevent);
-//        void resizeEvent(QResizeEvent *pevent);
+//        void paintEvent(QPaintEvent *prevent);
+//        void resizeEvent(QResizeEvent *prevent);
         void initializeGL();
 
         bool m_showContextMenu;

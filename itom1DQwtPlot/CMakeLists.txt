@@ -84,7 +84,7 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.cpp
 )
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

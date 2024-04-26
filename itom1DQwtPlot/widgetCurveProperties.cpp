@@ -173,7 +173,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			}
 			else
 			{
-				if (lineSymbol != QwtSymbol::NoSymbol)// check if the line before does't have any symbols set else the lines are of different style
+				if (lineSymbol != QwtSymbol::NoSymbol)// check if the line before doesn't have any symbols set else the lines are of different style
 				{
 					constLineSymbol = false;
 				}

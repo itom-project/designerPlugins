@@ -182,7 +182,7 @@ set(qwt_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_plot_panner.h
 )
 
-set(qwt_SOURCES 
+set(qwt_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_wheel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qwt_weeding_curve_fitter.cpp

@@ -24,7 +24,7 @@
 * \file motorController.cpp
 * \brief In this file the functions of the MotorController-Class are defined
 *
-*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are
+*    The MotorController-Class defines a widget for generic motor monitoring and control. The following files are
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorControllerFactory.h

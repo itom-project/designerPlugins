@@ -641,4 +641,3 @@ QwtGraphic QwtPlotMarker::legendIcon( int index, const QSizeF& size ) const
 
     return icon;
 }
-

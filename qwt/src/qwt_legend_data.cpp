@@ -128,4 +128,3 @@ QwtLegendData::Mode QwtLegendData::mode() const
 
     return QwtLegendData::ReadOnly;
 }
-
