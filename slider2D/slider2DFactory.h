@@ -33,7 +33,16 @@ class Slider2DFactory : public QObject, public QDesignerCustomWidgetInterface
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-    Slider2DFactory(QObject *parent = 0);
+    Slider2DFactory(QObject *parent = 0):
+                QObject(parent),
+                m_version(0),
+                m_maxItomVer(0),
+                m_minItomVer(0),
+                m_author(""),
+                m_description(""),
+                m_detaildescription(""),
+                m_aboutThis(""),
+                m_license("LGPL with ITO itom-exception") {}
 
     bool isContainer() const;
     bool isInitialized() const;
@@ -46,6 +55,17 @@ public:
     QString whatsThis() const;
     QWidget *createWidget(QWidget *parent);
     void initialize(QDesignerFormEditorInterface *core);
+
+    protected:
+
+    int m_version;                        //!< plugin version
+    int m_maxItomVer;                     //!< minimum required version of the main program
+    int m_minItomVer;                     //!< maximum supported version of the main program
+    QString m_author;                     //!< the plugin author
+    QString m_description;                //!< a brief descrition of the plugin
+    QString m_detaildescription;          //!< a detail descrition of the plugin
+    QString m_license;                    //!< a short license string for the plugin, default value is "LGPL with ITO itom-exception"
+    QString m_aboutThis;                  //!< a short string with compile informations
 
 private:
     bool initialized;
