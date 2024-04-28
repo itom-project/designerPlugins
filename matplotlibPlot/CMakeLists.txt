@@ -44,13 +44,14 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibplotfactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibSubfigConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/matplotlibWidget.h
-    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/dialogEditProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/colorWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/fontWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/formWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/formTabWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/editProperties/formComboWidget.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_HEADERS_COPY

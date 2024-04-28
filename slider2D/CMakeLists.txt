@@ -41,6 +41,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/slider2D.h
     ${CMAKE_CURRENT_SOURCE_DIR}/slider2DFactory.h
     ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_UI

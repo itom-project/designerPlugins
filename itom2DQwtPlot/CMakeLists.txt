@@ -68,6 +68,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
     ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_UI

@@ -42,6 +42,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/plotlyPlot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotlyPlotFactory.h
     ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_HEADERS_COPY

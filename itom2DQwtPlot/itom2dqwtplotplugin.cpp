@@ -27,6 +27,7 @@
 #include <QtCore/QtPlugin>
 #include "itom2dqwtplotplugin.h"
 #include "pluginVersion.h"
+#include "gitVersion.h"
 
 Itom2dQwtPlotPlugin::Itom2dQwtPlotPlugin(QObject *parent)
     : ito::AbstractItomDesignerPlugin(parent)
@@ -37,9 +38,13 @@ Itom2dQwtPlotPlugin::Itom2dQwtPlotPlugin(QObject *parent)
 
     m_description = QObject::tr("itom widget for 2D-visualisation of 2D/3D dataObjects based on Qwt.");
     m_detaildescription = QObject::tr("This designer plugin is an itom widget for image-like visualisation of dataObjects and live images. This widget is based on the Qwt framework (http://qwt.sf.net).");
+
     m_author = PLUGIN_AUTHOR;
-    m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
-    m_license = QObject::tr("LGPL, for Qwt see Qwt License");   
+    m_version = PLUGIN_VERSION;
+    m_minItomVer = PLUGIN_MIN_ITOM_VERSION;
+    m_maxItomVer = PLUGIN_MAX_ITOM_VERSION;
+    m_license = QObject::tr(PLUGIN_LICENCE);
+    m_aboutThis = QObject::tr(GITVERSION);
     
     initialized = false;
 }

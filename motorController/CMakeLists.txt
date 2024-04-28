@@ -57,6 +57,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/motorController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/motorControllerfactory.h
     ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 #Define Version in pluginVersion.h

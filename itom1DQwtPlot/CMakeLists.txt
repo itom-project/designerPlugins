@@ -51,8 +51,9 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveProperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
-    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_HEADERS_COPY

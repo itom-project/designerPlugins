@@ -61,7 +61,6 @@ link_directories(
 )
 
 set(DESIGNER_HEADERS
-    ${CMAKE_CURRENT_BINARY_DIR}/version/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogExportProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.h
@@ -77,6 +76,8 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotPanner.h
     ${CMAKE_CURRENT_SOURCE_DIR}/markerModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/markerWidget.h
+    ${CMAKE_CURRENT_BINARY_DIR}/version/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_HEADERS_COPY

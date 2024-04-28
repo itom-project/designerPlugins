@@ -28,19 +28,15 @@
 #ifndef PLUGINVERSION_H
 #define PLUGINVERSION_H
 
-#include "itom_sdk.h"
+#include <itom_sdk.h>
 
-#define PLUGIN_VERSION_MAJOR         ${itom_designerPlugin_VERSION_MAJOR}
-#define PLUGIN_VERSION_MINOR         ${itom_designerPlugin_VERSION_MINOR}
-#define PLUGIN_VERSION_PATCH         ${itom_designerPlugin_VERSION_PATCH}
-#define PLUGIN_VERSION_IDENTIFIERS   "${itom_designerPlugin_VERSION_IDENTIFIERS}"
-#define PLUGIN_VERSION               CREATEVERSION(PLUGIN_VERSION_MAJOR ,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH) //ITOM_VERSION is (major << 16) + (minor << 8) + patch
-#define PLUGIN_VERSION_STRING        CREATE_VERSION_STRING(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
-#define PLUGIN_COMPANY               "Institut fuer Technische Optik, University Stuttgart"
-#define PLUGIN_AUTHOR                "AuthorName"
-#define PLUGIN_COPYRIGHT             "(C) 2022, ITO, University Stuttgart"
-#define PLUGIN_NAME                  "itomQwtPlotBase"
-
-//----------------------------------------------------------------------------------------------------------------------------------
+#define PLUGIN_VERSION              CREATE_VERSION(1, 4, 2)
+#define PLUGIN_MIN_ITOM_VERSION     CREATE_VERSION(4, 0, 0)
+#define PLUGIN_MAX_ITOM_VERSION     CREATE_VERSION(${itom_designerPlugin_VERSION_MAJOR},${itom_designerPlugin_VERSION_MINOR},${itom_designerPlugin_VERSION_PATCH})
+#define PLUGIN_LICENCE              "Licensed under LGPL."
+#define PLUGIN_COMPANY              "Institut fuer Technische Optik, University Stuttgart"
+#define PLUGIN_AUTHOR               "M. Gronle, J. Krauter, R. Hahn, B.Bertschinger, H. Bieger, (ITO Uni Stuttgart)"
+#define PLUGIN_COPYRIGHT            "(C) 2022, ITO, University Stuttgart"
+#define PLUGIN_NAME                 "itomQwtPlotBase"
 
 #endif // PLUGINVERSION_H
