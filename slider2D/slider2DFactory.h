@@ -33,7 +33,16 @@ class Slider2DFactory : public QObject, public QDesignerCustomWidgetInterface
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-    Slider2DFactory(QObject *parent = 0);
+    Slider2DFactory(QObject *parent = 0):
+                QObject(parent),
+                m_version(0),
+                m_maxItomVer(0),
+                m_minItomVer(0),
+                m_author(""),
+                m_description(""),
+                m_detaildescription(""),
+                m_aboutThis(""),
+                m_license("LGPL with ITO itom-exception") {}
 
     bool isContainer() const;
     bool isInitialized() const;
