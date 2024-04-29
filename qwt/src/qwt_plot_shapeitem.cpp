@@ -498,3 +498,4 @@ QwtGraphic QwtPlotShapeItem::legendIcon( int index,
 
     return icon;
 }
+

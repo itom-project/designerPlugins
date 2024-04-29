@@ -736,3 +736,4 @@ QwtGraphic QwtPlotMultiBarChart::legendIcon( int index,
 
     return icon;
 }
+

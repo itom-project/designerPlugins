@@ -1,3 +1,5 @@
+exclude: ^(qwt)/
+
 ci:
     autoupdate_schedule: monthly
 
@@ -15,7 +17,7 @@ repos:
     hooks:
     -   id: codespell
         args:
-        -   --skip=*.ts,*.svg,*.hqx,*-inv.txt,*.iss.in,*.dox.in,qwt/*
+        -   --skip=*.ts,*.svg,*.hqx,*-inv.txt,*.iss.in,*.dox.in
         -   --ignore-words=.codespell_ignore_words.txt
 
 -   repo: https://github.com/asottile/pyupgrade

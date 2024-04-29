@@ -197,7 +197,8 @@ contains(QWT_CONFIG, QwtSvg) {
     CLASSHEADERS += \
         QwtPlotSvgItem
 }
-
+    
 target.path    = $${QWT_INSTALL_HEADERS}
 target.files   = $${CLASSHEADERS}
 INSTALLS       = target
+

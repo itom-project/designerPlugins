@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universit�t Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -708,7 +708,7 @@ void PlotTable::updateRelationShips(const bool fastUpdate)
                 }
                 case tArea:
                     //check = calculateArea(first, m_data->m_relationsList[i].extValue);
-                    //resultString = QString("%1%2�").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
+                    //resultString = QString("%1%2").arg(QString::number(m_data->m_relationsList[i].extValue)).arg(m_data->m_valueLabel);
                     //break;
                 default:
                     resultLabel->setText(resultString);

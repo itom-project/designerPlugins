@@ -1857,7 +1857,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
     {
         //!> opengl uses 'normalized' coordinates therefore we must transform the
         //!> input data accordingly. Normalized means in this case:
-        //!> x � [-1, 1], y � [-1, 1], z � [0, -1]
+        //!> x in [-1, 1], y in [-1, 1], z in [0, -1]
         if (m_pConfigData->m_elementMode & PAINT_POINTS)
         {
             float zmin = m_axes.m_axisZ.getMin();
@@ -3040,8 +3040,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
             m_axes.m_devAxis.m_label = "deviation";
             m_axes.m_devAxis.m_unit  = "mm";
 
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure �m can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure �m can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
             ((TwipOGLFigure*)parent())->updateLegend(id, TwipLegend::tPointCloud, m_pContentPC[id]->getType(), 255, true);
         }
 
@@ -3098,8 +3098,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
 
         if(!retval.containsError())
         {
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure �m can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure �m can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
 
             m_scaleX = 2.0 / (m_axes.m_axisX.getMax() - m_axes.m_axisX.getMin());
             if (cvIsNaN(m_scaleX) || cvIsInf(m_scaleX))
@@ -3194,8 +3194,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
     {
         if(!retval.containsError())
         {
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure �m can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure �m can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
 
             m_scaleX = 2.0 / (m_axes.m_axisX.getMax() - m_axes.m_axisX.getMin());
             if (cvIsNaN(m_scaleX) || cvIsInf(m_scaleX))

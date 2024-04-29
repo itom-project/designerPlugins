@@ -315,3 +315,4 @@ QRectF QwtColumnRect::toRect() const
 
     return r;
 }
+

@@ -45,3 +45,4 @@ QDebug operator<<( QDebug debug, const QwtPoint3D& point )
 }
 
 #endif
+

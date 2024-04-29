@@ -746,3 +746,4 @@ void QwtPlot::updateAxes()
         }
     }
 }
+

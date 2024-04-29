@@ -25,22 +25,23 @@ SUBDIRS = \
     doc
 
 contains(QWT_CONFIG, QwtDesigner ) {
-    SUBDIRS += designer
+    SUBDIRS += designer 
 }
 
 contains(QWT_CONFIG, QwtExamples ) {
-    SUBDIRS += examples
+    SUBDIRS += examples 
 }
 
 contains(QWT_CONFIG, QwtPlayground ) {
-    SUBDIRS += playground
+    SUBDIRS += playground 
 }
-
+ 
 contains(QWT_CONFIG, QwtTests ) {
-    SUBDIRS += tests
+    SUBDIRS += tests 
 }
 
 qwtspec.files  = qwtconfig.pri qwtfunctions.pri qwt.prf
 qwtspec.path  = $${QWT_INSTALL_FEATURES}
 
 INSTALLS += qwtspec
+

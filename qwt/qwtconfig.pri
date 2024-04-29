@@ -76,7 +76,7 @@ QWT_CONFIG           += QwtDll
 
 ######################################################################
 # QwtPlot enables all classes, that are needed to use the QwtPlot
-# widget.
+# widget. 
 ######################################################################
 
 QWT_CONFIG       += QwtPlot
