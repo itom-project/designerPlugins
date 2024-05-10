@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -2657,7 +2657,7 @@ void plotGLWidget::paintAxisOGL(double x0, double y0, double z0, double x1, doub
 //-----------------------------------------------------------------------------------------------
 /**
  *\fn static void dreidogl_lichtpfeil(class FilterObject *fo)
- *\brief Zeichnet den Lichtpfeil fuer die Beleuchtungsdarstellung
+ *\brief Zeichnet den Lichtpfeil für die Beleuchtungsdarstellung
  *\param[in] *fo Zeiger auf das Goofi-Filterobjekt
  *\return error
  *\ingroup 3DOGLFuncsGroup
@@ -2721,7 +2721,7 @@ void plotGLWidget::paintLightArrow()
 /**
  *\brief Zeichnet die Achsenstriche
  *\param[in] *fo Zeiger auf das Goofi-Filterobjekt
- *\param[in] write Flag fuer das Schreiben von Tick-Lables
+ *\param[in] write Flag für das Schreiben von Tick-Lables
  *\return error
  *\ingroup 3DOGLFuncsGroup
  */

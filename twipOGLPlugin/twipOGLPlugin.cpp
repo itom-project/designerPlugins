@@ -21,7 +21,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
