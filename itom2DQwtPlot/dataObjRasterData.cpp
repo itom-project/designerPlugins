@@ -1072,7 +1072,7 @@ void DataObjRasterData::initRaster( const QRectF& area, const QSize& raster )
                 }
 
             /*
-            todo: delete if pointer aproach fails
+            todo: delete if pointer approach fails
                 else if (m_D.m_dir == dirY)
                 {
                     //obtain start coordinate of volume cut

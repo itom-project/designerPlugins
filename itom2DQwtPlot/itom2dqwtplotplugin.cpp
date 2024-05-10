@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
+   Universitaet Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -39,8 +39,8 @@ Itom2dQwtPlotPlugin::Itom2dQwtPlotPlugin(QObject *parent)
     m_detaildescription = QObject::tr("This designer plugin is an itom widget for image-like visualisation of dataObjects and live images. This widget is based on the Qwt framework (http://qwt.sf.net).");
     m_author = "Marc Gronle, Wolfram Lyda, Christian Kohler, ITO, University Stuttgart";
     m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
-    m_license = QObject::tr("LGPL, for Qwt see Qwt License");   
-    
+    m_license = QObject::tr("LGPL, for Qwt see Qwt License");
+
     initialized = false;
 }
 

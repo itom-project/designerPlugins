@@ -93,7 +93,7 @@ set(DESIGNER_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotenums.h
 )
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

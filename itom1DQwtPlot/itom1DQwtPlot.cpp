@@ -163,7 +163,7 @@ void Itom1DQwtPlot::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx
 {
     if (m_pContent)
     {
-        m_pContent->setDataRepresentation(idx);  
+        m_pContent->setDataRepresentation(idx);
     }
 }
 

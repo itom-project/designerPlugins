@@ -80,7 +80,7 @@ if(3DCONNEXION_FOUND)
     #list(APPEND DESIGNER_HEADERS ${3DCONNEXION_LIBRARIES}/designerPluginLibraryVersion.rc)
 endif(3DCONNEXION_FOUND)
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

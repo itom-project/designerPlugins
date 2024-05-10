@@ -38,4 +38,3 @@
 #define PLUGIN_COMPANY        "Institut fuer Technische Optik, University Stuttgart"
 #define PLUGIN_COPYRIGHT       "(C) 2024, ITO, University Stuttgart"
 #define PLUGIN_NAME           "plotlyPlot"
-

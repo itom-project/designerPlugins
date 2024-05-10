@@ -88,7 +88,7 @@ modification, are permitted provided that the following conditions are met:<BR>\
 * The name of the author may be used to endorse or promote products<BR>\
   derived from this software without specific prior written permission.<BR><BR>";
 
-            QString wrangler = "This programm uses the OpenGL Extension Wrangler Library with following licence: <BR><BR>";
+            QString wrangler = "This program uses the OpenGL Extension Wrangler Library with following licence: <BR><BR>";
             wrangler.append(lic);
             wrangler.append('\n');
 

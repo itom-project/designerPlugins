@@ -145,10 +145,10 @@ struct InternalData
     char m_colorBarMode;            //!> flag indicating if and where colorbar is displayed
 
     bool m_forceCubicVoxel;         //!> flag to set isometric voxel displaying
-    bool m_drawTitle;               //!> flag inidcating if title is shown
-    bool m_drawLightDir;            //!> flag inidicating if light direction arrow is shown
+    bool m_drawTitle;               //!> flag indicating if title is shown
+    bool m_drawLightDir;            //!> flag indicating if light direction arrow is shown
     bool m_keepVoxel;
-    float m_alpha;                  //!> aplha value for intensity overlay
+    float m_alpha;                  //!> alpha value for intensity overlay
     ito::AutoInterval m_overlayInterval;
     ito::AutoInterval m_curvatureInterval;
     QString m_title;                //!> plot title string
@@ -500,7 +500,7 @@ class TwipOGLWidget : public QGLWidget
 
         // event variables
         int m_activeModifiers;
-        QPoint m_mouseStartPos;     //!> starting position of mouse when handeling mouse events
+        QPoint m_mouseStartPos;     //!> starting position of mouse when handling mouse events
 
         // config variables
         int m_isInit;               //!> flag indicating plot status (initialized)
