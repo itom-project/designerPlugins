@@ -151,8 +151,9 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
     //the base idea behind simple pointer copying (instead of shallow copies or shared pointer)
     // is that AbstractDObjFigure always keeps shallow copies of all data objects and therefore is
     // responsible that no dataObject is deleted when it is still in use by any object of this entire plot plugin.
-
+    qDebug() << "updateDataObject start";
     ito::uint8 newHash = PlotCanvas::changeNo;
+
     bool dataObjPlaneWasShallow = (&m_dataObj != m_dataObjPlane);
 
     if (dataObj)
@@ -370,7 +371,6 @@ ito::uint8 DataObjRasterData::updateDataObject(const ito::DataObject *dataObj, i
         setInterval(Qt::YAxis, QwtInterval() );
         setInterval(Qt::ZAxis, QwtInterval() );
     }
-
 
     return newHash;
 }

@@ -1285,9 +1285,18 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
 //---------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
+    qDebug() << "start refreshPlot";
     ito::RetVal retval;
+
+    // changeNo(0) : nothing changed,
+    // changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...),
+    // changeData (2): data changed (dimensions, sizes, other data object...)
+    ito::uint8 updateState = 0;
+
     if (m_isRefreshingPlot || !m_pData)
     {
+        m_dObjPtr = dObj; // todo: unsure if correct here.
+
         return;
     }
 
@@ -1305,9 +1314,6 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/, co
     }
 
     m_isRefreshingPlot = true;
-
-    ito::uint8 updateState = 0; //changeNo (0): nothing changed, changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...), changeData (2): data changed (dimensions, sizes, other data object...)
-
     m_dObjPtr = dObj;
 
     //QString valueLabel, axisLabel, title;
@@ -1517,7 +1523,10 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/, co
     }
 
     m_isRefreshingPlot = false;
-    replot();
+    replot(); //todo: check if correct
+    //repaint();
+
+    //qDebug() << "end refreshPlot";
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------

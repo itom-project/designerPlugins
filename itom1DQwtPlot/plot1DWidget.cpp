@@ -58,6 +58,7 @@
 #include <qmessagebox.h>
 #include <qnumeric.h>
 #include <qinputdialog.h>
+#include <qwidgetaction.h>
 
 /*static*/ QStringList Plot1DWidget::siLengthUnits = QStringList() << "pm" << "nm" << (QString(QChar(0xb5, 0x00)) + "m") << "mm" << "m" << "km";
 /*static*/ QStringList Plot1DWidget::siTimeUnits = QStringList() << "ps" << "ns" << (QString(QChar(0xb5, 0x00)) + "s") << "ms" << "s";
@@ -174,6 +175,10 @@ Plot1DWidget::Plot1DWidget(InternalData *data, ItomQwtDObjFigure *parent) :
     mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActProperties);
     mainTb->addAction(m_pActCamParameters);
+    if (parent)
+    {
+        mainTb->addAction(parent->actCameraChannelSelector());
+    }
     mainTb->addAction(m_pActScaleSettings);
     mainTb->addAction(m_pRescaleParent);
     mainTb->addAction(m_pActPan);
@@ -2093,7 +2098,6 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         {
             updatePickerPosition(true, false);
             updateScaleValues(true, false); //do replot
-            //replot();
         }
 
         m_hash = hash;
