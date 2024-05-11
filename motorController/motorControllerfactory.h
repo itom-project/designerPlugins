@@ -60,7 +60,7 @@ public:
     void initialize(QDesignerFormEditorInterface *core);
 
 protected:
-    
+
     int m_version;                                  //!< plugin version
     int m_maxItomVer;                               //!< minimum required version of the main program
     int m_minItomVer;                               //!< maximum supported version of the main program

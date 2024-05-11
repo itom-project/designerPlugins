@@ -34,9 +34,9 @@
 #define PLUGIN_MIN_ITOM_VERSION     CREATE_VERSION(2, 0, 0)
 #define PLUGIN_MAX_ITOM_VERSION     CREATE_VERSION(${itom_designerPlugin_VERSION_MAJOR},${itom_designerPlugin_VERSION_MINOR},${itom_designerPlugin_VERSION_PATCH})
 #define PLUGIN_LICENCE              "Licensed under LGPL."
-#define PLUGIN_COMPANY              "Institut fuer Technische Optik, University Stuttgart"
+#define PLUGIN_COMPANY              "Institut für Technische Optik, Universität Stuttgart"
 #define PLUGIN_AUTHOR               "S. Thiele, M. Gronle. J. Krauter, R. Hahn, B. Bertschinger, H. Bieger (ITO)"
-#define PLUGIN_COPYRIGHT            "(C) 2019, ITO, University Stuttgart"
+#define PLUGIN_COPYRIGHT            "(C) 2019, ITO, Universität Stuttgart"
 #define PLUGIN_NAME                 "slider2D"
 
 #endif // PLUGINVERSION_H

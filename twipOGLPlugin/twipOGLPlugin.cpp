@@ -47,7 +47,7 @@ TwipOGLPlugin::TwipOGLPlugin(QObject *parent)
 
     m_description = QObject::tr("twip optical solutions GmbH widget for visualisation of 2D / 3D DataObjects and PointClouds.");
     m_detaildescription = QObject::tr("");
-    
+
     m_author = PLUGIN_AUTHOR;
     m_version = PLUGIN_VERSION;
     m_minItomVer = PLUGIN_MIN_ITOM_VERSION;
