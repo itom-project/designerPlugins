@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -173,7 +173,7 @@ void WidgetCurveProperties::on_listWidget_itemSelectionChanged()
 			}
 			else
 			{
-				if (lineSymbol != QwtSymbol::NoSymbol)// check if the line before does't have any symbols set else the lines are of different style
+				if (lineSymbol != QwtSymbol::NoSymbol)// check if the line before doesn't have any symbols set else the lines are of different style
 				{
 					constLineSymbol = false;
 				}

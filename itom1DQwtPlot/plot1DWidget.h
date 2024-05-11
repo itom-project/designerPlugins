@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2023, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2023, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -392,7 +392,7 @@ struct Plot1DWidget::InternalData
 
     //true for one replot if setSource-Property has been set
     //(even if the same data object is given one more time,
-    //the hash might be the same, but we want to recalcuate
+    //the hash might be the same, but we want to recalculate
     //boundaries if values of dataObject changed.
     bool m_forceValueParsing;
 

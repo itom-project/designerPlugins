@@ -1,8 +1,8 @@
 /* ********************************************************************
  i tom measurement sys*tem
  URL: http://www.uni-stuttgart.de/ito
- Copyright (C) 2018, Institut fuer Technische Optik (ITO),
- Universitaet Stuttgart, Germany
+ Copyright (C) 2018, Institut für Technische Optik (ITO),
+ Universität Stuttgart, Germany
 
  This file is part of itom.
 
@@ -92,7 +92,7 @@ DrawItem::DrawItem(const ito::Shape &shape, ItomQwtPlotEnums::ModificationModes 
     d->m_fillBrushSelected = QBrush();
     d->m_labelBrush = QBrush(Qt::white, Qt::SolidPattern);
     d->m_labelFont = QFont("Verdana", 10);
-    //this pen is only used to set the style and the width of the elemets. The color is set to the inverse color of the curren palette
+    //this pen is only used to set the style and the width of the elements. The color is set to the inverse color of the current palette
     d->m_elementPen = QPen(QBrush(Qt::red), 1, Qt::SolidLine);
 
     if (shape.color().isValid())

@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -173,7 +173,7 @@ Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let 
 
     Q_CLASSINFO("slot://addGeometricShape", "Add a new geometric shape to the canvas if no shape with the same index already exists. \n"
         "\n"
-        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index is\n"
         "stored in the optional 'newIndex' parameter).\n"
         "\n"
         "Parameters\n"
@@ -188,7 +188,7 @@ Q_CLASSINFO("slot://userInteractionStart", "starts or aborts the process to let 
 
     Q_CLASSINFO("slot://updateGeometricShape", "Updates an existing geometric shape by the new shape if the index of the shape already exists, else add the new shape to the canvas (similar to 'addGeometricShape'. \n"
         "\n"
-        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index ist\n"
+        "If the index of the new shape is -1 (default), the next free auto-incremented index will be set for this shape. (C++ only: this new index is\n"
         "stored in the optional 'newIndex' parameter).\n"
         "\n"
         "Parameters\n"

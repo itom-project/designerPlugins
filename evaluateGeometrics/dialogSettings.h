@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -37,13 +37,13 @@
 
 /*!
  * \class DialogSettings
- * \brief This class manages the dialog for basic settings and it inherrits the ui-dialog "dialogSettings.ui"
+ * \brief This class manages the dialog for basic settings and it inherits the ui-dialog "dialogSettings.ui"
  */
 
 class DialogSettings : public QDialog
 {
 public:
-    DialogSettings(const InternalInfo &input, const int &geometicElements, QWidget *parent = NULL); /*!< Class constructor, which takes all necessary informations to create the correspondig dialog.*/
+    DialogSettings(const InternalInfo &input, const int &geometicElements, QWidget *parent = NULL); /*!< Class constructor, which takes all necessary information to create the corresponding dialog.*/
     ~DialogSettings() {};                                                                           /*!< Class destructor, currently not used */
 
     void getData(InternalInfo &data);                                                               /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */

@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2019, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2019, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -89,14 +89,14 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(ChildPlotItem::ChildPlotStates)
 
 //------------------------------------------------------------------------------------------------------------------------
-class Itom2dQwtPlotPrivate 
+class Itom2dQwtPlotPrivate
 {
 public:
 
-    Itom2dQwtPlotPrivate() : 
+    Itom2dQwtPlotPrivate() :
         m_pData(NULL)
     {}
-    
+
     PlotCanvas::InternalData *m_pData;
 
     //QHash<QObject*,ito::uint32> m_childFigures;
@@ -112,7 +112,7 @@ void Itom2dQwtPlot::constructor()
 
     // Basic settings
     m_pContent = NULL;
-    
+
     addInputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for volume plots from 3d objects").toLatin1().data()));
 
     //bounds, volumeCutBounds and zCutPoint are three different output connections, since it is possible to have a line cut, volume cut and a z-stack cut visible at the same time.
@@ -123,7 +123,7 @@ void Itom2dQwtPlot::constructor()
 
 
     d->m_pData = new PlotCanvas::InternalData();
-    
+
     //init internal data
     d->m_pData->m_dataType = ito::tFloat64;
     d->m_pData->m_autoTitle;
@@ -164,7 +164,7 @@ void Itom2dQwtPlot::constructor()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-Itom2dQwtPlot::Itom2dQwtPlot(QWidget *parent) : 
+Itom2dQwtPlot::Itom2dQwtPlot(QWidget *parent) :
     ItomQwtDObjFigure("", AbstractFigure::ModeStandaloneInUi, parent)
 {
     constructor();
@@ -193,8 +193,8 @@ Itom2dQwtPlot::~Itom2dQwtPlot()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-ito::RetVal Itom2dQwtPlot::init() 
-{ 
+ito::RetVal Itom2dQwtPlot::init()
+{
     //called when api-pointers are transmitted, directly after construction
     return m_pContent->init(getWindowMode() != ito::AbstractFigure::ModeStandaloneInUi);
 }
@@ -218,7 +218,7 @@ ito::RetVal Itom2dQwtPlot::applyUpdate()
         }
         else
         {
-        
+
         }
         m_pOutput["bounds"]->setVal<double*>(bounds, 6);
     }
@@ -806,9 +806,9 @@ void Itom2dQwtPlot::setPlaneIndex(const int &index)
 
         emit planeIndexChanged(idx);
     }
-    
+
     QStringList paramNames;
-    
+
     if (getOutputParam("bounds")->getLen() == 6)
     {
         paramNames << "bounds"  << "sourceout";
@@ -950,7 +950,7 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(const QVector<QPointF> &bounds, ito:
                 childFigure = (ito::AbstractDObjFigure*)childPlot;
                 connect(childPlot, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
 
-                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window.
                 //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
                 QTimer::singleShot(0, this, SLOT(activatePlot()));
 
@@ -1077,7 +1077,7 @@ ito::RetVal Itom2dQwtPlot::displayLineCut(const QVector<QPointF> &bounds, ito::u
                 childFigure = (ito::AbstractDObjFigure*)childPlot;
                 connect(childPlot, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
 
-                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window.
                 //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
                 QTimer::singleShot(0, this, SLOT(activatePlot()));
 
@@ -1218,7 +1218,7 @@ ito::RetVal Itom2dQwtPlot::displayZStackCut(const QVector<QPointF> &bounds, ito:
                 childFigure = (ito::AbstractDObjFigure*)childPlot;
                 connect(childPlot, SIGNAL(destroyed(QObject*)), this, SLOT(childFigureDestroyed(QObject*)));
 
-                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+                //try to active this 2d plot again -> activatePlot will then raise this 2d plot window.
                 //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
                 QTimer::singleShot(0, this, SLOT(activatePlot()));
 
@@ -1289,7 +1289,7 @@ ito::RetVal Itom2dQwtPlot::moveChildPlotCloseToThis(QWidget *child)
 {
     //get global position of this window
     QWidget *w = this;
-    
+
     QRect temp = geometry();
 
     QRect geom(0, 0, 0, 0); //final geometry of the child
@@ -1413,7 +1413,7 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::activatePlot()
 {
-    //try to active this 2d plot again -> activatePlot will then raise this 2d plot window. 
+    //try to active this 2d plot again -> activatePlot will then raise this 2d plot window.
     //Then, the focus is tried to be set to the canvas to receive key-events (like H or V for horizontal or vertical lines)
     //this method is invoked by displayCut
     activateWindow();
@@ -1424,7 +1424,7 @@ void Itom2dQwtPlot::activatePlot()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-bool Itom2dQwtPlot::getEnabledCenterMarker(void) const 
+bool Itom2dQwtPlot::getEnabledCenterMarker(void) const
 {
     if (m_pContent)
     {
@@ -1445,7 +1445,7 @@ void Itom2dQwtPlot::setEnabledCenterMarker(const bool &enabled)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-int Itom2dQwtPlot::getOverlayAlpha () const 
+int Itom2dQwtPlot::getOverlayAlpha () const
 {
     return d->m_pData->m_alpha;
 }
@@ -1459,7 +1459,7 @@ void Itom2dQwtPlot::setOverlayAlpha (const int alpha)
     }
 
     int alphaClipped = qBound(0, alpha, 255);
-    
+
     if (d->m_pData->m_alpha != alphaClipped)
     {
         d->m_pData->m_alpha = alphaClipped;
@@ -1479,7 +1479,7 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayed()
 {
     if (!m_pContent)
     {
-        return QSharedPointer<ito::DataObject>(); 
+        return QSharedPointer<ito::DataObject>();
     }
 
     return m_pContent->getDisplayed();
@@ -1490,12 +1490,12 @@ QSharedPointer<ito::DataObject> Itom2dQwtPlot::getDisplayedLineCut(void)
 {
     if (!m_pContent)
     {
-        return QSharedPointer<ito::DataObject>(); 
+        return QSharedPointer<ito::DataObject>();
     }
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {
-        return QSharedPointer<ito::DataObject>(); 
+        return QSharedPointer<ito::DataObject>();
     }
 
     QWidget* widget = d->m_lineCutChildPlot.childFigure();
@@ -1530,14 +1530,14 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const 
+QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const
 {
     if (m_pContent)
     {
         return m_pContent->getOverlayObject();
     }
 
-    return QSharedPointer< ito::DataObject >(NULL); 
+    return QSharedPointer< ito::DataObject >(NULL);
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setContourLevels(QSharedPointer<ito::DataObject> newLevelObj)
@@ -1561,7 +1561,7 @@ void Itom2dQwtPlot::setContourLevels(QSharedPointer<ito::DataObject> newLevelObj
 
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-QSharedPointer< ito::DataObject > Itom2dQwtPlot::getContourLevels() const 
+QSharedPointer< ito::DataObject > Itom2dQwtPlot::getContourLevels() const
 {
     if (m_pContent)
     {
@@ -1627,7 +1627,7 @@ void Itom2dQwtPlot::setOverlayImage(QSharedPointer< ito::DataObject > newOverlay
 
             // sometimes crash here when replacing the source
             m_dataPointer["overlayImage"] = newOverlayObj;
-        }  
+        }
     }
     else
     {
@@ -1698,7 +1698,7 @@ void Itom2dQwtPlot::setLineCutPlotItem(const ito::ItomPlotHandle &plotHandle)
             if (d->m_lineCutChildPlot.isValid())
             {
                 lineCutObj = d->m_lineCutChildPlot.childFigure();
-                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj); //lineCutObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast... 
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(lineCutObj); //lineCutObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast...
 
                 if (!retval.containsError() && lineCutObj && af)
                 {
@@ -1791,7 +1791,7 @@ void Itom2dQwtPlot::setZSlicePlotItem(const ito::ItomPlotHandle &plotHandle)
             if (d->m_zStackChildPlot.isValid())
             {
                 zStackObj = d->m_zStackChildPlot.childFigure();
-                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(zStackObj); //lineCutObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast... 
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(zStackObj); //lineCutObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast...
 
                 if (!retval.containsError() && zStackObj && af)
                 {
@@ -1884,7 +1884,7 @@ void Itom2dQwtPlot::setVolumeCutPlotItem(const ito::ItomPlotHandle &plotHandle)
             if (d->m_volumeCutChildPlot.isValid())
             {
                 volumeObj = d->m_volumeCutChildPlot.childFigure();
-                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(volumeObj); //volumeObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast... 
+                ito::AbstractFigure *af = qobject_cast<ito::AbstractFigure*>(volumeObj); //volumeObj is a QWidget, however AbstractFigure is derived from QMainWindow and AbstractNode. Therefore this upcast...
 
                 if (!retval.containsError() && volumeObj && af)
                 {

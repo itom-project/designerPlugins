@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -57,7 +57,7 @@ private:
             a = qAlpha(rgb);
 
             /*
-            when mapping a value to rgb we will have to calcualate:
+            when mapping a value to rgb we will have to calculate:
             - const int v = int( ( s1.v0 + ratio * s1.vStep ) + 0.5 );
 
             Thus adding 0.5 ( for rounding ) can be done in advance

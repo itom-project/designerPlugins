@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -24,7 +24,7 @@
 * \file motorController.h
 * \brief In this file the MotorController-Class is declared
 *
-*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are
+*    The MotorController-Class defines a widget for generic motor monitoring and control. The following files are
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorControllerFactory.h
@@ -94,7 +94,7 @@ class MotorController : public QGroupBox
     Q_CLASSINFO("prop://autoUpdate", "Toggle automatic motorposition update");
     Q_CLASSINFO("prop://smallStep", "Distances for the small step button, same value for plus and minus");
     Q_CLASSINFO("prop://bigStep", "Distances for the large step button, same value for plus and minus");
-    Q_CLASSINFO("prop://absRel", "Toggle between absolut or relative position display. Origin can be set via context menu.");
+    Q_CLASSINFO("prop://absRel", "Toggle between absolute or relative position display. Origin can be set via context menu.");
     Q_CLASSINFO("prop://allowJoyStick", "Allow a software joystick, e.g. usb or gameport, not implemented yet.");
 
     Q_ENUMS(Unit);
@@ -118,7 +118,7 @@ public:
     //! Set the actuator-handle
     void setActuator(QPointer<ito::AddInActuator> actuator);
 
-    //! Retrive the current actuator-handle
+    //! Retrieve the current actuator-handle
     QPointer<ito::AddInActuator> getActuator() const {return QPointer<ito::AddInActuator>(NULL);};
 
     //! Set the metrical unit of the display
@@ -130,13 +130,13 @@ public:
     //! Set the number of axis to be displayed
     void setNumAxis(const int numAxis);
 
-    //! Retrive the number of axis currently displayed
+    //! Retrieve the number of axis currently displayed
     int getNumAxis() const {return m_numVisAxis;};
 
-    //! Retrive readOnly status
+    //! Retrieve readOnly status
     bool getReadOnly() const {return m_readOnly;};
 
-    //! Retrive autoUpdate status
+    //! Retrieve autoUpdate status
     bool getAutoUpdate() const {return m_autoUpdate;};
 
     //! Set the autoUpdate status. If true every second an update is triggered
@@ -145,7 +145,7 @@ public:
     bool getAllowJoyStick() const {return m_allowJoyStick;};
     void setAllowJoyStick(const bool newState){m_allowJoyStick = newState;};
 
-    //! Toggle between display-only and additional controll functions
+    //! Toggle between display-only and additional control functions
     void setReadOnly(const bool value);
 
     //! Get the small step-distance of the widget
@@ -160,7 +160,7 @@ public:
     //! Set the large step-distance of the widget in writeMode
     void setBigStep(const double value);
 
-    //! Retrive absolute or relative display status
+    //! Retrieve absolute or relative display status
     bool getAbsRel() const {return m_absRelPosition;};
 
     //! Toggle between absolute display and relative to a virtual coordinate display mode
@@ -220,7 +220,7 @@ private:
     //! QList with the identifiers each the axis
     QList<QString > m_axisName;
 
-    //! Number of axis currently availeble
+    //! Number of axis currently available
     int m_numAxis;
 
     //! Number of axis currently visible
@@ -235,10 +235,10 @@ private:
     //! If true, no step-Buttons are visible
     bool m_readOnly;
 
-    //! If true, the "stepwidth" paramter is set to corresponding step width before step is triggered
+    //! If true, the "stepwidth" parameter is set to corresponding step width before step is triggered
     bool m_needStepAdaption;
 
-    //! If true, position are shown relative to correspondig position
+    //! If true, position are shown relative to corresponding position
     bool m_absRelPosition;
 
     //! If true, ignore several signals within the gui

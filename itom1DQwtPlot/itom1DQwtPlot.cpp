@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2020, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -163,7 +163,7 @@ void Itom1DQwtPlot::setRowPresentation(const ItomQwtPlotEnums::MultiLineMode idx
 {
     if (m_pContent)
     {
-        m_pContent->setDataRepresentation(idx);  
+        m_pContent->setDataRepresentation(idx);
     }
 }
 

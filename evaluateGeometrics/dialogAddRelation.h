@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -47,7 +47,7 @@ class DialogAddRelation : public QDialog
     Q_OBJECT
 
     public:
-        DialogAddRelation(const InternalInfo &data, EvaluateGeometricsFigure *egFig, QWidget *parent = NULL);    /*!< Class constructor, which takes all necessary informations to create the correspondig dialog and fill in the information of each relations.*/
+        DialogAddRelation(const InternalInfo &data, EvaluateGeometricsFigure *egFig, QWidget *parent = NULL);    /*!< Class constructor, which takes all necessary information to create the corresponding dialog and fill in the information of each relations.*/
         ~DialogAddRelation() {};                                                /*!< Class destructor, currently not used */
 
 //        void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */

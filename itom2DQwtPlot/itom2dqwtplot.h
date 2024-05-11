@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2019, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2019, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -77,11 +77,11 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
 
     Q_PROPERTY(QSharedPointer< ito::DataObject > lineCutData READ getDisplayedLineCut DESIGNABLE false)
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds DESIGNABLE false)
-    
+
     Q_PROPERTY(int planeIndex READ getPlaneIndex WRITE setPlaneIndex USER true)
     Q_PROPERTY(ItomQwtPlotEnums::DataChannel dataChannel READ getDataChannel WRITE setDataChannel  RESET resetDataChannel DESIGNABLE true USER true);
 
-    
+
     Q_PROPERTY(ito::ItomPlotHandle lineCutPlotItem READ getLineCutPlotItem WRITE setLineCutPlotItem DESIGNABLE false)
     Q_PROPERTY(ito::ItomPlotHandle zSlicePlotItem READ getZSlicePlotItem WRITE setZSlicePlotItem DESIGNABLE false)
     Q_PROPERTY(ito::ItomPlotHandle volumeCutPlotItem READ getVolumeCutPlotItem WRITE setVolumeCutPlotItem DESIGNABLE false)
@@ -107,18 +107,18 @@ class ITOM2DPLOT_EXPORT Itom2dQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://contourColorMap", "Defines which color map should be used for the contour lines [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
 
     Q_CLASSINFO("prop://overlayImage", "Set an overlay dataObject which is shown above the main dataObject and whose opacity (see 'overlayAlpha') can be controlled by a slider in the toolbar. Assign None to remove the overlay object.")
-    Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")        
-    Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")    
+    Q_CLASSINFO("prop://overlayAlpha", "Changes the value of the overlay channel")
+    Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")
     Q_CLASSINFO("prop://overlayColorMap", "Defines which color map should be used for the overlay channel [e.g. gray, grayMarked, falseColor, falseColorIR, hotIron, red, blue, green, viridis].")
 
-    Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")    
+    Q_CLASSINFO("prop://lineCutData", "Get the currently displayed slices from the child lineplot")
 
     Q_CLASSINFO("prop://planeIndex", "Plane index of currently visible plane.")
     Q_CLASSINFO("prop://dataChannel", "Type of visualized dataChannel. This is only considered for rgba32 dataObjects, in all other cases this property is ignored.")
 
-    Q_CLASSINFO("prop://lineCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for lateral slicing. The 'uiItem' can be savely cast to 'plotItem'.")
-    Q_CLASSINFO("prop://zSlicePlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for z slicing. The 'uiItem' can be savely cast to 'plotItem'.")
-    Q_CLASSINFO("prop://volumeCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for the volume cut. The 'uiItem' can be savely cast to 'plotItem'.")
+    Q_CLASSINFO("prop://lineCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for lateral slicing. The 'uiItem' can be safely cast to 'plotItem'.")
+    Q_CLASSINFO("prop://zSlicePlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for z slicing. The 'uiItem' can be safely cast to 'plotItem'.")
+    Q_CLASSINFO("prop://volumeCutPlotItem", "Set/get the uiItem of the current line plot respective the destination line plot for the volume cut. The 'uiItem' can be safely cast to 'plotItem'.")
     Q_CLASSINFO("slot://getDisplayed", "returns the currently displayed dataObject.")
     Q_CLASSINFO("slot://getDisplayedLineCut", "returns the currently displayed line cut dataObject")
 
@@ -188,7 +188,7 @@ public:
 
     bool getxAxisVisible() const;
     void setxAxisVisible(const bool &value);
-    
+
     bool getyAxisVisible() const;
     void setyAxisVisible(const bool &value);
 
@@ -220,15 +220,15 @@ public:
 
 	ItomQwtPlotEnums::ScaleEngine getValueScale() const;
 	void setValueScale(const ItomQwtPlotEnums::ScaleEngine &scale);
-    
+
     void setPlaneRange(int min, int max);
 
     virtual ito::AutoInterval getXAxisInterval(void) const;
     virtual void setXAxisInterval(ito::AutoInterval interval);
-        
+
     virtual ito::AutoInterval getYAxisInterval(void) const;
     virtual void setYAxisInterval(ito::AutoInterval interval);
-        
+
     virtual ito::AutoInterval getZAxisInterval(void) const;
     virtual void setZAxisInterval(ito::AutoInterval interval);
 
@@ -274,7 +274,7 @@ public:
 
     //!> return the current line cut id for zSlices
     void setZSlicePlotItem(const ito::ItomPlotHandle &plotHandle);
-    
+
     //!> set a line cut id for volume cut
     ito::ItomPlotHandle getVolumeCutPlotItem() const;
 
@@ -285,7 +285,7 @@ public:
     void setBounds(QVector<QPointF> bounds);
 
     //!> get the bounds for volume cut
-    QVector<QPointF> getBounds() const; 
+    QVector<QPointF> getBounds() const;
 
 	ItomQwtPlotEnums::ComplexType getComplexStyle() const;
 	void setComplexStyle(const ItomQwtPlotEnums::ComplexType &type);
@@ -301,7 +301,7 @@ protected:
 private:
     void constructor();
 
-    PlotCanvas *m_pContent;   
+    PlotCanvas *m_pContent;
 
     //avoid to add private members but put them in the Itom2dQwtPlotPrivate container
     //since this file is part of the itom SDK and can be included in other plugin's source code.

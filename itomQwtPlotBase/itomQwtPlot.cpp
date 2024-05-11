@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2020, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -475,7 +475,7 @@ void ItomQwtPlot::updateColors(void)
     //{
     //    m_styledBackground = false;
 
-    //    //no style sheets are applied, therefore the default OS dependet style methods can be used
+    //    //no style sheets are applied, therefore the default OS dependent style methods can be used
     //    c->setFrameStyle(QFrame::Box);
     //    c->setLineWidth(1);
     //    c->setMidLineWidth(0);
@@ -2009,7 +2009,7 @@ void ItomQwtPlot::polygonSinglePointPickingFinished()
         }
         else
         {
-            // enable mouse tracking to change curser when passing over starting / end point
+            // enable mouse tracking to change cursor when passing over starting / end point
             setMouseTracking(true);
 
             emit statusBarMessage(tr("1 point in polygon currently selected. Click the start point again to finish the polygon or press Esc to abort."), 2000);
@@ -2694,7 +2694,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
         int nrOfShapes = geometricShapes.size();
 
         DrawItem *newItem = NULL;
-        // The definition do not correspond to the definetion of primitiv elements
+        // The definition do not correspond to the definition of primitive elements
 
         foreach(ito::Shape shape, geometricShapes)
         {
@@ -2877,7 +2877,7 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
     else
     {
         DrawItem *newItem = NULL;
-        // The definition do not correspond to the definetion of primitiv elements
+        // The definition do not correspond to the definition of primitive elements
 
         if (m_pShapes.contains(geometricShape.index()))
         {
@@ -3359,7 +3359,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     QString varname = "zoom_object";
     m_copyDisplayedAsComplex = false;
     const QString dialogTitle = "Current to workspace";
-    const QString userText = "Indicate the python varible name for the currently visible object";
+    const QString userText = "Indicate the python variable name for the currently visible object";
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {

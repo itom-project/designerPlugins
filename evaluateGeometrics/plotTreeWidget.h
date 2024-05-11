@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -58,10 +58,10 @@ struct relationShip
     ~relationShip() {}
 
     ito::int32 firstElementIdx;     /*!< The index of the first geometric element. The relations will be a child of this element.  */
-    ito::uint32 type;               /*!< The type of the relations as defiend by PlotTreeWidget::tMeasurementType.  */
+    ito::uint32 type;               /*!< The type of the relations as defined by PlotTreeWidget::tMeasurementType.  */
     ito::int32 secondElementIdx;    /*!< The index of the second geometric element. For some measurement types, this is ignored  */
     QTreeWidgetItem* myWidget;      /*!< Handle to the childWidget of PlotTreeWidget, which will contain the data for this relation  */
-    ito::float32 extValue;          /*!< An external value or the result from the last caluclation.  */
+    ito::float32 extValue;          /*!< An external value or the result from the last calculation.  */
 };
 
 /*!
@@ -103,7 +103,7 @@ struct InternalInfo
     }
     ~InternalInfo() { }
 
-    QString m_valueUnit;                            /*!< The value unit for all caluclations */
+    QString m_valueUnit;                            /*!< The value unit for all calculations */
     QHash<ito::uint16, QString> m_shapeTypeNames;     /*!< A hashTable containing all possible primites type in it */
     QStringList m_relationNames;                    /*!< A list with the relation names to be plotted. First 6 are protected other can be added but should be used with external defined values */
     QVector<relationShip> m_relationsList;         /*!< A list with all relations to be evaluated for the figure*/
@@ -135,7 +135,7 @@ class PlotTreeWidget : public QTreeWidget
 
         ito::RetVal init();                                                           /*!< Initialisation function for this subwidget */
 
-        enum tMeasurementType                                                         /*!< Enumeration containing list of different relationship types. For dynamic adding of relations use a new number correspondig to new name and add tExtern to the type.*/
+        enum tMeasurementType                                                         /*!< Enumeration containing list of different relationship types. For dynamic adding of relations use a new number corresponding to new name and add tExtern to the type.*/
         {
             tNoType       =   0,
             tRadius       =   1,
@@ -148,7 +148,7 @@ class PlotTreeWidget : public QTreeWidget
             tExtern       =   0x8000
         };
 
-        bool m_showContextMenu;                                                       /*!< Toggle wether context menu should be accessable or not */
+        bool m_showContextMenu;                                                       /*!< Toggle whether context menu should be accessible or not */
 
     protected:
         static double quietNaN;
@@ -159,16 +159,16 @@ class PlotTreeWidget : public QTreeWidget
 
     private:
         void updateRelationShips(const bool fastUpdate);                                /*! force an update of all relation ships. */
-        void displayShape(const int row, const bool update, const ito::Shape &shape);   /*! Set a primitiv element in row number row */
+        void displayShape(const int row, const bool update, const ito::Shape &shape);   /*! Set a primitive element in row number row */
 
         bool calculateAngle(const ito::Shape &first, const ito::Shape &second, ito::float32 &angle);        /*! calculate the angle between to elements */
         bool calculateDistance(const ito::Shape &first, const ito::Shape &second, ito::float32 &distance);  /*! calculate the distance between to elements */
-        bool calculateRadius(const ito::Shape &first, ito::float32 &radius);                                /*! calculate the radius of a sigle circle or ellipse */
+        bool calculateRadius(const ito::Shape &first, ito::float32 &radius);                                /*! calculate the radius of a single circle or ellipse */
         bool calculateLength(const ito::Shape &first, ito::float32 &length);                                /*! calculate the length of a line */
         //bool calculateIntersections(ito::float32 *first, ito::float32 *second, const bool eval2D, cv::Vec3f &point);  /*! calculate the intersection point of two lines */
         bool calculateArea(const ito::Shape &first, ito::float32 &area);                                 /*! calculate the area of a geometric element */
 
-        ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);                                 /*! export content to comma seperated values */
+        ito::RetVal writeToCSV(const QFileInfo &QFileInfo, const bool asTable = false);                                 /*! export content to comma separated values */
         ito::RetVal writeToXML(const QFileInfo &fileName);                                                              /*! export content to XML-style file */
         ito::RetVal writeToRAW(const QFileInfo &fileName);                                                              /*! export raw content as two tables */
 

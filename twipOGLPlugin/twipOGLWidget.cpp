@@ -21,7 +21,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
@@ -95,7 +95,7 @@ float tickDist = 20;
 *   \brief OpenGL Widget for displaying perspective plots of dataObjects and pointClouds
 *
 *   Inner widget which actually does all the drawing job. The widget can render perspective
-*   plots of dataObjects and different types of pointClouds. The 3D data can be overlayed
+*   plots of dataObjects and different types of pointClouds. The 3D data can be overlaid
 *   with an intensity image and some basic illumination is available. For pointClouds it is
 *   also possible to use the values stored in the curvature for color coding. This can e.g.
 *   used to color code the difference to a model.
@@ -179,7 +179,7 @@ TwipOGLWidget::TwipOGLWidget(QMenu *contextMenu, void* configData, QGLFormat &fm
     m_pConfigData = (InternalData *)configData;
     updateColorsAndVisibility(false);
 
-    //(mouse tracking is controled by action in WinMatplotlib)
+    //(mouse tracking is controlled by action in WinMatplotlib)
     this->setMouseTracking(false);
     int ret = 0;
 
@@ -364,7 +364,7 @@ TwipOGLWidget::~TwipOGLWidget()
 /** Compile and link shader programs
 *   @param [in] progStr         String identifier of program to compile. The code is stored in the m_shaderProgs member
 *   @param [in / out] progName  Internal id for referencing the shader program on the gpu.
-*   @return 0 if everthing went well, otherwise the result of glGetError()
+*   @return 0 if everything went well, otherwise the result of glGetError()
 */
 int TwipOGLWidget::makeShaderProg(const QString &progStr, GLint &progName)
 {
@@ -986,7 +986,7 @@ ito::RetVal TwipOGLWidget::prepareFont(const QFont &font, struct SFont &glfont)
 
         // now we will create a QImage to store the texture, basically we are going to draw
         // into the qimage then save this in OpenGL format and load as a texture.
-        // This is relativly quick but should be done as early as possible for max performance when drawing
+        // This is relatively quick but should be done as early as possible for max performance when drawing
         QImage finalImage(widthPow2, heightPow2, QImage::Format_ARGB32);
 
         // set the background for transparent so we can avoid any areas which don't have text in them
@@ -1176,7 +1176,7 @@ void TwipOGLWidget::DrawAxesOGL(void)
         -1.0,  1.0,  0.0
     };
 
-    //Paint the axis itsself
+    //Paint the axis itself
     GLFPTR(glEnableVertexAttribArray)(m_attribVert3DPri);
     GLFPTR(glBindBuffer)(GL_ARRAY_BUFFER, m_vertBuf3DPri);
     GLFPTR(glBufferData)(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
@@ -1857,7 +1857,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
     {
         //!> opengl uses 'normalized' coordinates therefore we must transform the
         //!> input data accordingly. Normalized means in this case:
-        //!> x � [-1, 1], y � [-1, 1], z � [0, -1]
+        //!> x in [-1, 1], y in [-1, 1], z in [0, -1]
         if (m_pConfigData->m_elementMode & PAINT_POINTS)
         {
             float zmin = m_axes.m_axisZ.getMin();
@@ -2037,7 +2037,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
             //!> Here we activate the various buffers used in the shader, upload the buffer(s) and set their properties.
             //!> Even if we don't use some of the features, e.g. normals we must set the attributePointer to a
             //!> meaningful value, other we get problems on some graphics boards ... even if the attribute array
-            //!> is diabled ...
+            //!> is disabled ...
             GLFPTR(glBindBuffer)(GL_ARRAY_BUFFER, m_vertBuf3D.value(id));
             GLFPTR(glEnableVertexAttribArray)(m_attribVert);
             GLFPTR(glEnableVertexAttribArray)(m_attribVertColor);
@@ -2225,7 +2225,7 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
                 else
                 {
                     useNormals = 0;
-                    retVal += ito::RetVal(ito::retWarning, 0, "low memory, disabeling normals & lighting");
+                    retVal += ito::RetVal(ito::retWarning, 0, "low memory, disabling normals & lighting");
                     ptSize = 12;
                     ((TwipOGLFigure*)this->parent())->enableRenderModeSelector(PAINT_TRIANG);
                 }
@@ -2659,7 +2659,7 @@ template<typename _Tp, typename _TpMat> ito::RetVal TwipOGLWidget::GLSetTriangle
             //!> Here we activate the various buffers used in the shader, upload the buffer(s) and set their properties.
             //!> Even if we don't use some of the features, e.g. normals we must set the attributePointer to a
             //!> meaningful value, other we get problems on some graphics boards ... even if the attribute array
-            //!> is diabled ...
+            //!> is disabled ...
             GLFPTR(glBindBuffer)(GL_ARRAY_BUFFER, m_vertBuf3D.value(id));
             GLFPTR(glEnableVertexAttribArray)(m_attribVert);
             GLFPTR(glEnableVertexAttribArray)(m_attribVertColor);
@@ -3040,8 +3040,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
             m_axes.m_devAxis.m_label = "deviation";
             m_axes.m_devAxis.m_unit  = "mm";
 
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure �m can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure �m can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
             ((TwipOGLFigure*)parent())->updateLegend(id, TwipLegend::tPointCloud, m_pContentPC[id]->getType(), 255, true);
         }
 
@@ -3098,8 +3098,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
 
         if(!retval.containsError())
         {
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure �m can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure �m can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
 
             m_scaleX = 2.0 / (m_axes.m_axisX.getMax() - m_axes.m_axisX.getMin());
             if (cvIsNaN(m_scaleX) || cvIsInf(m_scaleX))
@@ -3194,8 +3194,8 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
     {
         if(!retval.containsError())
         {
-            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure �m can be displayed
-                m_pConfigData->m_zAmpl = 0.000001f; // make sure �m can be displayed
+            if (m_pConfigData->m_zAmpl < 0.000001f) // make sure µm can be displayed
+                m_pConfigData->m_zAmpl = 0.000001f; // make sure µm can be displayed
 
             m_scaleX = 2.0 / (m_axes.m_axisX.getMax() - m_axes.m_axisX.getMin());
             if (cvIsNaN(m_scaleX) || cvIsInf(m_scaleX))
@@ -3378,7 +3378,7 @@ void TwipOGLWidget::refreshPlot(ito::ParamBase *param, const int id)
 *   @param [in] width       width of the outer window
 *   @param [in] height      height of the outer window
 *
-*   Ajust the openGL widget to the size of the outer window
+*   Adjust the openGL widget to the size of the outer window
 */
 void TwipOGLWidget::resizeGL(int width, int height)
 {
@@ -4018,7 +4018,7 @@ void TwipOGLWidget::riseZAmplification(const double value)
 *
 *   The palette can be hidden or displayed in one of four predefined positions.
 *   With this function the palette is moved to the position stored in the member
-*   variable m_colorBarMode. The acutal painting is done by the method \ref{DrawColorBar}
+*   variable m_colorBarMode. The actual painting is done by the method \ref{DrawColorBar}
 */
 void TwipOGLWidget::togglePaletteMode()
 {
@@ -4095,7 +4095,7 @@ void TwipOGLWidget::setColorMap(QString palette)
 *   @param [in] minValue        minimum value to display
 *   @param [in] maxValue        maximum value to display
 *
-*   Though obivously not working yet this function should set the limits for the displayed
+*   Though obviously not working yet this function should set the limits for the displayed
 *   data.
 */
 ito::RetVal TwipOGLWidget::setInterval(const Qt::Axis axis, const bool autoCalcLimits, const double minValue, const double maxValue)
@@ -4368,7 +4368,7 @@ inline void TwipOGLWidget::generateObjectInfoText(const int fromID)
 *   @param [in] deltaZ      Position change in z
 *
 *   Moves the position of the view inside the window, which is done by moving the coordinate
-*   system. This comes handy when we zoom into the object and whant to see a detail that is
+*   system. This comes handy when we zoom into the object and want to see a detail that is
 *   not in the central part. Uses the method \ref{setViewTranslation} to incrementally
 *   move the view.
 */
@@ -4420,7 +4420,7 @@ void TwipOGLWidget::setCanvasZoomView(const double factor)
 *   @param [in] transZ      Position change in z
 *
 *   Moves the position of the view inside the window, which is done by moving the coordinate
-*   system. This comes handy when we zoom into the object and whant to see a detail that is
+*   system. This comes handy when we zoom into the object and want to see a detail that is
 *   not in the central part.
 */
 void TwipOGLWidget::setViewTranslation(const double transX, const double transY, const double transZ)
@@ -4697,7 +4697,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::updateOverlayImage(const int o
 //----------------------------------------------------------------------------------------------------------------------------------
 /** Find the minimum and maximum positional values in a point cloud
 *
-*   @param [in] *pcl    reference to the point cloude object
+*   @param [in] *pcl    reference to the point cloud object
 *   @param [in] *id     index value to access the member variable and return the specific distance value
 *
 */

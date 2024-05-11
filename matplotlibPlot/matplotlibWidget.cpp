@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2021, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -170,7 +170,7 @@ void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int 
 
 	//it seems that screens with scaling factor cannot render pixmaps with all sizes,
 	//therefore it can occur that the real image size is not returned, which will lead to
-	//an inifinte regression. To terminate this, we allow a size difference of up to 1px.
+	//an infinite regression. To terminate this, we allow a size difference of up to 1px.
     if (qAbs(m_pixmap.width() - s.width()) < 2 && qAbs(m_pixmap.height() - s.height()) < 2)
     {
         setTransform( QTransform(1,0,0,1,0,0), false );
@@ -268,7 +268,7 @@ void MatplotlibWidget::copyToClipboardResult(QSharedPointer<char> imageString, i
     }
 #endif
 
-    QImage image  = QImage((uchar*)imageString.data(), w, h, QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during livetime of image (therefore, copy below)
+    QImage image  = QImage((uchar*)imageString.data(), w, h, QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during lifetime of image (therefore, copy below)
 
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard)

@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -48,14 +48,14 @@ class DialogDeleteRelation : public QDialog
     Q_OBJECT
 
     public:
-        DialogDeleteRelation(const InternalInfo &data, EvaluateGeometricsFigure *egFig, QWidget *parent = NULL); /*!< Class constructor, which takes all necessary informations to create the correspondig dialog and fill in the information of each relations.*/
+        DialogDeleteRelation(const InternalInfo &data, EvaluateGeometricsFigure *egFig, QWidget *parent = NULL); /*!< Class constructor, which takes all necessary information to create the corresponding dialog and fill in the information of each relations.*/
         ~DialogDeleteRelation() {};                                             /*!< Class destructor, currently not used */
 
 //        void getData(InternalInfo &data);                                       /*!< This function updated the internal dataStructur. It is only called in case that the dialog existed with the ok-buttom */
 
     private:
         EvaluateGeometricsFigure *m_evalGeoFig;
-        Ui::DialogRelation ui;                                                /*!< Handle to the UI dialog, defiend in "ui_dialogRelation.h" */
+        Ui::DialogRelation ui;                                                /*!< Handle to the UI dialog, defined in "ui_dialogRelation.h" */
 
     private slots:
         void on_buttonBox_clicked(QAbstractButton* btn);

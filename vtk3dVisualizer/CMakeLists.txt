@@ -140,7 +140,7 @@ if(ITOM_SDK_PCL_SUPPORT)
         #Define Version in pluginVersion.h
         configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
-        #If you want to use automatical metadata for dlls under windows use the following if-case.
+        #If you want to use automatically metadata for dlls under windows use the following if-case.
         if(MSVC)
             list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
         endif()

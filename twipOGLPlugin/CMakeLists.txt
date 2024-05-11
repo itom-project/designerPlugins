@@ -21,7 +21,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
@@ -133,7 +133,7 @@ set(DESIGNER_RCC
 #Define Version in pluginVersion.h
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

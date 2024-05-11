@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -75,7 +75,7 @@ int plotGLWidget::initOGL2(const int width, const int height)
     QOpenGLFunctions *m_oglFunctions=new QOpenGLFunctions(QOpenGLContext::currentContext());
     m_oglFunctions->initializeOpenGLFunctions();
 
-    //everytime before doing anything OpenGL:
+    //every time before doing anything OpenGL:
     m_oglFunctions->glUseProgram(0);
 
     glShadeModel(GL_SMOOTH);                            //Smooth Shading
@@ -103,7 +103,7 @@ int plotGLWidget::initOGL2(const int width, const int height)
 
     if ((ret = glGetError()))
     {
-        std::cerr << "error enabeling texutres gl-window init\n";
+        std::cerr << "error enabling texutres gl-window init\n";
     }
 
     return ret;
@@ -132,7 +132,7 @@ plotGLWidget::plotGLWidget(
 #endif
     m_pContentWhileRastering(NULL), m_invalid(1.6e308), m_nthreads(2)
 {
-    this->setMouseTracking(false); //(mouse tracking is controled by action in WinMatplotlib)
+    this->setMouseTracking(false); //(mouse tracking is controlled by action in WinMatplotlib)
 
     m_timer.setSingleShot(true);
     QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(paintTimeout()));
@@ -631,7 +631,7 @@ inline ito::RetVal plotGLWidget::NormalizeObj(cv::Mat& scaledTopo, ito::float64&
     }
 #endif
 
-    // rescale the invalud value
+    // rescale the invalid value
     normedInvalid = (m_invalid - m_axisZ.phys[0]) / norm;
 
     return retVal;
@@ -2645,7 +2645,7 @@ void plotGLWidget::paintAxisOGL(double x0, double y0, double z0, double x1, doub
     else
         glColor3f(1, 1, 1);
 
-    // Paint the axis itsself
+    // Paint the axis itself
     glBegin(GL_LINES);
     glVertex3f(x0, y0, z0);
     glVertex3f(x1, y1, z1);
@@ -2657,7 +2657,7 @@ void plotGLWidget::paintAxisOGL(double x0, double y0, double z0, double x1, doub
 //-----------------------------------------------------------------------------------------------
 /**
  *\fn static void dreidogl_lichtpfeil(class FilterObject *fo)
- *\brief Zeichnet den Lichtpfeil fuer die Beleuchtungsdarstellung
+ *\brief Zeichnet den Lichtpfeil für die Beleuchtungsdarstellung
  *\param[in] *fo Zeiger auf das Goofi-Filterobjekt
  *\return error
  *\ingroup 3DOGLFuncsGroup
@@ -2688,7 +2688,7 @@ void plotGLWidget::paintLightArrow()
     position1[2] /= norm1;
     position1[2] *= 0.8f;
 
-    // Paint the axis itsself
+    // Paint the axis itself
     glBegin(GL_LINES);
     glVertex3f(position1[0] - 0.03, position1[1], position1[2]);
     glVertex3f(position1[0], position1[1], position1[2] + 0.1);
@@ -2721,7 +2721,7 @@ void plotGLWidget::paintLightArrow()
 /**
  *\brief Zeichnet die Achsenstriche
  *\param[in] *fo Zeiger auf das Goofi-Filterobjekt
- *\param[in] write Flag fuer das Schreiben von Tick-Lables
+ *\param[in] write Flag für das Schreiben von Tick-Lables
  *\return error
  *\ingroup 3DOGLFuncsGroup
  */
@@ -3306,7 +3306,7 @@ void plotGLWidget::DrawColorBar(
     else
         glColor3f(1, 1, 1);
 
-    // Paint the axis itsself
+    // Paint the axis itself
     glBegin(GL_LINES);
     glVertex3f(x0, y0, -1.0);
     glVertex3f(x0, y0 + dY, -1.0);
@@ -3360,7 +3360,7 @@ void plotGLWidget::DrawTitle(const std::string& myTitle, const int texty, int& y
     double x0 = -1 * myTitle.length() * 1.67 * m_fontsize * 0.6 / width();
     double y0 = 0.98 - (double)(++i * 2.0 * 1.67 * m_fontsize) / height();
 
-    /* Titel Object etc. */
+    /* Title Object etc. */
     OGLMakeFont(1.67 * m_fontsize);
     if (myTitle.length())
         OGLTextOut((char*)myTitle.data(), x0, y0, false, false);
@@ -3713,9 +3713,9 @@ inline void plotGLWidget::generateObjectInfoText()
     char buf[40] = {0};
 
     if (m_axisY.unit.length() && m_axisY.unit.length() < 5)
-        sprintf(buf, "Heigth: %.4g %s", m_axisY.phys[1] - m_axisY.phys[0], m_axisY.unit.data());
+        sprintf(buf, "Height: %.4g %s", m_axisY.phys[1] - m_axisY.phys[0], m_axisY.unit.data());
     else
-        sprintf(buf, "Heigth: %.4g", m_axisY.phys[1] - m_axisY.phys[0]);
+        sprintf(buf, "Height: %.4g", m_axisY.phys[1] - m_axisY.phys[0]);
     m_objectInfo.xLength = buf;
 
     if (m_axisX.unit.length() && m_axisX.unit.length() < 5)

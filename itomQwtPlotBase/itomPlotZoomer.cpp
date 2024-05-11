@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -217,7 +217,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
 
                 //qDebug() << plt->size() << plt->canvas()->size();
 
-                //more exact: take real pixel lenghts of axisScaleDraws are real area (only if axis is available, else take size of canvas)
+                //more exact: take real pixel lengths of axisScaleDraws are real area (only if axis is available, else take size of canvas)
                 const int canvas_width = plt->axisEnabled(xAxisId) ? plt->axisScaleDraw(xAxisId)->length() : plt->canvas()->width();
                 const int canvas_height = plt->axisEnabled(yAxisId) ? plt->axisScaleDraw(yAxisId)->length() : plt->canvas()->height();
 
@@ -249,7 +249,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
         }
         else
         {
-            //if the zoomer is disabled and this method is called, this might come frome an explicit call to zoom... or due to a
+            //if the zoomer is disabled and this method is called, this might come from an explicit call to zoom... or due to a
             //resize event with fixed aspect ratio. In the latter case, the zoom should not be done with respect to the current zoomRect
             //but to the scaleRect, that is the currently visible region.
             if ( !isEnabled() || zoomRect() != scaleRect() || m_aspectRatioChanged )
@@ -272,7 +272,7 @@ void ItomPlotZoomer::rescale(bool resizeEvent)
 
                     //qDebug() << plt->size() << plt->canvas()->size();
 
-                    //more exact: take real pixel lenghts of axisScaleDraws are real area (only if axis is available, else take size of canvas)
+                    //more exact: take real pixel lengths of axisScaleDraws are real area (only if axis is available, else take size of canvas)
                     const int canvas_width = plt->axisEnabled(xAxisId) ? plt->axisScaleDraw(xAxisId)->length() : plt->canvas()->width();
                     const int canvas_height = plt->axisEnabled(yAxisId) ? plt->axisScaleDraw(yAxisId)->length() : plt->canvas()->height();
 
