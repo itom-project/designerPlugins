@@ -51,8 +51,9 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveDataObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveProperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/valuepicker1d.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_HEADERS_COPY
@@ -83,6 +84,9 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/qwtPlotCurveProperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/itomPlotMarker.cpp
 )
+
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
 #If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)

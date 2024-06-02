@@ -110,7 +110,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/aboutTwip.h
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLLegend.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
@@ -129,6 +129,9 @@ set(DESIGNER_RCC
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLFigure.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
+
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
 #If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)

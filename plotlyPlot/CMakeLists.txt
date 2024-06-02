@@ -41,7 +41,8 @@ link_directories(
 set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/plotlyPlot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotlyPlotFactory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_HEADERS_COPY
@@ -59,6 +60,9 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/plotlyPlot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/plotlyPlotFactory.cpp
 )
+
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
 itom_add_source_group(editProperties)
 

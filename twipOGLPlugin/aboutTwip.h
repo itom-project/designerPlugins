@@ -33,7 +33,7 @@
 #define ABOUTTWIPDIALG
 
 #include "ui_aboutTwip.h"
-#include "itom_sdk.h"
+#include <itom_sdk.h>
 #include "pluginVersion.h"
 #include <qglobal.h>
 

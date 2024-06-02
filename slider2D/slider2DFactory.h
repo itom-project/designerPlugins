@@ -47,6 +47,16 @@ public:
     QWidget *createWidget(QWidget *parent);
     void initialize(QDesignerFormEditorInterface *core);
 
+protected:
+    int m_version;                        //!< plugin version
+    int m_maxItomVer;                     //!< minimum required version of the main program
+    int m_minItomVer;                     //!< maximum supported version of the main program
+    QString m_author;                     //!< the plugin author
+    QString m_description;                //!< a brief description of the plugin
+    QString m_detaildescription;          //!< a detail description of the plugin
+    QString m_license;                    //!< a short license string for the plugin, default value is "LGPL with ITO itom-exception"
+    QString m_aboutThis;                  //!< a short string with compile information
+
 private:
     bool initialized;
 };

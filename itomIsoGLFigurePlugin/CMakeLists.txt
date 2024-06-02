@@ -95,7 +95,8 @@ if(OPENGL_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.h
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.h
         ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+        ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+        ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
     )
 
     set(DESIGNER_UI
@@ -124,6 +125,9 @@ if(OPENGL_FOUND)
     if(MSVC)
         list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
     endif()
+
+    #Define Version in pluginVersion.h
+    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
     add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
 

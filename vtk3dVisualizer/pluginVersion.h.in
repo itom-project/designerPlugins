@@ -23,18 +23,15 @@
 #ifndef PLUGINVERSION_H
 #define PLUGINVERSION_H
 
-#include "itom_sdk.h"
+#include <itom_sdk.h>
 
-#define PLUGIN_VERSION_MAJOR 1
-#define PLUGIN_VERSION_MINOR 6
-#define PLUGIN_VERSION_PATCH 1
-#define PLUGIN_VERSION_REVISION 0
-#define PLUGIN_VERSION        CREATE_VERSION(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
-#define PLUGIN_VERSION_STRING CREATE_VERSION_STRING(PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_PATCH)
-#define PLUGIN_COMPANY        "Institut für Technische Optik, Universität Stuttgart"
-#define PLUGIN_COPYRIGHT      "(C) 2021, ITO, Universität Stuttgart"
-#define PLUGIN_NAME           "vtk3dVisualizer"
-
-//----------------------------------------------------------------------------------------------------------------------------------
+#define PLUGIN_VERSION              CREATE_VERSION(1, 6, 1)
+#define PLUGIN_MIN_ITOM_VERSION     CREATE_VERSION(1, 4, 0)
+#define PLUGIN_MAX_ITOM_VERSION     CREATE_VERSION(${itom_designerPlugin_VERSION_MAJOR},${itom_designerPlugin_VERSION_MINOR},${itom_designerPlugin_VERSION_PATCH})
+#define PLUGIN_LICENCE              "Licensed under LGPL 2.0"
+#define PLUGIN_COMPANY              "Institut für Technische Optik, Universität Stuttgart"
+#define PLUGIN_AUTHOR               "M. Gronle, ITO, Universität Stuttgart"
+#define PLUGIN_COPYRIGHT            "(C) 2021, ITO, Universität Stuttgart"
+#define PLUGIN_NAME                 "vtk3dVisualizer"
 
 #endif // PLUGINVERSION_H
