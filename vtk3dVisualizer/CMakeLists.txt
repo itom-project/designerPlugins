@@ -102,7 +102,7 @@ if(ITOM_SDK_PCL_SUPPORT)
             ${ITOM_SDK_INCLUDE_DIRS}
             ${CMAKE_CURRENT_SOURCE_DIR}/icons
         )
-    
+
         link_directories(
             ${CMAKE_CURRENT_SOURCE_DIR}/..
             ${VTK_DIR}
@@ -159,16 +159,12 @@ if(ITOM_SDK_PCL_SUPPORT)
             list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
         endif()
 
-
-
         add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
 
-        target_link_libraries(${target_name} ${VTK_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+        target_link_libraries(${target_name} ${PCL_LIBRARIES} ${VTK_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
 
-
-    # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
-    set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
-
+        # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
+        set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
 
         # translations
         set(FILES_TO_TRANSLATE ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI})

@@ -24,15 +24,15 @@
 
 #include "CustomTypes.h"
 
-#include "pcl/point_cloud.h"
+#include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/eigen.h>
 #include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/filters/filter.h>
-#include "pcl/search/kdtree.h"
-#include "pcl/octree/octree.h"
-#include "pcl/visualization/pcl_visualizer.h"
+#include <pcl/search/kdtree.h>
+#include <pcl/octree/octree.h>
+#include <pcl/visualization/pcl_visualizer.h>
 #include "vtkOutputWindow.h"
 #include "vtkFileOutputWindow.h"
 #include <qsharedpointer.h>
