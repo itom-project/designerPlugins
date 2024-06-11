@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut für Technische Optik (ITO),
+   Copyright (C) 2024, Institut für Technische Optik (ITO),
    Universität Stuttgart, Germany
 
    This file is part of itom.
@@ -20,8 +20,7 @@
    along with itom. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************** */
 
-#ifndef MATPLOTLIBWIDGET_H
-#define MATPLOTLIBWIDGET_H
+#pragma once
 
 #include <qwidget.h>
 #include <qstring.h>
@@ -153,8 +152,8 @@ signals:
 
 public slots:
     void externalResize(int width, int height);
-    void paintResultDeprecated(QByteArray imageString, int x, int y, int w, int h, bool blit );
-    void paintResult(QSharedPointer<char> imageString, int x, int y, int w, int h, bool blit ); //this version is faster than the version above.
+    void paintResult(QSharedPointer<char> imageString, int x, int y, int w, int h, bool blit );
+    void paintResultWithImageFormat(QSharedPointer<char> imageString, QString imageFormat, int x, int y, int w, int h, bool blit);
     void copyToClipboardResult(QSharedPointer<char> imageString, int x, int y, int w, int h);
     void paintRect(bool drawRect, int x = 0, int y = 0, int w = 0, int h = 0);
     void paintTimeout();
@@ -187,4 +186,3 @@ public slots:
     };
 };
 
-#endif
