@@ -161,7 +161,11 @@ if(ITOM_SDK_PCL_SUPPORT)
 
         add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
 
-        target_link_libraries(${target_name} ${PCL_LIBRARIES} ${VTK_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+        if(WIN32)
+            target_link_libraries(${target_name} ${PCL_LIBRARIES} ${VTK_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+        else(WIN32)
+            target_link_libraries(${target_name} ${VTK_LIBRARIES} ${ITOM_SDK_LIBRARIES} ${QT5_LIBRARIES} ${VISUALLEAKDETECTOR_LIBRARIES})
+        endif(WIN32)
 
         # Qt: enable all automoc, autouic and autorcc. Autouic file will be disabled for all files that are processed manually by itom_qt_wrap_ui.
         set_target_properties(${target_name} PROPERTIES AUTOMOC ON AUTORCC ON AUTOUIC ON)
