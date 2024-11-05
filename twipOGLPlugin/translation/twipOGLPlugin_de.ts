@@ -106,7 +106,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Published under LGPL v2.0 by twip optical solutions GmbH</source>
-        <translation>Veröffentlicht unter der LGPL v 2.0 durch die twip optical solutions GmbH</translation>
+        <translation type="vanished">Veröffentlicht unter der LGPL v 2.0 durch die twip optical solutions GmbH</translation>
     </message>
     <message>
         <source>Adding DataObject with different size or scaling is currently not supported

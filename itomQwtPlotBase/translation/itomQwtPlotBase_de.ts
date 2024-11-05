@@ -186,7 +186,7 @@
 <context>
     <name>ItomQwtPlot</name>
     <message>
-        <location filename="../itomQwtPlot.cpp" line="+231"/>
+        <location filename="../itomQwtPlot.cpp" line="+234"/>
         <source>Home</source>
         <translation>Ansicht zurücksetzen</translation>
     </message>
@@ -196,7 +196,7 @@
         <translation>Ursprüngliche Ansicht wiederherstellen</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+15"/>
         <source>Save...</source>
         <translation>Speichern...</translation>
     </message>
@@ -236,12 +236,12 @@
         <translation>Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Toggle fixed / variable aspect ration between axis x and y</source>
         <translation>Vollbild oder Seitenverhältnis beibehalten</translation>
     </message>
     <message>
-        <location line="-40"/>
+        <location line="-41"/>
         <source>Copy To Clipboard</source>
         <translation>In die Zwischenablage kopieren</translation>
     </message>
@@ -256,7 +256,7 @@
         <translation>Zoom in Rechteck</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Clear Geometric Shapes</source>
         <translation>Geometrische Formen löschen</translation>
     </message>
@@ -311,7 +311,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+1131"/>
+        <location line="+1142"/>
         <location line="+122"/>
         <location line="+62"/>
         <location line="+57"/>
@@ -454,7 +454,22 @@
         <translation>Bitte %1 Quadrate einzeichnen. ESC bricht die Auswahl ab.</translation>
     </message>
     <message>
-        <location line="-2024"/>
+        <location line="-2093"/>
+        <source>Zoom</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Undo zoom</source>
+        <translation type="unfinished">Zoom rückgängig</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Redo zoom</source>
+        <translation type="unfinished">Zoom wiederherstellen</translation>
+    </message>
+    <message>
+        <location line="+53"/>
         <source>Clear all existing geometric shapes</source>
         <translation type="unfinished">Alle geometrischen Formen entfernen</translation>
     </message>
@@ -464,7 +479,7 @@
         <translation>Toolboxen</translation>
     </message>
     <message>
-        <location line="+1428"/>
+        <location line="+1439"/>
         <location line="+585"/>
         <source>Please draw one square. Esc aborts the selection.</source>
         <translation>Bitte ein Quadrat einzeichnen. ESC bricht die Auswahl ab.</translation>
