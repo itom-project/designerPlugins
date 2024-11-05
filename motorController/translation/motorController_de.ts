@@ -84,7 +84,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../motorControllerfactory.cpp" line="+87"/>
+        <location filename="../motorControllerfactory.cpp" line="+96"/>
         <source>ITOM widget to show current axis positions of a motor.</source>
         <translation>itom-Widget zur Darstellung der Achsenposition(en) des aktuellen Motors.</translation>
     </message>

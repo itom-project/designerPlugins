@@ -125,7 +125,7 @@
 <context>
     <name>MatplotlibWidget</name>
     <message>
-        <location filename="../matplotlibWidget.cpp" line="+277"/>
+        <location filename="../matplotlibWidget.cpp" line="+236"/>
         <source>Copy current view to clipboard ... Done.</source>
         <translation type="unfinished">Die aktuelle Ansicht in die Zwischenablage kopieren... Beendet.</translation>
     </message>
@@ -138,14 +138,9 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../matplotlibplotfactory.cpp" line="+40"/>
+        <location filename="../matplotlibplotfactory.cpp" line="+41"/>
         <source>itom widget for matplotlib plots.</source>
         <translation>itom-Widget für matplotlib-Abbildungen.</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>LGPL</source>
-        <translation></translation>
     </message>
 </context>
 <context>
