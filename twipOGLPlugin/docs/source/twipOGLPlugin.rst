@@ -29,7 +29,7 @@ If dataObjects are plotted, all DataTypes except "rgba32" are accepted. To plot 
 
 If pointClouds are plotted, the plot features differ slightly. E.g. the overlay can not be added separately, but the intensity from pointClouds of types including RGB- or I-values are interpreted as the overlay directly.
 
-Plotting pointClouds of types with normals defined, allow the visualisation of the curvature as a false color map for the points. Some itomfilter code imformation within the curvature. The plot type also allows illumination and intensity overlay.
+Plotting pointClouds of types with normals defined, allow the visualisation of the curvature as a false color map for the points. Some itomfilter code information within the curvature. The plot type also allows illumination and intensity overlay.
 
 The "TwipOGLFigure" does neither support graphic element / marker plotting nor line or pixel picking at the moment.
 

@@ -1793,7 +1793,7 @@ template<typename _Tp> ito::RetVal TwipOGLWidget::GLSetPointsPCL(pcl::PointCloud
         return ito::RetVal(ito::retError, 0, "Too many points, calc triangles/points failed");
     }
 
-    //!> allocate temporary buffers in host memory so we can perpare the arrays for uploading
+    //!> allocate temporary buffers in host memory so we can prepare the arrays for uploading
     if (!retVal.containsError())
     {
         // If m_elementMode == PAINT_POINTS try to paint points for faster, less memory consuming visualisation

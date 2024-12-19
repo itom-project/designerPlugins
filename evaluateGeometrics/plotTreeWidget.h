@@ -175,7 +175,7 @@ class PlotTreeWidget : public QTreeWidget
         ito::RetVal m_lastRetVal;                                                                                       /*! last retval for error checking, currently not used */
         QMenu *m_contextMenu;                                                                                           /*! handle to the internal context menu */
         QWidget *m_pParent;                                                                                             /*! handle to the parent widget of this (see EvaluateGeometricsFigure) */
-        State m_state;                                                                                                  /*! current state for the state maschine */
+        State m_state;                                                                                                  /*! current state for the state machine */
         InternalInfo *m_pData;                                                                                          /*! handle to the shared configuration struct */
         QHash<ito::int32, ito::Shape> m_rowHash;                                                                        /*! the hash table with data for all geometric shapes */
         ito::RetVal updateElement(const ito::int32 &idx, const ito::Shape &shape);                                      /*! update a certain element of the hash table */
