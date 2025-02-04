@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut für Technische Optik (ITO),
+   Copyright (C) 2025, Institut für Technische Optik (ITO),
    Universität Stuttgart, Germany
 
    This file is part of itom.
@@ -898,26 +898,38 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
     if (bounds.size() == 2)
     {
         std::string description, unit;
-        int d = dataObj->getDims();
+        int dims = dataObj->getDims();
         unsigned int offsetByte;
-        //QVector<int> startPx(3); //convention x,y,z
         QVector<int> stepByte; //step to be done to next elem
+
+        // iterIdx is the axis index in the original dataObj that is used for the
+        // y-axis of the volume cut object. iterIdx is the first index of the first
+        // n-2 dimensions, whose size is > 1. If not possible, it is 0.
+        int iterIdx = 0;
+
+        for (int i = 0; i < dims - 2; ++i)
+        {
+            if (dataObj->getSize(i) > 1)
+            {
+                iterIdx = i;
+                break;
+            }
+        }
 
         int pxX1, pxX2, pxY1, pxY2, xSize, ySize;
         double yScaling, xScaling, yOffset, xOffset;
         bool _unused;
-        cv::Mat *mat;
-        pxX1 = qRound(dataObj->getPhysToPix(d - 1, bounds[0].x(), _unused));
-        pxY1 = qRound(dataObj->getPhysToPix(d - 2, bounds[0].y(), _unused));
-        pxX2 = qRound(dataObj->getPhysToPix(d - 1, bounds[1].x(), _unused));
-        pxY2 = qRound(dataObj->getPhysToPix(d - 2, bounds[1].y(), _unused));
+        pxX1 = qRound(dataObj->getPhysToPix(dims - 1, bounds[0].x(), _unused));
+        pxY1 = qRound(dataObj->getPhysToPix(dims - 2, bounds[0].y(), _unused));
+        pxX2 = qRound(dataObj->getPhysToPix(dims - 1, bounds[1].x(), _unused));
+        pxY2 = qRound(dataObj->getPhysToPix(dims - 2, bounds[1].y(), _unused));
 
-        saturation(pxX1, 0, dataObj->getSize(d - 1) - 1);
-        saturation(pxX2, 0, dataObj->getSize(d - 1) - 1);
-        saturation(pxY1, 0, dataObj->getSize(d - 2) - 1);
-        saturation(pxY2, 0, dataObj->getSize(d - 2) - 1);
+        saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+        saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+        saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
+        saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
 
-        mat = (cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(0)]; //first plane in ROI
+        const cv::Mat* mat = dataObj->getCvPlaneMat(dataObj->seekMat(0)); //first plane in ROI
 
         if (pxX2 == pxX1)
         {
@@ -925,11 +937,12 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dir = dirY;
             stepByte.resize(1);
 
-            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
-            xScaling = d > 2 ? dataObj->getAxisScale(d - 2) : 1.0; // scaling along y of the host object
-            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
-            xOffset = d > 2 ? dataObj->getAxisOffset(d - 2) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            yScaling = dims > 2 ? dataObj->getAxisScale(iterIdx) : 1.0; // scaling along z of the host object
+            xScaling = dims > 2 ? dataObj->getAxisScale(dims - 2) : 1.0; // scaling along y of the host object
+            yOffset = dims > 2 ? dataObj->getAxisOffset(iterIdx) : 0.0;
+            xOffset = dims > 2 ? dataObj->getAxisOffset(dims - 2) : 0.0;
+            ySize = dims > 2 ? dataObj->getSize(iterIdx) : 0;
+
             if (pxY2 >= pxY1)
             {
                 xSize = 1 + pxY2 - pxY1;
@@ -945,7 +958,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {
                 stepByte[0] = dataObj->get_mdata()[0]->step[0];
             }
-            else// go in negative direction
+            else // go in negative direction
             {
                 stepByte[0] = -static_cast<int>(dataObj->get_mdata()[0]->step[0]);
             }
@@ -986,10 +999,10 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                 break;
             default:
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
-
             }
-            description = dataObj->getAxisDescription(d - 2, _unused);
-            unit = dataObj->getAxisUnit(d - 2, _unused);
+
+            description = dataObj->getAxisDescription(dims - 2, _unused);
+            unit = dataObj->getAxisUnit(dims - 2, _unused);
 
             if (description == "")
             {
@@ -999,12 +1012,19 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setAxisDescription(1, description);
             m_dObjVolumeCut.setAxisUnit(1, unit);
 
-            description = dataObj->getAxisDescription(d - 3, _unused);
-            unit = dataObj->getAxisUnit(d - 3, _unused);
+            description = dataObj->getAxisDescription(iterIdx, _unused);
+            unit = dataObj->getAxisUnit(iterIdx, _unused);
 
             if (description == "")
             {
-                description = QObject::tr("z-axis").toLatin1().data();
+                if (iterIdx == dims - 3)
+                {
+                    description = QObject::tr("z-axis").toLatin1().data();
+                }
+                else
+                {
+                    description = QObject::tr("axis %1").arg(iterIdx).toLatin1().data();
+                }
             }
 
             m_dObjVolumeCut.setAxisDescription(0, description);
@@ -1012,11 +1032,11 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
 
-            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
-            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(dims - 3));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(dims - 3));
 
-            double startPhys = dataObj->getPixToPhys(d - 2, pxY1, _unused);
-            double right = dataObj->getPixToPhys(d - 2, pxY2, _unused);
+            double startPhys = dataObj->getPixToPhys(dims - 2, pxY1, _unused);
+            double right = dataObj->getPixToPhys(dims - 2, pxY2, _unused);
             double scale = xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0;
 
             m_dObjVolumeCut.setAxisScale(1, scale);
@@ -1026,11 +1046,11 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
         {
             m_dir = dirX;
             stepByte.resize(1);
-            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0; // scaling along z of the host object
-            xScaling = d > 2 ? dataObj->getAxisScale(d - 1) : 1.0; // scaling along y of the host object
-            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
-            xOffset = d > 2 ? dataObj->getAxisOffset(d - 1) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            yScaling = dims > 2 ? dataObj->getAxisScale(iterIdx) : 1.0; // scaling along z of the host object
+            xScaling = dims > 2 ? dataObj->getAxisScale(dims - 1) : 1.0; // scaling along y of the host object
+            yOffset = dims > 2 ? dataObj->getAxisOffset(iterIdx) : 0.0;
+            xOffset = dims > 2 ? dataObj->getAxisOffset(dims - 1) : 0.0;
+            ySize = dims > 2 ? dataObj->getSize(iterIdx) : 0;
 
             if (pxX2 >= pxX1)
             {
@@ -1091,8 +1111,8 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
 
-            description = dataObj->getAxisDescription(d - 1, _unused);
-            unit = dataObj->getAxisUnit(d - 1, _unused);
+            description = dataObj->getAxisDescription(dims - 1, _unused);
+            unit = dataObj->getAxisUnit(dims - 1, _unused);
 
             if (description == "")
             {
@@ -1102,12 +1122,19 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setAxisDescription(1, description);
             m_dObjVolumeCut.setAxisUnit(1, unit);
 
-            description = dataObj->getAxisDescription(d - 3, _unused);
-            unit = dataObj->getAxisUnit(d - 3, _unused);
+            description = dataObj->getAxisDescription(iterIdx, _unused);
+            unit = dataObj->getAxisUnit(iterIdx, _unused);
 
             if (description == "")
             {
-                description = QObject::tr("z-axis").toLatin1().data();
+                if (iterIdx == dims - 3)
+                {
+                    description = QObject::tr("z-axis").toLatin1().data();
+                }
+                else
+                {
+                    description = QObject::tr("axis %1").arg(iterIdx).toLatin1().data();
+                }
             }
 
             m_dObjVolumeCut.setAxisDescription(0, description);
@@ -1115,11 +1142,11 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
 
-            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
-            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(iterIdx));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(iterIdx));
 
-            double startPhys = dataObj->getPixToPhys(d - 1, pxX1, _unused);
-            double right = dataObj->getPixToPhys(d - 1, pxX2, _unused);
+            double startPhys = dataObj->getPixToPhys(dims - 1, pxX1, _unused);
+            double right = dataObj->getPixToPhys(dims - 1, pxX2, _unused);
             double scale = xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0;
             m_dObjVolumeCut.setAxisScale(1, xSize > 1 ? (right - startPhys) / (float)(xSize - 1) : 0.0);
             m_dObjVolumeCut.setAxisOffset(1, -startPhys/scale);
@@ -1127,21 +1154,22 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
         else
         {
             m_dir=dirXY;
-            int dx = abs( pxX2 - pxX1 );
+            int dx = abs(pxX2 - pxX1);
             int incx = pxX1 <= pxX2 ? 1 : -1;
-            int dy = abs( pxY2 - pxY1 );
+            int dy = abs(pxY2 - pxY1);
             int incy = pxY1 <= pxY2 ? 1 : -1;
 
             xSize = 1 + std::max(dx,dy);
 
             //m_d.startPhys= 0.0;  //there is no physical starting point for diagonal lines.
-            yScaling = d > 2 ? dataObj->getAxisScale(d - 3) : 1.0;
-            yOffset = d > 2 ? dataObj->getAxisOffset(d - 3) : 0.0;
-            ySize = d > 2 ? dataObj->getSize(d - 3) : 0;
+            yScaling = dims > 2 ? dataObj->getAxisScale(iterIdx) : 1.0;
+            yOffset = dims > 2 ? dataObj->getAxisOffset(iterIdx) : 0.0;
+            ySize = dims > 2 ? dataObj->getSize(iterIdx) : 0;
+
             if (xSize > 0)
             {
-                double dxPhys = dataObj->getPixToPhys(d-1, pxX2, _unused) - dataObj->getPixToPhys(d-1, pxX1, _unused);
-                double dyPhys = dataObj->getPixToPhys(d-2, pxY2, _unused) - dataObj->getPixToPhys(d-2, pxY1, _unused);
+                double dxPhys = dataObj->getPixToPhys(dims - 1, pxX2, _unused) - dataObj->getPixToPhys(dims-1, pxX1, _unused);
+                double dyPhys = dataObj->getPixToPhys(dims - 2, pxY2, _unused) - dataObj->getPixToPhys(dims-2, pxY1, _unused);
                 xScaling = sqrt((dxPhys * dxPhys) + (dyPhys * dyPhys)) / (xSize - 1);
             }
             else
@@ -1181,8 +1209,8 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             {  /* loop */
                 //setPixel(x,y)
                 stepByte[n] = (int)mat->step[0] * y + (int)mat->step[1] * x;
-
                 err -= es;
+
                 if (err < 0)
                 {
                     err += el;
@@ -1234,13 +1262,13 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                 retval += ito::RetVal(ito::retError, 0, tr("type not implemented yet").toLatin1().data());
             }
 
-            description = dataObj->getAxisDescription(d - 2, _unused);
-            unit = dataObj->getAxisUnit(d - 2, _unused);
+            description = dataObj->getAxisDescription(dims - 2, _unused);
+            unit = dataObj->getAxisUnit(dims - 2, _unused);
 
             if (unit == "") unit = "px";
 
-            std::string descr2 = dataObj->getAxisDescription(d - 1, _unused);
-            std::string unit2 = dataObj->getAxisUnit(d - 1, _unused);
+            std::string descr2 = dataObj->getAxisDescription(dims - 1, _unused);
+            std::string unit2 = dataObj->getAxisUnit(dims - 1, _unused);
 
             if (unit2 == "") unit2 = "px";
 
@@ -1255,12 +1283,19 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
                 m_dObjVolumeCut.setAxisUnit(1, QString("%1/%2").arg(QString::fromLatin1(unit.data()), QString::fromLatin1(unit2.data())).toLatin1().data());
             }
 
-            description = dataObj->getAxisDescription(d - 3, _unused);
-            unit = dataObj->getAxisUnit(d - 3, _unused);
+            description = dataObj->getAxisDescription(iterIdx, _unused);
+            unit = dataObj->getAxisUnit(iterIdx, _unused);
 
             if (description == "")
             {
-                description = QObject::tr("z-axis").toLatin1().data();
+                if (iterIdx == dims - 3)
+                {
+                    description = QObject::tr("z-axis").toLatin1().data();
+                }
+                else
+                {
+                    description = QObject::tr("axis %1").arg(iterIdx).toLatin1().data();
+                }
             }
 
             m_dObjVolumeCut.setAxisDescription(0, description);
@@ -1268,8 +1303,8 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
             m_dObjVolumeCut.setValueUnit(dataObj->getValueUnit());
             m_dObjVolumeCut.setValueDescription(dataObj->getValueDescription());
             m_dObjVolumeCut.setAxisScale(1, xScaling);
-            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(d - 3));
-            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(d - 3));
+            m_dObjVolumeCut.setAxisOffset(0, dataObj->getAxisOffset(iterIdx));
+            m_dObjVolumeCut.setAxisScale(0, dataObj->getAxisScale(iterIdx));
         }
     }
 
@@ -1279,14 +1314,19 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
 void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
     ito::RetVal retval;
+
     if (m_isRefreshingPlot || !m_pData)
     {
         return;
     }
 
+    int dims = 0;
+
     // the 2d plot does not accept a datetime or timedelta object
     if (dObj)
     {
+        dims = dObj->getDims();
+
         switch (dObj->getType())
         {
         case ito::tDateTime:
@@ -1313,6 +1353,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
             {
                 dObj = &m_dObjVolumeCut;
                 m_dObjPtr = &m_dObjVolumeCut;
+                dims = dObj->getDims();
             }
         }
         else
@@ -1320,7 +1361,6 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
             emit statusBarMessage(QObject::tr(retval.errorMessage()).toLatin1().data(), 10000);
         }
 
-        int dims = dObj->getDims();
         int width = dims > 0 ? dObj->getSize(dims - 1) : 0;
         int height = dims > 1 ? dObj->getSize(dims - 2) : 1;
 
@@ -1440,6 +1480,7 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
     if (updateState != changeNo)
     {
         Itom2dQwtPlot *p = (Itom2dQwtPlot*)(this->parent());
+
         if (p)
         {
             int type = dObj->getType();
@@ -1470,9 +1511,21 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
                 m_currentDataType = type;
             }
 
-            if (dObj->getDims() > 2)
+            if (dims)
             {
-                p->setPlaneRange(0, dObj->calcNumMats() - 1);
+                int numFirstDimsGreaterThan1 = 0;
+
+                for (int i = 0; i < dims - 2; ++i)
+                {
+                    // a zCut and volumeCut is only possible if only one
+                    // dimension of the first dims-2 dimensions has a size != 1.
+                    if (dObj->getSize(i) > 1)
+                    {
+                        numFirstDimsGreaterThan1++;
+                    }
+                }
+
+                p->setPlaneRange(0, dObj->calcNumMats() - 1, numFirstDimsGreaterThan1 <= 1);
             }
             else
             {

@@ -221,7 +221,7 @@ public:
 	ItomQwtPlotEnums::ScaleEngine getValueScale() const;
 	void setValueScale(const ItomQwtPlotEnums::ScaleEngine &scale);
 
-    void setPlaneRange(int min, int max);
+    void setPlaneRange(int min, int max, bool stackAndVolumeCutAllowed = true);
 
     virtual ito::AutoInterval getXAxisInterval(void) const;
     virtual void setXAxisInterval(ito::AutoInterval interval);

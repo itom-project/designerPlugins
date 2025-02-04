@@ -1889,15 +1889,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 if (seriesData && seriesData->isDobjInit())
                 {
-                    seriesData->updateDataObject(dataObj, tmpBounds);
+                    retval += seriesData->updateDataObject(dataObj, tmpBounds);
                 }
                 else
                 {
                     seriesData = new DataObjectSeriesData(1);
-                    seriesData->updateDataObject(dataObj, tmpBounds);
+                    retval += seriesData->updateDataObject(dataObj, tmpBounds);
                     seriesData->setCmplxState(m_pComplexStyle);
                     m_plotCurveItems[n]->setData(seriesData);
                 }
+
                 if (m_pData->m_dataType == ito::tRGBA32)
                 {
                     if (m_pData->m_colorLine == ItomQwtPlotEnums::Gray)
@@ -1912,6 +1913,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     {
                         seriesData->setColorState(n == 3 ? 4 : n);
                     }
+                }
+
+                if (retval.containsWarningOrError())
+                {
+                    emit statusBarMessage(QLatin1String(retval.errorMessage()), 5000);
                 }
             }
 
@@ -1929,14 +1935,19 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
                 if (seriesData && seriesData->isDobjInit())
                 {
-                    seriesData->updateDataObject(dataObj, bounds);
+                    retval += seriesData->updateDataObject(dataObj, bounds);
                 }
                 else
                 {
                     seriesData = new DataObjectSeriesData(1);
-                    seriesData->updateDataObject(dataObj, bounds);
+                    retval += seriesData->updateDataObject(dataObj, bounds);
                     seriesData->setCmplxState(m_pComplexStyle);
                     m_plotCurveItems[n]->setData(seriesData);
+                }
+
+                if (retval.containsWarningOrError())
+                {
+                    emit statusBarMessage(QLatin1String(retval.errorMessage()), 5000);
                 }
 
                 if (m_pData->m_dataType == ito::tRGBA32)

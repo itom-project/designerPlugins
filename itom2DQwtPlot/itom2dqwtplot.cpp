@@ -1,7 +1,7 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2019, Institut für Technische Optik (ITO),
+   Copyright (C) 2025, Institut für Technische Optik (ITO),
    Universität Stuttgart, Germany
 
    This file is part of itom.
@@ -881,8 +881,13 @@ void Itom2dQwtPlot::resetDataChannel()
     updatePropertyDock();
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------
-void Itom2dQwtPlot::setPlaneRange(int min, int max)
+//-------------------------------------------------------------------------------------
+/*
+* \param stackAndVolumeCutAllowed should be set to true if for a dim > 2 dataObject only
+*     one of the first dim-2 dimensions has a size != 1. Else, it is not possible to make
+*     a zCut or volumeCut.
+*/
+void Itom2dQwtPlot::setPlaneRange(int min, int max, bool stackAndVolumeCutAllowed)
 {
     if (m_pContent)
     {
@@ -899,6 +904,8 @@ void Itom2dQwtPlot::setPlaneRange(int min, int max)
         m_pContent->m_pActPlaneSelector->setVisible((max - min) > 0);
         m_pContent->m_pActStackCut->setVisible((max - min) > 0);
         m_pContent->m_pActVolumeCut->setVisible((max - min) > 0);
+        m_pContent->m_pActStackCut->setEnabled(stackAndVolumeCutAllowed);
+        m_pContent->m_pActVolumeCut->setEnabled(stackAndVolumeCutAllowed);
     }
 }
 
@@ -981,7 +988,12 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(const QVector<QPointF> &bounds, ito:
                 ((QMainWindow*)childFigure)->setWindowTitle(tr("Volumecut"));
                 if (childFigure->inherits("ItomQwtDObjFigure"))
                 {
-                    ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
+                    ItomQwtDObjFigure* itomChildFigure = (ItomQwtDObjFigure*)childFigure;
+
+                    if (itomChildFigure->getComplexStyle() != d->m_pData->m_cmplxType)
+                    {
+                        itomChildFigure->setComplexStyle(d->m_pData->m_cmplxType);
+                    }
                 }
 
                 QList<ito::AbstractNode::ParamNamePair> excludes;
