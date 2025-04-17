@@ -431,30 +431,36 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
 
     if(ito::ITOM_API_FUNCS_GRAPH)
     {
-        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, NULL).value<QPen>();
-        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, NULL).value<QPen>(); //defines the color of the tracker
-        trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, NULL).value<QFont>();
-        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, NULL).value<QBrush>();
-        selectionPen = apiGetFigureSetting(parent(), "selectionPen", selectionPen, NULL).value<QPen>();
+        rubberBandPen = apiGetFigureSetting(parent(), "zoomRubberBandPen", rubberBandPen, nullptr).value<QPen>();
+        trackerPen = apiGetFigureSetting(parent(), "trackerPen", trackerPen, nullptr).value<QPen>(); //defines the color of the tracker
+        trackerFont = apiGetFigureSetting(parent(), "trackerFont", trackerFont, nullptr).value<QFont>();
+        trackerBg = apiGetFigureSetting(parent(), "trackerBackground", trackerBg, nullptr).value<QBrush>();
+        selectionPen = apiGetFigureSetting(parent(), "selectionPen", selectionPen, nullptr).value<QPen>();
 
-        centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", centerMarkerSize, NULL).value<QSize>();
-        centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", centerMarkerPen, NULL).value<QPen>();
-        zStackMarkerPen = apiGetFigureSetting(parent(), "zStackMarkerPen", zStackMarkerPen, NULL).value<QPen>();
-        zStackMarkerSize = apiGetFigureSetting(parent(), "zStackMarkerSize", zStackMarkerSize, NULL).value<QSize>();
+        centerMarkerSize = apiGetFigureSetting(parent(), "centerMarkerSize", centerMarkerSize, nullptr).value<QSize>();
+        centerMarkerPen = apiGetFigureSetting(parent(), "centerMarkerPen", centerMarkerPen, nullptr).value<QPen>();
+        zStackMarkerPen = apiGetFigureSetting(parent(), "zStackMarkerPen", zStackMarkerPen, nullptr).value<QPen>();
+        zStackMarkerSize = apiGetFigureSetting(parent(), "zStackMarkerSize", zStackMarkerSize, nullptr).value<QSize>();
 
         if (overwriteDesignableProperties)
         {
-            buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, NULL).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot. //designable
+            buttonSet = apiGetFigureSetting(parent(), "buttonSet", buttonSet, nullptr).value<int>(); //usually this property is only asked to inherit the buttonSet from the parent plot. //designable
 
-            titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, NULL).value<QFont>(); //designable
-            labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, NULL).value<QFont>(); //designable
-            axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, NULL).value<QFont>(); //designable
+            titleFont = apiGetFigureSetting(parent(), "titleFont", titleFont, nullptr).value<QFont>(); //designable
+            labelFont = apiGetFigureSetting(parent(), "labelFont", labelFont, nullptr).value<QFont>(); //designable
+            axisFont = apiGetFigureSetting(parent(), "axisFont", axisFont, nullptr).value<QFont>(); //designable
 
-            colorMap = apiGetFigureSetting(parent(), "defaultColorMap", colorMap, NULL).value<QString>();
+            colorMap = apiGetFigureSetting(parent(), "defaultColorMap", colorMap, nullptr).value<QString>();
+
+            if (colorMap == "")
+            {
+                colorMap = "__first__";
+            }
+
             setColorMap(colorMap);
 
-            setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, NULL).value<bool>());
-            m_pData->m_yaxisFlipped = apiGetFigureSetting(parent(), "yAxisFlipped", false, NULL).value<bool>();
+            setKeepAspectRatio(apiGetFigureSetting(parent(), "keepAspectRatio", false, nullptr).value<bool>());
+            m_pData->m_yaxisFlipped = apiGetFigureSetting(parent(), "yAxisFlipped", false, nullptr).value<bool>();
         }
 
     }
