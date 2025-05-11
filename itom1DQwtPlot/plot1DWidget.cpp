@@ -625,7 +625,7 @@ void Plot1DWidget::setButtonStyle(int style)
 {
     ItomQwtPlot::setButtonStyle(style);
 
-    if (style == 0)
+    if (style == ItomQwtDObjFigure::StyleBright)
     {
         m_pActScaleSettings->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"));
         m_pRescaleParent->setIcon(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"));

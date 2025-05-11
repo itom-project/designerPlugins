@@ -768,7 +768,7 @@ void PlotCanvas::setButtonStyle(int style)
 {
     ItomQwtPlot::setButtonStyle(style);
 
-    if (style == 0)
+    if (style == ItomQwtDObjFigure::StyleBright)
     {
         m_pActScaleSettings->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"));
         m_pActColorPalette->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorPalette.png"));
