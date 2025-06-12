@@ -611,6 +611,17 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"));
         m_pActClearShapes->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"));
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect_lt/icons/AspRatio11_lt.png"));
+
+        if (m_pActProperties)
+        {
+            m_pActProperties->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/settings_lt.png"));
+        }
+
+        if (m_pActCamParameters)
+        {
+            m_pActCamParameters->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/camParams_lt.png"));
+        }
+
         m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/zoom_to_rect_lt.png"));
         m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython_lt.png"));
 
