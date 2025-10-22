@@ -192,6 +192,8 @@ protected:
     QColor inverseColor0() const { return m_inverseColor0; }
     QColor inverseColor1() const { return m_inverseColor1; }
 
+    void setButtonStyleFromPalette();
+
     virtual void home() = 0;
     virtual void zoomRedo() const = 0;
     virtual void zoomUndo() const = 0;
