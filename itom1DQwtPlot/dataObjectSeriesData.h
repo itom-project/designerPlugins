@@ -104,7 +104,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         bool floatingPointValues() const;
 
-        virtual RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec = NULL, const QVector<QPointF>& boundsX = QVector<QPointF>());
+        virtual RetVal updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec = NULL, const QVector<QPointF>& boundsX = QVector<QPointF>(), QVector<QPointF> boundsHisto = QVector<QPointF>());
         const ito::DataObject* getDataObject() const { return m_pDataObj; }
 
         inline void setCmplxState(ItomQwtPlotEnums::ComplexType state) { m_cmplxState = state; }
@@ -145,6 +145,7 @@ class DataObjectSeriesData : public QwtSeriesData<QPointF>
 
         LineData m_d;
         const ito::DataObject* m_pDataObj;               /*!< borrowed reference, do not delete here */
+        ito::DataObject m_histData;
         ColorType m_colorState;
         bool inSamplingMode;
         int m_fast;

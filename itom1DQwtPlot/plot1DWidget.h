@@ -74,7 +74,7 @@ class Plot1DWidget : public ItomQwtPlot
 
         ito::RetVal init(bool overwriteDesignableProperties);
 
-        void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>(), const ito::DataObject* xVec = nullptr);
+        void refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds = QVector<QPointF>(), const ito::DataObject* xVec = nullptr, const QVector<QPointF> boundsHist = QVector<QPointF>());
 
         ito::RetVal updateInterval(const Qt::Axis axis, const Plot1DWidget::InternalData &data);
 

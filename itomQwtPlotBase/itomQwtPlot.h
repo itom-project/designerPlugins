@@ -75,6 +75,7 @@ public:
         stateDrawShape = 6,
         stateMarkerPicker = 7,
         stateVolumeCut = 8,
+        stateHistogram = 9,
         stateUser = 100
     };
 

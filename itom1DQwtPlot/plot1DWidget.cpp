@@ -1227,7 +1227,7 @@ void Plot1DWidget::updateLabels()
                3 values: this 1d plot is the destination for a line cut of a dataObject with > 2 dims,
                          the first bounds is the the plane index, the other two the start and end points.
 */
-void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*=NULL*/)
+void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*=NULL*/, QVector<QPointF> boundsHist)
 {
     ito::RetVal retval(ito::retOk);
     DataObjectSeriesData* seriesData = nullptr;
@@ -1377,7 +1377,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 break;
             }
         }
-        else if (bounds.size() == 0)
+        else if (bounds.size() == 0 && boundsHist.size() == 0)
         {
             m_pData->m_colorLine = ItomQwtPlotEnums::AutoColor;
 
@@ -1439,7 +1439,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
             }
         }
-        else //if there are boundaries, only plot one curve from bounds[0] to bounds[1]
+        else if (bounds.size() != 0)//if there are boundaries, only plot one curve from bounds[0] to bounds[1]
         {
             if (bounds.size() == 3)
             {
@@ -1461,6 +1461,12 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 numCurves = 1;
                 m_layerState = false;
             }
+            m_pData->m_colorLine = ItomQwtPlotEnums::AutoColor;
+        }
+        else // boundsHist.size() != 0
+        {
+            numCurves = 1;
+            m_layerState = false;
             m_pData->m_colorLine = ItomQwtPlotEnums::AutoColor;
         }
 
@@ -1609,7 +1615,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
             updateLegendItems();
 		}
 
-        if (bounds.size() == 0) //default plot
+        if (bounds.size() == 0 && boundsHist.size() == 0) //default plot
         {
             QVector<QPointF> pts(2);
             QVector<QPointF> ptsX(2);
@@ -1962,6 +1968,24 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[0]->data());
                 m_pData->m_valueLabelDObj = seriesData->getDObjValueLabel(unitLabelStyle());
                 m_pData->m_axisLabelDObj = seriesData->getDObjAxisLabel(unitLabelStyle());
+            }
+        }
+        else if (boundsHist.size() > 0) 
+        {
+            for (int n = 0; n < numCurves; n++)
+            {
+                seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
+                if (seriesData && seriesData->isDobjInit())
+                {
+                    retval += seriesData->updateDataObject(dataObj, QVector<QPointF>(), nullptr, QVector<QPointF>(), boundsHist);
+                }
+                else
+                {
+                    seriesData = new DataObjectSeriesData(1);
+                    retval += seriesData->updateDataObject(dataObj, QVector<QPointF>(), nullptr, QVector<QPointF>(), boundsHist);
+                    seriesData->setCmplxState(m_pComplexStyle);
+                    m_plotCurveItems[n]->setData(seriesData);
+                }
             }
         }
 

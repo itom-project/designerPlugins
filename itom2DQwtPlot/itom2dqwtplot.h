@@ -160,6 +160,7 @@ public:
     ito::RetVal displayVolumeCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);
     ito::RetVal displayZStackCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);
     ito::RetVal displayLineCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID = NULL);
+    ito::RetVal displayHistogram(const QVector<QPointF>& bounds, ito::uint32* childFigureUID = NULL);    
 
     ito::RetVal applyUpdate();  //!> does the real update work
 
@@ -320,6 +321,7 @@ public slots:
 
     //this can be invoked by python to trigger a lineplot
     ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
+    ito::RetVal setHistogram(const double x0, const double y0, const double x1, const double y1, const int destID = -1);
 
     void removeOverlayImage(void) { return resetOverlayImage();}
 

@@ -75,6 +75,8 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
 	m_pStackPicker(NULL),
 	m_pLineCutLine(NULL),
     m_pVolumeCutLine(NULL),
+    m_pHistogramRect(NULL),
+    m_pHistogramPicker(NULL),
 	m_isRefreshingPlot(false),
 	m_unitLabelChanged(false),
 	m_pPaletteIsChanging(false),
@@ -85,6 +87,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     m_pActValuePicker(NULL),
     m_pActLineCut(NULL),
     m_pActVolumeCut(NULL),
+    m_pActHistogram(NULL),
     m_showCenterMarker(false),
     m_pMnuLineCutMode(NULL),
     m_pActStackCut(NULL),
@@ -213,6 +216,31 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     m_pVolumeCutLine->attach(this);
     m_pVolumeCutLine->setVisible(false);
 
+    // picker for histogram area marking
+    m_pHistogramPicker = new QwtPlotPicker(
+        QwtPlot::xBottom,
+        QwtPlot::yLeft,
+        QwtPicker::CrossRubberBand,
+        QwtPicker::AlwaysOn,
+        canvas());
+    m_pHistogramPicker->setEnabled(false);
+    m_pHistogramPicker->setStateMachine(new QwtPickerDragRectMachine);
+    m_pHistogramPicker->setRubberBandPen(QPen(Qt::green));
+    m_pHistogramPicker->setTrackerPen(QPen(Qt::green));
+    // disable key movements for the picker (the marker will be moved by the key-event of this
+    // widget)
+    m_pHistogramPicker->setKeyPattern(QwtEventPattern::KeyLeft, 0);
+    m_pHistogramPicker->setKeyPattern(QwtEventPattern::KeyRight, 0);
+    m_pHistogramPicker->setKeyPattern(QwtEventPattern::KeyUp, 0);
+    m_pHistogramPicker->setKeyPattern(QwtEventPattern::KeyDown, 0);
+    connect(m_pHistogramPicker, SIGNAL(moved(const QPoint&)), SLOT(histogramMovedPx(const QPoint&)));
+    connect(m_pHistogramPicker, SIGNAL(appended(const QPoint&)), SLOT(histogramAppendedPx(const QPoint&)));
+
+    // line for line picking
+    m_pHistogramRect = new QwtPlotCurve();
+    m_pHistogramRect->attach(this);
+    m_pHistogramRect->setVisible(false);
+
     //right axis (color bar)
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
     rightAxis->setColorBarEnabled(true);
@@ -260,6 +288,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     mainTb->addAction(m_pActLineCut);
     mainTb->addAction(m_pActVolumeCut);
     mainTb->addAction(m_pActStackCut);
+    mainTb->addAction(m_pActHistogram);
     mainTb->addSeparator();
     mainTb->addAction(m_pActShapeType);
     mainTb->addAction(m_pActClearShapes);
@@ -303,6 +332,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     menuTools->addAction(m_pActLineCut);
     menuTools->addAction(m_pActVolumeCut);
     menuTools->addAction(m_pActStackCut);
+    menuTools->addAction(m_pActHistogram);
     menuTools->addSeparator();
     menuTools->addMenu(m_pMenuShapeType);
     menuTools->addAction(m_pActClearShapes);
@@ -343,6 +373,9 @@ PlotCanvas::~PlotCanvas()
     delete m_pCenterMarker;
     m_pCenterMarker = NULL;
 
+    m_pHistogramRect->detach();
+    delete m_pHistogramRect;
+    m_pHistogramRect = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -499,6 +532,10 @@ void PlotCanvas::refreshStyles(bool overwriteDesignableProperties)
     m_pVolumeCutLine->setPen(selectionPen);
     m_pVolumeCutPicker->setRubberBandPen(rubberBandPen);
     m_pVolumeCutPicker->setTrackerPen(trackerPen);
+
+    m_pHistogramPicker->setRubberBandPen(rubberBandPen);
+    m_pHistogramPicker->setTrackerPen(trackerPen);
+    m_pHistogramRect->setPen(selectionPen);
 
     m_pStackPicker->setTrackerFont(trackerFont);
     m_pStackPicker->setTrackerPen(trackerPen);
@@ -711,6 +748,13 @@ void PlotCanvas::createActions()
 //    a->setCheckable(true);
     connect(m_pMnuLineCutMode, SIGNAL(triggered(QAction*)), this, SLOT(mnuLineCutMode(QAction*)));
 
+    // m_actLineCut
+    m_pActHistogram = a = new QAction(tr("Histogram"), p);
+    a->setCheckable(true);
+    a->setObjectName("actHistogram");
+    a->setToolTip(tr("Show a histogram"));
+    connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuHistogram(bool)));
+
     //m_pOverlaySlider
     m_pOverlaySlider = new QSlider(Qt::Horizontal, p);
     m_pOverlaySlider->setMinimum(0);
@@ -778,7 +822,8 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/volumeCut.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
-
+        m_pActHistogram->setIcon(QIcon(":/itomDesignerPlugins/general/icons/histogra.png"));
+        
         QList<QAction*> dataChannels = m_pMnuDataChannel->actions();
         dataChannels[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAuto.png"));
         dataChannels[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRgba.png"));
@@ -821,6 +866,7 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/colorbar_lt.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/marker_lt.png"));
         m_pActDataChannel->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/rgba_lt.png"));
+        m_pActHistogram->setIcon(QIcon(":/itomDesignerPlugins/plot_lt/icons/histogra_lt.png"));
 
         QList<QAction*> dataChannels = m_pMnuDataChannel->actions();
         dataChannels[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAuto.png"));
@@ -1317,7 +1363,7 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
     return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
+void PlotCanvas::refreshPlot(const ito::DataObject* dObj, int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/, const QVector<QPointF> boundsHist /*=QVector<QPointF>()*/)
 {
     ito::RetVal retval;
 
@@ -2627,11 +2673,13 @@ void PlotCanvas::stateChanged(int state)
     if (m_pLineCutPicker) m_pLineCutPicker->setEnabled(state == stateLineCut);
     if (m_pVolumeCutPicker) m_pVolumeCutPicker->setEnabled(state == stateVolumeCut);
     if (m_pStackPicker) m_pStackPicker->setEnabled(state == stateStackCut);
+    if (m_pHistogramPicker) m_pHistogramPicker->setEnabled(state == stateHistogram);
 
     m_pActLineCut->setChecked(state == stateLineCut);
     m_pActVolumeCut->setChecked(state == stateVolumeCut);
     m_pActValuePicker->setChecked(state == stateValuePicker);
     m_pActStackCut->setChecked(state == stateStackCut);
+    m_pActHistogram->setChecked(state == stateHistogram);
 
     if (state != stateLineCut && state != stateStackCut && state != stateVolumeCut)
     {
@@ -2770,6 +2818,154 @@ void PlotCanvas::volumeCutMovedPx(const QPoint & pt)
     QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
     volumeCutMovedPhys(phys);
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::histogramMovedPx(const QPoint& pt)
+{
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    histogramMovedPhys(phys);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::histogramAppendedPx(const QPoint& pt)
+{
+    QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
+    histogramAppendedPhys(phys);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::histogramAppendedPhys(const QPointF& pt)
+{
+    if (state() == stateHistogram)
+    {
+        QVector<QPointF> pts;
+        pts.resize(2);
+        pts[0] = pt;
+
+        if (m_rasterData->pointValid(pts[0]))
+        {
+            m_lineCutValidStart = true;
+        }
+        else
+        {
+            // first point not valid
+            m_lineCutValidStart = false;
+        }
+
+        QwtInterval xInterval = m_rasterData->interval(Qt::XAxis);
+        if (pts[0].x() < xInterval.minValue())
+            pts[0].setX(xInterval.minValue());
+        else if (pts[0].x() > xInterval.maxValue())
+            pts[0].setX(xInterval.maxValue());
+
+        QwtInterval yInterval = m_rasterData->interval(Qt::YAxis);
+        if (pts[0].y() < yInterval.minValue())
+            pts[0].setY(yInterval.minValue());
+        else if (pts[0].y() > yInterval.maxValue())
+            pts[0].setY(yInterval.maxValue());
+
+        pts[1] = pts[0];
+
+        m_pHistogramRect->setVisible(true);
+        m_pHistogramRect->setSamples(pts);
+        QRectF testRect = m_pHistogramRect->boundingRect();
+
+        setCoordinates(pts, true);
+
+        Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+
+        // check for m_dObjPtr first otherwise crash
+        if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+        {
+            pts.insert(
+                0, 1, QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+        }
+
+        ito::uint32 childFigureUID;
+
+        p->displayHistogram(pts, &childFigureUID);
+
+        if (p->pickerWidget() && childFigureUID > 0)
+        {
+            QVector4D vec;
+            if (pts.size() == 3)
+            {
+                vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+            }
+            else
+            {
+                vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+            }
+
+            p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Rectangle, vec);
+        }
+
+        replot();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::histogramMovedPhys(const QPointF& pt)
+{
+    if (state() == stateHistogram)
+    {
+        QPointF ptAdj = pt;
+
+        QwtInterval xInterval = m_rasterData->interval(Qt::XAxis);
+        if (ptAdj.x() < xInterval.minValue())
+            ptAdj.setX(xInterval.minValue());
+        else if (ptAdj.x() > xInterval.maxValue())
+            ptAdj.setX(xInterval.maxValue());
+
+        QwtInterval yInterval = m_rasterData->interval(Qt::YAxis);
+        if (ptAdj.y() < yInterval.minValue())
+            ptAdj.setY(yInterval.minValue());
+        else if (ptAdj.y() > yInterval.maxValue())
+            ptAdj.setY(yInterval.maxValue());
+
+        QPointF pt1 = m_pHistogramRect->sample(0);
+
+        QVector<QPointF> ptsRect;
+        ptsRect << pt1 << QPointF(ptAdj.x(), pt1.y()) << ptAdj << QPointF(pt1.x(), ptAdj.y()) << pt1;
+        m_pHistogramRect->setSamples(ptsRect);
+
+        QVector<QPointF> pts;
+        pts << pt1 << ptAdj;
+
+        setCoordinates(pts, true);
+
+        Itom2dQwtPlot* p = (Itom2dQwtPlot*)parent();
+
+        if (m_dObjPtr && m_dObjPtr->getDims() > 2)
+        {
+            pts.insert(
+                0,
+                1,
+                QPointF(m_rasterData->getCurrentPlane(), m_rasterData->getCurrentPlane()));
+        }
+
+        ito::uint32 childFigureUID;
+        p->displayHistogram(pts, &childFigureUID);
+
+        if (childFigureUID > 0 && p->pickerWidget())
+        {
+            QVector4D vec;
+            if (pts.size() == 3)
+            {
+                vec = QVector4D(pts[1].x(), pts[1].y(), pts[2].x(), pts[2].y());
+            }
+            else
+            {
+                vec = QVector4D(pts[0].x(), pts[0].y(), pts[1].x(), pts[1].y());
+            }
+
+            p->pickerWidget()->updateChildPlot(childFigureUID, ito::Shape::Rectangle, vec);
+        }
+
+        replot();
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::lineCutMovedPhys(const QPointF &pt)
 {
@@ -3019,12 +3215,14 @@ void PlotCanvas::lineCutAppendedPhys(const QPointF &pt)
         replot();
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::volumeCutAppendedPx(const QPoint &pt)
 {
     QPointF phys(invTransform(QwtPlot::xBottom, pt.x()), invTransform(QwtPlot::yLeft, pt.y()));
     volumeCutAppendedPhys(phys);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
 {
@@ -3205,6 +3403,7 @@ void PlotCanvas::volumeCutMovedPhys(const QPointF &pt)
         }
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
 {
@@ -3254,7 +3453,7 @@ void PlotCanvas::volumeCutAppendedPhys(const QPointF &pt)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::removeChildPlotIndicators(bool lineChildPlot, bool zStackChildPlot, bool volumeChildPlot, bool resetState /*= false*/)
+void PlotCanvas::removeChildPlotIndicators(bool lineChildPlot, bool zStackChildPlot, bool volumeChildPlot, bool histogramChildPlot, bool resetState /*= false*/)
 {
     if (zStackChildPlot)
     {
@@ -3283,6 +3482,17 @@ void PlotCanvas::removeChildPlotIndicators(bool lineChildPlot, bool zStackChildP
         setCoordinates(QVector<QPointF>(), false);
 
         if (resetState && state() == stateVolumeCut)
+        {
+            setState(stateIdle);
+        }
+    }
+
+    if (histogramChildPlot)
+    {
+        m_pHistogramRect->setVisible(false);
+        setCoordinates(QVector<QPointF>(), false);
+
+        if (resetState && state() == stateHistogram)
         {
             setState(stateIdle);
         }
@@ -3686,6 +3896,28 @@ ito::RetVal PlotCanvas::setLinePlot(const double x0, const double y0, const doub
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal PlotCanvas::setHistogram(
+    const double x0, const double y0, const double x1, const double y1)
+{
+    if (m_pActHistogram->isCheckable() && m_pActHistogram->isEnabled())
+    {
+        m_pActHistogram->setChecked(true);
+        mnuHistogram(true);
+    }
+    else
+    {
+        return ito::RetVal(
+            ito::retError, 0, tr("Could not activate the histogram.").toLatin1().data());
+    }
+
+    histogramAppendedPhys(QPointF(x0, y0));
+    //lineCutAppendedPhys(QPointF(x0, y0));
+    //lineCutMovedPhys(QPointF(x1, y1));
+
+    return ito::retOk;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType PlotCanvas::getComplexStyle() const
 {
     if (!m_pData)
@@ -3811,6 +4043,7 @@ void PlotCanvas::mnuLineCut(bool checked)
         setState(stateIdle);
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuVolumeCut(bool checked)
 {
@@ -3823,6 +4056,7 @@ void PlotCanvas::mnuVolumeCut(bool checked)
         setState(stateIdle);
     }
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void PlotCanvas::mnuLineCutMode(QAction *action)
 {
@@ -3993,6 +4227,24 @@ void PlotCanvas::mnuStackCut(bool checked)
         setState(stateStackCut);
     }
     else if (state() == stateStackCut)
+    {
+        setState(stateIdle);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void PlotCanvas::mnuHistogram(bool checked)
+{
+    if (checked)
+    {
+        setState(stateHistogram);
+        ito::AutoInterval x = getInterval(Qt::XAxis);
+        ito::AutoInterval y = getInterval(Qt::YAxis);
+
+        histogramAppendedPhys(QPoint(x.minimum(), y.minimum()));
+        histogramMovedPhys(QPoint(x.maximum(), y.maximum()));
+    }
+    else if (state() == stateHistogram)
     {
         setState(stateIdle);
     }

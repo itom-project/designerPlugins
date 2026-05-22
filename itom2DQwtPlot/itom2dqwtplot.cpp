@@ -103,6 +103,7 @@ public:
     ChildPlotItem m_volumeCutChildPlot; /*Line cut plot in the 2D plane, spanned by the last two dimensions and displayed as 1D plot*/
     ChildPlotItem m_lineCutChildPlot;   /*Line cut plot along the first dimension (in case of >= 3 dimensions), displayed as 1D plot */
     ChildPlotItem m_zStackChildPlot;    /*Plane cut along the x/z, y/z or x-y/z direction, displayed as 2D plot*/
+    ChildPlotItem m_histogramChildPlot; /*histogram displayed as 1D plot*/
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -120,6 +121,7 @@ void Itom2dQwtPlot::constructor()
     addOutputParam(new ito::Param("zCutPoint", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for z-stack cut in 3d objects").toLatin1().data()));
     addOutputParam(new ito::Param("volumeCutBounds", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for volume cut in 3d objects").toLatin1().data()));
     addOutputParam(new ito::Param("sourceout", ito::ParamBase::DObjPtr, NULL, QObject::tr("shallow copy of input source object").toLatin1().data()));
+    addOutputParam(new ito::Param("boundsHistogram", ito::ParamBase::DoubleArray, NULL, QObject::tr("Points for histogram plot from 2d object").toLatin1().data()));
 
 
     d->m_pData = new PlotCanvas::InternalData();
@@ -1042,6 +1044,162 @@ ito::RetVal Itom2dQwtPlot::displayVolumeCut(const QVector<QPointF> &bounds, ito:
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+// possibly we can join some of the subsequent code with the one from linecut making a common base method
+ito::RetVal Itom2dQwtPlot::displayHistogram(
+    const QVector<QPointF>& bounds, ito::uint32* childFigureUID /*= NULL*/)
+{
+    if (!ito::ITOM_API_FUNCS_GRAPH)
+    {
+        return ito::RetVal(
+            ito::retError,
+            0,
+            tr("Could not spawn histogram due to missing API-handle").toLatin1().data());
+    }
+
+    ito::RetVal retval = ito::retOk;
+    QList<QString> paramNames;
+    ito::uint32 UID = 0;
+    QWidget* childPlot = NULL;
+    ito::AbstractDObjFigure* childFigure = NULL;
+
+    double* pointArr = new double[2 * bounds.size()];
+    for (int np = 0; np < bounds.size(); np++)
+    {
+        pointArr[np * 2] = bounds[np].x();
+        pointArr[np * 2 + 1] = bounds[np].y();
+    }
+
+    getOutputParam("boundsHistogram")->setVal(pointArr, 2 * bounds.size());
+
+    DELETE_AND_SET_NULL_ARRAY(pointArr);
+
+    if (d->m_histogramChildPlot.isValid())
+    {
+        // there should exist a plot
+        childPlot = d->m_histogramChildPlot.childFigure();
+        UID = d->m_histogramChildPlot.UID();
+    }
+
+    if (UID == 0 || childPlot == NULL)
+    {
+        // try to create a new plot
+        d->m_histogramChildPlot.rStates() = ChildPlotItem::StateShowPending;
+        UID = 0;
+        retval += apiGetFigure("DObjStaticLine", "", UID, &childPlot, this);
+
+        if (!retval.containsError())
+        {
+            d->m_histogramChildPlot = ChildPlotItem(UID, childPlot, ChildPlotItem::StateShowPending);
+
+            if (childPlot->inherits("ito::AbstractDObjFigure"))
+            {
+                childFigure = (ito::AbstractDObjFigure*)childPlot;
+                connect(
+                    childPlot,
+                    SIGNAL(destroyed(QObject*)),
+                    this,
+                    SLOT(childFigureDestroyed(QObject*)));
+
+                // try to active this 2d plot again -> activatePlot will then raise this 2d plot
+                // window. Then, the focus is tried to be set to the canvas to receive key-events
+                // (like H or V for horizontal or vertical lines)
+                QTimer::singleShot(0, this, SLOT(activatePlot()));
+
+                retval += moveChildPlotCloseToThis(childFigure);
+            }
+            else
+            {
+                retval += ito::RetVal(
+                    ito::retError,
+                    0,
+                    tr("the opened figure is not inherited from ito::AbstractDObjFigure")
+                        .toLatin1()
+                        .data());
+            }
+        }
+    }
+
+    if (!retval.containsError())
+    {
+        if (childFigureUID)
+        {
+            *childFigureUID = UID;
+        }
+
+        childFigure = (ito::AbstractDObjFigure*)childPlot;
+
+        if (!(d->m_histogramChildPlot.states() & ChildPlotItem::StateChannelsConnected))
+        {
+            d->m_histogramChildPlot.rStates() &= ~ChildPlotItem::StateChannelsConnected;
+
+            if (bounds.size() == 3) // its a 3D-Object
+            {
+                ((QMainWindow*)childFigure)->setWindowTitle(tr("Histogram"));
+                if (childFigure->inherits("ItomQwtDObjFigure"))
+                {
+                    ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
+                }
+
+                QList<ito::AbstractNode::ParamNamePair> excludes;
+                excludes << ParamNamePair("boundsHistogram", "boundsHistogram");
+                excludes << ParamNamePair("sourceout", "source");
+                removeAllChannelsToReceiver((ito::AbstractNode*)childFigure, excludes);
+
+                // otherwise pass the original plane and z0:z1, y0:y1, x0, x1 coordinates
+                retval += createChannel("boundsHistogram", childFigure, "boundsHistogram", false);
+                retval += createChannel("sourceout", childFigure, "source", false);
+                paramNames << "boundsHistogram" << "sourceout";
+            }
+            else
+            {
+                ((QMainWindow*)childFigure)->setWindowTitle(tr("Histogram"));
+                if (childFigure->inherits("ItomQwtDObjFigure"))
+                {
+                    ((ItomQwtDObjFigure*)childFigure)->setComplexStyle(d->m_pData->m_cmplxType);
+                }
+
+                QList<ito::AbstractNode::ParamNamePair> excludes;
+                excludes << ParamNamePair("boundsHistogram", "boundsHistogram");
+                excludes << ParamNamePair("displayed", "source");
+                removeAllChannelsToReceiver((ito::AbstractNode*)childFigure, excludes);
+
+                // otherwise simply pass on the displayed plane
+                retval += createChannel("boundsHistogram", childFigure, "boundsHistogram", false);
+                retval += createChannel("displayed", childFigure, "source", false);
+                paramNames << "boundsHistogram" << "displayed";
+            }
+
+            retval += updateChannels(paramNames);
+
+            if (d->m_zStackChildPlot.states() & ChildPlotItem::StateShowPending)
+            {
+                d->m_zStackChildPlot.rStates() &= ~ChildPlotItem::StateShowPending;
+                childFigure->setVisible(true);
+            }
+            else // we do not have a plot so we have to show it and its child of this plot
+            {
+                childFigure->show();
+            }
+        }
+        else
+        {
+            if (bounds.size() == 3) // its a 3D-Object
+            {
+                paramNames << "boundsHistogram" << "sourceout";
+            }
+            else
+            {
+                paramNames << "boundsHistogram" << "displayed";
+            }
+
+            retval += updateChannels(paramNames);
+        }
+    }
+
+    return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
 ito::RetVal Itom2dQwtPlot::displayLineCut(const QVector<QPointF> &bounds, ito::uint32 *childFigureUID /*= NULL*/)
 {
     if (!ito::ITOM_API_FUNCS_GRAPH)
@@ -1384,6 +1542,7 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
     bool lineChildPlot = (d->m_lineCutChildPlot.childFigure() == obj);
     bool zStackChildPlot = (d->m_zStackChildPlot.childFigure() == obj);
     bool volumeChildPlot = (d->m_volumeCutChildPlot.childFigure() == obj);
+    bool histogramChildPlot = (d->m_histogramChildPlot.childFigure() == obj);
 
     ito::uint32 childPlotUid = 0;
 
@@ -1405,7 +1564,13 @@ void Itom2dQwtPlot::childFigureDestroyed(QObject *obj)
         d->m_volumeCutChildPlot = ChildPlotItem(); //reset it
     }
 
-    m_pContent->removeChildPlotIndicators(lineChildPlot, zStackChildPlot, volumeChildPlot);
+    if (histogramChildPlot)
+    {
+        childPlotUid = d->m_histogramChildPlot.UID();
+        d->m_histogramChildPlot = ChildPlotItem(); // reset it
+    }
+
+    m_pContent->removeChildPlotIndicators(lineChildPlot, zStackChildPlot, volumeChildPlot, histogramChildPlot);
 
     PlotInfoPicker* pickerWid = pickerWidget();
 
@@ -1537,9 +1702,24 @@ ito::RetVal Itom2dQwtPlot::setLinePlot(const double x0, const double y0, const d
     return ito::retOk;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
+ito::RetVal Itom2dQwtPlot::setHistogram(
+    const double x0, const double y0, const double x1, const double y1, const int /*destID*/)
+{
+    if (m_pContent)
+    {
+        m_pContent->setHistogram(x0, y0, x1, y1);
+    }
+    else
+    {
+        return ito::RetVal(
+            ito::retError,
+            0,
+            tr("Set histogram coordinates failed. Widget not ready.").toLatin1().data());
+    }
 
-
-
+    return ito::retOk;
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QSharedPointer< ito::DataObject > Itom2dQwtPlot::getOverlayImage() const
@@ -1968,6 +2148,7 @@ void Itom2dQwtPlot::setBounds(QVector<QPointF> bounds)
     getInputParam("bounds")->setVal(pointArr, 2 * bounds.size());
     delete[] pointArr;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 QVector<QPointF> Itom2dQwtPlot::getBounds(void) const
 {
@@ -1985,14 +2166,17 @@ QVector<QPointF> Itom2dQwtPlot::getBounds(void) const
     }
     return boundsVec;
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 ItomQwtPlotEnums::ComplexType Itom2dQwtPlot::getComplexStyle() const
 {
 	return m_pContent->getComplexStyle();
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom2dQwtPlot::setComplexStyle(const ItomQwtPlotEnums::ComplexType &type)
 {
 	m_pContent->setComplexStyle(type);
 }
+
 //----------------------------------------------------------------------------------------------------------------------------------

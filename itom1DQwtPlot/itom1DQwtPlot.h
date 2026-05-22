@@ -50,6 +50,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     //USER (default: false): property is visible in property editor of plot
 
     Q_PROPERTY(QVector<QPointF> bounds READ getBounds WRITE setBounds RESET resetBounds DESIGNABLE false)
+    Q_PROPERTY(QVector<QPointF> boundsHist READ getBoundsHist WRITE setBoundsHist RESET resetBoundsHist DESIGNABLE false)
 
     Q_PROPERTY(QString title READ getTitle WRITE setTitle RESET resetTitle USER true)
     Q_PROPERTY(QString axisLabel READ getAxisLabel WRITE setAxisLabel RESET resetAxisLabel USER true)
@@ -250,6 +251,10 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         QVector<QPointF> getBounds(void) const;
         void setBounds(QVector<QPointF> bounds);
         void resetBounds();
+
+        QVector<QPointF> getBoundsHist(void) const;
+        void setBoundsHist(QVector<QPointF> bounds);
+        void resetBoundsHist();
 
         // deprecated, since not used. Is a no-op method now. //todo : remove if major interface change is executed.
         void enableObjectGUIElements(const int mode);

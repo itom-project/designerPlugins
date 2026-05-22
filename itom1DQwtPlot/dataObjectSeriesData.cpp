@@ -139,7 +139,7 @@ void DataObjectSeriesData::calcHash()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/, const QVector<QPointF>& boundsX)
+RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QVector<QPointF> bounds, const ito::DataObject* xVec /*= NULL*/, const QVector<QPointF>& boundsX, QVector<QPointF> boundsHisto)
 {
     Q_UNUSED(boundsX);
     Q_UNUSED(xVec);
@@ -184,190 +184,520 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
         QVector<QPointF> tmpBounds;
 
-        if (bounds.size() == 3)
+        if (boundsHisto.size() > 0)
         {
-            m_d.plane = qBound(0, (int)bounds[0].x(), dataObj->getNumPlanes() - 1);
-            tmpBounds = bounds.mid(1, 2);
-        }
-        else
-        {
+            cv::Mat roiMat;
             m_d.plane = 0;
-            tmpBounds = bounds;
-        }
-
-        if (!dataObj->get_mdata() || !(cv::Mat*)(dataObj->get_mdata()[m_d.plane])->data)
-        {
-            return ito::RetVal(ito::retError, 0, QObject::tr("cv:Mat in data object seems corrupted").toLatin1().data());
-        }
-
-        switch( tmpBounds.size() )
-        {
-        case 2: //dirX, dirY or dirXY
-            m_d.valid = true;
-            pxX1 = qRound(dataObj->getPhysToPix(dims-1, tmpBounds[0].x(), _unused));
-            pxY1 = qRound(dataObj->getPhysToPix(dims-2, tmpBounds[0].y(), _unused));
-            pxX2 = qRound(dataObj->getPhysToPix(dims-1, tmpBounds[1].x(), _unused));
-            pxY2 = qRound(dataObj->getPhysToPix(dims-2, tmpBounds[1].y(), _unused));
-
-            saturation( pxX1, 0, dataObj->getSize(dims-1)-1 );
-            saturation( pxX2, 0, dataObj->getSize(dims-1)-1 );
-            saturation( pxY1, 0, dataObj->getSize(dims-2)-1 );
-            saturation( pxY2, 0, dataObj->getSize(dims-2)-1 );
-
-            mat = (cv::Mat*)dataObj->get_mdata()[ dataObj->seekMat(m_d.plane) ]; //first plane in ROI
-
-            if ( pxX1 == pxX2 ) //pure line in y-direction
+            try
             {
-                m_d.dir = dirY;
-                if (pxY2 >= pxY1)
-                {
-                    m_d.nrPoints = 1 + pxY2 - pxY1;
-                }
-                else
-                {
-                    m_d.nrPoints = 1 + pxY1 - pxY2;
-                }
-                m_d.startPhys= dataObj->getPixToPhys(dims-2, pxY1, _unused);
-                right = dataObj->getPixToPhys(dims-2, pxY2, _unused);
-                m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
-
-                m_d.startPx.setX(pxX1);
-                m_d.startPx.setY(pxY1);
-                m_d.stepSizePx.setWidth(0);
-                m_d.stepSizePx.setHeight(1);
-
-                m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                if (pxY2 >= pxY1)
-                {
-                    m_d.matStepSize = (int)mat->step[0]; //step in y-direction (in bytes)
-                }
-                else
-                {
-                    m_d.matStepSize = -(int)mat->step[0]; //step in y-direction (in bytes)
-                }
-
-
-                description = dataObj->getAxisDescription(dims-2,_unused);
-                unit = dataObj->getAxisUnit(dims-2,_unused);
-                if (description == "")
-                {
-                    description = QObject::tr("y-axis").toLatin1().data();
-                }
-                if (unit == "")
-                {
-                    m_dObjAxisDescription = fromStdLatin1String(description);
-                    m_dObjAxisUnit = "";
-                }
-                else
-                {
-                    m_dObjAxisDescription = fromStdLatin1String(description);
-                    m_dObjAxisUnit = fromStdLatin1String(unit);
-                }
-
-                description = dataObj->getValueDescription();
-                unit = dataObj->getValueUnit();
-                if (unit == "")
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = "";
-                }
-                else
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = fromStdLatin1String(unit);
-                }
+                roiMat =
+                    (*((cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]))((cv::Rect(
+                        boundsHisto[0].x(),
+                        boundsHisto[0].y(),
+                        fabs(boundsHisto[1].x() - boundsHisto[0].x()),
+                        fabs(boundsHisto[1].y() - boundsHisto[0].y()))));
             }
-            else if ( pxY1 == pxY2 ) //pure line in x-direction
+            catch (const cv::Exception& e)
             {
-                m_d.dir = dirX;
-                if (pxX2 >= pxX1)
-                {
-                    m_d.nrPoints = 1 + pxX2 - pxX1;
-                }
-                else {
-                    m_d.nrPoints = 1 + pxX1 - pxX2;
-                }
+                // not so nice, but sometime on 'wild selections roi goes out of scope
+                return ito::RetVal(ito::retWarning, 0, "Selected ROI out of dataobject bounds");
+            }
 
-                m_d.startPhys= dataObj->getPixToPhys(dims-1, pxX1, _unused); //tmpBounds[0].y() ;
-                right = dataObj->getPixToPhys(dims-1, pxX2, _unused); //tmpBounds[1].y();
-                m_d.stepSizePhys = m_d.nrPoints > 1 ? (right - m_d.startPhys) / (float)(m_d.nrPoints-1) : 0.0;
-
-                m_d.startPx.setX(pxX1);
-                m_d.startPx.setY(pxY1);
-                m_d.stepSizePx.setWidth(1);
-                m_d.stepSizePx.setHeight(0);
-
-                m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                if (pxX2 >= pxX1)
-                {
-                    m_d.matStepSize = (int)mat->step[1]; //step in x-direction (in bytes)
-                    if (dataObj->getType() == ito::tUInt32) //since uint32 is not supported by openCV the step method returns the wrong result
-                    {
-                        m_d.matStepSize = 4;
-                    }
-                }
-                else
-                {
-                    m_d.matStepSize = -(int)mat->step[1];
-                    if (dataObj->getType() == ito::tUInt32) //since uint32 is not supported by openCV the step method returns the wrong result
-                    {
-                        m_d.matStepSize = -4;
-                    }
-                }
-
-                description = dataObj->getAxisDescription(dims-1,_unused);
-                unit = dataObj->getAxisUnit(dims-1,_unused);
-                if (description == "")
-                {
-                    description = QObject::tr("x-axis").toLatin1().data();
-                }
-                if (unit == "")
-                {
-                    m_dObjAxisDescription = fromStdLatin1String(description);
-                    m_dObjAxisUnit = "";
-                }
-                else
-                {
-                    m_dObjAxisDescription = fromStdLatin1String(description);
-                    m_dObjAxisUnit = fromStdLatin1String(unit);
-                }
-
-                description = dataObj->getValueDescription();
-                unit = dataObj->getValueUnit();
-                if (unit == "")
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = "";
-                }
-                else
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = fromStdLatin1String(unit);
-                }
+            float range[] = {0, 255}; // Upper boundary is exclusive
+            const float* histRange = {range};
+            int histSize = 256;
+            if (roiMat.type() == CV_8U)
+            {
+                histSize = 256;
+                range[1] = 255;
+            }
+            else if (roiMat.type() == CV_16U || roiMat.type() == CV_16S)
+            {
+                histSize = 65535;
+                range[1] = 65535;
             }
             else
             {
-                m_d.dir = dirXY;
+                double min, max;
+                cv::minMaxIdx(roiMat, &min, &max);
+                histSize = 4096;
+                range[0] = min;
+                range[1] = max;
+            }
+                
+            cv::Mat hist;
+            cv::calcHist(
+                &roiMat, 1, 0, cv::Mat(), hist, 1, (const int*)&histSize, &histRange, true, false);
 
-                if (m_fast)
+            m_d.valid = true;
+            m_d.dir = dirX;
+            m_d.nrPoints = histSize;
+            m_d.startPhys = range[0];
+            m_d.stepSizePhys = (range[1] - range[0]) / histSize;
+
+            m_d.startPx.setX(0);
+            m_d.startPx.setY(0);
+            m_d.stepSizePx.setWidth(1);
+            m_d.stepSizePx.setHeight(0);
+
+            m_d.matOffset = 0;
+            m_d.matStepSize = (int)hist.step[1]; // s
+
+            // doing this causes memory leaks ... 
+            m_histData = ito::DataObject(hist);
+            m_pDataObj = &m_histData;
+        }
+        else
+        {
+            if (bounds.size() == 3)
+            {
+                m_d.plane = qBound(0, (int)bounds[0].x(), dataObj->getNumPlanes() - 1);
+                tmpBounds = bounds.mid(1, 2);
+            }
+            else
+            {
+                m_d.plane = 0;
+                tmpBounds = bounds;
+            }
+
+            if (!dataObj->get_mdata() || !(cv::Mat*)(dataObj->get_mdata()[m_d.plane])->data)
+            {
+                return ito::RetVal(
+                    ito::retError,
+                    0,
+                    QObject::tr("cv:Mat in data object seems corrupted").toLatin1().data());
+            }
+
+            switch (tmpBounds.size())
+            {
+            case 2: // dirX, dirY or dirXY
+                m_d.valid = true;
+                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
+                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
+                pxX2 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[1].x(), _unused));
+                pxY2 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[1].y(), _unused));
+
+                saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+                saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+                saturation(pxY1, 0, dataObj->getSize(dims - 2) - 1);
+                saturation(pxY2, 0, dataObj->getSize(dims - 2) - 1);
+
+                mat = (cv::Mat*)
+                          dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]; // first plane in ROI
+
+                if (pxX1 == pxX2) // pure line in y-direction
                 {
-                    // simple line points calculation using Bresenham
-                    // http://de.wikipedia.org/wiki/Bresenham-Algorithmus#C-Implementierung
-
-                    int dx = abs( pxX2 - pxX1 );
-                    int incx = pxX1 <= pxX2 ? 1 : -1;
-                    int dy = abs( pxY2 - pxY1 );
-                    int incy = pxY1 <= pxY2 ? 1 : -1;
-
-                    m_d.nrPoints = 1 + std::max(dx,dy);
-
-                    m_d.startPhys = 0.0;  //there is no physical starting point for diagonal lines.
-
-                    if (m_d.nrPoints > 0)
+                    m_d.dir = dirY;
+                    if (pxY2 >= pxY1)
                     {
-                        double dxPhys = dataObj->getPixToPhys(dims-1, pxX2, _unused) - dataObj->getPixToPhys(dims-1, pxX1, _unused);
-                        double dyPhys = dataObj->getPixToPhys(dims-2, pxY2, _unused) - dataObj->getPixToPhys(dims-2, pxY1, _unused);
-                        m_d.stepSizePhys = sqrt((dxPhys * dxPhys) + (dyPhys * dyPhys)) / (m_d.nrPoints - 1);
+                        m_d.nrPoints = 1 + pxY2 - pxY1;
+                    }
+                    else
+                    {
+                        m_d.nrPoints = 1 + pxY1 - pxY2;
+                    }
+                    m_d.startPhys = dataObj->getPixToPhys(dims - 2, pxY1, _unused);
+                    right = dataObj->getPixToPhys(dims - 2, pxY2, _unused);
+                    m_d.stepSizePhys = m_d.nrPoints > 1
+                        ? (right - m_d.startPhys) / (float)(m_d.nrPoints - 1)
+                        : 0.0;
+
+                    m_d.startPx.setX(pxX1);
+                    m_d.startPx.setY(pxY1);
+                    m_d.stepSizePx.setWidth(0);
+                    m_d.stepSizePx.setHeight(1);
+
+                    m_d.matOffset = (int)mat->step[0] * pxY1 +
+                        (int)mat->step[1] *
+                            pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                    if (pxY2 >= pxY1)
+                    {
+                        m_d.matStepSize = (int)mat->step[0]; // step in y-direction (in bytes)
+                    }
+                    else
+                    {
+                        m_d.matStepSize = -(int)mat->step[0]; // step in y-direction (in bytes)
+                    }
+
+
+                    description = dataObj->getAxisDescription(dims - 2, _unused);
+                    unit = dataObj->getAxisUnit(dims - 2, _unused);
+                    if (description == "")
+                    {
+                        description = QObject::tr("y-axis").toLatin1().data();
+                    }
+                    if (unit == "")
+                    {
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = "";
+                    }
+                    else
+                    {
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = fromStdLatin1String(unit);
+                    }
+
+                    description = dataObj->getValueDescription();
+                    unit = dataObj->getValueUnit();
+                    if (unit == "")
+                    {
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = "";
+                    }
+                    else
+                    {
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = fromStdLatin1String(unit);
+                    }
+                }
+                else if (pxY1 == pxY2) // pure line in x-direction
+                {
+                    m_d.dir = dirX;
+                    if (pxX2 >= pxX1)
+                    {
+                        m_d.nrPoints = 1 + pxX2 - pxX1;
+                    }
+                    else
+                    {
+                        m_d.nrPoints = 1 + pxX1 - pxX2;
+                    }
+
+                    m_d.startPhys =
+                        dataObj->getPixToPhys(dims - 1, pxX1, _unused); // tmpBounds[0].y() ;
+                    right = dataObj->getPixToPhys(dims - 1, pxX2, _unused); // tmpBounds[1].y();
+                    m_d.stepSizePhys = m_d.nrPoints > 1
+                        ? (right - m_d.startPhys) / (float)(m_d.nrPoints - 1)
+                        : 0.0;
+
+                    m_d.startPx.setX(pxX1);
+                    m_d.startPx.setY(pxY1);
+                    m_d.stepSizePx.setWidth(1);
+                    m_d.stepSizePx.setHeight(0);
+
+                    m_d.matOffset = (int)mat->step[0] * pxY1 +
+                        (int)mat->step[1] *
+                            pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                    if (pxX2 >= pxX1)
+                    {
+                        m_d.matStepSize = (int)mat->step[1]; // step in x-direction (in bytes)
+                        if (dataObj->getType() ==
+                            ito::tUInt32) // since uint32 is not supported by openCV the step method
+                                          // returns the wrong result
+                        {
+                            m_d.matStepSize = 4;
+                        }
+                    }
+                    else
+                    {
+                        m_d.matStepSize = -(int)mat->step[1];
+                        if (dataObj->getType() ==
+                            ito::tUInt32) // since uint32 is not supported by openCV the step method
+                                          // returns the wrong result
+                        {
+                            m_d.matStepSize = -4;
+                        }
+                    }
+
+                    description = dataObj->getAxisDescription(dims - 1, _unused);
+                    unit = dataObj->getAxisUnit(dims - 1, _unused);
+                    if (description == "")
+                    {
+                        description = QObject::tr("x-axis").toLatin1().data();
+                    }
+                    if (unit == "")
+                    {
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = "";
+                    }
+                    else
+                    {
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = fromStdLatin1String(unit);
+                    }
+
+                    description = dataObj->getValueDescription();
+                    unit = dataObj->getValueUnit();
+                    if (unit == "")
+                    {
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = "";
+                    }
+                    else
+                    {
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = fromStdLatin1String(unit);
+                    }
+                }
+                else
+                {
+                    m_d.dir = dirXY;
+
+                    if (m_fast)
+                    {
+                        // simple line points calculation using Bresenham
+                        // http://de.wikipedia.org/wiki/Bresenham-Algorithmus#C-Implementierung
+
+                        int dx = abs(pxX2 - pxX1);
+                        int incx = pxX1 <= pxX2 ? 1 : -1;
+                        int dy = abs(pxY2 - pxY1);
+                        int incy = pxY1 <= pxY2 ? 1 : -1;
+
+                        m_d.nrPoints = 1 + std::max(dx, dy);
+
+                        m_d.startPhys =
+                            0.0; // there is no physical starting point for diagonal lines.
+
+                        if (m_d.nrPoints > 0)
+                        {
+                            double dxPhys = dataObj->getPixToPhys(dims - 1, pxX2, _unused) -
+                                dataObj->getPixToPhys(dims - 1, pxX1, _unused);
+                            double dyPhys = dataObj->getPixToPhys(dims - 2, pxY2, _unused) -
+                                dataObj->getPixToPhys(dims - 2, pxY1, _unused);
+                            m_d.stepSizePhys =
+                                sqrt((dxPhys * dxPhys) + (dyPhys * dyPhys)) / (m_d.nrPoints - 1);
+                        }
+                        else
+                        {
+                            m_d.stepSizePhys = 0.0;
+                        }
+
+                        m_d.startPx.setX(pxX1);
+                        m_d.startPx.setY(pxY1);
+                        m_d.stepSizePx.setWidth(incx);
+                        m_d.stepSizePx.setHeight(incy);
+
+                        m_d.matOffset = (int)mat->step[0] * pxY1 +
+                            (int)mat->step[1] *
+                                pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                        m_d.matStepSize = 0;
+
+                        int pdx, pdy, ddx, ddy, es, el;
+                        if (dx > dy)
+                        {
+                            pdx = incx;
+                            pdy = 0;
+                            ddx = incx;
+                            ddy = incy;
+                            es = dy;
+                            el = dx;
+                        }
+                        else
+                        {
+                            pdx = 0;
+                            pdy = incy;
+                            ddx = incx;
+                            ddy = incy;
+                            es = dx;
+                            el = dy;
+                        }
+
+                        int err = el / 2; // 0; /* error value e_xy */
+                        int x = 0; // pxX1;
+                        int y = 0; // pxY1;
+
+                        m_d.matSteps.resize((int)m_d.nrPoints);
+
+                        for (unsigned int n = 0; n < (unsigned int)m_d.nrPoints; n++)
+                        { /* loop */
+                            // setPixel(x,y)
+                            m_d.matSteps[n] = (int)mat->step[0] * y + (int)mat->step[1] * x;
+
+                            err -= es;
+                            if (err < 0)
+                            {
+                                err += el;
+                                x += ddx;
+                                y += ddy;
+                            }
+                            else
+                            {
+                                x += pdx;
+                                y += pdy;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //// "full" calculation of line points using interpolation values for always
+                        ///four neighbouring point
+                        // double dx = (tmpBounds[1].x() - tmpBounds[0].x());
+                        // double dy = (tmpBounds[1].y() - tmpBounds[0].y());
+                        // double sizex = dataObj->getSize(dims-1);
+                        // double sizey = dataObj->getSize(dims-2);
+
+                        // double length = sqrt((double)(dx * dx + dy * dy));
+                        // double stepx, stepy;
+                        // if (dx == 0)
+                        //{
+                        //     stepx = 0;
+                        // }
+                        // else
+                        //{
+                        //     xdirect = true;
+                        //     stepx = dx / length;
+                        // }
+
+                        // if (dy == 0)
+                        //{
+                        //     stepy = 0;
+                        // }
+                        // else
+                        //{
+                        //     ydirect = true;
+                        //     stepy = dy / length;
+                        // }
+                        // m_size = floor(length) + 1;
+
+                        // if (xdirect && ydirect)
+                        //{
+                        //     m_startPos = 0.0;
+                        //     m_physLength = sqrt((double)(xscale* xscale* dx * dx + yscale *
+                        //     yscale * dy * dy));
+                        // }
+                        // else if (ydirect)
+                        //{
+                        //     m_startPos = tmpBounds[0].y();
+                        //     m_physLength = yscale* dy ;
+                        // }
+                        // else
+                        //{
+                        //     m_startPos = tmpBounds[0].x();
+                        //     m_physLength = xscale* dx ;
+                        // }
+
+                        // m_Scaling = m_physLength / length;
+
+                        // double xsub, ysub, xpos, ypos;
+
+                        // m_plotPts.resize(m_size);
+                        // for (unsigned int n = 0; n < m_size; n++)
+                        //{
+                        //     xpos = pts[0].x() + n * stepx;
+                        //     ypos = pts[0].y() + n * stepy;
+
+                        //    if (xpos >= sizex - 1)
+                        //    {
+                        //        if (xpos >= sizex)
+                        //        {
+                        //            xpos = sizex - 1;
+                        //        }
+                        //        m_plotPts[n].rangeX[1] =  static_cast<int32>(sizex - 1);
+                        //    }
+                        //    else
+                        //    {
+                        //        m_plotPts[n].rangeX[1] =  static_cast<int32>(floor(xpos) + 1);
+                        //    }
+
+                        //    if (ypos >= sizey - 1)
+                        //    {
+                        //        if (ypos >= sizey)
+                        //        {
+                        //            ypos = sizey - 1;
+                        //        }
+                        //        m_plotPts[n].rangeY[1] =  static_cast<int32>(sizey - 1);
+                        //    }
+                        //    else
+                        //    {
+                        //        m_plotPts[n].rangeY[1] =  static_cast<int32>(floor(ypos) + 1);
+                        //    }
+
+                        //    m_plotPts[n].rangeX[0] = floor(xpos);
+                        //    m_plotPts[n].rangeY[0] = floor(ypos);
+                        //    xsub = xpos - m_plotPts[n].rangeX[0];
+                        //    ysub = ypos - m_plotPts[n].rangeY[0];
+                        //    m_plotPts[n].weights[0] = (1 - xsub) * (1 - ysub);
+                        //    m_plotPts[n].weights[1] = (1 - xsub) * ysub;
+                        //    m_plotPts[n].weights[2] = xsub * ysub;
+                        //    m_plotPts[n].weights[3] = xsub * (1 - ysub);
+                        //}
+                    }
+
+                    description = dataObj->getAxisDescription(dims - 2, _unused);
+                    unit = dataObj->getAxisUnit(dims - 2, _unused);
+                    if (unit == "")
+                        unit = "px";
+
+                    std::string descr2 = dataObj->getAxisDescription(dims - 1, _unused);
+                    std::string unit2 = dataObj->getAxisUnit(dims - 1, _unused);
+                    if (unit2 == "")
+                        unit2 = "px";
+
+                    if (description == "" && descr2 == "")
+                    {
+                        if (unit == "" && unit2 == "")
+                        {
+                            m_dObjAxisDescription = QObject::tr("x/y-axis");
+                            m_dObjAxisUnit = "";
+                        }
+                        else
+                        {
+                            m_dObjAxisDescription = QObject::tr("x/y-axis");
+                            m_dObjAxisUnit = QString("%1/%2").arg(
+                                fromStdLatin1String(unit), fromStdLatin1String(unit2));
+                        }
+                    }
+                    else
+                    {
+                        if (unit == "" && unit2 == "")
+                        {
+                            m_dObjAxisDescription = QString("%1/%2").arg(
+                                fromStdLatin1String(description), fromStdLatin1String(descr2));
+                            m_dObjAxisUnit = "";
+                        }
+                        else
+                        {
+                            m_dObjAxisDescription = QString("%1/%2").arg(
+                                fromStdLatin1String(description), fromStdLatin1String(descr2));
+                            m_dObjAxisUnit = QString("%1/%2").arg(
+                                fromStdLatin1String(unit), fromStdLatin1String(unit2));
+                        }
+                    }
+
+                    description = dataObj->getValueDescription();
+                    unit = dataObj->getValueUnit();
+                    if (unit == "")
+                    {
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = "";
+                    }
+                    else
+                    {
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = fromStdLatin1String(unit);
+                    }
+                }
+
+                break;
+            case 1: // dirZ
+                if (numHigherDimsWithSizeBiggerThan1 != 1)
+                {
+                    retval += RetVal(
+                        retError,
+                        0,
+                        "line plot in z-direction requires a dataObject with n >= 3 dimensions, "
+                        "where only one of the first n-2 dimensions has a size != 1.");
+
+                    return retval;
+                }
+                else
+                {
+                    m_d.valid = true;
+                    pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
+                    pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
+
+                    saturation(pxX1, 0, dataObj->getSize(dims - 1) - 1);
+                    saturation(pxX2, 0, dataObj->getSize(dims - 1) - 1);
+
+                    m_d.dir = dirZ;
+                    m_d.nrPoints = dataObj->getSize(idxOfFirstDimWithSizeBiggerThan1);
+                    m_d.startPhys =
+                        dataObj->getPixToPhys(idxOfFirstDimWithSizeBiggerThan1, 0, _unused);
+
+                    if (m_d.nrPoints > 1)
+                    {
+                        right = dataObj->getPixToPhys(
+                            idxOfFirstDimWithSizeBiggerThan1, m_d.nrPoints - 1, _unused);
+                        m_d.stepSizePhys = (right - m_d.startPhys) / (float)(m_d.nrPoints - 1);
                     }
                     else
                     {
@@ -376,292 +706,70 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
                     m_d.startPx.setX(pxX1);
                     m_d.startPx.setY(pxY1);
-                    m_d.stepSizePx.setWidth(incx);
-                    m_d.stepSizePx.setHeight(incy);
+                    m_d.stepSizePx.setWidth(0);
+                    m_d.stepSizePx.setHeight(0);
 
-                    m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                    m_d.matStepSize= 0 ;
+                    mat =
+                        (cv::Mat*)
+                            dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]; // first plane in ROI
+                    m_d.matOffset = (int)mat->step[0] * pxY1 +
+                        (int)mat->step[1] *
+                            pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
+                    m_d.matStepSize = 0; // step in x-direction (in bytes)
 
-                    int pdx, pdy, ddx, ddy, es, el;
-                    if (dx>dy)
+                    description =
+                        dataObj->getAxisDescription(idxOfFirstDimWithSizeBiggerThan1, _unused);
+                    unit = dataObj->getAxisUnit(idxOfFirstDimWithSizeBiggerThan1, _unused);
+
+                    if (description == "")
                     {
-                        pdx = incx;
-                        pdy = 0;
-                        ddx = incx;
-                        ddy = incy;
-                        es = dy;
-                        el = dx;
-                    }
-                    else
-                    {
-                        pdx = 0;
-                        pdy = incy;
-                        ddx = incx;
-                        ddy = incy;
-                        es = dx;
-                        el = dy;
-                    }
-
-                    int err = el / 2; //0; /* error value e_xy */
-                    int x = 0; //pxX1;
-                    int y = 0; //pxY1;
-
-                    m_d.matSteps.resize((int)m_d.nrPoints);
-
-                    for (unsigned int n = 0; n < (unsigned int)m_d.nrPoints; n++)
-                    {  /* loop */
-                        //setPixel(x,y)
-                        m_d.matSteps[n] = (int)mat->step[0] * y + (int)mat->step[1] * x;
-
-                        err -= es;
-                        if (err < 0)
+                        if (idxOfFirstDimWithSizeBiggerThan1 == dims - 3)
                         {
-                            err += el;
-                            x += ddx;
-                            y += ddy;
+                            description = QObject::tr("z-axis").toLatin1().data();
                         }
                         else
                         {
-                            x += pdx;
-                            y += pdy;
+                            description = QObject::tr("axis %1")
+                                              .arg(idxOfFirstDimWithSizeBiggerThan1)
+                                              .toLatin1()
+                                              .data();
                         }
                     }
-                }
-                else
-                {
-                    //// "full" calculation of line points using interpolation values for always four neighbouring point
-                    //double dx = (tmpBounds[1].x() - tmpBounds[0].x());
-                    //double dy = (tmpBounds[1].y() - tmpBounds[0].y());
-                    //double sizex = dataObj->getSize(dims-1);
-                    //double sizey = dataObj->getSize(dims-2);
 
-                    //double length = sqrt((double)(dx * dx + dy * dy));
-                    //double stepx, stepy;
-                    //if (dx == 0)
-                    //{
-                    //    stepx = 0;
-                    //}
-                    //else
-                    //{
-                    //    xdirect = true;
-                    //    stepx = dx / length;
-                    //}
-
-                    //if (dy == 0)
-                    //{
-                    //    stepy = 0;
-                    //}
-                    //else
-                    //{
-                    //    ydirect = true;
-                    //    stepy = dy / length;
-                    //}
-                    //m_size = floor(length) + 1;
-
-                    //if (xdirect && ydirect)
-                    //{
-                    //    m_startPos = 0.0;
-                    //    m_physLength = sqrt((double)(xscale* xscale* dx * dx + yscale * yscale * dy * dy));
-                    //}
-                    //else if (ydirect)
-                    //{
-                    //    m_startPos = tmpBounds[0].y();
-                    //    m_physLength = yscale* dy ;
-                    //}
-                    //else
-                    //{
-                    //    m_startPos = tmpBounds[0].x();
-                    //    m_physLength = xscale* dx ;
-                    //}
-
-                    //m_Scaling = m_physLength / length;
-
-                    //double xsub, ysub, xpos, ypos;
-
-                    //m_plotPts.resize(m_size);
-                    //for (unsigned int n = 0; n < m_size; n++)
-                    //{
-                    //    xpos = pts[0].x() + n * stepx;
-                    //    ypos = pts[0].y() + n * stepy;
-
-                    //    if (xpos >= sizex - 1)
-                    //    {
-                    //        if (xpos >= sizex)
-                    //        {
-                    //            xpos = sizex - 1;
-                    //        }
-                    //        m_plotPts[n].rangeX[1] =  static_cast<int32>(sizex - 1);
-                    //    }
-                    //    else
-                    //    {
-                    //        m_plotPts[n].rangeX[1] =  static_cast<int32>(floor(xpos) + 1);
-                    //    }
-
-                    //    if (ypos >= sizey - 1)
-                    //    {
-                    //        if (ypos >= sizey)
-                    //        {
-                    //            ypos = sizey - 1;
-                    //        }
-                    //        m_plotPts[n].rangeY[1] =  static_cast<int32>(sizey - 1);
-                    //    }
-                    //    else
-                    //    {
-                    //        m_plotPts[n].rangeY[1] =  static_cast<int32>(floor(ypos) + 1);
-                    //    }
-
-                    //    m_plotPts[n].rangeX[0] = floor(xpos);
-                    //    m_plotPts[n].rangeY[0] = floor(ypos);
-                    //    xsub = xpos - m_plotPts[n].rangeX[0];
-                    //    ysub = ypos - m_plotPts[n].rangeY[0];
-                    //    m_plotPts[n].weights[0] = (1 - xsub) * (1 - ysub);
-                    //    m_plotPts[n].weights[1] = (1 - xsub) * ysub;
-                    //    m_plotPts[n].weights[2] = xsub * ysub;
-                    //    m_plotPts[n].weights[3] = xsub * (1 - ysub);
-                    //}
-                }
-
-                description = dataObj->getAxisDescription(dims-2,_unused);
-                unit = dataObj->getAxisUnit(dims-2,_unused);
-                if (unit == "") unit = "px";
-
-                std::string descr2 = dataObj->getAxisDescription(dims-1, _unused);
-                std::string unit2 = dataObj->getAxisUnit(dims-1, _unused);
-                if (unit2 == "") unit2 = "px";
-
-                if (description == "" && descr2 == "")
-                {
-                    if (unit == "" && unit2 == "")
+                    if (unit == "")
                     {
-                        m_dObjAxisDescription = QObject::tr("x/y-axis");
+                        m_dObjAxisDescription = fromStdLatin1String(description);
                         m_dObjAxisUnit = "";
                     }
                     else
                     {
-                        m_dObjAxisDescription = QObject::tr("x/y-axis");
-                        m_dObjAxisUnit = QString("%1/%2").arg( fromStdLatin1String(unit), fromStdLatin1String(unit2) );
+                        m_dObjAxisDescription = fromStdLatin1String(description);
+                        m_dObjAxisUnit = fromStdLatin1String(unit);
                     }
-                }
-                else
-                {
-                    if (unit == "" && unit2 == "")
+
+                    description = dataObj->getValueDescription();
+                    unit = dataObj->getValueUnit();
+
+                    if (unit == "")
                     {
-                        m_dObjAxisDescription = QString("%1/%2").arg( fromStdLatin1String(description), fromStdLatin1String(descr2) );
-                        m_dObjAxisUnit = "";
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = "";
                     }
                     else
                     {
-                        m_dObjAxisDescription = QString("%1/%2").arg( fromStdLatin1String(description), fromStdLatin1String(descr2) );
-                        m_dObjAxisUnit = QString("%1/%2").arg( fromStdLatin1String(unit), fromStdLatin1String(unit2) );
+                        m_dObjValueDescription = fromStdLatin1String(description);
+                        m_dObjValueUnit = fromStdLatin1String(unit);
                     }
                 }
 
-                description = dataObj->getValueDescription();
-                unit = dataObj->getValueUnit();
-                if (unit == "")
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = "";
-                }
-                else
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = fromStdLatin1String(unit);
-                }
+                break;
+            default:
+                retval += RetVal(retError, 0, "bounds vector must have 1 or 2 entries");
+                break;
             }
-
-            break;
-        case 1: // dirZ
-            if (numHigherDimsWithSizeBiggerThan1 != 1)
-            {
-                retval += RetVal(
-                    retError,
-                    0,
-                    "line plot in z-direction requires a dataObject with n >= 3 dimensions, where only one of the first n-2 dimensions has a size != 1."
-                );
-
-                return retval;
-            }
-            else
-            {
-                m_d.valid = true;
-                pxX1 = qRound(dataObj->getPhysToPix(dims - 1, tmpBounds[0].x(), _unused));
-                pxY1 = qRound(dataObj->getPhysToPix(dims - 2, tmpBounds[0].y(), _unused));
-
-                saturation( pxX1, 0, dataObj->getSize(dims - 1) - 1 );
-                saturation( pxX2, 0, dataObj->getSize(dims - 1) - 1 );
-
-                m_d.dir = dirZ;
-                m_d.nrPoints = dataObj->getSize(idxOfFirstDimWithSizeBiggerThan1);
-                m_d.startPhys = dataObj->getPixToPhys(idxOfFirstDimWithSizeBiggerThan1, 0, _unused);
-
-                if (m_d.nrPoints > 1)
-                {
-                    right = dataObj->getPixToPhys(idxOfFirstDimWithSizeBiggerThan1, m_d.nrPoints - 1, _unused);
-                    m_d.stepSizePhys = (right - m_d.startPhys) / (float)(m_d.nrPoints - 1);
-                }
-                else
-                {
-                    m_d.stepSizePhys = 0.0;
-                }
-
-                m_d.startPx.setX(pxX1);
-                m_d.startPx.setY(pxY1);
-                m_d.stepSizePx.setWidth(0);
-                m_d.stepSizePx.setHeight(0);
-
-                mat = (cv::Mat*)dataObj->get_mdata()[ dataObj->seekMat(m_d.plane) ]; //first plane in ROI
-                m_d.matOffset = (int)mat->step[0] * pxY1 + (int)mat->step[1] * pxX1; //(&mat->at<char>(pxY1,pxX1) - &mat->at<char>(0,0));
-                m_d.matStepSize= 0 ; //step in x-direction (in bytes)
-
-                description = dataObj->getAxisDescription(idxOfFirstDimWithSizeBiggerThan1, _unused);
-                unit = dataObj->getAxisUnit(idxOfFirstDimWithSizeBiggerThan1, _unused);
-
-                if (description == "")
-                {
-                    if (idxOfFirstDimWithSizeBiggerThan1 == dims - 3)
-                    {
-                        description = QObject::tr("z-axis").toLatin1().data();
-                    }
-                    else
-                    {
-                        description = QObject::tr("axis %1").arg(idxOfFirstDimWithSizeBiggerThan1).toLatin1().data();
-                    }
-                }
-
-                if (unit == "")
-                {
-                    m_dObjAxisDescription = fromStdLatin1String(description);
-                    m_dObjAxisUnit = "";
-                }
-                else
-                {
-                    m_dObjAxisDescription = fromStdLatin1String(description);
-                    m_dObjAxisUnit = fromStdLatin1String(unit);
-                }
-
-                description = dataObj->getValueDescription();
-                unit = dataObj->getValueUnit();
-
-                if (unit == "")
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = "";
-                }
-                else
-                {
-                    m_dObjValueDescription = fromStdLatin1String(description);
-                    m_dObjValueUnit = fromStdLatin1String(unit);
-                }
-            }
-
-            break;
-        default:
-            retval += RetVal(retError, 0, "bounds vector must have 1 or 2 entries");
-            break;
+            m_pDataObj = dataObj;
         }
     }
-    m_pDataObj = dataObj;
 
     if (m_d.valid)
     {

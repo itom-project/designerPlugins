@@ -60,6 +60,7 @@ void Itom1DQwtPlot::constructor()
     d = new Itom1DQwtPlotPrivate();
 
     addInputParam(new ito::Param("bounds", ito::ParamBase::DoubleArray, NULL, tr("Points for line plots from 2d objects").toLatin1().data()));
+    addInputParam(new ito::Param("boundsHistogram", ito::ParamBase::DoubleArray, NULL, tr("Rectangle or points for line histogram plots from source object").toLatin1().data()));
     addInputParam(new ito::Param("xData", ito::ParamBase::DObjPtr, NULL, tr("represents the xData of the given source object").toLatin1().data()));
 
     d->m_pData = new Plot1DWidget::InternalData();
@@ -238,8 +239,6 @@ QSharedPointer< ito::DataObject > Itom1DQwtPlot::getPicker() const
     return QSharedPointer< ito::DataObject >(new ito::DataObject());
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------------------
 void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle &style)
 {
@@ -259,6 +258,7 @@ void Itom1DQwtPlot::setUnitLabelStyle(const ito::AbstractFigure::UnitLabelStyle 
 ito::RetVal Itom1DQwtPlot::applyUpdate()
 {
     QVector<QPointF> bounds = getBounds();
+    QVector<QPointF> boundsHist = getBoundsHist();
 
     ito::Param *sourceParam = getInputParam("source");
 
@@ -276,7 +276,7 @@ ito::RetVal Itom1DQwtPlot::applyUpdate()
             m_pContent->m_hasParentForRescale |= (dataChannel && dataChannel->getSender());
         }
 
-        m_pContent->refreshPlot(sourceParam->getVal<const ito::DataObject*>(), bounds, getInputParam("xData")->getVal<const ito::DataObject*>());
+        m_pContent->refreshPlot(sourceParam->getVal<const ito::DataObject*>(), bounds, getInputParam("xData")->getVal<const ito::DataObject*>(), boundsHist);
     }
 
     return ito::retOk;
@@ -327,6 +327,47 @@ void Itom1DQwtPlot::resetBounds()
     if (getInputParam("bounds")->getLen() > 0)
     {
         getInputParam("bounds")->setVal<double*>(NULL, 0);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::setBoundsHist(QVector<QPointF> bounds)
+{
+    double* pointArr = new double[2 * bounds.size()];
+    for (int np = 0; np < bounds.size(); np++)
+    {
+        pointArr[np * 2] = bounds[np].x();
+        pointArr[np * 2 + 1] = bounds[np].y();
+    }
+    getInputParam("boundsHistogram")->setVal<double*>(pointArr, 2 * bounds.size());
+    delete[] pointArr;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+QVector<QPointF> Itom1DQwtPlot::getBoundsHist(void) const
+{
+    int numPts = getInputParam("boundsHistogram")->getLen();
+    QVector<QPointF> boundsVec;
+
+    if (numPts > 0)
+    {
+        const double* ptsDblVec = getInputParam("boundsHistogram")->getVal<const double*>();
+        boundsVec.reserve(numPts / 2);
+
+        for (int n = 0; n < numPts / 2; n++)
+        {
+            boundsVec.append(QPointF(ptsDblVec[n * 2], ptsDblVec[n * 2 + 1]));
+        }
+    }
+    return boundsVec;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+void Itom1DQwtPlot::resetBoundsHist()
+{
+    if (getInputParam("boundsHistogram")->getLen() > 0)
+    {
+        getInputParam("boundsHistogram")->setVal<double*>(NULL, 0);
     }
 }
 
@@ -969,6 +1010,7 @@ QVector<int> Itom1DQwtPlot::getPickerPixel() const
     if (!m_pContent)
     {
         emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initialized."), 12000 );
+        return QVector<int>();
     }
     return m_pContent->getPickerPixel();
 }
@@ -979,6 +1021,7 @@ QVector<float> Itom1DQwtPlot::getPickerPhys() const
     if (!m_pContent)
     {
         emit m_pContent->statusBarMessage(tr("Get picker failed, canvas handle not initialized."), 12000 );
+        return QVector<float>();
     }
     return m_pContent->getPickerPhys();
 }

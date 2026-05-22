@@ -79,7 +79,7 @@ class PlotCanvas : public ItomQwtPlot
         ~PlotCanvas();
 
         ito::RetVal init(bool overwriteDesignableProperties);
-        void refreshPlot(const ito::DataObject *dObj, int plane = -1, const QVector<QPointF> bounds = QVector<QPointF>());
+        void refreshPlot(const ito::DataObject* dObj, int plane = -1, const QVector<QPointF> bounds = QVector<QPointF>(), const QVector <QPointF> boundsHist = QVector <QPointF>());
 
         void changePlane(int plane);
         int getCurrentPlane();
@@ -88,7 +88,7 @@ class PlotCanvas : public ItomQwtPlot
 
         virtual void setButtonStyle(int style);
 
-        void removeChildPlotIndicators(bool lineChildPlot, bool zStackChildPlot, bool volumeChildPlot, bool resetState = false);
+        void removeChildPlotIndicators(bool lineChildPlot, bool zStackChildPlot, bool volumeChildPlot, bool histogramChildPlot, bool resetState = false);
 
         ito::AutoInterval getInterval(Qt::Axis axis) const;
         void setInterval(Qt::Axis axis, const ito::AutoInterval &interval);
@@ -115,6 +115,7 @@ class PlotCanvas : public ItomQwtPlot
         void setContourLineWidth(const float &width);
 
         ito::RetVal setLinePlot(const double x0, const double y0, const double x1, const double y1);
+        ito::RetVal setHistogram(const double x0, const double y0, const double x1, const double y1);
 
 		void setValueAxisScaleEngine(const ItomQwtPlotEnums::ScaleEngine &scaleEngine);
 
@@ -158,6 +159,9 @@ class PlotCanvas : public ItomQwtPlot
         void volumeCutAppendedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
         void volumeCutMovedPhys(const QPointF &pt); //pt is in axes coordinates (physical coordinates)
 
+        void histogramMovedPhys(const QPointF& pt); // pt is in axes coordinates (physical coordinates)
+        void histogramAppendedPhys(const QPointF& pt); // pt is in axes coordinates (physical coordinates)
+
 
     private:
         enum Direction { dirX = 0, dirY = 1, dirZ = 2, dirXY = 3, inPlane = 4 };
@@ -176,6 +180,9 @@ class PlotCanvas : public ItomQwtPlot
         QwtPlotCurve *m_pLineCutLine;
         QwtPlotPicker *m_pVolumeCutPicker;
         QwtPlotCurve *m_pVolumeCutLine;
+        QwtPlotPicker* m_pHistogramPicker;
+        QwtPlotCurve* m_pHistogramRect;
+        //QwtPlotCurve* m_pHistogramRect;
         ValuePicker2D *m_pValuePicker;
         ItomPlotPicker *m_pStackPicker;
         QwtPlotMarker *m_pStackCutMarker;
@@ -241,7 +248,7 @@ class PlotCanvas : public ItomQwtPlot
         QAction* m_pActCntrMarker; //
         QSlider* m_pOverlaySlider;
         QWidgetAction *m_pActOverlaySlider;
-
+        QAction* m_pActHistogram;
 
 
     signals:
@@ -255,6 +262,8 @@ class PlotCanvas : public ItomQwtPlot
         void lineCutAppendedPx(const QPoint &pt); //pt is in canvas coordinates (pixel)
         void volumeCutMovedPx(const  QPoint &pt); //pt is in canvas coordinates (pixel)
         void volumeCutAppendedPx(const QPoint &pt); //pt is in canvas coordinates (pixel)
+        void histogramMovedPx(const QPoint& pt); // pt is in canvas coordinates (pixel)
+        void histogramAppendedPx(const QPoint& pt); // pt is in canvas coordinates (pixel)
 
         void mnuScaleSettings();
         void mnuCmplxSwitch(QAction*);
@@ -271,6 +280,7 @@ class PlotCanvas : public ItomQwtPlot
         void mnuOverlaySliderChanged(int value);
         void mnuCenterMarker(bool checked);
         void mnuSetGrid(QAction *action);
+        void mnuHistogram(bool checked);
 
 };
 
