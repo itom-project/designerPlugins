@@ -748,7 +748,7 @@ void PlotCanvas::createActions()
 //    a->setCheckable(true);
     connect(m_pMnuLineCutMode, SIGNAL(triggered(QAction*)), this, SLOT(mnuLineCutMode(QAction*)));
 
-    // m_actLineCut
+    // m_pActHistogram
     m_pActHistogram = a = new QAction(tr("Histogram"), p);
     a->setCheckable(true);
     a->setObjectName("actHistogram");
@@ -822,8 +822,8 @@ void PlotCanvas::setButtonStyle(int style)
         m_pActVolumeCut->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/volumeCut.png"));
         m_pActToggleColorBar->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorbar.png"));
         m_pActValuePicker->setIcon(QIcon(":/itomDesignerPlugins/general/icons/crosshairs.png"));
-        m_pActHistogram->setIcon(QIcon(":/itomDesignerPlugins/general/icons/histogra.png"));
-        
+        m_pActHistogram->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/histogra.png"));
+
         QList<QAction*> dataChannels = m_pMnuDataChannel->actions();
         dataChannels[0]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelAuto.png"));
         dataChannels[1]->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/colorChannelRgba.png"));
