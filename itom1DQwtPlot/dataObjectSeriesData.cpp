@@ -186,66 +186,142 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 
         if (boundsHisto.size() > 0)
         {
-            cv::Mat roiMat;
-            m_d.plane = 0;
-            try
-            {
-                roiMat =
-                    (*((cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]))((cv::Rect(
-                        boundsHisto[0].x(),
-                        boundsHisto[0].y(),
-                        fabs(boundsHisto[1].x() - boundsHisto[0].x()),
-                        fabs(boundsHisto[1].y() - boundsHisto[0].y()))));
-            }
-            catch (const cv::Exception& e)
-            {
-                // not so nice, but sometime on 'wild selections roi goes out of scope
-                return ito::RetVal(ito::retWarning, 0, "Selected ROI out of dataobject bounds");
-            }
+            float startx = cv::min(boundsHisto[0].x(), boundsHisto[1].x());
+            float starty = cv::min(boundsHisto[0].y(), boundsHisto[1].y());
+            float width = fabs(boundsHisto[1].x() - boundsHisto[0].x());
+            float height = fabs(boundsHisto[1].y() - boundsHisto[0].y());
 
-            float range[] = {0, 255}; // Upper boundary is exclusive
-            const float* histRange = {range};
-            int histSize = 256;
-            if (roiMat.type() == CV_8U)
+            if (width > 0 && height > 0)
             {
-                histSize = 256;
-                range[1] = 255;
+                cv::Mat roiMat;
+                m_d.plane = 0;
+                try
+                {
+                    if (dataObj->getType() == ito::tComplex64 || dataObj->getType() == ito::tComplex128)
+                    {
+                        switch (m_cmplxState)
+                        {
+                        default:
+                        case ItomQwtPlotEnums::CmplxAbs:
+                            roiMat =
+                                (*((cv::Mat*)(abs(*dataObj)).get_mdata()[dataObj->seekMat(m_d.plane)]))(
+                                    (cv::Rect(startx, starty, width, height)));
+                            break;
+                        case ItomQwtPlotEnums::CmplxReal:
+                            roiMat = abs((
+                                *((cv::Mat*)(real(*dataObj)).get_mdata()[dataObj->seekMat(m_d.plane)]))(
+                                (cv::Rect(startx, starty, width, height))));
+                            break;
+                        case ItomQwtPlotEnums::CmplxImag:
+                            roiMat = abs((
+                                *((cv::Mat*)(imag(*dataObj)).get_mdata()[dataObj->seekMat(m_d.plane)]))(
+                                (cv::Rect(startx, starty, width, height))));
+                            break;
+                        case ItomQwtPlotEnums::CmplxArg:
+                            roiMat =
+                                (*((cv::Mat*)(arg(*dataObj)).get_mdata()[dataObj->seekMat(m_d.plane)]))(
+                                    (cv::Rect(startx, starty, width, height)));
+                            break;
+                        }
+                    }
+                    else if (dataObj->getType() == ito::tRGBA32)
+                    {
+                        cv::Mat tmpMat;
+                        switch (m_colorState)
+                        {
+                            default:
+                            case grayColor:
+                                roiMat = (*((cv::Mat*)(dataObj->toGray().
+                                                get_mdata())[dataObj->seekMat(m_d.plane)]))(
+                                    (cv::Rect(startx, starty, width, height)));
+                                break;
+                            case blueColor:
+                                tmpMat =
+                                    (*((cv::Mat*)(dataObj->get_mdata())[dataObj->seekMat(
+                                        m_d.plane)]))((cv::Rect(startx, starty, width, height)));
+                                cv::extractChannel(tmpMat, roiMat, 0);
+                                break;
+                            case greenColor:
+                                tmpMat = (*((cv::Mat*)(dataObj->get_mdata())[dataObj->seekMat(
+                                    m_d.plane)]))((cv::Rect(startx, starty, width, height)));
+                                cv::extractChannel(tmpMat, roiMat, 1);
+                                break;
+                            case redColor:
+                                tmpMat = (*((cv::Mat*)(dataObj->get_mdata())[dataObj->seekMat(
+                                    m_d.plane)]))((cv::Rect(startx, starty, width, height)));
+                                cv::extractChannel(tmpMat, roiMat, 2);
+                                break;
+                            case alphaColor:
+                                tmpMat = (*((cv::Mat*)(dataObj->get_mdata())[dataObj->seekMat(
+                                    m_d.plane)]))((cv::Rect(startx, starty, width, height)));
+                                cv::extractChannel(tmpMat, roiMat, 3);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        roiMat = (*((cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]))(
+                            (cv::Rect(startx, starty, width, height)));
+                    }
+
+                    // roiMat =
+                    //     (*((cv::Mat*)dataObj->get_mdata()[dataObj->seekMat(m_d.plane)]))((cv::Rect(
+                    //         startx, starty, width, height)));
+                }
+                catch (const cv::Exception& e)
+                {
+                    // std::cout << boundsHisto[0].x() << " " << boundsHisto[0].y() << " "
+                    //           << boundsHisto[1].x() << " " << boundsHisto[1].y() << "\n";
+                    // qDebug() << boundsHisto[0].x() << " " << boundsHisto[0].y() << " "
+                    //          << boundsHisto[1].x() << " " << boundsHisto[1].y();
+                    //  not so nice, but sometime on 'wild selections roi goes out of scope
+                    return ito::RetVal(ito::retWarning, 0, "Selected ROI out of dataobject bounds");
+                }
+
+                float range[] = {0, 256}; // Upper boundary is exclusive
+                const float* histRange = {range};
+                int histSize = 256;
+                if (roiMat.type() == CV_8U)
+                {
+                    histSize = 256;
+                    range[1] = 256;
+                }
+                else if (roiMat.type() == CV_16U || roiMat.type() == CV_16S)
+                {
+                    histSize = 65536;
+                    range[1] = 65536;
+                }
+                else
+                {
+                    double min, max;
+                    cv::minMaxIdx(roiMat, &min, &max);
+                    histSize = 4096;
+                    range[0] = min;
+                    range[1] = max + (max - min) / histSize;
+                }
+
+                cv::Mat hist;
+                cv::calcHist(
+                    &roiMat, 1, 0, cv::Mat(), hist, 1, (const int*)&histSize, &histRange, true, false);
+
+                m_d.valid = true;
+                m_d.dir = dirX;
+                m_d.nrPoints = histSize;
+                m_d.startPhys = range[0];
+                m_d.stepSizePhys = (range[1] - range[0]) / histSize;
+
+                m_d.startPx.setX(0);
+                m_d.startPx.setY(0);
+                m_d.stepSizePx.setWidth(1);
+                m_d.stepSizePx.setHeight(0);
+
+                m_d.matOffset = 0;
+                m_d.matStepSize = (int)hist.step[1]; // s
+
+                // doing this causes memory leaks ...
+                m_histData = ito::DataObject(hist);
+                m_pDataObj = &m_histData;
             }
-            else if (roiMat.type() == CV_16U || roiMat.type() == CV_16S)
-            {
-                histSize = 65535;
-                range[1] = 65535;
-            }
-            else
-            {
-                double min, max;
-                cv::minMaxIdx(roiMat, &min, &max);
-                histSize = 4096;
-                range[0] = min;
-                range[1] = max;
-            }
-                
-            cv::Mat hist;
-            cv::calcHist(
-                &roiMat, 1, 0, cv::Mat(), hist, 1, (const int*)&histSize, &histRange, true, false);
-
-            m_d.valid = true;
-            m_d.dir = dirX;
-            m_d.nrPoints = histSize;
-            m_d.startPhys = range[0];
-            m_d.stepSizePhys = (range[1] - range[0]) / histSize;
-
-            m_d.startPx.setX(0);
-            m_d.startPx.setY(0);
-            m_d.stepSizePx.setWidth(1);
-            m_d.stepSizePx.setHeight(0);
-
-            m_d.matOffset = 0;
-            m_d.matStepSize = (int)hist.step[1]; // s
-
-            // doing this causes memory leaks ... 
-            m_histData = ito::DataObject(hist);
-            m_pDataObj = &m_histData;
         }
         else
         {
