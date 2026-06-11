@@ -32,7 +32,7 @@
 <context>
     <name>EvaluateGeometricsFigure</name>
     <message>
-        <location filename="../evaluateGeometrics.cpp" line="+61"/>
+        <location filename="../evaluateGeometrics.cpp" line="+62"/>
         <location line="+217"/>
         <source>table</source>
         <translation>Tabelle</translation>
@@ -204,7 +204,7 @@
     <message>
         <location line="+852"/>
         <location line="+73"/>
-        <location line="+146"/>
+        <location line="+147"/>
         <source>could not write csv-data to file %1</source>
         <translation>Fehler beim Schreiben der CSV-Daten nach &apos;%1&apos;</translation>
     </message>
@@ -217,7 +217,7 @@
         <translation>Betrechne</translation>
     </message>
     <message>
-        <location filename="../evaluateGeometricsPlugin.cpp" line="+44"/>
+        <location filename="../evaluateGeometricsPlugin.cpp" line="+45"/>
         <source>itom measurement widget</source>
         <translation>itom Mess-Widget</translation>
     </message>
@@ -225,11 +225,6 @@
         <location line="+1"/>
         <source>The evaluate geometrics plugin can be used to evaluate geometric parameters of shapes drawn in itom plots.</source>
         <translation type="unfinished">Dieses Plugin kann zum Auswerten geometrischer Parameter von Formen, in itom-Plots gezeichnet, genutzt werden.</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>LGPL 2.0</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../plotTreeWidget.h" line="+91"/>

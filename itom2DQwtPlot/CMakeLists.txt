@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.12...3.24)
-
+cmake_minimum_required(VERSION 3.12...3.29)
 set(target_name itom2dQwtPlot)
 
 #this is to automatically detect the SDK subfolder of the itom build directory.
@@ -68,7 +67,8 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/valuePicker2d.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/plotCanvas.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_UI
@@ -94,7 +94,10 @@ set(DESIGNER_HEADERS_COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/itom2dqwtplotenums.h
 )
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
+
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

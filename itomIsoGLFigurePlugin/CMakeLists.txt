@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.12...3.24)
-
+cmake_minimum_required(VERSION 3.12...3.29)
 set(target_name itomIsoGLFigurePlugin)
 
 #this is to automatically detect the SDK subfolder of the itom build directory.
@@ -96,7 +95,8 @@ if(OPENGL_FOUND)
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigure.h
         ${CMAKE_CURRENT_SOURCE_DIR}/itomIsoGLFigurePlugin.h
         ${CMAKE_CURRENT_SOURCE_DIR}/plotIsoGLWidget.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+        ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+        ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
     )
 
     set(DESIGNER_UI
@@ -121,10 +121,13 @@ if(OPENGL_FOUND)
         #list(APPEND DESIGNER_HEADERS ${3DCONNEXION_LIBRARIES}/designerPluginLibraryVersion.rc)
     endif(3DCONNEXION_FOUND)
 
-    #If you want to use automatical metadata for dlls under windows use the following if-case.
+    #If you want to use automatically metadata for dlls under windows use the following if-case.
     if(MSVC)
         list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
     endif()
+
+    #Define Version in pluginVersion.h
+    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
     add_library(${target_name} SHARED ${DESIGNER_SOURCES} ${DESIGNER_HEADERS} ${DESIGNER_UI} ${DESIGNER_RCC})
 

@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.12...3.24)
-
+cmake_minimum_required(VERSION 3.12...3.29)
 set(target_name motorController)
 
 #this is to automatically detect the SDK subfolder of the itom build directory.
@@ -57,8 +56,12 @@ set(DESIGNER_HEADERS
     ${ITOM_SDK_INCLUDE_DIR}/common/sharedStructures.h
     ${CMAKE_CURRENT_SOURCE_DIR}/motorController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/motorControllerfactory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
+
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
 
 set(DESIGNER_UI
 #    ${CMAKE_CURRENT_SOURCE_DIR}/dialog2DScale.ui
@@ -81,7 +84,7 @@ if(3DCONNEXION_FOUND)
     #list(APPEND DESIGNER_HEADERS ${3DCONNEXION_LIBRARIES}/designerPluginLibraryVersion.rc)
 endif(3DCONNEXION_FOUND)
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

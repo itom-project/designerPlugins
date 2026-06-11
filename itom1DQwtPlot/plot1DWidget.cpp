@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2023, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2023, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -630,7 +630,7 @@ void Plot1DWidget::setButtonStyle(int style)
 {
     ItomQwtPlot::setButtonStyle(style);
 
-    if (style == 0)
+    if (style == ItomQwtDObjFigure::StyleBright)
     {
         m_pActScaleSettings->setIcon(QIcon(":/itomDesignerPlugins/plot/icons/autoscal.png"));
         m_pRescaleParent->setIcon(QIcon(":/itom1DQwtFigurePlugin/icons/parentScale.png"));
@@ -1044,7 +1044,7 @@ void Plot1DWidget::setLegendTitles(const QStringList &legends, const ito::DataOb
             {
                 m_legendTitles.append(QString(tag.getVal_ToString().data()));
             }
-            else // plots with empty tags: curce 0, curve 1, ...
+            else // plots with empty tags: curve 0, curve 1, ...
             {
                 m_legendTitles.append(tr("curve %1").arg(index));
             }
@@ -1494,7 +1494,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
 					dObjCurve = new QwtPlotCurveDataObject(QString::fromLatin1(tag.getVal_ToString().data()));
                     curveNames.append(QString(tag.getVal_ToString().data()));
 				}
-				else // plots with empty tags: curce 0, curve 1, ...
+				else // plots with empty tags: curve 0, curve 1, ...
 				{
 					dObjCurve = new QwtPlotCurveDataObject(tr("curve %1").arg(index+legendOffset));
                     curveNames.append(tr("curve %1").arg(index + legendOffset));
@@ -1577,7 +1577,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
         }
 
 
-		// re-use old legend titles entries, if no new curves have been appended
+		// reuse old legend titles entries, if no new curves have been appended
         // (e.g. important if 'the' same shape of object is only updated via resetting its source property
 		for (int i = curveNames.size(); i < std::min(numCurves, (int)m_legendTitles.size()); ++i)
 		{
@@ -1596,7 +1596,7 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     m_plotCurveItems[i]->setTitle(QString::fromLatin1(tag.getVal_ToString().data()));
                     curveNames[i] = QString(tag.getVal_ToString().data());
                 }
-                else // plots with empty tags: curce 0, curve 1, ...
+                else // plots with empty tags: curve 0, curve 1, ...
                 {
                     m_plotCurveItems[i]->setTitle(tr("curve %1").arg(i + legendOffset));
                     curveNames[i] = QString(tr("curve %1").arg(i + legendOffset));
@@ -1894,15 +1894,16 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 }
                 if (seriesData && seriesData->isDobjInit())
                 {
-                    seriesData->updateDataObject(dataObj, tmpBounds);
+                    retval += seriesData->updateDataObject(dataObj, tmpBounds);
                 }
                 else
                 {
                     seriesData = new DataObjectSeriesData(1);
-                    seriesData->updateDataObject(dataObj, tmpBounds);
+                    retval += seriesData->updateDataObject(dataObj, tmpBounds);
                     seriesData->setCmplxState(m_pComplexStyle);
                     m_plotCurveItems[n]->setData(seriesData);
                 }
+
                 if (m_pData->m_dataType == ito::tRGBA32)
                 {
                     if (m_pData->m_colorLine == ItomQwtPlotEnums::Gray)
@@ -1917,6 +1918,11 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                     {
                         seriesData->setColorState(n == 3 ? 4 : n);
                     }
+                }
+
+                if (retval.containsWarningOrError())
+                {
+                    emit statusBarMessage(QLatin1String(retval.errorMessage()), 5000);
                 }
             }
 
@@ -1934,14 +1940,19 @@ void Plot1DWidget::refreshPlot(const ito::DataObject* dataObj, QVector<QPointF> 
                 seriesData = static_cast<DataObjectSeriesData*>(m_plotCurveItems[n]->data());
                 if (seriesData && seriesData->isDobjInit())
                 {
-                    seriesData->updateDataObject(dataObj, bounds);
+                    retval += seriesData->updateDataObject(dataObj, bounds);
                 }
                 else
                 {
                     seriesData = new DataObjectSeriesData(1);
-                    seriesData->updateDataObject(dataObj, bounds);
+                    retval += seriesData->updateDataObject(dataObj, bounds);
                     seriesData->setCmplxState(m_pComplexStyle);
                     m_plotCurveItems[n]->setData(seriesData);
+                }
+
+                if (retval.containsWarningOrError())
+                {
+                    emit statusBarMessage(QLatin1String(retval.errorMessage()), 5000);
                 }
 
                 if (m_pData->m_dataType == ito::tRGBA32)
@@ -2224,7 +2235,7 @@ ito::RetVal Plot1DWidget::validateXData(const ito::DataObject* dataObj, const it
                 }
                 ++prependOneDimsX;
             }
-            if (dimsX == 0) //dataObject is empty set to missmatch to remove xVec
+            if (dimsX == 0) //dataObject is empty set to mismatch to remove xVec
             {
                 //xVec = NULL; // if XVec is set to None the dataObject will have no dimensions
                 m_pData->m_axisState = m_pData->m_axisState | ItomQwtPlotEnums::mismatch;

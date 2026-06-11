@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -116,7 +116,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
 
     Q_CLASSINFO("prop://fillCurve", "fill curve below / above or according to baseline.")
     Q_CLASSINFO("prop://curveFillColor", "the fill color for the curve, invalid color leads to line color selection.")
-    Q_CLASSINFO("prop://curveFillAlpha", "set the alpha value for the curve fill color seperatly.")
+    Q_CLASSINFO("prop://curveFillAlpha", "set the alpha value for the curve fill color separately.")
 
     Q_CLASSINFO("prop://lineSymbol", "Get / Set the current line symbol type")
     Q_CLASSINFO("prop://lineSymbolSize", "Get / Set the current line symbol size")
@@ -143,7 +143,7 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
     Q_CLASSINFO("prop://axisScale", "linear or logarithmic scale (various bases) can be chosen for the horizontal axis (x-axis). Please consider, that a logarithmic scale can only display values > 1e-100.")
 
     Q_CLASSINFO("prop://antiAliased", "True, if all curves should be plot with an anti-aliased render mode (slower) or False if not (faster).")
-    Q_CLASSINFO("prop://xData", "DataObject representing the xData of the plot. Expect a two dimensional dataObject with a (n x m) or (1 x m) shape for an (n x m) source object with n < m. For n > m a shape of (n x 1) or (n x m) is exspected.")
+    Q_CLASSINFO("prop://xData", "DataObject representing the xData of the plot. Expects a two dimensional dataObject with a (n x m) or (1 x m) shape for an (n x m) source object with n < m. For n > m a shape of (n x 1) or (n x m) is expected.")
 
     Q_CLASSINFO("slot://setPicker", "Set plot pickers to a specific curve either in physical (axis) or in pixel coordinates.\n"
     "\n"

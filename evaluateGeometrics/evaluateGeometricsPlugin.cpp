@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -27,6 +27,7 @@
 
 #include <QtCore/QtPlugin>
 #include "evaluateGeometrics.h"
+#include "gitVersion.h"
 
 /*!
  * \file evaluateGeometricsPlugin.cpp
@@ -43,9 +44,14 @@ EvaluateGeometricsPlugin::EvaluateGeometricsPlugin(QObject *parent)
 
     m_description = QObject::tr("itom measurement widget");
     m_detaildescription = QObject::tr("The evaluate geometrics plugin can be used to evaluate geometric parameters of shapes drawn in itom plots.");
-    m_author = "Christian Kohler and Wolfram Lyda, twip OS";
-    m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
-    m_license = QObject::tr("LGPL 2.0");
+    m_author = PLUGIN_AUTHOR;
+    m_version = PLUGIN_VERSION;
+    m_minItomVer = PLUGIN_MIN_ITOM_VERSION;
+    m_maxItomVer = PLUGIN_MAX_ITOM_VERSION;
+    m_license = QObject::tr(PLUGIN_LICENCE);
+    m_aboutThis = QObject::tr(GITVERSION);
+
+
 
     initialized = false;
 }

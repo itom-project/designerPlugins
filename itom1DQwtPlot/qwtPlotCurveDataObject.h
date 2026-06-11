@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -22,8 +22,8 @@
 
 /* **********************************************************************
 
-   The code form this file is based on / partially copied from / derived 
-   from the code of qwt_plot_curve.cpp / qwt_plot_curve.h found 
+   The code form this file is based on / partially copied from / derived
+   from the code of qwt_plot_curve.cpp / qwt_plot_curve.h found
    in the QWT-Framework
 
      * Qwt Widget Library

@@ -21,7 +21,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
@@ -62,10 +62,10 @@ class LineStyle
         LineStyle(int width, int color, lStyle style = solid) : m_lineWidth(width), m_lineColor(color), m_lineStyle(style) {}
         ~LineStyle() {}
 
-        //! Get the lineStyle accoring to the enum lStyle
+        //! Get the lineStyle occurring to the enum lStyle
         inline lStyle getLineStyle() { return m_lineStyle; }
 
-        //! Set the lineStyle accoring to the enum lStyle. Returns -1 if failed.
+        //! Set the lineStyle occurring to the enum lStyle. Returns -1 if failed.
         inline int setLineStyle(lStyle lineStyle) { m_lineStyle = lineStyle; return 0; }
 
         //! Get the width as a signed integer
@@ -91,7 +91,7 @@ class LineStyle
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-//! A class defining different font types, which can differ in bold, italic, regular, color, size and font familiy
+//! A class defining different font types, which can differ in bold, italic, regular, color, size and font family
 class FontStyle
 {
     public:
@@ -213,7 +213,7 @@ class Marker
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------
-//! A class defining the appearence of the color bar
+//! A class defining the appearance of the color bar
 class ColorBar : protected Scaling, protected LineStyle, protected FontStyle
 {
     public:

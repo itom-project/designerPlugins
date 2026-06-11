@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -24,15 +24,15 @@
 
 #include "CustomTypes.h"
 
-#include "pcl/point_cloud.h"
+#include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/eigen.h>
 #include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/filters/filter.h>
-#include "pcl/search/kdtree.h"
-#include "pcl/octree/octree.h"
-#include "pcl/visualization/pcl_visualizer.h"
+#include <pcl/search/kdtree.h>
+#include <pcl/octree/octree.h>
+#include <pcl/visualization/pcl_visualizer.h>
 #include "vtkOutputWindow.h"
 #include "vtkFileOutputWindow.h"
 #include <qsharedpointer.h>
@@ -213,7 +213,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
     );
 
     d->PCLVis->getInteractorStyle()->setKeyboardModifier(pcl::visualization::INTERACTOR_KB_MOD_SHIFT);
-    d->PCLVis->getRenderWindow()->Render(); //wichtig, dass dieser befehl vor dem ersten Hinzufuegen von Elementen oder setzen von visuellen Eigenschaften kommt, da sonst addPointCloud crashed, alternativ kann auch setBackgroundColor gerufen werden, aber das ruft intern auch render() auf.
+    d->PCLVis->getRenderWindow()->Render(); //Important that this command comes before the first addition of elements or setting of visual properties, as otherwise addPointCloud crashes. Alternatively, setBackgroundColor can also be called, but it internally also calls render().
 
     if (interactor->HasObserver(vtkCommand::ExitEvent))
     {
@@ -328,7 +328,7 @@ Vtk3dVisualizer::Vtk3dVisualizer(const QString &itomSettingsFile, AbstractFigure
 //-------------------------------------------------------------------------------------
 Vtk3dVisualizer::~Vtk3dVisualizer()
 {
-    //this timerEvent must be removed, else crashes can occure in some situations if visualization is already destroyed
+    //this timerEvent must be removed, else crashes can occur in some situations if visualization is already destroyed
     //and the timer event is fired afterwards.
 #if VTK_MAJOR_VERSION >= 9
     d->pclCanvas->interactor()->RemoveObservers(vtkCommand::TimerEvent);

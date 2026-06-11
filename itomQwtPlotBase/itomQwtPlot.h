@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2021, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -191,6 +191,8 @@ protected:
     void setInverseColors(const QColor &color0, const QColor &color1);
     QColor inverseColor0() const { return m_inverseColor0; }
     QColor inverseColor1() const { return m_inverseColor1; }
+
+    void setButtonStyleFromPalette();
 
     virtual void home() = 0;
     virtual void zoomRedo() const = 0;

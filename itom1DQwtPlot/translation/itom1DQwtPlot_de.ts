@@ -67,7 +67,7 @@
 <context>
     <name>Plot1DWidget</name>
     <message>
-        <location filename="../plot1DWidget.cpp" line="+216"/>
+        <location filename="../plot1DWidget.cpp" line="+204"/>
         <source>File</source>
         <translation type="unfinished">Datei</translation>
     </message>
@@ -82,7 +82,7 @@
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location line="+192"/>
+        <location line="+195"/>
         <source>Scale Settings...</source>
         <translation>Skaleneinstellungen...</translation>
     </message>
@@ -127,7 +127,21 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+16"/>
+        <source>set two pickers to the absolute minimum and maximum of the curve.
+If multiple curves are visible, the user can select the appropriate one.</source>
+        <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve.
+Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>set two pickers to the absolute minimum and maximum of the curve (within the current view).
+If multiple curves are visible, the user can select the appropriate one.</source>
+        <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve. (in der aktuellen Ansicht).
+Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Delete All Pickers</source>
         <translation>Alle Picker löschen</translation>
     </message>
@@ -210,7 +224,7 @@
         <translation type="unfinished">Erste Zeile</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+61"/>
         <source>No Grid</source>
         <translation type="unfinished">Kein Gitter</translation>
     </message>
@@ -245,7 +259,7 @@
         <translation type="unfinished">Y fein</translation>
     </message>
     <message>
-        <location line="+625"/>
+        <location line="+632"/>
         <source>A dateTime or timeDelta dataObject is not supported by this plot.</source>
         <translation type="unfinished">Dieser Plot untersützt keine Objekte vom Typ dateTime oder timeDelta.</translation>
     </message>
@@ -255,7 +269,7 @@
         <translation type="unfinished">Die x-Achsen dieses Plot untersützt kein Objekt vom Typ timeDelta.</translation>
     </message>
     <message>
-        <location line="+812"/>
+        <location line="+852"/>
         <source>1D Object Slice</source>
         <translation type="unfinished">1D-Objektschnitt</translation>
     </message>
@@ -288,7 +302,7 @@
         <translation type="unfinished">xData enthält mehr Werte als das Quell-DataObject. Ungenutzte Werte werden ignoriert.</translation>
     </message>
     <message>
-        <location line="+1293"/>
+        <location line="+1318"/>
         <source>CurveIndex out of bounds [0,%i]</source>
         <translation type="unfinished">Der &apos;curveIndex&apos; liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
@@ -303,12 +317,12 @@
         <translation type="unfinished">Die Anzahl der Picker überschreitet das Limit für Picker von %i</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+83"/>
         <source>ID out of range [0,%i]</source>
         <translation type="unfinished">Die ID liegt außerhalb des Gültigkeitsbereichs [0, %i]</translation>
     </message>
     <message>
-        <location line="+783"/>
+        <location line="+766"/>
         <source>Select a visible curve</source>
         <translation type="unfinished">Eine sichbare Kurve auswählen</translation>
     </message>
@@ -328,7 +342,7 @@
         <translation type="unfinished">Die Eigenschaften der Kurve %i ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-3894"/>
+        <location line="-3950"/>
         <location line="+1"/>
         <source>Color Representation</source>
         <translation type="unfinished">Farbdarstellung</translation>
@@ -360,17 +374,17 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>Grid</source>
         <translation>Gitter</translation>
     </message>
     <message>
-        <location line="-3"/>
+        <location line="-2"/>
         <source>Shows/hides a grid</source>
         <translation type="unfinished">Gitter ein-/ausblenden</translation>
     </message>
     <message>
-        <location line="+729"/>
+        <location line="+770"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+5"/>
@@ -394,13 +408,13 @@
         <translation>rot</translation>
     </message>
     <message>
-        <location line="+3127"/>
+        <location line="+3142"/>
         <source>itom API not available.</source>
         <translation type="unfinished">Die itom-API ist nicht verfügbar.</translation>
     </message>
     <message>
-        <location line="-3417"/>
-        <location line="+403"/>
+        <location line="-3474"/>
+        <location line="+450"/>
         <location line="+1"/>
         <location line="+101"/>
         <location line="+1"/>
@@ -408,12 +422,12 @@
         <translation>Kurve %1</translation>
     </message>
     <message>
-        <location line="-1382"/>
+        <location line="-1431"/>
         <source>Plotting Tools</source>
         <translation type="unfinished">Symbolleiste</translation>
     </message>
     <message>
-        <location line="+295"/>
+        <location line="+298"/>
         <source>Manual Picker Selection</source>
         <translation type="unfinished">Manuelle Pickerwahl</translation>
     </message>
@@ -423,26 +437,24 @@
         <translation type="unfinished">Zum globalen Min/Max</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>set two pickers to the absolute minimum and maximum of the curve.
 If multiple curves are visible, the user can select the appropriate one.</source>
-        <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve.
+        <translation type="obsolete">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve.
 Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>To Min-Max In Current View</source>
         <translation type="unfinished">Zum Min/Max in aktueller Ansicht</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>set two pickers to the absolute minimum and maximum of the curve (within the current view).
 If multiple curves are visible, the user can select the appropriate one.</source>
-        <translation type="unfinished">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve. (in der aktuellen Ansicht).
+        <translation type="obsolete">Setzt zwei Picker für das absolute &apos;Minimum und Maximim der Kurve. (in der aktuellen Ansicht).
 Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+66"/>
         <source>First Column</source>
         <translation>Erste Spalte</translation>
     </message>
@@ -472,7 +484,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation>Grauwert</translation>
     </message>
     <message>
-        <location line="+755"/>
+        <location line="+796"/>
         <location line="+12"/>
         <source>gray</source>
         <translation>grau</translation>
@@ -486,7 +498,7 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../itom1DQwtPlotPlugin.cpp" line="+39"/>
+        <location filename="../itom1DQwtPlotPlugin.cpp" line="+40"/>
         <source>itom widget for 1D dataObjects based on Qwt.</source>
         <translation type="unfinished">itom-Widget für 1D-Datenobjekten basierend auf Qwt.</translation>
     </message>
@@ -496,9 +508,8 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation type="unfinished">Dieses Designer-Plugin ist ein itom Widget zur zeilenweise/Graphbasierten Visualisierung von DataObjects und Live-Anzeige von Linienkamera. Das Widget basiert auf Qwt framework (http://qwt.sf.net).</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>LGPL, for Qwt see Qwt License</source>
-        <translation type="unfinished">LGPL, für Qwt siehe Qwt-Lizenz</translation>
+        <translation type="obsolete">LGPL, für Qwt siehe Qwt-Lizenz</translation>
     </message>
     <message>
         <location filename="../dataObjectSeriesData.cpp" line="+194"/>
@@ -527,12 +538,12 @@ Sind mehrere Kurven sichtbar, kann der Benutzer die Passende auswählen.</transl
         <translation>z-Achse</translation>
     </message>
     <message>
-        <location filename="../plot1DWidget.cpp" line="-1083"/>
+        <location filename="../plot1DWidget.cpp" line="-1127"/>
         <source>Plot1D</source>
         <translation>Plot1D</translation>
     </message>
     <message>
-        <location line="+1985"/>
+        <location line="+2034"/>
         <source>wrong xData data type. Complex64, complex128, rgba32 and timeDelta are not supported.</source>
         <translation type="unfinished">Falscher Datentyp von xData. Complex64, complex128, rgba32 und timeDelta werden nicht unterstützt.</translation>
     </message>

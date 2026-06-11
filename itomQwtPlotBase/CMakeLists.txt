@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.12...3.24)
-
+cmake_minimum_required(VERSION 3.12...3.29)
 set(target_name itomQwtPlotBase)
 
 message(STATUS "\n<--- BASE LIBRARY ${target_name} --->")
@@ -52,7 +51,7 @@ add_definitions(-DQWT_DLL) #use the shared library version of qwt
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/version
+    ${CMAKE_CURRENT_BINARY_DIR}/version
     ${ITOM_SDK_INCLUDE_DIRS}
     #${CMAKE_CURRENT_SOURCE_DIR}/../qwt/src
 )
@@ -62,7 +61,6 @@ link_directories(
 )
 
 set(DESIGNER_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/version/pluginVersion.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dialogExportProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/multiPointPickerMachine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/userInteractionPlotPicker.h
@@ -78,6 +76,8 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/itomQwtPlotPanner.h
     ${CMAKE_CURRENT_SOURCE_DIR}/markerModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/markerWidget.h
+    ${CMAKE_CURRENT_BINARY_DIR}/version/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
 set(DESIGNER_HEADERS_COPY
@@ -112,7 +112,10 @@ set(DESIGNER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/markerWidget.cpp
 )
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/version/pluginVersion.h)
+
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

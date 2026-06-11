@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -45,7 +45,7 @@ public:
     EvaluateGeometricsPlugin(QObject *parent = 0);                                              /*!< Class constructor */
 
     bool isContainer() const;                                                                   /*!< This is no container, hence return false.  */
-    bool isInitialized() const;                                                                 /*!< Check wether factory is initialized and return status */
+    bool isInitialized() const;                                                                 /*!< Check whether factory is initialized and return status */
     QIcon icon() const;                                                                         /*!< Return icon for the qt-designer */
     QString domXml() const;                                                                     /*!< The group of this widget is itom.... */
     QString group() const;

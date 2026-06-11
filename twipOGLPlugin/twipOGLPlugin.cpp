@@ -21,7 +21,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
@@ -36,6 +36,8 @@
 #include <QtCore/QtPlugin>
 #include "twipOGLFigure.h"
 #include "pluginVersion.h"
+#include "gitVersion.h"
+
 TwipOGLPlugin::TwipOGLPlugin(QObject *parent)
     : ito::AbstractItomDesignerPlugin(parent)
 {
@@ -45,9 +47,13 @@ TwipOGLPlugin::TwipOGLPlugin(QObject *parent)
 
     m_description = QObject::tr("twip optical solutions GmbH widget for visualisation of 2D / 3D DataObjects and PointClouds.");
     m_detaildescription = QObject::tr("");
-    m_author = "Christian Kohler, twip optical solutions GmbH";
-    m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
-    m_license = QObject::tr("Published under LGPL v2.0 by twip optical solutions GmbH");
+
+    m_author = PLUGIN_AUTHOR;
+    m_version = PLUGIN_VERSION;
+    m_minItomVer = PLUGIN_MIN_ITOM_VERSION;
+    m_maxItomVer = PLUGIN_MAX_ITOM_VERSION;
+    m_license = QObject::tr(PLUGIN_LICENCE);
+    m_aboutThis = QObject::tr(GITVERSION);
 
     initialized = false;
 }

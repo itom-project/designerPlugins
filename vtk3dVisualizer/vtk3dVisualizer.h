@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -165,7 +165,7 @@ class VTK3DVISUALIZER_EXPORT Vtk3dVisualizer : public ito::AbstractDObjPclFigure
     Q_CLASSINFO("slot://addPyramid", "add pyramid. The 5 corner points are given in a 3x5 data object (arguments: points, key, color=white)")
     Q_CLASSINFO("slot://addCuboid", "add cube. The 8 corner points are given in a 3x8 data object (arguments: points, key, color=white)")
     Q_CLASSINFO("slot://addCube", "add cube (arguments: [size_x, size_y, size_z], [t_x, t_y, t_z], [r_x, r_y, r_z], key, color=white)")
-    Q_CLASSINFO("slot://addLines", "add m lines to the canvas. The coordintates are given by a float32 data object [m x 6] where one row is (x0,y0,z0,x1,y1,z1) (arguments: points, key, color=red).")
+    Q_CLASSINFO("slot://addLines", "add m lines to the canvas. The coordinates are given by a float32 data object [m x 6] where one row is (x0,y0,z0,x1,y1,z1) (arguments: points, key, color=red).")
     Q_CLASSINFO("slot://addSphere", "add a sphere (arguments: [center_x, center_y, center_z], radius, key, color = red]).")
     Q_CLASSINFO("slot://addText", "add a 2d text to a specific position (arguments: text, x, y, fontsize, key, color = white)")
     Q_CLASSINFO("slot://addPolygon", "adds a 2d polygon (arguments: points, key, color = white) where points is a Mx3 data object where each line is the (x,y,z) coordinate of a point of the polygon. The point values will internally be converted to float32.")

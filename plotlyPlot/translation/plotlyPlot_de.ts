@@ -30,9 +30,5 @@
         <source>itom widget for plotly figures.</source>
         <translation type="unfinished">itom-Widget für Plotly-Grafiken.</translation>
     </message>
-    <message>
-        <source>LGPL</source>
-        <translation></translation>
-    </message>
 </context>
 </TS>

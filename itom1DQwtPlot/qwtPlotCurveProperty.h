@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -30,10 +30,10 @@
 #include "qwt_plot_curve.h"
 #include "itom1DQwtPlot.h"
 
-class QwtPlotCurveProperty : public QObject 
+class QwtPlotCurveProperty : public QObject
 {
     Q_OBJECT
-    
+
     Q_PROPERTY(bool visible READ getVisible WRITE setVisible USER true)
     Q_PROPERTY(Qt::PenStyle lineStyle READ getLineStyle WRITE setLineStyle USER true)
     Q_PROPERTY(qreal lineWidth READ getLineWidth WRITE setLineWidth USER true)
@@ -43,7 +43,7 @@ class QwtPlotCurveProperty : public QObject
     Q_PROPERTY(int lineSymbolSize READ getLineSymbolSize WRITE setLineSymbolSize USER true)
     Q_PROPERTY(Itom1DQwtPlot::Symbol lineSymbolStyle READ getLineSymbolStyle WRITE setLineSymbolStyle USER true)
     Q_PROPERTY(bool legendVisible READ getLegendVisible WRITE setLegendVisible USER true)
-    
+
 public:
     QwtPlotCurveProperty(QwtPlotCurve *curve);
     ~QwtPlotCurveProperty() {};

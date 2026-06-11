@@ -21,7 +21,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
@@ -160,14 +160,14 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
     Q_CLASSINFO("prop://overlayInterval", "Range of the overlayInterval to scale the values")
 
     Q_CLASSINFO("prop://invalidMap", "Set a map (uint8) for invalid masking with the defined invalid color.")
-    Q_CLASSINFO("prop://fillInvalids", "toggle between invalid visbility mode")
+    Q_CLASSINFO("prop://fillInvalids", "toggle between invalid visibility mode")
     Q_CLASSINFO("prop://invalidColor", "Set the color for invalid marked pixels")
 
     Q_CLASSINFO("prop://enableIllumination", "Enable the directed light illumination rendering. Only for triangles or pointClouds with normal vectors")
     Q_CLASSINFO("prop://rotationAngle", "Set the rotation angle of the object in degree")
     Q_CLASSINFO("prop://lightDirection", "Set the rotation angle of the illumination in degree")
 
-    Q_CLASSINFO("prop://curvatureToColor", "Set the color from the curvature and not from the z heigth")
+    Q_CLASSINFO("prop://curvatureToColor", "Set the color from the curvature and not from the z height")
     Q_CLASSINFO("prop://curvatureInterval", "Range of the curvature interval to scale the values")
 
     DESIGNER_PLUGIN_ITOM_API
@@ -512,7 +512,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         //!> reset alpha value for intensity overlay (overlay invisible)
         void resetOverlayAlpha(void);
 
-        //!> return inverval of intensity image
+        //!> return interval of intensity image
         //QPointF getOverlayInterval() const;
         ito::AutoInterval getOverlayInterval() const;
 
@@ -579,7 +579,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         //!> return if currently status or angle information visibility
         bool getShowAngleInfo(void) const;
 
-        /** switch visibility of angle infomation
+        /** switch visibility of angle information
         *   @param [in] newVal  true for enabled, false for invisible
         */
         void setShowAngleInfo(const bool newVal);
@@ -591,7 +591,7 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         //!> set viewport rotation angles
         void setRotationAngle(const QVector<float> newAngles);
 
-        //!> get viewport rotation angles (3 coordiates)
+        //!> get viewport rotation angles (3 coordinates)
         QVector<float> getRotationAngle() const;
 
         //!> set light vector direction towards center (2 coordinates)
@@ -696,8 +696,8 @@ class TwipOGLFigure : public ito::AbstractDObjPclFigure
         {
             if(m_pContent)
                 return m_pContent->setOverlayImage(overlayImage, objID);
-            else 
-                return ito::RetVal(ito::retError, 0, tr("Could not write overlay to uninitialized GL-Widget").toLatin1().data());            
+            else
+                return ito::RetVal(ito::retError, 0, tr("Could not write overlay to uninitialized GL-Widget").toLatin1().data());
         }
 
 };

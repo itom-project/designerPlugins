@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of the designer widget 'vtk3dVisualizer' for itom.
 
@@ -27,6 +27,7 @@
 #include <QtCore/QtPlugin>
 #include "vtk3dVisualizerFactory.h"
 #include "pluginVersion.h"
+#include "gitVersion.h"
 
 //---------------------------------------------------------------------------------------------------------------
 Vtk3DVisualizerFactory::Vtk3DVisualizerFactory(QObject *parent)
@@ -39,9 +40,13 @@ Vtk3DVisualizerFactory::Vtk3DVisualizerFactory(QObject *parent)
 
     m_description = QObject::tr("3D visualization of point clouds, polygon meshes and geometries using PCL and VTK.");
     m_detaildescription = QObject::tr("You can display any point cloud (with and without normals), polygon meshes or geometries, group them in a tree structure, change their display properties and connect to click events.");
-    m_author = "M. Gronle, ITO, University Stuttgart";
-    m_version = (PLUGIN_VERSION_MAJOR << 16) + (PLUGIN_VERSION_MINOR << 8) + PLUGIN_VERSION_PATCH;
-    m_license = QObject::tr("LGPL 2.0");
+
+    m_author = PLUGIN_AUTHOR;
+    m_version = PLUGIN_VERSION;
+    m_minItomVer = PLUGIN_MIN_ITOM_VERSION;
+    m_maxItomVer = PLUGIN_MAX_ITOM_VERSION;
+    m_license = QObject::tr(PLUGIN_LICENCE);
+    m_aboutThis = QObject::tr(GITVERSION);
 
     initialized = false;
 }

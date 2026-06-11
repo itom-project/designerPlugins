@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2021, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2021, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -121,138 +121,97 @@ void MatplotlibWidget::externalResize(int width, int height)
 //-------------------------------------------------------------------------------------
 void MatplotlibWidget::paintResult(QSharedPointer<char> imageString, int x, int y, int w, int h, bool blit )
 {
+    paintResultWithImageFormat(imageString, "ARGB32", x, y, w, h, blit);
+}
+
+//-------------------------------------------------------------------------------------
+void MatplotlibWidget::paintResultWithImageFormat(
+    QSharedPointer<char> imageString, QString imageFormat, int x, int y, int w, int h, bool blit)
+{
 #ifdef _DEBUG
     if (m_debugOutput)
     {
-        qDebug() << "MatplotlibWidet::paintResult:" << x << y << w << h << blit;
+        qDebug() << "MatplotlibWidet::paintResultWithImageFormat:" << x << y << w << h << blit << imageFormat;
     }
 #endif
+
+    imageFormat = imageFormat.toLower();
+    QImage::Format _imageFormat = QImage::Format_ARGB32;
+
+    if (imageFormat == "rgba8888")
+    {
+        _imageFormat = QImage::Format_RGBA8888;
+    }
+    else if (imageFormat == "argb32")
+    {
+        //_imageFormat = QImage::Format_ARGB32;
+    }
+    else
+    {
+        qDebug() << "unsupported imageFormat in MatplotlibWidget::paintResultWithImageFormat";
+    }
 
     int imgHeight = 0;
     int imgWidth = 0;
 
     m_timer.stop();
 
-    if(blit == false)
+    if (blit == false)
     {
-        QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
+        QImage image = QImage((uchar*)imageString.data(), w, h, _imageFormat);
 
         m_pixmap = QPixmap::fromImage(image);
         m_pixmapItem->setPixmap(m_pixmap);
-        m_pixmapItem->setOffset(x,y);
+        m_pixmapItem->setOffset(x, y);
         m_pixmapItem->update();
     }
     else
     {
-        //check sizes
+        // check sizes
         imgHeight = m_pixmap.height();
         imgWidth = m_pixmap.width();
 
-        if(x>=0 && y>=0 && imgHeight >= (y+h) && imgWidth >= (x+w))
+        if (x >= 0 && y >= 0 && imgHeight >= (y + h) && imgWidth >= (x + w))
         {
-            //in case of blit, y is the distance from the bottom border, convert it into the
-            //distance from top:
+            // in case of blit, y is the distance from the bottom border, convert it into the
+            // distance from top:
             y = imgHeight - h - y;
 
             QPainter painter(&m_pixmap);
-            QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
-            painter.drawImage(QPoint(x,y),image);
+            QImage image = QImage((uchar*)imageString.data(), w, h, _imageFormat);
+            painter.drawImage(QPoint(x, y), image);
             painter.end();
             m_pixmapItem->setPixmap(m_pixmap);
             m_pixmapItem->update();
         }
-
     }
 
     paintRect(false);
 
     QSize s = size();
 
-	//it seems that screens with scaling factor cannot render pixmaps with all sizes,
-	//therefore it can occur that the real image size is not returned, which will lead to
-	//an inifinte regression. To terminate this, we allow a size difference of up to 1px.
+    // it seems that screens with scaling factor cannot render pixmaps with all sizes,
+    // therefore it can occur that the real image size is not returned, which will lead to
+    // an infinite regression. To terminate this, we allow a size difference of up to 1px.
     if (qAbs(m_pixmap.width() - s.width()) < 2 && qAbs(m_pixmap.height() - s.height()) < 2)
     {
-        setTransform( QTransform(1,0,0,1,0,0), false );
-        centerOn( m_pixmapItem->boundingRect().center() );
+        setTransform(QTransform(1, 0, 0, 1, 0, 0), false);
+        centerOn(m_pixmapItem->boundingRect().center());
     }
     else
     {
 #ifdef _DEBUG
         if (m_debugOutput)
         {
-            qDebug() << "MatplotlibWidet::paintResult: create PendingEvent" << s.height() << s.width();
+            qDebug() << "MatplotlibWidet::paintResultWithImageFormat: create PendingEvent" << s.height()
+                     << s.width();
         }
 #endif
-        fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
+        fitInView(m_pixmapItem, Qt::IgnoreAspectRatio);
         m_pendingEvent = PendingEvent(s.height(), s.width());
     }
 
-    //handle possible further update requests
-    paintTimeout();
-
-    emit eventIdle();
-}
-
-//-------------------------------------------------------------------------------------
-void MatplotlibWidget::paintResultDeprecated(QByteArray imageString, int x, int y, int w, int h, bool blit )
-{
-#ifdef _DEBUG
-    if (m_debugOutput)
-    {
-        qDebug() << "MatplotlibWidet::paintResultDeprecated:" << x << y << w << h << blit;
-    }
-#endif
-
-    int imgHeight = 0;
-    int imgWidth = 0;
-
-    m_timer.stop();
-
-    if(blit == false)
-    {
-        QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
-        m_pixmap = QPixmap::fromImage(image);
-        m_pixmapItem->setPixmap(m_pixmap);
-        m_pixmapItem->setOffset(x,y);
-        m_pixmapItem->update();
-    }
-    else
-    {
-        //check sizes
-        imgHeight = m_pixmap.height();
-        imgWidth = m_pixmap.width();
-
-        if(x>=0 && y>=0 && imgHeight >= (y+h) && imgWidth >= (x+w))
-        {
-            //in case of blit, y is the distance from the bottom border, convert it into the
-            //distance from top:
-            y = imgHeight - h - y;
-            QPainter painter(&m_pixmap);
-            QImage image = QImage((uchar*)imageString.data(),w,h,QImage::Format_ARGB32);
-            painter.drawImage(QPoint(x,y),image);
-            painter.end();
-            m_pixmapItem->setPixmap(m_pixmap);
-            m_pixmapItem->update();
-        }
-
-    }
-
-    paintRect(false);
-
-    QSize s = size();
-
-    if (m_keepSizeFixed || (abs(m_pixmap.width() - s.width()) < 6 && abs(m_pixmap.height() - s.height()) < 6))
-    {
-        setTransform( QTransform(1,0,0,1,0,0), false );
-        centerOn( m_pixmapItem->boundingRect().center() );
-    }
-    else
-    {
-        fitInView(m_pixmapItem,Qt::IgnoreAspectRatio);
-    }
-
-    //handle possible further update requests
+    // handle possible further update requests
     paintTimeout();
 
     emit eventIdle();
@@ -268,7 +227,7 @@ void MatplotlibWidget::copyToClipboardResult(QSharedPointer<char> imageString, i
     }
 #endif
 
-    QImage image  = QImage((uchar*)imageString.data(), w, h, QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during livetime of image (therefore, copy below)
+    QImage image  = QImage((uchar*)imageString.data(), w, h, QImage::Format_ARGB32); //shallow copy of imageString buffer data, imageString must be alive during lifetime of image (therefore, copy below)
 
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard)

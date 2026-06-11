@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -24,11 +24,23 @@
 
 #include <QtCore/QtPlugin>
 #include "slider2DFactory.h"
+#include "pluginVersion.h"
+#include "gitVersion.h"
 
 
 Slider2DFactory::Slider2DFactory(QObject *parent)
     : QObject(parent)
 {
+    m_description = QObject::tr("itom 2D Slider Widget.");
+    m_detaildescription = QObject::tr("");
+
+    m_author = PLUGIN_AUTHOR;
+    m_version = PLUGIN_VERSION;
+    m_minItomVer = PLUGIN_MIN_ITOM_VERSION;
+    m_maxItomVer = PLUGIN_MAX_ITOM_VERSION;
+    m_license = QObject::tr(PLUGIN_LICENCE);
+    m_aboutThis = QObject::tr(GITVERSION);
+
     initialized = false;
 }
 

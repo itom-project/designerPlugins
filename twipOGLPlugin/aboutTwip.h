@@ -21,7 +21,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
@@ -33,7 +33,7 @@
 #define ABOUTTWIPDIALG
 
 #include "ui_aboutTwip.h"
-#include "itom_sdk.h"
+#include <itom_sdk.h>
 #include "pluginVersion.h"
 #include <qglobal.h>
 
@@ -88,7 +88,7 @@ modification, are permitted provided that the following conditions are met:<BR>\
 * The name of the author may be used to endorse or promote products<BR>\
   derived from this software without specific prior written permission.<BR><BR>";
 
-            QString wrangler = "This programm uses the OpenGL Extension Wrangler Library with following licence: <BR><BR>";
+            QString wrangler = "This program uses the OpenGL Extension Wrangler Library with following licence: <BR><BR>";
             wrangler.append(lic);
             wrangler.append('\n');
 

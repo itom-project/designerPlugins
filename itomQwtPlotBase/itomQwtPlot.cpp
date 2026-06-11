@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2020, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2020, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -85,7 +85,7 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_numShapesToPick(1),
     m_currentShapeType(ito::Shape::Point),
     m_allowedShapeTypes(~ItomQwtPlotEnums::ShapeTypes()),
-    m_buttonStyle(0),
+    m_buttonStyle(ItomQwtDObjFigure::StyleBright),
     m_boxFrame(true),
     m_plottingEnabled(true),
     m_shapesLabelVisible(false),
@@ -136,6 +136,8 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     //load actions and icons
     createBaseActions();
 
+    setButtonStyleFromPalette();
+
     updateColors();
 
     //zoom tool
@@ -167,8 +169,6 @@ ItomQwtPlot::ItomQwtPlot(ItomQwtDObjFigure * parent /*= NULL*/) :
     m_pMagnifier->setAxisEnabled(QwtPlot::yRight, false);
     m_pMagnifier->setAxisEnabled(QwtPlot::yLeft, true);
     m_pMagnifier->setAxisEnabled(QwtPlot::xBottom, true);
-
-
 
     //multi point picker for pick-point action (equivalent to matlabs ginput)
     m_pMultiPointPicker = new UserInteractionPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::PolygonRubberBand, QwtPicker::AlwaysOn, canvas());
@@ -223,6 +223,27 @@ ItomQwtPlot::~ItomQwtPlot()
     {
         delete m_pPrinter;
         m_pPrinter = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+void ItomQwtPlot::setButtonStyleFromPalette()
+{
+    // see itom MainApplication::setupApplication
+
+    // test the base color of the window color of the default palette of the application
+    // and set the dark theme, if the lightness of this color is < 0.5.
+    QPalette palette = QGuiApplication::palette();
+
+    QColor bgColor = palette.window().color();
+
+    if (bgColor.toHsv().lightnessF() < 0.5)
+    {
+        m_buttonStyle = ItomQwtDObjFigure::StyleDark;
+    }
+    else
+    {
+        m_buttonStyle = ItomQwtDObjFigure::StyleBright;
     }
 }
 
@@ -290,7 +311,6 @@ void ItomQwtPlot::createBaseActions()
     a->setChecked(false);
     a->setToolTip(tr("Zoom to rectangle"));
     connect(a, SIGNAL(triggered(bool)), this, SLOT(mnuActZoom(bool)));
-
 
     //m_pActClearDrawings
     m_pActClearShapes = a = new QAction(tr("Clear Geometric Shapes"), p);
@@ -479,7 +499,7 @@ void ItomQwtPlot::updateColors(void)
     //{
     //    m_styledBackground = false;
 
-    //    //no style sheets are applied, therefore the default OS dependet style methods can be used
+    //    //no style sheets are applied, therefore the default OS dependent style methods can be used
     //    c->setFrameStyle(QFrame::Box);
     //    c->setLineWidth(1);
     //    c->setMidLineWidth(0);
@@ -554,7 +574,7 @@ void ItomQwtPlot::setCanvasColor(const QColor &color)
 void ItomQwtPlot::setButtonStyle(int style)
 {    m_pMenuToolboxes->setIcon(QIcon(":/application/icons/list.png"));
 
-    if (style == 0)
+    if (style == ItomQwtDObjFigure::StyleBright)
     {
         m_pActSave->setIcon(QIcon(":/itomDesignerPlugins/general/icons/filesave.png"));
         m_pActPrint->setIcon(QIcon(":/itomDesignerPlugins/general/icons/print.png"));
@@ -614,6 +634,17 @@ void ItomQwtPlot::setButtonStyle(int style)
         m_pActPan->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/move_lt.png"));
         m_pActClearShapes->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/editDelete_lt.png"));
         m_pActAspectRatio->setIcon(QIcon(":/itomDesignerPlugins/aspect_lt/icons/AspRatio11_lt.png"));
+
+        if (m_pActProperties)
+        {
+            m_pActProperties->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/settings_lt.png"));
+        }
+
+        if (m_pActCamParameters)
+        {
+            m_pActCamParameters->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/camParams_lt.png"));
+        }
+
         m_pActZoom->setIcon(QIcon(":/itomDesignerPlugins/general_lt/icons/zoom_to_rect_lt.png"));
         m_pActSendCurrentToWorkspace->setIcon(QIcon(":/plugins/icons/sendToPython_lt.png"));
 
@@ -927,47 +958,48 @@ void ItomQwtPlot::setState(int state)
         {
             if (m_state != stateDrawShape) //start draw shape action
             {
+                bool brightStyle = (buttonStyle() == ItomQwtDObjFigure::StyleBright);
                 switch (m_currentShapeType)
                 {
                 default:
                 case ito::Shape::Point:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/point.png" : ":/itomDesignerPlugins/plot_lt/icons/point_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(brightStyle ? ":/itomDesignerPlugins/plot/icons/point.png" : ":/itomDesignerPlugins/plot_lt/icons/point_lt.png"));
                     m_numShapesToPick = std::max(m_numShapesToPick, -1);
                     startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Line:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/pntline.png" : ":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(brightStyle ? ":/itomDesignerPlugins/plot/icons/pntline.png" : ":/itomDesignerPlugins/plot_lt/icons/pntline_lt.png"));
                     m_numShapesToPick = std::max(m_numShapesToPick, -1);
                     startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Rectangle:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/rectangle.png" : ":/itomDesignerPlugins/plot_lt/icons/rectangle_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(brightStyle ? ":/itomDesignerPlugins/plot/icons/rectangle.png" : ":/itomDesignerPlugins/plot_lt/icons/rectangle_lt.png"));
                     m_numShapesToPick = std::max(m_numShapesToPick, -1);
                     startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Ellipse:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/ellipse.png" : ":/itomDesignerPlugins/plot_lt/icons/ellipse_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(brightStyle ? ":/itomDesignerPlugins/plot/icons/ellipse.png" : ":/itomDesignerPlugins/plot_lt/icons/ellipse_lt.png"));
                     m_numShapesToPick = std::max(m_numShapesToPick, -1);
                     startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Circle:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/circle.png" : ":/itomDesignerPlugins/plot_lt/icons/circle_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(brightStyle ? ":/itomDesignerPlugins/plot/icons/circle.png" : ":/itomDesignerPlugins/plot_lt/icons/circle_lt.png"));
                     m_numShapesToPick = std::max(m_numShapesToPick, -1);
                     startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Square:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/square.png" : ":/itomDesignerPlugins/plot_lt/icons/square_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(brightStyle ? ":/itomDesignerPlugins/plot/icons/square.png" : ":/itomDesignerPlugins/plot_lt/icons/square_lt.png"));
                     m_numShapesToPick = std::max(m_numShapesToPick, -1);
                     startOrStopDrawGeometricShape(true);
                     break;
 
                 case ito::Shape::Polygon:
-                    m_pActShapeType->setIcon(QIcon(m_buttonStyle == 0 ? ":/itomDesignerPlugins/plot/icons/polygon.png" : ":/itomDesignerPlugins/plot_lt/icons/polygon_lt.png"));
+                    m_pActShapeType->setIcon(QIcon(brightStyle ? ":/itomDesignerPlugins/plot/icons/polygon.png" : ":/itomDesignerPlugins/plot_lt/icons/polygon_lt.png"));
                     m_numShapesToPick = std::max(m_numShapesToPick, -1);
                     startOrStopDrawGeometricShape(true);
                     break;
@@ -2012,7 +2044,7 @@ void ItomQwtPlot::polygonSinglePointPickingFinished()
         }
         else
         {
-            // enable mouse tracking to change curser when passing over starting / end point
+            // enable mouse tracking to change cursor when passing over starting / end point
             setMouseTracking(true);
 
             emit statusBarMessage(tr("1 point in polygon currently selected. Click the start point again to finish the polygon or press Esc to abort."), 2000);
@@ -2697,7 +2729,7 @@ ito::RetVal ItomQwtPlot::setGeometricShapes(const QVector<ito::Shape> &geometric
         int nrOfShapes = geometricShapes.size();
 
         DrawItem *newItem = NULL;
-        // The definition do not correspond to the definetion of primitiv elements
+        // The definition do not correspond to the definition of primitive elements
 
         foreach(ito::Shape shape, geometricShapes)
         {
@@ -2880,7 +2912,7 @@ ito::RetVal ItomQwtPlot::updateGeometricShape(const ito::Shape &geometricShape, 
     else
     {
         DrawItem *newItem = NULL;
-        // The definition do not correspond to the definetion of primitiv elements
+        // The definition do not correspond to the definition of primitive elements
 
         if (m_pShapes.contains(geometricShape.index()))
         {
@@ -3362,7 +3394,7 @@ void ItomQwtPlot::mnuSendCurrentToWorkspace()
     QString varname = "zoom_object";
     m_copyDisplayedAsComplex = false;
     const QString dialogTitle = "Current to workspace";
-    const QString userText = "Indicate the python varible name for the currently visible object";
+    const QString userText = "Indicate the python variable name for the currently visible object";
 
     if (!ito::ITOM_API_FUNCS_GRAPH)
     {

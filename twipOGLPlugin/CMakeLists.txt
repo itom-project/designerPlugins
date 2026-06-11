@@ -21,15 +21,14 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
-#    itom is free software by ITO, University Stuttgart published under
+#    itom is free software by ITO, Universität Stuttgart published under
 #    GNU General Public License as published by the Free Software
 #    Foundation. See <https://github.com/itom-project/itom>
 #
 #    You should have received a copy of the GNU Library General Public License
 #    along with itom. If not, see <http://www.gnu.org/licenses/>.
 #*********************************************************************** */
-cmake_minimum_required(VERSION 3.12...3.24)
-
+cmake_minimum_required(VERSION 3.12...3.29)
 set(target_name twipOGLPlugin)
 
 #this is to automatically detect the SDK subfolder of the itom build directory.
@@ -111,7 +110,7 @@ set(DESIGNER_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLWidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/aboutTwip.h
     ${CMAKE_CURRENT_SOURCE_DIR}/twipOGLLegend.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h
     ${CMAKE_CURRENT_BINARY_DIR}/gitVersion.h
 )
 
@@ -131,7 +130,10 @@ set(DESIGNER_RCC
     ${CMAKE_CURRENT_SOURCE_DIR}/../itomDesignerPlugins.qrc
 )
 
-#If you want to use automatical metadata for dlls under windows use the following if-case.
+#Define Version in pluginVersion.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/pluginVersion.h.in ${CMAKE_CURRENT_BINARY_DIR}/pluginVersion.h)
+
+#If you want to use automatically metadata for dlls under windows use the following if-case.
 if(MSVC)
     list(APPEND DESIGNER_SOURCES ${ITOM_SDK_INCLUDE_DIR}/../designerPluginLibraryVersion.rc)
 endif()

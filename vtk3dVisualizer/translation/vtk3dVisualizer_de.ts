@@ -52,10 +52,6 @@
         <translation type="unfinished">Zum Anzeigen von Punktewolken (mit und ohne Normale), Polygonnetzen oder Geometrien, Gruppierung in eine Baumstruktur, Änderungen der Darstellungseigenschaften und zur Verknüpfung mit Klick-Events.</translation>
     </message>
     <message>
-        <source>LGPL 2.0</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>itom widget to show point clouds, polygon meshes, geometries...</source>
         <translation type="unfinished">itom-Widget für die Anzeige von Punktewolken, Polygonnetzen und Geometrien...</translation>
     </message>

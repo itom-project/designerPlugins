@@ -1,9 +1,9 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO), 
-   Universitaet Stuttgart, Germany 
- 
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
+
    This file is part of itom.
 
    itom is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 /* **********************************************************************
 
    The code form this file is based on / partially copied from the code
-   of qwt_plot_curve.cpp / qwt_plot_curve.h in the QWT-Framework 
+   of qwt_plot_curve.cpp / qwt_plot_curve.h in the QWT-Framework
 
      * Qwt Widget Library
      * Copyright (C) 1997   Josef Wilgen
@@ -64,16 +64,16 @@ static int verifyRange( int size, int &i1, int &i2 )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
-QwtPlotCurveDataObject::QwtPlotCurveDataObject(const QString &title /*= QString::null*/) : 
-    QwtPlotCurve(title), 
-    m_privCurveFitter(NULL), 
+QwtPlotCurveDataObject::QwtPlotCurveDataObject(const QString &title /*= QString::null*/) :
+    QwtPlotCurve(title),
+    m_privCurveFitter(NULL),
     m_curveFillState(ItomQwtPlotEnums::NoCurveFill)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
 QwtPlotCurveDataObject::QwtPlotCurveDataObject(const QwtText &title) :
-    QwtPlotCurve(title), 
+    QwtPlotCurve(title),
     m_privCurveFitter(NULL)
 {
 }
@@ -206,7 +206,7 @@ QPolygonF QwtPlotCurveDataObject::reducePoints(const QPolygonF &polyline, const 
         return polyline;
     }
 
-    
+
     int chunkSize = polyline_size / canvas_pixel_size;
     int halfChunk = chunkSize / 2;
     canvas_pixel_size *= 2;
@@ -254,7 +254,7 @@ QPolygonF QwtPlotCurveDataObject::reducePoints(const QPolygonF &polyline, const 
 
         i += chunk;
         data += chunk;
-        
+
         if (pmin.rx() < pmax.rx())
         {
             polyline2 << pmin << pmax;
@@ -283,7 +283,7 @@ void QwtPlotCurveDataObject::drawLines( QPainter *painter, const QwtScaleMap &xM
     const DataObjectSeriesData *d_objseries = dynamic_cast<const DataObjectSeriesData*>( data() );
     const DataObjectSeriesDataXY *d_objseriesXY = dynamic_cast<const DataObjectSeriesDataXY*>(d_objseries);
 
-    if (d_objseries && 
+    if (d_objseries &&
         (d_objseries->floatingPointValues() ||
         (d_objseriesXY && d_objseriesXY->floatingPointXValues())))
     {
@@ -587,7 +587,7 @@ void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMa
         mapper.setFlag( QwtPointMapper::RoundPoints, doAlign );
 
         const QImage image = mapper.toImage( xMap, yMap,
-            data(), from, to, this->pen(), 
+            data(), from, to, this->pen(),
             painter->testRenderHint( QPainter::Antialiasing ),
             renderThreadCount() );
 
@@ -610,7 +610,7 @@ void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMa
             }
 
             yi = yMap.transform( yi );
-            
+
             if ( doAlign )
             {
                 xi = qRound( xi );
@@ -623,7 +623,7 @@ void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMa
     else
     {
         if(d_objseries->floatingPointValues())
-        {        
+        {
             QPolygonF points;
             points.reserve(size);
             QPointF sample;
@@ -641,7 +641,7 @@ void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMa
                 }
 
                 yi = yMap.transform( yi );
-            
+
                 if ( doAlign )
                 {
                     xi = qRound( xi );
@@ -669,7 +669,7 @@ void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMa
             {
                 QwtPainter::drawPoints( painter, points );
                 if ( doFill )
-                    fillCurve( painter, xMap, yMap, canvasRect, points );  
+                    fillCurve( painter, xMap, yMap, canvasRect, points );
             }
         }
         else
@@ -690,7 +690,7 @@ void QwtPlotCurveDataObject::drawDots( QPainter *painter, const QwtScaleMap &xMa
                 }
 
                 yi = yMap.transform( yi );
-            
+
                 if ( doAlign )
                 {
                     xi = qRound( xi );
@@ -740,7 +740,7 @@ void QwtPlotCurveDataObject::drawSteps( QPainter *painter, const QwtScaleMap &xM
                     y = qRound( y );
                     sample.rx() = x;
                     sample.ry() = y;
-                    
+
 
                     if ( polyline.size() > 0 )
                     {
@@ -935,7 +935,7 @@ void QwtPlotCurveDataObject::drawCenteredSteps( QPainter *painter, const QwtScal
                     y = qRound( y );
                     sample.rx() = x;
                     sample.ry() = y;
-                    
+
 
                     if ( polyline.size() > 0 )
                     {
@@ -1166,7 +1166,7 @@ void QwtPlotCurveDataObject::fillCurve( QPainter *painter,
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 /*!
-  \brief Complete a polygon to be a closed polygon including the 
+  \brief Complete a polygon to be a closed polygon including the
          area between the original polygon and the baseline.
 
   \param painter Painter
@@ -1183,7 +1183,7 @@ void QwtPlotCurveDataObject::closePolyline( QPainter *painter, const QwtScaleMap
     const DataObjectSeriesData *d_objseries = static_cast<const DataObjectSeriesData*>( data() );
 
     double baseline = this->baseline();
-    
+
     if(ItomQwtPlotEnums::FillFromTop == m_curveFillState)
     {
         if ( orientation() == Qt::Vertical ) baseline = yMap.invTransform(yMap.p2());

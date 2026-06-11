@@ -125,7 +125,7 @@
         <translation>Z-Stapel</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+275"/>
         <source>Set lineCut coordinates failed. Widget not ready.</source>
         <translation>Das Setzten der Linienschnittkoordinaten schlug fehl. Widget nicht bereit.</translation>
     </message>
@@ -133,20 +133,20 @@
 <context>
     <name>PlotCanvas</name>
     <message>
-        <location filename="../plotCanvas.cpp" line="+1725"/>
-        <location line="+1670"/>
+        <location filename="../plotCanvas.cpp" line="+1737"/>
+        <location line="+1703"/>
         <source>Could not change color bar, api is missing</source>
         <translation type="unfinished">Farbleiste kann nicht geändert werden, API wurde nicht gefunden</translation>
     </message>
     <message>
-        <location line="-1803"/>
+        <location line="-1836"/>
         <location line="+141"/>
-        <location line="+1670"/>
+        <location line="+1703"/>
         <source>No color maps defined.</source>
         <translation>Keine Farbpalette definiert.</translation>
     </message>
     <message>
-        <location line="-3165"/>
+        <location line="-3210"/>
         <source>plotting tools</source>
         <translation type="unfinished">Symbolleiste Plot</translation>
     </message>
@@ -166,7 +166,7 @@
         <translation type="unfinished">Werkzeuge</translation>
     </message>
     <message>
-        <location line="+255"/>
+        <location line="+258"/>
         <source>Scale Settings...</source>
         <translation type="unfinished">Skaleneinstellungen...</translation>
     </message>
@@ -375,12 +375,12 @@
         <translation>| &amp;&amp; Max</translation>
     </message>
     <message>
-        <location line="+2876"/>
+        <location line="+2918"/>
         <source>Could not activate the line cut.</source>
         <translation type="unfinished">Der Linienschnitt kann nicht aktiviert werden.</translation>
     </message>
     <message>
-        <location line="-2895"/>
+        <location line="-2937"/>
         <source>line cut through global minimum and maximum value</source>
         <translation type="unfinished">Globales Minimum und Maximum für Linienschnitt übernehmen</translation>
     </message>
@@ -457,15 +457,15 @@
         <translation type="unfinished">2D Objekt Plot</translation>
     </message>
     <message>
-        <location line="+218"/>
+        <location line="+227"/>
         <location line="+131"/>
-        <location line="+1688"/>
+        <location line="+1721"/>
         <source>Selected color map has less than two points.</source>
         <translation>Ausgewählte Farbpalette hat weniger als zwei Punkte.</translation>
     </message>
     <message>
-        <location line="-1696"/>
-        <location line="+1687"/>
+        <location line="-1729"/>
+        <location line="+1720"/>
         <source>error when loading color map</source>
         <translation type="unfinished">Fehler beim Laden der Farbpalette</translation>
     </message>
@@ -485,7 +485,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../itom2dqwtplot.cpp" line="-1378"/>
+        <location filename="../itom2dqwtplot.cpp" line="-1403"/>
         <source>Points for line plots from 2d objects</source>
         <translation type="unfinished">Punkte für Linien-Plots in 2D-Objekten</translation>
     </message>
@@ -505,12 +505,12 @@
         <translation>Referenz auf Eingangsobjekt</translation>
     </message>
     <message>
-        <location filename="../plotCanvas.cpp" line="-2997"/>
+        <location filename="../plotCanvas.cpp" line="-3042"/>
         <source>plot2D</source>
         <translation type="unfinished">2D-Plot</translation>
     </message>
     <message>
-        <location line="+682"/>
+        <location line="+685"/>
         <source>y-axis</source>
         <translation>Y-Achse</translation>
     </message>
@@ -532,7 +532,7 @@
         <translation type="unfinished">Dieser Plot untersützt keine Objekte vom Typ dateTime oder timeDelta.</translation>
     </message>
     <message>
-        <location filename="../itom2dqwtplotplugin.cpp" line="+38"/>
+        <location filename="../itom2dqwtplotplugin.cpp" line="+39"/>
         <source>itom widget for 2D-visualisation of 2D/3D dataObjects based on Qwt.</source>
         <translation type="unfinished">Itom-Widget für die 2D-Visualisierung von 2D/3D-Datenobjekten basierend auf Qwt.</translation>
     </message>
@@ -542,9 +542,8 @@
         <translation type="unfinished">Dieses Designer-Plugin ist ein itom Widget zur bildgleichen Visualisierung von DataObjects und Live-Anzeige von Linienkamera. Das Widget basiert auf Qwt framework (http://qwt.sf.net).</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>LGPL, for Qwt see Qwt License</source>
-        <translation>LGPL, für Qwt siehe Qwt-Lizenz</translation>
+        <translation type="vanished">LGPL, für Qwt siehe Qwt-Lizenz</translation>
     </message>
 </context>
 </TS>

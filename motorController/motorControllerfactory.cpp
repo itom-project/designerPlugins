@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2018, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2018, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -24,7 +24,7 @@
 * \file motorControllerFactory.cpp
 * \brief In this file the functions of the factory for the MotorController-Widget are defined
 *
-*    The MotorController-Class defines a widget for generic motor monitoring and controll. The following files are
+*    The MotorController-Class defines a widget for generic motor monitoring and control. The following files are
 *   needed: MotorController.cpp, MotorController.h, MotorControllerFactory.h, MotorControllerFactory.cpp
 *
 *\sa MotorController, MotorControllerFactory, MotorController.h
@@ -36,11 +36,20 @@
 
 #include <QtCore/QtPlugin>
 #include "motorControllerfactory.h"
+#include "pluginVersion.h"
+#include "gitVersion.h"
 
 //-----------------------------------------------------------------------------------------------
 MotorControllerFactory::MotorControllerFactory(QObject *parent)
     : QObject(parent)
 {
+    m_author = PLUGIN_AUTHOR;
+    m_version = PLUGIN_VERSION;
+    m_minItomVer = PLUGIN_MIN_ITOM_VERSION;
+    m_maxItomVer = PLUGIN_MAX_ITOM_VERSION;
+    m_license = QObject::tr(PLUGIN_LICENCE);
+    m_aboutThis = QObject::tr(GITVERSION);
+
     initialized = false;
 }
 //-----------------------------------------------------------------------------------------------

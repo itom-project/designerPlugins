@@ -1,8 +1,8 @@
 /* ********************************************************************
    itom measurement system
    URL: http://www.uni-stuttgart.de/ito
-   Copyright (C) 2022, Institut fuer Technische Optik (ITO),
-   Universitaet Stuttgart, Germany
+   Copyright (C) 2022, Institut für Technische Optik (ITO),
+   Universität Stuttgart, Germany
 
    This file is part of itom.
 
@@ -424,7 +424,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(
             }
             else
             {
-                retval += RetVal(retError, 0, "recieved invalid bounds.");
+                retval += RetVal(retError, 0, "received invalid bounds.");
             }
         }
 
@@ -435,7 +435,7 @@ RetVal DataObjectSeriesDataXY::updateDataObject(
 
             if (unit != "" ||
                 description !=
-                    "") // xVec value description dominates over source axis- and unit decription
+                    "") // xVec value description dominates over source axis- and unit description
             {
                 if (description == "")
                 {
