@@ -4926,7 +4926,7 @@ ito::RetVal TwipOGLWidget::setInvalidImage(QSharedPointer< ito::DataObject > inv
 //----------------------------------------------------------------------------------------------------------------------------------
 template<typename _Tp> cv::Mat* TwipOGLWidget::newMatFromComplex(const cv::Mat* inData)
 {
-    cv::error(cv::Exception(CV_StsAssert, "newMatFromComplex only defined for complex type", "", __FILE__, __LINE__));
+    cv::error(CV_StsAssert, "newMatFromComplex only defined for complex type", "", __FILE__, __LINE__);
     return new cv::Mat(inData->rows, inData->cols, inData->type() );
 }
 
