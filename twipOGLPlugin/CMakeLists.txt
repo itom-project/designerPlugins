@@ -59,7 +59,12 @@ else()
 endif()
 
 itom_find_package_qt(ON Core Widgets Xml Designer LinguistTools OpenGL OpenGLExtensions)
-find_package(OpenCV COMPONENTS core imgproc REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc REQUIRED)
+
+# Verify OpenCV version is 3.0 or higher
+if(OpenCV_VERSION VERSION_LESS "3.0")
+	message(FATAL_ERROR "OpenCV version ${OpenCV_VERSION} found, but version 3.0 or higher is required (supports 3.x, 4.x, and 5.0+)")
+endif()
 find_package(OpenGL REQUIRED)
 
 if(BUILD_WITH_PCL)
