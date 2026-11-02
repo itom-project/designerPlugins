@@ -386,7 +386,8 @@ class ITOM1DPLOT_EXPORT Itom1DQwtPlot : public ItomQwtDObjFigure
         ito::RetVal setXData(QSharedPointer<ito::DataObject> data);
         QSharedPointer<ito::DataObject> getXData() const;
 
-
+        // overwrite of AbstractDObjFigure
+        Qt::Axis getValueAxis() const;
 
         friend Plot1DWidget;
 

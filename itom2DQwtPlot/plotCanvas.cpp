@@ -242,9 +242,13 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     mainTb->addAction(m_pActSave);
     mainTb->addAction(m_pActPrint);
     mainTb->addSeparator();
-    mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActProperties);
     mainTb->addAction(m_pActCamParameters);
+    if (parent)
+    {
+        mainTb->addAction(parent->actCameraChannelSelector());
+    }
+    mainTb->addAction(m_pActHome);
     mainTb->addAction(m_pActPan);
     mainTb->addAction(m_pActZoom);
     mainTb->addAction(m_pActAspectRatio);
@@ -267,6 +271,7 @@ PlotCanvas::PlotCanvas(PlotCanvas::InternalData *m_pData, ItomQwtDObjFigure * pa
     mainTb->addAction(m_pActPlaneSelector);
     mainTb->addAction(m_pActCmplxSwitch);
     mainTb->addAction(m_pActCoordinates);
+
 
     QMenu *menuFile = new QMenu(tr("File"), guiParent);
     menuFile->addAction(m_pActSave);
@@ -761,6 +766,8 @@ void PlotCanvas::createActions()
     m_pActPlaneSelector->setObjectName("planeSelector");
     m_pActPlaneSelector->setVisible(false);
     connect(planeSelector, SIGNAL(valueChanged(int)), this, SLOT(mnuPlaneSelector(int)));
+
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -1317,12 +1324,20 @@ ito::RetVal PlotCanvas::cutVolume(const ito::DataObject* dataObj, const QVector<
     return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
+void PlotCanvas::refreshPlot(const ito::DataObject *dObj, int plane /*= -1*/, const QVector<QPointF> bounds /*=QVector<QPointF>()*/ )
 {
+    qDebug() << "start refreshPlot";
     ito::RetVal retval;
+
+    // changeNo(0) : nothing changed,
+    // changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...),
+    // changeData (2): data changed (dimensions, sizes, other data object...)
+    ito::uint8 updateState = 0;
 
     if (m_isRefreshingPlot || !m_pData)
     {
+        m_dObjPtr = dObj; // todo: unsure if correct here.
+
         return;
     }
 
@@ -1344,9 +1359,6 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
     }
 
     m_isRefreshingPlot = true;
-
-    ito::uint8 updateState = 0; //changeNo (0): nothing changed, changeAppearance (1): appearance changed (yAxisFlipped, cmplxFlag, plane...), changeData (2): data changed (dimensions, sizes, other data object...)
-
     m_dObjPtr = dObj;
 
     //QString valueLabel, axisLabel, title;
@@ -1569,7 +1581,10 @@ void PlotCanvas::refreshPlot(const ito::DataObject *dObj,int plane /*= -1*/, con
     }
 
     m_isRefreshingPlot = false;
-    replot();
+    replot(); //todo: check if correct
+    //repaint();
+
+    //qDebug() << "end refreshPlot";
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
