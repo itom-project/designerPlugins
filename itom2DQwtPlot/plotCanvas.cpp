@@ -3863,94 +3863,74 @@ void PlotCanvas::mnuLineCutMode(QAction *action)
         if (ito::isFinite(min) && ito::isFinite(max))
         {
 
-            double dy = maxLoc[1] - minLoc[1];
-            double dx = maxLoc[2] - minLoc[2];
+            const double x0 = minLoc[2];
+            const double y0 = minLoc[1];
+            const double dy = maxLoc[1] - minLoc[1];
+            const double dx = maxLoc[2] - minLoc[2];
 
             if (!ito::isNotZero(dy) && !ito::isNotZero(dx))
             {
-                y.setMinimum((y.rmin() + y.rmax()) / 2.0);
-                y.setMaximum(y.rmin());
-            }
-            else if (fabs(dx) < std::numeric_limits<double>::epsilon() * 100)
-            {
-                y.setMinimum(minLoc[1]);
-                y.setMaximum(maxLoc[1]);
-            }
-            else if (fabs(dy) < std::numeric_limits<double>::epsilon() * 100)
-            {
-                x.setMinimum(minLoc[2]);
-                x.setMaximum(maxLoc[2]);
+                // minimum and maximum at the same location (e.g. constant data):
+                // horizontal line through this location
+                QwtInterval xIntervalDataObj = m_rasterData->interval(Qt::XAxis);
+                x.setMinimum(std::max((double)x.minimum(), xIntervalDataObj.minValue()));
+                x.setMaximum(std::min((double)x.maximum(), xIntervalDataObj.maxValue()));
+                y.setMinimum(y0);
+                y.setMaximum(y0);
             }
             else
             {
-                double b = minLoc[1] - dy / dx * minLoc[2];
+                // clip the infinite line through the minimum and maximum location
+                // to the intersection of the visible area and the area of the data object.
+                // The line is parametrized by p(t) = p0 + t * (p1 - p0), with p0 = location of
+                // the minimum and p1 = location of the maximum.
+                const QwtInterval xIntervalDataObj = m_rasterData->interval(Qt::XAxis);
+                const QwtInterval yIntervalDataObj = m_rasterData->interval(Qt::YAxis);
 
-                double xbmin = std::min(x.rmin(), x.rmax());
-                double xbmax = std::max(x.rmin(), x.rmax());
-                double ybmin = std::min(y.rmin(), y.rmax());
-                double ybmax = std::max(y.rmin(), y.rmax());
+                const double xbmin = std::max(
+                    std::min(x.minimum(), x.maximum()), xIntervalDataObj.minValue());
+                const double xbmax = std::min(
+                    std::max(x.minimum(), x.maximum()), xIntervalDataObj.maxValue());
+                const double ybmin = std::max(
+                    std::min(y.minimum(), y.maximum()), yIntervalDataObj.minValue());
+                const double ybmax = std::min(
+                    std::max(y.minimum(), y.maximum()), yIntervalDataObj.maxValue());
 
-                double xmin = (ybmin - b) / (dy / dx);
-                double xmax = (ybmax - b) / (dy / dx);
-                double ymin = xbmin * (dy / dx) + b;
-                double ymax = xbmax * (dy / dx) + b;
+                double tmin = -std::numeric_limits<double>::max();
+                double tmax = std::numeric_limits<double>::max();
 
-                if (dx / dy > 0)
+                if (ito::isNotZero(dx))
                 {
-                    if (xmin < xbmin)
-                    {
-                        x.setMinimum(xbmin);
-                        y.setMinimum(ymin);
-                    }
-                    else
-                    {
-                        x.setMinimum(xmin);
-                        y.setMinimum(ybmin);
-                    }
-
-                    if (xmax > xbmax)
-                    {
-                        x.setMaximum(xbmax);
-                        y.setMaximum(ymax);
-                    }
-                    else
-                    {
-                        x.setMaximum(xmax);
-                        y.setMaximum(ybmax);
-                    }
-                }
-                else
-                {
-                    if (xmin > xbmax)
-                    {
-                        x.setMinimum(xbmin);
-                        y.setMinimum(ymin);
-                    }
-                    else
-                    {
-                        x.setMinimum(xmin);
-                        y.setMinimum(ybmin);
-                    }
-
-                    if (xmax < xbmin)
-                    {
-                        x.setMaximum(xbmax);
-                        y.setMaximum(ymax);
-                    }
-                    else
-                    {
-                        x.setMaximum(xmax);
-                        y.setMaximum(ybmax);
-                    }
+                    const double t1 = (xbmin - x0) / dx;
+                    const double t2 = (xbmax - x0) / dx;
+                    tmin = std::max(tmin, std::min(t1, t2));
+                    tmax = std::min(tmax, std::max(t1, t2));
                 }
 
+                if (ito::isNotZero(dy))
+                {
+                    const double t1 = (ybmin - y0) / dy;
+                    const double t2 = (ybmax - y0) / dy;
+                    tmin = std::max(tmin, std::min(t1, t2));
+                    tmax = std::min(tmax, std::max(t1, t2));
+                }
+
+                if (tmin > tmax || xbmin > xbmax || ybmin > ybmax)
+                {
+                    // the line does not cross the visible part of the data object:
+                    // use the line segment between the minimum and maximum
+                    tmin = 0.0;
+                    tmax = 1.0;
+                }
+
+                // x and y are only used as containers for the start (rmin) and end (rmax) point
+                // of the line. Do not use setMinimum / setMaximum, since they enforce min <= max,
+                // which would collapse lines with a negative slope.
+                x.rmin() = x0 + tmin * dx;
+                y.rmin() = y0 + tmin * dy;
+                x.rmax() = x0 + tmax * dx;
+                y.rmax() = y0 + tmax * dy;
             }
-            /*
-            x.setX(minLoc[2]);
-            x.setY(maxLoc[2]);
-            y.setX(minLoc[1]);
-            y.setY(maxLoc[1]);
-            */
         }
         break;
     case 1: //horizontal line through global minimum

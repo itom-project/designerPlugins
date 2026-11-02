@@ -687,20 +687,48 @@ RetVal DataObjectSeriesData::updateDataObject(const ito::DataObject* dataObj, QV
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
+/**
+ * @brief Determines the range of data point indices that fall within the visible x-axis interval.
+ *
+ * Maps the physical x-range currently shown by @p xMap onto the corresponding index range of the
+ * underlying, regularly sampled data object. The physical start/end values of the scale map are
+ * converted into fractional indices using the data object's physical start position and step size,
+ * and are then clamped to the valid index interval [0, nrPoints - 1].
+ *
+ * If the data holds an explicit list of points (m_d.points), the full index range is returned instead.
+ *
+ * @param xMap       The scale map describing the mapping between physical x-values and paint coordinates.
+ *                   Its s1()/s2() values define the visible physical x-interval.
+ * @param clipMargin If true, the range is clipped tightly to the visible interval. If false, one extra
+ *                   point on each side is included so that connecting lines to off-screen points remain drawn.
+ *
+ * @return A QPoint whose x() component is the first (start) index and whose y() component is the last
+ *         (end) index of the visible data range.
+ */
 QPoint DataObjectSeriesData::indexRange(const QwtScaleMap &xMap, bool clipMargin) const
 {
     if (m_pDataObj && m_d.valid && m_d.points.size() == 0)
     {
-        int start, end;
-        double xMapStartPhys = std::min(xMap.s1(), xMap.s2());
-        double xMapEndPhys = std::max(xMap.s1(), xMap.s2());
-        double start_ = (xMapStartPhys - m_d.startPhys) / m_d.stepSizePhys;
-        double end_ = (xMapEndPhys - m_d.startPhys) / m_d.stepSizePhys;
-        // z-stack with negative stepSize does not get plot due to bounding of values below, if we do not do order checking here
-        if (end_ < start_)
-            qSwap(start_, end_);
-        start = clipMargin ? qBound(0, qCeil(start_), m_d.nrPoints - 1) : qBound(0, qCeil(start_) - 1, m_d.nrPoints - 1);
-        end = clipMargin ? qBound(start, qFloor(end_), m_d.nrPoints - 1) : qBound(start, qFloor(end_) + 1, m_d.nrPoints - 1);
+        int start = 0;
+        int end = 0;
+
+        if (m_d.nrPoints > 1 && std::abs(m_d.stepSizePhys) >= std::numeric_limits<float>::epsilon())
+        {
+            double xMapStartPhys = std::min(xMap.s1(), xMap.s2());
+            double xMapEndPhys = std::max(xMap.s1(), xMap.s2());
+            double start_ = (xMapStartPhys - m_d.startPhys) / m_d.stepSizePhys;
+            double end_ = (xMapEndPhys - m_d.startPhys) / m_d.stepSizePhys;
+            // z-stack with negative stepSize does not get plot due to bounding of values below, if
+            // we do not do order checking here
+            if (end_ < start_)
+                qSwap(start_, end_);
+
+            start = clipMargin ? qBound(0, qCeil(start_), m_d.nrPoints - 1)
+                               : qBound(0, qCeil(start_) - 1, m_d.nrPoints - 1);
+            end = clipMargin ? qBound(start, qFloor(end_), m_d.nrPoints - 1)
+                             : qBound(start, qFloor(end_) + 1, m_d.nrPoints - 1);
+        }
+
         return QPoint(start, end);
     }
     else
